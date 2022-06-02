@@ -9,10 +9,16 @@ const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 function LoginHooks() {
   const onSuccess = (res) => {
     console.log('Login Success: currentUser:', res.profileObj);
+    console.log('Login Success: token:', res.tokenObj);
     alert(
       `Logged in successfully welcome ${res.profileObj.name} 😍. \n See console for full profile object.`
     );
-    refreshTokenSetup(res);
+
+    if (res.tokenObj) {
+      localStorage.setItem("user_token", JSON.stringify(res.tokenObj));
+    }
+
+    //refreshTokenSetup(res);
   };
 
   const onFailure = (res) => {

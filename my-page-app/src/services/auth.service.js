@@ -21,6 +21,10 @@ const API_URL = "http://localhost:8080/api/auth/";
 const getCurrentUser = () => {
   return JSON.parse(localStorage.getItem("user"));
 };
+
+const getCurrentUserToken = () => {
+  return JSON.parse(localStorage.getItem("user_token"));
+};
 const AuthService = {
 //   register,
 //   login,

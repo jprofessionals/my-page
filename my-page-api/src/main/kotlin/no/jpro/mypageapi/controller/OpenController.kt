@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController()
-@RequestMapping("test")
-class TestController {
-    @GetMapping("")
-    fun sayHelloSecure(): String? {
-        return String.format("Hello from the secure API.")
+@RequestMapping("open")
+class OpenController {
+    @GetMapping("test")
+    fun sayHello(): String? {
+        return String.format("Hello from the API.")
     }
 }
