@@ -10,18 +10,24 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 class MyPageApiApplication
 
 fun main(args: Array<String>) {
-	runApplication<MyPageApiApplication>(*args)
+    runApplication<MyPageApiApplication>(*args)
 }
 
 @EnableWebSecurity
 class SpringSecurityConfiguration : WebSecurityConfigurerAdapter() {
-	override fun configure(http: HttpSecurity) {
-		http.authorizeRequests()
-			.antMatchers("/open/**").permitAll()
-			.antMatchers("/**").authenticated()
-			.anyRequest().authenticated()
-			.and()
-			.oauth2ResourceServer()
-			.jwt()
-	}
+    override fun configure(http: HttpSecurity) {
+        http.authorizeRequests()
+            .antMatchers(
+                "/open/**",
+                "/v3/api-docs",
+                "/v3/api-docs/**",
+                "/swagger-ui.html",
+                "/swagger-ui/**",
+            ).permitAll()
+            .antMatchers("/**").authenticated()
+            .and()
+            .csrf().disable()
+            .oauth2ResourceServer()
+            .jwt()
+    }
 }
