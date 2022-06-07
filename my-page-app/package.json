@@ -12,7 +12,9 @@
     "react-google-login": "^5.2.2",
     "react-router-dom": "^6.3.0",
     "react-scripts": "^2.1.3",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "bootstrap": "^5.1.3",
+    "react-bootstrap": "^2.4.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -37,6 +39,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.0.24"
   },
   "proxy": "http://localhost:8080"
 }
