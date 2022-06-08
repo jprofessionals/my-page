@@ -1,4 +1,7 @@
 import React from "react";
+import { Router, Link } from "react-router-dom";
+import Home from "../home";
+import Hjem from "./Hjem";
 
 function Navbar() {
   return (
