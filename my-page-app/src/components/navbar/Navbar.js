@@ -1,6 +1,9 @@
 import React from "react";
+import { Router, Link } from "react-router-dom";
+import Home from "../home";
+import Hjem from "./Hjem";
 
-const Navbar = () => {
+function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       {/* <a className="navbar-brand" href="#">
@@ -21,9 +24,9 @@ const Navbar = () => {
       <div className="collapse navbar-collapse" id="navbarNavDropdown">
         <ul className="navbar-nav">
           <li className="nav-item active">
-            <a className="nav-link" href="#">
+            <Link to="/hjem" className="nav-link" href="#">
               Hjem
-            </a>
+            </Link>
           </li>
           <li className="nav-item">
             <a className="nav-link" href="#">
@@ -39,6 +42,6 @@ const Navbar = () => {
       </div>
     </nav>
   );
-};
+}
 
 export default Navbar;
