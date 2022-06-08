@@ -5,6 +5,8 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Hjem from "./components/navbar/Hjem";
+import MyPage from "./components/navbar/MyPage";
+import Economy from "./components/navbar/Economy";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -13,6 +15,8 @@ root.render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/hjem" element={<Hjem />} />
+        <Route path="/min_side" element={<MyPage />} />
+        <Route path="/mine_utlegg" element={<Economy />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

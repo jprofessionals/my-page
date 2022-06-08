@@ -15,3 +15,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.color-nav {
+  background-color: orange;
+}
+
+.nav-link:hover {
+  color: white !important;
+  transform: scale(1.1);
+}
+.nav-link {
+  color: black !important;
+}

@@ -5,7 +5,8 @@ import Hjem from "./Hjem";
 
 function Navbar() {
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+    <nav className="color-nav navbar-expand-sm navbar-light">
+      {/* <nav className="navbar navbar-expand-lg navbar-light bg-light"> */}
       {/* <a className="navbar-brand" href="#">
         Navbar
       </a> */}
@@ -29,6 +30,17 @@ function Navbar() {
             </Link>
           </li>
           <li className="nav-item">
+            <Link to="/min_side" className="nav-link" href="#">
+              Min side
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/mine_utlegg" className="nav-link" href="#">
+              Mine utlegg
+            </Link>
+          </li>
+          {/* 
+          <li className="nav-item">
             <a className="nav-link" href="#">
               Min profil
             </a>
@@ -37,7 +49,7 @@ function Navbar() {
             <a className="nav-link" href="#">
               Mine utlegg
             </a>
-          </li>
+          </li> */}
         </ul>
       </div>
     </nav>
