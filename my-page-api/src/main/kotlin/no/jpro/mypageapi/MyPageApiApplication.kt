@@ -1,11 +1,16 @@
 package no.jpro.mypageapi
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.servers.Server
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 
+@OpenAPIDefinition(
+    servers = [Server(url = "/api")]
+)
 @SpringBootApplication
 class MyPageApiApplication
 
