@@ -16,11 +16,16 @@ Install gcloud cli - https://cloud.google.com/sdk/docs/install & https://cloud.g
 
 `gcloud config set project my-page-jpro`
 
-# Build
-...
+### API
+Running the API locally (in IDEA or on commandline) requires a database - activate the profile `h2` or `local` (the `local`profile requires a running MySQL db (see application-local.properties for connection details))
 
-# Running locally
-Run the api in IDEA and the app with the command `npm start`, the api will run on  localhost:8080 and the app on localhost:3000 (with a proxy to the local api).
+The api will run on  localhost:8080
+
+### Local MySQl
+`docker run -e MYSQL_USER=mypage -e MYSQL_PASSWORD=mypage -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=mypage -p 3306:3306 mysql:5.7.8`
+
+###
+Build the app with `npm install` and run it with `npm start. The app on localhost:3000 (with a proxy to the local api).
 
 # Deploy
 Both the API and the app runs in the same Google App Engine 
