@@ -1,17 +1,15 @@
 import React from "react";
 import { Nav, Navbar, NavDropdown } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Router, Link } from "react-router-dom";
+import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
 
 export default function NavBar() {
-  const mql = window.matchMedia("(max-width: 575px)");
-
-  let mobileView = mql.matches;
-
   return (
     <Navbar className="navbar" collapseOnSelect expand="sm" variant="dark">
-      <Navbar.Brand href="#home">jPro</Navbar.Brand>
-      <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+      <Navbar.Brand href="#home">
+        <img className="logo" src={jPro_logo_transparent} alt="jPro" />
+      </Navbar.Brand>
+      <Navbar.Toggle className="button" aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse className="navtext" id="responsive-navbar-nav">
         <Nav className="mr-auto">
           <Nav.Link href="/hjem">Hjem</Nav.Link>

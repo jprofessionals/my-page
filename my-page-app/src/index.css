@@ -16,40 +16,42 @@ code {
     monospace;
 }
 
-.color-nav {
-  background-color: orange;
-  height: 80px;
-}
-
 .nav-link:hover {
-  color: white !important;
+  color: #ff7a0c !important;
   transform: scale(1.1);
 }
 .nav-link {
-  color: black !important;
+  color: #fff !important;
   text-align: center;
   font-size: 18px;
   margin-left: 5px;
   margin-right: 5px;
-  
 }
 
 .navbar-nav.navbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translatex(-50%);
+  position: absolute;
+  left: 50%;
+  transform: translatex(-50%);
 }
 
 .navbar {
-    background-color: orange;
+  background-color: #2f4f4f;
 }
 
 .navtext {
-    width: 100%;
-    position: relative;
-    left: 50%;
-    transform: translatex(-50%);
-    text-align: center;
+  width: 100%;
+  position: relative;
+  left: 50%;
+  transform: translatex(-50%);
+  text-align: center;
 }
 
+.logo {
+  height: 30px;
+  width: 40px;
+  margin-left: 10px;
+}
 
+.button {
+  margin-right: 10px;
+}
