@@ -1,0 +1,35 @@
+.navbar {
+  background-color: #2f4f4f;
+
+  .navbar-nav {
+    a {
+      color: #fff !important;
+      text-align: center;
+      font-size: 18px;
+      margin-left: 5px;
+      margin-right: 5px;
+      &:hover {
+        color: #ff7a0c !important;
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .navtext {
+    width: 100%;
+    position: relative;
+    left: 50%;
+    transform: translatex(-50%);
+    text-align: center;
+  }
+
+  img {
+    height: 30px;
+    width: 40px;
+    margin-left: 10px;
+  }
+
+  button {
+    margin-right: 10px;
+  }
+}
