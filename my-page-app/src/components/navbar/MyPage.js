@@ -1,9 +1,9 @@
 import React from "react";
-import Navbar from "./Navbar";
+import NavBar from "./NavBar";
 function MyPage() {
   return (
     <div>
-      <Navbar />
+      <NavBar />
       <h3>Min Side</h3>
     </div>
   );

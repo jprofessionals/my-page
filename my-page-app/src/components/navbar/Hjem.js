@@ -1,9 +1,9 @@
 import React from "react";
-import Navbar from "./Navbar";
+import NavBar from "./NavBar";
 function Hjem() {
   return (
     <div>
-      <Navbar />
+      <NavBar />
       <h3>Hjem</h3>
     </div>
   );

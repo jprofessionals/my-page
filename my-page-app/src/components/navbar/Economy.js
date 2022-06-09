@@ -1,9 +1,9 @@
 import React from "react";
-import Navbar from "./Navbar";
+import NavBar from "./NavBar";
 function Economy() {
   return (
     <div>
-      <Navbar />
+      <NavBar />
       <h3>Mine Utlegg</h3>
     </div>
   );

@@ -18,6 +18,7 @@ code {
 
 .color-nav {
   background-color: orange;
+  height: 80px;
 }
 
 .nav-link:hover {
@@ -26,4 +27,29 @@ code {
 }
 .nav-link {
   color: black !important;
+  text-align: center;
+  font-size: 18px;
+  margin-left: 5px;
+  margin-right: 5px;
+  
 }
+
+.navbar-nav.navbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translatex(-50%);
+}
+
+.navbar {
+    background-color: orange;
+}
+
+.navtext {
+    width: 100%;
+    position: relative;
+    left: 50%;
+    transform: translatex(-50%);
+    text-align: center;
+}
+
+

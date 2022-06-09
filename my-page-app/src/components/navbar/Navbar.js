@@ -1,59 +1,24 @@
 import React from "react";
+import { Nav, Navbar, NavDropdown } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 import { Router, Link } from "react-router-dom";
-import Home from "../home";
-import Hjem from "./Hjem";
 
-function Navbar() {
+export default function NavBar() {
+  const mql = window.matchMedia("(max-width: 575px)");
+
+  let mobileView = mql.matches;
+
   return (
-    <nav className="color-nav navbar-expand-sm navbar-light">
-      {/* <nav className="navbar navbar-expand-lg navbar-light bg-light"> */}
-      {/* <a className="navbar-brand" href="#">
-        Navbar
-      </a> */}
-      <button
-        className="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNavDropdown"
-        aria-controls="navbarNavDropdown"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span className="navbar-toggler-icon"></span>
-      </button>
-
-      <div className="collapse navbar-collapse" id="navbarNavDropdown">
-        <ul className="navbar-nav">
-          <li className="nav-item active">
-            <Link to="/hjem" className="nav-link" href="#">
-              Hjem
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/min_side" className="nav-link" href="#">
-              Min side
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/mine_utlegg" className="nav-link" href="#">
-              Mine utlegg
-            </Link>
-          </li>
-          {/* 
-          <li className="nav-item">
-            <a className="nav-link" href="#">
-              Min profil
-            </a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link" href="#">
-              Mine utlegg
-            </a>
-          </li> */}
-        </ul>
-      </div>
-    </nav>
+    <Navbar className="navbar" collapseOnSelect expand="sm" variant="dark">
+      <Navbar.Brand href="#home">jPro</Navbar.Brand>
+      <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+      <Navbar.Collapse className="navtext" id="responsive-navbar-nav">
+        <Nav className="mr-auto">
+          <Nav.Link href="/hjem">Hjem</Nav.Link>
+          <Nav.Link href="/min_side">Min side</Nav.Link>
+          <Nav.Link href="/mine_utlegg">Mine utlegg</Nav.Link>
+        </Nav>
+      </Navbar.Collapse>
+    </Navbar>
   );
 }
-
-export default Navbar;

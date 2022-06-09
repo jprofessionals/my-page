@@ -2,14 +2,14 @@ import React from "react";
 import "./App.css";
 import LoginHooks from "./components/login/LoginHooks";
 import LogoutHooks from "./components/login/LogoutHooks";
-import Navbar from "./components/navbar/Navbar";
 import Home from "./components/home";
 import "bootstrap/dist/css/bootstrap.min.css";
+import NavBar from "./components/navbar/NavBar";
 
 function App() {
   return (
     <div className="App">
-      <Navbar />
+      <NavBar />
       <LoginHooks />
       <LogoutHooks />
       <Home />

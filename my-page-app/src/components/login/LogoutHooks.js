@@ -1,17 +1,17 @@
-import React from 'react';
-import { useGoogleLogout } from 'react-google-login';
+import React from "react";
+import { useGoogleLogout } from "react-google-login";
 
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 function LogoutHooks() {
   const onLogoutSuccess = (res) => {
     localStorage.removeItem("user_token");
-    console.log('Logged out Success');
-    alert('Logged out Successfully ✌');
+    console.log("Logged out Success");
+    alert("Logged out Successfully ✌");
   };
 
   const onFailure = () => {
-    console.log('Handle failure cases');
+    console.log("Handle failure cases");
   };
 
   const { signOut } = useGoogleLogout({
