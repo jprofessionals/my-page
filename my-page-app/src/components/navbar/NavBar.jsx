@@ -16,6 +16,9 @@ export default function NavBar() {
           <Nav.Link href="/hjem">Hjem</Nav.Link>
           <Nav.Link href="/min_side">Min side</Nav.Link>
           <Nav.Link href="/mine_utlegg">Mine utlegg</Nav.Link>
+          <Nav.Link as="a" href="https://intranet.jpro.no" target="_blank">
+            Intranett
+          </Nav.Link>
         </Nav>
       </Navbar.Collapse>
     </Navbar>
