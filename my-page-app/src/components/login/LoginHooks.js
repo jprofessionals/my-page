@@ -1,15 +1,15 @@
-import React from 'react';
-import { useGoogleLogin } from 'react-google-login';
+import React from "react";
+import { useGoogleLogin } from "react-google-login";
 
 // refresh token
-import { refreshTokenSetup } from '../../utils/refreshToken';
+import { refreshTokenSetup } from "../../utils/refreshToken";
 
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 function LoginHooks() {
   const onSuccess = (res) => {
-    console.log('Login Success: currentUser:', res.profileObj);
-    console.log('Login Success: token:', res.tokenObj);
+    console.log("Login Success: currentUser:", res.profileObj);
+    console.log("Login Success: token:", res.tokenObj);
     alert(
       `Logged in successfully welcome ${res.profileObj.name} 😍. \n See console for full profile object.`
     );
@@ -22,7 +22,7 @@ function LoginHooks() {
   };
 
   const onFailure = (res) => {
-    console.log('Login failed: res:', res);
+    console.log("Login failed: res:", res);
     alert(
       `Failed to login. 😢 Please ping this to repo owner twitter.com/sivanesh_fiz`
     );
@@ -33,7 +33,7 @@ function LoginHooks() {
     onFailure,
     clientId,
     isSignedIn: true,
-    accessType: 'offline',
+    accessType: "offline",
     // responseType: 'code',
     // prompt: 'consent',
   });
