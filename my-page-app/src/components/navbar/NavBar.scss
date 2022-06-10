@@ -2,14 +2,14 @@
   background-color: #2f4f4f;
 
   .navbar-nav {
-    a {
-      color: #fff !important;
+    a.nav-link {
+      color: #fff;
       text-align: center;
       font-size: 18px;
       margin-left: 5px;
       margin-right: 5px;
       &:hover {
-        color: #ff7a0c !important;
+        color: #ff7a0c;
         transform: scale(1.1);
       }
     }

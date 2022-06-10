@@ -1,6 +1,6 @@
 import React from "react";
 import NavBar from "./NavBar";
-function Hjem() {
+function HomePage() {
   return (
     <div>
       <NavBar />
@@ -8,4 +8,4 @@ function Hjem() {
     </div>
   );
 }
-export default Hjem;
+export default HomePage;

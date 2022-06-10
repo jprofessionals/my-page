@@ -1,6 +1,5 @@
 import React from "react";
-import { Nav, Navbar, NavDropdown } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { Nav, Navbar } from "react-bootstrap";
 import "./NavBar.scss";
 import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
 
