@@ -14,7 +14,9 @@ class UserMapper() : Mapper<UserDTO, User, Jwt> {
         user.name,
         user.givenName,
         user.familyName,
-        user.icon
+        user.icon,
+        user.nickName,
+        user.startDate
     )
 
     override fun fromJwtToUser(jwt: Jwt): User = User(
