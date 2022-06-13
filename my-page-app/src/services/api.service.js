@@ -11,8 +11,8 @@ const getTestApiOpen = () => {
 const getEmployees = () => {
   return axios.get(API_URL + "open/employees");
 };
-const postEmployees = () => {
-  return axios.post(API_URL + "open/employees", {});
+const postEmployees = (data) => {
+  return axios.post(API_URL + "open/employees", data);
 };
 
 const ApiService = {

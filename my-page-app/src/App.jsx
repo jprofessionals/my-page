@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, refetch, Component } from "react";
 import "./App.css";
 import LoginHooks from "./components/login/LoginHooks";
 import LogoutHooks from "./components/login/LogoutHooks";
@@ -33,64 +33,68 @@ import { ListGroup, NavItem } from "react-bootstrap";
 //   );
 // };
 
-function App() {
+
+
+function App(props) {
     const [count, setCount] = useState(0);
     const [api_response, setApiResponse] = useState([]);
     const [employeelist, setEmployees] = useState([]);
     const [employeeName, setEmployeeName] = useState([]);
     const [alert, setAlert] = useState(false);
+    // const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [userToken, setUserToken] = useState([]);
+
+    const getCallBackValue = () => {
+        alert("HEI dette er callback")
+    }
 
 
+
+   
 
     useEffect(() => {
-        ApiService.getTestApiOpen().then(stuff => {
-                setApiResponse(stuff)
+        if(employeelist.length && !alert) {
+            return;
+        }
+        ApiService.getEmployees().then(employees => {
+                setEmployees(employees.data)
         })
-        },[])
+        },[alert,employeelist])
 
         useEffect(() => {
-            ApiService.getEmployees().then(employees => {
-                // debugger
-                    setEmployees(employees.data)
+            if(alert) {
+                setTimeout(() => {
+                    setAlert(false);
+                },1000)
+            }
+        },[alert])
+
+
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            const inputobj = {
+                "name": employeeName
+            }
+            const authenticationObj = LoginHooks.authentication;
+            console.log(localStorage)
+            // console.log(isAuthenticated)
+            // console.log(isAuthenticated);
+            // console.log(ApiService.teststreng)
+            ApiService.postEmployees(inputobj).then(() => {
+                setEmployeeName('');
+                setAlert(true);
             })
-            },[])
+        };
 
-
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                // console.log(employeeName)
-                const inputobj = {
-                    "name": employeeName
-                }
-                console.log(inputobj)
-                // ApiService.postEmployees(inputobj)
-                ApiService.postEmployees({
-                    name: employeeName}).then((response) => {
-                    console.log(response);
-                }, (error) => {
-                    console.log(error);
-                });
-            };
-
-
-        console.log(employeelist)
-    
-
-    // useEffect(() => {
-    //     console.log('useEffect ran. count is: ', count);
-    //   }, [count]);
-
-    //   return (
-    //     <div>
-    //       <h2>Count: {count}</h2>
-    //       <button onClick={() => setCount(count + 1)}>Increment</button>
-    //     </div>
-    //   );
     return (
-        <div><h2>Employees</h2>
-        <ul>
-            {employeelist.map(employee => <li key = {employee.name}>{employee.name}</li>)}
-        </ul>
+        <div>
+            <><NavBar />
+            <LoginHooks callBackValue={() => getCallBackValue}  />
+            <LogoutHooks />
+            <h2>Employees</h2><ul>
+                {employeelist.map(employee => <li key={employee.name}>{employee.name}</li>)}
+            </ul></>
+        {alert && <h2>Submit Successful</h2>}
         <form onSubmit={handleSubmit}>
             <label>
                 <p>New employee</p>
@@ -100,6 +104,8 @@ function App() {
         </form>
         </div>
     );
-    };
+    
+
+}
 
 export default App;
