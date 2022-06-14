@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useGoogleLogout } from "react-google-login";
 
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -7,7 +7,6 @@ const LogoutHooks = (props) => {
   const onLogoutSuccess = (res) => {
     localStorage.removeItem("user_token");
     console.log("Logged out Success");
-    alert("Logged out Successfully ✌");
     props.authentication();
   };
 
