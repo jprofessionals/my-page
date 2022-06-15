@@ -3,6 +3,7 @@ import "./App.scss";
 import LoginHooks from "./components/login/LoginHooks";
 import LogoutHooks from "./components/login/LogoutHooks";
 import NavBar from "./components/navbar/NavBar";
+import Home from "./components/home";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
