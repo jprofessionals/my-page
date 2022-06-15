@@ -16,7 +16,7 @@ const LoginHooks = (props) => {
     if (res.tokenObj) {
       localStorage.setItem("user_token", JSON.stringify(res.tokenObj));
     }
-    props.authentication();
+    props.isAuthenticatedCallBack(true);
 
     //refreshTokenSetup(res);
   };

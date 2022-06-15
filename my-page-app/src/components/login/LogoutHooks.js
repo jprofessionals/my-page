@@ -7,7 +7,7 @@ const LogoutHooks = (props) => {
   const onLogoutSuccess = (res) => {
     localStorage.removeItem("user_token");
     console.log("Logged out Success");
-    props.authentication();
+    props.isAuthenticatedCallBack(false);
   };
 
   const onFailure = () => {
