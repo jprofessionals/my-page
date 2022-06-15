@@ -1,22 +1,24 @@
 package no.jpro.mypageapi.controller
 
-import no.jpro.mypageapi.model.Employee
-import no.jpro.mypageapi.model.User
+import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.repository.UserRepository
+import no.jpro.mypageapi.service.UserService
 import org.springframework.web.bind.annotation.*
-import java.security.Principal
 
 @RestController()
 @RequestMapping("test")
-class TestController(private val userRepository: UserRepository) {
+class TestController(private val userRepository: UserRepository, private val userService: UserService) {
     @GetMapping("")
-    fun sayHelloSecure(principal: Principal): String? {
+    fun sayHelloSecure(): String? {
         return String.format("Hello from the secure API.")
     }
 
-    @GetMapping("users")
-    fun getUsers(): List<User> = userRepository.findAll();
-
     @PostMapping("users")
-    fun createUser(@RequestBody user: User): User = userRepository.save(user)
+    fun createUser(@RequestBody userDTO: UserDTO): UserDTO {
+        return userService.createUser(userDTO)
+    }
+    @GetMapping("users")
+    fun getUsers(): List<UserDTO> = userService.getUsers();
+
+
 }

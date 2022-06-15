@@ -1,4 +1,4 @@
-package no.jpro.mypageapi.model
+package no.jpro.mypageapi.entity
 
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
