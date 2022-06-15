@@ -15,7 +15,7 @@
 	<description>my-page-api</description>
 	<properties>
 		<java.version>11</java.version>
-		<kotlin.version>1.6.21</kotlin.version>
+		<kotlin.version>1.7.0</kotlin.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -66,17 +66,17 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-data-rest</artifactId>
-			<version>1.6.8</version>
+			<version>1.6.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.6.8</version>
+			<version>1.6.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-kotlin</artifactId>
-			<version>1.6.8</version>
+			<version>1.6.9</version>
 		</dependency>
 
 	</dependencies>
@@ -88,7 +88,7 @@
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
 				<artifactId>appengine-maven-plugin</artifactId>
-				<version>2.2.0</version>
+				<version>2.4.3</version>
 				<configuration>
 					<version>1</version>
 					<projectId>my-page-jpro</projectId>
