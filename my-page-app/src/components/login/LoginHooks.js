@@ -1,6 +1,5 @@
 import React from "react";
 import { useGoogleLogin } from "react-google-login";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./LoginHook.scss";
 // refresh token
 import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";

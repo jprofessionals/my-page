@@ -6,7 +6,7 @@ import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
 export default function NavBar() {
   return (
     <Navbar className="navbar" collapseOnSelect expand="sm" variant="dark">
-      <Navbar.Brand href="#home">
+      <Navbar.Brand href="/">
         <img src={jPro_logo_transparent} alt="jPro" />
       </Navbar.Brand>
       <Navbar.Toggle className="button" aria-controls="responsive-navbar-nav" />
