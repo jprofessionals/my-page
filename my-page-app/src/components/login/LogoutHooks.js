@@ -3,11 +3,11 @@ import { useGoogleLogout } from "react-google-login";
 
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
-function LogoutHooks() {
+const LogoutHooks = (props) => {
   const onLogoutSuccess = (res) => {
     localStorage.removeItem("user_token");
     console.log("Logged out Success");
-    alert("Logged out Successfully ✌");
+    props.isAuthenticatedCallBack(false);
   };
 
   const onFailure = () => {
@@ -25,6 +25,6 @@ function LogoutHooks() {
       <span className="buttonText">Sign out</span>
     </button>
   );
-}
+};
 
 export default LogoutHooks;

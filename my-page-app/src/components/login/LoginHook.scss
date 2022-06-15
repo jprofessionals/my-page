@@ -1,0 +1,32 @@
+.vertical-center {
+  background-color: darkslategrey;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 1000;
+  h2 {
+    margin: 40px;
+    color: white;
+    text-align: center;
+  }
+  img {
+    margin: 10px;
+  }
+  .btn {
+    background-color: #ff7a0c;
+    margin: 0 auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    border-color: white;
+
+    &:hover {
+      background-color: orange;
+    }
+  }
+}
