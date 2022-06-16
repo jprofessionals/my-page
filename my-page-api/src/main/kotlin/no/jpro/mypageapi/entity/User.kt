@@ -6,10 +6,8 @@ import javax.persistence.Table
 
 @Entity
 @Table(name="user_table")
-class User (
-    @Id val id: Long = 0,
-
-    val email: String = ""
-
-
+data class User(
+    @Id val id: String? =null,
+    val email: String? =null,
+    val name: String? =null
 )

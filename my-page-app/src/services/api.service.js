@@ -15,10 +15,15 @@ const postEmployees = (data) => {
   return axios.post(API_URL + "open/employees", data);
 };
 
+const getUser = () => {
+  return axios.get(API_URL + "users/user", { headers: authHeader() });
+};
+
 const ApiService = {
   getTestApi,
   getTestApiOpen,
   getEmployees,
   postEmployees,
+  getUser,
 };
 export default ApiService;

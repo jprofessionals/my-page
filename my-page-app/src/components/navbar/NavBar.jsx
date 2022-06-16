@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Nav, Navbar } from "react-bootstrap";
 import "./NavBar.scss";
 import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
+import LogoutHooks from "../login/LogoutHooks";
 
-export default function NavBar() {
+const NavBar = (props) => {
+  const [isLogoutSuccess, setIsLogoutSuccess] = useState(false);
+  if (isLogoutSuccess) {
+    props.isAuthenticatedCallBack(false);
+  }
   return (
     <Navbar className="navbar" collapseOnSelect expand="sm" variant="dark">
       <Navbar.Brand href="/">
@@ -12,14 +17,14 @@ export default function NavBar() {
       <Navbar.Toggle className="button" aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse className="navtext" id="responsive-navbar-nav">
         <Nav className="mr-auto">
-          <Nav.Link href="/hjem">Hjem</Nav.Link>
-          <Nav.Link href="/min_side">Min side</Nav.Link>
-          <Nav.Link href="/mine_utlegg">Mine utlegg</Nav.Link>
+          <Nav.Link href="/">Min side</Nav.Link>
           <Nav.Link as="a" href="https://intranet.jpro.no" target="_blank">
             Intranett
           </Nav.Link>
+          <LogoutHooks isAuthenticatedCallBack={setIsLogoutSuccess} />
         </Nav>
       </Navbar.Collapse>
     </Navbar>
   );
-}
+};
+export default NavBar;

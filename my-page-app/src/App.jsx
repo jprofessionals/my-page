@@ -17,8 +17,9 @@ function App() {
   } else {
     return (
       <div>
-        <NavBar />
-        <LogoutHooks isAuthenticatedCallBack={setIsAuthenticated} />
+        <NavBar isAuthenticatedCallBack={setIsAuthenticated} />
+        <Home />
+        {/* <LogoutHooks isAuthenticatedCallBack={setIsAuthenticated} /> */}
       </div>
     );
   }

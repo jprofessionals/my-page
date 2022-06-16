@@ -13,12 +13,7 @@ class TestController(private val userRepository: UserRepository, private val use
         return String.format("Hello from the secure API.")
     }
 
-    @PostMapping("users")
-    fun createUser(@RequestBody userDTO: UserDTO): UserDTO {
-        return userService.createUser(userDTO)
-    }
-    @GetMapping("users")
-    fun getUsers(): List<UserDTO> = userService.getUsers();
+
 
 
 }
