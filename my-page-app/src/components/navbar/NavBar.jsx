@@ -1,27 +1,54 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Nav, Navbar } from "react-bootstrap";
 import "./NavBar.scss";
 import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
 import LogoutHooks from "../login/LogoutHooks";
+import ApiService from "../../services/api.service";
 
 const NavBar = (props) => {
   const [isLogoutSuccess, setIsLogoutSuccess] = useState(false);
-  if (isLogoutSuccess) {
-    props.isAuthenticatedCallBack(false);
-  }
+  const [icon, setIcon] = useState([]);
+
+    useEffect(() => {
+        if (isLogoutSuccess) {
+            props.isAuthenticatedCallBack(false);
+        }
+    },)
+
+    useEffect(() => {
+        ApiService.getUser().then(
+          (response) => {
+            setIcon(response.data.icon);
+          },
+          (error) => {
+            const _secureContent =
+              (error.response && error.response.data) ||
+              error.message ||
+              error.toString();
+            setIcon(_secureContent);
+          }
+        );
+      }, []);
+
   return (
     <Navbar className="navbar" collapseOnSelect expand="sm" variant="dark">
       <Navbar.Brand href="/">
-        <img src={jPro_logo_transparent} alt="jPro" />
+        <img className="logo" src={jPro_logo_transparent} alt="jPro" />
       </Navbar.Brand>
       <Navbar.Toggle className="button" aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse className="navtext" id="responsive-navbar-nav">
-        <Nav className="mr-auto">
+        <Nav className="container-fluid">
           <Nav.Link href="/">Min side</Nav.Link>
           <Nav.Link as="a" href="https://intranet.jpro.no" target="_blank">
             Intranett
           </Nav.Link>
+          <Nav.Link className="ms-auto">
           <LogoutHooks isAuthenticatedCallBack={setIsLogoutSuccess} />
+          </Nav.Link>
+          <Nav.Link className="smallNav">
+          <LogoutHooks isAuthenticatedCallBack={setIsLogoutSuccess} />
+          </Nav.Link>
+          <Nav.Item><img className="icon" src={icon} alt="Icon"></img></Nav.Item>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

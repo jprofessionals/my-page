@@ -1,17 +1,40 @@
+body{
+    overflow:hidden;
+    @media screen and (max-width:575px)  {
+          .icon{
+              display:none;
+          }
+          .ms-auto {
+              display: none;
+          }
+    }
+    @media screen and (min-width:575px)  {
+        .smallNav {
+            display: none;
+        }
+  }
+  
+
 .navbar {
   background-color: #2f4f4f;
 
   .navbar-nav {
+      
     a.nav-link {
+        
       color: #fff;
       text-align: center;
       font-size: 18px;
       margin-left: 5px;
       margin-right: 5px;
+      &:active>a.nav-link{
+        color: #ff7a0c;
+      }
       &:hover {
         color: #ff7a0c;
         transform: scale(1.1);
       }
+      
     }
   }
 
@@ -22,14 +45,28 @@
     transform: translatex(-50%);
     text-align: center;
   }
-
-  img {
-    height: 30px;
-    width: 40px;
+  a{
     margin-left: 10px;
   }
+  .container-fluid{
+      margin-right:30px;
+  }
 
+    .logo {
+        height: 30px;
+        width: 40px;
+        
+      }
+      .icon {
+          border-radius: 50%;
+          height: 30px;
+          margin-top:9px;
+      }
+  
+  
   button {
     margin-right: 10px;
   }
+}
+
 }

@@ -16,7 +16,7 @@ const postEmployees = (data) => {
 };
 
 const getUser = () => {
-  return axios.get(API_URL + "users/user", { headers: authHeader() });
+  return axios.get(API_URL + "me", { headers: authHeader() });
 };
 
 const ApiService = {

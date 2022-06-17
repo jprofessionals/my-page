@@ -7,11 +7,12 @@ import org.springframework.stereotype.Service
 @Service
 class UserMapper: Mapper<UserDTO, User> {
     override fun fromEntity(entity: User): UserDTO = UserDTO(
-            entity.email
+        entity.email,
+        entity.name,
+        entity.givenName,
+        entity.familyName,
+        entity.icon
     )
 
-    override fun toEntity(domain: UserDTO): User = User(
-        domain.email
-    )
 
 }
