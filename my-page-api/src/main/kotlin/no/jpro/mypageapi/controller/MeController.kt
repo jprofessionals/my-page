@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("me")
 class MeController(private val userService: UserService) {
-
     @GetMapping("")
-
     fun getCurrentLoggedInUser(@AuthenticationPrincipal jwt: Jwt): UserDTO = userService.getOrCreateUser(jwt)
-    }
+}

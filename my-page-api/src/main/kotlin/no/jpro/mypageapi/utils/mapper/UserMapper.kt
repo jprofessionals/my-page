@@ -17,14 +17,12 @@ class UserMapper (private val jwtService: JwtService): Mapper<UserDTO, User, Jwt
         user.icon
     )
 
-    override fun fromJwtToUser(jwt: Jwt): User=User(
+    override fun fromJwtToUser(jwt: Jwt): User = User(
         jwtService.getID(jwt),
-        jwtService.getEmail(jwt),
+        JwtUtils.getEmail(jwt),
         jwtService.getName(jwt),
         jwtService.getGivenName(jwt),
         jwtService.getFamilyName(jwt),
         jwtService.getIcon(jwt)
     )
-
-
 }
