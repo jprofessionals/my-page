@@ -7,11 +7,10 @@ import javax.persistence.Table
 @Entity
 @Table(name="user")
 data class User(
-    @Id val id: String? =null,
-    val email: String? =null,
-    val name: String? =null,
-    val givenName: String? = null,
-    val familyName: String? = null,
-    val icon: String? = null
-
+    @Id val id: String,
+    val email: String?,
+    val name: String?,
+    val givenName: String?,
+    val familyName: String?,
+    val icon: String?
 )
