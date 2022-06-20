@@ -14,5 +14,5 @@ class MeController(private val userService: UserService) {
 
     @GetMapping("")
 
-    fun getCurrentLoggedInUser(@AuthenticationPrincipal jwt: Jwt): UserDTO = userService.getAndCreateUser(jwt)
+    fun getCurrentLoggedInUser(@AuthenticationPrincipal jwt: Jwt): UserDTO = userService.getOrCreateUser(jwt)
     }
