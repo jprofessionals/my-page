@@ -1,7 +1,7 @@
 package no.jpro.mypageapi.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.jpro.mypageapi.model.Employee
+import no.jpro.mypageapi.entity.Employee
 import no.jpro.mypageapi.repository.EmployeeRepository
 import org.springframework.web.bind.annotation.*
 
