@@ -33,7 +33,7 @@ function App() {
         }
       );
     }
-  });
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return (
