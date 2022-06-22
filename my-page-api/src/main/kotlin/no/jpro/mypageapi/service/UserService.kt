@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val userMapper: UserMapper
+    private val userMapper: UserMapper,
 ) {
     fun getOrCreateUser(jwt: Jwt): UserDTO {
         val user =
@@ -26,4 +26,5 @@ class UserService(
         user.startDate = updateUserDTO.startDate ?: user.startDate
         return userMapper.fromUserToUserDTO(userRepository.save(user))
     }
+
 }
