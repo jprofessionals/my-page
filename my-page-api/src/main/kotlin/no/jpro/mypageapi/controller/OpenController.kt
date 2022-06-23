@@ -19,4 +19,5 @@ class OpenController(private val employeeRepository: EmployeeRepository) {
 
     @PostMapping("employees")
     fun createEmployee(@RequestBody employee: Employee): Employee = employeeRepository.save(employee)
+
 }

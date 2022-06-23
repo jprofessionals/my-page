@@ -1,10 +1,14 @@
 package no.jpro.mypageapi.dto
 
-class UserDTO (
-val email: String? = null,
-val name: String? = null,
-val givenName: String? = null,
-val familyName: String? = null,
-val icon: String? = null
+import java.time.LocalDate
+
+class UserDTO(
+    val email: String?,
+    val name: String?,
+    val givenName: String?,
+    val familyName: String?,
+    val icon: String?,
+    var nickName: String? = null,
+    var startDate: LocalDate?= null
 
 )
