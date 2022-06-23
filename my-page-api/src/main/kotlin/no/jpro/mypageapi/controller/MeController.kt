@@ -1,6 +1,7 @@
 package no.jpro.mypageapi.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.jpro.mypageapi.dto.UpdateUserDTO
 import no.jpro.mypageapi.dto.UserDTO
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("me")
@@ -22,6 +24,6 @@ class MeController(private val userService: UserService) {
 
     @PatchMapping("")
     @Operation(summary = "Update your user with nickname and/or startDate")
-    fun updateUser(@AuthenticationPrincipal jwt: Jwt, @RequestBody updateUserDTO: UpdateUserDTO): UserDTO =
+    fun updateUser(@Parameter (hidden=true) @AuthenticationPrincipal jwt: Jwt, @Valid @RequestBody updateUserDTO: UpdateUserDTO): UserDTO =
         userService.updateUser(jwt, updateUserDTO)
 }

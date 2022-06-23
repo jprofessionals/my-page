@@ -1,6 +1,6 @@
 package no.jpro.mypageapi.dto
 
-import java.util.Date
+import java.time.LocalDate
 
 class UserDTO(
     val email: String?,
@@ -9,6 +9,6 @@ class UserDTO(
     val familyName: String?,
     val icon: String?,
     var nickName: String? = null,
-    var startDate: Date? = null
+    var startDate: LocalDate?= null
 
 )

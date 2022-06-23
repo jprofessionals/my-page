@@ -1,7 +1,7 @@
 package no.jpro.mypageapi.entity
 
 
-import java.util.Date
+import java.time.LocalDate
 import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.Table
@@ -16,8 +16,5 @@ data class User(
     val familyName: String?,
     val icon: String?,
     var nickName: String? = null,
-    var startDate: Date? = null
-) {
-
-
-}
+    var startDate: LocalDate? = null
+)
