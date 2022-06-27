@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class UserMapper() : Mapper<UserDTO, User, Jwt> {
+class UserMapper(private val budgetPostMapper: BudgetPostMapper) : Mapper<UserDTO, User, Jwt> {
     override fun fromUserToUserDTO(user: User): UserDTO = UserDTO(
         user.email,
         user.name,
@@ -16,7 +16,8 @@ class UserMapper() : Mapper<UserDTO, User, Jwt> {
         user.familyName,
         user.icon,
         user.nickName,
-        user.startDate
+        user.startDate,
+        user.budgets.map { budgetPostMapper.fromBudgetToBudgetDTO(it) }
     )
 
     override fun fromJwtToUser(jwt: Jwt): User = User(
@@ -25,7 +26,8 @@ class UserMapper() : Mapper<UserDTO, User, Jwt> {
         JwtUtils.getName(jwt),
         JwtUtils.getGivenName(jwt),
         JwtUtils.getFamilyName(jwt),
-        JwtUtils.getIcon(jwt)
+        JwtUtils.getIcon(jwt),
+        budgets = listOf()
     )
 
 }

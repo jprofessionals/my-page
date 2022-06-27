@@ -1,20 +1,32 @@
 package no.jpro.mypageapi.controller
 
+import io.swagger.v3.oas.annotations.Parameter
 import no.jpro.mypageapi.dto.BudgetDTO
-import no.jpro.mypageapi.entity.Budget
-import no.jpro.mypageapi.repository.BudgetRepository
-import no.jpro.mypageapi.utils.mapper.BudgetPostMapper
+import no.jpro.mypageapi.dto.CreateBudgetDTO
+import no.jpro.mypageapi.service.BudgetService
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("budgets")
-class BudgetController (private val budgetRepository: BudgetRepository, private val budgetPostMapper: BudgetPostMapper) {
+class BudgetController(private val budgetService: BudgetService) {
     @GetMapping("")
-    fun getBudgets(): List<BudgetDTO> {
-        val budgets = budgetRepository.findAll()
-        return budgets.map {budgetPostMapper.fromBudgetToBudgetDTO(it)}
+    fun getBudgets(@Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt): List<BudgetDTO> {
+        return budgetService.getBudgetsToLoggedInUser(jwt)
+
+    }
+
+    @PostMapping("")
+    fun createBudget(
+        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
+        @RequestBody createBudgetDTO: CreateBudgetDTO
+    ): BudgetDTO {
+        return budgetService.createBudget(jwt, createBudgetDTO)
 
     }
 }
