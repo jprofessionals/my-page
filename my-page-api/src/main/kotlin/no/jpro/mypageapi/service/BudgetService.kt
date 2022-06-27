@@ -16,14 +16,15 @@ class BudgetService(
     private val userRepository: UserRepository
 ) {
 
-    fun getBudgetsToLoggedInUser(jwt: Jwt): List<BudgetDTO> {
-        val user = userRepository.findById(JwtUtils.getID(jwt)).get()
+    fun getBudgetsToLoggedInUser(id: String): List<BudgetDTO> {
+        val user = userRepository.findById(id).get()
         val budgets = user.budgets
         return budgets.map { budgetPostMapper.fromBudgetToBudgetDTO(it) }
     }
 
-    fun createBudget(jwt: Jwt, createBudgetDTO: CreateBudgetDTO): BudgetDTO {
-        val budget = budgetPostMapper.fromCreateBudgetDTOAndJwtToBudget(jwt, createBudgetDTO)
+    fun createBudget(id: String, createBudgetDTO: CreateBudgetDTO): BudgetDTO {
+        val budget = budgetPostMapper.fromCreateBudgetDTOToBudget(createBudgetDTO)
+        budget.user = userRepository.findById(id).get()
         budgetRepository.save(budget)
         return budgetPostMapper.fromBudgetToBudgetDTO(budget)
 

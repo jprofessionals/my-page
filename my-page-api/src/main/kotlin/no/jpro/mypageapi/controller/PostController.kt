@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.controller
 
+import io.swagger.v3.oas.annotations.Operation
 import no.jpro.mypageapi.dto.CreatePostDTO
 import no.jpro.mypageapi.dto.PostDTO
 import no.jpro.mypageapi.service.PostService
@@ -13,6 +14,7 @@ import javax.validation.Valid
 @RequestMapping("post")
 class PostController(private val postService: PostService) {
     @PostMapping("")
+    @Operation(summary = "Create a new post related to an existing budget. ")
     fun createPost(@Valid @RequestBody createPostDTO: CreatePostDTO): PostDTO {
         return postService.createPost(createPostDTO)
     }

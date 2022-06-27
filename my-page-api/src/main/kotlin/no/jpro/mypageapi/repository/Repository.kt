@@ -1,9 +1,6 @@
 package no.jpro.mypageapi.repository
 
-import no.jpro.mypageapi.entity.Budget
-import no.jpro.mypageapi.entity.Post
-import no.jpro.mypageapi.entity.Employee
-import no.jpro.mypageapi.entity.User
+import no.jpro.mypageapi.entity.*
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
@@ -18,5 +15,8 @@ interface BudgetRepository : JpaRepository<Budget,Long>
 
 @Repository
 interface PostRepository : JpaRepository<Post,Long>
+
+@Repository
+interface BudgetCharacteristicRepository : JpaRepository<BudgetCharacteristics,Long>
 
 

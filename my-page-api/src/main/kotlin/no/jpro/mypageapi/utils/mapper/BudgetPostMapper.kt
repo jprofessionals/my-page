@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
 
 @Service
-class BudgetPostMapper(private val budgetRepository: BudgetRepository, private val userRepository: UserRepository) {
+class BudgetPostMapper(private val userRepository: UserRepository) {
     fun fromPostToPostDTO(post: Post): PostDTO = PostDTO(
         date = post.date,
         description = post.description,
@@ -27,15 +27,14 @@ class BudgetPostMapper(private val budgetRepository: BudgetRepository, private v
         return BudgetDTO(
             name = budget.name,
             ageOfBudgetInMonths = budget.ageOfBudgetInMonths,
-            postDTOs = postDTOs
+            posts = postDTOs
         )
     }
 
-    fun fromCreateBudgetDTOAndJwtToBudget(jwt: Jwt, createBudgetDTO: CreateBudgetDTO): Budget = Budget(
+    fun fromCreateBudgetDTOToBudget(createBudgetDTO: CreateBudgetDTO): Budget = Budget(
         name = createBudgetDTO.name,
         ageOfBudgetInMonths = createBudgetDTO.ageOfBudgetInMonths,
-        posts = listOf(),
-        user = userRepository.findById(JwtUtils.getID(jwt)).get()
+        posts = listOf()
     )
 
     fun fromCreatePostDTOToPost(createPostDTO: CreatePostDTO): Post = Post(
@@ -43,7 +42,6 @@ class BudgetPostMapper(private val budgetRepository: BudgetRepository, private v
         description = createPostDTO.description,
         amount = createPostDTO.amount,
         expense = createPostDTO.expense,
-        budget = budgetRepository.findById(createPostDTO.budgetId).get()
     )
 
 

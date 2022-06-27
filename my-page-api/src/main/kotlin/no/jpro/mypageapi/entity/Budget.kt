@@ -12,6 +12,8 @@ data class Budget(
     @OneToMany(mappedBy = "budget")
     var posts: List<Post>,
     @ManyToOne
-    var user: User
+    var user: User? = null,
+    @ManyToOne
+    var budgetCharacteristic: BudgetCharacteristics? = null
 
 )

@@ -15,5 +15,5 @@ data class Post(
     val expense: Boolean,
     @JsonIgnore
     @ManyToOne
-    val budget: Budget
+    var budget: Budget? = null
 )
