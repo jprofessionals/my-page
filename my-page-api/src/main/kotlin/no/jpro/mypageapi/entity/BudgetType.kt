@@ -3,7 +3,7 @@ package no.jpro.mypageapi.entity
 import javax.persistence.*
 
 @Entity
-data class BudgetCharacteristics(
+data class BudgetType(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -12,7 +12,7 @@ data class BudgetCharacteristics(
     val deposit: Double,
     val intervalOfDepositInMonths: Long,
     val startAmount: Double,
-    @OneToMany(mappedBy = "budgetCharacteristic")
+    @OneToMany(mappedBy = "budgetType")
     var budgets: List<Budget>
 )
 

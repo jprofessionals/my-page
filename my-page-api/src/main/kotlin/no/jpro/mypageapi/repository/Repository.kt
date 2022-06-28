@@ -8,15 +8,22 @@ import org.springframework.stereotype.Repository
 interface EmployeeRepository : JpaRepository<Employee, Long>
 
 @Repository
-interface UserRepository : JpaRepository<User,String>
+interface UserRepository : JpaRepository<User, String>
+
 
 @Repository
-interface BudgetRepository : JpaRepository<Budget,Long>
+interface BudgetRepository : JpaRepository<Budget, Long> {
+    fun findBudgetsByUserId(userId: String): List<Budget>
+    fun findBudgetByUserIdAndId(userId: String, budgetId: Long): Budget?
+}
 
 @Repository
-interface PostRepository : JpaRepository<Post,Long>
+interface PostRepository : JpaRepository<Post, Long> {
+    fun findPostsByBudgetId(budgetId: Long): List<Post>
+    fun findPostByBudgetIdAndId(budgetId: Long, postId: Long): Post?
+}
 
 @Repository
-interface BudgetCharacteristicRepository : JpaRepository<BudgetCharacteristics,Long>
+interface BudgetTypeRepository : JpaRepository<BudgetType, Long>
 
 

@@ -16,15 +16,15 @@ class UserService(
 ) {
     fun getOrCreateUser(jwt: Jwt): UserDTO {
         val user =
-            userRepository.findByIdOrNull(JwtUtils.getID(jwt)) ?: userRepository.save(userMapper.fromJwtToUser(jwt))
-        return userMapper.fromUserToUserDTO(user)
+            userRepository.findByIdOrNull(JwtUtils.getID(jwt)) ?: userRepository.save(userMapper.toUser(jwt))
+        return userMapper.toUserDTO(user)
     }
 
     fun updateUser(jwt: Jwt, updateUserDTO: UpdateUserDTO): UserDTO {
         val user = userRepository.findById(JwtUtils.getID(jwt)).get()
         user.nickName = updateUserDTO.nickName ?: user.nickName
         user.startDate = updateUserDTO.startDate ?: user.startDate
-        return userMapper.fromUserToUserDTO(userRepository.save(user))
+        return userMapper.toUserDTO(userRepository.save(user))
     }
 
 }

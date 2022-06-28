@@ -14,6 +14,6 @@ data class Budget(
     @ManyToOne
     var user: User? = null,
     @ManyToOne
-    var budgetCharacteristic: BudgetCharacteristics? = null
+    var budgetType: BudgetType? = null
 
 )

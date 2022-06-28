@@ -6,24 +6,20 @@ import no.jpro.mypageapi.dto.CreatePostDTO
 import no.jpro.mypageapi.dto.PostDTO
 import no.jpro.mypageapi.entity.Budget
 import no.jpro.mypageapi.entity.Post
-import no.jpro.mypageapi.repository.BudgetRepository
-import no.jpro.mypageapi.repository.UserRepository
-import no.jpro.mypageapi.utils.JwtUtils
-import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
 
 @Service
-class BudgetPostMapper(private val userRepository: UserRepository) {
-    fun fromPostToPostDTO(post: Post): PostDTO = PostDTO(
+class BudgetPostMapper() {
+    fun toPostDTO(post: Post): PostDTO = PostDTO(
         date = post.date,
         description = post.description,
         amount = post.amount,
         expense = post.expense,
     )
 
-    fun fromBudgetToBudgetDTO(budget: Budget): BudgetDTO {
+    fun toBudgetDTO(budget: Budget): BudgetDTO {
         val posts = budget.posts
-        val postDTOs = posts.map { fromPostToPostDTO(it) }
+        val postDTOs = posts.map { toPostDTO(it) }
         return BudgetDTO(
             name = budget.name,
             ageOfBudgetInMonths = budget.ageOfBudgetInMonths,
@@ -31,13 +27,13 @@ class BudgetPostMapper(private val userRepository: UserRepository) {
         )
     }
 
-    fun fromCreateBudgetDTOToBudget(createBudgetDTO: CreateBudgetDTO): Budget = Budget(
+    fun toBudget(createBudgetDTO: CreateBudgetDTO): Budget = Budget(
         name = createBudgetDTO.name,
         ageOfBudgetInMonths = createBudgetDTO.ageOfBudgetInMonths,
         posts = listOf()
     )
 
-    fun fromCreatePostDTOToPost(createPostDTO: CreatePostDTO): Post = Post(
+    fun toPost(createPostDTO: CreatePostDTO): Post = Post(
         date = createPostDTO.date,
         description = createPostDTO.description,
         amount = createPostDTO.amount,

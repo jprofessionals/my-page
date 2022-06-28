@@ -7,5 +7,4 @@ class CreatePostDTO(
     val description: String?,
     val amount: Double,
     val expense: Boolean,
-    val budgetId: Long
 )
