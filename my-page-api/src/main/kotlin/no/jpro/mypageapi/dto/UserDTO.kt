@@ -9,6 +9,7 @@ class UserDTO(
     val familyName: String?,
     val icon: String?,
     var nickName: String? = null,
-    var startDate: LocalDate?= null
+    var startDate: LocalDate?= null,
+    var budgets: List<BudgetDTO>? = null
 
 )

@@ -4,6 +4,7 @@ package no.jpro.mypageapi.entity
 import java.time.LocalDate
 import javax.persistence.Entity
 import javax.persistence.Id
+import javax.persistence.OneToMany
 import javax.persistence.Table
 
 @Entity
@@ -16,5 +17,7 @@ data class User(
     val familyName: String?,
     val icon: String?,
     var nickName: String? = null,
-    var startDate: LocalDate? = null
+    var startDate: LocalDate? = null,
+    @OneToMany(mappedBy = "user")
+    var budgets: List<Budget>
 )
