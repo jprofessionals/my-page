@@ -36,6 +36,7 @@ class SpringSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 "/v3/api-docs/**",
                 "/swagger-ui.html",
                 "/swagger-ui/**",
+                "/actuator/**",
             ).permitAll()
             .antMatchers("/**").authenticated()
             .and()
