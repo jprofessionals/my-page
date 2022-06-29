@@ -23,7 +23,7 @@ class BudgetPostMapper() {
         return BudgetDTO(
             name = budget.name,
             ageOfBudgetInMonths = budget.ageOfBudgetInMonths,
-            posts = postDTOs
+            posts = postDTOs,
         )
     }
 

@@ -2,6 +2,7 @@ package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.dto.UpdateUserDTO
 import no.jpro.mypageapi.dto.UserDTO
+import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.JwtUtils
 import no.jpro.mypageapi.utils.mapper.UserMapper
@@ -18,6 +19,10 @@ class UserService(
         val user =
             userRepository.findByIdOrNull(JwtUtils.getID(jwt)) ?: userRepository.save(userMapper.toUser(jwt))
         return userMapper.toUserDTO(user)
+    }
+
+    fun getUser(userId: String): User? {
+        return userRepository.findByIdOrNull(userId)
     }
 
     fun updateUser(jwt: Jwt, updateUserDTO: UpdateUserDTO): UserDTO {

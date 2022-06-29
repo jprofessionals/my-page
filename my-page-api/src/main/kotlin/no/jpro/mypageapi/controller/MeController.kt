@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.jpro.mypageapi.dto.*
-import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.service.BudgetService
 import no.jpro.mypageapi.service.UserService
 import no.jpro.mypageapi.utils.JwtUtils
@@ -22,8 +21,7 @@ import javax.validation.Valid
 @SecurityRequirement(name = "Bearer Authentication")
 class MeController(
     private val userService: UserService,
-    private val budgetService: BudgetService,
-    private val userRepository: UserRepository,
+    private val budgetService: BudgetService
 ) {
     @GetMapping("")
     @Operation(summary = "Get data for user identified by the bearer token")
@@ -54,10 +52,13 @@ class MeController(
     fun createBudget(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @RequestBody createBudgetDTO: CreateBudgetDTO
-    ): BudgetDTO {
+    ): ResponseEntity<Any> {
         val userId = JwtUtils.getID(jwt)
-        val user = userRepository.findById(userId).get()
-        return budgetService.createBudget(user, createBudgetDTO)
+        val user = userService.getUser(userId)
+            ?: return ResponseEntity.badRequest().build()
+        val budgetType = budgetService.getBudgetType(createBudgetDTO.budgetTypeId)
+            ?: return ResponseEntity.badRequest().build()
+        return ResponseEntity.ok(budgetService.createBudget(user, createBudgetDTO, budgetType))
     }
 
     @GetMapping("budgets/{budgetId}")
@@ -101,7 +102,7 @@ class MeController(
     ): ResponseEntity<Any> {
         val userId = JwtUtils.getID(jwt)
         val budget = budgetService.getBudget(userId, budgetId)
-            ?: return ResponseEntity.notFound().build()
+            ?: return ResponseEntity.badRequest().build()
         return ResponseEntity.ok(budgetService.createPost(budget, createPostDTO))
     }
 }

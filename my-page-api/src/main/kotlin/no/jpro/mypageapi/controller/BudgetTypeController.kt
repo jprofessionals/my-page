@@ -1,22 +1,34 @@
 package no.jpro.mypageapi.controller
 
-import no.jpro.mypageapi.dto.CreateBudgetTypeDTO
-import no.jpro.mypageapi.repository.BudgetTypeRepository
-import no.jpro.mypageapi.utils.mapper.BudgetTypeMapper
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import no.jpro.mypageapi.dto.BudgetTypeDTO
+import no.jpro.mypageapi.service.BudgetService
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("budgetCharacteristic")
+@RequestMapping("budgetTypes")
 class BudgetTypeController(
-    private val budgetTypeMapper: BudgetTypeMapper,
-    private val budgetTypeRepository: BudgetTypeRepository
+    private val budgetService: BudgetService
 ) {
     @PostMapping("")
-    fun createBudgetType(@RequestBody createBudgetTypeDTO: CreateBudgetTypeDTO): CreateBudgetTypeDTO {
-        budgetTypeRepository.save(budgetTypeMapper.toBudgetType(createBudgetTypeDTO))
-        return createBudgetTypeDTO
+    @Operation(summary = "Create a budgetType.")
+    fun createBudgetType(
+        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
+        @RequestBody budgetTypeDTO: BudgetTypeDTO
+    ): BudgetTypeDTO {
+        return budgetService.createBudgetType(budgetTypeDTO)
+    }
+
+    @GetMapping("")
+    @Operation(summary = "Get the different budgetTypes.")
+    fun getBudgetTypes(@Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt): List<BudgetTypeDTO> {
+        return budgetService.getBudgetTypes()
     }
 }
