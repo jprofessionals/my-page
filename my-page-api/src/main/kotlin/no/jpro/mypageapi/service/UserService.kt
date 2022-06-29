@@ -21,14 +21,14 @@ class UserService(
         return userMapper.toUserDTO(user)
     }
 
-    fun getUser(userId: String): User? {
-        return userRepository.findByIdOrNull(userId)
+    fun checkIfUserExists(userId: String): Boolean{
+        return userRepository.existsUserById(userId)
     }
 
-    fun updateUser(jwt: Jwt, updateUserDTO: UpdateUserDTO): UserDTO {
+    fun updateUser(jwt: Jwt, userRequest: UpdateUserDTO): UserDTO {
         val user = userRepository.findById(JwtUtils.getID(jwt)).get()
-        user.nickName = updateUserDTO.nickName ?: user.nickName
-        user.startDate = updateUserDTO.startDate ?: user.startDate
+        user.nickName = userRequest.nickName ?: user.nickName
+        user.startDate = userRequest.startDate ?: user.startDate
         return userMapper.toUserDTO(userRepository.save(user))
     }
 

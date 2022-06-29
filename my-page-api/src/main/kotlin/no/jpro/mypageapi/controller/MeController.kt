@@ -36,9 +36,9 @@ class MeController(
     @Operation(summary = "Update your user with nickname and/or startDate")
     fun updateUser(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
-        @Valid @RequestBody updateUserDTO: UpdateUserDTO
+        @Valid @RequestBody updateUserRequest: UpdateUserDTO
     ): UserDTO =
-        userService.updateUser(jwt, updateUserDTO)
+        userService.updateUser(jwt, updateUserRequest)
 
     @GetMapping("budgets")
     @Operation(summary = "Get the different budgets that belong to logged in user.")
@@ -51,14 +51,15 @@ class MeController(
     @Operation(summary = "Create a budget for the logged in user")
     fun createBudget(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
-        @RequestBody createBudgetDTO: CreateBudgetDTO
+        @RequestBody budgetRequest: CreateBudgetDTO
     ): ResponseEntity<Any> {
         val userId = JwtUtils.getID(jwt)
-        val user = userService.getUser(userId)
-            ?: return ResponseEntity.badRequest().build()
-        val budgetType = budgetService.getBudgetType(createBudgetDTO.budgetTypeId)
-            ?: return ResponseEntity.badRequest().build()
-        return ResponseEntity.ok(budgetService.createBudget(user, createBudgetDTO, budgetType))
+        val userExists = userService.checkIfUserExists(userId)
+        val budgetTypeExists = budgetService.checkIfBudgetTypeExists(budgetRequest.budgetTypeId)
+        if (!userExists || !budgetTypeExists) {
+            return ResponseEntity.badRequest().build()
+        }
+        return ResponseEntity.ok(budgetService.createBudget(userId, budgetRequest))
     }
 
     @GetMapping("budgets/{budgetId}")
@@ -68,9 +69,9 @@ class MeController(
         @PathVariable("budgetId") budgetId: Long
     ): ResponseEntity<Any> {
         val userId = JwtUtils.getID(jwt)
-        val budgetDTO = budgetService.getBudgetDTO(userId, budgetId)
+        val budget = budgetService.getBudget(userId, budgetId)
             ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.ok(budgetDTO)
+        return ResponseEntity.ok(budget)
     }
 
     @GetMapping("budgets/{budgetId}/posts")
@@ -89,20 +90,22 @@ class MeController(
         @PathVariable("budgetId") budgetId: Long,
         @PathVariable("postId") postId: Long
     ): ResponseEntity<Any> {
-        val postDTO = budgetService.getPost(budgetId, postId)
+        val post = budgetService.getPost(budgetId, postId)
             ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.ok(postDTO)
+        return ResponseEntity.ok(post)
     }
 
     @PostMapping("budgets/{budgetId}/posts")
     @Operation(summary = "Create a new post related to an existing budget.")
     fun createPost(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
-        @Valid @RequestBody createPostDTO: CreatePostDTO, @PathVariable("budgetId") budgetId: Long,
+        @Valid @RequestBody postRequest: CreatePostDTO, @PathVariable("budgetId") budgetId: Long,
     ): ResponseEntity<Any> {
         val userId = JwtUtils.getID(jwt)
-        val budget = budgetService.getBudget(userId, budgetId)
-            ?: return ResponseEntity.badRequest().build()
-        return ResponseEntity.ok(budgetService.createPost(budget, createPostDTO))
+        val budgetExists = budgetService.checkIfBudgetExists(userId, budgetId)
+        if (!budgetExists) {
+            return ResponseEntity.badRequest().build()
+        }
+        return ResponseEntity.ok(budgetService.createPost(postRequest, budgetId, userId))
     }
 }

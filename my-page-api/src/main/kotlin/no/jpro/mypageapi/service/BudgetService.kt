@@ -1,22 +1,20 @@
 package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.dto.*
-import no.jpro.mypageapi.entity.Budget
-import no.jpro.mypageapi.entity.BudgetType
-import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.BudgetRepository
 import no.jpro.mypageapi.repository.BudgetTypeRepository
 import no.jpro.mypageapi.repository.PostRepository
+import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.BudgetPostMapper
 import no.jpro.mypageapi.utils.mapper.BudgetTypeMapper
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
 class BudgetService(
     private val budgetRepository: BudgetRepository,
     private val budgetPostMapper: BudgetPostMapper, private val postRepository: PostRepository,
-    private val budgetTypeMapper: BudgetTypeMapper, private val budgetTypeRepository: BudgetTypeRepository
+    private val budgetTypeMapper: BudgetTypeMapper, private val budgetTypeRepository: BudgetTypeRepository,
+    private val userRepository: UserRepository
 ) {
 
     fun getBudgets(userId: String): List<BudgetDTO> {
@@ -24,33 +22,31 @@ class BudgetService(
         return budgets.map { budgetPostMapper.toBudgetDTO(it) }
     }
 
-    fun createBudget(user: User, createBudgetDTO: CreateBudgetDTO, budgetType: BudgetType): BudgetDTO {
-        val budget = budgetPostMapper.toBudget(createBudgetDTO)
-        budget.user = user
-        budget.budgetType = budgetType
-        budgetRepository.save(budget)
-        return budgetPostMapper.toBudgetDTO(budget)
+    fun createBudget(userId: String, budgetRequest: CreateBudgetDTO): BudgetDTO {
+        val budget = budgetPostMapper.toBudget(budgetRequest)
+        budget.user = userRepository.findById(userId).get()
+        budget.budgetType = budgetTypeRepository.findById(budgetRequest.budgetTypeId).get()
+        val savedBudget = budgetRepository.save(budget)
+        return budgetPostMapper.toBudgetDTO(savedBudget)
     }
 
-    fun getBudgetDTO(userId: String, budgetId: Long): BudgetDTO? {
+    fun getBudget(userId: String, budgetId: Long): BudgetDTO? {
         val budget = budgetRepository.findBudgetByUserIdAndId(userId, budgetId)
             ?: return null
         return budgetPostMapper.toBudgetDTO(budget)
     }
 
-    fun getBudget(userId: String, budgetId: Long): Budget? {
-        return budgetRepository.findBudgetByUserIdAndId(userId, budgetId)
+    fun checkIfBudgetExists(userId: String, budgetId: Long): Boolean {
+        return budgetRepository.existsBudgetByUserIdAndId(userId, budgetId)
     }
 
-    fun getBudgetType(budgetTypeId: Long): BudgetType? {
-        return budgetTypeRepository.findByIdOrNull(budgetTypeId)
-    }
 
-    fun createPost(budget: Budget, createPostDTO: CreatePostDTO): PostDTO {
-        val post = budgetPostMapper.toPost(createPostDTO)
+    fun createPost(postRequest: CreatePostDTO, budgetId: Long, userId: String): PostDTO {
+        val post = budgetPostMapper.toPost(postRequest)
+        val budget = budgetRepository.findBudgetByUserIdAndId(userId, budgetId)
         post.budget = budget
-        postRepository.save(post)
-        return budgetPostMapper.toPostDTO(post)
+        val savedPost = postRepository.save(post)
+        return budgetPostMapper.toPostDTO(savedPost)
     }
 
     fun getPosts(budgetId: Long): List<PostDTO> {
@@ -64,13 +60,17 @@ class BudgetService(
         return budgetPostMapper.toPostDTO(post)
     }
 
-    fun createBudgetType(budgetTypeDTO: BudgetTypeDTO): BudgetTypeDTO {
-        budgetTypeRepository.save(budgetTypeMapper.toBudgetType(budgetTypeDTO))
-        return budgetTypeDTO
+    fun createBudgetType(budgetTypeRequest: BudgetTypeDTO): BudgetTypeDTO {
+        val savedBudgetType = budgetTypeRepository.save(budgetTypeMapper.toBudgetType(budgetTypeRequest))
+        return budgetTypeMapper.toBudgetTypeDTO(savedBudgetType)
     }
 
     fun getBudgetTypes(): List<BudgetTypeDTO> {
         val budgetTypes = budgetTypeRepository.findAll()
         return budgetTypes.map { budgetTypeMapper.toBudgetTypeDTO(it) }
+    }
+
+    fun checkIfBudgetTypeExists(budgetTypeId: Long): Boolean {
+        return budgetTypeRepository.existsBudgetTypeById(budgetTypeId)
     }
 }
