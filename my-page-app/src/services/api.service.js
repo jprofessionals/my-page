@@ -20,11 +20,16 @@ const getUser = () => {
   return axios.get(API_URL + "me", { headers: authHeader() });
 };
 
+const getBudgets = () => {
+  return axios.get(API_URL + "me/budgets", { headers: authHeader() });
+};
+
 const ApiService = {
   getTestApi,
   getTestApiOpen,
   getEmployees,
   postEmployees,
   getUser,
+  getBudgets,
 };
 export default ApiService;
