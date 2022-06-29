@@ -54,9 +54,7 @@ class MeController(
         @RequestBody budgetRequest: CreateBudgetDTO
     ): ResponseEntity<Any> {
         val userId = JwtUtils.getID(jwt)
-        val userExists = userService.checkIfUserExists(userId)
-        val budgetTypeExists = budgetService.checkIfBudgetTypeExists(budgetRequest.budgetTypeId)
-        if (!userExists || !budgetTypeExists) {
+        if (!userService.checkIfUserExists(userId) || !budgetService.checkIfBudgetTypeExists(budgetRequest.budgetTypeId)) {
             return ResponseEntity.badRequest().build()
         }
         return ResponseEntity.ok(budgetService.createBudget(userId, budgetRequest))
@@ -102,8 +100,7 @@ class MeController(
         @Valid @RequestBody postRequest: CreatePostDTO, @PathVariable("budgetId") budgetId: Long,
     ): ResponseEntity<Any> {
         val userId = JwtUtils.getID(jwt)
-        val budgetExists = budgetService.checkIfBudgetExists(userId, budgetId)
-        if (!budgetExists) {
+        if (!budgetService.checkIfBudgetExists(userId, budgetId)) {
             return ResponseEntity.badRequest().build()
         }
         return ResponseEntity.ok(budgetService.createPost(postRequest, budgetId, userId))

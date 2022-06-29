@@ -26,8 +26,7 @@ class BudgetService(
         val budget = budgetPostMapper.toBudget(budgetRequest)
         budget.user = userRepository.findById(userId).get()
         budget.budgetType = budgetTypeRepository.findById(budgetRequest.budgetTypeId).get()
-        val savedBudget = budgetRepository.save(budget)
-        return budgetPostMapper.toBudgetDTO(savedBudget)
+        return budgetPostMapper.toBudgetDTO(budgetRepository.save(budget))
     }
 
     fun getBudget(userId: String, budgetId: Long): BudgetDTO? {
@@ -45,8 +44,7 @@ class BudgetService(
         val post = budgetPostMapper.toPost(postRequest)
         val budget = budgetRepository.findBudgetByUserIdAndId(userId, budgetId)
         post.budget = budget
-        val savedPost = postRepository.save(post)
-        return budgetPostMapper.toPostDTO(savedPost)
+        return budgetPostMapper.toPostDTO(postRepository.save(post))
     }
 
     fun getPosts(budgetId: Long): List<PostDTO> {
