@@ -20,6 +20,8 @@ Install gcloud cli - https://cloud.google.com/sdk/docs/install & https://cloud.g
 
 Running the API locally (in IDEA or on commandline) requires a database - activate the profile `h2` or `local` (the `local`profile requires a running MySQL db (see application-local.properties for connection details))
 
+The API can also be run using the maven wrapper locally `./mvnw -DskipTests -Dspring-boot.run.profiles=local clean spring-boot:run`
+
 The api will run on localhost:8080
 
 ### Local MySQl
