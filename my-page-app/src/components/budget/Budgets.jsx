@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
 import ApiService from "../../services/api.service";
 import Budget from "./Budget";
 import { BudgetClass } from "./BudgetClass";
+import { Accordion, Col} from "react-bootstrap";
+
 
 const Budgets = () => {
   const [budgets, setBudgets] = useState([]);
@@ -25,20 +26,27 @@ const Budgets = () => {
       budgetList[i] = budgetElement;
       setBudgets(budgetList);
     }
-    console.log(budgets);
   }, [responseBudgets]);
 
-  const fetchBudgets = () => {
-    console.log(responseBudgets);
-  };
 
   return (
-    <div>
-      {budgets.map((budget) => (
-        <Budget key={budget.name} budget={budget} />
-      ))}
-      <Button onClick={fetchBudgets}>Mine budsjetter</Button>
-    </div>
+    <div style={{marginTop:15}}>
+    <h3 style= {{marginLeft:5}}>Dine budsjetter</h3>
+    <Accordion defaultActiveKey="0"> 
+       {budgets.map((budget) => ( 
+    <Accordion.Item key={budget.name} eventKey={budget.name}>
+      <Accordion.Header>
+        <Col>{budget.name}</Col>
+        <Col>{budget.ageOfBudgetInMonths}</Col>
+        </Accordion.Header>
+      <Accordion.Body>
+        <Budget budget={budget}/>
+      </Accordion.Body>
+    </Accordion.Item>
+    ))}
+  </Accordion>
+  </div>
+    
   );
 };
 

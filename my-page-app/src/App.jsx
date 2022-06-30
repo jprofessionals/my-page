@@ -21,7 +21,8 @@ function App() {
               response.data.email,
               response.data.givenName,
               response.data.familyName,
-              response.data.icon
+              response.data.icon,
+              response.data.startDate
             )
           );
         },
