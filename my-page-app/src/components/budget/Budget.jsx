@@ -2,12 +2,26 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { PostClass } from "./PostClass";
-import {Col, Row } from "react-bootstrap";
+import {Card, Button} from "react-bootstrap";
+import Post from "./Post";
+import "./Budget.scss";
+import CreateBudgetPost from "./CreateBudgetPost";
+
 
 const Budget = (props) => {
     const postList = props.budget.posts
     const [posts, setPosts] = useState([])
+    const [cardItem, setCardItem] = useState()
 
+
+    const addCard = (e) => {
+        setCardItem(<Card>
+            <Card.Body>
+                <CreateBudgetPost budget={props.budget} />
+            </Card.Body>
+        </Card>)
+        console.log(cardItem)
+    }
 
 useEffect(() => {
     const updatedPosts = [...posts];
@@ -24,13 +38,10 @@ useEffect(() => {
 
 return (
     <div>
+        <Button onClick={addCard}>Legg til utlegg</Button>
+        {cardItem}
     {posts.map((post) => (
-        <Row key={post.description}>
-            <Col><b>Beskrivelse:</b> {post.description}</Col>
-            <Col><b>Pris:</b> {post.amount}</Col> 
-            <Col><b>Dato:</b> {post.date}</Col> 
-        </Row>
-                    
+        <Post key={post.description} post={post}/>
 ))}
 </div>
 );

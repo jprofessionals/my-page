@@ -22,6 +22,7 @@ class BudgetPostMapper() {
         val postDTOs = posts.map { toPostDTO(it) }
         return BudgetDTO(
             name = budget.name,
+            id = budget.id,
             ageOfBudgetInMonths = budget.ageOfBudgetInMonths,
             posts = postDTOs,
         )
