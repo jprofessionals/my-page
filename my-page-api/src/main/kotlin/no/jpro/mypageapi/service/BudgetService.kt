@@ -7,6 +7,7 @@ import no.jpro.mypageapi.repository.PostRepository
 import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.BudgetPostMapper
 import no.jpro.mypageapi.utils.mapper.BudgetTypeMapper
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -66,6 +67,12 @@ class BudgetService(
     fun getBudgetTypes(): List<BudgetTypeDTO> {
         val budgetTypes = budgetTypeRepository.findAll()
         return budgetTypes.map { budgetTypeMapper.toBudgetTypeDTO(it) }
+    }
+
+    fun getBudgetType(budgetTypeId: Long): BudgetTypeDTO? {
+        val budgetType = budgetTypeRepository.findByIdOrNull(budgetTypeId)
+            ?: return null
+        return budgetTypeMapper.toBudgetTypeDTO(budgetType)
     }
 
     fun checkIfBudgetTypeExists(budgetTypeId: Long): Boolean {

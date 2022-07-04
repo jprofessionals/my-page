@@ -30,6 +30,12 @@ const createBudgetPost = (post, budgetId) => {
   });
 };
 
+const getBudgetType = (budgetTypeId) => {
+  return axios.get(API_URL + "budgetTypes/" + budgetTypeId, {
+    headers: authHeader(),
+  });
+};
+
 const ApiService = {
   getTestApi,
   getTestApiOpen,
@@ -38,5 +44,6 @@ const ApiService = {
   getUser,
   getBudgets,
   createBudgetPost,
+  getBudgetType,
 };
 export default ApiService;
