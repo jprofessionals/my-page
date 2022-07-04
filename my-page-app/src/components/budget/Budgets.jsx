@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import ApiService from "../../services/api.service";
 import Budget from "./Budget";
 import { BudgetClass } from "./BudgetClass";
-import { Accordion, Col, Button } from "react-bootstrap";
+import { Accordion, Col } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import "./Budget.scss";
 
 const Budgets = () => {
@@ -33,9 +35,18 @@ const Budgets = () => {
     });
   };
   return (
-    <div style={{ marginTop: 15 }}>
-      <h3 style={{ marginLeft: 5 }}>Dine budsjetter</h3>
-      <Button onClick={refreshBudgets}>Refresh budsjetter</Button>
+    <div className="budgets" style={{ marginTop: 15 }}>
+      <div className="headerBudgets">
+        <h3 className="headerText" style={{ marginLeft: 5 }}>
+          Dine budsjetter
+        </h3>
+        <FontAwesomeIcon
+          className="refresh"
+          icon={faRefresh}
+          onClick={refreshBudgets}
+          title="Refresh budsjettene"
+        />
+      </div>
       <Accordion defaultActiveKey="0">
         {budgets.map((budget) => (
           <Accordion.Item key={budget.id} eventKey={budget.id}>

@@ -4,7 +4,6 @@
   }
   &:not(.collapsed) {
     color: black;
-    // background-color: rgba(18.43%,30.98%,30.98%,0.5);
     background-color: rgba(100%, 47.84%, 4.71%, 0.5);
     &::after {
       color: black;
@@ -13,6 +12,24 @@
   }
   &:hover {
     background-color: rgba(100%, 47.84%, 4.71%, 0.5);
+  }
+}
+.budgets {
+  .headerBudgets {
+    display: flex;
+    .headerText {
+      width: 93.5%;
+    }
+    .refresh {
+      color: #ff7a0c;
+      font-size: xx-large;
+      top: 0;
+      justify-content: space-between;
+      &:hover {
+        cursor: pointer;
+        color: orange;
+      }
+    }
   }
 }
 
