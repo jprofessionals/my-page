@@ -25,6 +25,7 @@ class BudgetPostMapper() {
             id = budget.id,
             ageOfBudgetInMonths = budget.ageOfBudgetInMonths,
             posts = postDTOs,
+            budgetTypeId = budget.budgetType?.id
         )
     }
 

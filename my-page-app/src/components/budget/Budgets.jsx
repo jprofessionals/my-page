@@ -20,7 +20,8 @@ const Budgets = () => {
         responseBudgets[i].id,
         responseBudgets[i].name,
         responseBudgets[i].ageOfBudgetInMonths,
-        responseBudgets[i].posts
+        responseBudgets[i].posts,
+        responseBudgets[i].budgetTypeId
       );
       budgetList[i] = budgetElement;
       setBudgets(budgetList);
