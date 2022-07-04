@@ -17,7 +17,7 @@ const Budget = (props) => {
     const addCard = (e) => {
         setCardItem(<Card>
             <Card.Body>
-                <CreateBudgetPost budget={props.budget} />
+                <CreateBudgetPost budget={props.budget} refreshBudgets={props.refreshBudgets} />
             </Card.Body>
         </Card>)
         console.log(cardItem)

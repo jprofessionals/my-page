@@ -15,7 +15,9 @@ const CreateBudgetPost = (props) => {
             "amount": amount,
             "expense": true
         }
-        ApiService.createBudgetPost(budgetPost,props.budget.id)
+        ApiService.createBudgetPost(budgetPost,props.budget.id).then((response) => {
+            props.refreshBudgets()
+        })
     }
 
     const handleDescriptionChange = (e) => {
