@@ -2,6 +2,7 @@ package no.jpro.mypageapi.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.jpro.mypageapi.dto.BudgetTypeDTO
 import no.jpro.mypageapi.service.BudgetService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("budgetTypes")
+@SecurityRequirement(name = "Bearer Authentication")
 class BudgetTypeController(
     private val budgetService: BudgetService
 ) {

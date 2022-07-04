@@ -19,7 +19,7 @@ const Budget = (props) => {
           <CreateBudgetPost
             budget={props.budget}
             refreshBudgets={props.refreshBudgets}
-          />{" "}
+          />
         </Card.Body>
       </Card>
     );
