@@ -9,6 +9,7 @@ import CreateBudgetPost from "./CreateBudgetPost";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import "./Budget.scss";
+import BudgetInformation from "./BudgetInformation";
 
 const Budget = (props) => {
   const postList = props.budget.posts;
@@ -43,15 +44,18 @@ const Budget = (props) => {
   }, [postList]);
 
   return (
-    <div className="posts">
-      <div className="header">
-        <h3 className="headerText">Historikk</h3>
-        <FontAwesomeIcon
-          className="plus"
-          icon={faCirclePlus}
-          onClick={addCard}
-          title="Legg til ny post"
-        />
+    <div>
+      <BudgetInformation budget={props.budget} />
+      <div className="posts">
+        <div style={{ marginTop: 10 }} className="header">
+          <h3 className="headerText">Historikk</h3>
+          <FontAwesomeIcon
+            className="plus"
+            icon={faCirclePlus}
+            onClick={addCard}
+            title="Legg til ny post"
+          />
+        </div>
       </div>
       {cardItem}
       {posts.map((post) => (
