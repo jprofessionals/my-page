@@ -6,6 +6,9 @@ import { Card, Button } from "react-bootstrap";
 import Post from "./Post";
 import "./Budget.scss";
 import CreateBudgetPost from "./CreateBudgetPost";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import "./Budget.scss";
 
 const Budget = (props) => {
   const postList = props.budget.posts;
@@ -40,11 +43,19 @@ const Budget = (props) => {
   }, [postList]);
 
   return (
-    <div>
-      <Button onClick={addCard}>Legg til utlegg</Button>
+    <div className="posts">
+      <div className="header">
+        <h3 className="headerText">Historikk</h3>
+        <FontAwesomeIcon
+          className="plus"
+          icon={faCirclePlus}
+          onClick={addCard}
+          title="Legg til ny post"
+        />
+      </div>
       {cardItem}
       {posts.map((post) => (
-        <Post key={post.description} post={post} />
+        <Post className="post" key={post.description} post={post} />
       ))}
     </div>
   );
