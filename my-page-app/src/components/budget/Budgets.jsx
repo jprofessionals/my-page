@@ -2,20 +2,16 @@ import React, { useEffect, useState } from "react";
 import ApiService from "../../services/api.service";
 import Budget from "./Budget";
 import { BudgetClass } from "./BudgetClass";
-import { Accordion, Col, Button} from "react-bootstrap";
+import { Accordion, Col, Button } from "react-bootstrap";
 import "./Budget.scss";
-
 
 const Budgets = () => {
   const [budgets, setBudgets] = useState([]);
   const [responseBudgets, setResponseBudgets] = useState([]);
-  const [fireFetchBudgets, setFireFetchBudgets] = useState(false)
 
   useEffect(() => {
-    ApiService.getBudgets().then((responseBudgets) => {
-      setResponseBudgets(responseBudgets.data);
-    });
-  }, [fireFetchBudgets]);
+    refreshBudgets();
+  }, []);
 
   useEffect(() => {
     const budgetList = [...budgets];
@@ -31,34 +27,29 @@ const Budgets = () => {
     }
   }, [responseBudgets]);
 
-  const handleRefresh = () => {
-    if (fireFetchBudgets === true){
-        setFireFetchBudgets(false)
-    }else {
-        setFireFetchBudgets(true);
-    }
-  }
-
-
+  const refreshBudgets = () => {
+    ApiService.getBudgets().then((responseBudgets) => {
+      setResponseBudgets(responseBudgets.data);
+    });
+  };
   return (
-    <div style={{marginTop:15}}>
-    <h3 style= {{marginLeft:5}}>Dine budsjetter</h3>
-    <Button onClick={handleRefresh}>Refresh budsjetter</Button>
-    <Accordion defaultActiveKey="0"> 
-       {budgets.map((budget) => ( 
-    <Accordion.Item key={budget.id} eventKey={budget.id}>
-      <Accordion.Header>
-        <Col>{budget.name}</Col>
-        <Col>{budget.ageOfBudgetInMonths}</Col>
-        </Accordion.Header>
-      <Accordion.Body>
-        <Budget budget={budget}/>
-      </Accordion.Body>
-    </Accordion.Item>
-    ))}
-  </Accordion>
-  </div>
-    
+    <div style={{ marginTop: 15 }}>
+      <h3 style={{ marginLeft: 5 }}>Dine budsjetter</h3>
+      <Button onClick={refreshBudgets}>Refresh budsjetter</Button>
+      <Accordion defaultActiveKey="0">
+        {budgets.map((budget) => (
+          <Accordion.Item key={budget.id} eventKey={budget.id}>
+            <Accordion.Header>
+              <Col>{budget.name}</Col>
+              <Col>{budget.ageOfBudgetInMonths}</Col>
+            </Accordion.Header>
+            <Accordion.Body>
+              <Budget budget={budget} refreshBudgets={refreshBudgets} />
+            </Accordion.Body>
+          </Accordion.Item>
+        ))}
+      </Accordion>
+    </div>
   );
 };
 
