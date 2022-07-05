@@ -31,14 +31,4 @@ class BudgetTypeController(
         return budgetService.getBudgetTypes()
     }
 
-    @GetMapping("/{budgetTypeId}")
-    @Operation(summary = "Get budgetType based on id.")
-    fun getBudgetType(
-        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
-        @PathVariable("budgetTypeId") budgetTypeId: Long
-    ): ResponseEntity<Any> {
-        val budgetType = budgetService.getBudgetType(budgetTypeId)
-            ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.ok(budgetType)
-    }
 }

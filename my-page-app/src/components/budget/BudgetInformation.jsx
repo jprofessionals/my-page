@@ -1,36 +1,43 @@
 import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
-import { Accordion, Card } from "react-bootstrap";
-import ApiService from "../../services/api.service";
+import {Card } from "react-bootstrap";
+import "./Budget.scss";
 
 const BudgetInformation = (props) => {
-  const [budgetTypeResponse, setBudgetTypeResponse] = useState();
 
-  useEffect(() => {
-    ApiService.getBudgetType(props.budget.budgetTypeId).then(
-      (responseBudgetType) => {
-        setBudgetTypeResponse(responseBudgetType.data);
-      }
-    );
-  }, []);
+ const interValOfDeposit = (interval) => {
+    if (interval === 1) {
+        return ("Månedlig")
+    } else if (interval === 12) {
+        return ("Årlig")
+    }
+ }
+
+ const rollOver = (rollOverValue) => {
+    if (rollOverValue) {
+        return ("Budjsettet har roll over")
+    } else{
+        return ("Budsjettet har ikke roll over")
+    }
+ }
 
   return (
-    <div>
+    <div className="budgetType">
       <Card>
         <Card.Body>
           <p>
-            <b>Type budsjett: </b>Informasjon om hva slags budsjett
+            <span>Type budsjett: </span>{props.budget.budgetType.name}
           </p>
           <p>
-            <b>Periode på innskudd: </b>Hvor ofte er periodisk innskudd?
+            <span>Roll over: </span>{rollOver(props.budget.budgetType.rollOver)}
           </p>
           <p>
-            <b>Beløp på periodisk innskudd: </b>Hvor mye er det periodiske
-            innskuddet?
+            <span>Periode på innskudd: </span>{interValOfDeposit(props.budget.budgetType.intervalOfDepositInMonths)}
           </p>
           <p>
-            <b>Startbeløp: </b>Beløpet budsjettet startet med
+            <span>Periodisk innskudd: </span>{props.budget.budgetType.deposit},-
+          </p>
+          <p>
+          <span>Startbeløp: </span>{props.budget.budgetType.startAmount},-
           </p>
         </Card.Body>
       </Card>

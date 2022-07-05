@@ -68,12 +68,7 @@ class BudgetService(
         val budgetTypes = budgetTypeRepository.findAll()
         return budgetTypes.map { budgetTypeMapper.toBudgetTypeDTO(it) }
     }
-
-    fun getBudgetType(budgetTypeId: Long): BudgetTypeDTO? {
-        val budgetType = budgetTypeRepository.findByIdOrNull(budgetTypeId)
-            ?: return null
-        return budgetTypeMapper.toBudgetTypeDTO(budgetType)
-    }
+    
 
     fun checkIfBudgetTypeExists(budgetTypeId: Long): Boolean {
         return budgetTypeRepository.existsBudgetTypeById(budgetTypeId)
