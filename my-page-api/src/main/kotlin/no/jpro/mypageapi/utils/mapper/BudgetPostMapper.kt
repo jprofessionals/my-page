@@ -26,17 +26,17 @@ class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private v
         return BudgetDTO(
             name = budget.name,
             id = budget.id,
-            ageOfBudgetInMonths = budget.ageOfBudgetInMonths,
             posts = postDTOs,
-            budgetType = responseBudgetType
+            budgetType = responseBudgetType,
+            startDate = budget.startDate
         )
     }
 
     fun toBudget(createBudgetDTO: CreateBudgetDTO): Budget = Budget(
         name = createBudgetDTO.name,
-        ageOfBudgetInMonths = createBudgetDTO.ageOfBudgetInMonths,
         posts = listOf(),
-        budgetType = budgetTypeRepository.findById(createBudgetDTO.budgetTypeId).get()
+        budgetType = budgetTypeRepository.findById(createBudgetDTO.budgetTypeId).get(),
+        startDate = createBudgetDTO.startDate
     )
 
     fun toPost(createPostDTO: CreatePostDTO): Post = Post(
@@ -45,6 +45,4 @@ class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private v
         amount = createPostDTO.amount,
         expense = createPostDTO.expense,
     )
-
-
 }

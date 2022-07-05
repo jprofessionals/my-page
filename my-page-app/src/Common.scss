@@ -1,5 +1,26 @@
 $jpro-orange: #ff7a0c;
-$hover-orange: orange;
-$white: white;
+$hover-orange: #ffa500;
+$white: #ffffff;
 $navbar-color: #2f4f4f;
 $smallScreen: 575px;
+$lighter-orange: #ffbd8d;
+$darker-ordange: #d16512;
+$black: #000000;
+
+.btn {
+  background-color: $jpro-orange;
+  border-color: $white;
+  &:hover {
+    background-color: $hover-orange;
+  }
+}
+
+.orange-jpro-round-button {
+  border-radius: 50%;
+  margin-left: auto;
+  margin-bottom: 5px;
+  border: none;
+  &:focus {
+    background-color: $darker-ordange;
+  }
+}
