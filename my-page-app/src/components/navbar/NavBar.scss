@@ -1,72 +1,62 @@
-body{
-    overflow:hidden;
-    @media screen and (max-width:575px)  {
-          .icon{
-              display:none;
-          }
-          .ms-auto {
-              display: none;
-          }
+@import "../../Common.scss";
+
+body {
+  overflow: hidden;
+  @media screen and (max-width: 575px) {
+    .icon {
+      display: none;
     }
-    @media screen and (min-width:575px)  {
-        .smallNav {
-            display: none;
+    .ms-auto {
+      display: none;
+    }
+  }
+  @media screen and (min-width: 575px) {
+    .smallNav {
+      display: none;
+    }
+  }
+  .navbar {
+    background-color: $navbar-color;
+    .navbar-nav {
+      a.nav-link {
+        color: $white;
+        text-align: center;
+        font-size: 18px;
+        margin-left: 5px;
+        margin-right: 5px;
+        &:active > a.nav-link {
+          color: $jpro-orange;
         }
-  }
-  
-
-.navbar {
-  background-color: #2f4f4f;
-
-  .navbar-nav {
-      
-    a.nav-link {
-        
-      color: #fff;
+        &:hover {
+          color: $jpro-orange;
+          transform: scale(1.1);
+        }
+      }
+    }
+    .navtext {
+      width: 100%;
+      position: relative;
+      left: 50%;
+      transform: translatex(-50%);
       text-align: center;
-      font-size: 18px;
-      margin-left: 5px;
-      margin-right: 5px;
-      &:active>a.nav-link{
-        color: #ff7a0c;
-      }
-      &:hover {
-        color: #ff7a0c;
-        transform: scale(1.1);
-      }
-      
+    }
+    a {
+      margin-left: 10px;
+    }
+    .container-fluid {
+      margin-right: 30px;
+    }
+    .logo {
+      height: 30px;
+      width: 40px;
+    }
+    .icon {
+      border-radius: 50%;
+      height: 30px;
+      margin-top: 9px;
+    }
+    button {
+      margin-right: 10px;
     }
   }
-
-  .navtext {
-    width: 100%;
-    position: relative;
-    left: 50%;
-    transform: translatex(-50%);
-    text-align: center;
-  }
-  a{
-    margin-left: 10px;
-  }
-  .container-fluid{
-      margin-right:30px;
-  }
-
-    .logo {
-        height: 30px;
-        width: 40px;
-        
-      }
-      .icon {
-          border-radius: 50%;
-          height: 30px;
-          margin-top:9px;
-      }
-  
-  
-  button {
-    margin-right: 10px;
-  }
-}
-
 }

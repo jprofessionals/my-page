@@ -47,7 +47,7 @@ const Budget = (props) => {
     <div>
       <BudgetInformation budget={props.budget} />
       <div className="posts">
-        <div style={{ marginTop: 10 }} className="header">
+        <div className="header">
           <h3 className="headerText">Historikk</h3>
           <FontAwesomeIcon
             className="plus"

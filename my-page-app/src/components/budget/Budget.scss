@@ -1,6 +1,8 @@
+@import "../../Common.scss";
+
 .accordion-button {
   &:focus {
-    box-shadow: 0px 0px 0px 0.1rem #ff7a0c;
+    box-shadow: 0px 0px 0px 0.1rem $jpro-orange;
   }
   &:not(.collapsed) {
     color: black;
@@ -15,38 +17,49 @@
   }
 }
 .budgets {
+  margin-top: 15px;
   .headerBudgets {
     display: flex;
     .headerText {
-      width: 93.5%;
+      margin-left: 5px;
     }
-    .refresh {
-      color: #ff7a0c;
-      font-size: xx-large;
-      top: 0;
-      justify-content: space-between;
+    button {
+      display: block;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-left: auto;
+      margin-right: 15px;
+      .align {
+        margin: -6px;
+        .refresh {
+          color: $white;
+          border-width: 20px;
+          font-size: large;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
       &:hover {
         cursor: pointer;
-        color: orange;
+        color: $hover-orange;
       }
     }
   }
 }
-
 .posts {
   .header {
     display: flex;
-    .headerText {
-      width: 97%;
-    }
+    margin-top: 10px;
     .plus {
-      color: #ff7a0c;
+      color: $jpro-orange;
       font-size: xx-large;
       top: 0;
-      justify-content: space-between;
+      margin-left: auto;
       &:hover {
         cursor: pointer;
-        color: orange;
+        color: $hover-orange;
       }
     }
   }
