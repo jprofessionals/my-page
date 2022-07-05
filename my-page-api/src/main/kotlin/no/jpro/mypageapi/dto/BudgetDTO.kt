@@ -8,7 +8,7 @@ class BudgetDTO(
     val id: Long?,
     var ageOfBudgetInMonths: Long,
     var posts: List<PostDTO>,
-    var budgetTypeId : Long?
+    var budgetType: BudgetTypeDTO
 
 ) {
 }

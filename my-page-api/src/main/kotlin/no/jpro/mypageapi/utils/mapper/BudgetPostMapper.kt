@@ -6,10 +6,11 @@ import no.jpro.mypageapi.dto.CreatePostDTO
 import no.jpro.mypageapi.dto.PostDTO
 import no.jpro.mypageapi.entity.Budget
 import no.jpro.mypageapi.entity.Post
+import no.jpro.mypageapi.repository.BudgetTypeRepository
 import org.springframework.stereotype.Service
 
 @Service
-class BudgetPostMapper() {
+class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private val budgetTypeRepository: BudgetTypeRepository) {
     fun toPostDTO(post: Post): PostDTO = PostDTO(
         date = post.date,
         description = post.description,
@@ -20,19 +21,22 @@ class BudgetPostMapper() {
     fun toBudgetDTO(budget: Budget): BudgetDTO {
         val posts = budget.posts
         val postDTOs = posts.map { toPostDTO(it) }
+        val budgetType = budget.budgetType
+        val responseBudgetType = budgetTypeMapper.toBudgetTypeDTO(budgetType)
         return BudgetDTO(
             name = budget.name,
             id = budget.id,
             ageOfBudgetInMonths = budget.ageOfBudgetInMonths,
             posts = postDTOs,
-            budgetTypeId = budget.budgetType?.id
+            budgetType = responseBudgetType
         )
     }
 
     fun toBudget(createBudgetDTO: CreateBudgetDTO): Budget = Budget(
         name = createBudgetDTO.name,
         ageOfBudgetInMonths = createBudgetDTO.ageOfBudgetInMonths,
-        posts = listOf()
+        posts = listOf(),
+        budgetType = budgetTypeRepository.findById(createBudgetDTO.budgetTypeId).get()
     )
 
     fun toPost(createPostDTO: CreatePostDTO): Post = Post(

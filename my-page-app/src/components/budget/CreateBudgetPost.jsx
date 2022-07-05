@@ -2,16 +2,13 @@ import React, { useState } from "react";
 import "./Budget.scss";
 import ApiService from "../../services/api.service";
 import Form from "react-bootstrap/Form";
+import Moment from 'moment';
 
 const CreateBudgetPost = (props) => {
-  const dateToString = (dateVar) => {
-    const indexOfSplit = dateVar.toISOString().indexOf("T");
-    return dateVar.toISOString().slice(0, indexOfSplit);
-  };
-
+  
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState(0);
-  const [date, setDate] = useState(dateToString(new Date()));
+  const [date, setDate] = useState(Moment().format('YYYY-MM-DD'));
   const isEnabled = description.length > 0 && !isNaN(amount) && amount > 0;
 
   const handleSubmit = (e) => {
