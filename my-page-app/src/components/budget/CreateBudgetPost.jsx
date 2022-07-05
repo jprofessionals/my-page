@@ -22,6 +22,7 @@ const CreateBudgetPost = (props) => {
     ApiService.createBudgetPost(budgetPost, props.budget.id).then(
       (response) => {
         props.refreshBudgets();
+        props.terminate();
       },
       (error) => {
         alert("Noe gikk feil, prøv igjen");

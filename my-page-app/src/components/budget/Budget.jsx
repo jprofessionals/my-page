@@ -16,6 +16,10 @@ const Budget = (props) => {
   const [posts, setPosts] = useState([]);
   const [cardItem, setCardItem] = useState();
 
+  const terminateCreateBudgetPost = () => {
+    setCardItem(null)
+  }
+
   const addCard = (e) => {
     setCardItem(
       <Card>
@@ -23,6 +27,7 @@ const Budget = (props) => {
           <CreateBudgetPost
             budget={props.budget}
             refreshBudgets={props.refreshBudgets}
+            terminate={terminateCreateBudgetPost}
           />
         </Card.Body>
       </Card>

@@ -1,6 +1,6 @@
 import React from "react";
 import {Card } from "react-bootstrap";
-import "./Budget.scss";
+import "./BudgetInformation.scss";
 
 const BudgetInformation = (props) => {
 
@@ -14,9 +14,9 @@ const BudgetInformation = (props) => {
 
  const rollOver = (rollOverValue) => {
     if (rollOverValue) {
-        return ("Budjsettet har roll over")
+        return ("Ja")
     } else{
-        return ("Budsjettet har ikke roll over")
+        return ("Nei")
     }
  }
 
@@ -24,21 +24,23 @@ const BudgetInformation = (props) => {
     <div className="budgetType">
       <Card>
         <Card.Body>
-          <p>
+            <ul className="budgetInformation">
+          <li>
             <span>Type budsjett: </span>{props.budget.budgetType.name}
-          </p>
-          <p>
+          </li>
+          <li>
             <span>Roll over: </span>{rollOver(props.budget.budgetType.rollOver)}
-          </p>
-          <p>
+          </li>
+          <li>
             <span>Periode på innskudd: </span>{interValOfDeposit(props.budget.budgetType.intervalOfDepositInMonths)}
-          </p>
-          <p>
+          </li>
+          <li>
             <span>Periodisk innskudd: </span>{props.budget.budgetType.deposit},-
-          </p>
-          <p>
+          </li>
+          <li>
           <span>Startbeløp: </span>{props.budget.budgetType.startAmount},-
-          </p>
+          </li>
+          </ul>
         </Card.Body>
       </Card>
     </div>
