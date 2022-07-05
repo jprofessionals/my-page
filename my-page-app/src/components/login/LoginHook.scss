@@ -1,32 +1,25 @@
+@import "../../Common.scss";
 .vertical-center {
-  background-color: darkslategrey;
+  background-color: $navbar-color;
   height: 100%;
   width: 100%;
-  margin: 0 auto;
   position: fixed;
-  top: 0px;
-  left: 0px;
-  z-index: 1000;
-  h2 {
-    margin: 40px;
-    color: white;
+  .headerText {
+    color: $white;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    width: 100%;
     text-align: center;
+    transform: translate(-50%, -50%);
   }
-  img {
+  .logo {
     margin: 10px;
   }
-  .btn {
-    background-color: #ff7a0c;
-    margin: 0 auto;
+  .loginBtn {
     position: absolute;
     top: 50%;
     left: 50%;
-    -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-    border-color: white;
-
-    &:hover {
-      background-color: orange;
-    }
   }
 }

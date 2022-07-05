@@ -1,67 +1,9 @@
 @import "../../Common.scss";
 
-.accordion-button {
-  &:focus {
-    box-shadow: 0px 0px 0px 0.1rem $jpro-orange;
-  }
-  &:not(.collapsed) {
-    color: black;
-    background-color: rgba(100%, 47.84%, 4.71%, 0.5);
-    &::after {
-      color: black;
-      background-image: url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27 fill=%27%23212529%27%3e%3cpath fill-rule=%27evenodd%27 d=%27M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z%27/%3e%3c/svg%3e");
-    }
-  }
-  &:hover {
-    background-color: rgba(100%, 47.84%, 4.71%, 0.5);
-  }
-}
-.budgets {
-  margin-top: 15px;
-  .headerBudgets {
-    display: flex;
-    .headerText {
-      margin-left: 5px;
-    }
-    button {
-      display: block;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      margin-left: auto;
-      margin-right: 15px;
-      .align {
-        margin: -6px;
-        .refresh {
-          color: $white;
-          border-width: 20px;
-          font-size: large;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-      }
-      &:hover {
-        cursor: pointer;
-        color: $hover-orange;
-      }
-    }
-  }
-}
 .posts {
   .header {
     display: flex;
     margin-top: 10px;
-    .plus {
-      color: $jpro-orange;
-      font-size: xx-large;
-      top: 0;
-      margin-left: auto;
-      &:hover {
-        cursor: pointer;
-        color: $hover-orange;
-      }
-    }
   }
 }
 .card {
@@ -70,7 +12,7 @@
 }
 
 .budgetType {
-    span {
-        font-weight: bold;
-    }
+  span {
+    font-weight: bold;
+  }
 }

@@ -36,9 +36,9 @@ const LoginHooks = (props) => {
 
   return (
     <div className="vertical-center">
-      <img src={jPro_logo_transparent} alt="jPro" />
-      <h2>Velkommen til Min side!</h2>
-      <button onClick={signIn} className="btn btn-primary btn-lg">
+      <img className="logo" src={jPro_logo_transparent} alt="jPro" />
+      <h2 className="headerText">Velkommen til Min side!</h2>
+      <button className="btn btn-primary btn-lg loginBtn" onClick={signIn}>
         <span className="buttonText">Logg inn med Google</span>
       </button>
     </div>

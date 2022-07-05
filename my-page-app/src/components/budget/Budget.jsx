@@ -2,12 +2,12 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { PostClass } from "./PostClass";
-import { Card } from "react-bootstrap";
+import { Card, Button } from "react-bootstrap";
 import Post from "./Post";
 import "./Budget.scss";
 import CreateBudgetPost from "./CreateBudgetPost";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import "./Budget.scss";
 import BudgetInformation from "./BudgetInformation";
 
@@ -49,12 +49,14 @@ const Budget = (props) => {
       <div className="posts">
         <div className="header">
           <h3 className="headerText">Historikk</h3>
-          <FontAwesomeIcon
-            className="plus"
-            icon={faCirclePlus}
-            onClick={addCard}
-            title="Legg til ny post"
-          />
+          <Button className="orange-jpro-round-button btn shadow-none">
+            <FontAwesomeIcon
+              className="plus"
+              icon={faPlus}
+              onClick={addCard}
+              title="Legg til ny post"
+            />
+          </Button>
         </div>
       </div>
       {cardItem}
