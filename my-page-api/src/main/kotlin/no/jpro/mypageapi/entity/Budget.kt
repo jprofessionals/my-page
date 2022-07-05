@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.entity
 
+import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
@@ -8,7 +9,7 @@ data class Budget(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     val name: String,
-    val ageOfBudgetInMonths: Long,
+    val startDate: LocalDate,
     @OneToMany(mappedBy = "budget")
     var posts: List<Post>,
     @ManyToOne
