@@ -1,8 +1,11 @@
 package no.jpro.mypageapi.dto
 
+import java.time.LocalDate
 
-class CreateBudgetDTO(
+
+data class CreateBudgetDTO(
     val name: String,
     val ageOfBudgetInMonths: Long,
-    val budgetTypeId: Long
+    val budgetTypeId: Long,
+    val startDate: LocalDate
 )
