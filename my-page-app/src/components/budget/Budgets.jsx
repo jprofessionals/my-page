@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ApiService from "../../services/api.service";
 import Budget from "./Budget";
-import { Accordion, Col, Button } from "react-bootstrap";
+import { Accordion, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import "./Budgets.scss";
@@ -18,6 +18,7 @@ const Budgets = () => {
       setBudgets(responseBudgets.data);
     });
   };
+
   return (
     <div className="budgets">
       <div className="headerBudgets">
@@ -35,15 +36,11 @@ const Budgets = () => {
       </div>
       <Accordion defaultActiveKey="0">
         {budgets.map((budget) => (
-          <Accordion.Item key={budget.id} eventKey={budget.id}>
-            <Accordion.Header title="Åpne">
-              <Col title="Navn på budsjettet">{budget.name}</Col>
-              <Col title="Saldo">{budget.balance},-</Col>
-            </Accordion.Header>
-            <Accordion.Body>
-              <Budget budget={budget} refreshBudgets={refreshBudgets} />
-            </Accordion.Body>
-          </Accordion.Item>
+          <Budget
+            key={budget.id}
+            budget={budget}
+            refreshBudgets={refreshBudgets}
+          />
         ))}
       </Accordion>
     </div>
