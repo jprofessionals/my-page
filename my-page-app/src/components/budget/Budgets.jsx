@@ -22,19 +22,21 @@ const Budgets = () => {
     <div className="budgets">
       <div className="headerBudgets">
         <h3 className="headerText">Dine budsjetter</h3>
-        <Button className="orange-jpro-round-button btn shadow-none">
+        <Button
+          onClick={refreshBudgets}
+          className="orange-jpro-round-button btn shadow-none"
+        >
           <FontAwesomeIcon
             className="refresh"
             icon={faRefresh}
-            onClick={refreshBudgets}
             title="Oppdater"
           />
         </Button>
       </div>
       <Accordion defaultActiveKey="0">
         {budgets.map((budget) => (
-          <Accordion.Item title="utvid" key={budget.id} eventKey={budget.id}>
-            <Accordion.Header>
+          <Accordion.Item key={budget.id} eventKey={budget.id}>
+            <Accordion.Header title="Åpne">
               <Col title="Navn på budsjettet">{budget.name}</Col>
               <Col title="Saldo">{budget.balance},-</Col>
             </Accordion.Header>

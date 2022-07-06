@@ -6,7 +6,7 @@ import Post from "./Post";
 import "./Budget.scss";
 import CreateBudgetPost from "./CreateBudgetPost";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faRemove } from "@fortawesome/free-solid-svg-icons";
 import "./Budget.scss";
 import BudgetInformation from "./BudgetInformation";
 
@@ -15,9 +15,35 @@ const Budget = (props) => {
   const [posts, setPosts] = useState([]);
   const [cardItem, setCardItem] = useState();
 
+  const addOrCancelButton = () => {
+    if (cardItem == null) {
+      return (
+        <Button
+          onClick={addCard}
+          className="orange-jpro-round-button btn shadow-none"
+        >
+          <FontAwesomeIcon
+            className="plus"
+            icon={faPlus}
+            title="Legg til ny post"
+          />
+        </Button>
+      );
+    } else {
+      return (
+        <Button
+          onClick={terminateCreateBudgetPost}
+          className="orange-jpro-round-button btn shadow-none"
+        >
+          <FontAwesomeIcon className="remove" icon={faRemove} title="Avbryt" />
+        </Button>
+      );
+    }
+  };
+
   const terminateCreateBudgetPost = () => {
-    setCardItem(null)
-  }
+    setCardItem(null);
+  };
 
   const addCard = (e) => {
     setCardItem(
@@ -44,14 +70,8 @@ const Budget = (props) => {
       <div className="posts">
         <div className="header">
           <h3 className="headerText">Historikk</h3>
-          <Button className="orange-jpro-round-button btn shadow-none">
-            <FontAwesomeIcon
-              className="plus"
-              icon={faPlus}
-              onClick={addCard}
-              title="Legg til ny post"
-            />
-          </Button>
+
+          {addOrCancelButton()}
         </div>
       </div>
       {cardItem}
