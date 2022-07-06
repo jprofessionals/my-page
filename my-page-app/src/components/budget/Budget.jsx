@@ -65,9 +65,11 @@ const Budget = (props) => {
           </div>
         </div>
         {cardItem}
-        {posts.map((post) => (
-          <Post className="post" key={post.id} post={post} />
-        ))}
+        {posts
+          .sort((a, b) => (a.date < b.date ? 1 : -1))
+          .map((post) => (
+            <Post className="post" key={post.id} post={post} />
+          ))}
       </Accordion.Body>
     </Accordion.Item>
   );
