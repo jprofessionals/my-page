@@ -1,15 +1,25 @@
 import React, { useState } from "react";
 import "./Budget.scss";
 import ApiService from "../../services/api.service";
-import Form from "react-bootstrap/Form";
-import Moment from 'moment';
+import Moment from "moment";
+import { Card, Button } from "react-bootstrap";
 
 const CreateBudgetPost = (props) => {
-  
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState(0);
-  const [date, setDate] = useState(Moment().format('YYYY-MM-DD'));
-  const isEnabled = description.length > 0 && !isNaN(amount) && amount > 0;
+  const [date, setDate] = useState(Moment().format("YYYY-MM-DD"));
+
+  const submitButton = () => {
+    if (amount <= 0 || description === "") {
+      return null;
+    } else {
+      return (
+        <Button className="addPostBtn" type="btn submit">
+          Legg til utlegget
+        </Button>
+      );
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -45,32 +55,45 @@ const CreateBudgetPost = (props) => {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <input
-          type="text"
-          name="description"
-          placeholder="Beskrivelse"
-          onChange={handleDescriptionChange}
-          value={description}
-          required
-        />
-        <input
-          type="number"
-          name="amount"
-          placeholder="Pris"
-          onChange={handleAmountChange}
-          value={amount}
-          required
-        />
-        <Form.Control
-          type="date"
-          name="date"
-          onChange={handleDateChange}
-          value={date}
-        ></Form.Control>
-
-        <button type="submit" disabled={!isEnabled}>
-          Legg til utlegget
-        </button>
+        <Card className="inputCard">
+          <Card.Header>
+            <input
+              className="description"
+              type="text"
+              name="description"
+              placeholder="Beskrivelse"
+              onChange={handleDescriptionChange}
+              value={description}
+              required
+            />
+          </Card.Header>
+          <Card.Body>
+            <ul className="addPost">
+              <li>
+                <span className="priceTitle">Pris:</span>
+                <input
+                  type="number"
+                  name="amount"
+                  placeholder="Pris"
+                  onChange={handleAmountChange}
+                  value={amount}
+                  required
+                />
+              </li>
+              <li>
+                <span className="datoTitle">Dato:</span>
+                <input
+                  className="inputDate"
+                  type="date"
+                  name="date"
+                  onChange={handleDateChange}
+                  value={date}
+                ></input>
+              </li>
+            </ul>
+            {submitButton()}
+          </Card.Body>
+        </Card>
       </div>
     </form>
   );

@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { Card, Button } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import Post from "./Post";
 import "./Budget.scss";
 import CreateBudgetPost from "./CreateBudgetPost";
@@ -41,28 +41,24 @@ const Budget = (props) => {
     }
   };
 
-  const terminateCreateBudgetPost = () => {
+  const terminateCreateBudgetPost = (e) => {
     setCardItem(null);
+    e.target.closest("button").blur();
   };
 
   const addCard = (e) => {
     setCardItem(
-      <Card>
-        <Card.Body>
-          <CreateBudgetPost
-            budget={props.budget}
-            refreshBudgets={props.refreshBudgets}
-            terminate={terminateCreateBudgetPost}
-          />
-        </Card.Body>
-      </Card>
+      <CreateBudgetPost
+        budget={props.budget}
+        refreshBudgets={props.refreshBudgets}
+        terminate={terminateCreateBudgetPost}
+      />
     );
   };
 
-  useEffect (() => {
-    setPosts(postList)
-  }, [postList])
-
+  useEffect(() => {
+    setPosts(postList);
+  }, [postList]);
 
   return (
     <div>
@@ -70,7 +66,6 @@ const Budget = (props) => {
       <div className="posts">
         <div className="header">
           <h3 className="headerText">Historikk</h3>
-
           {addOrCancelButton()}
         </div>
       </div>

@@ -12,6 +12,7 @@ $black: #000000;
   border-color: $white;
   &:hover {
     background-color: $hover-orange;
+    border-color: $white;
   }
 }
 

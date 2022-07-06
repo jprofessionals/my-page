@@ -1,25 +1,25 @@
 @import "../../Common.scss";
 
 .budgetType {
-    .budgetInformation {
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-        padding: 5px;
-        justify-content: center;
-        
-        li {
-            flex: 50%;
-            list-style-type: none;
-            padding: 3px;
-        }
-       @media screen and (max-width: $smallScreen) {
-        li{
-            flex: 60%
-        }        
+  .budgetInformation {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 5px;
+    justify-content: center;
+
+    li {
+      flex: 50%;
+      list-style-type: none;
+      padding: 3px;
+    }
+    @media screen and (max-width: $smallScreen) {
+      li {
+        flex: 60%;
+      }
     }
     span {
-        font-weight: bold;
+      font-weight: bold;
     }
-}
+  }
 }

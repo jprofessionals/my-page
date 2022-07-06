@@ -1,4 +1,4 @@
-@import "../../Common.scss";
+@use "../../Common.scss";
 
 .posts {
   .header {
@@ -14,5 +14,45 @@
 .budgetType {
   span {
     font-weight: bold;
+  }
+}
+
+.inputCard {
+  border-color: Common.$darker-ordange;
+  input {
+    &:focus {
+      outline-color: Common.$jpro-orange;
+    }
+  }
+  .description {
+    min-width: 280px;
+    width: 50%;
+  }
+  .addPost {
+    width: 100%;
+    padding: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    li {
+      list-style-type: none;
+      margin-bottom: 10px;
+      margin-left: 10px;
+
+      .description {
+        margin-left: 5px;
+      }
+      span {
+        font-weight: bold;
+        display: inline-block;
+        width: 50px;
+      }
+      .inputDate {
+        width: 185px;
+        height: 30px;
+      }
+    }
+  }
+  .addPostBtn {
+    margin-left: 14px;
   }
 }
