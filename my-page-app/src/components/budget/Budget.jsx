@@ -65,7 +65,7 @@ const Budget = (props) => {
       <Accordion.Header title="Åpne/Lukk">
         <ul className="initialBudgetInformation">
           <li>
-            <span title="Navn på budsjettet">{props.budget.name}</span>
+            <span title="Type budsjett">{props.budget.budgetType.name}</span>
           </li>
           <li>
             <span title="Saldo">{props.budget.balance}kr</span>
