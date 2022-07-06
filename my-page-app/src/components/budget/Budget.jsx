@@ -1,7 +1,6 @@
 import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { PostClass } from "./PostClass";
 import { Card, Button } from "react-bootstrap";
 import Post from "./Post";
 import "./Budget.scss";
@@ -34,19 +33,10 @@ const Budget = (props) => {
     );
   };
 
-  useEffect(() => {
-    const updatedPosts = [...posts];
-    for (let i = 0; i < postList.length; i++) {
-      const post = new PostClass(
-        postList[i].date,
-        postList[i].description,
-        postList[i].amount,
-        postList[i].expense
-      );
-      updatedPosts[i] = post;
-      setPosts(updatedPosts);
-    }
-  }, [postList]);
+  useEffect (() => {
+    setPosts(postList)
+  }, [postList])
+
 
   return (
     <div>
@@ -66,7 +56,7 @@ const Budget = (props) => {
       </div>
       {cardItem}
       {posts.map((post) => (
-        <Post className="post" key={post.description} post={post} />
+        <Post className="post" key={post.id} post={post} />
       ))}
     </div>
   );

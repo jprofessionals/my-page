@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service
 @Service
 class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private val budgetTypeRepository: BudgetTypeRepository) {
     fun toPostDTO(post: Post): PostDTO = PostDTO(
+        id = post.id,
         date = post.date,
         description = post.description,
         amount = post.amount,
