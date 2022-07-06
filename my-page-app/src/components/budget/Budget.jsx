@@ -19,21 +19,25 @@ const Budget = (props) => {
   const addOrCancelButton = () => {
     if (cardItem == null) {
       return (
-        <FontAwesomeIcon
+        <Button
           onClick={addCard}
-          className="plus"
-          icon={faPlus}
-          title="Legg til ny post"
-        />
+          className="orange-jpro-round-button btn shadow-none"
+        >
+          <FontAwesomeIcon
+            className="plus"
+            icon={faPlus}
+            title="Legg til ny post"
+          />
+        </Button>
       );
     } else {
       return (
-        <FontAwesomeIcon
+        <Button
           onClick={terminateCreateBudgetPost}
-          className="remove"
-          icon={faRemove}
-          title="Avbryt"
-        />
+          className="orange-jpro-round-button btn shadow-none"
+        >
+          <FontAwesomeIcon className="remove" icon={faRemove} title="Avbryt" />
+        </Button>
       );
     }
   };
@@ -76,9 +80,8 @@ const Budget = (props) => {
       <div className="posts">
         <div className="header">
           <h3 className="headerText">Historikk</h3>
-          <Button className="orange-jpro-round-button btn shadow-none">
-            {addOrCancelButton()}
-          </Button>
+
+          {addOrCancelButton()}
         </div>
       </div>
       {cardItem}

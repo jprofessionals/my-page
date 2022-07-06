@@ -22,11 +22,13 @@ const Budgets = () => {
     <div className="budgets">
       <div className="headerBudgets">
         <h3 className="headerText">Dine budsjetter</h3>
-        <Button className="orange-jpro-round-button btn shadow-none">
+        <Button
+          onClick={refreshBudgets}
+          className="orange-jpro-round-button btn shadow-none"
+        >
           <FontAwesomeIcon
             className="refresh"
             icon={faRefresh}
-            onClick={refreshBudgets}
             title="Oppdater"
           />
         </Button>
