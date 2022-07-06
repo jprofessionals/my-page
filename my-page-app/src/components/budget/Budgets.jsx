@@ -33,8 +33,8 @@ const Budgets = () => {
       </div>
       <Accordion defaultActiveKey="0">
         {budgets.map((budget) => (
-          <Accordion.Item title="utvid" key={budget.id} eventKey={budget.id}>
-            <Accordion.Header>
+          <Accordion.Item key={budget.id} eventKey={budget.id}>
+            <Accordion.Header title="Åpne">
               <Col title="Navn på budsjettet">{budget.name}</Col>
               <Col title="Saldo">{budget.balance},-</Col>
             </Accordion.Header>
