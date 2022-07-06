@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { Accordion, Card, Button } from "react-bootstrap";
+import { Accordion, Button } from "react-bootstrap";
 import Post from "./Post";
 import "./Budget.scss";
 import CreateBudgetPost from "./CreateBudgetPost";
@@ -15,45 +15,20 @@ const Budget = (props) => {
   const [posts, setPosts] = useState([]);
   const [cardItem, setCardItem] = useState();
 
-  const addOrCancelButton = () => {
-    if (cardItem == null) {
-      return (
-        <Button
-          onClick={addCard}
-          className="orange-jpro-round-button btn shadow-none"
-        >
-          <FontAwesomeIcon
-            className="plus"
-            icon={faPlus}
-            title="Legg til ny post"
-          />
-        </Button>
+  const toggler = (e) => {
+    if (!cardItem) {
+      setCardItem(
+        <CreateBudgetPost
+          budget={props.budget}
+          refreshBudgets={props.refreshBudgets}
+          toggle={setCardItem}
+        />
       );
+      e.target.closest("button").blur();
     } else {
-      return (
-        <Button
-          onClick={terminateCreateBudgetPost}
-          className="orange-jpro-round-button btn shadow-none"
-        >
-          <FontAwesomeIcon className="remove" icon={faRemove} title="Avbryt" />
-        </Button>
-      );
+      setCardItem(null);
+      e.target.closest("button").blur();
     }
-  };
-
-  const terminateCreateBudgetPost = (e) => {
-    setCardItem(null);
-    e.target.closest("button").blur();
-  };
-
-  const addCard = (e) => {
-    setCardItem(
-      <CreateBudgetPost
-        budget={props.budget}
-        refreshBudgets={props.refreshBudgets}
-        terminate={terminateCreateBudgetPost}
-      />
-    );
   };
 
   useEffect(() => {
@@ -77,7 +52,16 @@ const Budget = (props) => {
         <div className="posts">
           <div className="header">
             <h3 className="headerText">Historikk</h3>
-            {addOrCancelButton()}
+            <Button
+              onClick={toggler}
+              className="orange-jpro-round-button btn shadow-none"
+            >
+              <FontAwesomeIcon
+                className="toggleButton"
+                icon={cardItem ? faRemove : faPlus}
+                title={cardItem ? "Avbryt" : "Legg til ny post"}
+              />
+            </Button>{" "}
           </div>
         </div>
         {cardItem}
