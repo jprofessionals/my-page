@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { Button } from "react-bootstrap";
+import { Accordion, Card, Button } from "react-bootstrap";
 import Post from "./Post";
 import "./Budget.scss";
 import CreateBudgetPost from "./CreateBudgetPost";
@@ -61,19 +61,31 @@ const Budget = (props) => {
   }, [postList]);
 
   return (
-    <div>
-      <BudgetInformation budget={props.budget} />
-      <div className="posts">
-        <div className="header">
-          <h3 className="headerText">Historikk</h3>
-          {addOrCancelButton()}
+    <Accordion.Item key={props.budget.id} eventKey={props.budget.id}>
+      <Accordion.Header title="Åpne/Lukk">
+        <ul className="initialBudgetInformation">
+          <li>
+            <span title="Navn på budsjettet">{props.budget.name}</span>
+          </li>
+          <li>
+            <span title="Saldo">{props.budget.balance}kr</span>
+          </li>
+        </ul>
+      </Accordion.Header>
+      <Accordion.Body>
+        <BudgetInformation budget={props.budget} />
+        <div className="posts">
+          <div className="header">
+            <h3 className="headerText">Historikk</h3>
+            {addOrCancelButton()}
+          </div>
         </div>
-      </div>
-      {cardItem}
-      {posts.map((post) => (
-        <Post className="post" key={post.id} post={post} />
-      ))}
-    </div>
+        {cardItem}
+        {posts.map((post) => (
+          <Post className="post" key={post.id} post={post} />
+        ))}
+      </Accordion.Body>
+    </Accordion.Item>
   );
 };
 

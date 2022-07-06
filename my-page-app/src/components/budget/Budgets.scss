@@ -28,4 +28,19 @@
       margin-right: 12px;
     }
   }
+
+  .initialBudgetInformation {
+    display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        padding: 0px;
+        margin-bottom: 0px;
+        justify-content: center;
+
+        li {
+            flex: 50%;
+            list-style-type: none;
+            margin-bottom: 0px;
+        }
+  }
 }
