@@ -16,12 +16,20 @@ data class BudgetDTO(
     @JsonProperty
     fun sumDeposits(): Double {
         val toDate = LocalDate.now()
-        val adjustedFromDate = if(budgetType.rollOver) startDate else toDate.withDayOfYear(1)
+        val adjustedFromDate = if (budgetType.rollOver) startDate else toDate.withDayOfYear(1)
         val countMonths = Period.between(adjustedFromDate, toDate).months
         return (countMonths / budgetType.intervalOfDepositInMonths) * budgetType.deposit
     }
+
     @JsonProperty
-    fun sumPosts() = posts.sumOf { post -> post.amount }
+    fun sumPosts(): Double {
+        val toDate = LocalDate.now()
+        val adjustedFromDate = if (budgetType.rollOver) startDate else toDate.withDayOfYear(1)
+        val posts = if (!budgetType.rollOver) posts.filter { post ->
+            (post.date.compareTo(adjustedFromDate) * post.date.compareTo(toDate)) <= 0 } else posts
+        return posts.sumOf { post -> post.amount }
+    }
+
     @JsonProperty
-    fun balance() = sumDeposits() - sumPosts()
+    fun balance() = budgetType.startAmount + sumDeposits() - sumPosts()
 }
