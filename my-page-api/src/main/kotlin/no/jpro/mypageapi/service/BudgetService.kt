@@ -7,7 +7,6 @@ import no.jpro.mypageapi.repository.PostRepository
 import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.BudgetPostMapper
 import no.jpro.mypageapi.utils.mapper.BudgetTypeMapper
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
