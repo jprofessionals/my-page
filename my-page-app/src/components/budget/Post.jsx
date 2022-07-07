@@ -1,9 +1,14 @@
 import React from "react";
 import { Card } from "react-bootstrap";
+import Moment from "moment";
 
 const Post = (props) => {
+  const postInFuture = () => {
+    return props.post.date > Moment().format("YYYY-MM-DD");
+  };
+
   return (
-    <Card border="dark">
+    <Card border={postInFuture() ? "grey" : "dark"}>
       <Card.Header>
         <b>{props.post.description}</b>
       </Card.Header>

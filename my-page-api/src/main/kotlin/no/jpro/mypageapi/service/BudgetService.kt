@@ -9,6 +9,7 @@ import no.jpro.mypageapi.utils.mapper.BudgetPostMapper
 import no.jpro.mypageapi.utils.mapper.BudgetTypeMapper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class BudgetService(
@@ -68,9 +69,13 @@ class BudgetService(
         val budgetTypes = budgetTypeRepository.findAll()
         return budgetTypes.map { budgetTypeMapper.toBudgetTypeDTO(it) }
     }
-    
 
     fun checkIfBudgetTypeExists(budgetTypeId: Long): Boolean {
         return budgetTypeRepository.existsBudgetTypeById(budgetTypeId)
+    }
+
+    fun checkIfDateIsBeforeStartOfBudget(createPostDate: LocalDate, budgetId: Long): Boolean {
+        val budgetDate = budgetRepository.findById(budgetId).get().startDate
+        return createPostDate.isBefore(budgetDate)
     }
 }
