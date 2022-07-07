@@ -10,14 +10,6 @@ const BudgetInformation = (props) => {
     }
   };
 
-  const rollOver = (rollOverValue) => {
-    if (rollOverValue) {
-      return "Ja";
-    } else {
-      return "Nei";
-    }
-  };
-
   return (
     <div className="budgetType">
       <Card>
@@ -33,10 +25,12 @@ const BudgetInformation = (props) => {
               <span title="Periodisk inskudd">Periodisk innskudd: </span>
               {props.budget.budgetType.deposit}kr
             </li>
-            <li>
-              <span title="Dato for siste kjøp">Dato for siste kjøp: </span>
-              {props.budget.posts.at(0).date}
-            </li>
+            {props.budget.posts ? null : (
+              <li>
+                <span title="Dato for siste kjøp">Dato for siste kjøp: </span>
+                {props.budget.posts.at(0).date}
+              </li>
+            )}
             <li>
               <span title="Forbruk siste året">Forbruk siste året: </span>
               {props.budget.sumPostsLastTwelveMonths}kr
