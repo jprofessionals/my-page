@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.jpro.mypageapi.dto.*
+import no.jpro.mypageapi.repository.BudgetRepository
 import no.jpro.mypageapi.service.BudgetService
 import no.jpro.mypageapi.service.UserService
 import no.jpro.mypageapi.utils.JwtUtils
@@ -21,7 +22,7 @@ import javax.validation.Valid
 @SecurityRequirement(name = "Bearer Authentication")
 class MeController(
     private val userService: UserService,
-    private val budgetService: BudgetService
+    private val budgetService: BudgetService,
 ) {
     @GetMapping("")
     @Operation(summary = "Get data for user identified by the bearer token")
@@ -101,6 +102,9 @@ class MeController(
     ): ResponseEntity<Any> {
         val userId = JwtUtils.getID(jwt)
         if (!budgetService.checkIfBudgetExists(userId, budgetId)) {
+            return ResponseEntity.badRequest().build()
+        }
+        if (budgetService.checkIfDateIsBeforeStartOfBudget(postRequest.date, budgetId)) {
             return ResponseEntity.badRequest().build()
         }
         return ResponseEntity.ok(budgetService.createPost(postRequest, budgetId, userId))

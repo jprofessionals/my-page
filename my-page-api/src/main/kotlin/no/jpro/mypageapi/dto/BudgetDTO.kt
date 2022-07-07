@@ -25,8 +25,10 @@ data class BudgetDTO(
     fun sumPosts(): Double {
         val toDate = LocalDate.now()
         val adjustedFromDate = if (budgetType.rollOver) startDate else toDate.withDayOfYear(1)
-        val adjustedPosts = posts.filter { post -> (post.date.isAfter(adjustedFromDate) || post.date.isEqual(adjustedFromDate)) &&
-                (post.date.isBefore(toDate) || post.date.isEqual(toDate) ) }
+        val adjustedPosts = posts.filter { post ->
+            (post.date.isAfter(adjustedFromDate) || post.date.isEqual(adjustedFromDate)) &&
+                    (post.date.isBefore(toDate) || post.date.isEqual(toDate))
+        }
         return adjustedPosts.sumOf { post -> post.amount }
     }
 
@@ -34,8 +36,10 @@ data class BudgetDTO(
     fun sumPostsLastTwelveMonths(): Double {
         val toDate = LocalDate.now()
         val dateOneYearAgo = toDate.minusYears(1)
-        val postsLastTwelveMonths = posts.filter { post -> (post.date.isAfter(dateOneYearAgo) || post.date.isEqual(dateOneYearAgo)) &&
-                (post.date.isBefore(toDate) || post.date.isEqual(toDate) ) }
+        val postsLastTwelveMonths = posts.filter { post ->
+            (post.date.isAfter(dateOneYearAgo) || post.date.isEqual(dateOneYearAgo)) &&
+                    (post.date.isBefore(toDate) || post.date.isEqual(toDate))
+        }
         return postsLastTwelveMonths.sumOf { post -> post.amount }
     }
 

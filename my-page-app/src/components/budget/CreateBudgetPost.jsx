@@ -87,6 +87,7 @@ const CreateBudgetPost = (props) => {
                   name="date"
                   onChange={handleDateChange}
                   value={date}
+                  min={props.budget.startDate}
                 ></input>
               </li>
             </ul>
