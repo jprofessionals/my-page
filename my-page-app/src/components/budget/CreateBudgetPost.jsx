@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./Budget.scss";
 import ApiService from "../../services/api.service";
 import Moment from "moment";
 import { Card, Button } from "react-bootstrap";

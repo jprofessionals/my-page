@@ -1,11 +1,11 @@
-@import "../../Common.scss";
+@use "../../Common.scss";
 .vertical-center {
-  background-color: $navbar-color;
+  background-color: Common.$navbar-color;
   height: 100%;
   width: 100%;
   position: fixed;
   .headerText {
-    color: $white;
+    color: Common.$white;
     position: absolute;
     top: 30%;
     left: 50%;
@@ -17,6 +17,7 @@
     margin: 10px;
   }
   .loginBtn {
+    @include Common.btn;
     position: absolute;
     top: 50%;
     left: 50%;

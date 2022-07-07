@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./App.scss";
-import "./Common.scss";
 import LoginHooks from "./components/login/LoginHooks";
 import NavBar from "./components/navbar/NavBar";
 import Home from "./components/home";

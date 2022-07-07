@@ -1,4 +1,4 @@
-@import "../../Common.scss";
+@use "../../Common.scss";
 
 body {
   overflow: hidden;
@@ -16,19 +16,19 @@ body {
     }
   }
   .navbar {
-    background-color: $navbar-color;
+    background-color: Common.$navbar-color;
     .navbar-nav {
       a.nav-link {
-        color: $white;
+        color: Common.$white;
         text-align: center;
         font-size: 18px;
         margin-left: 5px;
         margin-right: 5px;
         &:active > a.nav-link {
-          color: $jpro-orange;
+          color: Common.$jpro-orange;
         }
         &:hover {
-          color: $jpro-orange;
+          color: Common.$jpro-orange;
           transform: scale(1.1);
         }
       }
