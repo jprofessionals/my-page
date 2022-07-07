@@ -1,6 +1,4 @@
-import React from "react";
-import { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Accordion, Button, AccordionContext } from "react-bootstrap";
 import Post from "./Post";
 import "./Budget.scss";
@@ -8,7 +6,6 @@ import CreateBudgetPost from "./CreateBudgetPost";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faRemove } from "@fortawesome/free-solid-svg-icons";
 import BudgetInformation from "./BudgetInformation";
-import { useContext } from "react";
 
 const Budget = (props) => {
   const postList = props.budget.posts;
