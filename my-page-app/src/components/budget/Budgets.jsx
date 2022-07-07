@@ -4,7 +4,6 @@ import Budget from "./Budget";
 import { Accordion, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
-import "./Budgets.scss";
 
 const Budgets = () => {
   const [budgets, setBudgets] = useState([]);

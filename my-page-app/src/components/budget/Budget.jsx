@@ -7,7 +7,6 @@ import "./Budget.scss";
 import CreateBudgetPost from "./CreateBudgetPost";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faRemove } from "@fortawesome/free-solid-svg-icons";
-import "./Budget.scss";
 import BudgetInformation from "./BudgetInformation";
 
 const Budget = (props) => {

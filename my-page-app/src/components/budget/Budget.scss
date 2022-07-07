@@ -1,20 +1,18 @@
 @use "../../Common.scss";
-
+//Budget
 .posts {
   .header {
     display: flex;
     margin-top: 10px;
+    Button {
+      @include Common.orange-jpro-round-button;
+      @include Common.btn;
+    }
   }
 }
 .card {
   margin-bottom: 5px;
   margin-top: 5px;
-}
-
-.budgetType {
-  span {
-    font-weight: bold;
-  }
 }
 
 .inputCard {
@@ -53,6 +51,78 @@
     }
   }
   .addPostBtn {
+    @include Common.btn;
     margin-left: 14px;
+  }
+}
+//BudgetInformation
+.budgetType {
+  .budgetInformation {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 5px;
+    justify-content: center;
+
+    li {
+      flex: 50%;
+      list-style-type: none;
+      padding: 3px;
+    }
+    @media screen and (max-width: Common.$smallScreen) {
+      li {
+        flex: 60%;
+      }
+    }
+    span {
+      font-weight: bold;
+    }
+  }
+}
+//Budgets
+.accordion-button {
+  &:focus {
+    box-shadow: 0px 0px 0px 0.1rem Common.$jpro-orange;
+  }
+  &:not(.collapsed) {
+    color: Common.$black;
+    background-color: Common.$lighter-orange;
+    &::after {
+      color: Common.$black;
+      background-image: url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27 fill=%27%23212529%27%3e%3cpath fill-rule=%27evenodd%27 d=%27M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z%27/%3e%3c/svg%3e");
+    }
+  }
+  &:hover {
+    background-color: Common.$lighter-orange;
+  }
+}
+
+.budgets {
+  margin-top: 15px;
+  .headerBudgets {
+    display: flex;
+    .headerText {
+      margin-left: 5px;
+    }
+    button {
+      @include Common.orange-jpro-round-button;
+      @include Common.btn;
+      margin-right: 12px;
+    }
+  }
+
+  .initialBudgetInformation {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 0px;
+    margin-bottom: 0px;
+    justify-content: center;
+
+    li {
+      flex: 50%;
+      list-style-type: none;
+      margin-bottom: 0px;
+    }
   }
 }

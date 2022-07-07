@@ -7,7 +7,7 @@ $lighter-orange: #ffbd8d;
 $darker-ordange: #d16512;
 $black: #000000;
 
-.btn {
+@mixin btn {
   background-color: $jpro-orange;
   border-color: $white;
   &:hover {
@@ -16,7 +16,7 @@ $black: #000000;
   }
 }
 
-.orange-jpro-round-button {
+@mixin orange-jpro-round-button {
   border-radius: 50%;
   margin-left: auto;
   margin-bottom: 5px;
