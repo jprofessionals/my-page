@@ -24,26 +24,22 @@ const BudgetInformation = (props) => {
         <Card.Body>
           <ul className="budgetInformation">
             <li>
-              <span>Type budsjett: </span>
-              {props.budget.budgetType.name}
-            </li>
-            <li>
-              <span>Roll over: </span>
-              {rollOver(props.budget.budgetType.rollOver)}
-            </li>
-            <li>
-              <span>Periode på innskudd: </span>
+              <span title="Periode på inskudd">Periode på innskudd: </span>
               {interValOfDeposit(
                 props.budget.budgetType.intervalOfDepositInMonths
               )}
             </li>
             <li>
-              <span>Periodisk innskudd: </span>
-              {props.budget.budgetType.deposit},-
+              <span title="Periodisk inskudd">Periodisk innskudd: </span>
+              {props.budget.budgetType.deposit}kr
             </li>
             <li>
-              <span>Startbeløp: </span>
-              {props.budget.budgetType.startAmount},-
+              <span title="Dato for siste kjøp">Dato for siste kjøp: </span>
+              {props.budget.posts.at(0).date}
+            </li>
+            <li>
+              <span title="Forbruk siste året">Forbruk siste året: </span>
+              {props.budget.sumPostsLastTwelveMonths}kr
             </li>
           </ul>
         </Card.Body>
