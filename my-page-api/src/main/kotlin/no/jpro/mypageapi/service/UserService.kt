@@ -2,7 +2,6 @@ package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.dto.UpdateUserDTO
 import no.jpro.mypageapi.dto.UserDTO
-import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.JwtUtils
 import no.jpro.mypageapi.utils.mapper.UserMapper

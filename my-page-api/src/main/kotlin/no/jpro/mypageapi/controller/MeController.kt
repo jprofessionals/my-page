@@ -2,6 +2,7 @@ package no.jpro.mypageapi.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -21,7 +22,7 @@ import javax.validation.Valid
 @SecurityRequirement(name = "Bearer Authentication")
 class MeController(
     private val userService: UserService,
-    private val budgetService: BudgetService
+    private val budgetService: BudgetService,
 ) {
     @GetMapping("")
     @Operation(summary = "Get data for user identified by the bearer token")
@@ -34,6 +35,10 @@ class MeController(
 
     @PatchMapping("")
     @Operation(summary = "Update your user with nickname and/or startDate")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = UserDTO::class))]
+    )
     fun updateUser(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @Valid @RequestBody updateUserRequest: UpdateUserDTO
@@ -42,6 +47,12 @@ class MeController(
 
     @GetMapping("budgets")
     @Operation(summary = "Get the different budgets that belong to logged in user.")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json", array = ArraySchema(
+            schema = Schema(implementation = BudgetDTO::class)
+        ))]
+    )
     fun getBudgets(@Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt): List<BudgetDTO> {
         val userId = JwtUtils.getID(jwt)
         return budgetService.getBudgets(userId)
@@ -49,10 +60,14 @@ class MeController(
 
     @PostMapping("budgets")
     @Operation(summary = "Create a budget for the logged in user")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = BudgetDTO::class))]
+    )
     fun createBudget(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @RequestBody budgetRequest: CreateBudgetDTO
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<BudgetDTO> {
         val userId = JwtUtils.getID(jwt)
         if (!userService.checkIfUserExists(userId) || !budgetService.checkIfBudgetTypeExists(budgetRequest.budgetTypeId)) {
             return ResponseEntity.badRequest().build()
@@ -62,10 +77,14 @@ class MeController(
 
     @GetMapping("budgets/{budgetId}")
     @Operation(summary = "Get budget based on id.")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = BudgetDTO::class))]
+    )
     fun getBudget(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @PathVariable("budgetId") budgetId: Long
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<BudgetDTO> {
         val userId = JwtUtils.getID(jwt)
         val budget = budgetService.getBudget(userId, budgetId)
             ?: return ResponseEntity.notFound().build()
@@ -74,6 +93,12 @@ class MeController(
 
     @GetMapping("budgets/{budgetId}/posts")
     @Operation(summary = "Get posts for one budget.")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json", array = ArraySchema(
+            schema = Schema(implementation = PostDTO::class)
+        ))]
+    )
     fun getPosts(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @PathVariable("budgetId") budgetId: Long
@@ -83,11 +108,15 @@ class MeController(
 
     @GetMapping("budgets/{budgetId}/posts/{postId}")
     @Operation(summary = "Get post based on id.")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = PostDTO::class))]
+    )
     fun getPost(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @PathVariable("budgetId") budgetId: Long,
         @PathVariable("postId") postId: Long
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<PostDTO> {
         val post = budgetService.getPost(budgetId, postId)
             ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(post)
@@ -95,12 +124,19 @@ class MeController(
 
     @PostMapping("budgets/{budgetId}/posts")
     @Operation(summary = "Create a new post related to an existing budget.")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = PostDTO::class))]
+    )
     fun createPost(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @Valid @RequestBody postRequest: CreatePostDTO, @PathVariable("budgetId") budgetId: Long,
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<PostDTO> {
         val userId = JwtUtils.getID(jwt)
         if (!budgetService.checkIfBudgetExists(userId, budgetId)) {
+            return ResponseEntity.badRequest().build()
+        }
+        if (budgetService.checkIfDateIsBeforeStartOfBudget(postRequest.date, budgetId)) {
             return ResponseEntity.badRequest().build()
         }
         return ResponseEntity.ok(budgetService.createPost(postRequest, budgetId, userId))

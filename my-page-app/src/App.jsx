@@ -5,6 +5,7 @@ import NavBar from "./components/navbar/NavBar";
 import Home from "./components/home";
 import ApiService from "./services/api.service";
 import { User } from "./User";
+import Budgets from "./components/budget/Budgets";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -20,7 +21,8 @@ function App() {
               response.data.email,
               response.data.givenName,
               response.data.familyName,
-              response.data.icon
+              response.data.icon,
+              response.data.startDate
             )
           );
         },
@@ -46,6 +48,7 @@ function App() {
       <div>
         <NavBar isAuthenticatedCallBack={setIsAuthenticated} user={user} />
         <Home user={user} />
+        <Budgets></Budgets>
       </div>
     );
   }

@@ -15,7 +15,7 @@ const NavBar = (props) => {
 
   return (
     <Navbar className="navbar" collapseOnSelect expand="sm" variant="dark">
-      <Navbar.Brand href="/">
+      <Navbar.Brand href="/" title="min side">
         <img className="logo" src={jPro_logo_transparent} alt="jPro" />
       </Navbar.Brand>
       <Navbar.Toggle className="button" aria-controls="responsive-navbar-nav" />

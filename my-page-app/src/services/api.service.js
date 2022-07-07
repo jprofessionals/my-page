@@ -20,11 +20,30 @@ const getUser = () => {
   return axios.get(API_URL + "me", { headers: authHeader() });
 };
 
+const getBudgets = () => {
+  return axios.get(API_URL + "me/budgets", { headers: authHeader() });
+};
+
+const createBudgetPost = (post, budgetId) => {
+  return axios.post(API_URL + "me/budgets/" + budgetId + "/posts", post, {
+    headers: authHeader(),
+  });
+};
+
+const getBudgetType = (budgetTypeId) => {
+  return axios.get(API_URL + "budgetTypes/" + budgetTypeId, {
+    headers: authHeader(),
+  });
+};
+
 const ApiService = {
   getTestApi,
   getTestApiOpen,
   getEmployees,
   postEmployees,
   getUser,
+  getBudgets,
+  createBudgetPost,
+  getBudgetType,
 };
 export default ApiService;

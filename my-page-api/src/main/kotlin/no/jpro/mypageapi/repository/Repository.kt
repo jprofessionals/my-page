@@ -8,17 +8,17 @@ import org.springframework.stereotype.Repository
 interface EmployeeRepository : JpaRepository<Employee, Long>
 
 @Repository
-interface UserRepository : JpaRepository<User, String>{
+interface UserRepository : JpaRepository<User, String> {
     fun existsUserById(userId: String): Boolean
 }
-
 
 
 @Repository
 interface BudgetRepository : JpaRepository<Budget, Long> {
     fun findBudgetsByUserId(userId: String): List<Budget>
     fun findBudgetByUserIdAndId(userId: String, budgetId: Long): Budget?
-    fun existsBudgetByUserIdAndId(userId: String,budgetId: Long):Boolean
+    fun existsBudgetByUserIdAndId(userId: String, budgetId: Long): Boolean
+
 }
 
 @Repository
@@ -28,7 +28,7 @@ interface PostRepository : JpaRepository<Post, Long> {
 }
 
 @Repository
-interface BudgetTypeRepository : JpaRepository<BudgetType, Long>{
+interface BudgetTypeRepository : JpaRepository<BudgetType, Long> {
     fun existsBudgetTypeById(budgetTypeId: Long): Boolean
 }
 
