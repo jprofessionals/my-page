@@ -18,32 +18,44 @@ const Budgets = () => {
     });
   };
 
-  return (
-    <div className="budgets">
-      <div className="headerBudgets">
-        <h3 className="headerText">Dine budsjetter</h3>
-        <Button
-          onClick={refreshBudgets}
-          className="orange-jpro-round-button btn shadow-none"
-        >
-          <FontAwesomeIcon
-            className="refresh"
-            icon={faRefresh}
-            title="Oppdater"
-          />
-        </Button>
+  if (!budgets.length) {
+    return (
+      <div>
+        <h3>Du har ingen budsjetter</h3>
+        <p className="headerText">
+          Kontakt ledelsen for å få opprettet budsjettene dine
+        </p>
       </div>
-      <Accordion defaultActiveKey="0">
-        {budgets.map((budget) => (
-          <Budget
-            key={budget.id}
-            budget={budget}
-            refreshBudgets={refreshBudgets}
-          />
-        ))}
-      </Accordion>
-    </div>
-  );
+    );
+  } else {
+    return (
+      <div className="budgets">
+        <div className="headerBudgets">
+          <h3 className="headerText">Dine budsjetter</h3>
+
+          <Button
+            onClick={refreshBudgets}
+            className="orange-jpro-round-button btn shadow-none"
+          >
+            <FontAwesomeIcon
+              className="refresh"
+              icon={faRefresh}
+              title="Oppdater"
+            />
+          </Button>
+        </div>
+        <Accordion defaultActiveKey="0">
+          {budgets.map((budget) => (
+            <Budget
+              key={budget.id}
+              budget={budget}
+              refreshBudgets={refreshBudgets}
+            />
+          ))}
+        </Accordion>
+      </div>
+    );
+  }
 };
 
 export default Budgets;

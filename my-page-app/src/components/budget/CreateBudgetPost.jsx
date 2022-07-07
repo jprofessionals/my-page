@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import ApiService from "../../services/api.service";
 import Moment from "moment";
-import { Card, Button } from "react-bootstrap";
+import { Card, Button, Spinner } from "react-bootstrap";
 
 const CreateBudgetPost = (props) => {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState(0);
   const [date, setDate] = useState(Moment().format("YYYY-MM-DD"));
+  const [isLoading, setIsLoading] = useState(false);
 
   const submitButton = () => {
     if (amount <= 0 || description === "") {
@@ -21,6 +22,7 @@ const CreateBudgetPost = (props) => {
   };
 
   const handleSubmit = (e) => {
+    setIsLoading(true);
     e.preventDefault();
     const budgetPost = {
       date: date,
@@ -32,6 +34,7 @@ const CreateBudgetPost = (props) => {
       (response) => {
         props.refreshBudgets();
         props.toggle();
+        setIsLoading(false);
       },
       (error) => {
         alert("Noe gikk feil, prøv igjen");
@@ -54,6 +57,7 @@ const CreateBudgetPost = (props) => {
   return (
     <form onSubmit={handleSubmit}>
       <div>
+        {isLoading ? <Spinner animation="border" /> : null}
         <Card className="inputCard">
           <Card.Header>
             <input
