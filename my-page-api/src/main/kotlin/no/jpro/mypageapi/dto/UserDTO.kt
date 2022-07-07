@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDate
 
 class UserDTO(
@@ -10,6 +11,6 @@ class UserDTO(
     val icon: String?,
     var nickName: String? = null,
     var startDate: LocalDate?= null,
+    @JsonIgnore
     var budgets: List<BudgetDTO>? = null
-
 )
