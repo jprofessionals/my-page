@@ -36,6 +36,7 @@ function App() {
             error.message ||
             error.toString();
           console.log(_secureContent);
+          setLoadUser(false);
         }
       );
     }
@@ -49,20 +50,19 @@ function App() {
     );
   } else {
     return (
-      <div>
-        {loadUser ? (
+      <>
+        <div style={loadUser ? {} : { display: "none" }}>
           <div className="loadSpinUser d-flex align-items-center">
             <Spinner animation="border" />
             <h3>Laster inn bruker</h3>
           </div>
-        ) : (
-          <div>
-            <NavBar isAuthenticatedCallBack={setIsAuthenticated} user={user} />
-            <Home user={user} />
-            <Budgets></Budgets>
-          </div>
-        )}
-      </div>
+        </div>
+        <div style={loadUser ? { display: "none" } : {}}>
+          <NavBar isAuthenticatedCallBack={setIsAuthenticated} user={user} />
+          <Home user={user} />
+          <Budgets></Budgets>
+        </div>
+      </>
     );
   }
 }

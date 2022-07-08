@@ -15,7 +15,7 @@
   margin-bottom: 5px;
   margin-top: 5px;
 }
-
+//CreateBudgetPost
 .inputCard {
   border-color: Common.$darker-ordange;
   input {
@@ -55,6 +55,7 @@
     margin-left: 14px;
   }
 }
+
 //BudgetInformation
 .budgetType {
   .budgetInformation {
@@ -102,6 +103,7 @@
   .loadSpin {
     color: Common.$darker-ordange;
     align-items: center;
+    margin-left: 20px;
     h3 {
       margin-left: 20px;
     }
