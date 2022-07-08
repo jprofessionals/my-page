@@ -38,7 +38,7 @@ function App() {
             error.message ||
             error.toString();
           // console.log(_secureContent);
-          toast.configure.error("Feil:", _secureContent, {
+          toast.error("Feil:", _secureContent, {
             position: "top-left",
             autoClose: 5000,
             hideProgressBar: false,

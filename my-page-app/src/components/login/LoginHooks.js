@@ -23,7 +23,7 @@ const LoginHooks = (props) => {
   };
 
   const onFailure = (res) => {
-    toast.configure.error("Login feilet: resultatet er:", res, {
+    toast.error("Login feilet: resultatet er:", res, {
       position: "top-left",
       autoClose: 5000,
       hideProgressBar: false,

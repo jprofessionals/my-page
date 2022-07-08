@@ -44,7 +44,7 @@ const CreateBudgetPost = (props) => {
         setIsLoadingPost(false);
       },
       (error) => {
-        toast.configure.error("Noe gikk feil, prøv igjen senere", {
+        toast.error("Noe gikk feil, prøv igjen senere", {
           position: "top-left",
           autoClose: 5000,
           hideProgressBar: false,

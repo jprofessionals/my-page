@@ -15,7 +15,7 @@ const LogoutHooks = (props) => {
   };
 
   const onFailure = () => {
-    toast.configure.error("Utlogging feilet", {
+    toast.error("Utlogging feilet", {
       position: "top-left",
       autoClose: 5000,
       hideProgressBar: false,
