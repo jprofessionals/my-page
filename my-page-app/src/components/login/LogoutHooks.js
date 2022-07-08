@@ -2,6 +2,8 @@ import React from "react";
 import { useGoogleLogout } from "react-google-login";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOut } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
@@ -13,7 +15,17 @@ const LogoutHooks = (props) => {
   };
 
   const onFailure = () => {
-    console.log("Handle failure cases");
+    toast.configure.error("Utlogging feilet", {
+      position: "top-left",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+    toast("Utlogging feilet");
+    // console.log("Handle failure cases");
   };
 
   const { signOut } = useGoogleLogout({

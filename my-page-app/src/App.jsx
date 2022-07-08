@@ -7,6 +7,8 @@ import ApiService from "./services/api.service";
 import { User } from "./User";
 import Budgets from "./components/budget/Budgets";
 import { Spinner } from "react-bootstrap";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -35,7 +37,17 @@ function App() {
             (error.response && error.response.data) ||
             error.message ||
             error.toString();
-          console.log(_secureContent);
+          // console.log(_secureContent);
+          toast.configure.error("Feil:", _secureContent, {
+            position: "top-left",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          // toast("Feil:", _secureContent);
           setLoadUser(false);
         }
       );

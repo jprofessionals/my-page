@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import ApiService from "../../services/api.service";
 import Moment from "moment";
 import { Card, Button, Spinner } from "react-bootstrap";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CreateBudgetPost = (props) => {
   const [description, setDescription] = useState("");
@@ -42,7 +44,17 @@ const CreateBudgetPost = (props) => {
         setIsLoadingPost(false);
       },
       (error) => {
-        alert("Noe gikk feil, prøv igjen");
+        toast.configure.error("Noe gikk feil, prøv igjen senere", {
+          position: "top-left",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        // toast("Noe gikk feil, prøv igjen");
+        // alert("Noe gikk feil, prøv igjen");
       }
     );
   };

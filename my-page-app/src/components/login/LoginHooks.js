@@ -4,6 +4,8 @@ import "./LoginHook.scss";
 // refresh token
 import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
 import { refreshTokenSetup } from "../../utils/refreshToken";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
@@ -21,7 +23,17 @@ const LoginHooks = (props) => {
   };
 
   const onFailure = (res) => {
-    console.log("Login failed: res:", res);
+    toast.configure.error("Login feilet: resultatet er:", res, {
+      position: "top-left",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+    // toast("Login feilet: resultatet er:", res);
+    // console.log("Login failed: res:", res);
   };
 
   const { signIn } = useGoogleLogin({
