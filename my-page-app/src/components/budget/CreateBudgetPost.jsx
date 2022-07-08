@@ -57,47 +57,55 @@ const CreateBudgetPost = (props) => {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        {isLoading ? <Spinner animation="border" /> : null}
-        <Card className="inputCard">
-          <Card.Header>
-            <input
-              className="description"
-              type="text"
-              name="description"
-              placeholder="Beskrivelse"
-              onChange={handleDescriptionChange}
-              value={description}
-              required
-            />
-          </Card.Header>
-          <Card.Body>
-            <ul className="addPost">
-              <li>
-                <span className="priceTitle">Pris:</span>
+        {isLoading ? (
+          <div className="loadSpin d-flex align-items-center">
+            <Spinner animation="border" />
+            <h3>Legger til post</h3>
+          </div>
+        ) : (
+          <div>
+            <Card className="inputCard">
+              <Card.Header>
                 <input
-                  type="number"
-                  name="amount"
-                  placeholder="Pris"
-                  onChange={handleAmountChange}
-                  value={amount}
+                  className="description"
+                  type="text"
+                  name="description"
+                  placeholder="Beskrivelse"
+                  onChange={handleDescriptionChange}
+                  value={description}
                   required
                 />
-              </li>
-              <li>
-                <span className="datoTitle">Dato:</span>
-                <input
-                  className="inputDate"
-                  type="date"
-                  name="date"
-                  onChange={handleDateChange}
-                  value={date}
-                  min={props.budget.startDate}
-                ></input>
-              </li>
-            </ul>
-            {submitButton()}
-          </Card.Body>
-        </Card>
+              </Card.Header>
+              <Card.Body>
+                <ul className="addPost">
+                  <li>
+                    <span className="priceTitle">Pris:</span>
+                    <input
+                      type="number"
+                      name="amount"
+                      placeholder="Pris"
+                      onChange={handleAmountChange}
+                      value={amount}
+                      required
+                    />
+                  </li>
+                  <li>
+                    <span className="datoTitle">Dato:</span>
+                    <input
+                      className="inputDate"
+                      type="date"
+                      name="date"
+                      onChange={handleDateChange}
+                      value={date}
+                      min={props.budget.startDate}
+                    ></input>
+                  </li>
+                </ul>
+                {submitButton()}
+              </Card.Body>
+            </Card>
+          </div>
+        )}
       </div>
     </form>
   );

@@ -6,13 +6,16 @@ import Home from "./components/home";
 import ApiService from "./services/api.service";
 import { User } from "./User";
 import Budgets from "./components/budget/Budgets";
+import { Spinner } from "react-bootstrap";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(new User());
+  const [loadUser, setLoadUser] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
+      setLoadUser(true);
       ApiService.getUser().then(
         (response) => {
           setUser(
@@ -25,6 +28,7 @@ function App() {
               response.data.startDate
             )
           );
+          setLoadUser(false);
         },
         (error) => {
           const _secureContent =
@@ -46,9 +50,18 @@ function App() {
   } else {
     return (
       <div>
-        <NavBar isAuthenticatedCallBack={setIsAuthenticated} user={user} />
-        <Home user={user} />
-        <Budgets></Budgets>
+        {loadUser ? (
+          <div className="loadSpinUser d-flex align-items-center">
+            <Spinner animation="border" />
+            <h3>Laster inn bruker</h3>
+          </div>
+        ) : (
+          <div>
+            <NavBar isAuthenticatedCallBack={setIsAuthenticated} user={user} />
+            <Home user={user} />
+            <Budgets></Budgets>
+          </div>
+        )}
       </div>
     );
   }
