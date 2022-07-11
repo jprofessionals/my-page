@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.repository
 
+import no.jpro.mypageapi.dto.PostDTO
 import no.jpro.mypageapi.entity.*
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
@@ -18,6 +19,7 @@ interface BudgetRepository : JpaRepository<Budget, Long> {
     fun findBudgetsByUserId(userId: String): List<Budget>
     fun findBudgetByUserIdAndId(userId: String, budgetId: Long): Budget?
     fun existsBudgetByUserIdAndId(userId: String, budgetId: Long): Boolean
+
 
 }
 
