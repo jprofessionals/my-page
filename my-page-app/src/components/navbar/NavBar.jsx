@@ -4,12 +4,12 @@ import "./NavBar.scss";
 import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
 import LogoutHooks from "../login/LogoutHooks";
 
-const NavBar = (props) => {
+const NavBar = ({ user, isAuthenticatedCallBack }) => {
   const [isLogoutSuccess, setIsLogoutSuccess] = useState(false);
 
   useEffect(() => {
     if (isLogoutSuccess) {
-      props.isAuthenticatedCallBack(false);
+      isAuthenticatedCallBack(false);
     }
   }, [isLogoutSuccess]);
 
@@ -32,7 +32,7 @@ const NavBar = (props) => {
             <LogoutHooks isAuthenticatedCallBack={setIsLogoutSuccess} />
           </Nav.Link>
           <Nav.Item>
-            <img className="icon" src={props.user.icon} alt="Icon"></img>
+            <img className="icon" src={user.icon} alt="Icon"></img>
           </Nav.Item>
         </Nav>
       </Navbar.Collapse>

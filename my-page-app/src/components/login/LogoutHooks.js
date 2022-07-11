@@ -5,11 +5,11 @@ import { faSignOut } from "@fortawesome/free-solid-svg-icons";
 
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
-const LogoutHooks = (props) => {
+const LogoutHooks = ({ isAuthenticatedCallBack }) => {
   const onLogoutSuccess = (res) => {
     localStorage.removeItem("user_token");
     console.log("Logged out Success");
-    props.isAuthenticatedCallBack(true);
+    isAuthenticatedCallBack(true);
   };
 
   const onFailure = () => {

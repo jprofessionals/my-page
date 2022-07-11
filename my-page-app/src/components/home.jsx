@@ -1,12 +1,12 @@
 import React from "react";
 
-function Home(props) {
+function Home({ user }) {
   return (
-    <div style = {{marginTop:20, marginLeft:-5}} className="container">
+    <div style={{ marginTop: 20, marginLeft: -5 }} className="container">
       <header className="jumbotron">
-        <h3>Hei, {props.user.givenName}</h3>
-        <p>E-post: {props.user.email}</p>
-        <p>Startdato: {props.user.startDate}</p>
+        <h3>Hei, {user.givenName}</h3>
+        <p>E-post: {user.email}</p>
+        <p>Startdato: {user.startDate}</p>
       </header>
     </div>
   );

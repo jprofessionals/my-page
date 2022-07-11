@@ -1,4 +1,6 @@
+@use "./Common.scss";
 html {
+  height: 100%;
   overflow-x: scroll;
   .App {
     text-align: center;
@@ -39,6 +41,15 @@ html {
     }
     to {
       transform: rotate(360deg);
+    }
+  }
+  .loadSpinUser {
+    color: Common.$darker-ordange;
+    align-items: center;
+    margin-top: 20px;
+    margin-left: 20px;
+    h3 {
+      margin-left: 20px;
     }
   }
 }
