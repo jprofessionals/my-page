@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import ApiService from "../../services/api.service";
 import Moment from "moment";
 import { Card, Button, Spinner } from "react-bootstrap";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const CreateBudgetPost = (props) => {
   const [description, setDescription] = useState("");
@@ -20,7 +18,7 @@ const CreateBudgetPost = (props) => {
           <div className="d-flex align-items-center">
             Legg til utlegget
             <div style={isLoadingPost ? {} : { display: "none" }}>
-              <Spinner animation="border" />
+              <Spinner animation="border" style={{ marginLeft: 15 }} />
             </div>
           </div>
         </Button>
@@ -43,18 +41,9 @@ const CreateBudgetPost = (props) => {
         props.toggle();
         setIsLoadingPost(false);
       },
+
       (error) => {
-        toast.error("Noe gikk feil, prøv igjen senere", {
-          position: "top-left",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-        // toast("Noe gikk feil, prøv igjen");
-        // alert("Noe gikk feil, prøv igjen");
+        alert("Noe gikk feil, prøv igjen");
       }
     );
   };
