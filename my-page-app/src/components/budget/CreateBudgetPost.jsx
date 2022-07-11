@@ -5,7 +5,7 @@ import { Card, Button, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const CreateBudgetPost = (props) => {
+const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState(0);
   const [date, setDate] = useState(Moment().format("YYYY-MM-DD"));
@@ -37,10 +37,10 @@ const CreateBudgetPost = (props) => {
       amount: amount,
       expense: true,
     };
-    ApiService.createBudgetPost(budgetPost, props.budget.id).then(
+    ApiService.createBudgetPost(budgetPost, budget.id).then(
       (response) => {
-        props.refreshBudgets();
-        props.toggle();
+        refreshBudgets();
+        toggle();
         setIsLoadingPost(false);
       },
       (error) => {
@@ -106,7 +106,7 @@ const CreateBudgetPost = (props) => {
                 name="date"
                 onChange={handleDateChange}
                 value={date}
-                min={props.budget.startDate}
+                min={budget.startDate}
               ></input>
             </li>
           </ul>

@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
-const LoginHooks = (props) => {
+const LoginHooks = ({ isAuthenticatedCallBack }) => {
   const onSuccess = (res) => {
     console.log("Login Success: currentUser:", res.profileObj);
     console.log("Login Success: token:", res.tokenObj);
@@ -17,7 +17,7 @@ const LoginHooks = (props) => {
     if (res.tokenObj) {
       localStorage.setItem("user_token", JSON.stringify(res.tokenObj));
     }
-    props.isAuthenticatedCallBack(true);
+    isAuthenticatedCallBack(true);
 
     //refreshTokenSetup(res);
   };
