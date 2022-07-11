@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "react-bootstrap";
 
-const BudgetInformation = (props) => {
+const BudgetInformation = ({ budget }) => {
   const interValOfDeposit = (interval) => {
     if (interval === 1) {
       return "Månedlig";
@@ -17,23 +17,21 @@ const BudgetInformation = (props) => {
           <ul className="budgetInformation">
             <li>
               <span title="Periode på inskudd">Periode på innskudd: </span>
-              {interValOfDeposit(
-                props.budget.budgetType.intervalOfDepositInMonths
-              )}
+              {interValOfDeposit(budget.budgetType.intervalOfDepositInMonths)}
             </li>
             <li>
               <span title="Periodisk inskudd">Periodisk innskudd: </span>
-              {props.budget.budgetType.deposit}kr
+              {budget.budgetType.deposit}kr
             </li>
-            {props.budget.posts ? null : (
+            {budget.posts ? null : (
               <li>
                 <span title="Dato for siste kjøp">Dato for siste kjøp: </span>
-                {props.budget.posts.at(0).date}
+                {budget.posts.at(0).date}
               </li>
             )}
             <li>
               <span title="Forbruk siste året">Forbruk siste året: </span>
-              {props.budget.sumPostsLastTwelveMonths}kr
+              {budget.sumPostsLastTwelveMonths}kr
             </li>
           </ul>
         </Card.Body>

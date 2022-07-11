@@ -7,8 +7,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faRemove } from "@fortawesome/free-solid-svg-icons";
 import BudgetInformation from "./BudgetInformation";
 
-const Budget = (props) => {
-  const postList = props.budget.posts;
+const Budget = ({ budget, refreshBudgets }) => {
+  const postList = budget.posts;
   const [posts, setPosts] = useState([]);
   const [cardItem, setCardItem] = useState();
   const { activeEventKey } = useContext(AccordionContext);
@@ -17,8 +17,8 @@ const Budget = (props) => {
     if (!cardItem) {
       setCardItem(
         <CreateBudgetPost
-          budget={props.budget}
-          refreshBudgets={props.refreshBudgets}
+          budget={budget}
+          refreshBudgets={refreshBudgets}
           toggle={setCardItem}
         />
       );
@@ -34,21 +34,19 @@ const Budget = (props) => {
   }, [postList]);
 
   return (
-    <Accordion.Item key={props.budget.id} eventKey={props.budget.id}>
-      <Accordion.Header
-        title={activeEventKey === props.budget.id ? "Lukk" : "Åpne"}
-      >
+    <Accordion.Item key={budget.id} eventKey={budget.id}>
+      <Accordion.Header title={activeEventKey === budget.id ? "Lukk" : "Åpne"}>
         <ul className="initialBudgetInformation">
           <li>
-            <span title="Type budsjett">{props.budget.budgetType.name}</span>
+            <span title="Type budsjett">{budget.budgetType.name}</span>
           </li>
           <li>
-            <span title="Saldo">Saldo: {props.budget.balance}kr</span>
+            <span title="Saldo">Saldo: {budget.balance}kr</span>
           </li>
         </ul>
       </Accordion.Header>
       <Accordion.Body>
-        <BudgetInformation budget={props.budget} />
+        <BudgetInformation budget={budget} />
         <div className="posts">
           <div className="header">
             <h3 className="headerText">Historikk</h3>

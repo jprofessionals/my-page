@@ -3,7 +3,7 @@ import ApiService from "../../services/api.service";
 import Moment from "moment";
 import { Card, Button, Spinner } from "react-bootstrap";
 
-const CreateBudgetPost = (props) => {
+const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState(0);
   const [date, setDate] = useState(Moment().format("YYYY-MM-DD"));
@@ -35,10 +35,10 @@ const CreateBudgetPost = (props) => {
       amount: amount,
       expense: true,
     };
-    ApiService.createBudgetPost(budgetPost, props.budget.id).then(
+    ApiService.createBudgetPost(budgetPost, budget.id).then(
       (response) => {
-        props.refreshBudgets();
-        props.toggle();
+        refreshBudgets();
+        toggle();
         setIsLoadingPost(false);
       },
 
@@ -95,7 +95,7 @@ const CreateBudgetPost = (props) => {
                 name="date"
                 onChange={handleDateChange}
                 value={date}
-                min={props.budget.startDate}
+                min={budget.startDate}
               ></input>
             </li>
           </ul>
