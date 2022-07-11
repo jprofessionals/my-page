@@ -7,8 +7,8 @@ import ApiService from "./services/api.service";
 import { User } from "./User";
 import Budgets from "./components/budget/Budgets";
 import { Spinner } from "react-bootstrap";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,7 +37,16 @@ function App() {
             (error.response && error.response.data) ||
             error.message ||
             error.toString();
-          toast("Error");
+          toast.error("Får ikke lastet inn bruker, prøv igjen senere", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
           setLoadUser(false);
         }
       );

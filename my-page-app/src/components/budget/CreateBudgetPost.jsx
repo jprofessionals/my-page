@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import ApiService from "../../services/api.service";
 import Moment from "moment";
 import { Card, Button, Spinner } from "react-bootstrap";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
   const [description, setDescription] = useState("");
@@ -12,8 +12,8 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
   const [isLoadingPost, setIsLoadingPost] = useState(false);
 
   const isValid = () => {
-    return (amount > 0 && description && description !== "")
-  }
+    return amount > 0 && description && description !== "";
+  };
 
   const handleSubmit = (e) => {
     setIsLoadingPost(true);
@@ -29,11 +29,29 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
         refreshBudgets();
         toggle();
         setIsLoadingPost(false);
-        toast("Lagret")
+        toast.success("Lagret post", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
       },
       (error) => {
         setIsLoadingPost(false);
-        toast("Noe gikk feil, prøv igjen");
+        toast.error("Fikk ikke opprettet posten, prøv igjen", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
       }
     );
   };
@@ -89,7 +107,11 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
               ></input>
             </li>
           </ul>
-          <Button className="addPostBtn" type="btn submit" style={isValid() ? {} : { display: 'none' }}>
+          <Button
+            className="addPostBtn"
+            type="btn submit"
+            style={isValid() ? {} : { display: "none" }}
+          >
             <div className="d-flex align-items-center">
               Legg til utlegget
               <div style={isLoadingPost ? {} : { display: "none" }}>

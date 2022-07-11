@@ -4,8 +4,8 @@ import Budget from "./Budget";
 import { Accordion, Button, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Budgets = () => {
   const [budgets, setBudgets] = useState([]);
@@ -17,13 +17,24 @@ const Budgets = () => {
 
   const refreshBudgets = () => {
     setIsLoadingBudgets(true);
-    ApiService.getBudgets().then((responseBudgets) => {
-      setBudgets(responseBudgets.data);
-      setIsLoadingBudgets(false);
-    }).catch(error => {      
-      setIsLoadingBudgets(false);
-      toast("error");
-    });
+    ApiService.getBudgets()
+      .then((responseBudgets) => {
+        setBudgets(responseBudgets.data);
+        setIsLoadingBudgets(false);
+      })
+      .catch((error) => {
+        setIsLoadingBudgets(false);
+        toast.error("Klarte ikke laste budsjettene, prøv igjen senere", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      });
   };
 
   if (!budgets.length) {
