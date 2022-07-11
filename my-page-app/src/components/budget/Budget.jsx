@@ -49,7 +49,18 @@ const Budget = ({ budget, refreshBudgets }) => {
         <BudgetInformation budget={budget} />
         <div className="posts">
           <div className="header">
-            <h3 className="headerText">Historikk</h3>
+            <h3
+              style={posts.length !== 0 ? {} : { display: "none" }}
+              className="headerText"
+            >
+              Historikk
+            </h3>
+            <h3
+              style={posts.length === 0 ? {} : { display: "none" }}
+              className="headerText"
+            >
+              Ingen historikk funnet
+            </h3>
             <Button
               onClick={toggler}
               className="orange-jpro-round-button btn shadow-none"
