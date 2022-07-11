@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import ApiService from "../../services/api.service";
 import Moment from "moment";
 import { Card, Button, Spinner } from "react-bootstrap";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
   const [description, setDescription] = useState("");
@@ -40,10 +42,11 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
         refreshBudgets();
         toggle();
         setIsLoadingPost(false);
+        toast("Lagret")
       },
-
       (error) => {
-        alert("Noe gikk feil, prøv igjen");
+        setIsLoadingPost(false);
+        toast("Noe gikk feil, prøv igjen");
       }
     );
   };

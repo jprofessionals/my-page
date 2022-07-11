@@ -7,6 +7,8 @@ import ApiService from "./services/api.service";
 import { User } from "./User";
 import Budgets from "./components/budget/Budgets";
 import { Spinner } from "react-bootstrap";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -35,7 +37,7 @@ function App() {
             (error.response && error.response.data) ||
             error.message ||
             error.toString();
-          console.log(_secureContent);
+          toast("Error");
           setLoadUser(false);
         }
       );
@@ -46,11 +48,13 @@ function App() {
     return (
       <div>
         <LoginHooks isAuthenticatedCallBack={setIsAuthenticated} />
+        <ToastContainer />
       </div>
     );
   } else {
     return (
       <>
+        <ToastContainer />
         <div style={loadUser ? {} : { display: "none" }}>
           <div className="loadSpinUser d-flex align-items-center">
             <Spinner animation="border" />
