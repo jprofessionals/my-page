@@ -18,32 +18,32 @@ class BudgetService(
     private val userRepository: UserRepository
 ) {
 
-    fun getBudgets(userId: String): List<BudgetDTO> {
-        val budgets = budgetRepository.findBudgetsByUserId(userId)
+    fun getBudgets(userSub: String): List<BudgetDTO> {
+        val budgets = budgetRepository.findBudgetsByUserSub(userSub)
         return budgets.map { budgetPostMapper.toBudgetDTO(it) }
     }
 
-    fun createBudget(userId: String, budgetRequest: CreateBudgetDTO): BudgetDTO {
+    fun createBudget(userSub: String, budgetRequest: CreateBudgetDTO): BudgetDTO {
         val budget = budgetPostMapper.toBudget(budgetRequest)
-        budget.user = userRepository.findById(userId).get()
+        budget.user = userRepository.findUserBySub(userSub)
         budget.budgetType = budgetTypeRepository.findById(budgetRequest.budgetTypeId).get()
         return budgetPostMapper.toBudgetDTO(budgetRepository.save(budget))
     }
 
-    fun getBudget(userId: String, budgetId: Long): BudgetDTO? {
-        val budget = budgetRepository.findBudgetByUserIdAndId(userId, budgetId)
+    fun getBudget(userSub: String, budgetId: Long): BudgetDTO? {
+        val budget = budgetRepository.findBudgetByUserSubAndId(userSub, budgetId)
             ?: return null
         return budgetPostMapper.toBudgetDTO(budget)
     }
 
-    fun checkIfBudgetExists(userId: String, budgetId: Long): Boolean {
-        return budgetRepository.existsBudgetByUserIdAndId(userId, budgetId)
+    fun checkIfBudgetExists(userSub: String, budgetId: Long): Boolean {
+        return budgetRepository.existsBudgetByUserSubAndId(userSub, budgetId)
     }
 
 
-    fun createPost(postRequest: CreatePostDTO, budgetId: Long, userId: String): PostDTO {
+    fun createPost(postRequest: CreatePostDTO, budgetId: Long, userSub: String): PostDTO {
         val post = budgetPostMapper.toPost(postRequest)
-        val budget = budgetRepository.findBudgetByUserIdAndId(userId, budgetId)
+        val budget = budgetRepository.findBudgetByUserSubAndId(userSub, budgetId)
         post.budget = budget
         return budgetPostMapper.toPostDTO(postRepository.save(post))
     }

@@ -9,15 +9,18 @@ interface EmployeeRepository : JpaRepository<Employee, Long>
 
 @Repository
 interface UserRepository : JpaRepository<User, String> {
-    fun existsUserById(userId: String): Boolean
+    fun existsUserBySub(userSub: String): Boolean
+    fun findUserBySub(sub: String): User?
+    fun findUserByEmailAndSubIsNull(email: String): User?
+
 }
 
 
 @Repository
 interface BudgetRepository : JpaRepository<Budget, Long> {
-    fun findBudgetsByUserId(userId: String): List<Budget>
-    fun findBudgetByUserIdAndId(userId: String, budgetId: Long): Budget?
-    fun existsBudgetByUserIdAndId(userId: String, budgetId: Long): Boolean
+    fun findBudgetsByUserSub(userSub: String): List<Budget>
+    fun findBudgetByUserSubAndId(userSub: String, budgetId: Long): Budget?
+    fun existsBudgetByUserSubAndId(userSub: String, budgetId: Long): Boolean
 
 }
 
