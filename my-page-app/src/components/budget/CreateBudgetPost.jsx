@@ -11,22 +11,9 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
   const [date, setDate] = useState(Moment().format("YYYY-MM-DD"));
   const [isLoadingPost, setIsLoadingPost] = useState(false);
 
-  const submitButton = () => {
-    if (amount <= 0 || description === "") {
-      return null;
-    } else {
-      return (
-        <Button className="addPostBtn" type="btn submit">
-          <div className="d-flex align-items-center">
-            Legg til utlegget
-            <div style={isLoadingPost ? {} : { display: "none" }}>
-              <Spinner animation="border" style={{ marginLeft: 15 }} />
-            </div>
-          </div>
-        </Button>
-      );
-    }
-  };
+  const isValid = () => {
+    return (amount > 0 && description && description !== "")
+  }
 
   const handleSubmit = (e) => {
     setIsLoadingPost(true);
@@ -102,7 +89,14 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
               ></input>
             </li>
           </ul>
-          {submitButton()}
+          <Button className="addPostBtn" type="btn submit" style={isValid() ? {} : { display: 'none' }}>
+            <div className="d-flex align-items-center">
+              Legg til utlegget
+              <div style={isLoadingPost ? {} : { display: "none" }}>
+                <Spinner animation="border" style={{ marginLeft: 15 }} />
+              </div>
+            </div>
+          </Button>
         </Card.Body>
       </Card>
     </form>
