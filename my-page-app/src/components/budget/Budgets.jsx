@@ -24,16 +24,7 @@ const Budgets = () => {
       })
       .catch((error) => {
         setIsLoadingBudgets(false);
-        toast.error("Klarte ikke laste budsjettene, prøv igjen senere", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+        toast.error("Klarte ikke laste budsjettene, prøv igjen senere");
       });
   };
 
