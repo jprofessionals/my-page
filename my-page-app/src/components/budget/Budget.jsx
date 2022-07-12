@@ -66,7 +66,14 @@ const Budget = ({ budget, refreshBudgets }) => {
         {posts
           .sort((a, b) => (a.date < b.date ? 1 : -1))
           .map((post) => (
-            <Post className="post" key={post.id} post={post} />
+            <Post
+              className="post"
+              key={post.id}
+              budgetId={budget.id}
+              post={post}
+              budget={budget}
+              refreshBudgets={refreshBudgets}
+            />
           ))}
       </Accordion.Body>
     </Accordion.Item>

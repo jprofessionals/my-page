@@ -153,10 +153,13 @@ class MeController(
     ): ResponseEntity<Unit> {
         val userId = JwtUtils.getID(jwt)
         val postDTO = budgetService.getPost(budgetId,postId)
+        if (!budgetService.checkIfBudgetExists(userId, budgetId)) {
+            return ResponseEntity.badRequest().build()
+        }
         if (postDTO == null || postDTO.locked){
             return ResponseEntity.badRequest().build()
     }
-    return ResponseEntity.ok(budgetService.deletePost(userId, budgetId, postId))
+    return ResponseEntity.ok(budgetService.deletePost(budgetId, postId))
 
     }
 }

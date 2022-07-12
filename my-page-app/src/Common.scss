@@ -4,7 +4,7 @@ $white: #ffffff;
 $navbar-color: #2f4f4f;
 $smallScreen: 575px;
 $lighter-orange: #ffbd8d;
-$darker-ordange: #d16512;
+$darker-orange: #d16512;
 $black: #000000;
 
 @mixin btn {
@@ -22,6 +22,6 @@ $black: #000000;
   margin-bottom: 5px;
   border: none;
   &:focus {
-    background-color: $darker-ordange;
+    background-color: $darker-orange;
   }
 }
