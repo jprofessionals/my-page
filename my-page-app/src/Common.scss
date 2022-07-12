@@ -17,6 +17,8 @@ $black: #000000;
 }
 
 @mixin orange-jpro-round-button {
+  background-color: $jpro-orange;
+  border-color: $white;
   border-radius: 50%;
   margin-left: auto;
   margin-bottom: 5px;

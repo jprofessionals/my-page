@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Card, Button, Spinner } from "react-bootstrap";
 import Moment from "moment";
 import DeleteBudgetPostModal from "./DeleteBudgetPostModal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 const Post = ({ refreshBudgets, post, budgetId }) => {
   const [isLoadingPost, setIsLoadingPost] = useState(false);
@@ -21,17 +23,9 @@ const Post = ({ refreshBudgets, post, budgetId }) => {
 
   return (
     <Card border={postInFuture() ? "grey" : "dark"}>
-      <Card.Header>
-        <b>{post.description}</b>
-      </Card.Header>
-      <Card.Body>
-        <Card.Text>
-          <b>Pris:</b> {post.amount}
-        </Card.Text>
-        <Card.Text>
-          <b>Dato:</b> {post.date}
-        </Card.Text>
-        <div style={!post.locked ? {} : { display: "none" }}>
+      <div className="postHeader">
+        <Card.Header>
+          <b>{post.description}</b>
           <Button
             className="removePostBtn btn"
             type="btn"
@@ -46,14 +40,25 @@ const Post = ({ refreshBudgets, post, budgetId }) => {
               budgetId={budgetId}
               setIsLoadingPost={setIsLoadingPost}
             />
-            <div className="d-flex align-items-center">
-              Slett post
+            <div title="Logg ut">
+              <div style={isLoadingPost ? { display: "none" } : {}}>
+                <FontAwesomeIcon icon={faTrash} />
+              </div>
               <div style={isLoadingPost ? {} : { display: "none" }}>
-                <Spinner animation="border" style={{ marginLeft: 15 }} />
+                <Spinner animation="border" size="sm" />
               </div>
             </div>
           </Button>
-        </div>
+        </Card.Header>
+      </div>
+      <Card.Body>
+        <Card.Text>
+          <b>Pris:</b> {post.amount}
+        </Card.Text>
+        <Card.Text>
+          <b>Dato:</b> {post.date}
+        </Card.Text>
+        <div style={!post.locked ? {} : { display: "none" }}></div>
       </Card.Body>
     </Card>
   );

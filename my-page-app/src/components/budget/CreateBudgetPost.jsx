@@ -29,7 +29,7 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
         refreshBudgets();
         toggle();
         setIsLoadingPost(false);
-        toast.success("Lagret " + budgetPost.description, {
+        toast.success("Lagret post", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
