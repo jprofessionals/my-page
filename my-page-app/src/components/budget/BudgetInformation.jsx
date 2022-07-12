@@ -4,9 +4,9 @@ import { Card } from "react-bootstrap";
 const BudgetInformation = ({ budget }) => {
   const interValOfDeposit = (interval) => {
     if (interval === 1) {
-      return "Månedlig";
-    } else if (interval === 12) {
-      return "Årlig";
+      return "måned";
+    } else {
+      return interval + ".måned";
     }
   };
 
@@ -15,17 +15,20 @@ const BudgetInformation = ({ budget }) => {
       <Card>
         <Card.Body>
           <ul className="budgetInformation">
-            <li>
-              <span title="Periode på inskudd">Periode på innskudd: </span>
+            <li
+              style={budget.budgetType.deposit === 0 ? { display: "none" } : {}}
+            >
+              <span title="Opptjening">Opptjening: </span>
+              {budget.budgetType.deposit}kr hver{" "}
               {interValOfDeposit(budget.budgetType.intervalOfDepositInMonths)}
             </li>
-            <li>
-              <span title="Periodisk inskudd">Periodisk innskudd: </span>
-              {budget.budgetType.deposit}kr
-            </li>
-            <li>
+            <li style={budget.budgetType.rollOver ? {} : { display: "none" }}>
               <span title="Startbeløp">Startbeløp: </span>
-              {budget.startAmount}kr
+              {budget.startAmount}kr ({budget.startDate})
+            </li>
+            <li style={budget.budgetType.rollOver ? { display: "none" } : {}}>
+              <span title="Årlig budsjett">Årlig budsjett: </span>
+              {budget.budgetType.startAmount}kr
             </li>
             {budget.posts.length !== 0 ? (
               <li>

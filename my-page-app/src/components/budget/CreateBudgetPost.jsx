@@ -18,16 +18,7 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!isValid()) {
-      toast.error("Noen av verdiene var ikke gyldig, prøv igjen", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      toast.error("Noen av verdiene var ikke gyldig, prøv igjen");
     } else {
       setIsLoadingPost(true);
       const budgetPost = {
@@ -41,29 +32,11 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
           refreshBudgets();
           toggle();
           setIsLoadingPost(false);
-          toast.success("Lagret post", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-          });
+          toast.success("Lagret post");
         },
         (error) => {
           setIsLoadingPost(false);
-          toast.error("Fikk ikke opprettet posten, prøv igjen", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-          });
+          toast.error("Fikk ikke opprettet posten, prøv igjen");
         }
       );
     }
