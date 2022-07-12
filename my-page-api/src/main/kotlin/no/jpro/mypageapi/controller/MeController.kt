@@ -160,7 +160,7 @@ class MeController(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
          @PathVariable("budgetId") budgetId: Long, @PathVariable("postId") postId: Long,
     ): ResponseEntity<Unit> {
-        val userId = JwtUtils.getID(jwt)
+        val userId = JwtUtils.getSub(jwt)
         val postDTO = budgetService.getPost(budgetId,postId)
         if (!budgetService.checkIfBudgetExists(userId, budgetId)) {
             return ResponseEntity.badRequest().build()
