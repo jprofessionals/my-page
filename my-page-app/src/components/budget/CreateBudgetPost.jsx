@@ -16,44 +16,57 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
   };
 
   const handleSubmit = (e) => {
-    setIsLoadingPost(true);
     e.preventDefault();
-    const budgetPost = {
-      date: date,
-      description: description,
-      amount: amount,
-      expense: true,
-    };
-    ApiService.createBudgetPost(budgetPost, budget.id).then(
-      (response) => {
-        refreshBudgets();
-        toggle();
-        setIsLoadingPost(false);
-        toast.success("Lagret post", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
-      },
-      (error) => {
-        setIsLoadingPost(false);
-        toast.error("Fikk ikke opprettet posten, prøv igjen", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
-      }
-    );
+    if (!isValid()) {
+      toast.error("Noen av verdiene var ikke gyldig, prøv igjen", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    } else {
+      setIsLoadingPost(true);
+      const budgetPost = {
+        date: date,
+        description: description,
+        amount: amount,
+        expense: true,
+      };
+      ApiService.createBudgetPost(budgetPost, budget.id).then(
+        (response) => {
+          refreshBudgets();
+          toggle();
+          setIsLoadingPost(false);
+          toast.success("Lagret post", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
+        },
+        (error) => {
+          setIsLoadingPost(false);
+          toast.error("Fikk ikke opprettet posten, prøv igjen", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
+        }
+      );
+    }
   };
 
   const handleDescriptionChange = (e) => {
