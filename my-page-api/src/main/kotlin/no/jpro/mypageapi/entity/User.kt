@@ -2,22 +2,24 @@ package no.jpro.mypageapi.entity
 
 
 import java.time.LocalDate
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.OneToMany
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table(name = "user")
 data class User(
-    @Id val id: String,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
+    val sub: String? = null,
     val email: String?,
     val name: String?,
     val givenName: String?,
     val familyName: String?,
-    val icon: String?,
-    var nickName: String? = null,
-    var startDate: LocalDate? = null,
+    val icon: String? = null,
+    val nickName: String? = null,
+    val startDate: LocalDate? = null,
+    val employeeNumber: Int? = null,
+    val admin: Boolean = false,
     @OneToMany(mappedBy = "user")
-    var budgets: List<Budget>
+    val budgets: List<Budget>
 )

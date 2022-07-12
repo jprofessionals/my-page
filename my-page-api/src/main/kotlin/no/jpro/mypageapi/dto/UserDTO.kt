@@ -8,9 +8,9 @@ class UserDTO(
     val name: String?,
     val givenName: String?,
     val familyName: String?,
-    val icon: String?,
+    val icon: String? = null,
     var nickName: String? = null,
-    var startDate: LocalDate?= null,
+    var startDate: LocalDate? = null,
     @JsonIgnore
     var budgets: List<BudgetDTO>? = null
 )

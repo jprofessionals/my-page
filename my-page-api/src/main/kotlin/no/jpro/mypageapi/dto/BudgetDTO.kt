@@ -9,8 +9,8 @@ data class BudgetDTO(
     val id: Long?,
     var posts: List<PostDTO>,
     var budgetType: BudgetTypeDTO,
-
-    val startDate: LocalDate
+    val startDate: LocalDate,
+    val startAmount: Double
 ) {
     @JsonProperty
     fun sumDeposits(): Double {
@@ -41,5 +41,5 @@ data class BudgetDTO(
     }
 
     @JsonProperty
-    fun balance() = budgetType.startAmount + sumDeposits() - sumPosts()
+    fun balance() = startAmount + sumDeposits() - sumPosts()
 }

@@ -23,12 +23,16 @@ const BudgetInformation = ({ budget }) => {
               <span title="Periodisk inskudd">Periodisk innskudd: </span>
               {budget.budgetType.deposit}kr
             </li>
-            {budget.posts ? null : (
+            <li>
+              <span title="Startbeløp">Startbeløp: </span>
+              {budget.startAmount}kr
+            </li>
+            {budget.posts.length !== 0 ? (
               <li>
                 <span title="Dato for siste kjøp">Dato for siste kjøp: </span>
                 {budget.posts.at(0).date}
               </li>
-            )}
+            ) : null}
             <li>
               <span title="Forbruk siste året">Forbruk siste året: </span>
               {budget.sumPostsLastTwelveMonths}kr
