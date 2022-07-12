@@ -25,6 +25,5 @@ class BudgetTypeMapper {
             intervalOfDepositInMonths = budgetType.intervalOfDepositInMonths,
             startAmount = budgetType.startAmount,
         )
-
     }
 }

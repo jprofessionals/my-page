@@ -49,18 +49,7 @@ const Budget = ({ budget, refreshBudgets }) => {
         <BudgetInformation budget={budget} />
         <div className="posts">
           <div className="header">
-            <h3
-              style={posts.length !== 0 ? {} : { display: "none" }}
-              className="headerText"
-            >
-              Historikk
-            </h3>
-            <h3
-              style={posts.length === 0 ? {} : { display: "none" }}
-              className="headerText"
-            >
-              Ingen historikk funnet
-            </h3>
+            <h3 className="headerText">Historikk</h3>
             <Button
               onClick={toggler}
               className="orange-jpro-round-button btn shadow-none"
@@ -70,15 +59,16 @@ const Budget = ({ budget, refreshBudgets }) => {
                 icon={cardItem ? faRemove : faPlus}
                 title={cardItem ? "Avbryt" : "Legg til ny post"}
               />
-            </Button>{" "}
+            </Button>
           </div>
+          {cardItem}
+          <span style={posts.length > 0 ? { display: "none" } : {}}>Ingen historikk funnet</span>
+          {posts
+            .sort((a, b) => (a.date < b.date ? 1 : -1))
+            .map((post) => (
+              <Post className="post" key={post.id} post={post} />
+            ))}
         </div>
-        {cardItem}
-        {posts
-          .sort((a, b) => (a.date < b.date ? 1 : -1))
-          .map((post) => (
-            <Post className="post" key={post.id} post={post} />
-          ))}
       </Accordion.Body>
     </Accordion.Item>
   );
