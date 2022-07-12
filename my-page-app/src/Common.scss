@@ -6,6 +6,7 @@ $smallScreen: 575px;
 $lighter-orange: #ffbd8d;
 $darker-orange: #d16512;
 $black: #000000;
+$toast-success: #3c5c5c;
 
 @mixin btn {
   background-color: $jpro-orange;
@@ -26,4 +27,5 @@ $black: #000000;
   &:focus {
     background-color: $darker-orange;
   }
+
 }

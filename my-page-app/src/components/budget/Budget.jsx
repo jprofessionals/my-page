@@ -59,14 +59,14 @@ const Budget = ({ budget, refreshBudgets }) => {
                 icon={cardItem ? faRemove : faPlus}
                 title={cardItem ? "Avbryt" : "Legg til ny post"}
               />
-            </Button>{" "}
+            </Button>
           </div>
-        </div>
-        {cardItem}
-        {posts
-          .sort((a, b) => (a.date < b.date ? 1 : -1))
-          .map((post) => (
-            <Post
+          {cardItem}
+          <span style={posts.length > 0 ? { display: "none" } : {}}>Ingen historikk funnet</span>
+          {posts
+            .sort((a, b) => (a.date < b.date ? 1 : -1))
+            .map((post) => (
+              <Post
               className="post"
               key={post.id}
               budgetId={budget.id}
@@ -74,7 +74,8 @@ const Budget = ({ budget, refreshBudgets }) => {
               budget={budget}
               refreshBudgets={refreshBudgets}
             />
-          ))}
+            ))}
+        </div>
       </Accordion.Body>
     </Accordion.Item>
   );

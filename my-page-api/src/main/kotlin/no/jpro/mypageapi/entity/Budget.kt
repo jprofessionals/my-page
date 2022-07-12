@@ -10,6 +10,7 @@ data class Budget(
     val id: Long? = null,
     val name: String,
     val startDate: LocalDate,
+    val startAmount: Double,
     @OneToMany(mappedBy = "budget")
     var posts: List<Post>,
     @ManyToOne

@@ -23,7 +23,7 @@ class JwtUtils {
             return jwt.getClaimAsString("picture")
         }
 
-        fun getID(jwt: Jwt): String {
+        fun getSub(jwt: Jwt): String {
             return jwt.getClaimAsString("sub")
         }
     }

@@ -37,16 +37,7 @@ function App() {
             (error.response && error.response.data) ||
             error.message ||
             error.toString();
-          toast.error("Får ikke lastet inn bruker, prøv igjen senere", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-          });
+          toast.error("Får ikke lastet inn bruker, prøv igjen senere");
           setLoadUser(false);
         }
       );
@@ -57,13 +48,30 @@ function App() {
     return (
       <div>
         <LoginHooks isAuthenticatedCallBack={setIsAuthenticated} />
-        <ToastContainer />
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          closeOnClick={true}
+          pauseOnHover={true}
+          draggable={true}
+          progress={undefined}
+        />
       </div>
     );
   } else {
     return (
       <>
-        <ToastContainer />
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          closeOnClick={true}
+          pauseOnHover={true}
+          draggable={true}
+          progress={undefined}
+          theme="colored"
+        />
         <div style={loadUser ? {} : { display: "none" }}>
           <div className="loadSpinUser d-flex align-items-center">
             <Spinner animation="border" />

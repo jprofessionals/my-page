@@ -24,6 +24,7 @@ class MeController(
     private val userService: UserService,
     private val budgetService: BudgetService,
 ) {
+
     @GetMapping("")
     @Operation(summary = "Get data for user identified by the bearer token")
     @ApiResponse(
@@ -42,20 +43,26 @@ class MeController(
     fun updateUser(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @Valid @RequestBody updateUserRequest: UpdateUserDTO
-    ): UserDTO =
-        userService.updateUser(jwt, updateUserRequest)
+    ): ResponseEntity<UserDTO> {
+        if (!userService.checkIfUserExists(JwtUtils.getSub(jwt))) {
+            return ResponseEntity.badRequest().build()
+        }
+        return ResponseEntity.ok(userService.updateUser(jwt, updateUserRequest))
+    }
 
     @GetMapping("budgets")
     @Operation(summary = "Get the different budgets that belong to logged in user.")
     @ApiResponse(
         responseCode = "200",
-        content = [Content(mediaType = "application/json", array = ArraySchema(
-            schema = Schema(implementation = BudgetDTO::class)
-        ))]
+        content = [Content(
+            mediaType = "application/json", array = ArraySchema(
+                schema = Schema(implementation = BudgetDTO::class)
+            )
+        )]
     )
     fun getBudgets(@Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt): List<BudgetDTO> {
-        val userId = JwtUtils.getID(jwt)
-        return budgetService.getBudgets(userId)
+        val userSub = JwtUtils.getSub(jwt)
+        return budgetService.getBudgets(userSub)
     }
 
     @PostMapping("budgets")
@@ -68,11 +75,11 @@ class MeController(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @RequestBody budgetRequest: CreateBudgetDTO
     ): ResponseEntity<BudgetDTO> {
-        val userId = JwtUtils.getID(jwt)
-        if (!userService.checkIfUserExists(userId) || !budgetService.checkIfBudgetTypeExists(budgetRequest.budgetTypeId)) {
+        val userSub = JwtUtils.getSub(jwt)
+        if (!userService.checkIfUserExists(userSub) || !budgetService.checkIfBudgetTypeExists(budgetRequest.budgetTypeId)) {
             return ResponseEntity.badRequest().build()
         }
-        return ResponseEntity.ok(budgetService.createBudget(userId, budgetRequest))
+        return ResponseEntity.ok(budgetService.createBudget(userSub, budgetRequest))
     }
 
     @GetMapping("budgets/{budgetId}")
@@ -85,8 +92,8 @@ class MeController(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @PathVariable("budgetId") budgetId: Long
     ): ResponseEntity<BudgetDTO> {
-        val userId = JwtUtils.getID(jwt)
-        val budget = budgetService.getBudget(userId, budgetId)
+        val userSub = JwtUtils.getSub(jwt)
+        val budget = budgetService.getBudget(userSub, budgetId)
             ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(budget)
     }
@@ -95,9 +102,11 @@ class MeController(
     @Operation(summary = "Get posts for one budget.")
     @ApiResponse(
         responseCode = "200",
-        content = [Content(mediaType = "application/json", array = ArraySchema(
-            schema = Schema(implementation = PostDTO::class)
-        ))]
+        content = [Content(
+            mediaType = "application/json", array = ArraySchema(
+                schema = Schema(implementation = PostDTO::class)
+            )
+        )]
     )
     fun getPosts(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
@@ -132,14 +141,14 @@ class MeController(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @Valid @RequestBody postRequest: CreatePostDTO, @PathVariable("budgetId") budgetId: Long,
     ): ResponseEntity<PostDTO> {
-        val userId = JwtUtils.getID(jwt)
-        if (!budgetService.checkIfBudgetExists(userId, budgetId)) {
+        val userSub = JwtUtils.getSub(jwt)
+        if (!budgetService.checkIfBudgetExists(userSub, budgetId)) {
             return ResponseEntity.badRequest().build()
         }
         if (budgetService.checkIfDateIsBeforeStartOfBudget(postRequest.date, budgetId)) {
             return ResponseEntity.badRequest().build()
         }
-        return ResponseEntity.ok(budgetService.createPost(postRequest, budgetId, userId))
+        return ResponseEntity.ok(budgetService.createPost(postRequest, budgetId, userSub))
     }
     @DeleteMapping("budgets/{budgetId}/posts/{postId}")
     @Operation(summary = "Delete a post from based on PostID, BudgetID and UserID.")
