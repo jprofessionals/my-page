@@ -1,6 +1,5 @@
 package no.jpro.mypageapi.repository
 
-import no.jpro.mypageapi.dto.PostDTO
 import no.jpro.mypageapi.entity.*
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository

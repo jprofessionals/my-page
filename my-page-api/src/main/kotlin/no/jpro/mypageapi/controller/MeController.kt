@@ -11,6 +11,7 @@ import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.service.BudgetService
 import no.jpro.mypageapi.service.UserService
 import no.jpro.mypageapi.utils.JwtUtils
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
@@ -153,21 +154,18 @@ class MeController(
 
     @DeleteMapping("posts/{postId}")
     @Operation(summary = "Delete a post from based on PostID")
-    @ApiResponse(
-        responseCode = "200",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = PostDTO::class))]
-    )
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     fun deletePost(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @PathVariable("postId") postId: Long,
-    ): ResponseEntity<Unit> {
+    ): ResponseEntity<Void> {
         val userSub = JwtUtils.getSub(jwt)
         val postDTO = budgetService.getPost(postId, userSub) ?: return ResponseEntity.notFound().build()
         if (postDTO.locked) {
             return ResponseEntity.badRequest().build()
         }
-        return ResponseEntity.ok(budgetService.deletePost(postId))
-
+        budgetService.deletePost(postId)
+        return ResponseEntity.noContent().build()
     }
 
     @PatchMapping("posts/{postId}")

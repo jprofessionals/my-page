@@ -49,8 +49,8 @@ class BudgetService(
         return budgetPostMapper.toPostDTO(postRepository.save(post))
     }
 
-    fun deletePost(postId: Long): Unit? {
-        return postRepository.deleteById(postId)
+    fun deletePost(postId: Long) {
+        postRepository.deleteById(postId)
     }
 
     fun getPosts(budgetId: Long): List<PostDTO> {
