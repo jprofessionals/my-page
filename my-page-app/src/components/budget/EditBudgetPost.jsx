@@ -15,9 +15,9 @@ const EditBudgetPost = ({
   setIsLoadingPost,
   isLoadingPost,
 }) => {
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState(0);
-  const [date, setDate] = useState(Moment().format("YYYY-MM-DD"));
+  const [description, setDescription] = useState(post.description);
+  const [amount, setAmount] = useState(post.amount);
+  const [date, setDate] = useState(Moment().format(post.date));
 
   const isValid = () => {
     return amount > 0 && description && description !== "";
