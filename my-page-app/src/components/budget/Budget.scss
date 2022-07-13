@@ -10,10 +10,108 @@
   }
 }
 
+//Post
+.card-header {
+  height: 53px;
+  b {
+    vertical-align: middle;
+  }
+}
+.removePostBtn {
+  @include Common.orange-jpro-round-button;
+  float: right;
+  &:focus {
+    box-shadow: 0px 0px 0px 0.1rem Common.$lighter-orange;
+    border-color: Common.$lighter-orange;
+  }
+  &:not(.collapsed) {
+    color: Common.$white;
+    background-color: Common.$jpro-orange;
+    &::after {
+      color: Common.$white;
+      border-color: Common.$white;
+    }
+  }
+  &:hover {
+    background-color: Common.$hover-orange;
+  }
+}
+.headerPost {
+  display: flex;
+  b {
+    margin-top: 8px;
+  }
+  .btns {
+    margin-right: 0px;
+    margin-left: auto;
+    display: flex;
+    Button {
+      @include Common.orange-jpro-round-button;
+      &:focus {
+        box-shadow: 0px 0px 0px 0.1rem Common.$lighter-orange;
+        border-color: Common.$lighter-orange;
+      }
+      &:not(.collapsed) {
+        color: Common.$white;
+        background-color: Common.$jpro-orange;
+        &::after {
+          color: Common.$white;
+          border-color: Common.$white;
+        }
+      }
+      &:hover {
+        background-color: Common.$hover-orange;
+      }
+    }
+    .editPostBtn {
+      margin-right: 4%;
+    }
+  }
+}
+
+//EditBudgetPost
+.editPost {
+  // display: flex;
+  .editPostHeader {
+    display: flex;
+
+    .description {
+      margin-top: 6px;
+      margin-bottom: 6px;
+    }
+    .editCardBtns {
+      margin-right: 0px;
+      margin-left: auto;
+      display: flex;
+      Button {
+        @include Common.orange-jpro-round-button;
+        &:focus {
+          box-shadow: 0px 0px 0px 0.1rem Common.$lighter-orange;
+          border-color: Common.$lighter-orange;
+        }
+        &:not(.collapsed) {
+          color: Common.$white;
+          background-color: Common.$jpro-orange;
+          &::after {
+            color: Common.$white;
+            border-color: Common.$white;
+          }
+        }
+        &:hover {
+          background-color: Common.$hover-orange;
+        }
+      }
+      .addPostBtn {
+        margin-right: 4%;
+      }
+    }
+  }
+}
 .card {
   margin-bottom: 5px;
   margin-top: 5px;
 }
+
 //CreateBudgetPost
 .inputCard {
   border-color: Common.$darker-orange;
