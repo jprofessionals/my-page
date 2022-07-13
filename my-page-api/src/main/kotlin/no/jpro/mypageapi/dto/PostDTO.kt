@@ -9,4 +9,5 @@ class PostDTO(
     val description: String?,
     val amount: Double,
     val expense: Boolean,
+    val locked : Boolean
 )

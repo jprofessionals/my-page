@@ -50,10 +50,7 @@ const Budget = ({ budget, refreshBudgets }) => {
         <div className="posts">
           <div className="header">
             <h3 className="headerText">Historikk</h3>
-            <Button
-              onClick={toggler}
-              className="orange-jpro-round-button btn shadow-none"
-            >
+            <Button onClick={toggler} className="plus shadow-none">
               <FontAwesomeIcon
                 className="toggleButton"
                 icon={cardItem ? faRemove : faPlus}
@@ -62,11 +59,20 @@ const Budget = ({ budget, refreshBudgets }) => {
             </Button>
           </div>
           {cardItem}
-          <span style={posts.length > 0 ? { display: "none" } : {}}>Ingen historikk funnet</span>
+          <span style={posts.length > 0 ? { display: "none" } : {}}>
+            Ingen historikk funnet
+          </span>
           {posts
             .sort((a, b) => (a.date < b.date ? 1 : -1))
             .map((post) => (
-              <Post className="post" key={post.id} post={post} />
+              <Post
+                className="post"
+                key={post.id}
+                budgetId={budget.id}
+                post={post}
+                budget={budget}
+                refreshBudgets={refreshBudgets}
+              />
             ))}
         </div>
       </Accordion.Body>

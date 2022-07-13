@@ -22,12 +22,14 @@ interface BudgetRepository : JpaRepository<Budget, Long> {
     fun findBudgetByUserSubAndId(userSub: String, budgetId: Long): Budget?
     fun existsBudgetByUserSubAndId(userSub: String, budgetId: Long): Boolean
 
+
 }
 
 @Repository
 interface PostRepository : JpaRepository<Post, Long> {
     fun findPostsByBudgetId(budgetId: Long): List<Post>
     fun findPostByBudgetIdAndId(budgetId: Long, postId: Long): Post?
+    fun findPostByIdAndBudgetUserSub(postId: Long, userSub: String): Post?
 }
 
 @Repository

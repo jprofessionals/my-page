@@ -17,6 +17,7 @@ class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private v
         description = post.description,
         amount = post.amount,
         expense = post.expense,
+        locked = post.locked,
     )
 
     fun toBudgetDTO(budget: Budget): BudgetDTO {

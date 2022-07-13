@@ -36,6 +36,12 @@ const getBudgetType = (budgetTypeId) => {
   });
 };
 
+const deleteBudgetPost = (postId) => {
+  return axios.delete(API_URL + "me/posts/" + postId, {
+    headers: authHeader(),
+  });
+};
+
 const ApiService = {
   getTestApi,
   getTestApiOpen,
@@ -45,5 +51,6 @@ const ApiService = {
   getBudgets,
   createBudgetPost,
   getBudgetType,
+  deleteBudgetPost,
 };
 export default ApiService;

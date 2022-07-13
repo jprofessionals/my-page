@@ -11,6 +11,7 @@ import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.service.BudgetService
 import no.jpro.mypageapi.service.UserService
 import no.jpro.mypageapi.utils.JwtUtils
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
@@ -149,5 +150,21 @@ class MeController(
             return ResponseEntity.badRequest().build()
         }
         return ResponseEntity.ok(budgetService.createPost(postRequest, budgetId, userSub))
+    }
+
+    @DeleteMapping("posts/{postId}")
+    @Operation(summary = "Delete a post from based on PostID")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    fun deletePost(
+        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable("postId") postId: Long,
+    ): ResponseEntity<Void> {
+        val userSub = JwtUtils.getSub(jwt)
+        val postDTO = budgetService.getPost(postId, userSub) ?: return ResponseEntity.notFound().build()
+        if (postDTO.locked) {
+            return ResponseEntity.badRequest().build()
+        }
+        budgetService.deletePost(postId)
+        return ResponseEntity.noContent().build()
     }
 }

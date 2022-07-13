@@ -13,6 +13,7 @@ data class Post(
     val description: String?,
     val amount: Double,
     val expense: Boolean,
+    val locked: Boolean = false,
     @JsonIgnore
     @ManyToOne
     var budget: Budget? = null
