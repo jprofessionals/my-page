@@ -25,29 +25,31 @@ const Post = ({ refreshBudgets, post, budgetId }) => {
     <Card border={postInFuture() ? "grey" : "dark"}>
       <div className="postHeader">
         <Card.Header>
-          <b>{post.description}</b>
-          <Button
-            className="removePostBtn btn"
-            type="btn"
-            title="Slett post"
-            onClick={toggler}
-          >
-            <DeleteBudgetPostModal
-              isDeleteModalOpen={isDeleteModalOpen}
-              toggler={toggler}
-              refreshBudgets={refreshBudgets}
-              post={post}
-              setIsLoadingPost={setIsLoadingPost}
-            />
-            <div title="Logg ut">
-              <div style={isLoadingPost ? { display: "none" } : {}}>
-                <FontAwesomeIcon icon={faTrash} />
+          <div className="headerPost">
+            <b>{post.description}</b>
+            <Button
+              className="removePostBtn btn"
+              type="btn"
+              title="Slett post"
+              onClick={toggler}
+            >
+              <DeleteBudgetPostModal
+                isDeleteModalOpen={isDeleteModalOpen}
+                toggler={toggler}
+                refreshBudgets={refreshBudgets}
+                post={post}
+                setIsLoadingPost={setIsLoadingPost}
+              />
+              <div title="Logg ut">
+                <div style={isLoadingPost ? { display: "none" } : {}}>
+                  <FontAwesomeIcon icon={faTrash} />
+                </div>
+                <div style={isLoadingPost ? {} : { display: "none" }}>
+                  <Spinner animation="border" size="sm" />
+                </div>
               </div>
-              <div style={isLoadingPost ? {} : { display: "none" }}>
-                <Spinner animation="border" size="sm" />
-              </div>
-            </div>
-          </Button>
+            </Button>
+          </div>
         </Card.Header>
       </div>
       <Card.Body>

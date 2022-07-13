@@ -18,29 +18,11 @@ const DeleteBudgetPostModal = ({
       (response) => {
         refreshBudgets();
         setIsLoadingPost(false);
-        toast.success("Slettet " + post.description, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+        toast.success("Slettet " + post.description);
       },
       (error) => {
         setIsLoadingPost(false);
-        toast.error("Fikk ikke slettet posten, prøv igjen", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+        toast.error("Får ikke slettet posten, prøv igjen senere");
       }
     );
   };
