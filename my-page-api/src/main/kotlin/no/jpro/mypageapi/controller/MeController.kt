@@ -150,25 +150,23 @@ class MeController(
         }
         return ResponseEntity.ok(budgetService.createPost(postRequest, budgetId, userSub))
     }
-    @DeleteMapping("budgets/{budgetId}/posts/{postId}")
-    @Operation(summary = "Delete a post from based on PostID, BudgetID and UserID.")
+
+    @DeleteMapping("posts/{postId}")
+    @Operation(summary = "Delete a post from based on PostID")
     @ApiResponse(
         responseCode = "200",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = PostDTO::class))]
     )
     fun deletePost(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
-         @PathVariable("budgetId") budgetId: Long, @PathVariable("postId") postId: Long,
+        @PathVariable("postId") postId: Long,
     ): ResponseEntity<Unit> {
-        val userId = JwtUtils.getSub(jwt)
-        val postDTO = budgetService.getPost(budgetId,postId)
-        if (!budgetService.checkIfBudgetExists(userId, budgetId)) {
+        val userSub = JwtUtils.getSub(jwt)
+        val postDTO = budgetService.getPost(postId, userSub) ?: return ResponseEntity.notFound().build()
+        if (postDTO.locked) {
             return ResponseEntity.badRequest().build()
         }
-        if (postDTO == null || postDTO.locked){
-            return ResponseEntity.badRequest().build()
-    }
-    return ResponseEntity.ok(budgetService.deletePost(budgetId, postId))
+        return ResponseEntity.ok(budgetService.deletePost(postId))
 
     }
 }

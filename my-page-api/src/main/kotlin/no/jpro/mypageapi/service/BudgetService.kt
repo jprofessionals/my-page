@@ -1,7 +1,6 @@
 package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.dto.*
-import no.jpro.mypageapi.entity.Post
 import no.jpro.mypageapi.repository.BudgetRepository
 import no.jpro.mypageapi.repository.BudgetTypeRepository
 import no.jpro.mypageapi.repository.PostRepository
@@ -9,7 +8,6 @@ import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.BudgetPostMapper
 import no.jpro.mypageapi.utils.mapper.BudgetTypeMapper
 import org.springframework.stereotype.Service
-import java.net.CacheRequest
 import java.time.LocalDate
 
 @Service
@@ -50,10 +48,8 @@ class BudgetService(
         return budgetPostMapper.toPostDTO(postRepository.save(post))
     }
 
-    fun deletePost(budgetId: Long, postId: Long): Unit? {
-        val post = postRepository.findPostByBudgetIdAndId(budgetId, postId)
-            ?: return null
-            return postRepository.deleteById(postId)
+    fun deletePost(postId: Long): Unit? {
+        return postRepository.deleteById(postId)
     }
 
     fun getPosts(budgetId: Long): List<PostDTO> {
@@ -66,6 +62,15 @@ class BudgetService(
             ?: return null
         return budgetPostMapper.toPostDTO(post)
     }
+
+
+    fun getPost(postId: Long, userSub: String): PostDTO? {
+        val post = postRepository.findPostByIdAndBudgetUserSub(postId, userSub)
+            ?: return null
+        return budgetPostMapper.toPostDTO(post)
+
+    }
+
 
     fun createBudgetType(budgetTypeRequest: BudgetTypeDTO): BudgetTypeDTO {
         val savedBudgetType = budgetTypeRepository.save(budgetTypeMapper.toBudgetType(budgetTypeRequest))

@@ -36,8 +36,8 @@ const getBudgetType = (budgetTypeId) => {
   });
 };
 
-const deleteBudgetPost = (budgetId, postId) => {
-  return axios.delete(API_URL + "me/budgets/" + budgetId + "/posts/" + postId, {
+const deleteBudgetPost = (postId) => {
+  return axios.delete(API_URL + "me/posts/" + postId, {
     headers: authHeader(),
   });
 };

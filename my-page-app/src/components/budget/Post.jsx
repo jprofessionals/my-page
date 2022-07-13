@@ -37,7 +37,6 @@ const Post = ({ refreshBudgets, post, budgetId }) => {
               toggler={toggler}
               refreshBudgets={refreshBudgets}
               post={post}
-              budgetId={budgetId}
               setIsLoadingPost={setIsLoadingPost}
             />
             <div title="Logg ut">

@@ -30,6 +30,7 @@ interface BudgetRepository : JpaRepository<Budget, Long> {
 interface PostRepository : JpaRepository<Post, Long> {
     fun findPostsByBudgetId(budgetId: Long): List<Post>
     fun findPostByBudgetIdAndId(budgetId: Long, postId: Long): Post?
+    fun findPostByIdAndBudgetUserSub(postId: Long, userSub: String): Post?
 }
 
 @Repository

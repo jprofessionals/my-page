@@ -9,13 +9,12 @@ const DeleteBudgetPostModal = ({
   toggler,
   refreshBudgets,
   post,
-  budgetId,
   setIsLoadingPost,
 }) => {
   const handleDeletePost = (e) => {
     setIsLoadingPost(true);
     e.preventDefault();
-    ApiService.deleteBudgetPost(budgetId, post.id).then(
+    ApiService.deleteBudgetPost(post.id).then(
       (response) => {
         refreshBudgets();
         setIsLoadingPost(false);
