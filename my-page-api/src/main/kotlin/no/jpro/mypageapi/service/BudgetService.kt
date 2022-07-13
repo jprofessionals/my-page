@@ -1,6 +1,7 @@
 package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.dto.*
+import no.jpro.mypageapi.entity.Post
 import no.jpro.mypageapi.repository.BudgetRepository
 import no.jpro.mypageapi.repository.BudgetTypeRepository
 import no.jpro.mypageapi.repository.PostRepository
@@ -68,7 +69,10 @@ class BudgetService(
         val post = postRepository.findPostByIdAndBudgetUserSub(postId, userSub)
             ?: return null
         return budgetPostMapper.toPostDTO(post)
+    }
 
+    fun getPostByUserSubAndId(postId: Long, userSub: String): Post? {
+        return postRepository.findPostByIdAndBudgetUserSub(postId, userSub)
     }
 
 
@@ -89,5 +93,17 @@ class BudgetService(
     fun checkIfDateIsBeforeStartOfBudget(createPostDate: LocalDate, budgetId: Long): Boolean {
         val budgetDate = budgetRepository.findById(budgetId).get().startDate
         return createPostDate.isBefore(budgetDate)
+    }
+
+    fun editPost(editPostRequest: UpdatePostDTO, postToEdit: Post): PostDTO {
+        return budgetPostMapper.toPostDTO(
+            postRepository.save(
+                postToEdit.copy(
+                    date = editPostRequest.date ?: postToEdit.date,
+                    description = editPostRequest.description ?: postToEdit.description,
+                    amount = editPostRequest.amount ?: postToEdit.amount
+                )
+            )
+        )
     }
 }

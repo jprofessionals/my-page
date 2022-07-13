@@ -169,4 +169,19 @@ class MeController(
         return ResponseEntity.ok(budgetService.deletePost(postId))
 
     }
+
+    @PatchMapping("posts/{postId}")
+    @Operation(summary = "Edit an existing budget post")
+    fun editPost(
+        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable("postId") postId: Long,
+        @Valid @RequestBody editPostRequest: UpdatePostDTO,
+    ): ResponseEntity<PostDTO> {
+        val userSub = JwtUtils.getSub(jwt)
+        val postToEdit = budgetService.getPostByUserSubAndId(postId, userSub) ?: return ResponseEntity.notFound().build()
+        if (postToEdit.locked) {
+            return ResponseEntity.badRequest().build()
+        }
+        return ResponseEntity.ok(budgetService.editPost(editPostRequest, postToEdit))
+    }
 }

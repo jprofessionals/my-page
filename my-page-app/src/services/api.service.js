@@ -42,6 +42,12 @@ const deleteBudgetPost = (postId) => {
   });
 };
 
+const editBudgetPost = (postId, editPostRequest) => {
+  return axios.patch(API_URL + "me/posts/" + postId, editPostRequest, {
+    headers: authHeader(),
+  });
+};
+
 const ApiService = {
   getTestApi,
   getTestApiOpen,
@@ -52,5 +58,6 @@ const ApiService = {
   createBudgetPost,
   getBudgetType,
   deleteBudgetPost,
+  editBudgetPost,
 };
 export default ApiService;

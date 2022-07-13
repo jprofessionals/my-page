@@ -41,5 +41,15 @@ data class BudgetDTO(
     }
 
     @JsonProperty
+    fun sumPostsCurrentYear(): Double {
+        val toDate = LocalDate.now()
+        val startOfYear = toDate.withDayOfYear(1)
+        val postsCurrentYear = posts.filter { post ->
+            !post.date.isBefore(startOfYear) && !post.date.isAfter(toDate)
+        }
+        return postsCurrentYear.sumOf { post -> post.amount }
+    }
+
+    @JsonProperty
     fun balance() = startAmount + sumDeposits() - sumPosts()
 }
