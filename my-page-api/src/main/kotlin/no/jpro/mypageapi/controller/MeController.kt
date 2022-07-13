@@ -181,5 +181,6 @@ class MeController(
             return ResponseEntity.badRequest().build()
         }
         return ResponseEntity.ok(budgetService.editPost(editPostRequest, postToEdit))
+
     }
 }

@@ -4,9 +4,8 @@
   .header {
     display: flex;
     margin-top: 10px;
-    Button {
+    .plus {
       @include Common.orange-jpro-round-button;
-      @include Common.btn;
     }
   }
 }
@@ -69,29 +68,31 @@
 }
 
 //Post
-.card-header {
-  height: 53px;
-  b {
-    vertical-align: middle;
-  }
-}
-.removePostBtn {
-  @include Common.orange-jpro-round-button;
-  float: right;
-  &:focus {
-    box-shadow: 0px 0px 0px 0.1rem Common.$lighter-orange;
-    border-color: Common.$lighter-orange;
-  }
-  &:not(.collapsed) {
-    color: Common.$white;
-    background-color: Common.$jpro-orange;
-    &::after {
-      color: Common.$white;
-      border-color: Common.$white;
+.postHeader {
+  .card-header {
+    height: 53px;
+    b {
+      vertical-align: middle;
     }
   }
-  &:hover {
-    background-color: Common.$hover-orange;
+  .removePostBtn {
+    @include Common.orange-jpro-round-button;
+    float: right;
+    &:focus {
+      box-shadow: 0px 0px 0px 0.1rem Common.$lighter-orange;
+      border-color: Common.$lighter-orange;
+    }
+    &:not(.collapsed) {
+      color: Common.$white;
+      background-color: Common.$jpro-orange;
+      &::after {
+        color: Common.$white;
+        border-color: Common.$white;
+      }
+    }
+    &:hover {
+      background-color: Common.$hover-orange;
+    }
   }
 }
 //DeleteBudgetPostModal

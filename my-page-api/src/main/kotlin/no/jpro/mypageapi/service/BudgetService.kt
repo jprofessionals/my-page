@@ -69,10 +69,12 @@ class BudgetService(
         val post = postRepository.findPostByIdAndBudgetUserSub(postId, userSub)
             ?: return null
         return budgetPostMapper.toPostDTO(post)
+
     }
 
     fun getPostByUserSubAndId(postId: Long, userSub: String): Post? {
         return postRepository.findPostByIdAndBudgetUserSub(postId, userSub)
+
     }
 
 
