@@ -8,14 +8,13 @@ data class Budget(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-    val name: String,
     val startDate: LocalDate,
     val startAmount: Double,
     @OneToMany(mappedBy = "budget")
-    var posts: List<Post>,
+    val posts: List<Post>,
     @ManyToOne
-    var user: User? = null,
+    val user: User? = null,
     @ManyToOne
-    var budgetType: BudgetType
+    val budgetType: BudgetType
 
 )

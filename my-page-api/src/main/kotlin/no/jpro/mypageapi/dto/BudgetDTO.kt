@@ -5,10 +5,9 @@ import java.time.LocalDate
 import java.time.Period
 
 data class BudgetDTO(
-    val name: String,
     val id: Long?,
-    var posts: List<PostDTO>,
-    var budgetType: BudgetTypeDTO,
+    val posts: List<PostDTO>,
+    val budgetType: BudgetTypeDTO,
     val startDate: LocalDate,
     val startAmount: Double
 ) {

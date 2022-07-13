@@ -13,6 +13,6 @@ data class BudgetType(
     val intervalOfDepositInMonths: Long,
     val startAmount: Double,
     @OneToMany(mappedBy = "budgetType")
-    var budgets: List<Budget>
+    val budgets: List<Budget>
 )
 

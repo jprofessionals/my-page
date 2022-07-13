@@ -25,9 +25,10 @@ class BudgetService(
     }
 
     fun createBudget(userSub: String, budgetRequest: CreateBudgetDTO): BudgetDTO {
-        val budget = budgetPostMapper.toBudget(budgetRequest)
-        budget.user = userRepository.findUserBySub(userSub)
-        budget.budgetType = budgetTypeRepository.findById(budgetRequest.budgetTypeId).get()
+        val budget = budgetPostMapper.toBudget(budgetRequest).copy(
+            user = userRepository.findUserBySub(userSub),
+            budgetType = budgetTypeRepository.findById(budgetRequest.budgetTypeId).get()
+        )
         return budgetPostMapper.toBudgetDTO(budgetRepository.save(budget))
     }
 
@@ -43,9 +44,10 @@ class BudgetService(
 
 
     fun createPost(postRequest: CreatePostDTO, budgetId: Long, userSub: String): PostDTO {
-        val post = budgetPostMapper.toPost(postRequest)
         val budget = budgetRepository.findBudgetByUserSubAndId(userSub, budgetId)
-        post.budget = budget
+        val post = budgetPostMapper.toPost(postRequest).copy(
+            budget = budget
+        )
         return budgetPostMapper.toPostDTO(postRepository.save(post))
     }
 

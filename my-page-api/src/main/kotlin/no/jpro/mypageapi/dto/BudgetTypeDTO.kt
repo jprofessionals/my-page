@@ -1,6 +1,6 @@
 package no.jpro.mypageapi.dto
 
-class BudgetTypeDTO(
+ data class BudgetTypeDTO(
     val name: String,
     val rollOver: Boolean,
     val deposit: Double,

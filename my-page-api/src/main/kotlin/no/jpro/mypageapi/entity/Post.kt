@@ -16,5 +16,5 @@ data class Post(
     val locked: Boolean = false,
     @JsonIgnore
     @ManyToOne
-    var budget: Budget? = null
+    val budget: Budget? = null
 )
