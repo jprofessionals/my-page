@@ -48,8 +48,8 @@ class BudgetService(
         return budgetPostMapper.toPostDTO(postRepository.save(post))
     }
 
-    fun deletePost(postId: Long): Unit? {
-        return postRepository.deleteById(postId)
+    fun deletePost(postId: Long) {
+        postRepository.deleteById(postId)
     }
 
     fun getPosts(budgetId: Long): List<PostDTO> {
@@ -68,7 +68,6 @@ class BudgetService(
         val post = postRepository.findPostByIdAndBudgetUserSub(postId, userSub)
             ?: return null
         return budgetPostMapper.toPostDTO(post)
-
     }
 
 
