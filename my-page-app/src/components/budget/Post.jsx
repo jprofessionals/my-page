@@ -25,7 +25,6 @@ const Post = ({ refreshBudgets, post, budgetId }) => {
     <Card border={postInFuture() ? "grey" : "dark"}>
       <div className="postHeader">
         <Card.Header>
-          <div className="headerPost">
             <b>{post.description}</b>
             <Button
               className="removePostBtn btn"
@@ -49,7 +48,6 @@ const Post = ({ refreshBudgets, post, budgetId }) => {
                 </div>
               </div>
             </Button>
-          </div>
         </Card.Header>
       </div>
       <Card.Body>
