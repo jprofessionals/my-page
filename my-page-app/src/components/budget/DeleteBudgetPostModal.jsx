@@ -9,19 +9,19 @@ const DeleteBudgetPostModal = ({
   toggler,
   refreshBudgets,
   post,
-  setIsLoadingPost,
+  setIsLoadingDeletePost,
 }) => {
   const handleDeletePost = (e) => {
-    setIsLoadingPost(true);
+    setIsLoadingDeletePost(true);
     e.preventDefault();
     ApiService.deleteBudgetPost(post.id).then(
       (response) => {
         refreshBudgets();
-        setIsLoadingPost(false);
+        setIsLoadingDeletePost(false);
         toast.success("Slettet " + post.description);
       },
       (error) => {
-        setIsLoadingPost(false);
+        setIsLoadingDeletePost(false);
         toast.error("Får ikke slettet posten, prøv igjen senere");
       }
     );
@@ -37,7 +37,7 @@ const DeleteBudgetPostModal = ({
           <div className="container ">
             <h1>Slett post</h1>
             <p>Er du sikker på at du vil slette {post.description}?</p>
-            <div className="btns">
+            <div className="modalBtns">
               <button
                 type="button btn"
                 className="deletebtn btn"

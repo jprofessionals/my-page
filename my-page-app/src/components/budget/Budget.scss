@@ -9,12 +9,57 @@
     }
   }
 }
-
 .card {
   margin-bottom: 5px;
   margin-top: 5px;
 }
-//CreateBudgetPost
+//Round buttons to the right, used at EditBudgetPost and Post
+.rightBtnsDiv {
+  margin-right: 0px;
+  margin-left: auto;
+  display: flex;
+  Button {
+    @include Common.orange-jpro-round-button;
+  }
+  .leftBtn {
+    margin-right: 4px;
+  }
+}
+
+//Post
+.post {
+  .card-header {
+    b {
+      vertical-align: middle;
+    }
+  }
+  .postList {
+    li {
+      list-style-type: none;
+      margin-bottom: 10px;
+      margin-left: -25px;
+      .description {
+        margin-left: 5px;
+      }
+    }
+  }
+  .headerPost {
+    display: flex;
+    b {
+      margin-top: 8px;
+    }
+  }
+}
+
+//EditBudgetPost header for alignment of buttons
+.editPost {
+  .editPostHeader {
+    display: flex;
+    align-items: center;
+  }
+}
+
+//CreateBudgetPost and EditBudgetPost
 .inputCard {
   border-color: Common.$darker-orange;
   input {
@@ -30,7 +75,6 @@
     width: 100%;
     padding: 5px;
     display: flex;
-    flex-wrap: wrap;
     li {
       list-style-type: none;
       margin-bottom: 10px;
@@ -52,64 +96,21 @@
   .addPostBtn {
     @include Common.btn;
     margin-left: 14px;
-    &:focus {
-      box-shadow: 0px 0px 0px 0.1rem Common.$lighter-orange;
-      border-color: Common.$lighter-orange;
-    }
-    &:not(.collapsed) {
-      color: Common.$white;
-      background-color: Common.$jpro-orange;
-      &::after {
-        color: Common.$white;
-        border-color: Common.$white;
-      }
-    }
   }
 }
 
-//Post
-.postHeader {
-  .card-header {
-    height: 53px;
-    b {
-      vertical-align: middle;
-    }
-  }
-  .removePostBtn {
-    @include Common.orange-jpro-round-button;
-    float: right;
-    &:focus {
-      box-shadow: 0px 0px 0px 0.1rem Common.$lighter-orange;
-      border-color: Common.$lighter-orange;
-    }
-    &:not(.collapsed) {
-      color: Common.$white;
-      background-color: Common.$jpro-orange;
-      &::after {
-        color: Common.$white;
-        border-color: Common.$white;
-      }
-    }
-    &:hover {
-      background-color: Common.$hover-orange;
-    }
-  }
-}
 //DeleteBudgetPostModal
 .modal {
   .modal-body {
     background-color: Common.$navbar-color;
     color: Common.$white;
+    justify-content: space-between;
   }
-  .container {
-    .deletebtn {
+  .modalBtns {
+    display: flex;
+    justify-content: space-between;
+    Button {
       @include Common.btn;
-      color: Common.$white;
-    }
-    .cancelbtn {
-      @include Common.btn;
-      color: Common.$white;
-      float: right;
     }
   }
 }
@@ -140,23 +141,6 @@
 }
 
 //Budgets
-.accordion-button {
-  &:focus {
-    box-shadow: 0px 0px 0px 0.1rem Common.$jpro-orange;
-  }
-  &:not(.collapsed) {
-    color: Common.$black;
-    background-color: Common.$lighter-orange;
-    &::after {
-      color: Common.$black;
-      background-image: url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27 fill=%27%23212529%27%3e%3cpath fill-rule=%27evenodd%27 d=%27M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z%27/%3e%3c/svg%3e");
-    }
-  }
-  &:hover {
-    background-color: Common.$lighter-orange;
-  }
-}
-
 .budgets {
   margin-top: 15px;
   margin-left: 5px;
@@ -173,7 +157,6 @@
     display: flex;
     button {
       @include Common.orange-jpro-round-button;
-      @include Common.btn;
       margin-right: 12px;
     }
   }
@@ -188,6 +171,22 @@
       flex: 33%;
       list-style-type: none;
       margin-bottom: 0px;
+    }
+  }
+  .accordion-button {
+    &:focus {
+      box-shadow: 0px 0px 0px 0.1rem Common.$jpro-orange;
+    }
+    &:not(.collapsed) {
+      color: Common.$black;
+      background-color: Common.$lighter-orange;
+      &::after {
+        color: Common.$black;
+        background-image: url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27 fill=%27%23212529%27%3e%3cpath fill-rule=%27evenodd%27 d=%27M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z%27/%3e%3c/svg%3e");
+      }
+    }
+    &:hover {
+      background-color: Common.$lighter-orange;
     }
   }
 }
