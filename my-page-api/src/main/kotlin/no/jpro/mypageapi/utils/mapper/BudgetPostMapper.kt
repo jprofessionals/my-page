@@ -15,9 +15,13 @@ class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private v
         id = post.id,
         date = post.date,
         description = post.description,
-        amount = post.amount,
+        amountIncludedMva = post.amountIncludedMva,
+        amountExcludedMva = post.amountExcludedMva,
         expense = post.expense,
         locked = post.locked,
+        createdDate = post.createdDate,
+        lastModifiedDate = post.lastModifiedDate,
+        createdBy = post.createdBy?.name
     )
 
     fun toBudgetDTO(budget: Budget): BudgetDTO {
@@ -44,7 +48,8 @@ class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private v
     fun toPost(createPostDTO: CreatePostDTO): Post = Post(
         date = createPostDTO.date,
         description = createPostDTO.description,
-        amount = createPostDTO.amount,
+        amountIncludedMva = createPostDTO.amountIncludedMva,
+        amountExcludedMva = createPostDTO.amountExcludedMva,
         expense = createPostDTO.expense,
     )
 }

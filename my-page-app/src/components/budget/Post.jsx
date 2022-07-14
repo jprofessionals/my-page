@@ -25,34 +25,34 @@ const Post = ({ refreshBudgets, post, budgetId }) => {
     <Card border={postInFuture() ? "grey" : "dark"}>
       <div className="postHeader">
         <Card.Header>
-            <b>{post.description}</b>
-            <Button
-              className="removePostBtn btn"
-              type="btn"
-              title="Slett post"
-              onClick={toggler}
-            >
-              <DeleteBudgetPostModal
-                isDeleteModalOpen={isDeleteModalOpen}
-                toggler={toggler}
-                refreshBudgets={refreshBudgets}
-                post={post}
-                setIsLoadingPost={setIsLoadingPost}
-              />
-              <div title="Logg ut">
-                <div style={isLoadingPost ? { display: "none" } : {}}>
-                  <FontAwesomeIcon icon={faTrash} />
-                </div>
-                <div style={isLoadingPost ? {} : { display: "none" }}>
-                  <Spinner animation="border" size="sm" />
-                </div>
+          <b>{post.description}</b>
+          <Button
+            className="removePostBtn btn"
+            type="btn"
+            title="Slett post"
+            onClick={toggler}
+          >
+            <DeleteBudgetPostModal
+              isDeleteModalOpen={isDeleteModalOpen}
+              toggler={toggler}
+              refreshBudgets={refreshBudgets}
+              post={post}
+              setIsLoadingPost={setIsLoadingPost}
+            />
+            <div title="Logg ut">
+              <div style={isLoadingPost ? { display: "none" } : {}}>
+                <FontAwesomeIcon icon={faTrash} />
               </div>
-            </Button>
+              <div style={isLoadingPost ? {} : { display: "none" }}>
+                <Spinner animation="border" size="sm" />
+              </div>
+            </div>
+          </Button>
         </Card.Header>
       </div>
       <Card.Body>
         <Card.Text>
-          <b>Pris:</b> {post.amount}
+          <b>Pris:</b> {post.amountIncludedMva}
         </Card.Text>
         <Card.Text>
           <b>Dato:</b> {post.date}

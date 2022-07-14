@@ -24,7 +24,7 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
       const budgetPost = {
         date: date,
         description: description,
-        amount: amount,
+        amountIncludedMva: amount,
         expense: true,
       };
       ApiService.createBudgetPost(budgetPost, budget.id).then(

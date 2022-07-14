@@ -26,7 +26,7 @@ data class BudgetDTO(
         val adjustedFromDate = if (budgetType.rollOver) startDate else toDate.withDayOfYear(1)
         val filteredPosts =
             posts.filter { post -> (!post.date.isBefore(adjustedFromDate) && !post.date.isAfter(toDate)) }
-        return filteredPosts.sumOf { post -> post.amount }
+        return filteredPosts.sumOf { post -> post.amountIncludedMva }
     }
 
     @JsonProperty
@@ -36,7 +36,7 @@ data class BudgetDTO(
         val postsLastTwelveMonths = posts.filter { post ->
             !post.date.isBefore(dateOneYearAgo) && !post.date.isAfter(toDate)
         }
-        return postsLastTwelveMonths.sumOf { post -> post.amount }
+        return postsLastTwelveMonths.sumOf { post -> post.amountIncludedMva }
     }
 
     @JsonProperty
@@ -46,7 +46,7 @@ data class BudgetDTO(
         val postsCurrentYear = posts.filter { post ->
             !post.date.isBefore(startOfYear) && !post.date.isAfter(toDate)
         }
-        return postsCurrentYear.sumOf { post -> post.amount }
+        return postsCurrentYear.sumOf { post -> post.amountIncludedMva }
     }
 
     @JsonProperty
