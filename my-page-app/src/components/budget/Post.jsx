@@ -7,7 +7,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
 
 const Post = ({ refreshBudgets, post, budget }) => {
-  const [isLoadingPost, setIsLoadingPost] = useState(false);
+  const [isLoadingEditPost, setIsLoadingEditPost] = useState(false);
+  const [isLoadingDeletePost, setIsLoadingDeletePost] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditPostOpen, setIsEditPostOpen] = useState(false);
 
@@ -43,54 +44,68 @@ const Post = ({ refreshBudgets, post, budget }) => {
             <div className="headerPost">
               <b>{post.description}</b>
               <div className="btns">
-                <Button
-                  className="editPostBtn"
-                  type="btn"
-                  title="Rediger post"
-                  onClick={togglerEdit}
+                <div
+                  style={
+                    isLoadingDeletePost || post.locked
+                      ? { display: "none" }
+                      : {}
+                  }
                 >
-                  <div title="Rediger Post">
-                    <div style={isLoadingPost ? { display: "none" } : {}}>
-                      <FontAwesomeIcon icon={faEdit} />
+                  <Button
+                    className="editPostBtn"
+                    type="btn"
+                    title="Rediger post"
+                    onClick={togglerEdit}
+                  >
+                    <div title="Rediger Post">
+                      <div style={isLoadingEditPost ? { display: "none" } : {}}>
+                        <FontAwesomeIcon icon={faEdit} />
+                      </div>
+                      <div style={isLoadingEditPost ? {} : { display: "none" }}>
+                        <Spinner animation="border" size="sm" />
+                      </div>
                     </div>
-                    <div style={isLoadingPost ? {} : { display: "none" }}>
-                      <Spinner animation="border" size="sm" />
-                    </div>
-                  </div>
-                </Button>
-                <Button
-                  className="removePostBtn"
-                  type="btn"
-                  title="Slett post"
-                  onClick={toggler}
+                  </Button>
+                </div>
+                <div
+                  style={
+                    isLoadingEditPost || post.locked ? { display: "none" } : {}
+                  }
                 >
-                  <DeleteBudgetPostModal
-                    isDeleteModalOpen={isDeleteModalOpen}
-                    togglerDelete={toggler}
-                    refreshBudgets={refreshBudgets}
-                    post={post}
-                    setIsLoadingPost={setIsLoadingPost}
-                  />
-                  <div title="Logg ut">
-                    <div style={isLoadingPost ? { display: "none" } : {}}>
+                  <Button
+                    className="removePostBtn"
+                    type="btn"
+                    title="Slett post"
+                    onClick={toggler}
+                  >
+                    <DeleteBudgetPostModal
+                      isDeleteModalOpen={isDeleteModalOpen}
+                      togglerDelete={toggler}
+                      refreshBudgets={refreshBudgets}
+                      post={post}
+                      setIsLoadingDeletePost={setIsLoadingDeletePost}
+                    />
+                    <div style={isLoadingDeletePost ? { display: "none" } : {}}>
                       <FontAwesomeIcon icon={faTrash} />
                     </div>
-                    <div style={isLoadingPost ? {} : { display: "none" }}>
+                    <div style={isLoadingDeletePost ? {} : { display: "none" }}>
                       <Spinner animation="border" size="sm" />
                     </div>
-                  </div>
-                </Button>
+                  </Button>
+                </div>
               </div>
             </div>
           </Card.Header>
         </div>
         <Card.Body>
-          <Card.Text>
-            <b>Pris:</b> {post.amount}
-          </Card.Text>
-          <Card.Text>
-            <b>Dato:</b> {post.date}
-          </Card.Text>
+          <ul className="postList">
+            <li>
+              <b>Pris:</b> {post.amount}
+            </li>
+            <li>
+              <b>Dato:</b> {post.date}
+            </li>
+          </ul>
         </Card.Body>
       </Card>
       <div style={isEditPostOpen ? {} : { display: "none" }}>
@@ -99,8 +114,8 @@ const Post = ({ refreshBudgets, post, budget }) => {
           refreshBudgets={refreshBudgets}
           budget={budget}
           post={post}
-          setIsLoadingPost={setIsLoadingPost}
-          isLoadingPost={isLoadingPost}
+          setIsLoadingEditPost={setIsLoadingEditPost}
+          isLoadingEditPost={isLoadingEditPost}
         />
       </div>
     </div>

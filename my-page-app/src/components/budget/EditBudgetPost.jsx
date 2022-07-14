@@ -12,8 +12,8 @@ const EditBudgetPost = ({
   refreshBudgets,
   budget,
   post,
-  setIsLoadingPost,
-  isLoadingPost,
+  setIsLoadingEditPost,
+  isLoadingEditPost,
 }) => {
   const [description, setDescription] = useState(post.description);
   const [amount, setAmount] = useState(post.amount);
@@ -28,7 +28,7 @@ const EditBudgetPost = ({
     if (!isValid()) {
       toast.error("Noen av verdiene var ikke gyldig, prøv igjen");
     } else {
-      setIsLoadingPost(true);
+      setIsLoadingEditPost(true);
       const budgetPost = {
         date: date,
         description: description,
@@ -38,12 +38,12 @@ const EditBudgetPost = ({
         (response) => {
           refreshBudgets();
           toggle();
-          setIsLoadingPost(false);
-          toast.success("Lagret", post.description);
+          setIsLoadingEditPost(false);
+          toast.success("Lagret " + description);
         },
         (error) => {
-          setIsLoadingPost(false);
-          toast.error("Fikk ikke oppdatert", post.description, "prøv igjen");
+          setIsLoadingEditPost(false);
+          toast.error("Fikk ikke oppdatert " + description + ", prøv igjen");
         }
       );
     }
@@ -68,7 +68,7 @@ const EditBudgetPost = ({
           className="description"
           type="text"
           name="description"
-          placeholder={post.description}
+          placeholder="Beskrivelse"
           onChange={handleDescriptionChange}
           value={description}
         />
@@ -80,26 +80,28 @@ const EditBudgetPost = ({
             onClick={handleSubmit}
             title="Lagre Post"
           >
-            <div style={isLoadingPost ? { display: "none" } : {}}>
+            <div style={isLoadingEditPost ? { display: "none" } : {}}>
               <FontAwesomeIcon icon={faCheck} />
             </div>
-            <div style={isLoadingPost ? {} : { display: "none" }}>
+            <div style={isLoadingEditPost ? {} : { display: "none" }}>
               <Spinner animation="border" size="sm" />
             </div>
           </Button>
-          <Button
-            className="canselEditButton"
-            type="btn"
-            title="Avbryt redigering"
-            onClick={toggle}
-          >
-            <div style={isLoadingPost ? { display: "none" } : {}}>
-              <FontAwesomeIcon icon={faRemove} />
-            </div>
-            <div style={isLoadingPost ? {} : { display: "none" }}>
-              <Spinner animation="border" size="sm" />
-            </div>
-          </Button>
+          <div style={isLoadingEditPost ? { display: "none" } : {}}>
+            <Button
+              className="canselEditButton"
+              type="btn"
+              title="Avbryt redigering"
+              onClick={toggle}
+            >
+              <div style={isLoadingEditPost ? { display: "none" } : {}}>
+                <FontAwesomeIcon icon={faRemove} />
+              </div>
+              <div style={isLoadingEditPost ? {} : { display: "none" }}>
+                <Spinner animation="border" size="sm" />
+              </div>
+            </Button>
+          </div>
         </div>
       </Card.Header>
       <Card.Body>
@@ -109,7 +111,7 @@ const EditBudgetPost = ({
             <input
               type="number"
               name="amount"
-              placeholder={post.amount}
+              placeholder="Pris"
               onChange={handleAmountChange}
               value={amount}
             />
@@ -122,7 +124,7 @@ const EditBudgetPost = ({
               name="date"
               onChange={handleDateChange}
               value={date}
-              placeholder={post.date}
+              placeholder={date}
             ></input>
           </li>
         </ul>

@@ -9,19 +9,19 @@ const DeleteBudgetPostModal = ({
   toggler,
   refreshBudgets,
   post,
-  setIsLoadingPost,
+  setIsLoadingDeletePost,
 }) => {
   const handleDeletePost = (e) => {
-    setIsLoadingPost(true);
+    setIsLoadingDeletePost(true);
     e.preventDefault();
     ApiService.deleteBudgetPost(post.id).then(
       (response) => {
         refreshBudgets();
-        setIsLoadingPost(false);
+        setIsLoadingDeletePost(false);
         toast.success("Slettet " + post.description);
       },
       (error) => {
-        setIsLoadingPost(false);
+        setIsLoadingDeletePost(false);
         toast.error("Får ikke slettet posten, prøv igjen senere");
       }
     );
