@@ -16,11 +16,13 @@ const EditBudgetPost = ({
   isLoadingEditPost,
 }) => {
   const [description, setDescription] = useState(post.description);
-  const [amount, setAmount] = useState(post.amount);
+  const [amountIncludedMva, setAmountIncludedMva] = useState(
+    post.amountIncludedMva
+  );
   const [date, setDate] = useState(Moment().format(post.date));
 
   const isValid = () => {
-    return amount > 0 && description && description !== "";
+    return amountIncludedMva > 0 && description && description !== "";
   };
 
   const handleSubmit = (e) => {
@@ -32,7 +34,7 @@ const EditBudgetPost = ({
       const budgetPost = {
         date: date,
         description: description,
-        amount: amount,
+        amountIncludedMva: amountIncludedMva,
       };
       ApiService.editBudgetPost(post.id, budgetPost).then(
         (response) => {
@@ -54,7 +56,7 @@ const EditBudgetPost = ({
   };
 
   const handleAmountChange = (e) => {
-    setAmount(e.target.value);
+    setAmountIncludedMva(e.target.value);
   };
 
   const handleDateChange = (e) => {
@@ -110,10 +112,10 @@ const EditBudgetPost = ({
             <span className="priceTitle">Pris:</span>
             <input
               type="number"
-              name="amount"
+              name="amountIncludedMva"
               placeholder="Pris"
               onChange={handleAmountChange}
-              value={amount}
+              value={amountIncludedMva}
             />
           </li>
           <li>

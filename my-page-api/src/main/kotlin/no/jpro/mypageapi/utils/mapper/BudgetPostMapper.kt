@@ -8,7 +8,6 @@ import no.jpro.mypageapi.entity.Budget
 import no.jpro.mypageapi.entity.Post
 import no.jpro.mypageapi.repository.BudgetTypeRepository
 import org.springframework.stereotype.Service
-
 @Service
 class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private val budgetTypeRepository: BudgetTypeRepository) {
     fun toPostDTO(post: Post): PostDTO = PostDTO(
@@ -17,6 +16,9 @@ class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private v
         description = post.description,
         amountIncludedMva = post.amountIncludedMva,
         amountExcludedMva = post.amountExcludedMva,
+        documentNumber = post.documentNumber,
+        dateOfPayment = post.dateOfPayment,
+        dateOfDeduction = post.dateOfDeduction,
         expense = post.expense,
         locked = post.locked,
         createdDate = post.createdDate,
