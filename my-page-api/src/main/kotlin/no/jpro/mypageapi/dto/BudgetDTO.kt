@@ -5,10 +5,9 @@ import java.time.LocalDate
 import java.time.Period
 
 data class BudgetDTO(
-    val name: String,
     val id: Long?,
-    var posts: List<PostDTO>,
-    var budgetType: BudgetTypeDTO,
+    val posts: List<PostDTO>,
+    val budgetType: BudgetTypeDTO,
     val startDate: LocalDate,
     val startAmount: Double
 ) {
@@ -38,6 +37,16 @@ data class BudgetDTO(
             !post.date.isBefore(dateOneYearAgo) && !post.date.isAfter(toDate)
         }
         return postsLastTwelveMonths.sumOf { post -> post.amount }
+    }
+
+    @JsonProperty
+    fun sumPostsCurrentYear(): Double {
+        val toDate = LocalDate.now()
+        val startOfYear = toDate.withDayOfYear(1)
+        val postsCurrentYear = posts.filter { post ->
+            !post.date.isBefore(startOfYear) && !post.date.isAfter(toDate)
+        }
+        return postsCurrentYear.sumOf { post -> post.amount }
     }
 
     @JsonProperty
