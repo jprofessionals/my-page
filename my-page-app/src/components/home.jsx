@@ -6,7 +6,9 @@ function Home({ user }) {
       <header className="jumbotron">
         <h3>Hei, {user.givenName}</h3>
         <p>E-post: {user.email}</p>
-        <p>Startdato: {user.startDate}</p>
+        <p style={user.startDate ? {} : { display: "none" }}>
+          Startdato: {user.startDate}
+        </p>
       </header>
     </div>
   );

@@ -32,11 +32,11 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
           refreshBudgets();
           toggle();
           setIsLoadingPost(false);
-          toast.success("Lagret post");
+          toast.success("Lagret " + description);
         },
         (error) => {
           setIsLoadingPost(false);
-          toast.error("Fikk ikke opprettet posten, prøv igjen");
+          toast.error("Fikk ikke opprettet " + description + ", prøv igjen");
         }
       );
     }

@@ -68,7 +68,6 @@ const Budget = ({ budget, refreshBudgets }) => {
               <Post
                 className="post"
                 key={post.id}
-                budgetId={budget.id}
                 post={post}
                 budget={budget}
                 refreshBudgets={refreshBudgets}
