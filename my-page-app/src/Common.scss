@@ -36,4 +36,8 @@ $toast-success: #3c5c5c;
   &:hover {
     background-color: $hover-orange;
   }
+  &:not(.collapsed) {
+    color: $white;
+    background-color: $jpro-orange;
+  }
 }
