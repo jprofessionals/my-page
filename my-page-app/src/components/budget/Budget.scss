@@ -13,11 +13,22 @@
   margin-bottom: 5px;
   margin-top: 5px;
 }
+//Round buttons to the right, used at EditBudgetPost and Post
+.rightBtnsDiv {
+  margin-right: 0px;
+  margin-left: auto;
+  display: flex;
+  Button {
+    @include Common.orange-jpro-round-button;
+  }
+  .leftBtn {
+    margin-right: 4px;
+  }
+}
 
 //Post
 .post {
   .card-header {
-    height: 53px;
     b {
       vertical-align: middle;
     }
@@ -37,75 +48,18 @@
     b {
       margin-top: 8px;
     }
-    .btns {
-      margin-right: 0px;
-      margin-left: auto;
-      display: flex;
-      .editPostBtn {
-        margin-right: 4px;
-      }
-      Button {
-        @include Common.orange-jpro-round-button;
-        &:focus {
-          box-shadow: 0px 0px 0px 0.1rem Common.$lighter-orange;
-          border-color: Common.$lighter-orange;
-        }
-        &:not(.collapsed) {
-          color: Common.$white;
-          background-color: Common.$jpro-orange;
-          &::after {
-            color: Common.$white;
-            border-color: Common.$white;
-          }
-        }
-        &:hover {
-          background-color: Common.$hover-orange;
-        }
-      }
-    }
   }
 }
 
-//EditBudgetPost
+//EditBudgetPost header for alignment of buttons
 .editPost {
   .editPostHeader {
     display: flex;
-    .description {
-      height: 30px;
-      margin-top: 4px;
-    }
-    .editCardBtns {
-      margin-right: 0px;
-      margin-left: auto;
-      display: flex;
-      Button {
-        @include Common.orange-jpro-round-button;
-        height: 38px;
-        width: 38px;
-        &:focus {
-          box-shadow: 0px 0px 0px 0.1rem Common.$lighter-orange;
-          border-color: Common.$lighter-orange;
-        }
-        &:not(.collapsed) {
-          color: Common.$white;
-          background-color: Common.$jpro-orange;
-          &::after {
-            color: Common.$white;
-            border-color: Common.$white;
-          }
-        }
-        &:hover {
-          background-color: Common.$hover-orange;
-        }
-      }
-      .addPostBtn {
-        margin-right: 4px;
-      }
-    }
+    align-items: center;
   }
 }
 
-//CreateBudgetPost
+//CreateBudgetPost and EditBudgetPost
 .inputCard {
   border-color: Common.$darker-orange;
   input {
@@ -121,7 +75,6 @@
     width: 100%;
     padding: 5px;
     display: flex;
-    flex-wrap: wrap;
     li {
       list-style-type: none;
       margin-bottom: 10px;
@@ -143,18 +96,6 @@
   .addPostBtn {
     @include Common.btn;
     margin-left: 14px;
-    &:focus {
-      box-shadow: 0px 0px 0px 0.1rem Common.$lighter-orange;
-      border-color: Common.$lighter-orange;
-    }
-    &:not(.collapsed) {
-      color: Common.$white;
-      background-color: Common.$jpro-orange;
-      &::after {
-        color: Common.$white;
-        border-color: Common.$white;
-      }
-    }
   }
 }
 
@@ -163,20 +104,6 @@
   .modal-body {
     background-color: Common.$navbar-color;
     color: Common.$white;
-  }
-  .container {
-    .btns {
-      display: flex;
-      justify-content: space-between;
-      .deletebtn {
-        @include Common.btn;
-        color: Common.$white;
-      }
-      .cancelbtn {
-        @include Common.btn;
-        color: Common.$white;
-      }
-    }
   }
 }
 
@@ -206,7 +133,6 @@
 }
 
 //Budgets
-
 .budgets {
   margin-top: 15px;
   margin-left: 5px;
@@ -223,7 +149,6 @@
     display: flex;
     button {
       @include Common.orange-jpro-round-button;
-      @include Common.btn;
       margin-right: 12px;
     }
   }

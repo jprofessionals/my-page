@@ -43,7 +43,7 @@ const Post = ({ refreshBudgets, post, budget }) => {
           <Card.Header className="postHeader">
             <div className="headerPost">
               <b>{post.description}</b>
-              <div className="btns">
+              <div className="rightBtnsDiv">
                 <div
                   style={
                     isLoadingDeletePost || post.locked
@@ -52,7 +52,7 @@ const Post = ({ refreshBudgets, post, budget }) => {
                   }
                 >
                   <Button
-                    className="editPostBtn"
+                    className="leftBtn"
                     type="btn"
                     title="Rediger post"
                     onClick={togglerEdit}

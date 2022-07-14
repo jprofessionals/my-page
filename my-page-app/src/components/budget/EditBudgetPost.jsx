@@ -72,9 +72,9 @@ const EditBudgetPost = ({
           onChange={handleDescriptionChange}
           value={description}
         />
-        <div className="editCardBtns">
+        <div className="rightBtnsDiv">
           <Button
-            className="addPostBtn"
+            className="leftBtn"
             type="btn submit"
             style={isValid() ? {} : { display: "none" }}
             onClick={handleSubmit}
