@@ -104,6 +104,14 @@
   .modal-body {
     background-color: Common.$navbar-color;
     color: Common.$white;
+    justify-content: space-between;
+  }
+  .modalBtns {
+    display: flex;
+    justify-content: space-between;
+    Button {
+      @include Common.btn;
+    }
   }
 }
 

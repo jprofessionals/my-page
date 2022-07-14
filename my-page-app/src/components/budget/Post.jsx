@@ -26,10 +26,8 @@ const Post = ({ refreshBudgets, post, budget }) => {
 
   const togglerEdit = () => {
     if (isEditPostOpen) {
-      console.log("hei");
       setIsEditPostOpen(false);
     } else {
-      console.log("hei");
       setIsEditPostOpen(true);
     }
   };
