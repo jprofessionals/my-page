@@ -5,7 +5,7 @@ import java.time.LocalDate
 data class CreatePostDTO(
     val date: LocalDate,
     val description: String?,
-    val amountIncludedMva: Double,
-    val amountExcludedMva: Double,
+    val amountIncMva: Double,
+    val amountExMva: Double,
     val expense: Boolean,
 )

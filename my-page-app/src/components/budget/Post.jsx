@@ -99,7 +99,7 @@ const Post = ({ refreshBudgets, post, budget }) => {
         <Card.Body>
           <ul className="postList">
             <li>
-              <b>Pris:</b> {post.amountIncludedMva}
+              <b>Pris:</b> {post.amountExMva}
             </li>
             <li>
               <b>Dato:</b> {post.date}

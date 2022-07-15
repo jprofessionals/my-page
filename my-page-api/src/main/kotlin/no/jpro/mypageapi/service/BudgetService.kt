@@ -107,7 +107,7 @@ class BudgetService(
                 postToEdit.copy(
                     date = editPostRequest.date ?: postToEdit.date,
                     description = editPostRequest.description ?: postToEdit.description,
-                    amountIncludedMva = editPostRequest.amountIncludedMva ?: postToEdit.amountIncludedMva
+                    amountExMva = editPostRequest.amountExMva ?: postToEdit.amountExMva
                 )
             )
         )

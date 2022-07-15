@@ -11,23 +11,8 @@ data class BudgetDTO(
     val startDate: LocalDate,
     val startAmount: Double
 ) {
-    @JsonProperty
-    fun sumDeposits(): Double {
-        val toDate = LocalDate.now()
-        val adjustedFromDate = if (budgetType.rollOver) startDate else toDate.withDayOfYear(1)
-        val countMonths = Period.between(adjustedFromDate, toDate).months
-        if (budgetType.intervalOfDepositInMonths == 0L) return 0.0
-        return (countMonths / budgetType.intervalOfDepositInMonths) * budgetType.deposit
-    }
-
-    @JsonProperty
-    fun sumPosts(): Double {
-        val toDate = LocalDate.now()
-        val adjustedFromDate = if (budgetType.rollOver) startDate else toDate.withDayOfYear(1)
-        val filteredPosts =
-            posts.filter { post -> (!post.date.isBefore(adjustedFromDate) && !post.date.isAfter(toDate)) }
-        return filteredPosts.sumOf { post -> post.amountIncludedMva }
-    }
+        @JsonProperty
+    fun sumPosts(): Double = posts.sumOf { post -> post.amountExMva ?: 0.0 }
 
     @JsonProperty
     fun sumPostsLastTwelveMonths(): Double {
@@ -36,7 +21,7 @@ data class BudgetDTO(
         val postsLastTwelveMonths = posts.filter { post ->
             !post.date.isBefore(dateOneYearAgo) && !post.date.isAfter(toDate)
         }
-        return postsLastTwelveMonths.sumOf { post -> post.amountIncludedMva }
+        return postsLastTwelveMonths.sumOf { post -> post.amountExMva ?: 0.0 }
     }
 
     @JsonProperty
@@ -46,9 +31,31 @@ data class BudgetDTO(
         val postsCurrentYear = posts.filter { post ->
             !post.date.isBefore(startOfYear) && !post.date.isAfter(toDate)
         }
-        return postsCurrentYear.sumOf { post -> post.amountIncludedMva }
+        return postsCurrentYear.sumOf { post -> post.amountExMva ?: 0.0 }
+    }
+
+
+    private fun sumDeposits(toDate: LocalDate): Double {
+        if (budgetType.intervalOfDepositInMonths == 0L || budgetType.deposit == 0.0) return 0.0
+
+        return if(budgetType.rollOver){
+            val countMonths = Period.between(startDate, toDate).months
+            (countMonths / budgetType.intervalOfDepositInMonths) * budgetType.deposit
+        } else {
+            val countMonths = Period.between(toDate.withDayOfYear(1), toDate).months
+            (countMonths / budgetType.intervalOfDepositInMonths) * budgetType.deposit
+        }
+    }
+
+    private fun sumPosts(toDate: LocalDate): Double {
+        return if(budgetType.rollOver){
+            posts.sumOf { post -> post.amountExMva ?: 0.0 }
+        } else {
+            val startOfYear = toDate.withDayOfYear(1)
+            return posts.filter { post -> !post.date.isBefore(startOfYear) && !post.date.isAfter(toDate) }.sumOf { post -> post.amountExMva ?: 0.0 }
+        }
     }
 
     @JsonProperty
-    fun balance() = startAmount + sumDeposits() - sumPosts()
+    fun balance(): Double = startAmount + sumDeposits(LocalDate.now()) - sumPosts(LocalDate.now())
 }
