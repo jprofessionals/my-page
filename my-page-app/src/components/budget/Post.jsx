@@ -32,6 +32,7 @@ const Post = ({ refreshBudgets, post, budget }) => {
     }
   };
   return (
+
     <div className="post">
       <Card
         border={postInFuture() ? "grey" : "dark"}
@@ -98,10 +99,10 @@ const Post = ({ refreshBudgets, post, budget }) => {
         <Card.Body>
           <ul className="postList">
             <li>
-              <b>Pris:</b> {post.amount}
+              <b>Pris:</b> {post.amountExMva.toLocaleString(undefined, { maximumFractionDigits: 2 })} kr
             </li>
             <li>
-              <b>Dato:</b> {post.date}
+              <b>Dato:</b> {Moment(post.date).format('DD.MM.YYYY')}
             </li>
           </ul>
         </Card.Body>

@@ -5,6 +5,6 @@ import java.time.LocalDate
 data class UpdatePostDTO(
     val date: LocalDate? = null,
     val description: String? = null,
-    val amount: Double? = null,
+    val amountExMva: Double? = null,
 ) {
 }

@@ -45,8 +45,10 @@ class BudgetService(
 
     fun createPost(postRequest: CreatePostDTO, budgetId: Long, userSub: String): PostDTO {
         val budget = budgetRepository.findBudgetByUserSubAndId(userSub, budgetId)
+        val createdBy = userRepository.findUserBySub(userSub)
         val post = budgetPostMapper.toPost(postRequest).copy(
-            budget = budget
+            budget = budget,
+            createdBy = createdBy
         )
         return budgetPostMapper.toPostDTO(postRepository.save(post))
     }
@@ -105,7 +107,7 @@ class BudgetService(
                 postToEdit.copy(
                     date = editPostRequest.date ?: postToEdit.date,
                     description = editPostRequest.description ?: postToEdit.description,
-                    amount = editPostRequest.amount ?: postToEdit.amount
+                    amountExMva = editPostRequest.amountExMva ?: postToEdit.amountExMva
                 )
             )
         )

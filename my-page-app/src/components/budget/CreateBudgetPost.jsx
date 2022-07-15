@@ -7,12 +7,12 @@ import "react-toastify/dist/ReactToastify.css";
 
 const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
   const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState(0);
+  const [amountExMva, setAmountExMva] = useState(0);
   const [date, setDate] = useState(Moment().format("YYYY-MM-DD"));
   const [isLoadingPost, setIsLoadingPost] = useState(false);
 
   const isValid = () => {
-    return amount > 0 && description && description !== "";
+    return amountExMva > 0 && description && description !== "";
   };
 
   const handleSubmit = (e) => {
@@ -24,7 +24,7 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
       const budgetPost = {
         date: date,
         description: description,
-        amount: amount,
+        amountExMva: amountExMva,
         expense: true,
       };
       ApiService.createBudgetPost(budgetPost, budget.id).then(
@@ -47,7 +47,7 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
   };
 
   const handleAmountChange = (e) => {
-    setAmount(e.target.value);
+    setAmountExMva(e.target.value);
   };
 
   const handleDateChange = (e) => {
@@ -74,10 +74,10 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
               <span className="priceTitle">Pris:</span>
               <input
                 type="number"
-                name="amount"
-                placeholder="Pris"
+                name="amountExMva"
+                placeholder="Pris inkludert mva"
                 onChange={handleAmountChange}
-                value={amount}
+                value={amountExMva}
                 required
               />
             </li>
@@ -90,6 +90,7 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
                 onChange={handleDateChange}
                 value={date}
                 min={budget.startDate}
+                format="DD.MM.YYYY"
               ></input>
             </li>
           </ul>

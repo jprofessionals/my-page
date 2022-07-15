@@ -143,6 +143,9 @@ class MeController(
         @Valid @RequestBody postRequest: CreatePostDTO, @PathVariable("budgetId") budgetId: Long,
     ): ResponseEntity<PostDTO> {
         val userSub = JwtUtils.getSub(jwt)
+        if(!userService.checkIfUserExists(userSub)) {
+            return ResponseEntity.badRequest().build()
+        }
         if (!budgetService.checkIfBudgetExists(userSub, budgetId)) {
             return ResponseEntity.badRequest().build()
         }
