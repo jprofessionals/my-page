@@ -15,7 +15,6 @@
     "react": "^18.2.0",
     "react-bootstrap": "^2.4.0",
     "react-dom": "^18.2.0",
-    "react-google-login": "^5.2.2",
     "react-router-dom": "^6.3.0",
     "react-toastify": "^9.0.7",
     "sass": "^1.54.3",
