@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Nav, Navbar } from "react-bootstrap";
 import "./NavBar.scss";
 import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
-import LogoutHooks from "../login/LogoutHooks";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSignOut } from "@fortawesome/free-solid-svg-icons";
 
 const NavBar = ({ user, isAuthenticatedCallBack }) => {
   const [isLogoutSuccess, setIsLogoutSuccess] = useState(false);
@@ -12,6 +13,13 @@ const NavBar = ({ user, isAuthenticatedCallBack }) => {
       isAuthenticatedCallBack(false);
     }
   }, [isLogoutSuccess]);
+
+  // function handleSigout() {
+  //   localStorage.removeItem("user_token");
+  //   console.log("Logged out Success");
+  //   isAuthenticatedCallBack(false);
+  //   window.location.href = "/logged-out";
+  // }
 
   return (
     <Navbar className="navbar" collapseOnSelect expand="sm" variant="dark">
@@ -26,10 +34,14 @@ const NavBar = ({ user, isAuthenticatedCallBack }) => {
             Intranett
           </Nav.Link>
           <Nav.Link className="ms-auto">
-            <LogoutHooks isAuthenticatedCallBack={setIsLogoutSuccess} />
+            <FontAwesomeIcon icon={faSignOut} 
+            // onClick={handleSigout} 
+            title="Logg ut" />
           </Nav.Link>
           <Nav.Link className="smallNav">
-            <LogoutHooks isAuthenticatedCallBack={setIsLogoutSuccess} />
+            <FontAwesomeIcon icon={faSignOut} 
+            // onClick={handleSigout} 
+            title="Logg ut" />
           </Nav.Link>
           <Nav.Item>
             <img className="icon" src={user.icon} alt="Icon"></img>

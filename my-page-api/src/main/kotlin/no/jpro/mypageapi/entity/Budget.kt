@@ -4,6 +4,7 @@ import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
+@Table(uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "budget_type_id"])])
 data class Budget(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
