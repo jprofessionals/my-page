@@ -1,25 +1,17 @@
-import React, { useEffect, useState } from "react";
 import { Nav, Navbar } from "react-bootstrap";
 import "./NavBar.scss";
+import { useNavigate } from "react-router-dom";
 import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOut } from "@fortawesome/free-solid-svg-icons";
 
 const NavBar = ({ user, isAuthenticatedCallBack }) => {
-  const [isLogoutSuccess, setIsLogoutSuccess] = useState(false);
+  let navigate = useNavigate();
 
-  useEffect(() => {
-    if (isLogoutSuccess) {
-      isAuthenticatedCallBack(false);
-    }
-  }, [isLogoutSuccess]);
-
-  // function handleSigout() {
-  //   localStorage.removeItem("user_token");
-  //   console.log("Logged out Success");
-  //   isAuthenticatedCallBack(false);
-  //   window.location.href = "/logged-out";
-  // }
+  function HandleSigout() {
+    localStorage.removeItem("user_token");
+    isAuthenticatedCallBack(false);
+  }
 
   return (
     <Navbar className="navbar" collapseOnSelect expand="sm" variant="dark">
@@ -35,12 +27,18 @@ const NavBar = ({ user, isAuthenticatedCallBack }) => {
           </Nav.Link>
           <Nav.Link className="ms-auto">
             <FontAwesomeIcon icon={faSignOut} 
-            // onClick={handleSigout} 
+            onClick={() => {
+              HandleSigout();
+              navigate('/logget-ut');
+            }} 
             title="Logg ut" />
           </Nav.Link>
           <Nav.Link className="smallNav">
             <FontAwesomeIcon icon={faSignOut} 
-            // onClick={handleSigout} 
+            onClick={() => {
+              HandleSigout();
+              navigate('/logget-ut');
+            }} 
             title="Logg ut" />
           </Nav.Link>
           <Nav.Item>
