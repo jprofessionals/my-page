@@ -38,9 +38,14 @@ const BudgetInformation = ({ budget }) => {
               </li>
             ) : null}
             <li>
-              <span title="Forbruk siste året">Forbruk siste året: </span>
+              <span title="Forbruk i år">Forbruk i år: </span>
+              {budget.sumPostsCurrentYear.toLocaleString(undefined, { maximumFractionDigits: 2 })} kr
+            </li>
+            <li>
+              <span title="Forbruk siste 12 måneder">Forbruk siste 12 måneder: </span>
               {budget.sumPostsLastTwelveMonths.toLocaleString(undefined, { maximumFractionDigits: 2 })} kr
             </li>
+
           </ul>
         </Card.Body>
       </Card>

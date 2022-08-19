@@ -58,13 +58,13 @@ const Budgets = () => {
           <div className="headerBudgets">
             <h3 className="headerText">Dine budsjetter</h3>
 
-            <Button onClick={refreshBudgets} className="shadow-none">
+            {/* <Button onClick={refreshBudgets} className="shadow-none">
               <FontAwesomeIcon
                 className="refresh"
                 icon={faRefresh}
                 title="Oppdater"
               />
-            </Button>
+            </Button> */}
           </div>
           <Accordion defaultActiveKey="0">
             {budgets.map((budget) => (
