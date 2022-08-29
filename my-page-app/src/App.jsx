@@ -134,7 +134,9 @@ function App() {
         <div style={loadUser ? { display: "none" } : {}}>
           <NavBar isAuthenticatedCallBack={setIsAuthenticated} user={user} />
           <Home user={user} />
-          <Budgets></Budgets>
+          {loadUser ? null :
+            <Budgets></Budgets>
+          }
         </div>
       </>
     );
