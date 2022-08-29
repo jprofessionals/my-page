@@ -41,7 +41,7 @@ const Budget = ({ budget, refreshBudgets }) => {
             <span title="Type budsjett">{budget.budgetType.name}</span>
           </li>
           <li>
-            <span title="Saldo">Saldo: {budget.balance.toLocaleString(undefined, { maximumFractionDigits: 2 })} kr</span>
+            <span title="Saldo">Saldo: {budget.balance.toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span>
           </li>
         </ul>
       </Accordion.Header>

@@ -99,7 +99,7 @@ const Post = ({ refreshBudgets, post, budget }) => {
         <Card.Body>
           <ul className="postList">
             <li>
-              <b>Pris:</b> {post.amountExMva.toLocaleString(undefined, { maximumFractionDigits: 2 })} kr
+              <b>Pris:</b> {post.amountExMva.toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}
             </li>
             <li>
               <b>Dato:</b> {Moment(post.date).format('DD.MM.YYYY')}

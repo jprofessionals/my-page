@@ -20,16 +20,16 @@ const BudgetInformation = ({ budget }) => {
               style={budget.budgetType.deposit === 0 ? { display: "none" } : {}}
             >
               <span title="Opptjening">Opptjening: </span>
-              {budget.budgetType.deposit.toLocaleString(undefined, { maximumFractionDigits: 2 })} kr hver{" "}
+              {budget.budgetType.deposit.toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })} hver{" "}
               {interValOfDeposit(budget.budgetType.intervalOfDepositInMonths)}
             </li>
             <li style={budget.budgetType.rollOver ? {} : { display: "none" }}>
               <span title="Startbeløp">Startbeløp: </span>
-              {budget.startAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} kr ({Moment(budget.startDate).format('DD.MM.YYYY')})
+              {budget.startAmount.toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })} ({Moment(budget.startDate).format('DD.MM.YYYY')})
             </li>
             <li style={budget.budgetType.rollOver ? { display: "none" } : {}}>
               <span title="Årlig budsjett">Årlig budsjett: </span>
-              {budget.budgetType.startAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} kr
+              {budget.budgetType.startAmount.toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}
             </li>
             {budget.posts.length !== 0 ? (
               <li>
@@ -39,11 +39,11 @@ const BudgetInformation = ({ budget }) => {
             ) : null}
             <li>
               <span title="Forbruk i år">Forbruk i år: </span>
-              {budget.sumPostsCurrentYear.toLocaleString(undefined, { maximumFractionDigits: 2 })} kr
+              {budget.sumPostsCurrentYear.toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}
             </li>
             <li>
               <span title="Forbruk siste 12 måneder">Forbruk siste 12 måneder: </span>
-              {budget.sumPostsLastTwelveMonths.toLocaleString(undefined, { maximumFractionDigits: 2 })} kr
+              {budget.sumPostsLastTwelveMonths.toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}
             </li>
 
           </ul>
