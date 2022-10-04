@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOut } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 const NavBar = ({ user, isAuthenticatedCallBack }) => {
   let navigate = useNavigate();
@@ -21,7 +22,8 @@ const NavBar = ({ user, isAuthenticatedCallBack }) => {
       <Navbar.Toggle className="button" aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse className="navtext" id="responsive-navbar-nav">
         <Nav className="container-fluid">
-          <Nav.Link href="/">Min side</Nav.Link>
+          <Link className="nav-link" to="/budsjett">Budsjett</Link>
+          <Link className="nav-link" to="/bidra">Bidra til Min side</Link>
           <Nav.Link as="a" href="https://intranet.jpro.no">
             Intranett
           </Nav.Link>

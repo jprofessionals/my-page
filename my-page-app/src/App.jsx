@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./App.scss";
 import NavBar from "./components/navbar/NavBar";
-import Home from "./components/home";
 import ApiService from "./services/api.service";
 import { User } from "./User";
-import Budgets from "./components/budget/Budgets";
-import { Spinner } from "react-bootstrap";
+import BudgetContainer from "./components/budget/Budgets";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import jPro_logo_transparent from "./components/images/jPro_logo_transparent.svg";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoggedOut from "./LoggedOut";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -114,31 +114,30 @@ function App() {
     );
   } else {
     return (
-      <>
-        <ToastContainer
-          position="top-right"
-          autoClose={2000}
-          hideProgressBar={false}
-          closeOnClick={true}
-          pauseOnHover={true}
-          draggable={true}
-          progress={undefined}
-          theme="colored"
-        />
-        <div style={loadUser ? {} : { display: "none" }}>
-          <div className="loadSpinUser d-flex align-items-center">
-            <Spinner animation="border" />
-            <h3>Laster inn bruker</h3>
-          </div>
-        </div>
-        <div style={loadUser ? { display: "none" } : {}}>
-          <NavBar isAuthenticatedCallBack={setIsAuthenticated} user={user} />
-          <Home user={user} />
-          {loadUser ? null :
-            <Budgets></Budgets>
-          }
-        </div>
-      </>
+        <BrowserRouter>
+            <NavBar isAuthenticatedCallBack={setIsAuthenticated} user={user} />
+            <Routes>
+                {["/", "/budsjett"].map((path, index) => {
+                    return (
+                            <Route path={path} element={
+                                <BudgetContainer loadUser={loadUser} authenticatedCallBack={setIsAuthenticated} user={user}/>
+                            }
+                            key={index}
+                            />
+                        )
+                })}
+                <Route path="/bidra" element={<b>PLACEHOLDER!!!</b>} />
+                <Route path="/logget-ut" element={<LoggedOut />} />
+                <Route path="*"
+                       element={
+                           <main style={{ padding: "1rem" }}>
+                               <p>There's nothing here!</p>
+                           </main>
+                       }
+                />
+
+            </Routes>
+        </BrowserRouter>
     );
   }
 }

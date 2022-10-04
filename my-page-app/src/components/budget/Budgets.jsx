@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import ApiService from "../../services/api.service";
 import Budget from "./Budget";
 import { Accordion, Button, Spinner } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -57,14 +55,6 @@ const Budgets = () => {
         <div style={!isLoadingBudgets ? {} : { display: "none" }}>
           <div className="headerBudgets">
             <h3 className="headerText">Dine budsjetter</h3>
-
-            {/* <Button onClick={refreshBudgets} className="shadow-none">
-              <FontAwesomeIcon
-                className="refresh"
-                icon={faRefresh}
-                title="Oppdater"
-              />
-            </Button> */}
           </div>
           <Accordion defaultActiveKey="0">
             {budgets.map((budget) => (
