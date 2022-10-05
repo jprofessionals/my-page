@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import "./App.scss";
 import NavBar from "./components/navbar/NavBar";
 import ApiService from "./services/api.service";
-import { User } from "./User";
+import {User} from "./User";
 import BudgetContainer from "./components/budget/Budgets";
-import { ToastContainer, toast } from "react-toastify";
+import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import jPro_logo_transparent from "./components/images/jPro_logo_transparent.svg";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {BrowserRouter, Routes, Route} from "react-router-dom";
 import LoggedOut from "./LoggedOut";
+import Bidra from "./components/bidra/Bidra";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,7 +20,7 @@ function App() {
 
   function handleGoogleSignIn(response) {
     if (response.credential) {
-      localStorage.setItem("user_token", JSON.stringify({ 'id_token': response.credential }));
+      localStorage.setItem("user_token", JSON.stringify({'id_token': response.credential}));
     }
     setIsAuthenticated(true);
   }
@@ -98,7 +99,7 @@ function App() {
   if (!isAuthenticated) {
     return (
       <div className="vertical-center">
-        <img className="logo" src={jPro_logo_transparent} alt="jPro" />
+        <img className="logo" src={jPro_logo_transparent} alt="jPro"/>
         {/* <h2 className="headerText">Velkommen til Min side!</h2> */}
         <div id="signInDiv"></div>
         <div><ToastContainer
@@ -108,36 +109,36 @@ function App() {
           closeOnClick={true}
           pauseOnHover={true}
           draggable={true}
-          progress={undefined} />
+          progress={undefined}/>
         </div>
       </div>
     );
   } else {
     return (
-        <BrowserRouter>
-            <NavBar isAuthenticatedCallBack={setIsAuthenticated} user={user} />
-            <Routes>
-                {["/", "/budsjett"].map((path, index) => {
-                    return (
-                            <Route path={path} element={
-                                <BudgetContainer loadUser={loadUser} authenticatedCallBack={setIsAuthenticated} user={user}/>
-                            }
-                            key={index}
-                            />
-                        )
-                })}
-                <Route path="/bidra" element={<b>PLACEHOLDER!!!</b>} />
-                <Route path="/logget-ut" element={<LoggedOut />} />
-                <Route path="*"
-                       element={
-                           <main style={{ padding: "1rem" }}>
-                               <p>There's nothing here!</p>
-                           </main>
-                       }
-                />
+      <BrowserRouter>
+        <NavBar isAuthenticatedCallBack={setIsAuthenticated} user={user}/>
+        <Routes>
+          {["/", "/budsjett"].map((path, index) => {
+            return (
+              <Route path={path} element={
+                <BudgetContainer loadUser={loadUser} authenticatedCallBack={setIsAuthenticated} user={user}/>
+              }
+                     key={index}
+              />
+            )
+          })}
+          <Route path="/bidra" element={<Bidra/>}/>
+          <Route path="/logget-ut" element={<LoggedOut/>}/>
+          <Route path="*"
+                 element={
+                   <main style={{padding: "1rem"}}>
+                     <p>There's nothing here!</p>
+                   </main>
+                 }
+          />
 
-            </Routes>
-        </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
     );
   }
 }
