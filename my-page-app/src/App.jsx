@@ -3,7 +3,7 @@ import "./App.scss";
 import NavBar from "./components/navbar/NavBar";
 import ApiService from "./services/api.service";
 import {User} from "./User";
-import BudgetContainer from "./components/budget/Budgets";
+import BudgetContainer from "./components/budget/BudgetContainer";
 import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import jPro_logo_transparent from "./components/images/jPro_logo_transparent.svg";
@@ -121,7 +121,7 @@ function App() {
           {["/", "/budsjett"].map((path, index) => {
             return (
               <Route path={path} element={
-                <BudgetContainer loadUser={loadUser} authenticatedCallBack={setIsAuthenticated} user={user}/>
+                <BudgetContainer loadUser={loadUser} user={user}/>
               }
                      key={index}
               />

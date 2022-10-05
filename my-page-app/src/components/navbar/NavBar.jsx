@@ -12,6 +12,7 @@ const NavBar = ({ user, isAuthenticatedCallBack }) => {
   function HandleSigout() {
     localStorage.removeItem("user_token");
     isAuthenticatedCallBack(false);
+    navigate('/logget-ut');
   }
 
   return (
@@ -31,16 +32,14 @@ const NavBar = ({ user, isAuthenticatedCallBack }) => {
             <FontAwesomeIcon icon={faSignOut} 
             onClick={() => {
               HandleSigout();
-              navigate('/logget-ut');
-            }} 
+            }}
             title="Logg ut" />
           </Nav.Link>
           <Nav.Link className="smallNav">
             <FontAwesomeIcon icon={faSignOut} 
             onClick={() => {
               HandleSigout();
-              navigate('/logget-ut');
-            }} 
+            }}
             title="Logg ut" />
           </Nav.Link>
           <Nav.Item>
