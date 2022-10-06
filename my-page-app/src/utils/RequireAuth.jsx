@@ -2,8 +2,8 @@ import {User} from "../User";
 import ApiService from "../services/api.service";
 import {toast} from "react-toastify";
 
-function RequireAuth({ isAuthenticated, setAuthenticated, user, setUser, children }) {
-  if (!isAuthenticated || !user.loaded) {
+function RequireAuth({ isAuthenticated, setAuthenticated, setUser, children }) {
+  if (!isAuthenticated){
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     document.querySelector("body")?.appendChild(script);
@@ -15,7 +15,7 @@ function RequireAuth({ isAuthenticated, setAuthenticated, user, setUser, childre
     return children;
   }
 
-  function authenticate(setAuthenticated) {
+  function authenticate() {
     if (!window.google) return;
 
     window.google.accounts.id.initialize({
@@ -42,6 +42,7 @@ function RequireAuth({ isAuthenticated, setAuthenticated, user, setUser, childre
 
   function handleGoogleSignIn(response) {
     if (response.credential) {
+      setAuthenticated(true);
       localStorage.setItem("user_token", JSON.stringify({'id_token': response.credential}));
       ApiService.getUser().then(
         (response) => {
@@ -56,7 +57,6 @@ function RequireAuth({ isAuthenticated, setAuthenticated, user, setUser, childre
               true
             )
           );
-          setAuthenticated(true);
         },
         () => {
           toast.error("Får ikke lastet inn bruker, prøv igjen senere");

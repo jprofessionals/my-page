@@ -12,7 +12,6 @@ import RequireAuth from "./utils/RequireAuth";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(new User());
-  const authBundle = {user, setUser, isAuthenticated, setIsAuthenticated};
   let navigate = useNavigate();
       return (
         <>
@@ -21,7 +20,7 @@ function App() {
             {["/", "/budsjett"].map((path, index) => {
               return (
                 <Route path={path} element={
-                  <RequireAuth user={user} setUser={setUser} isAuthenticated={isAuthenticated} setAuthenticated={setIsAuthenticated}>
+                  <RequireAuth setUser={setUser} isAuthenticated={isAuthenticated} setAuthenticated={setIsAuthenticated}>
                     <BudgetContainer user={user}/>
                   </RequireAuth>
                 } key={index} />
