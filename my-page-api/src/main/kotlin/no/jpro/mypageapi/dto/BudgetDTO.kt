@@ -9,7 +9,8 @@ data class BudgetDTO(
     val posts: List<PostDTO>,
     val budgetType: BudgetTypeDTO,
     val startDate: LocalDate,
-    val startAmount: Double
+    val startAmount: Double,
+    val hoursUsed: Int
 ) {
         @JsonProperty
     fun sumPosts(): Double = posts.sumOf { post -> post.amountExMva ?: 0.0 }

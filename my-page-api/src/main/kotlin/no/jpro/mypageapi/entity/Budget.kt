@@ -16,6 +16,6 @@ data class Budget(
     @ManyToOne
     val user: User? = null,
     @ManyToOne
-    val budgetType: BudgetType
-
+    val budgetType: BudgetType,
+    val hoursUsed: Int
 )

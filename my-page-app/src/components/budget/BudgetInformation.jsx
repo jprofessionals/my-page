@@ -45,6 +45,10 @@ const BudgetInformation = ({ budget }) => {
               <span title="Forbruk siste 12 måneder">Forbruk siste 12 måneder: </span>
               {budget.sumPostsLastTwelveMonths.toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}
             </li>
+            <li>
+              <span title="Antall timer brukt i år">Antall timer brukt i år: </span>
+              {budget.hoursUsed===1 ? budget.hoursUsed + ' time' : budget.hoursUsed + ' timer'}
+            </li>
 
           </ul>
         </Card.Body>
