@@ -26,7 +26,7 @@ const Budgets = () => {
       });
   };
 
-  if (!budgets.length) {
+  if (!budgets.length && !isLoadingBudgets) {
     return (
       <div className="budgets">
         <div style={isLoadingBudgets ? {} : { display: "none" }}>

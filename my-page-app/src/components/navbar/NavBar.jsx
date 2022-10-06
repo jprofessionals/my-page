@@ -1,19 +1,11 @@
 import { Nav, Navbar } from "react-bootstrap";
 import "./NavBar.scss";
-import { useNavigate } from "react-router-dom";
 import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOut } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
-const NavBar = ({ user, isAuthenticatedCallBack }) => {
-  let navigate = useNavigate();
-
-  function HandleSigout() {
-    localStorage.removeItem("user_token");
-    isAuthenticatedCallBack(false);
-    navigate('/logget-ut');
-  }
+const NavBar = ({ logout, user }) => {
 
   return (
     <Navbar className="navbar" collapseOnSelect expand="sm" variant="dark">
@@ -28,21 +20,21 @@ const NavBar = ({ user, isAuthenticatedCallBack }) => {
           <Nav.Link as="a" href="https://intranet.jpro.no">
             Intranett
           </Nav.Link>
-          <Nav.Link className="ms-auto">
+          <Nav.Link className="ms-auto" style={!user.loaded ? {display: "none"} : {}}>
             <FontAwesomeIcon icon={faSignOut} 
             onClick={() => {
-              HandleSigout();
+              logout();
             }}
             title="Logg ut" />
           </Nav.Link>
-          <Nav.Link className="smallNav">
+          <Nav.Link className="smallNav" style={!user.loaded ? {display: "none"} : {}}>
             <FontAwesomeIcon icon={faSignOut} 
             onClick={() => {
-              HandleSigout();
+              logout();
             }}
             title="Logg ut" />
           </Nav.Link>
-          <Nav.Item>
+          <Nav.Item style={!user.loaded ? {display: "none"} : {}}>
             <img className="icon" src={user.icon} alt="Icon"></img>
           </Nav.Item>
         </Nav>

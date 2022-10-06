@@ -4,7 +4,7 @@ import Home from "../home";
 import Budgets from "./Budgets";
 import React from "react";
 
-const BudgetContainer = ({loadUser, user}) => {
+const BudgetContainer = ({user}) => {
   return <>
     <ToastContainer
       position="top-right"
@@ -16,15 +16,15 @@ const BudgetContainer = ({loadUser, user}) => {
       progress={undefined}
       theme="colored"
     />
-    <div style={loadUser ? {} : {display: "none"}}>
+    <div style={!user.loaded ? {} : {display: "none"}}>
       <div className="loadSpinUser d-flex align-items-center">
         <Spinner animation="border"/>
         <h3>Laster inn bruker</h3>
       </div>
     </div>
-    <div style={loadUser ? {display: "none"} : {}}>
+    <div style={!user.loaded ? {display: "none"} : {}}>
       <Home user={user}/>
-      {loadUser ? null :
+      {!user.loaded ? null :
         <Budgets></Budgets>
       }
     </div>
