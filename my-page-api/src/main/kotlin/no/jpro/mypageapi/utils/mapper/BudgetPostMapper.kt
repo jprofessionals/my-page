@@ -37,7 +37,7 @@ class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private v
             budgetType = responseBudgetType,
             startDate = budget.startDate,
             startAmount = budget.startAmount,
-            hoursUsed = budget.hoursUsed
+            hours = budget.hours
         )
     }
 
@@ -46,7 +46,7 @@ class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private v
         budgetType = budgetTypeRepository.findById(createBudgetDTO.budgetTypeId).get(),
         startDate = createBudgetDTO.startDate,
         startAmount = createBudgetDTO.startAmount,
-        hoursUsed = createBudgetDTO.hoursUsed
+        hours = emptyList()
     )
 
     fun toPost(createPostDTO: CreatePostDTO): Post = Post(
