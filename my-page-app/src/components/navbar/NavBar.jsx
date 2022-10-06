@@ -1,17 +1,11 @@
 import { Nav, Navbar } from "react-bootstrap";
 import "./NavBar.scss";
-import { useNavigate } from "react-router-dom";
 import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOut } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
-const NavBar = ({ user, isAuthenticatedCallBack }) => {
-  let navigate = useNavigate();
-
-  function HandleSigout() {
-    localStorage.removeItem("user_token");
-    isAuthenticatedCallBack(false);
-  }
+const NavBar = ({ logout, user }) => {
 
   return (
     <Navbar className="navbar" collapseOnSelect expand="sm" variant="dark">
@@ -21,27 +15,26 @@ const NavBar = ({ user, isAuthenticatedCallBack }) => {
       <Navbar.Toggle className="button" aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse className="navtext" id="responsive-navbar-nav">
         <Nav className="container-fluid">
-          <Nav.Link href="/">Min side</Nav.Link>
+          <Link className="nav-link" to="/budsjett">Budsjett</Link>
+          <Link className="nav-link" to="/bidra">Bidra til Min side</Link>
           <Nav.Link as="a" href="https://intranet.jpro.no">
             Intranett
           </Nav.Link>
-          <Nav.Link className="ms-auto">
+          <Nav.Link className="ms-auto" style={!user.loaded ? {display: "none"} : {}}>
             <FontAwesomeIcon icon={faSignOut} 
             onClick={() => {
-              HandleSigout();
-              navigate('/logget-ut');
-            }} 
+              logout();
+            }}
             title="Logg ut" />
           </Nav.Link>
-          <Nav.Link className="smallNav">
+          <Nav.Link className="smallNav" style={!user.loaded ? {display: "none"} : {}}>
             <FontAwesomeIcon icon={faSignOut} 
             onClick={() => {
-              HandleSigout();
-              navigate('/logget-ut');
-            }} 
+              logout();
+            }}
             title="Logg ut" />
           </Nav.Link>
-          <Nav.Item>
+          <Nav.Item style={!user.loaded ? {display: "none"} : {}}>
             <img className="icon" src={user.icon} alt="Icon"></img>
           </Nav.Item>
         </Nav>
