@@ -8,7 +8,7 @@ import no.jpro.mypageapi.repository.UserRepository
 import org.springframework.stereotype.Service
 
 @Service
-class HoursMapper(private val budgetRepository: BudgetRepository, private val userRepository: UserRepository, private val userMapper: UserMapper) {
+class HoursMapper(private val budgetRepository: BudgetRepository, private val userRepository: UserRepository) {
 
     fun toHours(createHoursDTO: CreateHoursDTO, budgetId: Long, userSub: String): Hours {
         val budget = budgetRepository.findById(budgetId).get()
@@ -16,7 +16,8 @@ class HoursMapper(private val budgetRepository: BudgetRepository, private val us
         return Hours(
             hours = createHoursDTO.hoursUsed,
             budget = budget,
-            createdBy = user?.name
+            createdBy = user?.name,
+            dateOfUsage = createHoursDTO.dateOfUsage
         )
     }
 
@@ -24,7 +25,8 @@ class HoursMapper(private val budgetRepository: BudgetRepository, private val us
         return HoursDTO(
             id = hours.id,
             hours = hours.hours,
-            createdBy = hours.createdBy ?: ""
+            createdBy = hours.createdBy ?: "",
+            dateOfUsage = hours.dateOfUsage
         )
     }
 }

@@ -1,3 +1,8 @@
 package no.jpro.mypageapi.dto
 
-data class CreateHoursDTO (val hoursUsed: Int)
+import java.time.LocalDate
+
+data class CreateHoursDTO (
+    val hoursUsed: Int,
+    val dateOfUsage: LocalDate = LocalDate.now()
+    )

@@ -2,6 +2,7 @@ package no.jpro.mypageapi.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.CreationTimestamp
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -20,5 +21,6 @@ data class Hours(
     @JsonIgnore
     @ManyToOne
     val budget: Budget? = null,
-    val createdBy: String?
+    val createdBy: String?,
+    val dateOfUsage: LocalDate
 )

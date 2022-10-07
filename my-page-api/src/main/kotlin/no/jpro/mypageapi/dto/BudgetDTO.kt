@@ -62,5 +62,25 @@ data class BudgetDTO(
     fun balance(): Double = startAmount + sumDeposits(LocalDate.now()) - sumPosts(LocalDate.now())
 
     @JsonProperty
-    fun hoursUsed(): Int = hours.sumOf { it.hours }
+    fun sumHours(): Int = hours.sumOf { it.hours }
+
+    @JsonProperty
+    fun sumHoursLastTwelveMonths(): Int {
+        val toDate = LocalDate.now()
+        val dateOneYearAgo = toDate.minusYears(1)
+        val hoursLastTwelveMonths = hours.filter { hoursEntry ->
+            !hoursEntry.dateOfUsage.isBefore(dateOneYearAgo) && !hoursEntry.dateOfUsage.isAfter(toDate)
+        }
+        return hoursLastTwelveMonths.sumOf { hoursEntry -> hoursEntry.hours }
+    }
+
+    @JsonProperty
+    fun sumHoursCurrentYear(): Int {
+        val toDate = LocalDate.now()
+        val startOfYear = toDate.withDayOfYear(1)
+        val hoursCurrentYear = hours.filter { hoursEntry ->
+            !hoursEntry.dateOfUsage.isBefore(startOfYear) && !hoursEntry.dateOfUsage.isAfter(toDate)
+        }
+        return hoursCurrentYear.sumOf { hoursEntry -> hoursEntry.hours }
+    }
 }

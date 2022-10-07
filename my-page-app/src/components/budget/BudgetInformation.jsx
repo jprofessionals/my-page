@@ -47,7 +47,11 @@ const BudgetInformation = ({ budget }) => {
             </li>
             <li>
               <span title="Antall timer brukt i år">Antall timer brukt i år: </span>
-              {budget.hoursUsed===1 ? budget.hoursUsed + ' time' : budget.hoursUsed + ' timer'}
+              {budget.sumHoursCurrentYear===1 ? budget.sumHoursCurrentYear + ' time' : budget.sumHoursCurrentYear + ' timer'}
+            </li>
+            <li>
+              <span title="Antall timer brukt siste 12 måneder">Antall timer brukt siste 12 måneder: </span>
+              {budget.sumHoursLastTwelveMonths===1 ? budget.sumHoursLastTwelveMonths + ' time' : budget.sumHoursLastTwelveMonths + ' timer'}
             </li>
 
           </ul>
