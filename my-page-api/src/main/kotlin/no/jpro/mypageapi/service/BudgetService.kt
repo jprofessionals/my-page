@@ -91,6 +91,14 @@ class BudgetService(
         return budgetTypeMapper.toBudgetTypeDTO(savedBudgetType)
     }
 
+
+    fun updateBudgetTypeAllowTimeBalance(budgetTypeId: Long, allowTimeBalance: Boolean): BudgetTypeDTO {
+        val budgetTypeFromDb = budgetTypeRepository.findById(budgetTypeId).get()
+        budgetTypeFromDb.allowTimeBalance = allowTimeBalance
+        budgetTypeRepository.save(budgetTypeFromDb)
+        return budgetTypeMapper.toBudgetTypeDTO(budgetTypeFromDb)
+    }
+
     fun getBudgetTypes(): List<BudgetTypeDTO> {
         val budgetTypes = budgetTypeRepository.findAll()
         return budgetTypes.map { budgetTypeMapper.toBudgetTypeDTO(it) }
@@ -118,7 +126,7 @@ class BudgetService(
     }
 
     fun createHours(createHoursDTO: CreateHoursDTO, budgetId: Long, userSub: String): HoursDTO {
-        val hours = hoursRepository.save(hoursMapper.toHours(createHoursDTO, budgetId, userSub));
+        val hours = hoursRepository.save(hoursMapper.toHours(createHoursDTO, budgetId, userSub))
         return hoursMapper.toHoursDTO(hours)
     }
 

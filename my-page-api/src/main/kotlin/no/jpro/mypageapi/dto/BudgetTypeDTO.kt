@@ -6,6 +6,7 @@ package no.jpro.mypageapi.dto
     val deposit: Double,
     val intervalOfDepositInMonths: Long,
     val startAmount: Double,
+    val allowTimeBalance: Boolean = false
 ) {
 
 }
