@@ -13,7 +13,8 @@ class BudgetTypeMapper {
             deposit = budgetTypeDTO.deposit,
             intervalOfDepositInMonths = budgetTypeDTO.intervalOfDepositInMonths,
             startAmount = budgetTypeDTO.startAmount,
-            budgets = listOf()
+            budgets = listOf(),
+            allowTimeBalance = budgetTypeDTO.allowTimeBalance
         )
     }
 
@@ -24,6 +25,7 @@ class BudgetTypeMapper {
             deposit = budgetType.deposit,
             intervalOfDepositInMonths = budgetType.intervalOfDepositInMonths,
             startAmount = budgetType.startAmount,
+            allowTimeBalance = budgetType.allowTimeBalance
         )
     }
 }

@@ -23,7 +23,7 @@ import javax.validation.Valid
 @SecurityRequirement(name = "Bearer Authentication")
 class MeController(
     private val userService: UserService,
-    private val budgetService: BudgetService,
+    private val budgetService: BudgetService
 ) {
 
     @GetMapping("")
@@ -185,5 +185,52 @@ class MeController(
         }
         return ResponseEntity.ok(budgetService.editPost(editPostRequest, postToEdit))
 
+    }
+
+    @PostMapping("budgets/{budgetId}/hours")
+    @Operation(summary = "Create a new hours entry related to an existing budget.")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = HoursDTO::class))]
+    )
+    fun createHours(
+        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
+        @Valid @RequestBody postRequest: CreateHoursDTO, @PathVariable("budgetId") budgetId: Long,
+    ): ResponseEntity<HoursDTO> {
+        val userSub = JwtUtils.getSub(jwt)
+        if(!userService.checkIfUserExists(userSub)) {
+            return ResponseEntity.badRequest().build()
+        }
+        if (!budgetService.checkIfBudgetExists(userSub, budgetId)) {
+            return ResponseEntity.badRequest().build()
+        }
+        return ResponseEntity.ok(budgetService.createHours(postRequest, budgetId, userSub))
+    }
+
+    @DeleteMapping("hours/{hoursId}")
+    @Operation(summary = "Delete an hours entry based on hoursID")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    fun deleteHours(
+        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable("hoursId") hoursId: Long,
+    ): ResponseEntity<Void> {
+        val hours = budgetService.getHours(hoursId) ?: return ResponseEntity.notFound().build()
+        budgetService.deleteHours(hours)
+        return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("budget/{budgetId}/hours")
+    @Operation(summary = "Get hours based on budgetId.")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = HoursDTO::class))]
+    )
+    fun getHoursForBudget(
+        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable("budgetId") budgetId: Long
+    ): ResponseEntity<List<HoursDTO>> {
+        val hours = budgetService.getHoursForBudgetId(budgetId)
+            ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(hours)
     }
 }

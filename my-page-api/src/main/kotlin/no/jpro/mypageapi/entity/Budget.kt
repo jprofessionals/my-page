@@ -16,6 +16,7 @@ data class Budget(
     @ManyToOne
     val user: User? = null,
     @ManyToOne
-    val budgetType: BudgetType
-
+    val budgetType: BudgetType,
+    @OneToMany(mappedBy = "budget")
+    val hours: List<Hours>
 )

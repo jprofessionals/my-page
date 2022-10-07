@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.jpro.mypageapi.dto.BudgetTypeDTO
 import no.jpro.mypageapi.service.BudgetService
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
@@ -40,5 +41,22 @@ class BudgetTypeController(
     )
     fun getBudgetTypes(@Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt): List<BudgetTypeDTO> {
         return budgetService.getBudgetTypes()
+    }
+
+    @PatchMapping("/{budgetTypeId}/allowTimeBalance")
+    @Operation(summary = "Change whether a budgetType should keep track of hours spent")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = BudgetTypeDTO::class))]
+    )
+    fun patchBudgetTypeAllowTimeBalance(
+        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
+        @RequestBody allowTimeBalance: Boolean,
+        @PathVariable("budgetTypeId") budgetTypeId: Long
+    ): ResponseEntity<BudgetTypeDTO> {
+        if (!budgetService.checkIfBudgetTypeExists(budgetTypeId)) {
+            return ResponseEntity.badRequest().build()
+        }
+        return ResponseEntity.ok(budgetService.updateBudgetTypeAllowTimeBalance(budgetTypeId, allowTimeBalance))
     }
 }

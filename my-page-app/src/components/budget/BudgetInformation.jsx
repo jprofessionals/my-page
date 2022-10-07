@@ -45,6 +45,14 @@ const BudgetInformation = ({ budget }) => {
               <span title="Forbruk siste 12 måneder">Forbruk siste 12 måneder: </span>
               {budget.sumPostsLastTwelveMonths.toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}
             </li>
+            <li style={budget.budgetType.allowTimeBalance ? {} : { display: "none" }}>
+              <span title="Antall timer brukt i år">Antall timer brukt i år: </span>
+              {budget.sumHoursCurrentYear===1 ? budget.sumHoursCurrentYear + ' time' : budget.sumHoursCurrentYear + ' timer'}
+            </li>
+            <li style={budget.budgetType.allowTimeBalance ? {} : { display: "none" }}>
+              <span title="Antall timer brukt siste 12 måneder">Antall timer brukt siste 12 måneder: </span>
+              {budget.sumHoursLastTwelveMonths===1 ? budget.sumHoursLastTwelveMonths + ' time' : budget.sumHoursLastTwelveMonths + ' timer'}
+            </li>
 
           </ul>
         </Card.Body>

@@ -35,4 +35,7 @@ interface BudgetTypeRepository : JpaRepository<BudgetType, Long> {
     fun existsBudgetTypeById(budgetTypeId: Long): Boolean
 }
 
-
+@Repository
+interface HoursRepository : JpaRepository<Hours, Long> {
+    fun findHoursByBudgetId(budgetId: Long): List<Hours>
+}

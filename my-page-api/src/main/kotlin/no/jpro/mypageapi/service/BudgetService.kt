@@ -1,22 +1,26 @@
 package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.dto.*
+import no.jpro.mypageapi.entity.Hours
 import no.jpro.mypageapi.entity.Post
 import no.jpro.mypageapi.repository.BudgetRepository
 import no.jpro.mypageapi.repository.BudgetTypeRepository
 import no.jpro.mypageapi.repository.PostRepository
 import no.jpro.mypageapi.repository.UserRepository
+import no.jpro.mypageapi.repository.HoursRepository
 import no.jpro.mypageapi.utils.mapper.BudgetPostMapper
 import no.jpro.mypageapi.utils.mapper.BudgetTypeMapper
+import no.jpro.mypageapi.utils.mapper.HoursMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
 class BudgetService(
-    private val budgetRepository: BudgetRepository,
-    private val budgetPostMapper: BudgetPostMapper, private val postRepository: PostRepository,
+    private val budgetRepository: BudgetRepository, private val budgetPostMapper: BudgetPostMapper,
+    private val postRepository: PostRepository,
     private val budgetTypeMapper: BudgetTypeMapper, private val budgetTypeRepository: BudgetTypeRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val hoursRepository: HoursRepository, private val hoursMapper: HoursMapper
 ) {
 
     fun getBudgets(userSub: String): List<BudgetDTO> {
@@ -87,6 +91,14 @@ class BudgetService(
         return budgetTypeMapper.toBudgetTypeDTO(savedBudgetType)
     }
 
+
+    fun updateBudgetTypeAllowTimeBalance(budgetTypeId: Long, allowTimeBalance: Boolean): BudgetTypeDTO {
+        val budgetTypeFromDb = budgetTypeRepository.findById(budgetTypeId).get()
+        budgetTypeFromDb.allowTimeBalance = allowTimeBalance
+        budgetTypeRepository.save(budgetTypeFromDb)
+        return budgetTypeMapper.toBudgetTypeDTO(budgetTypeFromDb)
+    }
+
     fun getBudgetTypes(): List<BudgetTypeDTO> {
         val budgetTypes = budgetTypeRepository.findAll()
         return budgetTypes.map { budgetTypeMapper.toBudgetTypeDTO(it) }
@@ -111,5 +123,23 @@ class BudgetService(
                 )
             )
         )
+    }
+
+    fun createHours(createHoursDTO: CreateHoursDTO, budgetId: Long, userSub: String): HoursDTO {
+        val hours = hoursRepository.save(hoursMapper.toHours(createHoursDTO, budgetId, userSub))
+        return hoursMapper.toHoursDTO(hours)
+    }
+
+    fun getHours(hoursId: Long): Hours? {
+        return hoursRepository.findById(hoursId).get()
+    }
+
+    fun deleteHours(hours: Hours) {
+        hoursRepository.delete(hours)
+    }
+
+    fun getHoursForBudgetId(budgetId: Long): List<HoursDTO>? {
+        val hours = hoursRepository.findHoursByBudgetId(budgetId)
+        return hours.map( hoursMapper::toHoursDTO)
     }
 }
