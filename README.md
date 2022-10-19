@@ -22,7 +22,7 @@ Running the API locally (in IDEA or on commandline) requires a database - activa
 
 The API can also be run using the maven wrapper locally `./mvnw -DskipTests -Dspring-boot.run.profiles=local clean spring-boot:run`
 
-The api will run on localhost:8080
+The api will run on localhost:8080 - See http://localhost:8080/api/swagger-ui/index.html for api doc
 
 ### Local MySQl
 
