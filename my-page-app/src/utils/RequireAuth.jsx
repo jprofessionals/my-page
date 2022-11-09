@@ -54,6 +54,7 @@ function RequireAuth({ isAuthenticated, setAuthenticated, setUser, children }) {
               response.data.familyName,
               response.data.icon,
               response.data.startDate,
+              response.data.admin,
               true
             )
           );

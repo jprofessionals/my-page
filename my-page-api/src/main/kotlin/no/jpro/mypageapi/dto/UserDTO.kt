@@ -11,6 +11,7 @@ data class UserDTO(
     val icon: String? = null,
     val nickName: String? = null,
     val startDate: LocalDate? = null,
+    val admin: Boolean = false,
     @JsonIgnore
     val budgets: List<BudgetDTO>? = null
 )
