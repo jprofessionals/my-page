@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.servers.Server
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.context.annotation.Bean
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.web.SecurityFilterChain
 
 @OpenAPIDefinition(
     servers = [Server(url = "/api")]
@@ -28,23 +25,4 @@ fun main(args: Array<String>) {
     runApplication<MyPageApiApplication>(*args)
 }
 
-@Bean
-fun filterChain(http: HttpSecurity) : SecurityFilterChain {
-    http
-        .authorizeRequests()
-        .antMatchers(
-            "/open/**",
-            "/v3/api-docs",
-            "/v3/api-docs/**",
-            "/swagger-ui.html",
-            "/swagger-ui/**",
-            "/actuator/**",
-        ).permitAll()
-        .antMatchers("/**").authenticated()
-        .and()
-        .csrf().disable()
-        .oauth2ResourceServer()
-        .jwt()
 
-    return http.build()
-}
