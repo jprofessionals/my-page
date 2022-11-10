@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.servers.Server
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 
 @OpenAPIDefinition(
     servers = [Server(url = "/api")]
@@ -17,7 +16,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
     bearerFormat = "JWT",
     scheme = "bearer"
 )
-@EnableWebSecurity
 @SpringBootApplication
 class MyPageApiApplication
 
