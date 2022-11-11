@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import {Routes, Route, useNavigate} from "react-router-dom";
 import LoggedOut from "./LoggedOut";
 import Bidra from "./components/bidra/Bidra";
+import Admin from "./components/admin/Admin";
 import RequireAuth from "./utils/RequireAuth";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
               )
             })}
             <Route path="/bidra" element={<Bidra/>}/>
+            <Route path="/admin" element={<Admin/>}/>
             <Route path="/logget-ut" element={<LoggedOut/>}/>
             <Route path="*"
                    element={

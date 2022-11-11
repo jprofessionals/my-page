@@ -4,6 +4,7 @@ import jPro_logo_transparent from "../images/jPro_logo_transparent.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOut } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import RequireAdmin from "../../utils/RequireAdmin";
 
 const NavBar = ({ logout, user }) => {
 
@@ -17,6 +18,9 @@ const NavBar = ({ logout, user }) => {
         <Nav className="container-fluid">
           <Link className="nav-link" to="/budsjett">Budsjett</Link>
           <Link className="nav-link" to="/bidra">Bidra til Min side</Link>
+          <RequireAdmin user={user}>
+            <Link className="nav-link" to="/admin">Admin</Link>
+          </RequireAdmin>
           <Nav.Link as="a" href="https://intranet.jpro.no">
             Intranett
           </Nav.Link>
