@@ -2,7 +2,7 @@ package no.jpro.mypageapi.utils.mapper
 
 import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.entity.User
-import no.jpro.mypageapi.utils.JwtUtils
+import no.jpro.mypageapi.extensions.*
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
 
@@ -22,12 +22,12 @@ class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
     )
 
     fun toUser(jwt: Jwt): User = User(
-        sub = JwtUtils.getSub(jwt),
-        email = JwtUtils.getEmail(jwt),
-        name = JwtUtils.getName(jwt),
-        givenName = JwtUtils.getGivenName(jwt),
-        familyName = JwtUtils.getFamilyName(jwt),
-        icon = JwtUtils.getIcon(jwt),
+        sub = jwt.getSub(),
+        email = jwt.getEmail(),
+        name = jwt.getName(),
+        givenName = jwt.getGivenName(),
+        familyName = jwt.getFamilyName(),
+        icon = jwt.getIcon(),
         budgets = listOf()
     )
 
