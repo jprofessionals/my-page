@@ -3,8 +3,8 @@ package no.jpro.mypageapi.service
 import no.jpro.mypageapi.dto.UpdateUserDTO
 import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.entity.User
+import no.jpro.mypageapi.extensions.*
 import no.jpro.mypageapi.repository.UserRepository
-import no.jpro.mypageapi.utils.JwtUtils
 import no.jpro.mypageapi.utils.mapper.UserMapper
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
@@ -16,7 +16,7 @@ class UserService(
 ) {
     fun getOrCreateUser(jwt: Jwt): UserDTO {
         val user =
-            userRepository.findUserBySub(JwtUtils.getSub(jwt))
+            userRepository.findUserBySub(jwt.getSub())
                 ?: findUserByEmailAndConnect(jwt)
                 ?: createUser(jwt)
         return userMapper.toUserDTO(user)
@@ -27,14 +27,14 @@ class UserService(
     }
 
     fun findUserByEmailAndConnect(jwt: Jwt): User? {
-        val user = userRepository.findUserByEmailAndSubIsNull(JwtUtils.getEmail(jwt)) ?: return null
+        val user = userRepository.findUserByEmailAndSubIsNull(jwt.getEmail()) ?: return null
         return userRepository.save(
             user.copy(
-                sub = JwtUtils.getSub(jwt),
-                icon = JwtUtils.getIcon(jwt),
-                name = JwtUtils.getName(jwt),
-                givenName = JwtUtils.getGivenName(jwt),
-                familyName = JwtUtils.getFamilyName(jwt)
+                sub =jwt.getSub(),
+                icon = jwt.getIcon(),
+                name = jwt.getName(),
+                givenName = jwt.getGivenName(),
+                familyName = jwt.getFamilyName()
             )
         )
     }
@@ -43,8 +43,8 @@ class UserService(
         return userRepository.existsUserBySub(userSub)
     }
 
-    fun updateUser(jwt: Jwt, userRequest: UpdateUserDTO): UserDTO? {
-        val user = userRepository.findUserBySub(JwtUtils.getSub(jwt)) ?: return null
+    fun updateUser(userSub: String, userRequest: UpdateUserDTO): UserDTO? {
+        val user = userRepository.findUserBySub(userSub) ?: return null
         return userMapper.toUserDTO(
             userRepository.save(
                 user.copy(

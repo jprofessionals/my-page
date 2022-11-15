@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.BudgetTypeDTO
 import no.jpro.mypageapi.service.BudgetService
 import org.springframework.http.ResponseEntity
@@ -26,8 +27,8 @@ class BudgetTypeController(
         responseCode = "200",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = BudgetTypeDTO::class))]
     )
+    @RequiresAdmin
     fun createBudgetType(
-        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @RequestBody budgetTypeDTO: BudgetTypeDTO
     ): BudgetTypeDTO {
         return budgetService.createBudgetType(budgetTypeDTO)
@@ -39,7 +40,7 @@ class BudgetTypeController(
         responseCode = "200",
         content = [Content(mediaType = "application/json", array = ArraySchema(schema = Schema(implementation = BudgetTypeDTO::class)))]
     )
-    fun getBudgetTypes(@Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt): List<BudgetTypeDTO> {
+    fun getBudgetTypes(): List<BudgetTypeDTO> {
         return budgetService.getBudgetTypes()
     }
 
@@ -49,8 +50,8 @@ class BudgetTypeController(
         responseCode = "200",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = BudgetTypeDTO::class))]
     )
+    @RequiresAdmin
     fun patchBudgetTypeAllowTimeBalance(
-        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @RequestBody allowTimeBalance: Boolean,
         @PathVariable("budgetTypeId") budgetTypeId: Long
     ): ResponseEntity<BudgetTypeDTO> {
