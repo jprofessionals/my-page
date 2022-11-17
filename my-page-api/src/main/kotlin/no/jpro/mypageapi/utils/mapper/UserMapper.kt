@@ -18,7 +18,8 @@ class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
         nickName = user.nickName,
         startDate = user.startDate,
         budgets = user.budgets.map { budgetPostMapper.toBudgetDTO(it) },
-        admin = user.admin
+        admin = user.admin,
+        userSub = user.sub
     )
 
     fun toUser(jwt: Jwt): User = User(

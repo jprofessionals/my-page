@@ -12,6 +12,7 @@ data class UserDTO(
     val nickName: String? = null,
     val startDate: LocalDate? = null,
     val admin: Boolean = false,
+    val userSub: String? = null,
     @JsonIgnore
     val budgets: List<BudgetDTO>? = null
 )

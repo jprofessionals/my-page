@@ -48,6 +48,11 @@ const editBudgetPost = (postId, editPostRequest) => {
   });
 };
 
+
+const getEmployeeSummary = () => {
+  return axios.get(API_URL + "admin/summary", { headers: authHeader() });
+};
+
 const ApiService = {
   getTestApi,
   getTestApiOpen,
@@ -59,5 +64,6 @@ const ApiService = {
   getBudgetType,
   deleteBudgetPost,
   editBudgetPost,
+  getEmployeeSummary
 };
 export default ApiService;
