@@ -1,6 +1,5 @@
 package no.jpro.mypageapi.service
 
-import no.jpro.mypageapi.dto.UpdateUserDTO
 import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.*
@@ -43,16 +42,5 @@ class UserService(
         return userRepository.existsUserBySub(userSub)
     }
 
-    fun updateUser(userSub: String, userRequest: UpdateUserDTO): UserDTO? {
-        val user = userRepository.findUserBySub(userSub) ?: return null
-        return userMapper.toUserDTO(
-            userRepository.save(
-                user.copy(
-                    nickName = userRequest.nickName ?: user.nickName,
-                    startDate = userRequest.startDate ?: user.startDate
-                )
-            )
-        )
-    }
-
+    fun getAllUsers() = userRepository.findAll().map { userMapper.toUserDTO(it) }
 }
