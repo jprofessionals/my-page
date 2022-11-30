@@ -1,8 +1,8 @@
 package no.jpro.mypageapi.entity
 
 
+import jakarta.persistence.*
 import java.time.LocalDate
-import javax.persistence.*
 
 @Entity
 @Table(name = "user")

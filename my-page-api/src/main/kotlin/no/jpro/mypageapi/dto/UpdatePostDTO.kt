@@ -6,5 +6,4 @@ data class UpdatePostDTO(
     val date: LocalDate? = null,
     val description: String? = null,
     val amountExMva: Double? = null,
-) {
-}
+)

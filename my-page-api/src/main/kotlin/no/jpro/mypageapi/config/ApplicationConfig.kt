@@ -5,7 +5,7 @@ import io.swagger.v3.oas.models.info.Info
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.core.GrantedAuthorityDefaults
@@ -13,7 +13,7 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 class ApplicationConfig {
 
     @Bean
@@ -29,8 +29,8 @@ class ApplicationConfig {
     @Bean
     fun filterChain(http: HttpSecurity, customJwtAuthenticationConverter: CustomJwtAuthenticationConverter) : SecurityFilterChain {
         http
-            .authorizeRequests()
-            .antMatchers(
+            .authorizeHttpRequests()
+            .requestMatchers(
                 "/open/**",
                 "/v3/api-docs",
                 "/v3/api-docs/**",
@@ -38,7 +38,7 @@ class ApplicationConfig {
                 "/swagger-ui/**",
                 "/actuator/**",
             ).permitAll()
-            .antMatchers("/**").authenticated()
+            .requestMatchers("/**").authenticated()
             .and()
             .csrf().disable()
             .oauth2ResourceServer()

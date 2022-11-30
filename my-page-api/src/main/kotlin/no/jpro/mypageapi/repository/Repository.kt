@@ -4,7 +4,6 @@ import no.jpro.mypageapi.entity.*
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
-
 @Repository
 interface UserRepository : JpaRepository<User, String> {
     fun existsUserBySub(userSub: String): Boolean
@@ -13,14 +12,11 @@ interface UserRepository : JpaRepository<User, String> {
 
 }
 
-
 @Repository
 interface BudgetRepository : JpaRepository<Budget, Long> {
     fun findBudgetsByUserSub(userSub: String): List<Budget>
     fun findBudgetByUserSubAndId(userSub: String, budgetId: Long): Budget?
     fun existsBudgetByUserSubAndId(userSub: String, budgetId: Long): Boolean
-
-
 }
 
 @Repository

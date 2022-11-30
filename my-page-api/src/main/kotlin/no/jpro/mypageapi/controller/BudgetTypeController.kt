@@ -1,7 +1,6 @@
 package no.jpro.mypageapi.controller
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -11,8 +10,6 @@ import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.BudgetTypeDTO
 import no.jpro.mypageapi.service.BudgetService
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
 
 @RestController
