@@ -1,7 +1,6 @@
 package no.jpro.mypageapi.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import no.jpro.mypageapi.entity.Hours
 import java.time.LocalDate
 import java.time.Period
 
@@ -11,7 +10,7 @@ data class BudgetDTO(
     val budgetType: BudgetTypeDTO,
     val startDate: LocalDate,
     val startAmount: Double,
-    val hours: List<Hours>
+    val hours: List<HoursDTO>
 ) {
         @JsonProperty
     fun sumPosts(): Double = posts.sumOf { post -> post.amountExMva ?: 0.0 }

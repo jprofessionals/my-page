@@ -6,20 +6,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class BudgetTypeMapper {
-    fun toBudgetType(budgetTypeDTO: BudgetTypeDTO): BudgetType {
-        return BudgetType(
-            name = budgetTypeDTO.name,
-            rollOver = budgetTypeDTO.rollOver,
-            deposit = budgetTypeDTO.deposit,
-            intervalOfDepositInMonths = budgetTypeDTO.intervalOfDepositInMonths,
-            startAmount = budgetTypeDTO.startAmount,
-            budgets = listOf(),
-            allowTimeBalance = budgetTypeDTO.allowTimeBalance
-        )
-    }
 
     fun toBudgetTypeDTO(budgetType: BudgetType): BudgetTypeDTO {
         return BudgetTypeDTO(
+            id = budgetType.id!!,
             name = budgetType.name,
             rollOver = budgetType.rollOver,
             deposit = budgetType.deposit,
