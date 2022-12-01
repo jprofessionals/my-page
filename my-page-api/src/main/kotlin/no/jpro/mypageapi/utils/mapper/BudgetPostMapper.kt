@@ -1,15 +1,14 @@
 package no.jpro.mypageapi.utils.mapper
 
 import no.jpro.mypageapi.dto.BudgetDTO
-import no.jpro.mypageapi.dto.CreateBudgetDTO
 import no.jpro.mypageapi.dto.CreatePostDTO
 import no.jpro.mypageapi.dto.PostDTO
 import no.jpro.mypageapi.entity.Budget
 import no.jpro.mypageapi.entity.Post
-import no.jpro.mypageapi.repository.BudgetTypeRepository
 import org.springframework.stereotype.Service
 @Service
-class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private val budgetTypeRepository: BudgetTypeRepository) {
+class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper,
+                       private val hoursMapper: HoursMapper) {
     fun toPostDTO(post: Post): PostDTO = PostDTO(
         id = post.id,
         date = post.date,
@@ -37,17 +36,9 @@ class BudgetPostMapper(private val budgetTypeMapper: BudgetTypeMapper, private v
             budgetType = responseBudgetType,
             startDate = budget.startDate,
             startAmount = budget.startAmount,
-            hours = budget.hours
+            hours = budget.hours.map { hoursMapper.toHoursDTO(it) }
         )
     }
-
-    fun toBudget(createBudgetDTO: CreateBudgetDTO): Budget = Budget(
-        posts = listOf(),
-        budgetType = budgetTypeRepository.findById(createBudgetDTO.budgetTypeId).get(),
-        startDate = createBudgetDTO.startDate,
-        startAmount = createBudgetDTO.startAmount,
-        hours = emptyList()
-    )
 
     fun toPost(createPostDTO: CreatePostDTO): Post = Post(
         date = createPostDTO.date,
