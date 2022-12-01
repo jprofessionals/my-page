@@ -6,7 +6,6 @@ import no.jpro.mypageapi.extensions.*
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
 
-
 @Service
 class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
     fun toUserDTO(user: User): UserDTO = UserDTO(
@@ -30,6 +29,4 @@ class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
         icon = jwt.getIcon(),
         budgets = listOf()
     )
-
 }
-
