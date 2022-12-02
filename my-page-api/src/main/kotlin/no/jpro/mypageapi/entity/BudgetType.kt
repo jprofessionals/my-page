@@ -1,6 +1,6 @@
 package no.jpro.mypageapi.entity
 
-import jakarta.persistence.*
+import javax.persistence.*
 
 @Entity
 data class BudgetType(
