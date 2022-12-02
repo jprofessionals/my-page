@@ -1,4 +1,4 @@
-runtime: java11
+runtime: java17
 service: api
 
 #manual_scaling:

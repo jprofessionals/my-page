@@ -14,7 +14,7 @@
 	<name>my-page-api</name>
 	<description>my-page-api</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<kotlin.version>1.7.21</kotlin.version>
 	</properties>
 	<dependencies>
