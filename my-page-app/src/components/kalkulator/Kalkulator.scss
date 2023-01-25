@@ -1,0 +1,27 @@
+.kalkulator {  
+  .input{
+    display: flex;
+    flex-wrap: wrap;
+    .column {      
+       max-width: 500px;
+       min-width: 300px;
+       margin-right: 10px;
+    }    
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 15px;
+    li {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+  }
+
+  input {
+    max-width: 100px;
+  }
+
+}
+

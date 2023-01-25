@@ -17,6 +17,7 @@ const NavBar = ({ logout, user }) => {
       <Navbar.Collapse className="navtext" id="responsive-navbar-nav">
         <Nav className="container-fluid">
           <Link className="nav-link" to="/budsjett">Budsjett</Link>
+          {/* <Link className="nav-link" to="/kalkulator">Lønnskalkulator</Link> */}
           <Link className="nav-link" to="/bidra">Bidra til Min side</Link>
           <RequireAdmin user={user}>
             <Link className="nav-link" to="/admin">Admin</Link>
