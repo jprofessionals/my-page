@@ -1,5 +1,9 @@
 import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 import "./Kalkulator.scss";
+import { Tooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
 
 function Kalkulator() {
   const [garantilonn, setGarantilønn] = useState(50000);
@@ -14,10 +18,7 @@ function Kalkulator() {
   const [antallTimerInterntid, setAntallTimerInterntid] = useState(0);
   const [antallTimerInterntidMedKomp, setAntallTimerInterntidMedKom] = useState(0);
   const [antallTimerFerie, setAntallTimerFerie] = useState(0);
-  const [antallTimerEgenmelding, setAntallTimerEgenmelding] = useState(0);
-  // const [antallTimerSyktBarn, setAntallTimerSyktBarn] = useState(0);
-  // const [antallTimerSykemelding, setAntallTimerSykemelding] = useState(0);
-  // const [antallTimerForeldrePerm, setAntallTimerForeldrePerm] = useState(0);
+  const [antallTimerSyk, setAntallTimerSyk] = useState(0);
 
   function Timelonn9G() {
     return ((grunnbelop * 9) / 1880);
@@ -28,9 +29,7 @@ function Kalkulator() {
   }
 
   function AntallTimerSyk() {
-    return antallTimerEgenmelding
-    // return+antallTimerEgenmelding + +antallTimerSyktBarn + +antallTimerForeldrePerm + +antallTimerSykemelding;
-
+    return antallTimerSyk
   }
 
   function SumFakturertTid() {
@@ -55,6 +54,10 @@ function Kalkulator() {
 
   function Bruttolonn() {
     return +Math.max(BeregnetGarantilonn(), SumBetaltTid()) + +bonus
+  }
+
+  function GarantilonnBenytet() {
+    return BeregnetGarantilonn() > SumBetaltTid();
   }
 
   const handleGarantilonnChange = (e) => {
@@ -101,44 +104,33 @@ function Kalkulator() {
     setAntallTimerFerie(e.target.value);
   };
 
-  const handleAntallTimerEgenmeldingChange = (e) => {
-    setAntallTimerEgenmelding(e.target.value);
+  const handleAntallTimerSykChange = (e) => {
+    setAntallTimerSyk(e.target.value);
   };
-
-  // const handleAntallTimerSyktBarnChange = (e) => {
-  //   setAntallTimerSyktBarn(e.target.value);
-  // };
-
-  // const handleAntallTimerSykemeldingChange = (e) => {
-  //   setAntallTimerSykemelding(e.target.value);
-  // };
-
-  // const handleAntallTimerForeldrePermChange = (e) => {
-  //   setAntallTimerForeldrePerm(e.target.value);
-  // };
 
   const handleBonusChange = (e) => {
     setBonus(e.target.value);
   };
 
   return (
-    <>
+    <><div className="innhold">
       <div className="topp">
         <h3>Lønnskalulator</h3>
+        <p>Her kan du se omtrentlig hvordan vi beregner lønn hver måned. Du kan selv leke med tallene for å se hvordan dette påvirker beregningen av bruttolønn. Mer info om timeføring og lønnsberegning finner du på <a href="https://sites.google.com/a/jpro.no/jpro-intranet/home/personalh%C3%A5ndbok/l%C3%B8nn-og-timef%C3%B8ring">intranett</a>. Forklaring av tilgjengelige timeføringskontoer finnes også på <a href="https://sites.google.com/a/jpro.no/jpro-intranet/home/personalh%C3%A5ndbok/l%C3%B8nn-og-timef%C3%B8ring/timef%C3%B8ring">intranett</a>.</p>
       </div>
       <div className="kalkulator">
         <div className="input">
           <div className="column">
             <h4>Basis</h4>
             <ul>
-              <li>Syntetisk timepris<input type="number" disabled={true} value={timeprisKompetanse} onChange={handleTimeprisKompetanseChange} /></li>
+              <li >Syntetisk timepris               
+                <FontAwesomeIcon icon={faQuestionCircle} id="tooltip-1" data-tooltip-content="Benyttes som timepris for kompetanse (innenfor årlig budsjett)" />
+                <input type="number" disabled={true} value={timeprisKompetanse} onChange={handleTimeprisKompetanseChange} /></li>
               <li>Garantilønn<input type="number" disabled={true} value={garantilonn} onChange={handleGarantilonnChange} /></li>
               <li>Grunnbeløp<input type="number" disabled={true} value={grunnbelop} onChange={handleGrunnbelopChange} /></li>
-              <li>Timer i måned<input type="number" value={antallTimerMnd} onChange={handleAntallTimerMndChange} /></li>
-              <li>Rest komperansetimer<input type="number" value={restKompetanseBudsjett} onChange={handleRestKompetanseBudsjettChange} /></li>
-              {/* <li><input type="range" value={restKompetanseBudsjett} onChange={handleRestKompetanseBudsjettChange} /></li> */}
+              <li>Timer i måned<FontAwesomeIcon icon={faQuestionCircle} id="tooltip-2" data-tooltip-content="Antall arbeidstimer i den aktuelle måneden" /><input type="number" value={antallTimerMnd} onChange={handleAntallTimerMndChange} /></li>
+              <li>Rest komperansetimer<FontAwesomeIcon icon={faQuestionCircle} id="tooltip-3" data-tooltip-content="Antall timer du har igjen på årlig kompetansebudjett før eventuelt utak" /><input type="number" value={restKompetanseBudsjett} onChange={handleRestKompetanseBudsjettChange} /></li>
               <li>Timepris på prosjekt<input type="number" value={timeprisProsjekt} onChange={handleTimeprisProsjektChange} /></li>
-              {/* <li><input type="range" value={timeprisProsjekt} min={1000} max={2500} onChange={handleTimeprisProsjektChange} /></li> */}
               <li>Bonus<input type="number" value={bonus} onChange={handleBonusChange} /></li>
             </ul>
 
@@ -151,27 +143,31 @@ function Kalkulator() {
               <li>Interntid<input type="number" value={antallTimerInterntid} onChange={handleAntallTimerInerntidChange} /></li>
               <li>Interntid m/komp<input type="number" value={antallTimerInterntidMedKomp} onChange={handleAntallTimerInterntidMedKomChange} /></li>
               <li>Ferie<input type="number" value={antallTimerFerie} onChange={handleAntallTimerFerieChange} /></li>
-              <li>Sykdom<input type="number" value={antallTimerEgenmelding} onChange={handleAntallTimerEgenmeldingChange} /></li>
-              {/* <li>Sykt barn<input type="number" value={antallTimerSyktBarn} onChange={handleAntallTimerSyktBarnChange} /></li>
-              <li>Sykemelding<input type="number" value={antallTimerSykemelding} onChange={handleAntallTimerSykemeldingChange} /></li>
-              <li>foreldrepermisjon<input type="number" value={antallTimerForeldrePerm} onChange={handleAntallTimerForeldrePermChange} /></li> */}
+              <li>Sykdom<FontAwesomeIcon icon={faQuestionCircle} id="tooltip-4" data-tooltip-content="Egenmelding, sykemelding, sykt barn og foreldre permisjon" /><input type="number" value={antallTimerSyk} onChange={handleAntallTimerSykChange} /></li>
             </ul>
           </div>
           <div className="column">
-            <h4>Resultat</h4>
+            <h4>Resultat <FontAwesomeIcon icon={faQuestionCircle} id="tooltip-5" data-tooltip-content="Viser resultat av beregningen og hvilke faktorer som blir med i beregnet bruttolønn" /></h4>
             <ul>
-              <li>9G timelønn: <span>{Timelonn9G().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
-              <li>Sum sykelønn: <span>{SumSykeLonn().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
-              <li>Sum fakturert tid: <span>{SumFakturertTid().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
-              <li>Sum kompetanse: <span>{SumKompetanse().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
-              <li>Sum betalt tid: <span>{SumBetaltTid().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
-              <li>Tilgjengelig tid: <span>{SumTilgjengeligTid()} av {antallTimerMnd}</span></li>
-              <li>Beregnet garantilønn: <span>{BeregnetGarantilonn().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
-              <li>Bruttolønn: <span>{Bruttolonn().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
+              <li className={GarantilonnBenytet() ? "notSelected" : ""}>9G timelønn: <span>{Timelonn9G().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
+              <li className={GarantilonnBenytet() ? "notSelected" : ""}>Sum sykelønn: <span>{SumSykeLonn().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
+              <li className={GarantilonnBenytet() ? "notSelected" : ""}>Sum fakturert tid: <span>{SumFakturertTid().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
+              <li className={GarantilonnBenytet() ? "notSelected" : ""}>Sum kompetanse: <span>{SumKompetanse().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
+              <li className={GarantilonnBenytet() ? "line notSelected" : "line "}>Sum betalt tid: <span>{SumBetaltTid().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
+              <li className={GarantilonnBenytet() ? "" : "notSelected"}>Tilgjengelig tid: <span>{SumTilgjengeligTid()} av {antallTimerMnd}</span></li>
+              <li className={GarantilonnBenytet() ? "line " : "line notSelected"}>Beregnet garantilønn: <span>{BeregnetGarantilonn().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
+              <li className="line">Bonus: <span>{bonus}</span></li>
+              <li className="bold">Bruttolønn: <span>{Bruttolonn().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
             </ul>
           </div>
         </div>
       </div>
+    </div>
+    <Tooltip anchorId="tooltip-1" />
+    <Tooltip anchorId="tooltip-2" />
+    <Tooltip anchorId="tooltip-3" />
+    <Tooltip anchorId="tooltip-4" />
+    <Tooltip anchorId="tooltip-5" />
     </>
   );
 }
