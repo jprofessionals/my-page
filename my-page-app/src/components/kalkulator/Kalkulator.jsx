@@ -36,8 +36,12 @@ function Kalkulator() {
     return (timeprisProsjekt * 0.52 * antallTimerFakturert)
   }
 
+  function SumIntertidMedKomp() {
+    return (timeprisProsjekt * 0.52 * antallTimerInterntidMedKomp)
+  }
+
   function SumBetaltTid() {
-    return +SumSykeLonn() + +SumFakturertTid() + +SumKompetanse()
+    return +SumSykeLonn() + +SumFakturertTid() + +SumKompetanse() + +SumIntertidMedKomp()
   }
 
   function SumKompetanse() {
@@ -141,7 +145,7 @@ function Kalkulator() {
               <li>Fakturerte timer<input type="number" value={antallTimerFakturert} onChange={handleAntallTimerFakturertChange} /></li>
               <li>Kompetanseheving<input type="number" value={antallTimerKompetanse} onChange={handleAntallTimerKompetanseChange} /></li>
               <li>Interntid<input type="number" value={antallTimerInterntid} onChange={handleAntallTimerInerntidChange} /></li>
-              <li>Interntid m/komp<input type="number" value={antallTimerInterntidMedKomp} onChange={handleAntallTimerInterntidMedKomChange} /></li>
+              <li>Interntid m/komp<FontAwesomeIcon icon={faQuestionCircle} id="tooltip-6" data-tooltip-content="Interntid som kompanseres som fakturert tid, se intranett for retningslinjer" /><input type="number" value={antallTimerInterntidMedKomp} onChange={handleAntallTimerInterntidMedKomChange} /></li>
               <li>Ferie<input type="number" value={antallTimerFerie} onChange={handleAntallTimerFerieChange} /></li>
               <li>Sykdom<FontAwesomeIcon icon={faQuestionCircle} id="tooltip-4" data-tooltip-content="Egenmelding, sykemelding, sykt barn og foreldre permisjon" /><input type="number" value={antallTimerSyk} onChange={handleAntallTimerSykChange} /></li>
             </ul>
@@ -152,6 +156,7 @@ function Kalkulator() {
               <li className={GarantilonnBenytet() ? "notSelected" : ""}>9G timelønn: <span>{Timelonn9G().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
               <li className={GarantilonnBenytet() ? "notSelected" : ""}>Sum sykelønn: <span>{SumSykeLonn().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
               <li className={GarantilonnBenytet() ? "notSelected" : ""}>Sum fakturert tid: <span>{SumFakturertTid().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
+              <li className={GarantilonnBenytet() ? "notSelected" : ""}>Sum interntid m/komp: <span>{SumIntertidMedKomp().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
               <li className={GarantilonnBenytet() ? "notSelected" : ""}>Sum kompetanse: <span>{SumKompetanse().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
               <li className={GarantilonnBenytet() ? "line notSelected" : "line "}>Sum betalt tid: <span>{SumBetaltTid().toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' })}</span></li>
               <li className={GarantilonnBenytet() ? "" : "notSelected"}>Tilgjengelig tid: <span>{SumTilgjengeligTid()} av {antallTimerMnd}</span></li>
@@ -168,6 +173,7 @@ function Kalkulator() {
     <Tooltip anchorId="tooltip-3" />
     <Tooltip anchorId="tooltip-4" />
     <Tooltip anchorId="tooltip-5" />
+    <Tooltip anchorId="tooltip-6" />
     </>
   );
 }
