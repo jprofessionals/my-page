@@ -107,7 +107,7 @@ function Admin() {
             </thead>
             <tbody>
             {
-              users.map((userRow) => (
+              users.sort((a, b) => a.name.localeCompare(b.name)).map((userRow) => (
                 <tr key={userRow.email}>
                   <td key={userRow.email}>{userRow.name}</td>
                   {budgetTypes.map((budgetColumn) => (
