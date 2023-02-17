@@ -9,6 +9,7 @@ import LoggedOut from "./LoggedOut";
 import Bidra from "./components/bidra/Bidra";
 import Admin from "./components/admin/Admin";
 import RequireAuth from "./utils/RequireAuth";
+import Kalkulator from "./components/kalkulator/Kalkulator";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -27,6 +28,7 @@ function App() {
                 } key={index} />
               )
             })}
+            <Route path="/kalkulator" element={<Kalkulator/>}/>
             <Route path="/bidra" element={<Bidra/>}/>
             <Route path="/admin" element={
               <RequireAuth setUser={setUser} isAuthenticated={isAuthenticated} setAuthenticated={setIsAuthenticated}>

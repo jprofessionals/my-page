@@ -49,8 +49,8 @@ function Admin() {
   };
 
   const budgetBalance = (budget) => {
-    if (budget) {
-      return "kr " + budget.balance.toFixed(2);
+    if (budget) {      
+      return budget.balance.toLocaleString('no-NO', { maximumFractionDigits: 2, style: 'currency', currency: 'NOK' });
     } else {
       return "-"
     }
@@ -107,7 +107,7 @@ function Admin() {
             </thead>
             <tbody>
             {
-              users.map((userRow) => (
+              users.sort((a, b) => a.name.localeCompare(b.name)).map((userRow) => (
                 <tr key={userRow.email}>
                   <td key={userRow.email}>{userRow.name}</td>
                   {budgetTypes.map((budgetColumn) => (

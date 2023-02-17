@@ -40,10 +40,10 @@ data class BudgetDTO(
         if (budgetType.intervalOfDepositInMonths == 0L || budgetType.deposit == 0.0) return 0.0
 
         return if(budgetType.rollOver){
-            val countMonths = Period.between(startDate, toDate).months
+            val countMonths = Period.between(startDate, toDate).toTotalMonths()
             (countMonths / budgetType.intervalOfDepositInMonths) * budgetType.deposit
         } else {
-            val countMonths = Period.between(toDate.withDayOfYear(1), toDate).months
+            val countMonths = Period.between(toDate.withDayOfYear(1), toDate).toTotalMonths()
             (countMonths / budgetType.intervalOfDepositInMonths) * budgetType.deposit
         }
     }
