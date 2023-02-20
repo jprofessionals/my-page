@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Accordion, Button, AccordionContext } from "react-bootstrap";
+import React, {useContext, useEffect, useState} from "react";
+import {Accordion, AccordionContext, Button} from "react-bootstrap";
 import Post from "./Post";
 import "./Budget.scss";
 import CreateBudgetPost from "./CreateBudgetPost";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faRemove } from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faPlus, faRemove} from "@fortawesome/free-solid-svg-icons";
 import BudgetInformation from "./BudgetInformation";
+import RequireAdmin from "../../utils/RequireAdmin";
 
-const Budget = ({ budget, refreshBudgets }) => {
+const Budget = ({ budget, refreshBudgets, user }) => {
   const postList = budget.posts;
   const [posts, setPosts] = useState([]);
   const [cardItem, setCardItem] = useState();
@@ -50,6 +51,7 @@ const Budget = ({ budget, refreshBudgets }) => {
         <div className="posts">
           <div className="header">
             <h3 className="headerText">Historikk</h3>
+            <RequireAdmin user={user}>
             <Button onClick={toggler} className="plus shadow-none">
               <FontAwesomeIcon
                 className="toggleButton"
@@ -57,6 +59,7 @@ const Budget = ({ budget, refreshBudgets }) => {
                 title={cardItem ? "Avbryt" : "Legg til ny post"}
               />
             </Button>
+            </RequireAdmin>
           </div>
           {cardItem}
           <span style={posts.length > 0 ? { display: "none" } : {}}>
