@@ -25,7 +25,6 @@ class BudgetService(
         return budgetRepository.existsBudgetByUserSubAndId(userSub, budgetId)
     }
 
-
     fun createPost(postRequest: CreatePostDTO, budgetId: Long, userSub: String): PostDTO {
         val budget = budgetRepository.findBudgetByUserSubAndId(userSub, budgetId)
         val createdBy = userRepository.findUserBySub(userSub)
@@ -44,12 +43,10 @@ class BudgetService(
         val post = postRepository.findPostByIdAndBudgetUserSub(postId, userSub)
             ?: return null
         return budgetPostMapper.toPostDTO(post)
-
     }
 
     fun getPostByUserSubAndId(postId: Long, userSub: String): Post? {
         return postRepository.findPostByIdAndBudgetUserSub(postId, userSub)
-
     }
 
     fun checkIfDateIsBeforeStartOfBudget(createPostDate: LocalDate, budgetId: Long): Boolean {
