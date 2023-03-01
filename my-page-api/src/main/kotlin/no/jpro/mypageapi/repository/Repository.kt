@@ -16,6 +16,7 @@ interface BudgetRepository : JpaRepository<Budget, Long> {
     fun findBudgetsByUserSub(userSub: String): List<Budget>
     fun findBudgetByUserSubAndId(userSub: String, budgetId: Long): Budget?
     fun existsBudgetByUserSubAndId(userSub: String, budgetId: Long): Boolean
+    fun findBudgetsByUserEmployeeNumber(userEmployeeNumber: Long): List<Budget>
 }
 
 @Repository

@@ -21,6 +21,12 @@ class BudgetService(
         return budgets.map { budgetPostMapper.toBudgetDTO(it) }
     }
 
+    fun getBudgets(userEmployeeNumber: Int): List<BudgetDTO> {
+        val budgets = budgetRepository.findBudgetsByUserEmployeeNumber(userEmployeeNumber)
+        return budgets.map { budgetPostMapper.toBudgetDTO(it) }
+    }
+
+
     fun checkIfBudgetExists(userSub: String, budgetId: Long): Boolean {
         return budgetRepository.existsBudgetByUserSubAndId(userSub, budgetId)
     }

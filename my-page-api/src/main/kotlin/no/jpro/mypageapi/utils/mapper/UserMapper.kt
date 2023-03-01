@@ -16,6 +16,7 @@ class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
         icon = user.icon,
         nickName = user.nickName,
         startDate = user.startDate,
+        employeeNumber = user.employeeNumber,
         budgets = user.budgets.map { budgetPostMapper.toBudgetDTO(it) },
         admin = user.admin
     )
