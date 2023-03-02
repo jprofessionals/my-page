@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import apiService from "../../services/api.service";
 import {toast} from "react-toastify";
 import {Spinner, Table} from "react-bootstrap";
+import {Link} from "react-router-dom";
 
 function Admin() {
   const [users, setUsers] = useState([]);
@@ -120,6 +121,7 @@ function Admin() {
             }
             </tbody>
           </Table>
+          <Link to="/add-user">Legg til bruker</Link>
         </div>
       </>
     );
