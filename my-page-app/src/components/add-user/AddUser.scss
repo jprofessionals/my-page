@@ -1,0 +1,23 @@
+.addUser {
+  width: 100%;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  li {
+    list-style-type: none;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    .description {
+      margin-left: 5px;
+    }
+    span {
+      font-weight: bold;
+      display: inline-block;
+      width: 100px;
+    }
+    .inputDate {
+      width: 185px;
+      height: 30px;
+    }
+  }
+}
