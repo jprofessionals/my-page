@@ -6,6 +6,10 @@ const getUsers = () => {
   return axios.get(API_URL + "user", { headers: authHeader() });
 };
 
+const createUser = () => {
+  return axios.post(API_URL + "user", { headers: authHeader() });
+};
+
 const getUser = () => {
   return axios.get(API_URL + "me", { headers: authHeader() });
 };
@@ -34,6 +38,7 @@ const editBudgetPost = (postId, editPostRequest) => {
 
 const ApiService = {
   getUsers,
+  createUser,
   getUser,
   getBudgets,
   createBudgetPost,
