@@ -67,9 +67,7 @@ class MeController(
         if (!budgetService.checkIfBudgetExists(userSub, budgetId)) {
             return ResponseEntity.badRequest().build()
         }
-        if (budgetService.checkIfDateIsBeforeStartOfBudget(postRequest.date, budgetId)) {
-            return ResponseEntity.badRequest().build()
-        }
+
         return ResponseEntity.ok(budgetService.createPost(postRequest, budgetId, userSub))
     }
 

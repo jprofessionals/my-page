@@ -49,11 +49,6 @@ class BudgetService(
         return postRepository.findPostByIdAndBudgetUserSub(postId, userSub)
     }
 
-    fun checkIfDateIsBeforeStartOfBudget(createPostDate: LocalDate, budgetId: Long): Boolean {
-        val budgetDate = budgetRepository.findById(budgetId).get().startDate
-        return createPostDate.isBefore(budgetDate)
-    }
-
     fun editPost(editPostRequest: UpdatePostDTO, postToEdit: Post): PostDTO {
         return budgetPostMapper.toPostDTO(
             postRepository.save(
