@@ -89,7 +89,6 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
                 name="date"
                 onChange={handleDateChange}
                 value={date}
-                min={budget.startDate}
                 format="DD.MM.YYYY"
               ></input>
             </li>
