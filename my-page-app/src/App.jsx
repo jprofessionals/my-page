@@ -10,48 +10,59 @@ import Bidra from "./components/bidra/Bidra";
 import Admin from "./components/admin/Admin";
 import RequireAuth from "./utils/RequireAuth";
 import Kalkulator from "./components/kalkulator/Kalkulator";
+import AddUser from "./components/add-user/AddUser";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(new User());
   let navigate = useNavigate();
-      return (
-        <>
-          <NavBar logout={logout} user={user}/>
-          <Routes>
-            {["/", "/budsjett"].map((path, index) => {
-              return (
-                <Route path={path} element={
-                  <RequireAuth setUser={setUser} isAuthenticated={isAuthenticated} setAuthenticated={setIsAuthenticated}>
-                    <BudgetContainer user={user}/>
-                  </RequireAuth>
-                } key={index} />
-              )
-            })}
-            <Route path="/kalkulator" element={<Kalkulator/>}/>
-            <Route path="/bidra" element={<Bidra/>}/>
-            <Route path="/admin" element={
-              <RequireAuth setUser={setUser} isAuthenticated={isAuthenticated} setAuthenticated={setIsAuthenticated}>
-                <Admin/>
+  return (
+    <>
+      <NavBar logout={logout} user={user}/>
+      <Routes>
+        {["/", "/budsjett"].map((path, index) => {
+          return (
+            <Route path={path} element={
+              <RequireAuth setUser={setUser} isAuthenticated={isAuthenticated}
+                           setAuthenticated={setIsAuthenticated}>
+                <BudgetContainer user={user}/>
               </RequireAuth>
-                }/>
-            <Route path="/logget-ut" element={<LoggedOut/>}/>
-            <Route path="*"
-                   element={
-                     <main style={{padding: "1rem"}}>
-                       <p>There's nothing here!</p>
-                     </main>
-                   }
-            />
-          </Routes>
-        </>
-      );
+            } key={index}/>
+          )
+        })}
+        <Route path="/kalkulator" element={<Kalkulator/>}/>
+        <Route path="/bidra" element={<Bidra/>}/>
+        <Route path="/admin" element={
+          <RequireAuth setUser={setUser} isAuthenticated={isAuthenticated}
+                       setAuthenticated={setIsAuthenticated}>
+            <Admin/>
+          </RequireAuth>
+        }/>
+        <Route path="/add-user" element={
+          <RequireAuth setUser={setUser} isAuthenticated={isAuthenticated}
+                       setAuthenticated={setIsAuthenticated}>
+            <AddUser/>
+          </RequireAuth>
 
-  function logout () {
+        }/>
+        <Route path="/logget-ut" element={<LoggedOut/>}/>
+        <Route path="*"
+               element={
+                 <main style={{padding: "1rem"}}>
+                   <p>There's nothing here!</p>
+                 </main>
+               }
+        />
+      </Routes>
+    </>
+  );
+
+  function logout() {
     setUser(new User())
     setIsAuthenticated(false);
     localStorage.removeItem("user_token");
     navigate('/logget-ut');
   }
 }
+
 export default App;
