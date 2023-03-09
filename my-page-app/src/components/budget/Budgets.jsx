@@ -6,17 +6,16 @@ import {toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Budgets = ({user = {}, useLogggedInUser = true}) => {
-    let [budgets, setBudgets] = useState([]);
+    const [budgets, setBudgets] = useState([]);
     const [isLoadingBudgets, setIsLoadingBudgets] = useState(false);
 
     useEffect(() => {
         refreshBudgets();
     }, []);
 
-    const refreshBudgets = () => {
+    const refreshBudgets = async () => {
         setIsLoadingBudgets(true);
-        let loadedBudgets = null
-        loadedBudgets = useLogggedInUser ? ApiService.getBudgets() : ApiService.getBudgetsForEmployee(user.employeeNumber);
+        const loadedBudgets = useLogggedInUser ? ApiService.getBudgets() : ApiService.getBudgetsForEmployee(user.employeeNumber);
 
         loadedBudgets.then((responseBudgets) => {
             setBudgets(responseBudgets.data);
@@ -27,10 +26,6 @@ const Budgets = ({user = {}, useLogggedInUser = true}) => {
                 toast.error("Klarte ikke laste budsjettene, prøv igjen senere");
             });
     };
-
-    /*  if(useLogggedInUser){
-          budgets= user.budgets;
-      }*/
     if (!budgets.length && !isLoadingBudgets) {
         return (
             <div className="budgets">
