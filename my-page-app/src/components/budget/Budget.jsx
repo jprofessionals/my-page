@@ -1,14 +1,16 @@
-import React, {useContext, useEffect, useState} from "react";
-import {Accordion, AccordionContext, Button} from "react-bootstrap";
+
 import Post from "./Post";
 import "./Budget.scss";
 import CreateBudgetPost from "./CreateBudgetPost";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus, faRemove} from "@fortawesome/free-solid-svg-icons";
-import BudgetInformation from "./BudgetInformation";
+import React, {useContext, useEffect, useState} from "react";
 import RequireAdmin from "../../utils/RequireAdmin";
+import {Accordion, AccordionContext, Button} from "react-bootstrap";
+import BudgetInformation from "./BudgetInformation";
 
-const Budget = ({ budget, refreshBudgets, user }) => {
+
+const  Budget = ({ budget, refreshBudgets, user }) => {
   const postList = budget.posts;
   const [posts, setPosts] = useState([]);
   const [cardItem, setCardItem] = useState();
@@ -51,15 +53,15 @@ const Budget = ({ budget, refreshBudgets, user }) => {
         <div className="posts">
           <div className="header">
             <h3 className="headerText">Historikk</h3>
-            <RequireAdmin user={user}>
-            <Button onClick={toggler} className="plus shadow-none">
-              <FontAwesomeIcon
-                className="toggleButton"
-                icon={cardItem ? faRemove : faPlus}
-                title={cardItem ? "Avbryt" : "Legg til ny post"}
-              />
-            </Button>
-            </RequireAdmin>
+              <RequireAdmin user={user}>
+              <Button onClick={toggler} className="plus shadow-none">
+                <FontAwesomeIcon
+                  className="toggleButton"
+                  icon={cardItem ? faRemove : faPlus}
+                  title={cardItem ? "Avbryt" : "Legg til ny post"}
+                />
+              </Button>
+              </RequireAdmin>
           </div>
           {cardItem}
           <span style={posts.length > 0 ? { display: "none" } : {}}>
