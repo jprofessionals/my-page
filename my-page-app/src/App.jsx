@@ -14,7 +14,7 @@ import Kalkulator from "./components/kalkulator/Kalkulator";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(new User());
-  let navigate = useNavigate();
+  const navigate = useNavigate();
       return (
         <>
           <NavBar logout={logout} user={user}/>
