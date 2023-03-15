@@ -29,7 +29,7 @@ class UserService(
         val user = userRepository.findUserByEmailAndSubIsNull(jwt.getEmail()) ?: return null
         return userRepository.save(
             user.copy(
-                sub =jwt.getSub(),
+                sub = jwt.getSub(),
                 icon = jwt.getIcon(),
                 name = jwt.getName(),
                 givenName = jwt.getGivenName(),
@@ -41,6 +41,8 @@ class UserService(
     fun checkIfUserExists(userSub: String): Boolean {
         return userRepository.existsUserBySub(userSub)
     }
+
+    fun getUserBySub(userSub: String) = userRepository.findUserBySub(userSub)
 
     fun getAllUsers() = userRepository.findAll().map { userMapper.toUserDTO(it) }
 }

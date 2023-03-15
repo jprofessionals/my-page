@@ -11,7 +11,7 @@ const getUser = () => {
 };
 
 const getBudgetsForEmployee = (employeeNumber) => {
-  return axios.get(API_URL + "user/budgets/"+employeeNumber, { headers: authHeader() });
+  return axios.get(API_URL + "budget/"+employeeNumber, { headers: authHeader() });
 };
 
 const getBudgets = () => {
@@ -19,19 +19,19 @@ const getBudgets = () => {
 };
 
 const createBudgetPost = (post, budgetId) => {
-  return axios.post(API_URL + "me/budgets/" + budgetId + "/posts", post, {
+  return axios.post(API_URL + "budget/" + budgetId + "/posts", post, {
     headers: authHeader(),
   });
 };
 
 const deleteBudgetPost = (postId) => {
-  return axios.delete(API_URL + "me/posts/" + postId, {
+  return axios.delete(API_URL + "budget/posts/" + postId, {
     headers: authHeader(),
   });
 };
 
 const editBudgetPost = (postId, editPostRequest) => {
-  return axios.patch(API_URL + "me/posts/" + postId, editPostRequest, {
+  return axios.patch(API_URL + "budget/posts/" + postId, editPostRequest, {
     headers: authHeader(),
   });
 };
