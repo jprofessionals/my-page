@@ -29,4 +29,15 @@ class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
         icon = jwt.getIcon(),
         budgets = listOf()
     )
+
+    fun toUser(userDTO: UserDTO): User {
+        return User(
+            email = userDTO.email,
+            name = userDTO.name,
+            givenName = userDTO.name,
+            familyName = userDTO.familyName,
+            budgets = listOf()
+        )
+    }
+
 }

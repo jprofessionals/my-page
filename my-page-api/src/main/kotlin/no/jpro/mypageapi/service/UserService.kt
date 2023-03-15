@@ -25,11 +25,19 @@ class UserService(
         return userRepository.save(userMapper.toUser(jwt))
     }
 
+    fun createUser(userDTO: UserDTO): UserDTO {
+        val user = userMapper.toUser(userDTO)
+
+        userRepository.save(user)
+
+        return userDTO
+    }
+
     fun findUserByEmailAndConnect(jwt: Jwt): User? {
         val user = userRepository.findUserByEmailAndSubIsNull(jwt.getEmail()) ?: return null
         return userRepository.save(
             user.copy(
-                sub =jwt.getSub(),
+                sub = jwt.getSub(),
                 icon = jwt.getIcon(),
                 name = jwt.getName(),
                 givenName = jwt.getGivenName(),

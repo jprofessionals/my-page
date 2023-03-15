@@ -6,8 +6,8 @@ const getUsers = () => {
   return axios.get(API_URL + "user", { headers: authHeader() });
 };
 
-const createUser = () => {
-  return axios.post(API_URL + "user", { headers: authHeader() });
+const createUser = (user) => {
+  return axios.post(API_URL + "user", user, { headers: authHeader() });
 };
 
 const getUser = () => {
