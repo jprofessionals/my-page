@@ -5,7 +5,7 @@ import {Accordion, Spinner} from "react-bootstrap";
 import {toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Budgets = ({user = {}, useLogggedInUser = true})  => {
+const Budgets = ({user = {}, useLogggedInUser = true}) => {
     const [budgets, setBudgets] = useState([]);
     const [isLoadingBudgets, setIsLoadingBudgets] = useState(false);
 
@@ -61,8 +61,8 @@ const Budgets = ({user = {}, useLogggedInUser = true})  => {
                 {budgets.map((budget) => (
                   <Budget
                     key={budget.id}
-
-                    user={user.user}budget={budget}
+                    user={user.user}
+                    budget={budget}
                     refreshBudgets={refreshBudgets}
                   />
                 ))}

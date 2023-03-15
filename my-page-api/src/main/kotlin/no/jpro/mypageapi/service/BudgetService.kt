@@ -1,19 +1,23 @@
 package no.jpro.mypageapi.service
 
-import no.jpro.mypageapi.dto.*
+import no.jpro.mypageapi.dto.BudgetDTO
+import no.jpro.mypageapi.dto.CreatePostDTO
+import no.jpro.mypageapi.dto.PostDTO
+import no.jpro.mypageapi.dto.UpdatePostDTO
+import no.jpro.mypageapi.entity.Budget
 import no.jpro.mypageapi.entity.Post
+import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.BudgetRepository
 import no.jpro.mypageapi.repository.PostRepository
-import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.BudgetPostMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
 class BudgetService(
-    private val budgetRepository: BudgetRepository, private val budgetPostMapper: BudgetPostMapper,
-    private val postRepository: PostRepository,
-    private val userRepository: UserRepository,
+    private val budgetRepository: BudgetRepository,
+    private val budgetPostMapper: BudgetPostMapper,
+    private val postRepository: PostRepository
 ) {
 
     fun getBudgets(userSub: String): List<BudgetDTO> {
@@ -26,14 +30,7 @@ class BudgetService(
         return budgets.map { budgetPostMapper.toBudgetDTO(it) }
     }
 
-
-    fun checkIfBudgetExists(userSub: String, budgetId: Long): Boolean {
-        return budgetRepository.existsBudgetByUserSubAndId(userSub, budgetId)
-    }
-
-    fun createPost(postRequest: CreatePostDTO, budgetId: Long, userSub: String): PostDTO {
-        val budget = budgetRepository.findBudgetByUserSubAndId(userSub, budgetId)
-        val createdBy = userRepository.findUserBySub(userSub)
+    fun createPost(postRequest: CreatePostDTO, budget: Budget, createdBy: User): PostDTO {
         val post = budgetPostMapper.toPost(postRequest).copy(
             budget = budget,
             createdBy = createdBy
@@ -45,14 +42,8 @@ class BudgetService(
         postRepository.deleteById(postId)
     }
 
-    fun getPost(postId: Long, userSub: String): PostDTO? {
-        val post = postRepository.findPostByIdAndBudgetUserSub(postId, userSub)
-            ?: return null
-        return budgetPostMapper.toPostDTO(post)
-    }
-
-    fun getPostByUserSubAndId(postId: Long, userSub: String): Post? {
-        return postRepository.findPostByIdAndBudgetUserSub(postId, userSub)
+    fun getPost(postId: Long): Post? {
+        return postRepository.findPostById(postId)
     }
 
     fun editPost(editPostRequest: UpdatePostDTO, postToEdit: Post): PostDTO {
@@ -65,5 +56,9 @@ class BudgetService(
                 )
             )
         )
+    }
+
+    fun getBudget(budgetId: Long): Budget? {
+        return budgetRepository.findBudgetById(budgetId)
     }
 }
