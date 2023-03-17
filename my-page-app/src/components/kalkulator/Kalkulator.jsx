@@ -120,7 +120,7 @@ function Kalkulator() {
     <><div className="innhold">
       <div className="topp">
         <h3>Lønnskalulator</h3>
-        <p>Her kan du se omtrentlig hvordan vi beregner lønn hver måned. Du kan selv leke med tallene for å se hvordan dette påvirker beregningen av bruttolønn. Mer info om timeføring og lønnsberegning finner du på <a href="https://sites.google.com/a/jpro.no/jpro-intranet/home/personalh%C3%A5ndbok/l%C3%B8nn-og-timef%C3%B8ring">intranett</a>. Forklaring av tilgjengelige timeføringskontoer finnes også på <a href="https://sites.google.com/a/jpro.no/jpro-intranet/home/personalh%C3%A5ndbok/l%C3%B8nn-og-timef%C3%B8ring/timef%C3%B8ring">intranett</a>.</p>
+        <p>Her kan du se omtrentlig hvordan vi beregner lønn hver måned. Du kan selv leke med tallene for å se hvordan dette påvirker beregningen av bruttolønn. Mer info om timeføring og lønnsberegning finner du på <a href="https://sites.google.com/a/jpro.no/jpro-intranet/personalh%C3%A5ndbok/l%C3%B8nn-og-timef%C3%B8ring">intranett</a>. Forklaring av tilgjengelige timeføringskontoer finnes også på <a href="https://sites.google.com/a/jpro.no/jpro-intranet/personalh%C3%A5ndbok/l%C3%B8nn-og-timef%C3%B8ring/timef%C3%B8ring">intranett</a>.</p>
       </div>
       <div className="kalkulator">
         <div className="input">

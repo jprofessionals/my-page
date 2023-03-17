@@ -44,7 +44,7 @@ function Admin() {
     const getBudgetBalanceForType = (budgets, type) => {
         var foundBudget = budgets.find(budget => budget.budgetType.id === type.id);
         if (type.balanceIsHours) {
-            return budgetBalanceHours(foundBudget);
+            return budgetBalanceHoursCurrentYear(foundBudget);
         } else {
             return budgetBalance(foundBudget);
         }
@@ -69,6 +69,14 @@ function Admin() {
             return "-"
         }
     };
+
+    const budgetBalanceHoursCurrentYear = (budget) => {
+      if (budget) {
+          return budget.sumHoursCurrentYear + (budget.sumHoursCurrentYear === 1 ? " time" : " timer");
+      } else {
+          return "-"
+      }
+  };
 
     const handleExpandUser = (user, event) => {
         // Check if the clicked target is not a child of the expanded area
