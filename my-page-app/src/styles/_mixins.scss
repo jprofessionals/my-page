@@ -1,0 +1,43 @@
+$jpro-orange: #ff7a0c;
+$hover-orange: #ffa500;
+$white: #ffffff;
+$navbar-color: #2f4f4f;
+$smallScreen: 575px;
+$lighter-orange: #ffbd8d;
+$darker-orange: #d16512;
+$black: #000000;
+$toast-success: #3c5c5c;
+
+@mixin btn {
+  background-color: $jpro-orange;
+  border-color: $white;
+  color: $white;
+  &:hover {
+    background-color: $hover-orange;
+    border-color: $white;
+  }
+  &:focus {
+    box-shadow: 0px 0px 0px 0.1rem $lighter-orange;
+    border-color: $lighter-orange;
+  }
+}
+
+@mixin orange-jpro-round-button {
+  background-color: $jpro-orange;
+  border-color: $white;
+  border-radius: 18px 50%;
+  margin-left: auto;
+  margin-bottom: 5px;
+  border: none;
+  &:focus {
+    box-shadow: 0px 0px 0px 0.1rem $lighter-orange;
+    border-color: $lighter-orange;
+  }
+  &:hover {
+    background-color: $hover-orange;
+  }
+  &:not(.collapsed) {
+    color: $white;
+    background-color: $jpro-orange;
+  }
+}
