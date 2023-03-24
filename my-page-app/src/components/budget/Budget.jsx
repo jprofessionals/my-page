@@ -1,6 +1,6 @@
 
 import Post from "./Post";
-import "./Budget.scss";
+import "./Budget.module.scss";
 import CreateBudgetPost from "./CreateBudgetPost";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus, faRemove} from "@fortawesome/free-solid-svg-icons";
