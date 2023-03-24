@@ -2,55 +2,47 @@
 
 .navbar {
   background-color: mixins.$navbar-color;
-
-  .navbar-nav {
-    a.nav-link {
-      color: mixins.$white;
-      text-align: center;
-      font-size: 18px;
-      margin-left: 5px;
-      margin-right: 5px;
-
-      &:active > a.nav-link {
-        color: mixins.$jpro-orange;
-      }
-
-      &:hover {
-        color: mixins.$jpro-orange;
-        transform: scale(1.1);
-      }
-    }
-  }
-
-  .navtext {
-    width: 100%;
-    position: relative;
-    left: 50%;
-    transform: translatex(-50%);
-    text-align: center;
-  }
-
   a {
     margin-left: 10px;
   }
+}
 
-  .container-fluid {
-    margin-right: 30px;
+.navLink {
+  color: mixins.$white;
+  text-align: center;
+  font-size: 18px;
+  margin-left: 5px;
+  margin-right: 5px;
+
+  &:active > a.navLink {
+    color: mixins.$jpro-orange;
   }
 
-  .logo {
-    height: 30px;
-    width: 40px;
-  }
-
-  .icon {
-    border-radius: 50%;
-    height: 30px;
-    margin-top: 9px;
-  }
-
-  button {
-    margin-right: 10px;
+  &:hover {
+    color: mixins.$jpro-orange;
+    transform: scale(1.1);
   }
 }
 
+.navtext {
+  width: 100%;
+  position: relative;
+  left: 50%;
+  transform: translatex(-50%);
+  text-align: center;
+}
+
+.containerFluid {
+  margin-right: 30px;
+}
+
+.logo {
+  height: 30px;
+  width: 40px;
+}
+
+.icon {
+  border-radius: 50%;
+  height: 30px;
+  margin-top: 9px;
+}
