@@ -3,6 +3,8 @@ import {Spinner} from "react-bootstrap";
 import Home from "../home";
 import Budgets from "./Budgets";
 import React from "react";
+import styles from "./BudgetContainer.module.scss";
+
 
 const BudgetContainer = ({user}) => {
   return <>
@@ -17,7 +19,7 @@ const BudgetContainer = ({user}) => {
       theme="colored"
     />
     <div style={!user.loaded ? {} : {display: "none"}}>
-      <div className="loadSpinUser d-flex align-items-center">
+      <div className={`${styles.loadSpinUser} d-flex align-items-center`}>
         <Spinner animation="border"/>
         <h3>Laster inn bruker</h3>
       </div>
