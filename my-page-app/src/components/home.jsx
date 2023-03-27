@@ -1,5 +1,5 @@
-import React from "react";
-import Moment from "moment";
+import React from 'react'
+import Moment from 'moment'
 
 function Home({ user }) {
   return (
@@ -7,12 +7,12 @@ function Home({ user }) {
       <header className="jumbotron">
         <h3>Hei, {user.givenName}</h3>
         <p>E-post: {user.email}</p>
-        <p style={user.startDate ? {} : { display: "none" }}>
+        <p style={user.startDate ? {} : { display: 'none' }}>
           Startdato: {Moment(user.startDate).format('DD.MM.YYYY')}
         </p>
       </header>
     </div>
-  );
+  )
 }
 
-export default Home;
+export default Home

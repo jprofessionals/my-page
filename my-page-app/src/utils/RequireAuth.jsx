@@ -1,49 +1,52 @@
-import {User} from "../User";
-import ApiService from "../services/api.service";
-import {toast} from "react-toastify";
+import { User } from '../User'
+import ApiService from '../services/api.service'
+import { toast } from 'react-toastify'
 
 function RequireAuth({ isAuthenticated, setAuthenticated, setUser, children }) {
-  if (!isAuthenticated){
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    document.querySelector("body")?.appendChild(script);
+  if (!isAuthenticated) {
+    const script = document.createElement('script')
+    script.src = 'https://accounts.google.com/gsi/client'
+    document.querySelector('body')?.appendChild(script)
     script.addEventListener('load', () => {
-      authenticate();
+      authenticate()
     })
-    return <div id="signInDiv"></div>;
+    return <div id="signInDiv"></div>
   } else {
-    return children;
+    return children
   }
 
   function authenticate() {
-    if (!window.google) return;
+    if (!window.google) return
 
     window.google.accounts.id.initialize({
       client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
       auto_select: true,
-      prompt_parent_id: "signInDiv",
-      callback: handleGoogleSignIn
-    });
+      prompt_parent_id: 'signInDiv',
+      callback: handleGoogleSignIn,
+    })
     window.google.accounts.id.prompt((notification) => {
       if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
         window.google.accounts.id.renderButton(
-          document.getElementById("signInDiv"),
+          document.getElementById('signInDiv'),
           {
-            type: "standard",
-            theme: "outline",
-            size: "medium",
-            text: "continue_with",
-            shape: "rectangular"
-          }
-        );
+            type: 'standard',
+            theme: 'outline',
+            size: 'medium',
+            text: 'continue_with',
+            shape: 'rectangular',
+          },
+        )
       }
-    });
+    })
   }
 
   function handleGoogleSignIn(response) {
     if (response.credential) {
-      setAuthenticated(true);
-      localStorage.setItem("user_token", JSON.stringify({'id_token': response.credential}));
+      setAuthenticated(true)
+      localStorage.setItem(
+        'user_token',
+        JSON.stringify({ id_token: response.credential }),
+      )
       ApiService.getUser().then(
         (response) => {
           setUser(
@@ -56,16 +59,16 @@ function RequireAuth({ isAuthenticated, setAuthenticated, setUser, children }) {
               response.data.startDate,
               response.data.admin,
               response.data.employeeNumber,
-              true
-            )
-          );
+              true,
+            ),
+          )
         },
         () => {
-          toast.error("Får ikke lastet inn bruker, prøv igjen senere");
-        }
+          toast.error('Får ikke lastet inn bruker, prøv igjen senere')
+        },
       )
     }
   }
 }
 
-export default RequireAuth;
+export default RequireAuth

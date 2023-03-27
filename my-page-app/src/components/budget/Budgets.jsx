@@ -1,38 +1,41 @@
-import React, {useEffect, useState} from "react";
-import ApiService from "../../services/api.service";
-import Budget from "./Budget";
-import {Accordion, Spinner} from "react-bootstrap";
-import {toast} from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useEffect, useState } from 'react'
+import ApiService from '../../services/api.service'
+import Budget from './Budget'
+import { Accordion, Spinner } from 'react-bootstrap'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-const Budgets = ({user = {}, useLogggedInUser = true}) => {
-  const [budgets, setBudgets] = useState([]);
-  const [isLoadingBudgets, setIsLoadingBudgets] = useState(false);
+const Budgets = ({ user = {}, useLogggedInUser = true }) => {
+  const [budgets, setBudgets] = useState([])
+  const [isLoadingBudgets, setIsLoadingBudgets] = useState(false)
 
   useEffect(() => {
-    refreshBudgets();
-  }, []);
+    refreshBudgets()
+  }, [])
 
   const refreshBudgets = async () => {
-    setIsLoadingBudgets(true);
-    const loadedBudgets = useLogggedInUser ? ApiService.getBudgets() : ApiService.getBudgetsForEmployee(user.employeeNumber);
+    setIsLoadingBudgets(true)
+    const loadedBudgets = useLogggedInUser
+      ? ApiService.getBudgets()
+      : ApiService.getBudgetsForEmployee(user.employeeNumber)
 
-    loadedBudgets.then((responseBudgets) => {
-      setBudgets(responseBudgets.data);
-      setIsLoadingBudgets(false);
-    })
+    loadedBudgets
+      .then((responseBudgets) => {
+        setBudgets(responseBudgets.data)
+        setIsLoadingBudgets(false)
+      })
       .catch((error) => {
-        setIsLoadingBudgets(false);
-        toast.error("Klarte ikke laste budsjettene, prøv igjen senere");
-      });
-  };
+        setIsLoadingBudgets(false)
+        toast.error('Klarte ikke laste budsjettene, prøv igjen senere')
+      })
+  }
 
   if (!budgets.length && !isLoadingBudgets) {
     return (
       <div className="budgets">
-        <div style={isLoadingBudgets ? {} : {display: "none"}}>
+        <div style={isLoadingBudgets ? {} : { display: 'none' }}>
           <div className="loadSpin d-flex align-items-center">
-            <Spinner animation="border" className="spinn"/>
+            <Spinner animation="border" className="spinn" />
             <h3>Laster inn dine budsjetter</h3>
           </div>
         </div>
@@ -43,17 +46,17 @@ const Budgets = ({user = {}, useLogggedInUser = true}) => {
           </p>
         </div>
       </div>
-    );
+    )
   } else {
     return (
       <div className="budgets">
-        <div style={isLoadingBudgets ? {} : {display: "none"}}>
+        <div style={isLoadingBudgets ? {} : { display: 'none' }}>
           <div className="loadSpin d-flex align-items-center ">
-            <Spinner animation="border"/>
+            <Spinner animation="border" />
             <h3>Laster inn dine budsjetter</h3>
           </div>
         </div>
-        <div style={!isLoadingBudgets ? {} : {display: "none"}}>
+        <div style={!isLoadingBudgets ? {} : { display: 'none' }}>
           <div className="headerBudgets">
             <h3 className="headerText">Dine budsjetter</h3>
           </div>
@@ -69,8 +72,8 @@ const Budgets = ({user = {}, useLogggedInUser = true}) => {
           </Accordion>
         </div>
       </div>
-    );
+    )
   }
-};
+}
 
-export default Budgets;
+export default Budgets

@@ -1,58 +1,58 @@
-import React, { useState } from "react";
-import ApiService from "../../services/api.service";
-import Moment from "moment";
-import { Card, Button, Spinner } from "react-bootstrap";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useState } from 'react'
+import ApiService from '../../services/api.service'
+import Moment from 'moment'
+import { Card, Button, Spinner } from 'react-bootstrap'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
-  const [description, setDescription] = useState("");
-  const [amountExMva, setAmountExMva] = useState(0);
-  const [date, setDate] = useState(Moment().format("YYYY-MM-DD"));
-  const [isLoadingPost, setIsLoadingPost] = useState(false);
+  const [description, setDescription] = useState('')
+  const [amountExMva, setAmountExMva] = useState(0)
+  const [date, setDate] = useState(Moment().format('YYYY-MM-DD'))
+  const [isLoadingPost, setIsLoadingPost] = useState(false)
 
   const isValid = () => {
-    return amountExMva > 0 && description && description !== "";
-  };
+    return amountExMva > 0 && description && description !== ''
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!isValid()) {
-      toast.error("Noen av verdiene var ikke gyldig, prøv igjen");
+      toast.error('Noen av verdiene var ikke gyldig, prøv igjen')
     } else {
-      setIsLoadingPost(true);
+      setIsLoadingPost(true)
       const budgetPost = {
         date: date,
         description: description,
         amountExMva: amountExMva,
         expense: true,
-      };
+      }
       ApiService.createBudgetPost(budgetPost, budget.id).then(
         (response) => {
-          refreshBudgets();
-          toggle();
-          setIsLoadingPost(false);
-          toast.success("Lagret " + description);
+          refreshBudgets()
+          toggle()
+          setIsLoadingPost(false)
+          toast.success('Lagret ' + description)
         },
         (error) => {
-          setIsLoadingPost(false);
-          toast.error("Fikk ikke opprettet " + description + ", prøv igjen");
-        }
-      );
+          setIsLoadingPost(false)
+          toast.error('Fikk ikke opprettet ' + description + ', prøv igjen')
+        },
+      )
     }
-  };
+  }
 
   const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
-  };
+    setDescription(e.target.value)
+  }
 
   const handleAmountChange = (e) => {
-    setAmountExMva(e.target.value);
-  };
+    setAmountExMva(e.target.value)
+  }
 
   const handleDateChange = (e) => {
-    setDate(e.target.value);
-  };
+    setDate(e.target.value)
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -96,11 +96,11 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
           <Button
             className="addPostBtn"
             type="btn submit"
-            style={isValid() ? {} : { display: "none" }}
+            style={isValid() ? {} : { display: 'none' }}
           >
             <div className="d-flex align-items-center">
               Legg til utlegget
-              <div style={isLoadingPost ? {} : { display: "none" }}>
+              <div style={isLoadingPost ? {} : { display: 'none' }}>
                 <Spinner animation="border" style={{ marginLeft: 15 }} />
               </div>
             </div>
@@ -108,7 +108,7 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
         </Card.Body>
       </Card>
     </form>
-  );
-};
+  )
+}
 
-export default CreateBudgetPost;
+export default CreateBudgetPost

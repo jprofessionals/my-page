@@ -1,9 +1,9 @@
 function RequireAdmin({ user, children }) {
-  if (user && user.admin){
-    return children;
+  if (user && user.admin) {
+    return children
   } else {
-    return "";
+    return ''
   }
 }
 
-export default RequireAdmin;
+export default RequireAdmin

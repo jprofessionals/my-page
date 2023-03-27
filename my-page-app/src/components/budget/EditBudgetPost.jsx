@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import ApiService from "../../services/api.service";
-import Moment from "moment";
-import { Card, Button, Spinner } from "react-bootstrap";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRemove, faCheck } from "@fortawesome/free-solid-svg-icons";
+import React, { useState } from 'react'
+import ApiService from '../../services/api.service'
+import Moment from 'moment'
+import { Card, Button, Spinner } from 'react-bootstrap'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRemove, faCheck } from '@fortawesome/free-solid-svg-icons'
 
 const EditBudgetPost = ({
   toggle,
@@ -15,53 +15,51 @@ const EditBudgetPost = ({
   setIsLoadingEditPost,
   isLoadingEditPost,
 }) => {
-  const [description, setDescription] = useState(post.description);
-  const [amountExMva, setAmountExMva] = useState(
-    post.amountExMva
-  );
-  const [date, setDate] = useState(Moment().format(post.date));
+  const [description, setDescription] = useState(post.description)
+  const [amountExMva, setAmountExMva] = useState(post.amountExMva)
+  const [date, setDate] = useState(Moment().format(post.date))
 
   const isValid = () => {
-    return amountExMva > 0 && description && description !== "";
-  };
+    return amountExMva > 0 && description && description !== ''
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!isValid()) {
-      toast.error("Noen av verdiene var ikke gyldig, prøv igjen");
+      toast.error('Noen av verdiene var ikke gyldig, prøv igjen')
     } else {
-      setIsLoadingEditPost(true);
+      setIsLoadingEditPost(true)
       const budgetPost = {
         date: date,
         description: description,
         amountExMva: amountExMva,
-      };
+      }
       ApiService.editBudgetPost(post.id, budgetPost).then(
         (response) => {
-          refreshBudgets();
-          toggle();
-          setIsLoadingEditPost(false);
-          toast.success("Lagret " + description);
+          refreshBudgets()
+          toggle()
+          setIsLoadingEditPost(false)
+          toast.success('Lagret ' + description)
         },
         (error) => {
-          setIsLoadingEditPost(false);
-          toast.error("Fikk ikke oppdatert " + description + ", prøv igjen");
-        }
-      );
+          setIsLoadingEditPost(false)
+          toast.error('Fikk ikke oppdatert ' + description + ', prøv igjen')
+        },
+      )
     }
-  };
+  }
 
   const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
-  };
+    setDescription(e.target.value)
+  }
 
   const handleAmountChange = (e) => {
-    setAmountExMva(e.target.value);
-  };
+    setAmountExMva(e.target.value)
+  }
 
   const handleDateChange = (e) => {
-    setDate(e.target.value);
-  };
+    setDate(e.target.value)
+  }
 
   return (
     <Card className="inputCard editPost">
@@ -78,28 +76,28 @@ const EditBudgetPost = ({
           <Button
             className="leftBtn"
             type="btn submit"
-            style={isValid() ? {} : { display: "none" }}
+            style={isValid() ? {} : { display: 'none' }}
             onClick={handleSubmit}
             title="Lagre Post"
           >
-            <div style={isLoadingEditPost ? { display: "none" } : {}}>
+            <div style={isLoadingEditPost ? { display: 'none' } : {}}>
               <FontAwesomeIcon icon={faCheck} />
             </div>
-            <div style={isLoadingEditPost ? {} : { display: "none" }}>
+            <div style={isLoadingEditPost ? {} : { display: 'none' }}>
               <Spinner animation="border" size="sm" />
             </div>
           </Button>
-          <div style={isLoadingEditPost ? { display: "none" } : {}}>
+          <div style={isLoadingEditPost ? { display: 'none' } : {}}>
             <Button
               className="canselEditButton"
               type="btn"
               title="Avbryt redigering"
               onClick={toggle}
             >
-              <div style={isLoadingEditPost ? { display: "none" } : {}}>
+              <div style={isLoadingEditPost ? { display: 'none' } : {}}>
                 <FontAwesomeIcon icon={faRemove} />
               </div>
-              <div style={isLoadingEditPost ? {} : { display: "none" }}>
+              <div style={isLoadingEditPost ? {} : { display: 'none' }}>
                 <Spinner animation="border" size="sm" />
               </div>
             </Button>
@@ -132,7 +130,7 @@ const EditBudgetPost = ({
         </ul>
       </Card.Body>
     </Card>
-  );
-};
+  )
+}
 
-export default EditBudgetPost;
+export default EditBudgetPost

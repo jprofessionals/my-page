@@ -1,8 +1,8 @@
-import { Modal } from "react-bootstrap";
-import ApiService from "../../services/api.service";
-import React from "react";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Modal } from 'react-bootstrap'
+import ApiService from '../../services/api.service'
+import React from 'react'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const DeleteBudgetPostModal = ({
   isDeleteModalOpen,
@@ -12,20 +12,20 @@ const DeleteBudgetPostModal = ({
   setIsLoadingDeletePost,
 }) => {
   const handleDeletePost = (e) => {
-    setIsLoadingDeletePost(true);
-    e.preventDefault();
+    setIsLoadingDeletePost(true)
+    e.preventDefault()
     ApiService.deleteBudgetPost(post.id).then(
       (response) => {
-        refreshBudgets();
-        setIsLoadingDeletePost(false);
-        toast.success("Slettet " + post.description);
+        refreshBudgets()
+        setIsLoadingDeletePost(false)
+        toast.success('Slettet ' + post.description)
       },
       (error) => {
-        setIsLoadingDeletePost(false);
-        toast.error("Får ikke slettet posten, prøv igjen senere");
-      }
-    );
-  };
+        setIsLoadingDeletePost(false)
+        toast.error('Får ikke slettet posten, prøv igjen senere')
+      },
+    )
+  }
   return (
     <div>
       <Modal
@@ -57,7 +57,7 @@ const DeleteBudgetPostModal = ({
         </div>
       </Modal>
     </div>
-  );
-};
+  )
+}
 
-export default DeleteBudgetPostModal;
+export default DeleteBudgetPostModal

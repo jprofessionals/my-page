@@ -1,4 +1,4 @@
-@use "../../styles/mixins";
+@use '../../styles/mixins';
 
 .Toastify__toast-theme--colored.Toastify__toast--success {
   background-color: mixins.$toast-success;
