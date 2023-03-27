@@ -1,6 +1,6 @@
 
 import Post from "./Post";
-import "./Budget.module.scss";
+import styles from "./Budget.module.scss";
 import CreateBudgetPost from "./CreateBudgetPost";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus, faRemove} from "@fortawesome/free-solid-svg-icons";
@@ -39,7 +39,7 @@ const  Budget = ({ budget, refreshBudgets, user }) => {
   return (
     <Accordion.Item key={budget.id} eventKey={budget.id}>
       <Accordion.Header title={activeEventKey === budget.id ? "Lukk" : "Åpne"}>
-        <ul className="initialBudgetInformation">
+        <ul className={styles.initialBudgetInformation}>
           <li>
             <span title="Type budsjett">{budget.budgetType.name}</span>
           </li>
