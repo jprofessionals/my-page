@@ -6,6 +6,13 @@ import React from 'react'
 import styles from './BudgetContainer.module.scss'
 
 const BudgetContainer = ({ user }) => {
+  if (!user)
+    return (
+      <div className={`${styles.loadSpinUser} d-flex align-items-center`}>
+        <Spinner animation="border" />
+        <h3>Laster inn bruker</h3>
+      </div>
+    )
   return (
     <>
       <ToastContainer
@@ -18,16 +25,8 @@ const BudgetContainer = ({ user }) => {
         progress={undefined}
         theme="colored"
       />
-      <div style={!user.loaded ? {} : { display: 'none' }}>
-        <div className={`${styles.loadSpinUser} d-flex align-items-center`}>
-          <Spinner animation="border" />
-          <h3>Laster inn bruker</h3>
-        </div>
-      </div>
-      <div style={!user.loaded ? { display: 'none' } : {}}>
-        <Home user={user} />
-        {!user.loaded ? null : <Budgets user={user}></Budgets>}
-      </div>
+      <Home user={user} />
+      <Budgets user={user} />
     </>
   )
 }
