@@ -6,11 +6,11 @@ import { faSignOut } from '@fortawesome/free-solid-svg-icons'
 import RequireAdmin from '../../utils/RequireAdmin'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useAuthContext } from '@/context/auth'
+import { useAuthContext } from '@/providers/AuthProvider'
 
-const NavBar = ({ logout }) => {
-  const [isAuthenticated, setIsAuthenticated, user, setUser] = useAuthContext()
-
+const NavBar = () => {
+  const { user } = useAuthContext()
+  const logout = () => true
   return (
     <Navbar
       className={`${styles.navbar} navbar`}
@@ -52,37 +52,36 @@ const NavBar = ({ logout }) => {
           >
             Intranett
           </Nav.Link>
-          <Nav.Link
-            className={`${styles.navLink} ms-auto`}
-            style={!user.loaded ? { display: 'none' } : {}}
-          >
-            <FontAwesomeIcon
-              icon={faSignOut}
-              onClick={() => {
-                logout()
-              }}
-              title="Logg ut"
-            />
-          </Nav.Link>
-          <Nav.Link
-            className="smallNav"
-            style={!user.loaded ? { display: 'none' } : {}}
-          >
-            <FontAwesomeIcon
-              icon={faSignOut}
-              onClick={() => {
-                logout()
-              }}
-              title="Logg ut"
-            />
-          </Nav.Link>
-          <Nav.Item style={!user.loaded ? { display: 'none' } : {}}>
-            <img
-              className={`${styles.icon} icon`}
-              src={user.icon}
-              alt="Icon"
-            ></img>
-          </Nav.Item>
+
+          {user ? (
+            <>
+              <Nav.Link className={`${styles.navLink} ms-auto`}>
+                <FontAwesomeIcon
+                  icon={faSignOut}
+                  onClick={() => {
+                    logout()
+                  }}
+                  title="Logg ut"
+                />
+              </Nav.Link>
+              <Nav.Link className="smallNav">
+                <FontAwesomeIcon
+                  icon={faSignOut}
+                  onClick={() => {
+                    logout()
+                  }}
+                  title="Logg ut"
+                />
+              </Nav.Link>
+              <Nav.Item>
+                <img
+                  className={`${styles.icon} icon`}
+                  src={user.icon}
+                  alt="Icon"
+                ></img>
+              </Nav.Item>
+            </>
+          ) : null}
         </Nav>
       </Navbar.Collapse>
     </Navbar>
