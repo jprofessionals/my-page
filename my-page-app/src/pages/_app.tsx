@@ -12,8 +12,8 @@ export default function App({Component, pageProps: {...pageProps}}: AppProps) {
             <Head>
                 <title>Min side</title>
             </Head>
-            <NavBar logout={""} user={""}/>
             <AuthProvider>
+                <NavBar logout={""}/>
                 <Component {...pageProps} />
             </AuthProvider>
         </>
