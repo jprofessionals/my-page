@@ -6,8 +6,11 @@ import { faSignOut } from "@fortawesome/free-solid-svg-icons";
 import RequireAdmin from "../../utils/RequireAdmin";
 import Link from "next/link";
 import Image from "next/image";
+import {useAuthContext} from "@/context/auth";
 
-const NavBar = ({ logout, user }) => {
+const NavBar = ({ logout }) => {
+
+  const [isAuthenticated, setIsAuthenticated, user, setUser] = useAuthContext();
 
   return (
     <Navbar className={`${styles.navbar} navbar`} collapseOnSelect expand="sm" variant="dark">
@@ -15,8 +18,8 @@ const NavBar = ({ logout, user }) => {
         <Image className={`${styles.logo} logo`} src={jPro_logo_transparent} alt="jPro" />
       </Navbar.Brand>
       <Navbar.Toggle className="button" aria-controls="responsive-navbar-nav" />
-      <Navbar.Collapse className={`${styles.navtext}`} id="responsive-navbar-nav">
-        <Nav className={`${styles.containerFluid}`}>
+      <Navbar.Collapse className={`${styles.navtext} navtext`} id="responsive-navbar-nav">
+        <Nav className={`${styles.containerFluid} container-fluid`}>
           <Link className={`${styles.navLink} nav-link`} href="/budsjett">Budsjett</Link>
           <Link className={`${styles.navLink} nav-link`} href="/kalkulator">Lønnskalkulator</Link>
           <Link className={`${styles.navLink} nav-link`} href="/bidra">Bidra til Min side</Link>
@@ -26,7 +29,7 @@ const NavBar = ({ logout, user }) => {
           <Nav.Link className={`${styles.navLink}`} as="a" href="https://intranet.jpro.no">
             Intranett
           </Nav.Link>
-          <Nav.Link className="ms-auto" style={!user.loaded ? {display: "none"} : {}}>
+          <Nav.Link className={`${styles.navLink} ms-auto`} style={!user.loaded ? {display: "none"} : {}}>
             <FontAwesomeIcon icon={faSignOut}
                              onClick={() => {
                                logout();
