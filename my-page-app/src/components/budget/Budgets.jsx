@@ -6,21 +6,21 @@ import {toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Budgets = ({user = {}, useLogggedInUser = true}) => {
-    const [budgets, setBudgets] = useState([]);
-    const [isLoadingBudgets, setIsLoadingBudgets] = useState(false);
+  const [budgets, setBudgets] = useState([]);
+  const [isLoadingBudgets, setIsLoadingBudgets] = useState(false);
 
-    useEffect(() => {
-        refreshBudgets();
-    }, []);
+  useEffect(() => {
+    refreshBudgets();
+  }, []);
 
-    const refreshBudgets = async () => {
-        setIsLoadingBudgets(true);
-        const loadedBudgets = useLogggedInUser ? ApiService.getBudgets() : ApiService.getBudgetsForEmployee(user.employeeNumber);
+  const refreshBudgets = async () => {
+    setIsLoadingBudgets(true);
+    const loadedBudgets = useLogggedInUser ? ApiService.getBudgets() : ApiService.getBudgetsForEmployee(user.employeeNumber);
 
-        loadedBudgets.then((responseBudgets) => {
-        setBudgets(responseBudgets.data);
-        setIsLoadingBudgets(false);
-      })
+    loadedBudgets.then((responseBudgets) => {
+      setBudgets(responseBudgets.data);
+      setIsLoadingBudgets(false);
+    })
       .catch((error) => {
         setIsLoadingBudgets(false);
         toast.error("Klarte ikke laste budsjettene, prøv igjen senere");
@@ -30,9 +30,9 @@ const Budgets = ({user = {}, useLogggedInUser = true}) => {
   if (!budgets.length && !isLoadingBudgets) {
     return (
       <div className="budgets">
-        <div style={isLoadingBudgets ? {} : { display: "none" }}>
+        <div style={isLoadingBudgets ? {} : {display: "none"}}>
           <div className="loadSpin d-flex align-items-center">
-            <Spinner animation="border" className="spinn" />
+            <Spinner animation="border" className="spinn"/>
             <h3>Laster inn dine budsjetter</h3>
           </div>
         </div>
@@ -47,26 +47,26 @@ const Budgets = ({user = {}, useLogggedInUser = true}) => {
   } else {
     return (
       <div className="budgets">
-        <div style={isLoadingBudgets ? {} : { display: "none" }}>
+        <div style={isLoadingBudgets ? {} : {display: "none"}}>
           <div className="loadSpin d-flex align-items-center ">
-            <Spinner animation="border" />
+            <Spinner animation="border"/>
             <h3>Laster inn dine budsjetter</h3>
           </div>
         </div>
-        <div style={!isLoadingBudgets ? {} : { display: "none" }}>
+        <div style={!isLoadingBudgets ? {} : {display: "none"}}>
           <div className="headerBudgets">
             <h3 className="headerText">Dine budsjetter</h3>
           </div>
-              <Accordion defaultActiveKey="0">
-                {budgets.map((budget) => (
-                  <Budget
-                    key={budget.id}
-                    user={user.user}
-                    budget={budget}
-                    refreshBudgets={refreshBudgets}
-                  />
-                ))}
-              </Accordion>
+          <Accordion defaultActiveKey="0">
+            {budgets.map((budget) => (
+              <Budget
+                key={budget.id}
+                user={user.user}
+                budget={budget}
+                refreshBudgets={refreshBudgets}
+              />
+            ))}
+          </Accordion>
         </div>
       </div>
     );
