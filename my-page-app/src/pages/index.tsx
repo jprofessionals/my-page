@@ -1,16 +1,22 @@
 import { Inter } from 'next/font/google'
-import { useAuthContext } from '@/context/auth'
 import RequireAuth from '../components/auth/RequireAuth'
 import BudgetContainer from '../components/budget/BudgetContainer'
+import Head from 'next/head'
+import { useAuthContext } from '@/providers/AuthProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
-  const [isAuthenticated, setIsAuthenticated, user, setUser] = useAuthContext()
+  const { user } = useAuthContext()
 
   return (
-    <RequireAuth>
-      <BudgetContainer user={user} />
-    </RequireAuth>
+    <>
+      <Head>
+        <title>Min side</title>
+      </Head>
+      <RequireAuth>
+        <BudgetContainer user={user} />
+      </RequireAuth>
+    </>
   )
 }
