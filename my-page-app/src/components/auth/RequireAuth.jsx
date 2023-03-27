@@ -1,12 +1,11 @@
 import React, { useCallback } from 'react'
 import ApiService from '../../services/api.service'
-import { User } from '../../User'
 import { toast } from 'react-toastify'
 import Script from 'next/script'
-import { useAuthContext } from '../../context/auth'
+import { useAuthContext } from '../../providers/AuthProvider'
 
 function RequireAuth({ children }) {
-  const [isAuthenticated, setIsAuthenticated, user, setUser] = useAuthContext()
+  const { isAuthenticated, setIsAuthenticated, setUser } = useAuthContext()
 
   const authenticate = () => {
     window?.google?.accounts.id.initialize({
@@ -42,19 +41,10 @@ function RequireAuth({ children }) {
       )
       ApiService.getUser().then(
         (response) => {
-          setUser(
-            new User(
-              response.data.name,
-              response.data.email,
-              response.data.givenName,
-              response.data.familyName,
-              response.data.icon,
-              response.data.startDate,
-              response.data.admin,
-              response.data.employeeNumber,
-              true,
-            ),
-          )
+          setUser({
+            ...response.data,
+            loaded: true,
+          })
         },
         () => {
           toast.error('Får ikke lastet inn bruker, prøv igjen senere')
