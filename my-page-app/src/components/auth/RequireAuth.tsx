@@ -1,10 +1,10 @@
-import React, { useCallback } from 'react'
+import React, { PropsWithChildren } from 'react'
 import ApiService from '../../services/api.service'
 import { toast } from 'react-toastify'
 import Script from 'next/script'
-import { useAuthContext } from '../../providers/AuthProvider'
+import { useAuthContext } from '@/providers/AuthProvider'
 
-function RequireAuth({ children }) {
+function RequireAuth({ children }: PropsWithChildren) {
   const { isAuthenticated, setIsAuthenticated, setUser } = useAuthContext()
 
   const authenticate = () => {
