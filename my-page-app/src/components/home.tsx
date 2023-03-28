@@ -1,7 +1,9 @@
 import React from 'react'
 import Moment from 'moment'
+import { useAuthContext } from '@/providers/AuthProvider'
 
-function Home({ user }) {
+function Home() {
+  const { user } = useAuthContext()
   return (
     <div style={{ marginTop: 20, marginLeft: -5 }} className="container">
       <header className="jumbotron">

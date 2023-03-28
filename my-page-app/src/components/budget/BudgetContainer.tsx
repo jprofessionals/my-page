@@ -28,7 +28,7 @@ const BudgetContainer = () => {
         progress={undefined}
         theme="colored"
       />
-      <Home user={user} />
+      <Home />
       <Budgets user={user} />
     </>
   )
