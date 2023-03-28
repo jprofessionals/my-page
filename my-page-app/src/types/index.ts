@@ -7,5 +7,10 @@ export type User = {
   startDate: string
   admin: string
   employeeNumber: string
+  budgets?: any[]
   loaded: boolean
+}
+
+export type Budget = {
+  [key: string]: any
 }
