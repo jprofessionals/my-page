@@ -4,20 +4,26 @@ import Moment from 'moment'
 import { Card, Button, Spinner } from 'react-bootstrap'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { Budget } from '@/types'
+import Loading from '@/components/Loading'
 
-const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
+type Props = {
+  budget: Budget
+  refreshBudgets: Function
+  toggle: Function
+}
+
+const CreateBudgetPost = ({ budget, refreshBudgets, toggle }: Props) => {
   const [description, setDescription] = useState('')
   const [amountExMva, setAmountExMva] = useState(0)
   const [date, setDate] = useState(Moment().format('YYYY-MM-DD'))
   const [isLoadingPost, setIsLoadingPost] = useState(false)
 
-  const isValid = () => {
-    return amountExMva > 0 && description && description !== ''
-  }
+  const isValid = amountExMva > 0 && description && description !== ''
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault()
-    if (!isValid()) {
+    if (!isValid) {
       toast.error('Noen av verdiene var ikke gyldig, prøv igjen')
     } else {
       setIsLoadingPost(true)
@@ -42,15 +48,15 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
     }
   }
 
-  const handleDescriptionChange = (e) => {
+  const handleDescriptionChange = (e: any) => {
     setDescription(e.target.value)
   }
 
-  const handleAmountChange = (e) => {
+  const handleAmountChange = (e: any) => {
     setAmountExMva(e.target.value)
   }
 
-  const handleDateChange = (e) => {
+  const handleDateChange = (e: any) => {
     setDate(e.target.value)
   }
 
@@ -89,22 +95,22 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }) => {
                 name="date"
                 onChange={handleDateChange}
                 value={date}
-                format="DD.MM.YYYY"
+                // format="DD.MM.YYYY"
               ></input>
             </li>
           </ul>
-          <Button
-            className="addPostBtn"
-            type="btn submit"
-            style={isValid() ? {} : { display: 'none' }}
-          >
-            <div className="d-flex align-items-center">
-              Legg til utlegget
-              <div style={isLoadingPost ? {} : { display: 'none' }}>
-                <Spinner animation="border" style={{ marginLeft: 15 }} />
+          {isValid ? (
+            <Button
+              className="addPostBtn"
+              type="submit"
+              style={isValid ? {} : { display: 'none' }}
+            >
+              <div className="d-flex align-items-center">
+                Legg til utlegget
+                <Loading isLoading={isLoadingPost} />
               </div>
-            </div>
-          </Button>
+            </Button>
+          ) : null}
         </Card.Body>
       </Card>
     </form>

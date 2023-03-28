@@ -3,6 +3,13 @@ import ApiService from '../../services/api.service'
 import React from 'react'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+type Props = {
+  isDeleteModalOpen: boolean
+  toggler: Function
+  refreshBudgets: Function
+  post: any
+  setIsLoadingDeletePost: Function
+}
 
 const DeleteBudgetPostModal = ({
   isDeleteModalOpen,
@@ -10,8 +17,8 @@ const DeleteBudgetPostModal = ({
   refreshBudgets,
   post,
   setIsLoadingDeletePost,
-}) => {
-  const handleDeletePost = (e) => {
+}: Props) => {
+  const handleDeletePost = (e: any) => {
     setIsLoadingDeletePost(true)
     e.preventDefault()
     ApiService.deleteBudgetPost(post.id).then(
@@ -39,16 +46,16 @@ const DeleteBudgetPostModal = ({
             <p>Er du sikker på at du vil slette {post.description}?</p>
             <div className="modalBtns">
               <button
-                type="button btn"
+                type="button"
                 className="deletebtn btn"
                 onClick={handleDeletePost}
               >
                 Slett post
               </button>
               <button
-                type="button btn"
+                type="button"
                 className="cancelbtn btn"
-                onClick={toggler}
+                onClick={() => toggler()}
               >
                 Avbryt
               </button>

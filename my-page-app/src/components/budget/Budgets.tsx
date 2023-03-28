@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import ApiService from '../../services/api.service'
 import Budget from './Budget'
-import { Accordion, Spinner } from 'react-bootstrap'
+import { Accordion } from 'react-bootstrap'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { User } from '@/types'
+import Loading from '@/components/Loading'
 
-const Budgets = ({ user = {}, useLogggedInUser = true }) => {
-  const [budgets, setBudgets] = useState([])
+type Props = {
+  useLoggedInUser?: boolean
+  user: User
+}
+
+const Budgets = ({ useLoggedInUser = true, user }: Props) => {
+  const [budgets, setBudgets] = useState<any[]>([])
   const [isLoadingBudgets, setIsLoadingBudgets] = useState(false)
 
   useEffect(() => {
@@ -15,7 +22,7 @@ const Budgets = ({ user = {}, useLogggedInUser = true }) => {
 
   const refreshBudgets = async () => {
     setIsLoadingBudgets(true)
-    const loadedBudgets = useLogggedInUser
+    const loadedBudgets = useLoggedInUser
       ? ApiService.getBudgets()
       : ApiService.getBudgetsForEmployee(user.employeeNumber)
 
@@ -33,30 +40,19 @@ const Budgets = ({ user = {}, useLogggedInUser = true }) => {
   if (!budgets.length && !isLoadingBudgets) {
     return (
       <div className="budgets">
-        <div style={isLoadingBudgets ? {} : { display: 'none' }}>
-          <div className="loadSpin d-flex align-items-center">
-            <Spinner animation="border" className="spinn" />
-            <h3>Laster inn dine budsjetter</h3>
-          </div>
-        </div>
-        <div>
-          <h3>Du har ingen budsjetter</h3>
-          <p className="headerText">
-            Kontakt ledelsen for å få opprettet budsjettene dine
-          </p>
-        </div>
+        <h3>Du har ingen budsjetter</h3>
+        <p className="headerText">
+          Kontakt ledelsen for å få opprettet budsjettene dine
+        </p>
       </div>
     )
   } else {
     return (
       <div className="budgets">
-        <div style={isLoadingBudgets ? {} : { display: 'none' }}>
-          <div className="loadSpin d-flex align-items-center ">
-            <Spinner animation="border" />
-            <h3>Laster inn dine budsjetter</h3>
-          </div>
-        </div>
-        <div style={!isLoadingBudgets ? {} : { display: 'none' }}>
+        <Loading
+          isLoading={isLoadingBudgets}
+          loadingText="Laster inn dine budsjetter"
+        >
           <div className="headerBudgets">
             <h3 className="headerText">Dine budsjetter</h3>
           </div>
@@ -64,13 +60,12 @@ const Budgets = ({ user = {}, useLogggedInUser = true }) => {
             {budgets.map((budget) => (
               <Budget
                 key={budget.id}
-                user={user.user}
                 budget={budget}
                 refreshBudgets={refreshBudgets}
               />
             ))}
           </Accordion>
-        </div>
+        </Loading>
       </div>
     )
   }

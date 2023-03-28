@@ -80,55 +80,55 @@ function Kalkulator() {
     return BeregnetGarantilonn() > SumBetaltTid()
   }
 
-  const handleGarantilonnChange = (e) => {
+  const handleGarantilonnChange = (e: any) => {
     setGarantilønn(e.target.value)
   }
 
-  const handleGrunnbelopChange = (e) => {
+  const handleGrunnbelopChange = (e: any) => {
     setGrunnbelop(e.target.value)
   }
 
-  const handleAntallTimerMndChange = (e) => {
+  const handleAntallTimerMndChange = (e: any) => {
     setAntallTimerMnd(e.target.value)
   }
 
-  const handleRestKompetanseBudsjettChange = (e) => {
+  const handleRestKompetanseBudsjettChange = (e: any) => {
     setRestKompetanseBudsjett(e.target.value)
   }
 
-  const handleTimeprisProsjektChange = (e) => {
+  const handleTimeprisProsjektChange = (e: any) => {
     setTimeprisProsjekt(e.target.value)
   }
 
-  const handleTimeprisKompetanseChange = (e) => {
+  const handleTimeprisKompetanseChange = (e: any) => {
     setTimeprisKompetanse(e.target.value)
   }
 
-  const handleAntallTimerFakturertChange = (e) => {
+  const handleAntallTimerFakturertChange = (e: any) => {
     setAntallTimerFakturert(e.target.value)
   }
 
-  const handleAntallTimerKompetanseChange = (e) => {
+  const handleAntallTimerKompetanseChange = (e: any) => {
     setAntallTimerKompetanse(e.target.value)
   }
 
-  const handleAntallTimerInerntidChange = (e) => {
+  const handleAntallTimerInerntidChange = (e: any) => {
     setAntallTimerInterntid(e.target.value)
   }
 
-  const handleAntallTimerInterntidMedKomChange = (e) => {
+  const handleAntallTimerInterntidMedKomChange = (e: any) => {
     setAntallTimerInterntidMedKom(e.target.value)
   }
 
-  const handleAntallTimerFerieChange = (e) => {
+  const handleAntallTimerFerieChange = (e: any) => {
     setAntallTimerFerie(e.target.value)
   }
 
-  const handleAntallTimerSykChange = (e) => {
+  const handleAntallTimerSykChange = (e: any) => {
     setAntallTimerSyk(e.target.value)
   }
 
-  const handleBonusChange = (e) => {
+  const handleBonusChange = (e: any) => {
     setBonus(e.target.value)
   }
 

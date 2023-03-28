@@ -42,7 +42,7 @@ const NavBar = () => {
           <Link className={`${styles.navLink} nav-link`} href="/bidra">
             Bidra til Min side
           </Link>
-          <RequireAdmin user={user}>
+          <RequireAdmin>
             <Link className={`${styles.navLink} nav-link`} href="/admin">
               Admin
             </Link>
@@ -76,11 +76,13 @@ const NavBar = () => {
                 />
               </Nav.Link>
               <Nav.Item>
-                <img
+                <Image
                   className={`${styles.icon} icon`}
                   src={user.icon}
                   alt="Icon"
-                ></img>
+                  width="40"
+                  height="40"
+                ></Image>
               </Nav.Item>
             </>
           ) : null}

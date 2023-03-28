@@ -4,12 +4,13 @@ import apiService from '../../services/api.service'
 import { toast } from 'react-toastify'
 import { Spinner, Table } from 'react-bootstrap'
 import Budgets from '../budget/Budgets'
+import { Budget, User } from '@/types'
 
 function Admin() {
-  const [users, setUsers] = useState([])
-  const [budgetTypes, setBudgetTypes] = useState([])
+  const [users, setUsers] = useState<User[]>([])
+  const [budgetTypes, setBudgetTypes] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [expandedUser, setExpandedUser] = useState(null)
+  const [expandedUser, setExpandedUser] = useState<User | null>(null)
   const [filterValue, setFilterValue] = useState('')
 
   useEffect(() => {
@@ -17,11 +18,11 @@ function Admin() {
     // eslint-disable-next-line
   }, [])
 
-  const extractListOfBudgets = (users) => {
+  const extractListOfBudgets = (users: User[]) => {
     if (users.length > 0) {
-      const extractedBudgetTypes = []
+      const extractedBudgetTypes: any[] = []
       users.map((user) =>
-        user.budgets.forEach((budget) => {
+        user?.budgets?.forEach((budget) => {
           if (!budgetTypeListContains(extractedBudgetTypes, budget)) {
             budget.budgetType.balanceIsHours = false
             extractedBudgetTypes.push(budget.budgetType)
@@ -38,14 +39,20 @@ function Admin() {
     }
   }
 
-  const budgetTypeListContains = (extractedBudgetTypes, newBudget) => {
+  const budgetTypeListContains = (
+    extractedBudgetTypes: any,
+    newBudget: Budget,
+  ) => {
     return extractedBudgetTypes.some(
-      (budgetType) => budgetType.id === newBudget.budgetType.id,
+      (budgetType: any) => budgetType.id === newBudget.budgetType.id,
     )
   }
 
-  const getBudgetBalanceForType = (budgets, type) => {
-    var foundBudget = budgets.find((budget) => budget.budgetType.id === type.id)
+  const getBudgetBalanceForType = (budgets: Budget[], type: any) => {
+    const foundBudget = budgets.find(
+      (budget) => budget.budgetType.id === type.id,
+    )
+    if (!foundBudget) return null
     if (type.balanceIsHours) {
       return budgetBalanceHoursCurrentYear(foundBudget)
     } else {
@@ -53,7 +60,7 @@ function Admin() {
     }
   }
 
-  const budgetBalance = (budget) => {
+  const budgetBalance = (budget: Budget) => {
     if (budget) {
       return budget.balance.toLocaleString('no-NO', {
         maximumFractionDigits: 2,
@@ -65,7 +72,7 @@ function Admin() {
     }
   }
 
-  const budgetBalanceHours = (budget) => {
+  const budgetBalanceHours = (budget: Budget) => {
     if (budget) {
       return budget.sumHours + (budget.sumHours === 1 ? ' time' : ' timer')
     } else {
@@ -73,7 +80,7 @@ function Admin() {
     }
   }
 
-  const budgetBalanceHoursCurrentYear = (budget) => {
+  const budgetBalanceHoursCurrentYear = (budget: Budget) => {
     if (budget) {
       return (
         budget.sumHoursCurrentYear +
@@ -84,7 +91,7 @@ function Admin() {
     }
   }
 
-  const handleExpandUser = (user, event) => {
+  const handleExpandUser = (user: User, event: any) => {
     // Check if the clicked target is not a child of the expanded area
     const expandedArea = document.querySelector(
       `[data-expanded-user="${user.email}"]`,
@@ -179,7 +186,7 @@ function Admin() {
                           onClick={(event) => handleExpandUser(userRow, event)}
                         >
                           {getBudgetBalanceForType(
-                            userRow.budgets,
+                            userRow.budgets!,
                             budgetColumn,
                           )}
                         </td>
@@ -195,7 +202,7 @@ function Admin() {
                         <td colSpan={budgetTypes.length + 2}>
                           {' '}
                           {/* +2 for brukere and expand button columns */}
-                          {<Budgets user={userRow} useLogggedInUser={false} />}
+                          {<Budgets user={userRow} useLoggedInUser={false} />}
                         </td>
                       </tr>
                     )}

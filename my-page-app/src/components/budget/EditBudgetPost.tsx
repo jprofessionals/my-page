@@ -6,6 +6,17 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRemove, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { Budget } from '@/types'
+
+type Props = {
+  isDeleteModalOpen?: boolean
+  toggle: Function
+  refreshBudgets: Function
+  post: any
+  budget: Budget
+  setIsLoadingEditPost: Function
+  isLoadingEditPost: boolean
+}
 
 const EditBudgetPost = ({
   toggle,
@@ -14,7 +25,7 @@ const EditBudgetPost = ({
   post,
   setIsLoadingEditPost,
   isLoadingEditPost,
-}) => {
+}: Props) => {
   const [description, setDescription] = useState(post.description)
   const [amountExMva, setAmountExMva] = useState(post.amountExMva)
   const [date, setDate] = useState(Moment().format(post.date))
@@ -23,7 +34,7 @@ const EditBudgetPost = ({
     return amountExMva > 0 && description && description !== ''
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault()
     if (!isValid()) {
       toast.error('Noen av verdiene var ikke gyldig, prøv igjen')
@@ -49,15 +60,15 @@ const EditBudgetPost = ({
     }
   }
 
-  const handleDescriptionChange = (e) => {
+  const handleDescriptionChange = (e: any) => {
     setDescription(e.target.value)
   }
 
-  const handleAmountChange = (e) => {
+  const handleAmountChange = (e: any) => {
     setAmountExMva(e.target.value)
   }
 
-  const handleDateChange = (e) => {
+  const handleDateChange = (e: any) => {
     setDate(e.target.value)
   }
 
@@ -75,7 +86,7 @@ const EditBudgetPost = ({
         <div className="rightBtnsDiv">
           <Button
             className="leftBtn"
-            type="btn submit"
+            type="submit"
             style={isValid() ? {} : { display: 'none' }}
             onClick={handleSubmit}
             title="Lagre Post"
@@ -90,9 +101,9 @@ const EditBudgetPost = ({
           <div style={isLoadingEditPost ? { display: 'none' } : {}}>
             <Button
               className="canselEditButton"
-              type="btn"
+              type="button"
               title="Avbryt redigering"
-              onClick={toggle}
+              onClick={() => toggle()}
             >
               <div style={isLoadingEditPost ? { display: 'none' } : {}}>
                 <FontAwesomeIcon icon={faRemove} />

@@ -5,8 +5,14 @@ import DeleteBudgetPostModal from './DeleteBudgetPostModal'
 import EditBudgetPost from './EditBudgetPost'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
+import { Budget } from '@/types'
 
-const Post = ({ refreshBudgets, post, budget }) => {
+type Props = {
+  budget: Budget
+  refreshBudgets: Function
+  post: any
+}
+const Post = ({ refreshBudgets, post, budget }: Props) => {
   const [isLoadingEditPost, setIsLoadingEditPost] = useState(false)
   const [isLoadingDeletePost, setIsLoadingDeletePost] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -51,7 +57,7 @@ const Post = ({ refreshBudgets, post, budget }) => {
                 >
                   <Button
                     className="leftBtn"
-                    type="btn"
+                    type="button"
                     title="Rediger post"
                     onClick={togglerEdit}
                   >
@@ -72,13 +78,13 @@ const Post = ({ refreshBudgets, post, budget }) => {
                 >
                   <Button
                     className="removePostBtn"
-                    type="btn"
+                    type="button"
                     title="Slett post"
                     onClick={toggler}
                   >
                     <DeleteBudgetPostModal
                       isDeleteModalOpen={isDeleteModalOpen}
-                      togglerDelete={toggler}
+                      toggler={toggler}
                       refreshBudgets={refreshBudgets}
                       post={post}
                       setIsLoadingDeletePost={setIsLoadingDeletePost}

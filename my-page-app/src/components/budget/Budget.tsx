@@ -8,13 +8,18 @@ import RequireAdmin from '../../utils/RequireAdmin'
 import { Accordion, AccordionContext, Button } from 'react-bootstrap'
 import BudgetInformation from './BudgetInformation'
 
-const Budget = ({ budget, refreshBudgets, user }) => {
+type Props = {
+  budget: any
+  refreshBudgets: any
+}
+
+const Budget = ({ budget, refreshBudgets }: Props) => {
   const postList = budget.posts
-  const [posts, setPosts] = useState([])
-  const [cardItem, setCardItem] = useState()
+  const [posts, setPosts] = useState<any[]>([])
+  const [cardItem, setCardItem] = useState<any>()
   const { activeEventKey } = useContext(AccordionContext)
 
-  const toggler = (e) => {
+  const toggler = (e: any) => {
     if (!cardItem) {
       setCardItem(
         <CreateBudgetPost
@@ -58,7 +63,7 @@ const Budget = ({ budget, refreshBudgets, user }) => {
         <div className="posts">
           <div className="header">
             <h3 className="headerText">Historikk</h3>
-            <RequireAdmin user={user}>
+            <RequireAdmin>
               <Button onClick={toggler} className="plus shadow-none">
                 <FontAwesomeIcon
                   className="toggleButton"
@@ -76,7 +81,7 @@ const Budget = ({ budget, refreshBudgets, user }) => {
             .sort((a, b) => (a.date < b.date ? 1 : -1))
             .map((post) => (
               <Post
-                className="post"
+                // className="post"
                 key={post.id}
                 post={post}
                 budget={budget}

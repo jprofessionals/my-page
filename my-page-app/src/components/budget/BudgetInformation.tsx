@@ -1,9 +1,14 @@
 import React from 'react'
 import { Card } from 'react-bootstrap'
 import Moment from 'moment'
+import { Budget } from '@/types'
 
-const BudgetInformation = ({ budget }) => {
-  const interValOfDeposit = (interval) => {
+type Props = {
+  budget: Budget
+}
+
+const BudgetInformation = ({ budget }: Props) => {
+  const interValOfDeposit = (interval: number) => {
     if (interval === 1) {
       return 'måned'
     } else {
