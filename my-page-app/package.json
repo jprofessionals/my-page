@@ -13,6 +13,7 @@
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.3.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@types/google-one-tap": "^1.2.2",
     "@types/node": "18.15.5",
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
@@ -26,6 +27,7 @@
     "react-bootstrap": "^2.7.2",
     "react-dom": "18.2.0",
     "react-toastify": "^9.1.1",
+    "react-tooltip": "^5.10.1",
     "sass": "^1.59.3",
     "typescript": "5.0.2"
   },
