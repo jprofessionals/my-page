@@ -4,8 +4,11 @@ import Home from '../home'
 import Budgets from './Budgets'
 import React from 'react'
 import styles from './BudgetContainer.module.scss'
+import { useAuthContext } from '@/providers/AuthProvider'
 
-const BudgetContainer = ({ user }) => {
+const BudgetContainer = () => {
+  const { user } = useAuthContext()
+
   if (!user)
     return (
       <div className={`${styles.loadSpinUser} d-flex align-items-center`}>
