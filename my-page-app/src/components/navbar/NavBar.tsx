@@ -18,13 +18,15 @@ const NavBar = () => {
       expand="sm"
       variant="dark"
     >
-      <Navbar.Brand href="/" title="min side">
-        <Image
-          className={`${styles.logo} logo`}
-          src={jPro_logo_transparent}
-          alt="jPro"
-        />
-      </Navbar.Brand>
+      <Link href="/">
+        <Navbar.Brand title="min side">
+          <Image
+            className={`${styles.logo} logo`}
+            src={jPro_logo_transparent}
+            alt="jPro"
+          />
+        </Navbar.Brand>
+      </Link>
       <Navbar.Toggle className="button" aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse
         className={`${styles.navtext} navtext`}
