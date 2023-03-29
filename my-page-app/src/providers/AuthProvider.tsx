@@ -3,6 +3,7 @@ import {
   PropsWithChildren,
   useCallback,
   useContext,
+  useMemo,
   useState,
 } from 'react'
 import { User } from '@/types'
@@ -13,17 +14,36 @@ import ApiService from '@/services/api.service'
 
 type AuthContext = {
   isAuthenticated: boolean
-  setIsAuthenticated: (isAuth: boolean) => void
   authenticate: () => void
   user: User | null
-  setUser: (user: User) => void
+  setUser: (user: User | null) => void
 }
 
 const Context = createContext<AuthContext | null>(null)
 
 export function AuthProvider({ children }: PropsWithChildren) {
-  const [user, setUser] = useSessionStorage<User | null>('user', null)
-  const [isAuthenticated, setIsAuthenticated] = useState(!!user)
+  const [user, setUser] = useState<User | null>(null)
+  const isAuthenticated = useMemo(() => !!user, [user])
+
+  const authHandler = useCallback((response: CredentialResponse) => {
+    if (response.credential) {
+      localStorage.setItem(
+        'user_token',
+        JSON.stringify({ id_token: response.credential }),
+      )
+      ApiService.getUser().then(
+        (response) => {
+          setUser({
+            ...response.data,
+            loaded: true,
+          })
+        },
+        () => {
+          toast.error('Får ikke lastet inn bruker, prøv igjen senere')
+        },
+      )
+    }
+  }, [])
 
   const authenticate = useCallback(() => {
     window.google.accounts.id.initialize({
@@ -46,34 +66,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
           })
       }
     })
-  }, [])
+  }, [authHandler])
 
-  function authHandler(response: CredentialResponse) {
-    if (response.credential) {
-      setIsAuthenticated(true)
-
-      localStorage.setItem(
-        'user_token',
-        JSON.stringify({ id_token: response.credential }),
-      )
-      ApiService.getUser().then(
-        (response) => {
-          setUser({
-            ...response.data,
-            loaded: true,
-          })
-        },
-        () => {
-          toast.error('Får ikke lastet inn bruker, prøv igjen senere')
-        },
-      )
-    }
-  }
   return (
     <Context.Provider
       value={{
         isAuthenticated,
-        setIsAuthenticated,
         user,
         setUser,
         authenticate,
