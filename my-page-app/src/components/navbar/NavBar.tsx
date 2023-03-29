@@ -33,7 +33,7 @@ const NavBar = () => {
         id="responsive-navbar-nav"
       >
         <Nav className={`${styles.containerFluid} container-fluid`}>
-          <Link className={`${styles.navLink} nav-link`} href="/budsjett">
+          <Link className={`${styles.navLink} nav-link`} href="/">
             Budsjett
           </Link>
           <Link className={`${styles.navLink} nav-link`} href="/kalkulator">
