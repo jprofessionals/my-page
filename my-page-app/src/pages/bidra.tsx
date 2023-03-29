@@ -1,3 +1,5 @@
+import Bidra from '@/components/bidra/Bidra'
+
 export default function bidra() {
-  return <h1>Bidra</h1>
+  return <Bidra />
 }
