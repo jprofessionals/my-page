@@ -44,3 +44,49 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.innhold {
+  padding: 10px;
+
+  .kalkulator {
+    .input {
+      display: flex;
+      flex-wrap: wrap;
+
+      .column {
+        max-width: 500px;
+        min-width: 300px;
+        margin-right: 10px;
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 15px;
+
+      li {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+      }
+      li.bold {
+        font-weight: bold;
+      }
+      li.notSelected {
+        font-weight: lighter;
+      }
+      li.line {
+        border-bottom: 1px solid;
+        padding-bottom: 5px;
+      }
+    }
+
+    input {
+      max-width: 100px;
+    }
+  }
+}
+.bidra-container {
+  margin-top: 15px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
