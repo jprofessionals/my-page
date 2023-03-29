@@ -1,5 +1,3 @@
-import './Bidra.scss'
-
 function Bidra() {
   return (
     <div className="bidra-container">
