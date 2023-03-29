@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import ApiService from '../../services/api.service'
 import Budget from './Budget'
 import { Accordion } from 'react-bootstrap'
@@ -16,11 +16,7 @@ const Budgets = ({ useLoggedInUser = true, user }: Props) => {
   const [budgets, setBudgets] = useState<any[]>([])
   const [isLoadingBudgets, setIsLoadingBudgets] = useState(false)
 
-  useEffect(() => {
-    refreshBudgets()
-  }, [])
-
-  const refreshBudgets = async () => {
+  const refreshBudgets = useCallback(() => {
     setIsLoadingBudgets(true)
     const loadedBudgets = useLoggedInUser
       ? ApiService.getBudgets()
@@ -35,7 +31,11 @@ const Budgets = ({ useLoggedInUser = true, user }: Props) => {
         setIsLoadingBudgets(false)
         toast.error('Klarte ikke laste budsjettene, prøv igjen senere')
       })
-  }
+  }, [useLoggedInUser, user])
+
+  useEffect(() => {
+    refreshBudgets()
+  }, [refreshBudgets])
 
   if (!budgets.length && !isLoadingBudgets) {
     return (
