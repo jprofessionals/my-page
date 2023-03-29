@@ -10,10 +10,7 @@ function RequireAuth({ children }: PropsWithChildren) {
       <>
         <Script
           src="https://accounts.google.com/gsi/client"
-          onLoad={() => {
-            console.log('Er inne i onLoad')
-            authenticate()
-          }}
+          onReady={() => authenticate()}
         />
         <div id="signInDiv"></div>
       </>
