@@ -1,9 +1,13 @@
-import { Inter } from 'next/font/google'
 import RequireAuth from '../components/auth/RequireAuth'
-import BudgetContainer from '../components/budget/BudgetContainer'
 import Head from 'next/head'
+import dynamic from 'next/dynamic'
 
-const inter = Inter({ subsets: ['latin'] })
+const BudgetContainer = dynamic(
+  () => import('@/components/budget/BudgetContainer'),
+  {
+    ssr: false,
+  },
+)
 
 export default function Home() {
   return (
