@@ -1,3 +1,5 @@
+import Kalkulator from '@/components/Kalkulator'
+
 export default function kalkulator() {
-  return <h1>Kalkulator</h1>
+  return <Kalkulator />
 }

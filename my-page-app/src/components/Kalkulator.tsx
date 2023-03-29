@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
-import './Kalkulator.scss'
 import { Tooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 
@@ -407,12 +406,12 @@ function Kalkulator() {
           </div>
         </div>
       </div>
-      <Tooltip anchorId="tooltip-1" />
-      <Tooltip anchorId="tooltip-2" />
-      <Tooltip anchorId="tooltip-3" />
-      <Tooltip anchorId="tooltip-4" />
-      <Tooltip anchorId="tooltip-5" />
-      <Tooltip anchorId="tooltip-6" />
+      <Tooltip data-tooltip-id="tooltip-1" />
+      <Tooltip data-tooltip-id="tooltip-2" />
+      <Tooltip data-tooltip-id="tooltip-3" />
+      <Tooltip data-tooltip-id="tooltip-4" />
+      <Tooltip data-tooltip-id="tooltip-5" />
+      <Tooltip data-tooltip-id="tooltip-6" />
     </>
   )
 }
