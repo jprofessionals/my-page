@@ -7,10 +7,16 @@ import RequireAdmin from '../../utils/RequireAdmin'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuthContext } from '@/providers/AuthProvider'
+import { useRouter } from 'next/router'
 
 const NavBar = () => {
-  const { user } = useAuthContext()
-  const logout = () => true
+  const { user, setUser } = useAuthContext()
+  const router = useRouter()
+  const logout = () => {
+    setUser(null)
+    localStorage.removeItem('user_token')
+    router.push('/loggut')
+  }
   return (
     <Navbar
       className={`${styles.navbar} navbar`}
