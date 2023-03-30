@@ -16,8 +16,16 @@ const getBudgetsForEmployee = (employeeNumber) => {
   })
 }
 
-const getBudgets = () => {
-  return axios.get(API_URL + 'me/budgets', { headers: authHeader() })
+const getBudgets = async () => {
+  const response = await axios.get(API_URL + 'me/budgets', {
+    headers: authHeader(),
+  })
+
+  const budgets = response.data
+  return budgets.map((budget) => ({
+    ...budget,
+    id: String(budget.id),
+  }))
 }
 
 const createBudgetPost = (post, budgetId) => {
