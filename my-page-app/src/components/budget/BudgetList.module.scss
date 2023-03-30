@@ -1,0 +1,19 @@
+@use '../../styles/mixins';
+
+.headerBudgets {
+  display: flex;
+  button {
+    @include mixins.orange-jpro-round-button;
+    margin-right: 12px;
+  }
+}
+
+.headerText {
+  color: mixins.$black;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  width: 100%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
