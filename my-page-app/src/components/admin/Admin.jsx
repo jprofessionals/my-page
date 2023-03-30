@@ -5,7 +5,7 @@ import {toast} from "react-toastify";
 import {Spinner, Table} from "react-bootstrap";
 import Budgets from "../budget/Budgets";
 
-function Admin() {
+function Admin({adminUser}) {
     const [users, setUsers] = useState([]);
     const [budgetTypes, setBudgetTypes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -141,13 +141,12 @@ function Admin() {
                             .sort((a, b) => a.name.localeCompare(b.name)).map((userRow) => (
                                 <Fragment key={userRow.email}>
                                     <tr key={userRow.email}
-                                    > {/* pass event object to handleExpandUser */}
+                                        onClick={(event) => handleExpandUser(userRow, event)}>
                                         <td key={userRow.email}>
                                             {userRow.name}
                                         </td>
                                         {budgetTypes.map((budgetColumn) => (
-                                            <td key={userRow.email + budgetColumn.id + "" + budgetColumn.balanceIsHours}
-                                                onClick={(event) => handleExpandUser(userRow, event)}>
+                                            <td key={userRow.email + budgetColumn.id + "" + budgetColumn.balanceIsHours}>
                                                 {getBudgetBalanceForType(userRow.budgets, budgetColumn)}
                                             </td>
                                         ))}
@@ -156,7 +155,7 @@ function Admin() {
                                         <tr key={`${userRow.email}-expanded`}
                                             data-expanded-user={userRow.email}> {/* add data-expanded-user attribute */}
                                             <td colSpan={budgetTypes.length + 2}> {/* +2 for brukere and expand button columns */}
-                                                {<Budgets user={userRow} useLogggedInUser={false}/>}
+                                                {<Budgets employee={userRow} loggedInUser={adminUser}/>}
                                             </td>
                                         </tr>
                                     )}

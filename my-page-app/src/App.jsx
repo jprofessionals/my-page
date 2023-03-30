@@ -32,7 +32,7 @@ function App() {
             <Route path="/bidra" element={<Bidra/>}/>
             <Route path="/admin" element={
               <RequireAuth setUser={setUser} isAuthenticated={isAuthenticated} setAuthenticated={setIsAuthenticated}>
-                <Admin/>
+                <Admin adminUser={user}/>
               </RequireAuth>
                 }/>
             <Route path="/logget-ut" element={<LoggedOut/>}/>

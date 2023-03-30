@@ -25,7 +25,7 @@ const BudgetContainer = ({user}) => {
     <div style={!user.loaded ? {display: "none"} : {}}>
       <Home user={user}/>
       {!user.loaded ? null :
-        <Budgets user={user}></Budgets>
+        <Budgets employee={user} loggedInUser={user}/>
       }
     </div>
   </>;
