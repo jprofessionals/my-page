@@ -7,14 +7,16 @@ import {
   useState,
 } from 'react'
 import { User } from '@/types'
-import { useLocalStorage, useSessionStorage } from 'usehooks-ts'
-import { toast } from 'react-toastify'
 import { CredentialResponse } from 'google-one-tap'
 import ApiService from '@/services/api.service'
 
+type UserFetchStatus = 'init' | 'fetchingUser' | 'fetched' | 'fetchFailed'
+
 type AuthContext = {
   isAuthenticated: boolean
+  userToken: string | null
   authenticate: () => void
+  userFetchStatus: UserFetchStatus
   user: User | null
   setUser: (user: User | null) => void
 }
@@ -23,25 +25,26 @@ const Context = createContext<AuthContext | null>(null)
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null)
-  const isAuthenticated = useMemo(() => !!user, [user])
+  const [userToken, setUserToken] = useState<string | null>(null)
+  const [userFetchStatus, setUserFetchStatus] =
+    useState<UserFetchStatus>('init')
+  const isAuthenticated = useMemo(() => !!userToken, [userToken])
 
-  const authHandler = useCallback((response: CredentialResponse) => {
+  const authHandler = useCallback(async (response: CredentialResponse) => {
     if (response.credential) {
-      localStorage.setItem(
-        'user_token',
-        JSON.stringify({ id_token: response.credential }),
-      )
-      ApiService.getUser().then(
-        (response) => {
-          setUser({
-            ...response.data,
-            loaded: true,
-          })
-        },
-        () => {
-          toast.error('Får ikke lastet inn bruker, prøv igjen senere')
-        },
-      )
+      setUserToken(response.credential)
+      localStorage.setItem('user_token', response.credential)
+      setUserFetchStatus('fetchingUser')
+      try {
+        const user = await ApiService.getUser()
+        setUser({
+          ...user.data,
+          loaded: true,
+        })
+        setUserFetchStatus('fetched')
+      } catch (e) {
+        setUserFetchStatus('fetchFailed')
+      }
     }
   }, [])
 
@@ -71,10 +74,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
   return (
     <Context.Provider
       value={{
+        userToken,
         isAuthenticated,
         user,
         setUser,
         authenticate,
+        userFetchStatus,
       }}
     >
       {children}
