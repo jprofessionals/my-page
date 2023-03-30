@@ -1,3 +1,6 @@
+import { Property } from 'csstype'
+import Float = Property.Float
+
 export type User = {
   name: string
   email: string
@@ -12,5 +15,43 @@ export type User = {
 }
 
 export type Budget = {
-  [key: string]: any
+  id: string
+  posts: Post[]
+  budgetType: BudgetType
+  startDate: Date
+  startAmount: number
+  hours: Hour[]
+}
+
+type Post = {
+  id?: number
+  date: Date
+  description?: string
+  amountIncMva?: number
+  amountExMva?: number
+  documentNumber?: string
+  dateOfPayment?: Date
+  dateOfDeduction?: Date
+  expense: boolean
+  locked: boolean
+  createdDate?: Date
+  lastModifiedDate?: Date
+  createdBy?: string
+}
+
+type Hour = {
+  id?: number
+  hours: number
+  createdBy: string
+  dateOfUsage: Date
+}
+
+type BudgetType = {
+  id: number
+  name: string
+  rollOver: boolean
+  deposit: number
+  intervalOfDepositInMonths: number
+  startAmount: number
+  allowTimeBalance: boolean
 }
