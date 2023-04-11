@@ -1,6 +1,7 @@
 import { Budget } from '@/types'
 import BudgetItem from '@/components/budget/BudgetItem'
 import styles from './BudgetList.module.scss'
+import { Accordion } from 'react-bootstrap'
 
 type Props = {
   budgets: Budget[]
@@ -15,13 +16,15 @@ const BudgetList = ({ budgets, refreshBudgets }: Props) => {
         <h3 className={styles.headerText}>Dine budsjetter</h3>
       </div>
       <div>
-        {budgets.map((budget) => (
-          <BudgetItem
-            key={budget.id}
-            budget={budget}
-            refreshBudgets={refreshBudgets}
-          />
-        ))}
+        <Accordion>
+          {budgets.map((budget) => (
+            <BudgetItem
+              key={budget.id}
+              budget={budget}
+              refreshBudgets={refreshBudgets}
+            />
+          ))}
+        </Accordion>
       </div>
     </div>
   )
