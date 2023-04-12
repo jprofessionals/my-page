@@ -1,4 +1,3 @@
-import styles from './Admin.module.scss'
 import { useEffect, useState, Fragment } from 'react'
 import apiService from '../../services/api.service'
 import { toast } from 'react-toastify'
@@ -92,6 +91,7 @@ function Admin() {
 
   const handleExpandUser = (user: User, event: any) => {
     // Check if the clicked target is not a child of the expanded area
+
     const expandedArea = document.querySelector(
       `[data-expanded-user="${user.email}"]`,
     )
@@ -127,7 +127,7 @@ function Admin() {
   } else {
     return (
       <>
-        <div className={styles.adminContainer}>
+        <div className="admin-container">
           <h2>Brukere</h2>
 
           {/* Add text input field */}
@@ -201,7 +201,7 @@ function Admin() {
                         <td colSpan={budgetTypes.length + 2}>
                           {' '}
                           {/* +2 for brukere and expand button columns */}
-                       {/*   {<Budgets user={userRow} useLoggedInUser={false} />} TODO: fix this*/ }
+                          {/*a<Budgets user={userRow} useLoggedInUser={false} />*/}
                         </td>
                       </tr>
                     )}

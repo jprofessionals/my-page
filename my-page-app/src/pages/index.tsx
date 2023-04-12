@@ -36,9 +36,9 @@ export default function HomePage() {
   }, [])
 
   useEffect(() => {
-    if (budgets.length > 0) return
+    if (budgetLoadingStatus !== 'init') return
     if (userFetchStatus === 'fetched') refreshBudgets()
-  }, [userFetchStatus, budgets])
+  }, [userFetchStatus, budgetLoadingStatus])
 
   return (
     <>
