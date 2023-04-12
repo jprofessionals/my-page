@@ -2,6 +2,6 @@ env: standard
 runtime: nodejs16
 service: my-page-jpro
 handlers:
- - url: /.*
- secure: always
- script: auto
+  - url: /.*
+  secure: always
+  script: auto
