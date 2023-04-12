@@ -1,12 +1,7 @@
+env: standard
 runtime: nodejs16
+service: my-page-jpro
 handlers:
-  # Serve all static files with url ending with a file extension
-  - url: /(.*\..+)$
-    static_files: build/\1
-    upload: build/(.*\..+)$
-    secure: always
-  # Catch all handler to index.html
-  - url: /.*
-    static_files: build/index.html
-    upload: build/index.html
-    secure: always
+ - url: /.*
+ secure: always
+ script: auto
