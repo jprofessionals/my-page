@@ -1,9 +1,8 @@
-import './Admin.scss'
+import styles from './Admin.module.scss'
 import { useEffect, useState, Fragment } from 'react'
 import apiService from '../../services/api.service'
 import { toast } from 'react-toastify'
 import { Spinner, Table } from 'react-bootstrap'
-import Budgets from '../budget/Budgets'
 import { Budget, User } from '@/types'
 
 function Admin() {
@@ -128,7 +127,7 @@ function Admin() {
   } else {
     return (
       <>
-        <div className="admin-container">
+        <div className={styles.adminContainer}>
           <h2>Brukere</h2>
 
           {/* Add text input field */}
@@ -202,7 +201,7 @@ function Admin() {
                         <td colSpan={budgetTypes.length + 2}>
                           {' '}
                           {/* +2 for brukere and expand button columns */}
-                          {<Budgets user={userRow} useLoggedInUser={false} />}
+                       {/*   {<Budgets user={userRow} useLoggedInUser={false} />} TODO: fix this*/ }
                         </td>
                       </tr>
                     )}

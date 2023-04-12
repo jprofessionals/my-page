@@ -21,6 +21,9 @@ export type Budget = {
   startDate: Date
   startAmount: number
   hours: Hour[]
+  balance: number
+  sumHours:number
+  sumHoursCurrentYear:number
 }
 
 type Post = {
