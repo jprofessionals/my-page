@@ -11,9 +11,9 @@ type Props = {
 const BudgetList = ({ budgets, refreshBudgets }: Props) => {
   console.log('Budgets: ', { budgets })
   return (
-    <div>
+    <div className={styles.budgets}>
       <div className={styles.headerBudgets}>
-        <h3 className={styles.headerText}>Dine budsjetter</h3>
+        <h3>Dine budsjetter</h3>
       </div>
       <div>
         <Accordion>

@@ -1,5 +1,11 @@
 @use '../../styles/mixins';
 
+.budgets {
+  margin-top: 15px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
 .headerBudgets {
   display: flex;
   button {

@@ -63,7 +63,7 @@ const BudgetItem = ({ budget, refreshBudgets }: Props) => {
         <BudgetInformation budget={budget} />
         <div className={styles.posts}>
           <div className={styles.header}>
-            <h3 className={styles.headerText}>Historikk</h3>
+            <h3>Historikk</h3>
             <RequireAdmin>
               <Button onClick={toggler} className="plus shadow-none">
                 <FontAwesomeIcon

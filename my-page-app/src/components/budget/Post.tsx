@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Card, Button, Spinner } from 'react-bootstrap'
 import Moment from 'moment'
 import DeleteBudgetPostModal from './DeleteBudgetPostModal'
@@ -6,6 +6,7 @@ import EditBudgetPost from './EditBudgetPost'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
 import { Budget } from '@/types'
+import styles from './Post.module.scss'
 
 type Props = {
   budget: Budget
@@ -43,11 +44,11 @@ const Post = ({ refreshBudgets, post, budget }: Props) => {
         border={postInFuture() ? 'grey' : 'dark'}
         style={isEditPostOpen ? { display: 'none' } : {}}
       >
-        <div className="postHeaderDiv">
-          <Card.Header className="postHeader">
-            <div className="headerPost">
+        <div>
+          <Card.Header>
+            <div className={styles.headerPost}>
               <b>{post.description}</b>
-              <div className="rightBtnsDiv">
+              <div className={styles.rightBtnsDiv}>
                 <div
                   style={
                     isLoadingDeletePost || post.locked
@@ -102,7 +103,7 @@ const Post = ({ refreshBudgets, post, budget }: Props) => {
           </Card.Header>
         </div>
         <Card.Body>
-          <ul className="postList">
+          <ul className={styles.postList}>
             <li>
               <b>Pris:</b>{' '}
               {post.amountExMva.toLocaleString('no-NO', {

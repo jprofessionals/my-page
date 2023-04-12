@@ -46,17 +46,19 @@ export default function HomePage() {
         <title>Min side</title>
       </Head>
       <RequireAuth>
-        <UserInformation />
-        <Loading
-          isLoading={['loading', 'init'].includes(budgetLoadingStatus)}
-          loadingText="Laster inn ditt budsjett..."
-        >
-          {budgetLoadingStatus === 'completed' ? (
-            <BudgetList budgets={budgets} refreshBudgets={refreshBudgets} />
-          ) : (
-            <ErrorPage errorText="Din bruker er autentisert, men vi klarte likevel ikke å hente ut dine budsjetter. Prøv igjen senere." />
-          )}
-        </Loading>
+        <div>
+          <UserInformation />
+          <Loading
+            isLoading={['loading', 'init'].includes(budgetLoadingStatus)}
+            loadingText="Laster inn ditt budsjett..."
+          >
+            {budgetLoadingStatus === 'completed' ? (
+              <BudgetList budgets={budgets} refreshBudgets={refreshBudgets} />
+            ) : (
+              <ErrorPage errorText="Din bruker er autentisert, men vi klarte likevel ikke å hente ut dine budsjetter. Prøv igjen senere." />
+            )}
+          </Loading>
+        </div>
       </RequireAuth>
     </>
   )
