@@ -24,6 +24,9 @@ export type Budget = {
   balance: number
   sumHours:number
   sumHoursCurrentYear:number
+  sumPostsCurrentYear:number
+  sumPostsLastTwelveMonths:number
+  sumHoursLastTwelveMonths:number
 }
 
 type Post = {

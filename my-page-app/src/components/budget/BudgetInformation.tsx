@@ -52,7 +52,7 @@ const BudgetInformation = ({ budget }: Props) => {
           {budget.posts.length !== 0 ? (
             <li>
               <span title="Dato for siste kjøp">Dato for siste kjøp: </span>
-              {Moment(budget.posts.at(0).date).format('DD.MM.YYYY')}
+              {budget.posts[0] ? Moment(budget.posts[0].date).format('DD.MM.YYYY') : 'aldri'}
             </li>
           ) : null}
           <li>
