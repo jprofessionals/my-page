@@ -1,8 +1,9 @@
-import { useEffect, useState, Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import apiService from '../../services/api.service'
 import { toast } from 'react-toastify'
 import { Spinner, Table } from 'react-bootstrap'
 import { Budget, User } from '@/types'
+import BudgetList from '@/components/budget/BudgetList'
 
 function Admin() {
   const [users, setUsers] = useState<User[]>([])
@@ -201,7 +202,12 @@ function Admin() {
                         <td colSpan={budgetTypes.length + 2}>
                           {' '}
                           {/* +2 for brukere and expand button columns */}
-                          {/*a<Budgets user={userRow} useLoggedInUser={false} />*/}
+                          {
+                            <BudgetList
+                              budgets={userRow.budgets ?? []}
+                              refreshBudgets={refreshTable}
+                            />
+                          }
                         </td>
                       </tr>
                     )}

@@ -10,7 +10,7 @@ export type User = {
   startDate: string
   admin: string
   employeeNumber: string
-  budgets?: any[]
+  budgets?: Budget[]
   loaded: boolean
 }
 
@@ -22,11 +22,11 @@ export type Budget = {
   startAmount: number
   hours: Hour[]
   balance: number
-  sumHours:number
-  sumHoursCurrentYear:number
-  sumPostsCurrentYear:number
-  sumPostsLastTwelveMonths:number
-  sumHoursLastTwelveMonths:number
+  sumHours: number
+  sumHoursCurrentYear: number
+  sumPostsCurrentYear: number
+  sumPostsLastTwelveMonths: number
+  sumHoursLastTwelveMonths: number
 }
 
 type Post = {
