@@ -53,6 +53,11 @@ const NavBar = () => {
               Admin
             </Link>
           </RequireAdmin>
+          <RequireAdmin>
+            <Link className={`${styles.navLink} nav-link`} href="/admintest">
+              AdminTest
+            </Link>
+          </RequireAdmin>
           <Nav.Link
             className={`${styles.navLink}`}
             as="a"
