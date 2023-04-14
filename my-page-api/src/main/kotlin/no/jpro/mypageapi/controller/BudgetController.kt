@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("budget")
@@ -103,5 +104,29 @@ class BudgetController(private val userService: UserService, private val budgetS
         return ResponseEntity.ok(budgetService.editPost(editPostRequest, postToEdit))
     }
 
+    /*
+    Create a POST mapping that takes a email as path variable and a start date as query parameter.
+     */
+    @PostMapping("createDefaultBudgets/{email}")
+    @RequiresAdmin
+    @Operation(summary = "Create a default set of budgets for a user.")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json", array = ArraySchema(
+                schema = Schema(implementation = BudgetDTO::class)
+            )
+        )]
+    )
+    fun createDefaultBudgets(
+        token: JwtAuthenticationToken,
+        @PathVariable("email") email: String,
+        @RequestParam("startDate") startDate: LocalDate,
+    ) {
+        budgetService.createDefaultSetOfBudgets(email, startDate)
+    }
+
     private fun userPermittedToManageBudget(budget: Budget, user: User) = (budget.user?.id == user.id || user.admin)
+
+
 }
