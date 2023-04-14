@@ -18,7 +18,7 @@ import java.time.LocalDate
 class BudgetService(
     private val budgetRepository: BudgetRepository,
     private val budgetPostMapper: BudgetPostMapper,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
     private val userService: UserService,
     private val budgetTypeService: BudgetTypeService
 ) {
@@ -77,7 +77,7 @@ class BudgetService(
         val userHasBudgets = checkIfUserHasAnyBudgetsForGivenBudgetTypes(user, defaultBudgetTypes)
 
         if (userHasBudgets) {
-            throw RuntimeException("User already has budgets for default budget types")
+            throw IllegalArgumentException("User already has budgets for default budget types")
         }
 
         val budgets = createBudgetsFromBudgetTypes(defaultBudgetTypes, user, startDate)
@@ -120,7 +120,7 @@ class BudgetService(
 
     private fun getBudgetsForUser(user: User): List<Budget> {
         if (user.email == null) {
-            throw RuntimeException("Could not get budgets for user with no email")
+            throw IllegalArgumentException("Could not get budgets for user with no email")
         }
 
         return budgetRepository.findBudgetsByUserEmail(user.email)
