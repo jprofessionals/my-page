@@ -17,6 +17,7 @@ import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.BudgetService
 import no.jpro.mypageapi.service.UserService
+import no.jpro.mypageapi.utils.mapper.BudgetMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
@@ -26,7 +27,11 @@ import java.time.LocalDate
 @RestController
 @RequestMapping("budget")
 @SecurityRequirement(name = "Bearer Authentication")
-class BudgetController(private val userService: UserService, private val budgetService: BudgetService) {
+class BudgetController(
+    private val userService: UserService,
+    private val budgetService: BudgetService,
+    private val budgetMapper: BudgetMapper
+) {
 
     @GetMapping("{employeeNumber}")
     @RequiresAdmin
@@ -104,7 +109,7 @@ class BudgetController(private val userService: UserService, private val budgetS
         return ResponseEntity.ok(budgetService.editPost(editPostRequest, postToEdit))
     }
 
-    @PostMapping("createDefaultBudgets/{email}")
+    @PostMapping("createDefaultBudgets")
     @RequiresAdmin
     @Operation(summary = "Create a default set of budgets for a user.")
     @ApiResponse(
@@ -117,10 +122,12 @@ class BudgetController(private val userService: UserService, private val budgetS
     )
     fun createDefaultBudgets(
         token: JwtAuthenticationToken,
-        @PathVariable("email") email: String,
+        @RequestParam("email") email: String,
         @RequestParam("startDate") startDate: LocalDate,
-    ) {
-        budgetService.createDefaultSetOfBudgets(email, startDate)
+    ): List<BudgetDTO> {
+        return budgetService
+            .createDefaultSetOfBudgets(email, startDate)
+            .map { budgetMapper.toBudgetDTO(it) }
     }
 
     private fun userPermittedToManageBudget(budget: Budget, user: User) = (budget.user?.id == user.id || user.admin)
