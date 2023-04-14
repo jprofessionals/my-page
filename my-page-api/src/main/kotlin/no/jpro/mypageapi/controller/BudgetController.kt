@@ -104,9 +104,6 @@ class BudgetController(private val userService: UserService, private val budgetS
         return ResponseEntity.ok(budgetService.editPost(editPostRequest, postToEdit))
     }
 
-    /*
-    Create a POST mapping that takes a email as path variable and a start date as query parameter.
-     */
     @PostMapping("createDefaultBudgets/{email}")
     @RequiresAdmin
     @Operation(summary = "Create a default set of budgets for a user.")
