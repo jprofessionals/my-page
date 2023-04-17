@@ -5,7 +5,7 @@ import { Accordion } from 'react-bootstrap'
 
 type Props = {
   budgets: Budget[]
-  refreshBudgets: (userId?: string) => void
+  refreshBudgets?: (userId?: string) => void
 }
 
 const BudgetList = ({ budgets, refreshBudgets }: Props) => {
