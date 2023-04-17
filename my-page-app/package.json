@@ -24,7 +24,7 @@
     "moment": "^2.29.4",
     "next": "13.2.4",
     "react": "18.2.0",
-    "react-bootstrap": "^2.7.2",
+    "react-bootstrap": "^2.7.4",
     "react-dom": "18.2.0",
     "react-toastify": "^9.1.2",
     "react-tooltip": "^5.10.1",
