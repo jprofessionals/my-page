@@ -52,7 +52,7 @@ type Hour = {
   dateOfUsage: Date
 }
 
-type BudgetType = {
+export type BudgetType = {
   id: number
   name: string
   rollOver: boolean
@@ -60,4 +60,5 @@ type BudgetType = {
   intervalOfDepositInMonths: number
   startAmount: number
   allowTimeBalance: boolean
+  balanceIsHours?: boolean
 }
