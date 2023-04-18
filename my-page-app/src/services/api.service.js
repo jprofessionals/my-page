@@ -1,31 +1,16 @@
 import axios from 'axios'
 import authHeader from './auth-header'
-const API_URL = '/api/'
+export const API_URL = '/api/'
 
 const getUsers = () => {
   return axios.get(API_URL + 'user', { headers: authHeader() })
 }
 
-const getUser = () => {
-  return axios.get(API_URL + 'me', { headers: authHeader() })
-}
 
 const getBudgetsForEmployee = (employeeNumber) => {
   return axios.get(API_URL + 'budget/' + employeeNumber, {
     headers: authHeader(),
   })
-}
-
-const getBudgets = async () => {
-  const response = await axios.get(API_URL + 'me/budgets', {
-    headers: authHeader(),
-  })
-
-  const budgets = response.data
-  return budgets.map((budget) => ({
-    ...budget,
-    id: String(budget.id),
-  }))
 }
 
 const createBudgetPost = (post, budgetId) => {
@@ -48,8 +33,6 @@ const editBudgetPost = (postId, editPostRequest) => {
 
 const ApiService = {
   getUsers,
-  getUser,
-  getBudgets,
   getBudgetsForEmployee,
   createBudgetPost,
   deleteBudgetPost,
