@@ -1,44 +1,38 @@
 import RequireAuth from '../components/auth/RequireAuth'
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
-import { useCallback, useEffect, useState } from 'react'
-import ApiService from '@/services/api.service'
-import { toast } from 'react-toastify'
-import { Budget } from '@/types'
+import { API_URL } from '@/services/api.service'
 import Loading from '@/components/Loading'
 import UserInformation from '@/components/UserInformation'
-import { useAuthContext } from '@/providers/AuthProvider'
 import ErrorPage from '@/components/ErrorPage'
+import { useQuery } from "react-query";
+import axios from "axios";
+import authHeader from "@/services/auth-header";
+import { Budget } from "@/types";
 
 const BudgetList = dynamic(() => import('@/components/budget/BudgetList'), {
   ssr: false,
 })
 
-type BudgetLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
+const getBudgets = async (): Promise<Budget[]> => {
+  const response = await axios.get(API_URL + 'me/budgets', {
+    headers: authHeader(),
+  })
+
+  const budgets: Budget[] = response.data
+
+  return budgets.map((budget) => ({
+    ...budget,
+    id: String(budget.id),
+  }))
+}
 
 export default function HomePage() {
-  const [budgets, setBudgets] = useState<Budget[]>([])
-  const [budgetLoadingStatus, setBudgetLoadingStatus] =
-    useState<BudgetLoadingStatus>('init')
-  const { userFetchStatus } = useAuthContext()
-
-  const refreshBudgets = useCallback(async () => {
-    setBudgetLoadingStatus('loading')
-
-    try {
-      const loadedBudgets = await ApiService.getBudgets()
-      setBudgetLoadingStatus('completed')
-      setBudgets(loadedBudgets)
-    } catch (e) {
-      setBudgetLoadingStatus('failed')
-      toast.error('Klarte ikke laste budsjettene, prøv igjen senere')
-    }
-  }, [])
-
-  useEffect(() => {
-    if (budgetLoadingStatus !== 'init') return
-    if (userFetchStatus === 'fetched') refreshBudgets()
-  }, [userFetchStatus, budgetLoadingStatus])
+  const {
+    data: budgets = [],
+    isFetched,
+    isLoading,
+  } = useQuery('budgets', () => getBudgets())
 
   return (
     <>
@@ -49,13 +43,14 @@ export default function HomePage() {
         <div>
           <UserInformation />
           <Loading
-            isLoading={['loading', 'init'].includes(budgetLoadingStatus)}
+            isLoading={isLoading}
             loadingText="Laster inn ditt budsjett..."
           >
-            {budgetLoadingStatus === 'completed' ? (
-              <BudgetList budgets={budgets} refreshBudgets={refreshBudgets} />
+            {isFetched ? (
+              <BudgetList budgets={budgets} />
             ) : (
-              <ErrorPage errorText="Din bruker er autentisert, men vi klarte likevel ikke å hente ut dine budsjetter. Prøv igjen senere." />
+              <ErrorPage
+                errorText="Din bruker er autentisert, men vi klarte likevel ikke å hente ut dine budsjetter. Prøv igjen senere." />
             )}
           </Loading>
         </div>
