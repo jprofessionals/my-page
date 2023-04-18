@@ -8,7 +8,10 @@ import {
 } from 'react'
 import { User } from '@/types'
 import { CredentialResponse } from 'google-one-tap'
-import ApiService from '@/services/api.service'
+import ApiService, { API_URL } from '@/services/api.service'
+import { useQuery, useQueryClient } from "react-query";
+import axios from "axios";
+import authHeader from "@/services/auth-header";
 
 type UserFetchStatus = 'init' | 'fetchingUser' | 'fetched' | 'fetchFailed'
 
@@ -17,34 +20,41 @@ type AuthContext = {
   userToken: string | null
   authenticate: () => void
   userFetchStatus: UserFetchStatus
-  user: User | null
-  setUser: (user: User | null) => void
+  user?: User
+  logout: () => void
 }
 
 const Context = createContext<AuthContext | null>(null)
 
-export function AuthProvider({ children }: PropsWithChildren) {
-  const [user, setUser] = useState<User | null>(null)
-  const [userToken, setUserToken] = useState<string | null>(null)
-  const [userFetchStatus, setUserFetchStatus] =
-    useState<UserFetchStatus>('init')
-  const isAuthenticated = useMemo(() => !!userToken, [userToken])
+const getUser = async (): Promise<User> => {
+  const response = await axios.get(API_URL + 'me', { headers: authHeader() })
+  return response.data
+}
 
+export function AuthProvider({ children }: PropsWithChildren) {
+  const [userToken, setUserToken] = useState<string | null>(null)
+  const [userFetchStatus, setUserFetchStatus] = useState<UserFetchStatus>('init')
+  const isAuthenticated = useMemo(() => !!userToken, [userToken])
+  const queryClient = useQueryClient()
+
+  const logout = useCallback(() => {
+    setUserToken(null)
+    localStorage.removeItem('user_token')
+    queryClient.clear()
+  }, [])
+
+  const { data: user } = useQuery("user", async () => {
+    setUserFetchStatus('fetchingUser')
+    return await getUser()
+  }, {
+    enabled: isAuthenticated,
+    onSuccess: () => setUserFetchStatus('fetched'),
+    onError: () => setUserFetchStatus('fetchFailed'),
+  })
   const authHandler = useCallback(async (response: CredentialResponse) => {
     if (response.credential) {
       setUserToken(response.credential)
       localStorage.setItem('user_token', response.credential)
-      setUserFetchStatus('fetchingUser')
-      try {
-        const user = await ApiService.getUser()
-        setUser({
-          ...user.data,
-          loaded: true,
-        })
-        setUserFetchStatus('fetched')
-      } catch (e) {
-        setUserFetchStatus('fetchFailed')
-      }
     }
   }, [])
 
@@ -77,9 +87,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
         userToken,
         isAuthenticated,
         user,
-        setUser,
         authenticate,
         userFetchStatus,
+        logout
       }}
     >
       {children}
