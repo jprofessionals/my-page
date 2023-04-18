@@ -4,6 +4,7 @@ import { AuthProvider } from '@/providers/AuthProvider'
 import dynamic from 'next/dynamic'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { QueryClient, QueryClientProvider } from "react-query";
 
 export default function App({
   Component,
@@ -12,6 +13,9 @@ export default function App({
   const NavBar = dynamic(() => import('@/components/navbar/NavBar'), {
     ssr: false,
   })
+
+  const queryClient = new QueryClient()
+
   return (
     <>
       <ToastContainer
@@ -23,10 +27,12 @@ export default function App({
         draggable={true}
         theme="colored"
       />
-      <AuthProvider>
-        <NavBar />
-        <Component {...pageProps} />
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <NavBar/>
+          <Component {...pageProps} />
+        </AuthProvider>
+      </QueryClientProvider>
     </>
   )
 }
