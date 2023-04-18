@@ -2,13 +2,16 @@ import { Budget } from '@/types'
 import BudgetItem from '@/components/budget/BudgetItem'
 import styles from './BudgetList.module.scss'
 import { Accordion } from 'react-bootstrap'
+import {AccordionEventKey} from "react-bootstrap/AccordionContext";
 
 type Props = {
   budgets: Budget[]
   refreshBudgets: (userId?: string) => void
+  activeBudgetId: AccordionEventKey | null
+  updateActiveBudget: (budgetId: AccordionEventKey) => void
 }
 
-const BudgetList = ({ budgets, refreshBudgets }: Props) => {
+const BudgetList = ({ budgets, refreshBudgets,activeBudgetId, updateActiveBudget }: Props) => {
   if (budgets.length === 0) {
     return (
       <div>
@@ -25,7 +28,12 @@ const BudgetList = ({ budgets, refreshBudgets }: Props) => {
           <h3>Dine budsjetter</h3>
         </div>
         <div>
-          <Accordion>
+          <Accordion
+              activeKey={activeBudgetId}
+              onSelect={(selectedBudget) => {
+                  updateActiveBudget(selectedBudget)
+              }}
+          >
             {budgets.map((budget) => (
               <BudgetItem
                 key={budget.id}
