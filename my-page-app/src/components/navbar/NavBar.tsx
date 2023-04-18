@@ -10,11 +10,10 @@ import { useAuthContext } from '@/providers/AuthProvider'
 import { useRouter } from 'next/router'
 
 const NavBar = () => {
-  const { user, setUser } = useAuthContext()
+  const { user, logout } = useAuthContext()
   const router = useRouter()
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem('user_token')
+  const handleLogout = () => {
+    logout()
     router.push('/loggut')
   }
   return (
@@ -67,7 +66,7 @@ const NavBar = () => {
                 <FontAwesomeIcon
                   icon={faSignOut}
                   onClick={() => {
-                    logout()
+                    handleLogout()
                   }}
                   title="Logg ut"
                 />
@@ -76,7 +75,7 @@ const NavBar = () => {
                 <FontAwesomeIcon
                   icon={faSignOut}
                   onClick={() => {
-                    logout()
+                    handleLogout()
                   }}
                   title="Logg ut"
                 />
