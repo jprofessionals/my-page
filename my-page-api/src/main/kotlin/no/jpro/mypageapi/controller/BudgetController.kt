@@ -45,6 +45,23 @@ class BudgetController(private val userService: UserService, private val budgetS
         return budgetService.getBudgets(employeeNumber)
     }
 
+    @GetMapping("")
+    @RequiresAdmin
+    @Operation(summary = "Get all budgets for all users.")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json", array = ArraySchema(
+                schema = Schema(implementation = BudgetDTO::class)
+            )
+        )]
+    )
+    fun getBudgets(
+        token: JwtAuthenticationToken,
+    ): List<BudgetDTO> {
+        return budgetService.getBudgets()
+    }
+
     @PostMapping("{budgetId}/posts")
     @Operation(summary = "Create a new post related to an existing budget.")
     @ApiResponse(

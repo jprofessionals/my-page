@@ -30,6 +30,11 @@ class BudgetService(
         return budgets.map { budgetPostMapper.toBudgetDTO(it) }
     }
 
+    fun getBudgets(): List<BudgetDTO> {
+        val budgets = budgetRepository.findAll()
+        return budgets.map { budgetPostMapper.toBudgetDTO(it) }
+    }
+
     fun createPost(postRequest: CreatePostDTO, budget: Budget, createdBy: User): PostDTO {
         val post = budgetPostMapper.toPost(postRequest).copy(
             budget = budget,
