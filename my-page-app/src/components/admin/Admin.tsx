@@ -7,6 +7,7 @@ import BudgetList from '@/components/budget/BudgetList'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronCircleUp, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 import {faChevronCircleDown} from "@fortawesome/free-solid-svg-icons/faChevronCircleDown";
+import {AccordionEventKey} from "react-bootstrap/AccordionContext";
 
 function Admin() {
   const [users, setUsers] = useState<User[]>([])
@@ -14,6 +15,7 @@ function Admin() {
   const [isLoading, setIsLoading] = useState(true)
   const [expandedUser, setExpandedUser] = useState<string>('')
   const [filterValue, setFilterValue] = useState('')
+  const [activeBudget, setActiveBudget] = useState<AccordionEventKey | null>(null)
 
   useEffect(() => {
     refreshTable()
@@ -203,6 +205,8 @@ function Admin() {
                                 <BudgetList
                                     budgets={userRow.budgets ?? []}
                                     refreshBudgets={refreshTable}
+                                    activeBudgetId={activeBudget}
+                                    updateActiveBudget={setActiveBudget}
                                 />
                               </td>
                             </tr>

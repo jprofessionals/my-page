@@ -9,6 +9,7 @@ import Loading from '@/components/Loading'
 import UserInformation from '@/components/UserInformation'
 import { useAuthContext } from '@/providers/AuthProvider'
 import ErrorPage from '@/components/ErrorPage'
+import {AccordionEventKey} from "react-bootstrap/AccordionContext";
 
 const BudgetList = dynamic(() => import('@/components/budget/BudgetList'), {
   ssr: false,
@@ -21,6 +22,7 @@ export default function HomePage() {
   const [budgetLoadingStatus, setBudgetLoadingStatus] =
     useState<BudgetLoadingStatus>('init')
   const { userFetchStatus } = useAuthContext()
+  const [activeBudget, setActiveBudget] = useState<AccordionEventKey | null>(null)
 
   const refreshBudgets = useCallback(async () => {
     setBudgetLoadingStatus('loading')
@@ -53,7 +55,7 @@ export default function HomePage() {
             loadingText="Laster inn ditt budsjett..."
           >
             {budgetLoadingStatus === 'completed' ? (
-              <BudgetList budgets={budgets} refreshBudgets={refreshBudgets} />
+              <BudgetList budgets={budgets} refreshBudgets={refreshBudgets} activeBudgetId={activeBudget} updateActiveBudget={setActiveBudget} />
             ) : (
               <ErrorPage errorText="Din bruker er autentisert, men vi klarte likevel ikke å hente ut dine budsjetter. Prøv igjen senere." />
             )}
