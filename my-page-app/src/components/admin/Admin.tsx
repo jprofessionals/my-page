@@ -15,8 +15,7 @@ function Admin() {
   const [isLoading, setIsLoading] = useState(true)
   const [expandedUser, setExpandedUser] = useState<string>('')
   const [filterValue, setFilterValue] = useState('')
-
-  const [activeBudget, setActiveBudget] = useState(null as AccordionEventKey | null)
+  const [activeBudget, setActiveBudget] = useState<AccordionEventKey | null>(null)
 
   useEffect(() => {
     refreshTable()

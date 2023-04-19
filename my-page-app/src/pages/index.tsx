@@ -22,7 +22,7 @@ export default function HomePage() {
   const [budgetLoadingStatus, setBudgetLoadingStatus] =
     useState<BudgetLoadingStatus>('init')
   const { userFetchStatus } = useAuthContext()
-  const [activeBudget, setActiveBudget] = useState(null as AccordionEventKey | null)
+  const [activeBudget, setActiveBudget] = useState<AccordionEventKey | null>(null)
 
   const refreshBudgets = useCallback(async () => {
     setBudgetLoadingStatus('loading')
