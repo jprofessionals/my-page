@@ -7,12 +7,54 @@ import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.UserMapper
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
     private val userMapper: UserMapper,
+    private val budgetService: BudgetService
 ) {
+
+    fun initializeNewEmployee(email: String, employeeNumber: Int, budgetStartDate: LocalDate): User {
+        val existingUser = getUserByEmail(email)
+
+        existingUser?.let { initializeNewEmployeeIfAlreadyInDatabase(it, employeeNumber, budgetStartDate) }
+            ?: initializeNewEmployeeIfNotInDatabase(email, employeeNumber, budgetStartDate)
+    }
+
+    private fun initializeNewEmployeeIfNotInDatabase(email: String, employeeNumber: Int, budgetStartDate: LocalDate) {
+        val user = saveUser(email, employeeNumber)
+        budgetService.initializeBudgetsForNewEmployee(user, budgetStartDate)
+    }
+
+    private fun saveUser(email: String, employeeNumber: Int): User {
+        return userRepository.save(
+            User(
+                email = email,
+                employeeNumber = employeeNumber,
+                budgets = listOf(),
+                familyName = null,
+                givenName = null,
+                name = null
+            )
+        )
+    }
+
+    private fun initializeNewEmployeeIfAlreadyInDatabase(
+        existingUser: User,
+        employeeNumber: Int,
+        budgetStartDate: LocalDate
+    ) {
+        saveUpdatedEmployeeNumberForUser(existingUser, employeeNumber)
+        budgetService.initializeBudgetsForNewEmployee(existingUser, budgetStartDate)
+    }
+
+    private fun saveUpdatedEmployeeNumberForUser(user: User, employeeNumber: Int) {
+        val updatedUser = user.copy(employeeNumber = employeeNumber)
+        userRepository.save(updatedUser)
+    }
+
     fun getOrCreateUser(jwt: Jwt): UserDTO {
         val user =
             userRepository.findUserBySub(jwt.getSub())
