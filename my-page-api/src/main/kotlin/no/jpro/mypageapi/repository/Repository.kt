@@ -23,6 +23,7 @@ interface BudgetRepository : JpaRepository<Budget, Long> {
     fun findBudgetsByUserEmployeeNumber(userEmployeeNumber: Int): List<Budget>
     fun findBudgetsByUserEmail(userEmail: String): List<Budget>
     fun findBudgetById(budgetId: Long): Budget
+    fun findBudgetsByUserEmailAndBudgetTypeIn(userEmail: String, budgetTypes: List<BudgetType>): List<Budget>
 }
 
 @Repository
