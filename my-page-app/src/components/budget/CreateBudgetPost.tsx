@@ -1,16 +1,31 @@
 import React, { useState } from 'react'
-import ApiService from '../../services/api.service'
+import ApiService, { API_URL } from '../../services/api.service'
 import Moment from 'moment'
-import { Card, Button, Spinner } from 'react-bootstrap'
+import { Button, Card } from 'react-bootstrap'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { Budget } from '@/types'
+import { Budget, Post } from '@/types'
 import Loading from '@/components/Loading'
+import { useMutation } from "react-query";
+import axios from "axios";
+import authHeader from "@/services/auth-header";
 
 type Props = {
   budget: Budget
   refreshBudgets: Function
   toggle: Function
+}
+
+type CreatePostVariables = {
+  post: Post
+  budgetId: string
+}
+
+const postBudgetPost = async ({post, budgetId}: CreatePostVariables): Promise<Post> => {
+  const response = await axios.post(API_URL + 'budget/' + budgetId + '/posts', post, {
+    headers: authHeader(),
+  })
+  return response.data
 }
 
 const CreateBudgetPost = ({ budget, refreshBudgets, toggle }: Props) => {
@@ -19,32 +34,30 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }: Props) => {
   const [date, setDate] = useState(Moment().format('YYYY-MM-DD'))
   const [isLoadingPost, setIsLoadingPost] = useState(false)
 
+  const { mutate: createBudgetPost, isLoading } = useMutation(postBudgetPost, {
+    onSuccess: () => {
+      refreshBudgets()
+      toggle()
+      toast.success('Lagret ' + description)
+    },
+    onError: () => {
+      toast.error('Fikk ikke opprettet ' + description + ', prøv igjen')
+    }
+  })
   const isValid = amountExMva > 0 && description && description !== ''
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!isValid) {
       toast.error('Noen av verdiene var ikke gyldig, prøv igjen')
     } else {
-      setIsLoadingPost(true)
-      const budgetPost = {
+      const budgetPost: Post = {
         date: date,
         description: description,
         amountExMva: amountExMva,
         expense: true,
       }
-      ApiService.createBudgetPost(budgetPost, budget.id).then(
-        (response) => {
-          refreshBudgets()
-          toggle()
-          setIsLoadingPost(false)
-          toast.success('Lagret ' + description)
-        },
-        (error) => {
-          setIsLoadingPost(false)
-          toast.error('Fikk ikke opprettet ' + description + ', prøv igjen')
-        },
-      )
+      createBudgetPost({post: budgetPost, budgetId: budget.id})
     }
   }
 
