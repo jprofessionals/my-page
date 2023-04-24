@@ -14,6 +14,7 @@ interface UserRepository : JpaRepository<User, String> {
 
 @Repository
 interface BudgetTypeRepository : JpaRepository<BudgetType, Long> {
+    fun findBudgetTypesByDefault(default: Boolean): List<BudgetType>
 }
 
 @Repository

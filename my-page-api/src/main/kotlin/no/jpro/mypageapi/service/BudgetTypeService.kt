@@ -9,8 +9,8 @@ class BudgetTypeService(
     private val budgetTypeRepository: BudgetTypeRepository
 ) {
 
-    fun getBudgetTypes(): List<BudgetType> {
-        return budgetTypeRepository.findAll()
+    fun getDefaultBudgetTypes(): List<BudgetType> {
+        return budgetTypeRepository.findBudgetTypesByDefault(true)
     }
 
 }

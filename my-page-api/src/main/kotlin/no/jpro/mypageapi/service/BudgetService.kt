@@ -78,7 +78,11 @@ class BudgetService(
         return budgetRepository.saveAll(budgets)
     }
 
-    private fun createBudgetsFromBudgetTypes(budgetTypes: List<BudgetType>, user: User, startDate: LocalDate): List<Budget> {
+    private fun createBudgetsFromBudgetTypes(
+        budgetTypes: List<BudgetType>,
+        user: User,
+        startDate: LocalDate
+    ): List<Budget> {
         return budgetTypes.map { budgetType ->
             Budget(
                 startAmount = budgetType.startAmount,
@@ -92,16 +96,7 @@ class BudgetService(
     }
 
     private fun getDefaultBudgetTypes(): List<BudgetType> {
-        val budgetTypes = budgetTypeService.getBudgetTypes()
-
-        val defaultBudgetTypes = budgetTypes.filter { budgetType ->
-            budgetType.name == "Kompetanse" ||
-                    budgetType.name == "Hjemmekontor" ||
-                    budgetType.name == "Laptop" ||
-                    budgetType.name == "Mobil"
-        }
-
-        return defaultBudgetTypes
+        return budgetTypeService.getDefaultBudgetTypes()
     }
 
     private fun checkIfUserHasAnyBudgetsForGivenBudgetTypes(user: User, budgetTypes: List<BudgetType>): Boolean {
