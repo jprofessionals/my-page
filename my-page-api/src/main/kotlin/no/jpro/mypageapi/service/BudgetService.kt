@@ -65,14 +65,7 @@ class BudgetService(
         return budgetRepository.findBudgetById(budgetId)
     }
 
-    fun createDefaultSetOfBudgets(email: String, startDate: LocalDate): List<Budget> {
-        val user = userService.getUserByEmail(email)
-            ?: throw IllegalArgumentException("User with email $email does not exist")
-
-        return createDefaultSetOfBudgets(user, startDate)
-    }
-
-    private fun createDefaultSetOfBudgets(user: User, startDate: LocalDate): List<Budget> {
+    fun initializeBudgetsForNewEmployee(user: User, startDate: LocalDate): List<Budget> {
         val defaultBudgetTypes = getDefaultBudgetTypes()
         val userHasBudgets = checkIfUserHasAnyBudgetsForGivenBudgetTypes(user, defaultBudgetTypes)
 
