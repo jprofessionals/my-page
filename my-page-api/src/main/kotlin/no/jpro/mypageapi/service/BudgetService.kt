@@ -19,7 +19,6 @@ class BudgetService(
     private val budgetRepository: BudgetRepository,
     private val budgetPostMapper: BudgetPostMapper,
     private val postRepository: PostRepository,
-    private val userService: UserService,
     private val budgetTypeService: BudgetTypeService
 ) {
 
@@ -65,15 +64,20 @@ class BudgetService(
         return budgetRepository.findBudgetById(budgetId)
     }
 
-    fun initializeBudgetsForNewEmployee(user: User, startDate: LocalDate): List<Budget> {
+    fun initializeBudgetsForNewEmployee(user: User, budgetStartDate: LocalDate): List<Budget> {
         val defaultBudgetTypes = getDefaultBudgetTypes()
-        val userHasBudgets = checkIfUserHasAnyBudgetsForGivenBudgetTypes(user, defaultBudgetTypes)
 
-        if (userHasBudgets) {
-            throw IllegalArgumentException("User already has budgets for default budget types")
-        }
+        ensureUserHasNoBudgetsForGivenBudgetTypes(user, defaultBudgetTypes)
 
-        val budgets = createBudgetsFromBudgetTypes(defaultBudgetTypes, user, startDate)
+        return saveBudgetsFromBudgetTypes(defaultBudgetTypes, user, budgetStartDate)
+    }
+
+    private fun saveBudgetsFromBudgetTypes(
+        defaultBudgetTypes: List<BudgetType>,
+        user: User,
+        budgetStartDate: LocalDate
+    ): MutableList<Budget> {
+        val budgets = createBudgetsFromBudgetTypes(defaultBudgetTypes, user, budgetStartDate)
 
         return budgetRepository.saveAll(budgets)
     }
@@ -99,19 +103,15 @@ class BudgetService(
         return budgetTypeService.getDefaultBudgetTypes()
     }
 
-    private fun checkIfUserHasAnyBudgetsForGivenBudgetTypes(user: User, budgetTypes: List<BudgetType>): Boolean {
-        val budgetsForUser = getBudgetsForUser(user)
-        val budgetTypesForUser = budgetsForUser.map { budget -> budget.budgetType }
+    private fun ensureUserHasNoBudgetsForGivenBudgetTypes(user: User, budgetTypes: List<BudgetType>) {
+        val email = user.email
+            ?: throw IllegalArgumentException("Cannot check budgets for user with no email")
+        val hasBudgets = budgetRepository.findBudgetsByUserEmailAndBudgetTypeIn(email, budgetTypes)
+            .any()
 
-        return budgetTypesForUser.any { budgetType -> budgetTypes.contains(budgetType) }
-    }
-
-    private fun getBudgetsForUser(user: User): List<Budget> {
-        if (user.email == null) {
-            throw IllegalArgumentException("Could not get budgets for user with no email")
+        if (hasBudgets) {
+            throw IllegalArgumentException("User already has budgets for default budget types")
         }
-
-        return budgetRepository.findBudgetsByUserEmail(user.email)
     }
 
 }

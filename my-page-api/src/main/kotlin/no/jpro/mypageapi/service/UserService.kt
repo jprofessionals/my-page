@@ -7,6 +7,7 @@ import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.UserMapper
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
@@ -16,16 +17,15 @@ class UserService(
     private val budgetService: BudgetService
 ) {
 
+    @Transactional
     fun initializeNewEmployee(email: String, employeeNumber: Int, budgetStartDate: LocalDate): User {
         val existingUser = getUserByEmail(email)
 
-        existingUser?.let { initializeNewEmployeeIfAlreadyInDatabase(it, employeeNumber, budgetStartDate) }
-            ?: initializeNewEmployeeIfNotInDatabase(email, employeeNumber, budgetStartDate)
-    }
+        val userWithEmployeeNumber = existingUser?.let {
+            saveUpdatedEmployeeNumberForUser(it, employeeNumber)
+        } ?: saveUser(email, employeeNumber)
 
-    private fun initializeNewEmployeeIfNotInDatabase(email: String, employeeNumber: Int, budgetStartDate: LocalDate) {
-        val user = saveUser(email, employeeNumber)
-        budgetService.initializeBudgetsForNewEmployee(user, budgetStartDate)
+        budgetService.initializeBudgetsForNewEmployee(userWithEmployeeNumber, budgetStartDate)
     }
 
     private fun saveUser(email: String, employeeNumber: Int): User {
@@ -41,16 +41,7 @@ class UserService(
         )
     }
 
-    private fun initializeNewEmployeeIfAlreadyInDatabase(
-        existingUser: User,
-        employeeNumber: Int,
-        budgetStartDate: LocalDate
-    ) {
-        saveUpdatedEmployeeNumberForUser(existingUser, employeeNumber)
-        budgetService.initializeBudgetsForNewEmployee(existingUser, budgetStartDate)
-    }
-
-    private fun saveUpdatedEmployeeNumberForUser(user: User, employeeNumber: Int) {
+    private fun saveUpdatedEmployeeNumberForUser(user: User, employeeNumber: Int): User {
         val updatedUser = user.copy(employeeNumber = employeeNumber)
         userRepository.save(updatedUser)
     }
