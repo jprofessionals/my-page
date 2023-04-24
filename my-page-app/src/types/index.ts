@@ -29,7 +29,7 @@ export type Budget = {
   sumHoursLastTwelveMonths: number
 }
 
-type Post = {
+export type Post = {
   id?: number
   date: Date
   description?: string
