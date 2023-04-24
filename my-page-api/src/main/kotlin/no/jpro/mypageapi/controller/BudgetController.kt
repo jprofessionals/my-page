@@ -17,12 +17,10 @@ import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.BudgetService
 import no.jpro.mypageapi.service.UserService
-import no.jpro.mypageapi.utils.mapper.BudgetMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDate
 
 @RestController
 @RequestMapping("budget")
@@ -30,7 +28,6 @@ import java.time.LocalDate
 class BudgetController(
     private val userService: UserService,
     private val budgetService: BudgetService,
-    private val budgetMapper: BudgetMapper
 ) {
 
     @GetMapping("{employeeNumber}")
@@ -107,27 +104,6 @@ class BudgetController(
             return ResponseEntity.badRequest().build()
         }
         return ResponseEntity.ok(budgetService.editPost(editPostRequest, postToEdit))
-    }
-
-    @PostMapping("createDefaultBudgets")
-    @RequiresAdmin
-    @Operation(summary = "Create a default set of budgets for a user.")
-    @ApiResponse(
-        responseCode = "200",
-        content = [Content(
-            mediaType = "application/json", array = ArraySchema(
-                schema = Schema(implementation = BudgetDTO::class)
-            )
-        )]
-    )
-    fun createDefaultBudgets(
-        token: JwtAuthenticationToken,
-        @RequestParam("email") email: String,
-        @RequestParam("startDate") startDate: LocalDate,
-    ): List<BudgetDTO> {
-        return budgetService
-            .createDefaultSetOfBudgets(email, startDate)
-            .map { budgetMapper.toBudgetDTO(it) }
     }
 
     private fun userPermittedToManageBudget(budget: Budget, user: User) = (budget.user?.id == user.id || user.admin)
