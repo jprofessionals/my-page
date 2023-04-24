@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
-@ControllerAdvice(assignableTypes = [BudgetController::class])
-class BudgetControllerAdvice : ResponseEntityExceptionHandler() {
+@ControllerAdvice(assignableTypes = [UserController::class])
+class UserControllerAdvice : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgumentException(ex: IllegalArgumentException): ResponseEntity<Any> {
