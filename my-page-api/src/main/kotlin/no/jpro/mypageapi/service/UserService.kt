@@ -26,6 +26,8 @@ class UserService(
         } ?: saveUser(email, employeeNumber)
 
         budgetService.initializeBudgetsForNewEmployee(userWithEmployeeNumber, budgetStartDate)
+
+        return userWithEmployeeNumber
     }
 
     private fun saveUser(email: String, employeeNumber: Int): User {
@@ -43,7 +45,7 @@ class UserService(
 
     private fun saveUpdatedEmployeeNumberForUser(user: User, employeeNumber: Int): User {
         val updatedUser = user.copy(employeeNumber = employeeNumber)
-        userRepository.save(updatedUser)
+        return userRepository.save(updatedUser)
     }
 
     fun getOrCreateUser(jwt: Jwt): UserDTO {
