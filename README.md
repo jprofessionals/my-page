@@ -12,6 +12,23 @@ Install nvm - https://github.com/nvm-sh/nvm#installation or https://tecadmin.net
 ### Node
 Install node - `nvm install node`
 
+## Running the API
+
+Running the API locally (in IDEA or on commandline) requires a database - activate the profile `h2` or `local` (the `local`profile requires a running MySQL db (see application-local.properties for connection details))
+
+The API can also be run using the maven wrapper locally `./mvnw -DskipTests -Dspring-boot.run.profiles=local clean spring-boot:run`
+
+The api will run on localhost:8080 - See http://localhost:8080/api/swagger-ui/index.html for api doc
+
+## Running the app
+
+Build the app with `npm install` and run it with `npm run dev. The app on localhost:3000 (with a proxy to the local api).
+
+### Local MySQl
+
+`docker run -e MYSQL_USER=mypage -e MYSQL_PASSWORD=mypage -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=mypage -d -p 3306:3306 mysql:5.7.8`
+
+
 ### CLI for Google Cloud
 
 If you are only doing local development and testing, there is
@@ -26,21 +43,6 @@ Install gcloud cli - https://cloud.google.com/sdk/docs/install & https://cloud.g
 
 `gcloud config set project my-page-jpro`
 
-## Running the API
-
-Running the API locally (in IDEA or on commandline) requires a database - activate the profile `h2` or `local` (the `local`profile requires a running MySQL db (see application-local.properties for connection details))
-
-The API can also be run using the maven wrapper locally `./mvnw -DskipTests -Dspring-boot.run.profiles=local clean spring-boot:run`
-
-The api will run on localhost:8080 - See http://localhost:8080/api/swagger-ui/index.html for api doc
-
-### Local MySQl
-
-`docker run -e MYSQL_USER=mypage -e MYSQL_PASSWORD=mypage -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=mypage -d -p 3306:3306 mysql:5.7.8`
-
-## Running the app
-
-Build the app with `npm install` and run it with `npm start. The app on localhost:3000 (with a proxy to the local api).
 
 # Deploy
 
