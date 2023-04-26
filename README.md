@@ -22,12 +22,16 @@ The api will run on localhost:8080 - See http://localhost:8080/api/swagger-ui/in
 
 ## Running the app
 
-Build the app with `npm install` and run it with `npm run dev. The app on localhost:3000 (with a proxy to the local api).
+Build the app with `npm install` and run it with `npm run dev`. The app will run on http://localhost:3000 (with a proxy to the api running on localhost:8080).
 
 ### Local MySQl
 
+There is a Docker Compose file for running a local MySQL with some semi-random testdata under `my-page-api`, this can be run with the following command: `docker-compose -f my-page-api/docker-compose.yaml up local-mypage-db -d`
+
+Alternatively you can run a clean MySQL db without data using the following:
 `docker run -e MYSQL_USER=mypage -e MYSQL_PASSWORD=mypage -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=mypage -d -p 3306:3306 mysql:5.7.8`
 
+Both of these will set up MySQL to work when running the api with the `local` profile.
 
 ### CLI for Google Cloud
 
