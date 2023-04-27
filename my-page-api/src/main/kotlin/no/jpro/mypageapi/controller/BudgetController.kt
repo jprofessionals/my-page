@@ -25,7 +25,10 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("budget")
 @SecurityRequirement(name = "Bearer Authentication")
-class BudgetController(private val userService: UserService, private val budgetService: BudgetService) {
+class BudgetController(
+    private val userService: UserService,
+    private val budgetService: BudgetService,
+) {
 
     @GetMapping("{employeeNumber}")
     @RequiresAdmin
@@ -104,4 +107,6 @@ class BudgetController(private val userService: UserService, private val budgetS
     }
 
     private fun userPermittedToManageBudget(budget: Budget, user: User) = (budget.user?.id == user.id || user.admin)
+
+
 }
