@@ -2,16 +2,21 @@ import { FormEvent, useState } from 'react'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import NewEmployeeForm from '@/components/newemployee/NewEmployeeForm'
-import { NewEmployeeDTO } from '@/types'
+import { NewEmployee } from '@/types'
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { API_URL } from '@/services/api.service'
 import authHeader from '@/services/auth-header'
 
-const createNewEmployee = async (newEmployeeDTO: NewEmployeeDTO) => {
+const createNewEmployee = async (newEmployee: NewEmployee) => {
+  const modifiedNewEmployee = {
+    ...newEmployee,
+    employeeNumber: parseInt(newEmployee.employeeNumber, 10),
+  }
+
   return await axios.post(
     API_URL + 'user',
-    newEmployeeDTO,
+    modifiedNewEmployee,
     {
       headers: authHeader(),
     },
@@ -20,9 +25,9 @@ const createNewEmployee = async (newEmployeeDTO: NewEmployeeDTO) => {
 
 export default function NewUserModal() {
   const [show, setShow] = useState(false)
-  const [inputData, setInputData] = useState<NewEmployeeDTO>({
+  const [inputData, setInputData] = useState<NewEmployee>({
     email: '',
-    employeeNumber: 0,
+    employeeNumber: '',
     budgetStartDate: '',
   })
 
@@ -52,7 +57,7 @@ export default function NewUserModal() {
   const resetInputData = () => {
     setInputData({
       email: '',
-      employeeNumber: 0,
+      employeeNumber: '',
       budgetStartDate: '',
     })
   }

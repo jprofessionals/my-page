@@ -1,11 +1,11 @@
 import { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import styles from './NewEmployeeForm.module.scss'
-import { NewEmployeeDTO } from '@/types'
+import { NewEmployee } from '@/types'
 
 
 type Props = {
-  inputData: NewEmployeeDTO,
-  setInputData: Dispatch<SetStateAction<NewEmployeeDTO>>
+  inputData: NewEmployee,
+  setInputData: Dispatch<SetStateAction<NewEmployee>>
 }
 
 const NewEmployeeForm = ({ inputData, setInputData }: Props) => {
