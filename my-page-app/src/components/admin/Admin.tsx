@@ -236,7 +236,7 @@ function Admin() {
             </tbody>
           </Table>
         </div>
-        <NewUserModal></NewUserModal>
+        <NewUserModal />
       </>
     )
   }
