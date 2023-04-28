@@ -62,3 +62,9 @@ export type BudgetType = {
   allowTimeBalance: boolean
   balanceIsHours?: boolean
 }
+
+export type NewEmployeeDTO = {
+  email: string
+  employeeNumber: number
+  budgetStartDate: string
+}
