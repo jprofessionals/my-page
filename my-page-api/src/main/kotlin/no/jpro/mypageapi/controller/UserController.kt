@@ -11,6 +11,7 @@ import no.jpro.mypageapi.dto.NewEmployeeDTO
 import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.service.UserService
 import no.jpro.mypageapi.utils.mapper.UserMapper
+import org.slf4j.LoggerFactory
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.*
 
@@ -21,6 +22,8 @@ class UserController(
     private val userService: UserService,
     private val userMapper: UserMapper
 ) {
+
+    private val logger = LoggerFactory.getLogger(UserController::class.java)
 
     @GetMapping
     @RequiresAdmin
@@ -38,6 +41,7 @@ class UserController(
         token: JwtAuthenticationToken,
         @Valid @RequestBody newEmployeeDTO: NewEmployeeDTO
     ): UserDTO {
+        logger.info("Initializing new employee with email ${newEmployeeDTO.email}")
         val user = userService.initializeNewEmployee(
             newEmployeeDTO.email,
             newEmployeeDTO.employeeNumber,
