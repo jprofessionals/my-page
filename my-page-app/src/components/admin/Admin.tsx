@@ -1,13 +1,26 @@
-import React, {Fragment, MouseEvent, useEffect, useState} from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import apiService from '../../services/api.service'
-import {toast} from 'react-toastify'
-import {Spinner, Table} from 'react-bootstrap'
-import {Budget, BudgetType, User} from '@/types'
+import { toast } from 'react-toastify'
+import { Spinner, Table } from 'react-bootstrap'
+import { Budget, BudgetType, User } from '@/types'
 import BudgetList from '@/components/budget/BudgetList'
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChevronCircleUp, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
-import {faChevronCircleDown} from "@fortawesome/free-solid-svg-icons/faChevronCircleDown";
-import {AccordionEventKey} from "react-bootstrap/AccordionContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronCircleUp } from '@fortawesome/free-solid-svg-icons'
+import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown'
+import { AccordionEventKey } from 'react-bootstrap/AccordionContext'
+import NewUserModal from '@/components/admin/NewUserModal'
+
+function compareUsers(a: User, b: User): number {
+  if (a.name === null && b.name === null) {
+    return a.email.localeCompare(b.email)
+  } else if (a.name === null) {
+    return a.email.localeCompare(b.name)
+  } else if (b.name === null) {
+    return a.name.localeCompare(b.email)
+  } else {
+    return a.name.localeCompare(b.name)
+  }
+}
 
 function Admin() {
   const [users, setUsers] = useState<User[]>([])
@@ -26,36 +39,36 @@ function Admin() {
     if (users.length > 0) {
       const extractedBudgetTypes: BudgetType[] = []
       users.map((user) =>
-          user?.budgets?.forEach((budget) => {
-            if (!budgetTypeListContains(extractedBudgetTypes, budget)) {
-              extractedBudgetTypes.push(budget.budgetType)
-              if (budget.budgetType.allowTimeBalance) {
-                const budgetType = {
-                  ...budget.budgetType,
-                  balanceIsHours: true,
-                  name: budget.budgetType.name + '(timer)',
-                }
-                extractedBudgetTypes.push(budgetType)
+        user?.budgets?.forEach((budget) => {
+          if (!budgetTypeListContains(extractedBudgetTypes, budget)) {
+            extractedBudgetTypes.push(budget.budgetType)
+            if (budget.budgetType.allowTimeBalance) {
+              const budgetType = {
+                ...budget.budgetType,
+                balanceIsHours: true,
+                name: budget.budgetType.name + '(timer)',
               }
+              extractedBudgetTypes.push(budgetType)
             }
-          }),
+          }
+        }),
       )
       setBudgetTypes(extractedBudgetTypes)
     }
   }
 
   const budgetTypeListContains = (
-      extractedBudgetTypes: BudgetType[],
-      newBudget: Budget,
+    extractedBudgetTypes: BudgetType[],
+    newBudget: Budget,
   ) => {
     return extractedBudgetTypes.some(
-        (budgetType: BudgetType) => budgetType.id === newBudget.budgetType.id,
+      (budgetType: BudgetType) => budgetType.id === newBudget.budgetType.id,
     )
   }
 
   const getBudgetBalanceForType = (budgets: Budget[], type: BudgetType) => {
     const foundBudget = budgets.find(
-        (budget) => budget.budgetType.id === type.id,
+      (budget) => budget.budgetType.id === type.id,
     )
     if (!foundBudget) return null
     if (type.balanceIsHours) {
@@ -88,8 +101,8 @@ function Admin() {
   const budgetBalanceHoursCurrentYear = (budget: Budget) => {
     if (budget) {
       return (
-          budget.sumHoursCurrentYear +
-          (budget.sumHoursCurrentYear === 1 ? ' time' : ' timer')
+        budget.sumHoursCurrentYear +
+        (budget.sumHoursCurrentYear === 1 ? ' time' : ' timer')
       )
     } else {
       return '-'
@@ -104,119 +117,127 @@ function Admin() {
   const refreshTable = () => {
     setIsLoading(true)
     apiService
-        .getUsers()
-        .then((responseSummary) => {
-          setUsers(responseSummary.data)
-          extractListOfBudgets(responseSummary.data)
-          setIsLoading(false)
-        })
-        .catch(() => {
-          setIsLoading(false)
-          toast.error('Klarte ikke laste liste over ansatte, prøv igjen senere')
-        })
+      .getUsers()
+      .then((responseSummary) => {
+        setUsers(responseSummary.data)
+        extractListOfBudgets(responseSummary.data)
+        setIsLoading(false)
+      })
+      .catch(() => {
+        setIsLoading(false)
+        toast.error('Klarte ikke laste liste over ansatte, prøv igjen senere')
+      })
   }
 
   if (isLoading) {
     return (
-        <div className="loadSpin d-flex align-items-center">
-          <Spinner animation="border" className="spinn"/>
-          <h3>Laster inn oversikt</h3>
-        </div>
+      <div className='loadSpin d-flex align-items-center'>
+        <Spinner animation='border' className='spinn' />
+        <h3>Laster inn oversikt</h3>
+      </div>
     )
   } else if (!isLoading && users.length === 0) {
     return <h3>Fant ikke noe data...</h3>
   } else {
     return (
-        <>
-          <div className="admin-container">
-            <h2>Brukere</h2>
+      <>
+        <div className='admin-container'>
+          <h2>Brukere</h2>
 
-            {/* Add text input field */}
-            <div className="mb-3">
-              <label htmlFor="filterInput" className="form-label">
-                Filtrer brukere:
-              </label>
-              <input
-                  type="text"
-                  className="form-control"
-                  id="filterInput"
-                  onChange={(e) => setFilterValue(e.target.value)}
-                  style={{width: '300px'}}
-              />
-            </div>
-
-            <Table
-                striped
-                bordered
-                hover
-                style={
-                  !isLoading && budgetTypes.length > 0 ? {} : {display: 'none'}
-                }
-            >
-              <thead>
-              <tr key={'headerRow'}>
-                <th key={'brukerHeader'}>Brukere</th>
-                {budgetTypes.map((budgetType) => (
-                    <th key={budgetType.id + '' + budgetType.balanceIsHours}>
-                      {budgetType.name}
-                    </th>
-                ))}
-              </tr>
-              </thead>
-              <tbody>
-              {users
-                  .filter((user) =>
-                      user.name.toLowerCase().includes(filterValue.toLowerCase()),
-                  ) // Filter users by text input value
-                  .sort((a, b) => a.name.localeCompare(b.name))
-                  .map((userRow) => (
-                      <Fragment key={userRow.email}>
-                        <tr key={userRow.email}>
-                          {/* pass event object to handleExpandUser */}
-                          <td key={userRow.email}>{userRow.name}</td>
-                          {budgetTypes.map((budgetColumn) => (
-                              <td
-                                  key={
-                                      userRow.email +
-                                      budgetColumn.id +
-                                      '' +
-                                      budgetColumn.balanceIsHours
-                                  }
-                              >
-                                {getBudgetBalanceForType(
-                                    userRow.budgets!,
-                                    budgetColumn,
-                                )}
-                              </td>
-                          ))}
-                          <td onClick={() => handleExpandUser(userRow)}
-                              style={{display: 'flex', height: 41, justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}>
-                            <FontAwesomeIcon
-                                icon={userRow.email === expandedUser ? faChevronCircleUp :  faChevronCircleDown}
-                            />
-                          </td>
-                        </tr>
-                        {expandedUser === userRow.email ? (
-                            <tr
-                                key={`${userRow.email}-expanded`}
-                            >
-                              <td colSpan={budgetTypes.length + 2}>
-                                {/* +2 for brukere and expand button columns */}
-                                <BudgetList
-                                    budgets={userRow.budgets ?? []}
-                                    refreshBudgets={refreshTable}
-                                    activeBudgetId={activeBudget}
-                                    updateActiveBudget={setActiveBudget}
-                                />
-                              </td>
-                            </tr>
-                        ) : null}
-                      </Fragment>
-                  ))}
-              </tbody>
-            </Table>
+          {/* Add text input field */}
+          <div className='mb-3'>
+            <label htmlFor='filterInput' className='form-label'>
+              Filtrer brukere:
+            </label>
+            <input
+              type='text'
+              className='form-control'
+              id='filterInput'
+              onChange={(e) => setFilterValue(e.target.value)}
+              style={{ width: '300px' }}
+            />
           </div>
-        </>
+
+          <Table
+            striped
+            bordered
+            hover
+            style={
+              !isLoading && budgetTypes.length > 0 ? {} : { display: 'none' }
+            }
+          >
+            <thead>
+            <tr key={'headerRow'}>
+              <th key={'brukerHeader'}>Brukere</th>
+              {budgetTypes.map((budgetType) => (
+                <th key={budgetType.id + '' + budgetType.balanceIsHours}>
+                  {budgetType.name}
+                </th>
+              ))}
+            </tr>
+            </thead>
+            <tbody>
+            {users
+              .filter((user) =>
+                (user.name ? user.name.toLowerCase() : user.email.toLowerCase())
+                  .includes(filterValue.toLowerCase()),
+              ) // Filter users by text input value
+              .sort((a, b) => compareUsers(a, b))
+              .map((userRow) => (
+                <Fragment key={userRow.email}>
+                  <tr key={userRow.email}>
+                    {/* pass event object to handleExpandUser */}
+                    <td key={userRow.email}>{userRow.name ? userRow.name : userRow.email}</td>
+                    {budgetTypes.map((budgetColumn) => (
+                      <td
+                        key={
+                          userRow.email +
+                          budgetColumn.id +
+                          '' +
+                          budgetColumn.balanceIsHours
+                        }
+                      >
+                        {getBudgetBalanceForType(
+                          userRow.budgets!,
+                          budgetColumn,
+                        )}
+                      </td>
+                    ))}
+                    <td onClick={() => handleExpandUser(userRow)}
+                        style={{
+                          display: 'flex',
+                          height: 41,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                        }}>
+                      <FontAwesomeIcon
+                        icon={userRow.email === expandedUser ? faChevronCircleUp : faChevronCircleDown}
+                      />
+                    </td>
+                  </tr>
+                  {expandedUser === userRow.email ? (
+                    <tr
+                      key={`${userRow.email}-expanded`}
+                    >
+                      <td colSpan={budgetTypes.length + 2}>
+                        {/* +2 for brukere and expand button columns */}
+                        <BudgetList
+                          budgets={userRow.budgets ?? []}
+                          refreshBudgets={refreshTable}
+                          activeBudgetId={activeBudget}
+                          updateActiveBudget={setActiveBudget}
+                        />
+                      </td>
+                    </tr>
+                  ) : null}
+                </Fragment>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+        <NewUserModal></NewUserModal>
+      </>
     )
   }
 }
