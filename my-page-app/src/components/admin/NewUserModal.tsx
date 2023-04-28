@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { FormEvent, useState } from 'react'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import NewEmployeeForm from '@/components/newemployee/NewEmployeeForm'
@@ -41,7 +41,7 @@ export default function NewUserModal() {
     setShow(false)
   }
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
 
     mutate(inputData)
