@@ -1,8 +1,22 @@
 import JobPostingList from '@/components/jobposting/JobPostingList'
 import { JobPostingType } from '@/types'
+import { useQuery } from 'react-query'
+import axios from 'axios'
+import { API_URL } from '@/services/api.service'
+import authHeader from '@/services/auth-header'
+
+const getAllJobPostings = async () => {
+  const response = await axios.get(API_URL + 'jobposting', {
+    headers: authHeader(),
+  })
+
+  const jobPostings: JobPostingType[] = response.data
+
+  return jobPostings
+}
 
 export default function Utlysninger() {
-  const jobPostings: JobPostingType[] = []
+  const { data: jobPostings = [] } = useQuery('jobPostings', getAllJobPostings)
 
   const currentDate = new Date().toISOString().split('T')[0]
 
