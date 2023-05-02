@@ -68,3 +68,10 @@ export type NewEmployee = {
   employeeNumber: string
   budgetStartDate: string
 }
+
+export type JobPostingType = {
+  id: number
+  title: string
+  technologies: string[]
+  dueDate: string
+}
