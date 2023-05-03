@@ -11,4 +11,5 @@ data class JobPostingDTO(
     val location: String?,
     val dueDateForApplication: LocalDate?,
     val requiredYearsOfExperience: Int?,
+    val resourcesNeeded: Int?
 )
