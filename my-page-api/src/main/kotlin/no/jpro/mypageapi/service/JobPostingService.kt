@@ -1,13 +1,16 @@
 package no.jpro.mypageapi.service
 
-import no.jpro.mypageapi.dto.JobPostingDTO
+import no.jpro.mypageapi.entity.JobPosting
+import no.jpro.mypageapi.repository.JobPostingRepository
 import org.springframework.stereotype.Service
 
 @Service
-class JobPostingService {
+class JobPostingService(
+    private val jobPostingRepository: JobPostingRepository
+) {
 
-    fun getAllJobPostings(): List<JobPostingDTO> {
-        return listOf()
+    fun getAllJobPostings(): List<JobPosting> {
+        return jobPostingRepository.findAll()
     }
 
 }
