@@ -70,8 +70,13 @@ export type NewEmployee = {
 }
 
 export type JobPostingType = {
-  id: number
+  id?: number
   title: string
-  technologies: string[]
-  dueDate: string
+  description?: string
+  tags?: string[]
+  customer: string
+  location?: String
+  dueDateForApplication?: string
+  requiredYearsOfExperience?: number
+  resourcesNeeded?: number
 }

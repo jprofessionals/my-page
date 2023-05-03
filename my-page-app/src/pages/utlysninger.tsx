@@ -20,13 +20,19 @@ export default function Utlysninger() {
 
   const currentDate = new Date().toISOString().split('T')[0]
 
-  const currentJobPostings = jobPostings.filter(
-    (jobPosting) => jobPosting.dueDate >= currentDate,
-  )
+  const currentJobPostings = jobPostings.filter((jobPosting) => {
+    return (
+      jobPosting.dueDateForApplication &&
+      jobPosting.dueDateForApplication >= currentDate
+    )
+  })
 
-  const pastJobPostings = jobPostings.filter(
-    (jobPosting) => jobPosting.dueDate < currentDate,
-  )
+  const pastJobPostings = jobPostings.filter((jobPosting) => {
+    return (
+      jobPosting.dueDateForApplication &&
+      jobPosting.dueDateForApplication < currentDate
+    )
+  })
 
   return (
     <div
