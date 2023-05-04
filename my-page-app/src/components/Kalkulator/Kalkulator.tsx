@@ -529,8 +529,9 @@ const months = [
   { name: 'November', value: '11' },
   { name: 'Desember', value: '12' },
 ]
+
 const years = Array.from({ length: 25 }).map((_x, i) =>
   String(new Date().getFullYear() + i - 10),
 )
-console.log(years)
+
 export default Kalkulator
