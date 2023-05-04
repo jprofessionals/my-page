@@ -1,0 +1,26 @@
+name: Deploy app
+on:
+  - push
+  - workflow_dispatch
+jobs:
+  deploy-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - name: Perform build
+        working-directory: ./my-page-app
+        run: |
+          npm install
+          npm run build
+      - name: Deploy to app engine
+        uses: actions-hub/gcloud@master
+        env:
+          PROJECT_ID: my-page-jpro-test
+          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        with:
+          args: app deploy my-page-app/app.yaml

@@ -80,6 +80,18 @@ cd..
 kill %1
 ```
 
+### Github Actions
+```
+gcloud iam service-accounts create my-page-jpro-test-github-actions --display-name="Service account for Github Actions"
+gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/appengine.deployer
+gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/appengine.serviceAdmin
+gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/storage.objectAdmin
+gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/iam.serviceAccountUser
+gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/cloudbuild.builds.editor
+gcloud iam service-accounts keys create ./github-actions-service-account-private-key.json --iam-account github-actions@my-page-jpro-test.iam.gserviceaccount.com
+base64 -i github-actions-service-account-private-key.json | pbcopy
+```
+
 ### App Engine
 #### One time setup
 ```
