@@ -1,0 +1,94 @@
+@use '../../styles/mixins';
+
+.calculator :global {
+  .card-header {
+    color: white;
+    background: mixins.$navbar-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .input-group {
+    display: grid;
+    grid-template-columns: 8fr 2fr;
+
+    .input-group-text {
+      background: var(grey);
+      flex-grow: 1;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    input {
+      text-align: right;
+      width: 100px;
+    }
+  }
+
+  ul.result {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+
+      span {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 5px;
+      }
+    }
+
+    li.bold {
+      font-weight: bold;
+    }
+
+    li.notSelected {
+      font-weight: lighter;
+    }
+
+    li.line {
+      border-bottom: 1px solid;
+      padding-bottom: 5px;
+    }
+  }
+}
+
+.form :global {
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .input-group {
+    display: grid;
+    grid-template-columns: 4fr 95px;
+
+    .input-group-text {
+      background: var(grey);
+      flex-grow: 1;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    input {
+      text-align: right;
+      width: 100%;
+    }
+  }
+}
