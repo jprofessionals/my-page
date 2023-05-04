@@ -1,0 +1,155 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="JProfessionals" id="1">
+        <createTable tableName="budget">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="start_amount" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="date"/>
+            <column name="budget_type_id" type="BIGINT"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="JProfessionals" id="2">
+        <createTable tableName="budget_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="deposit" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="interval_of_deposit_in_months" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="roll_over" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_amount" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="allow_time_balance" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="JProfessionals" id="3">
+        <createTable tableName="hours">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_date" type="datetime"/>
+            <column name="hours" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="budget_id" type="BIGINT"/>
+            <column name="date_of_usage" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="JProfessionals" id="4">
+        <createTable tableName="post">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="amount_ex_mva" type="DOUBLE"/>
+            <column name="amount_inc_mva" type="DOUBLE"/>
+            <column name="created_date" type="datetime"/>
+            <column name="date" type="date"/>
+            <column name="date_of_deduction" type="date"/>
+            <column name="date_of_payment" type="date"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="document_number" type="VARCHAR(255)"/>
+            <column name="expense" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="datetime"/>
+            <column name="locked" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="budget_id" type="BIGINT"/>
+            <column name="created_by_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="JProfessionals" id="5">
+        <createTable tableName="user">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="admin" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints unique="true"/>
+            </column>
+            <column name="employee_number" type="INT"/>
+            <column name="family_name" type="VARCHAR(255)"/>
+            <column name="given_name" type="VARCHAR(255)"/>
+            <column name="icon" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="nick_name" type="VARCHAR(255)"/>
+            <column name="start_date" type="date"/>
+            <column name="sub" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="JProfessionals" id="6">
+        <addUniqueConstraint columnNames="user_id, budget_type_id" constraintName="UC_User_Budget_Type"
+                             tableName="budget"/>
+    </changeSet>
+    <changeSet author="JProfessionals" id="7">
+        <createIndex indexName="FK579l3cu9thlt9m3co9595xr5v" tableName="post">
+            <column name="created_by_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="JProfessionals" id="8">
+        <createIndex indexName="FKaqc2ugd8kcwd0rm8qiaftvosx" tableName="hours">
+            <column name="budget_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="JProfessionals" id="9">
+        <createIndex indexName="FKfgnwi0hv1n20w7ks1n0ohl00t" tableName="post">
+            <column name="budget_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="JProfessionals" id="10">
+        <createIndex indexName="FKkv7b1cicwa2gqdqu72hwaai2p" tableName="budget">
+            <column name="budget_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="JProfessionals" id="11">
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="post"
+                                 constraintName="FK579l3cu9thlt9m3co9595xr5v" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="JProfessionals" id="12">
+        <addForeignKeyConstraint baseColumnNames="budget_id" baseTableName="hours"
+                                 constraintName="FKaqc2ugd8kcwd0rm8qiaftvosx" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="budget" validate="true"/>
+    </changeSet>
+    <changeSet author="JProfessionals" id="13">
+        <addForeignKeyConstraint baseColumnNames="budget_id" baseTableName="post"
+                                 constraintName="FKfgnwi0hv1n20w7ks1n0ohl00t" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="budget" validate="true"/>
+    </changeSet>
+    <changeSet author="JProfessionals" id="14">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="budget"
+                                 constraintName="FKkuh8cj1roovp9nh6ut2igrxm2" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="JProfessionals" id="15">
+        <addForeignKeyConstraint baseColumnNames="budget_type_id" baseTableName="budget"
+                                 constraintName="FKkv7b1cicwa2gqdqu72hwaai2p" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="budget_type" validate="true"/>
+    </changeSet>
+</databaseChangeLog>
