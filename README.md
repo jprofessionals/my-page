@@ -47,18 +47,62 @@ Install gcloud cli - https://cloud.google.com/sdk/docs/install & https://cloud.g
 
 `gcloud config set project my-page-jpro`
 
+# Setup resources in a new account
 
-# Deploy
+## Database
+```
+gcloud sql instances create my-page-jpro-test --region europe-west1 --tier db-g1-small
+gcloud sql databases create my-page --instance my-page-jpro-test
+```
 
-Both the API and the app runs in the same Google App Engine
+### Create tables with liquibase
+#### One time setup to proxy connections to the database
+```
+curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.2.0/cloud-sql-proxy.darwin.arm64
+chmod +x cloud-sql-proxy
+gcloud auth application-default login
+```
 
-### API
+#### Run the proxy in the background
+```
+./cloud-sql-proxy --address 127.0.0.1 --port 3306 my-page-jpro-test:europe-west1:my-page-jpro-test &
+```
 
-The API can be build and deployed using the maven wrapper `./mvnw -DskipTests package appengine:deploy`
+#### In the main shell run
+```
+cd my-page-api
+./mvnw -Dliquibase.url=jdbc:mysql://root:@localhost:3306/my-page liquibase:update
+cd..
+```
 
-The routing for the api is configured in dispatch.yaml and can be deployed with the command `gcloud app deploy dispatch.yaml`
+#### Stop the proxy in the background
+```
+kill %1
+```
 
-### App
+### App Engine
+#### One time setup
+```
+gcloud app create --region=europe-west
+```
 
-The app is build with `npm run build` and deployed with `gcloud app deploy`
+#### Manual deploy
+##### App
+```
+cd my-page-app
+npm run build
+gcloud app deploy my-page-app/app.yaml
+cd ..
+```
 
+##### API
+```
+cd my-page-api
+./mvnw -DskipTests package appengine:deploy
+cd ..
+```
+
+##### One time setup for routing after the first version of services have been deployed
+```
+gcloud app deploy my-page-app/dispatch.yaml
+```
