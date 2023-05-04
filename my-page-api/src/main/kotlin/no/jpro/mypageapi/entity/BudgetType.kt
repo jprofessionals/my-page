@@ -15,6 +15,7 @@ data class BudgetType(
     @OneToMany(mappedBy = "budgetType")
     val budgets: List<Budget>,
     var allowTimeBalance: Boolean = false,
+    @Column(name="\"default\"")
     val default: Boolean = false
 )
 
