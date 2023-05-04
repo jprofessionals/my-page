@@ -37,6 +37,9 @@
             <column name="allow_time_balance" type="BIT(1)">
                 <constraints nullable="false"/>
             </column>
+            <column name="default" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
     <changeSet author="JProfessionals" id="3">

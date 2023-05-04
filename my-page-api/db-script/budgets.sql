@@ -1,9 +1,9 @@
 -- Budget types
-INSERT INTO mypage.budget_type (deposit, interval_of_deposit_in_months, name, roll_over, start_amount, allow_time_balance) VALUES (700, 1, 'Laptop', true, 25000, false);
-INSERT INTO mypage.budget_type (deposit, interval_of_deposit_in_months, name, roll_over, start_amount, allow_time_balance) VALUES (330, 1, 'Mobil', true, 8000, false);
-INSERT INTO mypage.budget_type (deposit, interval_of_deposit_in_months, name, roll_over, start_amount, allow_time_balance) VALUES (0, 1, 'Kompetanse', false, 50000, true);
-INSERT INTO mypage.budget_type (deposit, interval_of_deposit_in_months, name, roll_over, start_amount, allow_time_balance) VALUES (0, 1, 'Hjemmekontor', true, 0, false);
-INSERT INTO mypage.budget_type (deposit, interval_of_deposit_in_months, name, roll_over, start_amount, allow_time_balance) VALUES (0, 1, 'Bruttotrekk', true, 0, false);
+INSERT INTO mypage.budget_type (deposit, interval_of_deposit_in_months, name, roll_over, start_amount, allow_time_balance, `default`) VALUES (700, 1, 'Laptop', true, 25000, false, true);
+INSERT INTO mypage.budget_type (deposit, interval_of_deposit_in_months, name, roll_over, start_amount, allow_time_balance, `default`) VALUES (330, 1, 'Mobil', true, 8000, false, true);
+INSERT INTO mypage.budget_type (deposit, interval_of_deposit_in_months, name, roll_over, start_amount, allow_time_balance, `default`) VALUES (0, 1, 'Kompetanse', false, 50000, true, true);
+INSERT INTO mypage.budget_type (deposit, interval_of_deposit_in_months, name, roll_over, start_amount, allow_time_balance, `default`) VALUES (0, 1, 'Hjemmekontor', true, 0, false, true);
+INSERT INTO mypage.budget_type (deposit, interval_of_deposit_in_months, name, roll_over, start_amount, allow_time_balance, `default`) VALUES (0, 1, 'Bruttotrekk', true, 0, false, true);
 
 -- Create budgets for all users
 insert into budget(start_amount, start_date, budget_type_id, user_id)

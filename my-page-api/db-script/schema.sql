@@ -9,7 +9,8 @@ create table budget_type
     name                          varchar(255) null,
     roll_over                     bit          not null,
     start_amount                  double       not null,
-    allow_time_balance            bit          not null
+    allow_time_balance            bit          not null,
+    `default`                     bit          not null
 )
     engine = InnoDB;
 
