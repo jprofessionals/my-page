@@ -7,12 +7,47 @@ import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.UserMapper
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
     private val userMapper: UserMapper,
+    private val budgetService: BudgetService
 ) {
+
+    @Transactional
+    fun initializeNewEmployee(email: String, employeeNumber: Int, budgetStartDate: LocalDate): User {
+        val existingUser = getUserByEmail(email)
+
+        val userWithEmployeeNumber = existingUser?.let {
+            saveUpdatedEmployeeNumberForUser(it, employeeNumber)
+        } ?: saveUser(email, employeeNumber)
+
+        budgetService.initializeBudgetsForNewEmployee(userWithEmployeeNumber, budgetStartDate)
+
+        return userWithEmployeeNumber
+    }
+
+    private fun saveUser(email: String, employeeNumber: Int): User {
+        return userRepository.save(
+            User(
+                email = email,
+                employeeNumber = employeeNumber,
+                budgets = listOf(),
+                familyName = null,
+                givenName = null,
+                name = null
+            )
+        )
+    }
+
+    private fun saveUpdatedEmployeeNumberForUser(user: User, employeeNumber: Int): User {
+        val updatedUser = user.copy(employeeNumber = employeeNumber)
+        return userRepository.save(updatedUser)
+    }
+
     fun getOrCreateUser(jwt: Jwt): UserDTO {
         val user =
             userRepository.findUserBySub(jwt.getSub())
@@ -41,6 +76,8 @@ class UserService(
     fun checkIfUserExists(userSub: String): Boolean {
         return userRepository.existsUserBySub(userSub)
     }
+
+    fun getUserByEmail(email: String) = userRepository.findUserByEmail(email)
 
     fun getUserBySub(userSub: String) = userRepository.findUserBySub(userSub)
 
