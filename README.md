@@ -118,3 +118,8 @@ cd ..
 ```
 gcloud app deploy my-page-app/dispatch.yaml
 ```
+
+
+### Google Identity Services
+
+Follow this guide: https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid
