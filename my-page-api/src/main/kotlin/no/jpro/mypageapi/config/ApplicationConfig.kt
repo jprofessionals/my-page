@@ -27,28 +27,34 @@ class ApplicationConfig {
     }
 
     @Bean
-    fun filterChain(http: HttpSecurity, customJwtAuthenticationConverter: CustomJwtAuthenticationConverter) : SecurityFilterChain {
-        http.authorizeHttpRequests {
-            authz -> authz.requestMatchers("/open/**",
-                                                    "/v3/api-docs", "/v3/api-docs/**",
-                                                    "/swagger-ui.html", "/swagger-ui/**",
-                                                    "/actuator/**").permitAll()
-                          .requestMatchers("/**").authenticated()
+    fun filterChain(
+        http: HttpSecurity,
+        customJwtAuthenticationConverter: CustomJwtAuthenticationConverter
+    ): SecurityFilterChain {
+        http.authorizeHttpRequests { authz ->
+            authz.requestMatchers(
+                "/open/**",
+                "/v3/api-docs", "/v3/api-docs/**",
+                "/swagger-ui.html", "/swagger-ui/**",
+                "/actuator/**", "/explorationSock",
+                "/explorationSock/**"
+            ).permitAll()
+                .requestMatchers("/**").authenticated()
         }
-        .csrf {
-            csrf -> csrf.disable()
-        }
-        .oauth2ResourceServer {
-            server -> server.jwt {
-                jwt -> jwt.jwtAuthenticationConverter(customJwtAuthenticationConverter)
+            .csrf { csrf ->
+                csrf.disable()
             }
-        }
+            .oauth2ResourceServer { server ->
+                server.jwt { jwt ->
+                    jwt.jwtAuthenticationConverter(customJwtAuthenticationConverter)
+                }
+            }
 
         return http.build()
     }
 
     @Bean
-    fun customJwtAuthenticationConverter(jdbcTemplate: JdbcTemplate) : CustomJwtAuthenticationConverter {
+    fun customJwtAuthenticationConverter(jdbcTemplate: JdbcTemplate): CustomJwtAuthenticationConverter {
         return CustomJwtAuthenticationConverter(CustomJwtGrantedAuthoritiesConverter(jdbcTemplate))
     }
 

@@ -39,3 +39,5 @@ build/
 
 ### VS Code ###
 .vscode/
+/my-page-api/src/main/resources/application.yml
+/my-page-api/src/main/resources/application.yaml
