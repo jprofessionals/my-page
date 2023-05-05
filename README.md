@@ -82,7 +82,7 @@ kill %1
 
 ### Github Actions
 ```
-gcloud iam service-accounts create my-page-jpro-test-github-actions --display-name="Service account for Github Actions"
+gcloud iam service-accounts create github-actions --display-name="Service account for Github Actions"
 gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/appengine.deployer
 gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/appengine.serviceAdmin
 gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/storage.objectAdmin

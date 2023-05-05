@@ -1,7 +1,13 @@
 name: Deploy app
 on:
-  - push
-  - workflow_dispatch
+  push:
+    branches:
+      - main
+      - deploy-with-actions
+    paths:
+      - '.github/**'
+      - 'my-page-app/**'
+  workflow_dispatch:
 jobs:
   deploy-app:
     runs-on: ubuntu-latest
@@ -17,10 +23,17 @@ jobs:
           npm ci
           npm run build
         working-directory: ./my-page-app
-      - name: Deploy to app engine
+      - name: Deploy to test
         uses: actions-hub/gcloud@master
         env:
           PROJECT_ID: my-page-jpro-test
           APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        with:
+          args: app deploy my-page-app/app.yaml
+      - name: Deploy to prod
+        uses: actions-hub/gcloud@master
+        env:
+          PROJECT_ID: my-page-jpro
+          APPLICATION_CREDENTIALS: ${{ secrets.PROD_GOOGLE_APPLICATION_CREDENTIALS }}
         with:
           args: app deploy my-page-app/app.yaml
