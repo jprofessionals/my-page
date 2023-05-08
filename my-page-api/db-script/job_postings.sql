@@ -5,8 +5,8 @@ VALUES ('NAV',
         'Hei,\nVi trenger en senior backendutvikler til PO pensjon, helst 5års+ erfaring, men 4 år funker dersom konsulenten er veldig dyktig.\Teamet er fleksible mtp på oppstart.',
         '2023-04-10',
         'Oslo',
-        1,
         5,
+        1,
         'Erstatter - senior backend til PO pensjon');
 
 INSERT INTO job_posting (customer, description, due_date_for_application, location, required_years_of_experience,
@@ -15,8 +15,8 @@ VALUES ('Skatteetaten',
         'Hei,\nSkatteetaten har behov for å øke kapasiteten primært på frontend kompetanse, og da særskilt å sørge for at deres publikumsløsninger, men også interne saksbehandlingsløsninger tilfredsstiller krav til UU og er helhetlig integrert mot vårt designsystem.',
         '2028-04-10',
         'Helsfyr',
-        1,
         5,
+        1,
         'Utvikler Skatteprosess');
 
 -- Insert example data into tags table
