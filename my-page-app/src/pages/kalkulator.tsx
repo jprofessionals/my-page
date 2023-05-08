@@ -1,4 +1,4 @@
-import Kalkulator from '@/components/Kalkulator'
+import Kalkulator from '@/components/Kalkulator/Kalkulator'
 
 export default function kalkulator() {
   return <Kalkulator />
