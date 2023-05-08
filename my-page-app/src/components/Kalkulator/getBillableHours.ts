@@ -32,7 +32,7 @@ export function getBillabeHoursEntireYear(year?: string) {
     .map(({ date }) => date.split(' ')[0])
 
   const months = Array.from({ length: 12 })
-    .map((_x, i) => (i < 10 ? `0${i + 1}` : `${i + 1}`))
+    .map((_x, i) => (i < 9 ? `0${i + 1}` : `${i + 1}`))
     .flatMap((month) => getBusinessDaysInMonth(year, month))
     .filter((date) => !holidays.includes(date))
 
