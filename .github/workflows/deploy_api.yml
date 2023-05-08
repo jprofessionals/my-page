@@ -2,7 +2,6 @@ name: Deploy api
 on:
   push:
     branches:
-      - main
       - deploy-with-actions
     paths:
       - '.github/**'
