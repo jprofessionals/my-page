@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import styles from './JobPosting.module.scss'
 import { JobPostingType } from '@/types'
+import { Col, Container, Row } from "react-bootstrap";
 
 type Props = {
   jobPosting: JobPostingType
@@ -29,26 +30,42 @@ export default function JobPosting({ jobPosting }: Props) {
       <h3 className="card-title font-weight-bold">{jobPosting.title}</h3>
       <p className="card-text font-weight-bold">Frist: {formattedDueDate()}</p>
       {showDetails && (
-        <div className="row">
-          <div className="col-2">
-            <p className="card-text font-weight-bold">Kunde</p>
-            <p className="card-text font-weight-bold">Beskrivelse</p>
-            <p className="card-text font-weight-bold">Krav til erfaring</p>
-            <p className="card-text font-weight-bold">Sted</p>
-            <p className="card-text font-weight-bold">Antall ressurser</p>
-            <p className="card-text font-weight-bold">Emneknagger</p>
-          </div>
-          <div className="col-10">
-            <p className="card-text">{jobPosting.customer}</p>
-            <p className="card-text">{jobPosting.description}</p>
-            <p className="card-text">
+        <Container>
+          <Row>
+            <Col xs={2} className={styles.label}>Kunde</Col>
+            <Col xs={10} className={styles.value}>{jobPosting.customer}</Col>
+          </Row>
+          <Row>
+            <Col xs={2} className={styles.label}>Beskrivelse</Col>
+            <Col xs={10} className={styles.value}>
+              {jobPosting.description ?
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: jobPosting.description.replaceAll('\n', '<br/>')
+                  }}
+                />
+                : null}
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={2} className={styles.label}>Krav til erfaring</Col>
+            <Col xs={10} className={styles.value}>
               {jobPosting.requiredYearsOfExperience} år
-            </p>
-            <p className="card-text">{jobPosting.location}</p>
-            <p className="card-text">{jobPosting.resourcesNeeded}</p>
-            <p className="card-text">{jobPosting.tags?.join(', ')}</p>
-          </div>
-        </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={2} className={styles.label}>Sted</Col>
+            <Col xs={10} className={styles.value}>{jobPosting.location}</Col>
+          </Row>
+          <Row>
+            <Col xs={2} className={styles.label}>Antall ressurser</Col>
+            <Col xs={10} className={styles.value}>{jobPosting.resourcesNeeded}</Col>
+          </Row>
+          <Row>
+            <Col xs={2} className={styles.label}>Emneknagger</Col>
+            <Col xs={10} className={styles.value}>{jobPosting.tags?.join(', ')}</Col>
+          </Row>
+        </Container>
       )}
     </div>
   )
