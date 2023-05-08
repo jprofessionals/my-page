@@ -48,6 +48,9 @@ const NavBar = () => {
           <Link className={`${styles.navLink} nav-link`} href="/bidra">
             Bidra til Min side
           </Link>
+          <Link className={`${styles.navLink} nav-link`} href="/utlysninger">
+            Utlysninger
+          </Link>
           <RequireAdmin>
             <Link className={`${styles.navLink} nav-link`} href="/admin">
               Admin
