@@ -1,10 +1,8 @@
 package no.jpro.mypageapi.repository
 
-import no.jpro.mypageapi.entity.Budget
-import no.jpro.mypageapi.entity.BudgetType
-import no.jpro.mypageapi.entity.Post
-import no.jpro.mypageapi.entity.User
+import no.jpro.mypageapi.entity.*
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -32,3 +30,6 @@ interface BudgetRepository : JpaRepository<Budget, Long> {
 interface PostRepository : JpaRepository<Post, Long> {
     fun findPostById(postId: Long): Post?
 }
+
+@Repository
+interface JobPostingRepository : JpaRepository<JobPosting, Long>

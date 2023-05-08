@@ -1,0 +1,57 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="JProfessionals" id="16">
+        <createTable tableName="job_posting">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="customer" type="VARCHAR(255)"/>
+            <column name="description" type="LONGTEXT"/>
+            <column name="due_date_for_application" type="date"/>
+            <column name="location" type="VARCHAR(255)"/>
+            <column name="required_years_of_experience" type="INT"/>
+            <column name="resources_needed" type="INT"/>
+            <column name="title" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="JProfessionals" id="17">
+        <createTable tableName="job_posting_tags">
+            <column name="job_posting_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="JProfessionals" id="18">
+        <createTable tableName="tags">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="JProfessionals" id="19">
+        <createIndex indexName="FK_job_posting_tags_tags" tableName="job_posting_tags">
+            <column name="tag_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="JProfessionals" id="20">
+        <addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="job_posting_tags"
+                                 constraintName="FK_job_posting_tags_tags" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="tags" validate="true"/>
+    </changeSet>
+    <changeSet author="JProfessionals" id="21">
+        <addForeignKeyConstraint baseColumnNames="job_posting_id" baseTableName="job_posting_tags"
+                                 constraintName="FK_job_posting_tags_job_posting" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="job_posting" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

@@ -28,7 +28,9 @@ function Admin() {
   const [isLoading, setIsLoading] = useState(true)
   const [expandedUser, setExpandedUser] = useState<string>('')
   const [filterValue, setFilterValue] = useState('')
-  const [activeBudget, setActiveBudget] = useState<AccordionEventKey | null>(null)
+  const [activeBudget, setActiveBudget] = useState<AccordionEventKey | null>(
+    null,
+  )
 
   useEffect(() => {
     refreshTable()
@@ -131,8 +133,8 @@ function Admin() {
 
   if (isLoading) {
     return (
-      <div className='loadSpin d-flex align-items-center'>
-        <Spinner animation='border' className='spinn' />
+      <div className="loadSpin d-flex align-items-center">
+        <Spinner animation="border" className="spinn" />
         <h3>Laster inn oversikt</h3>
       </div>
     )
@@ -141,22 +143,24 @@ function Admin() {
   } else {
     return (
       <>
-        <div className='admin-container'>
+        <div className="admin-container">
           <h2>Brukere</h2>
 
           {/* Add text input field */}
-          <div className='mb-3'>
-            <label htmlFor='filterInput' className='form-label'>
+          <div className="mb-3">
+            <label htmlFor="filterInput" className="form-label">
               Filtrer brukere:
             </label>
             <input
-              type='text'
-              className='form-control'
-              id='filterInput'
+              type="text"
+              className="form-control"
+              id="filterInput"
               onChange={(e) => setFilterValue(e.target.value)}
               style={{ width: '300px' }}
             />
           </div>
+
+          <NewUserModal />
 
           <Table
             striped
@@ -167,76 +171,83 @@ function Admin() {
             }
           >
             <thead>
-            <tr key={'headerRow'}>
-              <th key={'brukerHeader'}>Brukere</th>
-              {budgetTypes.map((budgetType) => (
-                <th key={budgetType.id + '' + budgetType.balanceIsHours}>
-                  {budgetType.name}
-                </th>
-              ))}
-            </tr>
+              <tr key={'headerRow'}>
+                <th key={'brukerHeader'}>Brukere</th>
+                {budgetTypes.map((budgetType) => (
+                  <th key={budgetType.id + '' + budgetType.balanceIsHours}>
+                    {budgetType.name}
+                  </th>
+                ))}
+              </tr>
             </thead>
             <tbody>
-            {users
-              .filter((user) =>
-                (user.name ? user.name.toLowerCase() : user.email.toLowerCase())
-                  .includes(filterValue.toLowerCase()),
-              ) // Filter users by text input value
-              .sort((a, b) => compareUsers(a, b))
-              .map((userRow) => (
-                <Fragment key={userRow.email}>
-                  <tr key={userRow.email}>
-                    {/* pass event object to handleExpandUser */}
-                    <td key={userRow.email}>{userRow.name ? userRow.name : userRow.email}</td>
-                    {budgetTypes.map((budgetColumn) => (
-                      <td
-                        key={
-                          userRow.email +
-                          budgetColumn.id +
-                          '' +
-                          budgetColumn.balanceIsHours
-                        }
-                      >
-                        {getBudgetBalanceForType(
-                          userRow.budgets!,
-                          budgetColumn,
-                        )}
+              {users
+                .filter((user) =>
+                  (user.name
+                    ? user.name.toLowerCase()
+                    : user.email.toLowerCase()
+                  ).includes(filterValue.toLowerCase()),
+                ) // Filter users by text input value
+                .sort((a, b) => compareUsers(a, b))
+                .map((userRow) => (
+                  <Fragment key={userRow.email}>
+                    <tr key={userRow.email}>
+                      {/* pass event object to handleExpandUser */}
+                      <td key={userRow.email}>
+                        {userRow.name ? userRow.name : userRow.email}
                       </td>
-                    ))}
-                    <td onClick={() => handleExpandUser(userRow)}
+                      {budgetTypes.map((budgetColumn) => (
+                        <td
+                          key={
+                            userRow.email +
+                            budgetColumn.id +
+                            '' +
+                            budgetColumn.balanceIsHours
+                          }
+                        >
+                          {getBudgetBalanceForType(
+                            userRow.budgets!,
+                            budgetColumn,
+                          )}
+                        </td>
+                      ))}
+                      <td
+                        onClick={() => handleExpandUser(userRow)}
                         style={{
                           display: 'flex',
                           height: 41,
                           justifyContent: 'center',
                           alignItems: 'center',
                           cursor: 'pointer',
-                        }}>
-                      <FontAwesomeIcon
-                        icon={userRow.email === expandedUser ? faChevronCircleUp : faChevronCircleDown}
-                      />
-                    </td>
-                  </tr>
-                  {expandedUser === userRow.email ? (
-                    <tr
-                      key={`${userRow.email}-expanded`}
-                    >
-                      <td colSpan={budgetTypes.length + 2}>
-                        {/* +2 for brukere and expand button columns */}
-                        <BudgetList
-                          budgets={userRow.budgets ?? []}
-                          refreshBudgets={refreshTable}
-                          activeBudgetId={activeBudget}
-                          updateActiveBudget={setActiveBudget}
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={
+                            userRow.email === expandedUser
+                              ? faChevronCircleUp
+                              : faChevronCircleDown
+                          }
                         />
                       </td>
                     </tr>
-                  ) : null}
-                </Fragment>
-              ))}
+                    {expandedUser === userRow.email ? (
+                      <tr key={`${userRow.email}-expanded`}>
+                        <td colSpan={budgetTypes.length + 2}>
+                          {/* +2 for brukere and expand button columns */}
+                          <BudgetList
+                            budgets={userRow.budgets ?? []}
+                            refreshBudgets={refreshTable}
+                            activeBudgetId={activeBudget}
+                            updateActiveBudget={setActiveBudget}
+                          />
+                        </td>
+                      </tr>
+                    ) : null}
+                  </Fragment>
+                ))}
             </tbody>
           </Table>
         </div>
-        <NewUserModal />
       </>
     )
   }

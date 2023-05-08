@@ -15,3 +15,4 @@ services:
       - "./db-script/schema.sql:/docker-entrypoint-initdb.d/1.sql"
       - "./db-script/users.sql:/docker-entrypoint-initdb.d/2.sql"
       - "./db-script/budgets.sql:/docker-entrypoint-initdb.d/3.sql"
+      - "./db-script/job_postings.sql:/docker-entrypoint-initdb.d/4.sql"
