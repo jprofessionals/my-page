@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("jobposting")
 @SecurityRequirement(name = "Bearer Authentication")
 class JobPostingController(
-    private val jobPostingService: JobPostingService,
-    private val jobPostingMapper: JobPostingMapper
+    private val jobPostingService: JobPostingService
 ) {
 
     private val logger = LoggerFactory.getLogger(JobPostingController::class.java)
@@ -33,7 +32,7 @@ class JobPostingController(
     fun getAllJobPostings(): List<JobPostingDTO> {
         logger.info("Getting all job postings")
 
-        val jobPostingDTOList = jobPostingService.getAllJobPostings().map { jobPostingMapper.toJobPostingDTO(it) }
+        val jobPostingDTOList = jobPostingService.getAllJobPostings().map { JobPostingMapper.toJobPostingDTO(it) }
         logger.info("Got the following job postings: $jobPostingDTOList")
 
         return jobPostingDTOList

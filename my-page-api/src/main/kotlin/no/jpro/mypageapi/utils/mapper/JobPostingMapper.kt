@@ -2,10 +2,8 @@ package no.jpro.mypageapi.utils.mapper
 
 import no.jpro.mypageapi.dto.JobPostingDTO
 import no.jpro.mypageapi.entity.JobPosting
-import org.springframework.stereotype.Service
 
-@Service
-class JobPostingMapper {
+object JobPostingMapper {
 
     fun toJobPostingDTO(jobPosting: JobPosting): JobPostingDTO {
         return JobPostingDTO(
