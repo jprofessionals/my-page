@@ -111,7 +111,7 @@ function Kalkulator() {
     return billableHoursThisYear * timeprisProsjekt * 0.52 * 1.12 + +bonus
   }
 
-  function GarantilonnBenytet() {
+  function GarantilonnBenyttet() {
     return BeregnetGarantilonn() > SumBetaltTid()
   }
 
@@ -153,7 +153,7 @@ function Kalkulator() {
     setAntallTimerKompetanse(e.target.value)
   }
 
-  const handleAntallTimerInerntidChange = (e: any) => {
+  const handleAntallTimerInterntidChange = (e: any) => {
     setAntallTimerInterntid(e.target.value)
   }
 
@@ -271,7 +271,7 @@ function Kalkulator() {
                   Rest komperansetimer
                   <ReadMoreIcon
                     id="tooltip-3"
-                    text="Antall timer du har igjen på årlig kompetansebudjett før eventuelt utak"
+                    text="Antall timer du har igjen på årlig kompetansebudjett før eventuelt uttak"
                   />
                 </InputGroup.Text>
                 <Form.Control
@@ -330,7 +330,7 @@ function Kalkulator() {
                 <Form.Control
                   type="number"
                   value={antallTimerInterntid}
-                  onChange={handleAntallTimerInerntidChange}
+                  onChange={handleAntallTimerInterntidChange}
                 />
               </InputGroup>
               <InputGroup>
@@ -383,7 +383,7 @@ function Kalkulator() {
             </Card.Header>
             <Card.Body>
               <ul className="result">
-                <li className={GarantilonnBenytet() ? 'notSelected' : ''}>
+                <li className={GarantilonnBenyttet() ? 'notSelected' : ''}>
                   9G timelønn:{' '}
                   <span>
                     {Timelonn9G().toLocaleString('no-NO', {
@@ -393,7 +393,7 @@ function Kalkulator() {
                     })}
                   </span>
                 </li>
-                <li className={GarantilonnBenytet() ? 'notSelected' : ''}>
+                <li className={GarantilonnBenyttet() ? 'notSelected' : ''}>
                   Sum sykelønn:{' '}
                   <span>
                     {SumSykeLonn().toLocaleString('no-NO', {
@@ -403,7 +403,7 @@ function Kalkulator() {
                     })}
                   </span>
                 </li>
-                <li className={GarantilonnBenytet() ? 'notSelected' : ''}>
+                <li className={GarantilonnBenyttet() ? 'notSelected' : ''}>
                   Sum fakturert tid:{' '}
                   <span>
                     {SumFakturertTid().toLocaleString('no-NO', {
@@ -413,7 +413,7 @@ function Kalkulator() {
                     })}
                   </span>
                 </li>
-                <li className={GarantilonnBenytet() ? 'notSelected' : ''}>
+                <li className={GarantilonnBenyttet() ? 'notSelected' : ''}>
                   Sum interntid m/komp:{' '}
                   <span>
                     {SumIntertidMedKomp().toLocaleString('no-NO', {
@@ -423,7 +423,7 @@ function Kalkulator() {
                     })}
                   </span>
                 </li>
-                <li className={GarantilonnBenytet() ? 'notSelected' : ''}>
+                <li className={GarantilonnBenyttet() ? 'notSelected' : ''}>
                   Sum kompetanse:{' '}
                   <span>
                     {SumKompetanse().toLocaleString('no-NO', {
@@ -435,7 +435,7 @@ function Kalkulator() {
                 </li>
                 <li
                   className={
-                    GarantilonnBenytet() ? 'line notSelected' : 'line '
+                    GarantilonnBenyttet() ? 'line notSelected' : 'line '
                   }
                 >
                   Sum betalt tid:{' '}
@@ -447,7 +447,7 @@ function Kalkulator() {
                     })}
                   </span>
                 </li>
-                <li className={GarantilonnBenytet() ? '' : 'notSelected'}>
+                <li className={GarantilonnBenyttet() ? '' : 'notSelected'}>
                   Tilgjengelig tid:{' '}
                   <span>
                     {SumTilgjengeligTid()} av {antallTimerMnd}
@@ -455,7 +455,7 @@ function Kalkulator() {
                 </li>
                 <li
                   className={
-                    GarantilonnBenytet() ? 'line ' : 'line notSelected'
+                    GarantilonnBenyttet() ? 'line ' : 'line notSelected'
                   }
                 >
                   Beregnet garantilønn:{' '}
