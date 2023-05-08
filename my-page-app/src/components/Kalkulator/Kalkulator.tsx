@@ -176,7 +176,7 @@ function Kalkulator() {
   return (
     <Container fluid>
       <div className="topp">
-        <h3>Lønnskalulator</h3>
+        <h3>Lønnskalkulator</h3>
         <p>
           Her kan du se omtrentlig hvordan vi beregner lønn hver måned. Du kan
           selv leke med tallene for å se hvordan dette påvirker beregningen av
