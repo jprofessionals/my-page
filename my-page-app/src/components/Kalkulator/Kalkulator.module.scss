@@ -68,6 +68,32 @@
   }
 }
 
+.month_year_group :global {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-top: -0.5rem;
+  justify-content: flex-start;
+  border: 0.5px solid grey;
+  border-radius: 0.5rem;
+  width: fit-content;
+  padding: 0.5rem;
+
+  .input-group {
+    width: unset;
+  }
+}
+
+.month_select {
+  max-width: 130px;
+  text-align: right;
+}
+
+.year_select {
+  max-width: 88px;
+}
+
 .form :global {
   .card-body {
     display: flex;

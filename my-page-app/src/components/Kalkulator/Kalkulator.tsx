@@ -191,13 +191,13 @@ function Kalkulator() {
           .
         </p>
       </div>
-      <Row>
-        <p>Se utregning basert på år og måned:</p>
-        <Col xs={12} sm={4} md={2}>
+      <div>
+        <p style={{ width: '100%' }}>Se utregning basert på år og måned:</p>
+        <div className={styles.month_year_group}>
           <InputGroup>
             <InputGroup.Text>År</InputGroup.Text>
             <Form.Select
-              style={{ textAlign: 'right' }}
+              className={styles.year_select}
               onChange={(e) => setSelectedYear(e.target.value)}
               value={selectedYear}
             >
@@ -208,12 +208,10 @@ function Kalkulator() {
               ))}
             </Form.Select>
           </InputGroup>
-        </Col>
-        <Col xs={12} sm={6} md={3}>
           <InputGroup>
             <InputGroup.Text>Måned</InputGroup.Text>
             <Form.Select
-              style={{ textAlign: 'right' }}
+              className={styles.month_select}
               onChange={(e) => setSelectedMonth(e.target.value)}
               value={selectedMonth}
             >
@@ -224,11 +222,9 @@ function Kalkulator() {
               ))}
             </Form.Select>
           </InputGroup>
-        </Col>
-        <Col xs={2} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button onClick={handleMonthAndYearChange}>Sett</Button>
-        </Col>
-      </Row>
+          <Button onClick={handleMonthAndYearChange}>Oppdater</Button>
+        </div>
+      </div>
       <Row>
         <Col className={styles.form}>
           <Card>
@@ -485,13 +481,15 @@ function Kalkulator() {
                   </span>
                 </li>
                 <li>
-                  Ca arslonn:
-                  <ReadMoreIcon
-                    id="arslonn"
-                    text={`Utregning: Antall fakturerbare timer i ${selectedYear} er ${
-                      billableHoursThisYear + 25 * 7.5
-                    }. Trekker fra 25 feriedager og legger på feriepenger (12%). `}
-                  />
+                  <span>
+                    Ca årslønn:
+                    <ReadMoreIcon
+                      id="arslonn"
+                      text={`Utregning: Antall fakturerbare timer i ${selectedYear} er ${
+                        billableHoursThisYear + 25 * 7.5
+                      }. Trekker fra 25 feriedager og legger på feriepenger (12%). Regnestykket blir: \n\n${billableHoursThisYear}t * ${timeprisProsjekt}kr/t * 0.52 * 1.12`}
+                    />
+                  </span>
                   <span>
                     {BruttoArsLonn().toLocaleString('no-NO', {
                       maximumFractionDigits: 2,
