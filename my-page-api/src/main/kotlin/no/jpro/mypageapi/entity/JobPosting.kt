@@ -6,6 +6,9 @@ import java.time.LocalDate
 @Entity
 class JobPosting(
     val title: String,
+
+    @Lob
+    @Column(length = 16777216)
     val description: String?,
     val customer: String,
     val location: String?,
