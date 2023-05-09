@@ -2,6 +2,7 @@ name: Deploy app
 on:
   push:
     branches:
+      - main
       - deploy-with-actions
     paths:
       - '.github/**'
