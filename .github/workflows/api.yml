@@ -1,0 +1,59 @@
+name: Deploy api
+on:
+  push:
+    branches:
+      - multistage-action
+    paths:
+      - '.github/**'
+      - 'my-page-api/**'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'liberica'
+          java-version: '17'
+          cache: 'maven'
+      - name: Perform build
+        run: |
+          ./mvnw -DskipTests package
+        working-directory: ./my-page-api
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: jar
+          path: my-page-api/target/my-page-api-0.0.1-SNAPSHOT.jar
+  deploy-test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download jar
+        uses: actions/download-artifact@v3
+        with:
+          name: jar
+      - name: Deploy to test
+        uses: actions-hub/gcloud@master
+        env:
+          PROJECT_ID: my-page-jpro-test
+          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        with:
+          args: app deploy my-page-api-0.0.1-SNAPSHOT.jar --appyaml=my-page-api/src/main/appengine/app.yaml
+  deploy-prod:
+    needs: deploy-test
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Download jar
+        uses: actions/download-artifact@v3
+        with:
+          name: jar
+      - name: Deploy to prod
+        uses: actions-hub/gcloud@master
+        env:
+          PROJECT_ID: my-page-jpro
+          APPLICATION_CREDENTIALS: ${{ secrets.PROD_GOOGLE_APPLICATION_CREDENTIALS }}
+        with:
+          args: app deploy my-page-api-0.0.1-SNAPSHOT.jar --appyaml=my-page-api/src/main/appengine/app-prod.yaml
