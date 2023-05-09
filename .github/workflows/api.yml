@@ -30,12 +30,12 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: app.yaml
-          path: my-page-api/src/main/resources/app.yaml
+          path: my-page-api/src/main/appengine/app.yaml
       - name: Upload app-prod.yaml
         uses: actions/upload-artifact@v3
         with:
           name: app-prod.yaml
-          path: my-page-api/src/main/resources/app-prod.yaml
+          path: my-page-api/src/main/appengine/app-prod.yaml
   deploy-test:
     needs: build
     runs-on: ubuntu-latest
