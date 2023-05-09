@@ -1,4 +1,4 @@
-name: API
+name: App
 on:
   push:
     branches:
