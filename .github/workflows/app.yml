@@ -1,15 +1,15 @@
-name: Deploy app
+name: App
 on:
   push:
     branches:
       - main
-      - deploy-with-actions
     paths:
       - '.github/**'
       - 'my-page-app/**'
   workflow_dispatch:
+
 jobs:
-  deploy-app:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -23,6 +23,12 @@ jobs:
           npm ci
           npm run build
         working-directory: ./my-page-app
+  deploy-test:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v3
       - name: Deploy to test
         uses: actions-hub/gcloud@master
         env:
@@ -30,10 +36,16 @@ jobs:
           APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         with:
           args: app deploy my-page-app/app.yaml
+  deploy-prod:
+    needs: deploy-test
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v3
       - name: Deploy to prod
         uses: actions-hub/gcloud@master
         env:
           PROJECT_ID: my-page-jpro
-          APPLICATION_CREDENTIALS: ${{ secrets.PROD_GOOGLE_APPLICATION_CREDENTIALS }}
+          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         with:
           args: app deploy my-page-app/app.yaml
