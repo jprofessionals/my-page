@@ -59,7 +59,7 @@ jobs:
   deploy-prod:
     needs: deploy-test
     runs-on: ubuntu-latest
-    environment: production
+    environment: prod
     steps:
       - name: Download jar
         uses: actions/download-artifact@v3
