@@ -9,7 +9,7 @@ updates:
     directory: "/my-page-app" # Location of package manifests
     schedule:
       interval: "daily"
-  - package-ecosystem: "maven" # See documentation for possible values
+  - package-ecosystem: "gradle" # See documentation for possible values
     directory: "/my-page-api" # Location of package manifests
     schedule:
       interval: "daily"
