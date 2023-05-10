@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.liquibase.gradle") version "2.2.0"
+    id("com.google.cloud.tools.appengine") version "2.4.4"
     kotlin("jvm") version "1.8.21"
     kotlin("plugin.spring") version "1.8.21"
     kotlin("plugin.jpa") version "1.8.21"
@@ -58,6 +59,13 @@ liquibase {
                 "driver" to "com.mysql.cj.jdbc.Driver"
             )
         }
+    }
+}
+
+appengine {
+    deploy { // deploy configuration
+        projectId = "my-page-jpro-test"
+        version = "GCLOUD_CONFIG"
     }
 }
 
