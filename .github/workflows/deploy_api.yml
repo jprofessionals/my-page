@@ -17,10 +17,10 @@ jobs:
         with:
           distribution: 'liberica'
           java-version: '17'
-          cache: 'maven'
+          cache: 'gradle'
       - name: Perform build
         run: |
-          ./mvnw -DskipTests package
+          ./gradlew build --no-daemon -x test
         working-directory: ./my-page-api
       - name: Deploy to test
         uses: actions-hub/gcloud@master
@@ -28,11 +28,11 @@ jobs:
           PROJECT_ID: my-page-jpro-test
           APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         with:
-          args: app deploy my-page-api/target/my-page-api-0.0.1-SNAPSHOT.jar --appyaml=my-page-api/src/main/appengine/app.yaml
+          args: app deploy my-page-api/build/libs/my-page-api-0.0.1-SNAPSHOT.jar --appyaml=my-page-api/src/main/appengine/app.yaml
       - name: Deploy to prod
         uses: actions-hub/gcloud@master
         env:
           PROJECT_ID: my-page-jpro
           APPLICATION_CREDENTIALS: ${{ secrets.PROD_GOOGLE_APPLICATION_CREDENTIALS }}
         with:
-          args: app deploy my-page-api/target/my-page-api-0.0.1-SNAPSHOT.jar --appyaml=my-page-api/src/main/appengine/app-prod.yaml
+          args: app deploy my-page-api/build/libs/my-page-api-0.0.1-SNAPSHOT.jar --appyaml=my-page-api/src/main/appengine/app-prod.yaml
