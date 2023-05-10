@@ -17,16 +17,16 @@ jobs:
         with:
           distribution: 'liberica'
           java-version: '17'
-          cache: 'maven'
+          cache: 'gradle'
       - name: Perform build
         run: |
-          ./mvnw -DskipTests package
+          ./gradlew build --no-daemon -x test
         working-directory: ./my-page-api
       - name: Upload jar
         uses: actions/upload-artifact@v3
         with:
           name: jar
-          path: my-page-api/target/my-page-api-0.0.1-SNAPSHOT.jar
+          path: my-page-api/build/libs/my-page-api-0.0.1-SNAPSHOT.jar
       - name: Upload app.yaml
         uses: actions/upload-artifact@v3
         with:
