@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
+    id("org.liquibase.gradle") version "2.2.0"
     kotlin("jvm") version "1.8.21"
     kotlin("plugin.spring") version "1.8.21"
     kotlin("plugin.jpa") version "1.8.21"
@@ -35,7 +36,29 @@ dependencies {
 
     runtimeOnly("com.h2database:h2")
 
+    liquibaseRuntime("org.liquibase:liquibase-core:4.21.1")
+    liquibaseRuntime("info.picocli:picocli:4.7.3")
+    liquibaseRuntime("com.mysql:mysql-connector-j:8.0.33")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+liquibase {
+    activities {
+        register("main") {
+            val url = project.properties["liquibaseUrl"] as String? ?: ""
+            val username = project.properties["liquibaseUsername"] as String? ?: ""
+            val password = project.properties["liquibasePassword"] as String? ?: ""
+
+            this.arguments = mapOf(
+                "url" to url,
+                "username" to username,
+                "password" to password,
+                "changelogFile" to "db-migration/changelog/db.changelog-root.yaml",
+                "driver" to "com.mysql.cj.jdbc.Driver"
+            )
+        }
+    }
 }
 
 tasks.withType<KotlinCompile> {
