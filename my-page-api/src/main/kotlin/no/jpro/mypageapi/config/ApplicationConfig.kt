@@ -37,6 +37,7 @@ class ApplicationConfig {
                 "/swagger-ui.html",
                 "/swagger-ui/**",
                 "/actuator/**",
+                "/error",
             ).permitAll()
             .requestMatchers("/**").authenticated()
             .and()
