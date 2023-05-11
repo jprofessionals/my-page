@@ -1,13 +1,25 @@
-import { Nav, Navbar } from 'react-bootstrap'
-import styles from './NavBar.module.scss'
 import jPro_logo_transparent from '../images/jPro_logo_transparent.svg'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSignOut } from '@fortawesome/free-solid-svg-icons'
-import RequireAdmin from '../../utils/RequireAdmin'
+import { faBars, faX } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { useRouter } from 'next/router'
+import { Disclosure, Menu, Transition } from '@headlessui/react'
+import { Fragment, useMemo } from 'react'
+
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ')
+}
+
+const navigation = [
+  { href: '/', name: 'Budsjett' },
+  { href: '/kalkulator', name: 'Lønnskalkulator' },
+  { href: '/utlysninger', name: 'Utlysninger' },
+  { href: '/bidra', name: 'Bidra til min side' },
+  { href: '/admin', name: 'Admin', requiresAdmin: true },
+  { href: 'https://intranet.jpro.no', name: 'Intranett' },
+]
 
 const NavBar = () => {
   const { user, setUser } = useAuthContext()
@@ -17,87 +29,149 @@ const NavBar = () => {
     localStorage.removeItem('user_token')
     router.push('/loggut')
   }
-  return (
-    <Navbar
-      className={`${styles.navbar} navbar`}
-      collapseOnSelect
-      expand="sm"
-      variant="dark"
-    >
-      <Link href="/">
-        <Navbar.Brand title="min side">
-          <Image
-            className={`${styles.logo} logo`}
-            src={jPro_logo_transparent}
-            alt="jPro"
-          />
-        </Navbar.Brand>
-      </Link>
-      <Navbar.Toggle className="button" aria-controls="responsive-navbar-nav" />
-      <Navbar.Collapse
-        className={`${styles.navtext} navtext`}
-        id="responsive-navbar-nav"
-      >
-        <Nav className={`${styles.containerFluid} container-fluid`}>
-          <Link className={`${styles.navLink} nav-link`} href="/">
-            Budsjett
-          </Link>
-          <Link className={`${styles.navLink} nav-link`} href="/kalkulator">
-            Lønnskalkulator
-          </Link>
-          <Link className={`${styles.navLink} nav-link`} href="/bidra">
-            Bidra til Min side
-          </Link>
-          <Link className={`${styles.navLink} nav-link`} href="/utlysninger">
-            Utlysninger
-          </Link>
-          <RequireAdmin>
-            <Link className={`${styles.navLink} nav-link`} href="/admin">
-              Admin
-            </Link>
-          </RequireAdmin>
-          <Nav.Link
-            className={`${styles.navLink}`}
-            as="a"
-            href="https://intranet.jpro.no"
-          >
-            Intranett
-          </Nav.Link>
 
-          {user ? (
-            <>
-              <Nav.Link className={`${styles.navLink} ms-auto`}>
-                <FontAwesomeIcon
-                  icon={faSignOut}
-                  onClick={() => {
-                    logout()
-                  }}
-                  title="Logg ut"
-                />
-              </Nav.Link>
-              <Nav.Link className="smallNav">
-                <FontAwesomeIcon
-                  icon={faSignOut}
-                  onClick={() => {
-                    logout()
-                  }}
-                  title="Logg ut"
-                />
-              </Nav.Link>
-              <Nav.Item>
-                <Image
-                  className={`${styles.icon} icon`}
-                  src={user.icon}
-                  alt="Icon"
-                  width="40"
-                  height="40"
-                ></Image>
-              </Nav.Item>
-            </>
-          ) : null}
-        </Nav>
-      </Navbar.Collapse>
-    </Navbar>
+  const navigationItems = useMemo(
+    () =>
+      navigation.filter(({ requiresAdmin }) => {
+        if (requiresAdmin) {
+          if (!user || !user.admin) return false
+        }
+        return true
+      }),
+    [user],
+  )
+
+  return (
+    <Disclosure as="nav" className="bg-black-nav">
+      {({ open }) => (
+        <>
+          <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center">
+              {' '}
+              <div className="flex flex-1 justify-between items-end">
+                <Link href="/">
+                  <div
+                    title="min side"
+                    className="flex gap-2 items-center self-center text-white"
+                  >
+                    <Image
+                      src={jPro_logo_transparent}
+                      alt="jPro"
+                      className="w-10 h-10 mb-[9px]"
+                    />
+                    <span>Min side</span>
+                  </div>
+                </Link>
+                <div className="hidden h-full text-sm sm:block">
+                  <div className="flex space-x-4 h-full">
+                    {navigationItems.map(({ href, name }) => (
+                      <a
+                        href={href}
+                        key={name}
+                        aria-disabled={href === router.pathname}
+                        className={classNames(
+                          href === router.pathname
+                            ? "after:content-[''] after:h-2 after:bg-orange-brand"
+                            : '',
+                          'text-white flex flex-col justify-between gap-1.5',
+                        )}
+                      >
+                        {name}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="hidden sm:block sm:ml-6">
+                {user ? (
+                  <div className="flex items-center">
+                    <button
+                      type="button"
+                      className="p-1 text-gray-400 bg-gray-800 rounded-full hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none"
+                    >
+                      <span className="sr-only">View notifications</span>
+                      <div className="w-6 h-6" aria-hidden="true">
+                        👤
+                      </div>
+                    </button>
+
+                    {/* Profile dropdown */}
+                    <Menu as="div" className="relative ml-3">
+                      <Menu.Button className="flex text-sm bg-gray-800 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none">
+                        <span className="sr-only">Open user menu</span>
+                        <Image
+                          src={user?.icon || ''}
+                          alt="Icon"
+                          width="40"
+                          height="40"
+                        />
+                      </Menu.Button>
+                      <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                      >
+                        <Menu.Items className="absolute right-0 z-10 py-1 mt-2 w-48 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg origin-top-right focus:outline-none">
+                          <Menu.Item>
+                            {({ active }) => (
+                              <a
+                                href="#"
+                                className={classNames(
+                                  active ? 'bg-gray-100' : '',
+                                  'block px-4 py-2 text-sm text-gray-700',
+                                )}
+                              >
+                                Your Profile
+                              </a>
+                            )}
+                          </Menu.Item>
+                        </Menu.Items>
+                      </Transition>
+                    </Menu>
+                  </div>
+                ) : null}
+              </div>
+              <div className="flex -mr-2 sm:hidden">
+                {/* Mobile menu button */}
+                <Disclosure.Button className="inline-flex justify-center items-center p-2 text-white rounded-md hover:text-white hover:bg-gray-700 focus:ring-2 focus:ring-inset focus:ring-white focus:outline-none">
+                  <span className="sr-only">Open main menu</span>
+                  {open ? (
+                    <div className="block w-6 h-6" aria-hidden="true">
+                      <FontAwesomeIcon icon={faX} />
+                    </div>
+                  ) : (
+                    <div className="block w-6 h-6" aria-hidden="true">
+                      <FontAwesomeIcon icon={faBars} />
+                    </div>
+                  )}
+                </Disclosure.Button>
+              </div>
+            </div>
+          </div>
+
+          <Disclosure.Panel className="sm:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              {navigationItems.map(({ name, href }) => {
+                return (
+                  <Disclosure.Button
+                    as="a"
+                    href={href}
+                    key={name}
+                    className="block py-2 px-3 text-base font-medium text-white bg-gray-900 rounded-md"
+                  >
+                    {name}
+                  </Disclosure.Button>
+                )
+              })}
+            </div>
+          </Disclosure.Panel>
+        </>
+      )}
+    </Disclosure>
   )
 }
 export default NavBar
