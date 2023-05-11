@@ -9,6 +9,7 @@ import {
 import { User } from '@/types'
 import { CredentialResponse } from 'google-one-tap'
 import ApiService from '@/services/api.service'
+import config from '../config/config'
 
 type UserFetchStatus = 'init' | 'fetchingUser' | 'fetched' | 'fetchFailed'
 
@@ -48,9 +49,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }, [])
 
-  const authenticate = useCallback(() => {
+  const authenticate = useCallback(async () => {
+    const { googleClientId } = config();
+    console.log('googleClientId: ', googleClientId)
+
     window.google.accounts.id.initialize({
-      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
+      client_id: googleClientId,
       auto_select: true,
       prompt_parent_id: 'signInDiv',
       callback: authHandler,
