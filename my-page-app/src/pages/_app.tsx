@@ -29,8 +29,10 @@ export default function App({
       />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <NavBar />
-          <Component {...pageProps} />
+          <main data-theme="jpro">
+            <NavBar />
+            <Component {...pageProps} />
+          </main>
         </AuthProvider>
       </QueryClientProvider>
     </>
