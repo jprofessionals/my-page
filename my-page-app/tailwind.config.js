@@ -28,5 +28,20 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  daisyui: {
+    themes: [
+      {
+        jpro: {
+          primary: '#ff7a0c',
+          secondary: '#ffa500',
+          warning: '#d16512',
+          accent: '#2f4f4f',
+          neutral: '#2c2c2c',
+          'base-100': '#ffffff',
+        },
+      },
+      'light',
+    ],
+  },
+  plugins: [require('daisyui'), require('@tailwindcss/typography')],
 }
