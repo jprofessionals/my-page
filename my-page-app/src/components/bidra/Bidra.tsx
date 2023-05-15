@@ -1,6 +1,6 @@
 function Bidra() {
   return (
-    <div className="bidra-container">
+    <div className="p-4">
       <h3>Bidra til Min side</h3>
       <p>
         Min Side er en side som utvikles internt i JPro.
