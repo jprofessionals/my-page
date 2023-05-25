@@ -7,6 +7,8 @@ import { useAuthContext } from '@/providers/AuthProvider'
 import { useRouter } from 'next/router'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Fragment, useMemo } from 'react'
+import { Button } from '../ui/button'
+import clsx from 'clsx'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -18,7 +20,7 @@ const navigation = [
   { href: '/utlysninger', name: 'Utlysninger' },
   { href: '/bidra', name: 'Bidra til min side' },
   { href: '/admin', name: 'Admin', requiresAdmin: true },
-  { href: 'https://intranet.jpro.no', name: 'Intranett' },
+  { href: 'https://intranet.jpro.no', name: 'Intranett 🔗' },
 ]
 
 const NavBar = () => {
@@ -26,10 +28,9 @@ const NavBar = () => {
   const router = useRouter()
   const logout = () => {
     setUser(null)
-    localStorage.removeItem('user_token')
+    sessionStorage.removeItem('user_token')
     router.push('/loggut')
   }
-
   const navigationItems = useMemo(
     () =>
       navigation.filter(({ requiresAdmin }) => {
@@ -47,7 +48,6 @@ const NavBar = () => {
         <>
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="flex justify-between items-center">
-              {' '}
               <div className="flex flex-1 justify-between items-end">
                 <Link href="/">
                   <div
@@ -62,7 +62,7 @@ const NavBar = () => {
                     <span>Min side</span>
                   </div>
                 </Link>
-                <div className="hidden h-full text-sm sm:block">
+                <div className="hidden h-full text-sm md:block">
                   <div className="flex space-x-4 h-full">
                     {navigationItems.map(({ href, name }) => (
                       <a
@@ -82,60 +82,45 @@ const NavBar = () => {
                   </div>
                 </div>
               </div>
-              <div className="hidden sm:block sm:ml-6">
-                {user ? (
-                  <div className="flex items-center">
-                    <button
-                      type="button"
-                      className="p-1 text-gray-400 bg-gray-800 rounded-full hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none"
+              <div className="hidden md:block md:ml-6">
+                <div
+                  className={clsx(
+                    !user ? 'invisible pointer-events-none' : '',
+                    'flex items-center',
+                  )}
+                >
+                  <Menu as="div" className="relative ml-3">
+                    <Menu.Button className="flex text-sm bg-gray-800 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none">
+                      <span className="sr-only">Open user menu</span>
+                      <Image
+                        src={user?.icon || ''}
+                        alt="Icon"
+                        width="40"
+                        height="40"
+                        className="rounded-full"
+                      />
+                    </Menu.Button>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
                     >
-                      <span className="sr-only">View notifications</span>
-                      <div className="w-6 h-6" aria-hidden="true">
-                        👤
-                      </div>
-                    </button>
-
-                    {/* Profile dropdown */}
-                    <Menu as="div" className="relative ml-3">
-                      <Menu.Button className="flex text-sm bg-gray-800 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none">
-                        <span className="sr-only">Open user menu</span>
-                        <Image
-                          src={user?.icon || ''}
-                          alt="Icon"
-                          width="40"
-                          height="40"
-                        />
-                      </Menu.Button>
-                      <Transition
-                        as={Fragment}
-                        enter="transition ease-out duration-100"
-                        enterFrom="transform opacity-0 scale-95"
-                        enterTo="transform opacity-100 scale-100"
-                        leave="transition ease-in duration-75"
-                        leaveFrom="transform opacity-100 scale-100"
-                        leaveTo="transform opacity-0 scale-95"
-                      >
-                        <Menu.Items className="absolute right-0 z-10 py-1 mt-2 w-48 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg origin-top-right focus:outline-none">
-                          <Menu.Item>
-                            {({ active }) => (
-                              <a
-                                href="#"
-                                className={classNames(
-                                  active ? 'bg-gray-100' : '',
-                                  'block px-4 py-2 text-sm text-gray-700',
-                                )}
-                              >
-                                Your Profile
-                              </a>
-                            )}
-                          </Menu.Item>
-                        </Menu.Items>
-                      </Transition>
-                    </Menu>
-                  </div>
-                ) : null}
+                      <Menu.Items className="absolute right-0 z-10 mt-2 w-28 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg origin-top-right focus:outline-none">
+                        <Menu.Item>
+                          <Button className="w-full" onClick={() => logout()}>
+                            Logg ut
+                          </Button>
+                        </Menu.Item>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
+                </div>
               </div>
-              <div className="flex -mr-2 sm:hidden">
+              <div className="flex -mr-2 md:hidden">
                 {/* Mobile menu button */}
                 <Disclosure.Button className="inline-flex justify-center items-center p-2 text-white rounded-md hover:text-white hover:bg-gray-700 focus:ring-2 focus:ring-inset focus:ring-white focus:outline-none">
                   <span className="sr-only">Open main menu</span>
@@ -153,8 +138,8 @@ const NavBar = () => {
             </div>
           </div>
 
-          <Disclosure.Panel className="sm:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+          <Disclosure.Panel className="md:hidden">
+            <div className="flex flex-col gap-2 px-2 pt-2 pb-3">
               {navigationItems.map(({ name, href }) => {
                 return (
                   <Disclosure.Button
@@ -167,6 +152,33 @@ const NavBar = () => {
                   </Disclosure.Button>
                 )
               })}
+              {user ? (
+                <>
+                  <hr className="!m-4" />
+                  <div className="flex gap-10 justify-between px-4">
+                    <div className="flex gap-2 text-white">
+                      <Image
+                        src={user?.icon || ''}
+                        alt="Icon"
+                        width="60"
+                        height="60"
+                        className="rounded-lg"
+                      />
+                      <span className="flex flex-col flex-wrap">
+                        <span>{user?.name}</span>
+                        <span>{user?.email}</span>
+                      </span>
+                    </div>
+                    <Disclosure.Button
+                      as="button"
+                      onClick={() => logout()}
+                      className="block self-end py-2 px-3 text-base font-medium text-white bg-gray-900 rounded-md"
+                    >
+                      Logg ut
+                    </Disclosure.Button>
+                  </div>
+                </>
+              ) : null}
             </div>
           </Disclosure.Panel>
         </>
