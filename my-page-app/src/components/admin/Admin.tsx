@@ -1,14 +1,14 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import apiService from '../../services/api.service'
 import { toast } from 'react-toastify'
 import { Budget, BudgetType, User } from '@/types'
 import BudgetList from '@/components/budget/BudgetList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown'
-import { AccordionEventKey } from 'react-bootstrap/AccordionContext'
 import NewUserModal from '@/components/admin/NewUserModal'
 import clsx from 'clsx'
 import { useAuthContext } from '@/providers/AuthProvider'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 
 function compareUsers(a: User, b: User): number {
   if (a.name === null && b.name === null) {
@@ -28,9 +28,7 @@ function Admin() {
   const [isLoading, setIsLoading] = useState(true)
   const [expandedUser, setExpandedUser] = useState<string>('')
   const [filterValue, setFilterValue] = useState('')
-  const [activeBudget, setActiveBudget] = useState<AccordionEventKey | null>(
-    null,
-  )
+  const [activeBudget, setActiveBudget] = useState<string | null>(null)
   const { user } = useAuthContext()
 
   useEffect(() => {
@@ -93,14 +91,6 @@ function Admin() {
     }
   }
 
-  const budgetBalanceHours = (budget: Budget) => {
-    if (budget) {
-      return budget.sumHours + (budget.sumHours === 1 ? ' time' : ' timer')
-    } else {
-      return '-'
-    }
-  }
-
   const budgetBalanceHoursCurrentYear = (budget: Budget) => {
     if (budget) {
       return (
@@ -136,8 +126,8 @@ function Admin() {
 
   if (isLoading) {
     return (
-      <div className="loadSpin d-flex align-items-center">
-        <div animation="border" className="spinn" />
+      <div className="flex flex-col justify-center items-center mt-[30%] gap-4">
+        <FontAwesomeIcon icon={faRefresh} className="animate-spin" size="3x" />
         <h3>Laster inn oversikt</h3>
       </div>
     )
