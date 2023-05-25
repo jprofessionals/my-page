@@ -6,8 +6,6 @@ import moment from 'moment'
 import { Button } from '../ui/button'
 import { OverlayTrigger, Tooltip } from 'react-bootstrap'
 import getInNok from '@/utils/getInNok'
-import styles from './Kalkulator.module.scss'
-import clsx from 'clsx'
 
 const defaultValues: Record<string, number> = {
   garantilonn: 50000,
@@ -102,10 +100,6 @@ function Kalkulator() {
 
   function BruttoArsLonn() {
     return billableHoursThisYear * timeprisProsjekt * 0.52 * 1.12 + +bonus
-  }
-
-  function GarantilonnBenyttet() {
-    return BeregnetGarantilonn() > SumBetaltTid()
   }
 
   const handleMonthAndYearChange = () => {

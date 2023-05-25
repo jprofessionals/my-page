@@ -1,24 +1,21 @@
-import React from 'react'
 import Moment from 'moment'
 import { useAuthContext } from '@/providers/AuthProvider'
 
 function UserInformation() {
   const { user } = useAuthContext()
 
+  if (!user) return null
+
   return (
-    <>
-      {user ? (
-        <div style={{ marginTop: 20, marginLeft: -5 }} className="container">
-          <header className="jumbotron">
-            <h3>Hei, {user?.givenName}</h3>
-            <p>E-post: {user?.email}</p>
-            <p style={user?.startDate ? {} : { display: 'none' }}>
-              Startdato: {Moment(user?.startDate).format('DD.MM.YYYY')}
-            </p>
-          </header>
-        </div>
-      ) : null}
-    </>
+    <div className="py-8 px-4 prose prose-h2:mb-0 prose-h2:font-light prose-p:font-light">
+      <h2>Hei, {user?.givenName}</h2>
+      <p className="flex flex-col">
+        E-post: {user?.email}
+        {user.startDate ? (
+          <span>Startdato: {Moment(user?.startDate).format('DD.MM.YYYY')}</span>
+        ) : null}
+      </p>
+    </div>
   )
 }
 

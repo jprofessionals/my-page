@@ -1,6 +1,5 @@
-import { Modal } from 'react-bootstrap'
 import ApiService from '../../services/api.service'
-import React from 'react'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 type Props = {
