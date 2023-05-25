@@ -112,19 +112,19 @@ const BudgetItem = ({
     >
       <button
         className={clsx(
-          'grid grid-cols-2 items-center pr-6 collapse-title self-start hover:brightness-90 focus:brightness-90',
+          'text-sm grid grid-cols-2 items-center pr-6 collapse-title self-start hover:brightness-90 focus:brightness-90',
           textColor,
           bgColor,
         )}
         onClick={() => setActiveId(isActive ? '' : budget.id)}
       >
-        <span title="Type budsjett" className="flex gap-4 uppercase">
+        <span title="Type budsjett" className="flex gap-2 uppercase">
           {icon ? (
             <FontAwesomeIcon icon={icon} size="xl" className="w-8" />
           ) : null}
           {budget.budgetType.name}{' '}
         </span>
-        <div className="flex justify-between">
+        <div className="flex gap-4 justify-end">
           <span title="Saldo">Saldo: {getInNok(budget.balance)}</span>
           <FontAwesomeIcon
             icon={faChevronDown}
@@ -168,6 +168,7 @@ const BudgetItem = ({
                       post={post}
                       budget={budget}
                       refreshBudgets={refreshBudgets}
+                      showActions={type === 'list'}
                     />
                   ))
               ) : (
