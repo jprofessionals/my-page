@@ -21,6 +21,7 @@ import clsx from 'clsx'
 type Props = {
   budget: Budget
   isActive: boolean
+  setActiveId: (id: string) => void
   refreshBudgets: any
   type: 'list' | 'tiles'
 }
@@ -65,10 +66,15 @@ const budgetConfigs: Record<
   },
 }
 
-const BudgetItem = ({ budget, refreshBudgets, type, isActive }: Props) => {
+const BudgetItem = ({
+  budget,
+  refreshBudgets,
+  type,
+  isActive,
+  setActiveId,
+}: Props) => {
   const { posts } = budget
   const [cardItem, setCardItem] = useState<any>()
-  const [isOpen, setIsOpen] = useState(isActive)
 
   const toggler = (e: any) => {
     if (!cardItem) {
@@ -101,7 +107,7 @@ const BudgetItem = ({ budget, refreshBudgets, type, isActive }: Props) => {
         {
           'first:rounded-t-lg last:rounded-b-lg rounded-none': type === 'list',
         },
-        isOpen ? 'collapse-open' : '',
+        isActive ? 'collapse-open' : '',
       )}
     >
       <button
@@ -110,7 +116,7 @@ const BudgetItem = ({ budget, refreshBudgets, type, isActive }: Props) => {
           textColor,
           bgColor,
         )}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setActiveId(isActive ? '' : budget.id)}
       >
         <span title="Type budsjett" className="flex gap-4 uppercase">
           {icon ? (
@@ -123,14 +129,14 @@ const BudgetItem = ({ budget, refreshBudgets, type, isActive }: Props) => {
           <FontAwesomeIcon
             icon={faChevronDown}
             className={clsx(
-              isOpen ? 'rotate-180' : 'rotate-0',
+              isActive ? 'rotate-180' : 'rotate-0',
               'place-self-end self-center',
             )}
           />
         </div>
       </button>
       <div className="collapse-content">
-        {isOpen ? (
+        {isActive ? (
           <>
             <BudgetInformation budget={budget} />
             <div className="flex flex-col gap-3">
