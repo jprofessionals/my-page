@@ -1,80 +1,27 @@
-@use './mixins';
-@import '~bootstrap/scss/bootstrap';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-
-#root {
-  min-width: 350px;
-}
-
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
-.innhold {
-  padding: 10px;
+.calculator-group {
+  &>.input-group {
+    @apply grid;
+    grid-template-columns: 4fr 110px;
 
-  .kalkulator {
-    .input {
-      display: flex;
-      flex-wrap: wrap;
-
-      .column {
-        max-width: 500px;
-        min-width: 300px;
-        margin-right: 10px;
-      }
+    &>span {
+      @apply flex justify-between gap-2;
     }
 
-    ul {
-      list-style: none;
-      padding-left: 15px;
-
-      li {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 5px;
-      }
-      li.bold {
-        font-weight: bold;
-      }
-      li.notSelected {
-        font-weight: lighter;
-      }
-      li.line {
-        border-bottom: 1px solid;
-        padding-bottom: 5px;
-      }
-    }
-
-    input {
-      max-width: 100px;
+    &>.input {
+      @apply text-right pr-0 h-10;
     }
   }
-}
 
-.accordion-button {
-  &:focus {
-    box-shadow: 0px 0px 0px 0.1rem mixins.$jpro-orange;
+  &>.btn {
+    @apply h-10 min-h-6;
   }
-  &:not(.collapsed) {
-    color: mixins.$black;
-    background-color: mixins.$lighter-orange;
-    &::after {
-      color: mixins.$black;
-      background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27 fill=%27%23212529%27%3e%3cpath fill-rule=%27evenodd%27 d=%27M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z%27/%3e%3c/svg%3e');
-    }
-  }
-  &:hover {
-    background-color: mixins.$lighter-orange;
-  }
-}
-
-.card {
-  margin-bottom: 5px;
-  margin-top: 5px;
 }
