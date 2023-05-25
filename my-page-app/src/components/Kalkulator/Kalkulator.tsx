@@ -4,8 +4,8 @@ import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
 import getBillableHours, { getBillabeHoursEntireYear } from './getBillableHours'
 import moment from 'moment'
 import { Button } from '../ui/button'
-import { OverlayTrigger, Tooltip } from 'react-bootstrap'
 import getInNok from '@/utils/getInNok'
+import clsx from 'clsx'
 
 const defaultValues: Record<string, number> = {
   garantilonn: 50000,
@@ -214,16 +214,15 @@ function Kalkulator() {
         </div>
       </div>
       <div className="flex flex-wrap gap-6 items-start">
-        <div className="overflow-hidden rounded-lg border border-gray-300 grow shrink-0">
-          <div className="p-4 border-b border-gray-300 bg-slate-200">Basis</div>
+        <div className="rounded-b-lg card card-bordered grow shrink-0">
+          <div className="p-4 rounded-t-lg border-b border-gray-300 bg-slate-200">
+            Basis
+          </div>
           <div className="gap-2 p-4 form-control calculator-group">
             <label className="input-group">
               <span>
                 Syntetisk timepris
-                <ReadMoreIcon
-                  id="tooltip-1"
-                  text="Benyttes som timepris for kompetanse (innenfor årlig budsjett)"
-                />
+                <ReadMoreIcon text="Benyttes som timepris for kompetanse (innenfor årlig budsjett)" />
               </span>
               <input
                 type="number"
@@ -253,10 +252,7 @@ function Kalkulator() {
             <label className="input-group">
               <span>
                 Timer i måned
-                <ReadMoreIcon
-                  id="tooltip-2"
-                  text="Antall arbeidstimer i den aktuelle måneden"
-                />
+                <ReadMoreIcon text="Antall arbeidstimer i den aktuelle måneden" />
               </span>
               <input
                 type="number"
@@ -268,10 +264,7 @@ function Kalkulator() {
             <label className="input-group">
               <span>
                 Rest komperansetimer
-                <ReadMoreIcon
-                  id="tooltip-3"
-                  text="Antall timer du har igjen på årlig kompetansebudjett før eventuelt uttak"
-                />
+                <ReadMoreIcon text="Antall timer du har igjen på årlig kompetansebudjett før eventuelt uttak" />
               </span>
               <input
                 type="number"
@@ -292,10 +285,7 @@ function Kalkulator() {
             <label className="input-group">
               <span>
                 Bonus
-                <ReadMoreIcon
-                  id="tooltip-bonus"
-                  text="Bonus denne måneden. Eksempelvis presentasjonsbonus og rekrutteringsbonus, mer info på intranettet."
-                />
+                <ReadMoreIcon text="Bonus denne måneden. Eksempelvis presentasjonsbonus og rekrutteringsbonus, mer info på intranettet." />
               </span>
               <input
                 type="number"
@@ -306,7 +296,7 @@ function Kalkulator() {
             </label>
           </div>
         </div>
-        <div className="overflow-hidden rounded-lg border border-gray-300 border-solid grow shrink-0">
+        <div className="rounded-lg border border-gray-300 border-solid grow shrink-0">
           <div className="p-4 border-b border-gray-300 bg-slate-200">Timer</div>
           <div className="gap-2 p-4 form-control calculator-group">
             <label className="input-group">
@@ -339,10 +329,7 @@ function Kalkulator() {
             <label className="input-group">
               <span>
                 Interntid m/komp
-                <ReadMoreIcon
-                  id="tooltip-4"
-                  text="Interntid som kompanseres som fakturert tid, se intranett for retningslinjer"
-                />
+                <ReadMoreIcon text="Interntid som kompanseres som fakturert tid, se intranett for retningslinjer" />
               </span>
               <input
                 type="number"
@@ -363,10 +350,7 @@ function Kalkulator() {
             <label className="input-group">
               <span>
                 Sykdom
-                <ReadMoreIcon
-                  id="tooltip-5"
-                  text="Egenmelding, sykemelding, sykt barn og foreldre permisjon"
-                />
+                <ReadMoreIcon text="Egenmelding, sykemelding, sykt barn og foreldre permisjon" />
               </span>
               <input
                 type="number"
@@ -377,13 +361,10 @@ function Kalkulator() {
             </label>
           </div>
         </div>
-        <div className="overflow-hidden rounded-lg border border-gray-300 border-solid grow shrink-0 min-w-[310px]">
+        <div className="rounded-lg border border-gray-300 border-solid grow shrink-0 min-w-[310px]">
           <div className="flex justify-between p-4 text-white bg-green-brand">
             Resultat
-            <ReadMoreIcon
-              id="tooltip-6"
-              text="Viser resultat av beregningen og hvilke faktorer som blir med i beregnet bruttolønn"
-            />
+            <ReadMoreIcon text="Viser resultat av beregningen og hvilke faktorer som blir med i beregnet bruttolønn" />
           </div>
           <ul className="flex flex-col gap-2 justify-between p-4">
             <li className="flex justify-between">
@@ -422,11 +403,10 @@ function Kalkulator() {
             <li className="flex justify-between border-b-2 border-solid border-b-black-nav">
               Bruttolønn: <span>{getInNok(Bruttolonn())}</span>
             </li>
-            <li className="flex justify-between">
-              <span>
+            <li className="flex gap-4 justify-between">
+              <span className="flex justify-between w-full">
                 Ca årslønn:
                 <ReadMoreIcon
-                  id="arslonn"
                   text={`Utregning: Antall fakturerbare timer i ${selectedYear} er ${
                     billableHoursThisYear + 25 * 7.5
                   }. Trekker fra 25 feriedager og legger på feriepenger (12%). Regnestykket blir: \n\n${billableHoursThisYear}t * ${timeprisProsjekt}kr/t * 0.52 * 1.12`}
@@ -441,10 +421,10 @@ function Kalkulator() {
   )
 }
 
-const ReadMoreIcon = ({ text, id }: { text: string; id: string }) => (
-  <OverlayTrigger overlay={<Tooltip id={id}>{text}</Tooltip>}>
+const ReadMoreIcon = ({ text }: { text: string }) => (
+  <div className="tooltip" data-tip={text}>
     <FontAwesomeIcon icon={faQuestionCircle} />
-  </OverlayTrigger>
+  </div>
 )
 
 const months = [

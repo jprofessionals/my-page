@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Budget } from '@/types'
 import Loading from '@/components/Loading'
-import { Button } from 'react-bootstrap'
+import { Button } from '../ui/button'
 
 type Props = {
   budget: Budget
