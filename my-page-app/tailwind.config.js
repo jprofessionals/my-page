@@ -38,6 +38,7 @@ module.exports = {
           accent: '#2f4f4f',
           neutral: '#2c2c2c',
           'base-100': '#ffffff',
+          error: '#DC2626',
         },
       },
       'light',
