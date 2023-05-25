@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import ApiService from '../../services/api.service'
 import Moment from 'moment'
-import { Card, Button, Spinner } from 'react-bootstrap'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faRemove, faCheck } from '@fortawesome/free-solid-svg-icons'
 import { Budget } from '@/types'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 
 type Props = {
   isDeleteModalOpen?: boolean
@@ -21,7 +20,6 @@ type Props = {
 const EditBudgetPost = ({
   toggle,
   refreshBudgets,
-  budget,
   post,
   setIsLoadingEditPost,
   isLoadingEditPost,
@@ -46,13 +44,13 @@ const EditBudgetPost = ({
         amountExMva: amountExMva,
       }
       ApiService.editBudgetPost(post.id, budgetPost).then(
-        (response) => {
+        () => {
           refreshBudgets()
           toggle()
           setIsLoadingEditPost(false)
           toast.success('Lagret ' + description)
         },
-        (error) => {
+        () => {
           setIsLoadingEditPost(false)
           toast.error('Fikk ikke oppdatert ' + description + ', prøv igjen')
         },
@@ -73,74 +71,79 @@ const EditBudgetPost = ({
   }
 
   return (
-    <Card className="inputCard editPost">
-      <Card.Header className="editPostHeader">
+    <div className="overflow-hidden w-full rounded-xl border-2 border-gray-500 border-solid shadow-sm">
+      <div className="flex justify-between items-center px-3 pt-3 pb-2 w-full text-sm bg-gray-200">
         <input
-          className="description"
+          className="input input-sm"
           type="text"
           name="description"
           placeholder="Beskrivelse"
           onChange={handleDescriptionChange}
           value={description}
         />
-        <div className="rightBtnsDiv">
-          <Button
-            className="leftBtn"
+        <div className="btn-group">
+          <button
+            className="btn btn-success btn-sm"
             type="submit"
-            style={isValid() ? {} : { display: 'none' }}
+            disabled={!isValid()}
             onClick={handleSubmit}
             title="Lagre Post"
           >
-            <div style={isLoadingEditPost ? { display: 'none' } : {}}>
-              <FontAwesomeIcon icon={faCheck} />
-            </div>
-            <div style={isLoadingEditPost ? {} : { display: 'none' }}>
-              <Spinner animation="border" size="sm" />
-            </div>
-          </Button>
-          <div style={isLoadingEditPost ? { display: 'none' } : {}}>
-            <Button
-              className="canselEditButton"
-              type="button"
-              title="Avbryt redigering"
-              onClick={() => toggle()}
-            >
-              <div style={isLoadingEditPost ? { display: 'none' } : {}}>
-                <FontAwesomeIcon icon={faRemove} />
-              </div>
-              <div style={isLoadingEditPost ? {} : { display: 'none' }}>
-                <Spinner animation="border" size="sm" />
-              </div>
-            </Button>
-          </div>
+            {isLoadingEditPost ? (
+              <FontAwesomeIcon
+                icon={faRefresh}
+                className="animate-spin"
+                size="sm"
+              />
+            ) : (
+              //<FontAwesomeIcon icon={faCheck} />
+              'Lagre'
+            )}
+          </button>
+          <button
+            className="btn btn-sm"
+            type="button"
+            title="Avbryt redigering"
+            disabled={isLoadingEditPost}
+            onClick={() => toggle()}
+          >
+            {!isLoadingEditPost ? (
+              'Avbryt'
+            ) : (
+              <FontAwesomeIcon
+                icon={faRefresh}
+                className="animate-spin"
+                size="sm"
+              />
+            )}
+          </button>
         </div>
-      </Card.Header>
-      <Card.Body>
-        <ul className="addPost">
-          <li>
-            <span className="priceTitle">Pris:</span>
-            <input
-              type="number"
-              name="amountExMva"
-              placeholder="Pris"
-              onChange={handleAmountChange}
-              value={amountExMva}
-            />
-          </li>
-          <li>
-            <span className="datoTitle">Dato:</span>
-            <input
-              className="inputDate"
-              type="date"
-              name="date"
-              onChange={handleDateChange}
-              value={date}
-              placeholder={date}
-            ></input>
-          </li>
-        </ul>
-      </Card.Body>
-    </Card>
+      </div>
+      <div className="flex flex-col gap-1 p-3">
+        <strong>Pris:</strong>
+        <label>
+          <input
+            type="number"
+            className="w-48 input input-bordered input-sm"
+            name="amountExMva"
+            placeholder="Pris"
+            onChange={handleAmountChange}
+            value={amountExMva}
+          />
+        </label>
+        <strong>Dato:</strong>
+        <label>
+          <input
+            className="w-48 input input-bordered input-sm"
+            type="date"
+            name="date"
+            onChange={handleDateChange}
+            value={date}
+            placeholder={date}
+          />
+        </label>
+      </div>
+    </div>
   )
 }
 
