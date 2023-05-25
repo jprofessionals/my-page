@@ -8,13 +8,13 @@ function RequireAuth({ children }: PropsWithChildren) {
 
   if (!isAuthenticated) {
     return (
-      <>
+      <div className="flex justify-center w-full mt-[30%]">
         <Script
           src="https://accounts.google.com/gsi/client"
           onReady={() => authenticate()}
         />
-        <div id="signInDiv"></div>
-      </>
+        <div id="signInDiv" />
+      </div>
     )
   } else {
     if (userFetchStatus === 'fetched') return <>{children}</>
