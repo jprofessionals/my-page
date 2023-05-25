@@ -1,4 +1,4 @@
-import Moment from 'moment'
+import moment from 'moment'
 import { useAuthContext } from '@/providers/AuthProvider'
 
 function UserInformation() {
@@ -12,7 +12,7 @@ function UserInformation() {
       <p className="flex flex-col">
         E-post: {user?.email}
         {user.startDate ? (
-          <span>Startdato: {Moment(user?.startDate).format('DD.MM.YYYY')}</span>
+          <span>Startdato: {moment(user?.startDate).format('DD.MM.YYYY')}</span>
         ) : null}
       </p>
     </div>

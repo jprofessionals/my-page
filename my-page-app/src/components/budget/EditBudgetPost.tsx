@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import ApiService from '../../services/api.service'
-import Moment from 'moment'
+import moment from 'moment'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Budget } from '@/types'
@@ -26,7 +26,7 @@ const EditBudgetPost = ({
 }: Props) => {
   const [description, setDescription] = useState(post.description)
   const [amountExMva, setAmountExMva] = useState(post.amountExMva)
-  const [date, setDate] = useState(Moment().format(post.date))
+  const [date, setDate] = useState(moment().format(post.date))
 
   const isValid = () => {
     return amountExMva > 0 && description && description !== ''

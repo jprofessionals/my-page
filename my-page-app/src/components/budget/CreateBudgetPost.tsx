@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import ApiService from '../../services/api.service'
-import Moment from 'moment'
+import moment from 'moment'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Budget } from '@/types'
@@ -16,7 +16,7 @@ type Props = {
 const CreateBudgetPost = ({ budget, refreshBudgets, toggle }: Props) => {
   const [description, setDescription] = useState('')
   const [amountExMva, setAmountExMva] = useState(0)
-  const [date, setDate] = useState(Moment().format('YYYY-MM-DD'))
+  const [date, setDate] = useState(moment().format('YYYY-MM-DD'))
   const [isLoadingPost, setIsLoadingPost] = useState(false)
 
   const isValid = amountExMva > 0 && description && description !== ''
