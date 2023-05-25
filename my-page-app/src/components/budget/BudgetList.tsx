@@ -36,7 +36,7 @@ const BudgetList = ({
         ) : null}
         <div
           className={clsx(
-            type === 'tiles' ? 'gap-y-2 gap-x-3 lg:grid grid-cols-2' : '',
+            type === 'tiles' ? 'grid gap-2 gap-x-3 md:grid-cols-2' : '',
           )}
         >
           {budgets.map((budget) => (
