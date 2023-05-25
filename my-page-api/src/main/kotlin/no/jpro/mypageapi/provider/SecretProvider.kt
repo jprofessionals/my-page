@@ -1,6 +1,5 @@
 package no.jpro.mypageapi.provider
 
-import com.google.cloud.secretmanager.v1.SecretManagerServiceClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
@@ -10,7 +9,7 @@ interface SecretProvider {
 }
 
 @Component
-@Profile("local")
+@Profile("local", "h2")
 class SecretProviderLocal: SecretProvider {
     //For lokal kjøring, sett denne i for eksempel application-local.yml og legg den til .gitignore så den ikke blir committed
     //kontakt Roger for å få OpenAI API key hvis du ikke har allerede.
@@ -23,12 +22,11 @@ class SecretProviderLocal: SecretProvider {
     }
 }
 
-
-@Profile("gcp")
 @Component
+@Profile("gcp")
 class SecretProviderGcp : SecretProvider {
-    private var apiKey: String = "PLACEHOLDER"
-    private val secretManagerServiceClient: SecretManagerServiceClient = SecretManagerServiceClient.create()
+    @Value("\${OpenAI_API:PLACEHOLDER}")
+    private val apiKey: String = "PLACEHOLDER"
 
     override fun getApiKey(): String {
         return apiKey
