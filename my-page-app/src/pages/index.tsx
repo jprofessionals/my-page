@@ -1,4 +1,3 @@
-import RequireAuth from '../components/auth/RequireAuth'
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useState } from 'react'
@@ -9,9 +8,11 @@ import Loading from '@/components/Loading'
 import UserInformation from '@/components/UserInformation'
 import { useAuthContext } from '@/providers/AuthProvider'
 import ErrorPage from '@/components/ErrorPage'
-import {AccordionEventKey} from "react-bootstrap/AccordionContext";
 
 const BudgetList = dynamic(() => import('@/components/budget/BudgetList'), {
+  ssr: false,
+})
+const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
   ssr: false,
 })
 
@@ -22,7 +23,7 @@ export default function HomePage() {
   const [budgetLoadingStatus, setBudgetLoadingStatus] =
     useState<BudgetLoadingStatus>('init')
   const { userFetchStatus } = useAuthContext()
-  const [activeBudget, setActiveBudget] = useState<AccordionEventKey | null>(null)
+  const [activeBudget, setActiveBudget] = useState<string | null>(null)
 
   const refreshBudgets = useCallback(async () => {
     setBudgetLoadingStatus('loading')
@@ -40,6 +41,7 @@ export default function HomePage() {
   useEffect(() => {
     if (budgetLoadingStatus !== 'init') return
     if (userFetchStatus === 'fetched') refreshBudgets()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userFetchStatus, budgetLoadingStatus])
 
   return (
@@ -55,7 +57,13 @@ export default function HomePage() {
             loadingText="Laster inn ditt budsjett..."
           >
             {budgetLoadingStatus === 'completed' ? (
-              <BudgetList budgets={budgets} refreshBudgets={refreshBudgets} activeBudgetId={activeBudget} updateActiveBudget={setActiveBudget} />
+              <BudgetList
+                type="tiles"
+                budgets={budgets}
+                refreshBudgets={refreshBudgets}
+                activeBudgetId={activeBudget}
+                updateActiveBudget={setActiveBudget}
+              />
             ) : (
               <ErrorPage errorText="Din bruker er autentisert, men vi klarte likevel ikke å hente ut dine budsjetter. Prøv igjen senere." />
             )}
