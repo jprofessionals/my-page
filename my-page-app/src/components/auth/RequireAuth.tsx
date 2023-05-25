@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react'
+import { PropsWithChildren } from 'react'
 import Script from 'next/script'
 import { useAuthContext } from '@/providers/AuthProvider'
 import ErrorPage from '@/components/ErrorPage'
