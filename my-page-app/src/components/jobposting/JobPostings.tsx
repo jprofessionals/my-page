@@ -35,16 +35,27 @@ export default function JobPostingList({ jobPostings }: Props) {
                   {jobPosting.customer}
                 </span>
               </h4>
+              <div className="flex flex-col gap-2 p-4 rounded card-bordered bg-orange-brand">
+                <strong className="text-2xl text-white">Teknologier</strong>
+                <div className="flex flex-wrap gap-2">
+                  {jobPosting.tags?.map((tag) => (
+                    <div
+                      key={tag}
+                      className="py-1 px-2 rounded-lg bg-slate-100"
+                    >
+                      {tag}
+                    </div>
+                  ))}
+                </div>
+              </div>
               <h4>Beskrivelse</h4>
-              <p>
-                {jobPosting.description ? (
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: jobPosting.description.replaceAll('\n', '<br/>'),
-                    }}
-                  />
-                ) : null}
-              </p>
+              {jobPosting.description ? (
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: jobPosting.description.replaceAll('\n', '<br/>'),
+                  }}
+                />
+              ) : null}
               <div className="flex flex-col">
                 <strong>Krav til erfaring</strong>
                 <span>{jobPosting.requiredYearsOfExperience} år</span>
@@ -52,8 +63,6 @@ export default function JobPostingList({ jobPostings }: Props) {
                 <span>{jobPosting.location}</span>
                 <strong>Antall ressurser</strong>
                 <span>{jobPosting.resourcesNeeded}</span>
-                <strong>Emneknagger</strong>
-                <span>{jobPosting.tags?.join(', ')}</span>
               </div>
             </div>
           </Accordion.Content>
