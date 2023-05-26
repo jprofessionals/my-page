@@ -13,7 +13,6 @@ const formattedDueDate = (dueDate?: string) => {
   return new Intl.DateTimeFormat('nb-NO').format(new Date(dueDate))
 }
 export default function JobPostingList({ jobPostings }: Props) {
-  jobPostings = [...jobPostings, ...jobPostings]
   return (
     <Accordion.Accordion type="multiple" className="flex flex-col gap-4">
       {jobPostings?.map((jobPosting, index) => (
