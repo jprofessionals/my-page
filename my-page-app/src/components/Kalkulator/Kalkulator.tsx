@@ -387,13 +387,13 @@ function Kalkulator() {
             <li className="flex justify-between border-b-2 border-solid border-b-black-nav">
               Sum betalt tid: <span>{getInNok(SumBetaltTid())}</span>
             </li>
-            <li className="flex justify-between text-gray-500">
-              Tilgjengelig tid:{' '}
+            <li className="flex justify-between text-gray-400">
+              Tilgjengelig tid:
               <span>
                 {SumTilgjengeligTid()} av {antallTimerMnd}
               </span>
             </li>
-            <li className="flex justify-between border-b-2 border-solid border-b-black-nav">
+            <li className="flex justify-between text-gray-400 border-b-2 border-solid border-b-black-nav">
               Beregnet garantilønn:{' '}
               <span>{getInNok(BeregnetGarantilonn())}</span>
             </li>
@@ -422,7 +422,7 @@ function Kalkulator() {
 }
 
 const ReadMoreIcon = ({ text }: { text: string }) => (
-  <div className="tooltip" data-tip={text}>
+  <div className="tooltip tooltip-left" data-tip={text}>
     <FontAwesomeIcon icon={faQuestionCircle} />
   </div>
 )
