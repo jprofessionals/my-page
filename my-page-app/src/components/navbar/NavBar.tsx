@@ -91,7 +91,7 @@ const NavBar = () => {
                     <Menu.Button className="flex text-sm bg-gray-800 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none">
                       <span className="sr-only">Open user menu</span>
                       <Image
-                        src={user?.icon || ''}
+                        src={user?.icon || '/default-profile.jpeg'}
                         alt="Icon"
                         width="40"
                         height="40"
