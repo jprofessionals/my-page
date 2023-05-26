@@ -1,5 +1,6 @@
 import { JobPostingType } from '@/types'
 import * as Accordion from '../ui/accordion'
+import { Button } from '../ui/button'
 
 type Props = {
   jobPostings: JobPostingType[]
@@ -64,6 +65,13 @@ export default function JobPostingList({ jobPostings }: Props) {
                 <strong>Antall ressurser</strong>
                 <span>{jobPosting.resourcesNeeded}</span>
               </div>
+              <Button
+                className="mt-8"
+                onClick={() => alert('Hør med Roger eller Steinar da vel!')}
+                title="Kommer kanskje noe bedre enn en alert her i framtiden"
+              >
+                Søk på denne
+              </Button>
             </div>
           </Accordion.Content>
         </Accordion.Item>
