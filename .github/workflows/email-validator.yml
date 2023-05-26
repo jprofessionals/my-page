@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - smtp-pubsub-pipeline
     paths:
       - 'email-validator/**'
   workflow_dispatch:

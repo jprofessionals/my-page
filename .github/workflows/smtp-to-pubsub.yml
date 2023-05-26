@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - smtp-pubsub-pipeline
     paths:
       - 'smtp-to-pubsub/**'
   workflow_dispatch:
