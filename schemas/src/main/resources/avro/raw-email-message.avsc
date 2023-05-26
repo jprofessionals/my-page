@@ -1,0 +1,22 @@
+{
+  "namespace": "no.jpro.mypage",
+  "type": "record",
+  "name": "RawEmail",
+  "fields": [
+    {
+      "name": "from",
+      "type": "string"
+    },
+    {
+      "name": "to",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    },
+    {
+      "name": "content",
+      "type": "bytes"
+    }
+  ]
+}
