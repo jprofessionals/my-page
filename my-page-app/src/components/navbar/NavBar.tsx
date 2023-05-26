@@ -11,11 +11,11 @@ import { Button } from '../ui/button'
 import clsx from 'clsx'
 
 const navigation = [
+  { href: '/admin', name: 'Admin 🛠️', requiresAdmin: true },
   { href: '/', name: 'Budsjett' },
-  { href: '/kalkulator', name: 'Lønnskalkulator' },
   { href: '/utlysninger', name: 'Utlysninger' },
+  { href: '/kalkulator', name: 'Lønnskalkulator' },
   { href: '/bidra', name: 'Bidra til min side' },
-  { href: '/admin', name: 'Admin', requiresAdmin: true },
   { href: 'https://intranet.jpro.no', name: 'Intranett 🔗' },
 ]
 
