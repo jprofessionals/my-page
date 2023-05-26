@@ -1,70 +1,60 @@
-# Getting Started with Create React App
+# My page - the frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This app is a NextJS project built with:
+
+- [TypeScript](https://www.typescriptlang.org/)
+- [React](https://react.dev/) + [NextJS](https://nextjs.org/)
+- Styled with [Tailwind CSS](https://tailwindcss.com/)
+- Server state with [TanStack/React Query](https://tanstack.com/query/v3/)
+- Kept sane with [prettier](https://prettier.io/) and
+  [eslint](https://eslint.org/)
+
+The components under ./src/components/ui are from
+[shadcn/ui](https://ui.shadcn.com/), with slight modifications.
 
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `npm start`
+### npm run dev
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+This starts up the Next server locally, enabling you to develop and see changes
+as you save.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### npm run build
 
-### `npm test`
+This will build a production build of your current project. It will cleanse out
+the previous built version through `rm -rf ./build` and build it fresh.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### npm run start
 
-### `npm run build`
+This starts up the production build built with `npm run build`, unlike
+`npm run dev`, this will not reflect changes done when changing files.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### npm run lint
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+This performs a scan of the project using eslint. Generally meant to be ran as
+part of the CI/CD pipeline in Github Actions, to ensure consistent linting
+across all contributers contributions.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Ideally, you should be able to set your editor up to warn you about these
+warnings/errors while developing, and fix them as you go.
 
-### `npm run eject`
+### npm run format
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Same as `lint`, but scans the project for consistency in formatting.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### npm run format:fix
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Same as `format`, but this attempts to fix all the issues automatically.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+We _HIGHLY_ recommend you to set up your editor to automatically format the file
+you're working on `on save`, during development. This script will run in Github
+Actions, so the formatting should be consistent anyways, but its nice to work on
+formatted code.
 
 ### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+We host our NextJS on Google Cloud AppEngine. We've set up the project to
+automatically deploy once new pull requests merge into `main`, so there's no
+need for manual deployment.
