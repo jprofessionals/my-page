@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - smtp-pubsub-pipeline
     paths:
       - 'schemas/src/main/resources/avro/raw-email-message.avsc'
   workflow_dispatch:
