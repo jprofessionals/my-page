@@ -1,9 +1,14 @@
-import JobPostingList from '@/components/jobposting/JobPostingList'
+import JobPostings from '@/components/jobposting/JobPostings'
 import { JobPostingType } from '@/types'
 import { useQuery } from 'react-query'
 import axios from 'axios'
 import { API_URL } from '@/services/api.service'
 import authHeader from '@/services/auth-header'
+import dynamic from 'next/dynamic'
+
+const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
+  ssr: false,
+})
 
 const getAllJobPostings = async () => {
   const response = await axios.get(API_URL + 'jobposting', {
@@ -35,43 +40,26 @@ export default function Utlysninger() {
   })
 
   return (
-    <div
-      className="container"
-      style={{
-        marginTop: '2rem',
-      }}
-    >
-      <h1
-        style={{
-          marginBottom: '2rem',
-        }}
-      >
-        Utlysninger
-      </h1>
-      <h2>Pågående utlysninger</h2>
-      {currentJobPostings.length > 0 ? (
-        <JobPostingList jobPostings={currentJobPostings} />
-      ) : (
-        <p
-          style={{
-            fontStyle: 'italic',
-          }}
-        >
-          Ingen pågående utlysninger
-        </p>
-      )}
-      <h2>Tidligere utlysninger</h2>
-      {pastJobPostings.length > 0 ? (
-        <JobPostingList jobPostings={pastJobPostings} />
-      ) : (
-        <p
-          style={{
-            fontStyle: 'italic',
-          }}
-        >
-          Ingen tidligere utlysninger
-        </p>
-      )}
-    </div>
+    <RequireAuth>
+      <div className="flex flex-col gap-4 p-4">
+        <div className="prose">
+          <h1>Utlysninger</h1>
+          <h2>Pågående utlysninger</h2>
+        </div>
+        {currentJobPostings.length > 0 ? (
+          <JobPostings jobPostings={currentJobPostings} />
+        ) : (
+          <p>Ingen pågående utlysninger</p>
+        )}
+        <span className="prose">
+          <h2>Tidligere utlysninger</h2>
+        </span>
+        {pastJobPostings.length > 0 ? (
+          <JobPostings jobPostings={pastJobPostings} />
+        ) : (
+          <p>Ingen tidligere utlysninger</p>
+        )}
+      </div>
+    </RequireAuth>
   )
 }
