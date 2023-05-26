@@ -5,6 +5,7 @@ import axios from 'axios'
 import { API_URL } from '@/services/api.service'
 import authHeader from '@/services/auth-header'
 import dynamic from 'next/dynamic'
+import moment from 'moment'
 
 const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
   ssr: false,
@@ -15,9 +16,7 @@ const getAllJobPostings = async () => {
     headers: authHeader(),
   })
 
-  const jobPostings: JobPostingType[] = response.data
-
-  return jobPostings
+  return response.data as JobPostingType[]
 }
 
 export default function Utlysninger() {
@@ -25,25 +24,23 @@ export default function Utlysninger() {
 
   const currentDate = new Date().toISOString().split('T')[0]
 
-  const currentJobPostings = jobPostings.filter((jobPosting) => {
-    return (
-      jobPosting.dueDateForApplication &&
-      jobPosting.dueDateForApplication >= currentDate
-    )
-  })
+  const currentJobPostings = jobPostings.filter((jobPosting) =>
+    moment(jobPosting.dueDateForApplication).isAfter(currentDate, 'day'),
+  )
 
-  const pastJobPostings = jobPostings.filter((jobPosting) => {
-    return (
-      jobPosting.dueDateForApplication &&
-      jobPosting.dueDateForApplication < currentDate
-    )
-  })
+  const pastJobPostings = jobPostings.filter((jobPosting) =>
+    moment(jobPosting.dueDateForApplication).isBefore(currentDate, 'day'),
+  )
 
   return (
     <RequireAuth>
       <div className="flex flex-col gap-4 p-4">
         <div className="prose">
           <h1>Utlysninger</h1>
+          <p>
+            Her legger vi ut utlysninger som Chat-GPT har omformulert fra
+            epost-format til noe vi lettere kan søke gjennom 🤖
+          </p>
           <h2>Pågående utlysninger</h2>
         </div>
         {currentJobPostings.length > 0 ? (
