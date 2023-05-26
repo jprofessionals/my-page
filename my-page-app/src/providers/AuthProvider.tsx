@@ -11,8 +11,14 @@ import { User } from '@/types'
 import ApiService from '@/services/api.service'
 import config from '../config/config'
 import { useSessionStorage } from 'usehooks-ts'
+import { useRouter } from 'next/router'
 
-type UserFetchStatus = 'init' | 'fetchingUser' | 'fetched' | 'fetchFailed'
+type UserFetchStatus =
+  | 'init'
+  | 'fetchingUser'
+  | 'fetched'
+  | 'fetchFailed'
+  | 'signedOut'
 
 type AuthContext = {
   isAuthenticated: boolean
@@ -20,6 +26,7 @@ type AuthContext = {
   authenticate: () => void
   userFetchStatus: UserFetchStatus
   user: User | null
+  logout: () => void
   setUser: (user: User | null) => void
 }
 
@@ -63,6 +70,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }, [isAuthenticated, setUserToken, user])
 
+  const router = useRouter()
+  const logout = () => {
+    setUserFetchStatus('signedOut')
+    setUserToken(null)
+    setUser(null)
+    router.push('/loggut')
+  }
+
   const authenticate = async () => {
     const { googleClientId } = config()
 
@@ -97,6 +112,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setUser,
         authenticate,
         userFetchStatus,
+        logout,
       }}
     >
       {children}
