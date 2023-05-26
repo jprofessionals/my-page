@@ -9,7 +9,7 @@ import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 
 const Accordion = AccordionPrimitive.Root
 
-const AccordionItem = forwardRef<
+const Item = forwardRef<
   ElementRef<typeof AccordionPrimitive.Item>,
   ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
 >(({ className, ...props }, ref) => (
@@ -19,9 +19,9 @@ const AccordionItem = forwardRef<
     {...props}
   />
 ))
-AccordionItem.displayName = 'AccordionItem'
+Item.displayName = 'AccordionItem'
 
-const AccordionTrigger = forwardRef<
+const Trigger = forwardRef<
   ElementRef<typeof AccordionPrimitive.Trigger>,
   ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
 >(({ className, children, ...props }, ref) => (
@@ -42,9 +42,9 @@ const AccordionTrigger = forwardRef<
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ))
-AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
+Trigger.displayName = AccordionPrimitive.Trigger.displayName
 
-const AccordionContent = forwardRef<
+const Content = forwardRef<
   ElementRef<typeof AccordionPrimitive.Content>,
   ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
@@ -59,6 +59,6 @@ const AccordionContent = forwardRef<
     <div className="pt-0 pb-4">{children}</div>
   </AccordionPrimitive.Content>
 ))
-AccordionContent.displayName = AccordionPrimitive.Content.displayName
+Content.displayName = AccordionPrimitive.Content.displayName
 
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
+export { Accordion, Item, Trigger, Content }
