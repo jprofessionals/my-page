@@ -10,10 +10,6 @@ import { Fragment, useMemo } from 'react'
 import { Button } from '../ui/button'
 import clsx from 'clsx'
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
-}
-
 const navigation = [
   { href: '/', name: 'Budsjett' },
   { href: '/kalkulator', name: 'Lønnskalkulator' },
@@ -65,19 +61,21 @@ const NavBar = () => {
                 <div className="hidden h-full text-sm md:block">
                   <div className="flex space-x-4 h-full">
                     {navigationItems.map(({ href, name }) => (
-                      <a
-                        href={href}
-                        key={name}
-                        aria-disabled={href === router.pathname}
-                        className={classNames(
-                          href === router.pathname
-                            ? "after:content-[''] after:h-2 after:bg-orange-brand"
-                            : '',
-                          'text-white flex flex-col justify-between gap-1.5',
-                        )}
-                      >
-                        {name}
-                      </a>
+                      <div key={name} className="flex flex-col gap-2">
+                        <a
+                          href={href}
+                          aria-disabled={href === router.pathname}
+                          className="text-white no-underline link"
+                        >
+                          {name}
+                        </a>
+                        <div
+                          className={clsx(
+                            href !== router.pathname || 'bg-orange-brand',
+                            'h-2',
+                          )}
+                        />
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -85,7 +83,7 @@ const NavBar = () => {
               <div className="hidden md:block md:ml-6">
                 <div
                   className={clsx(
-                    !user ? 'invisible pointer-events-none' : '',
+                    !user ? 'pointer-events-none' : '',
                     'flex items-center',
                   )}
                 >
