@@ -20,13 +20,9 @@ const navigation = [
 ]
 
 const NavBar = () => {
-  const { user, setUser } = useAuthContext()
+  const { user, logout } = useAuthContext()
   const router = useRouter()
-  const logout = () => {
-    setUser(null)
-    sessionStorage.removeItem('user_token')
-    router.push('/loggut')
-  }
+
   const navigationItems = useMemo(
     () =>
       navigation.filter(({ requiresAdmin }) => {
