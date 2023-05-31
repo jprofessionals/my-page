@@ -3,6 +3,5 @@ handlers:
   - url: /.*
     secure: always
     script: auto
-spring:
-  profiles:
-    active: gcp
+env_variables:
+  spring.profiles.active: "gcp"
