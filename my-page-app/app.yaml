@@ -3,3 +3,6 @@ handlers:
   - url: /.*
     secure: always
     script: auto
+spring:
+  profiles:
+    active: gcp
