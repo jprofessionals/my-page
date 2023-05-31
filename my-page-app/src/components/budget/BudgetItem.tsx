@@ -17,6 +17,7 @@ import BudgetInformation from './BudgetInformation'
 import { Budget } from '@/types'
 import getInNok from '@/utils/getInNok'
 import clsx from 'clsx'
+import { get } from 'radash'
 
 type Props = {
   budget: Budget
@@ -92,10 +93,11 @@ const BudgetItem = ({
     }
   }
 
-  const { bgColor, textColor, icon } =
-    type === 'tiles'
-      ? budgetConfigs[budget.budgetType.name]
-      : budgetConfigs.default
+  const budgetConfig = get(
+    budgetConfigs,
+    type === 'list' ? 'default' : budget.budgetType.name,
+    budgetConfigs.default,
+  )
 
   return (
     <div
@@ -113,14 +115,18 @@ const BudgetItem = ({
       <button
         className={clsx(
           'text-sm grid grid-cols-2 items-center pr-6 collapse-title self-start hover:brightness-90 focus:brightness-90',
-          textColor,
-          bgColor,
+          budgetConfig?.textColor,
+          budgetConfig?.bgColor,
         )}
         onClick={() => setActiveId(isActive ? '' : budget.id)}
       >
         <span title="Type budsjett" className="flex gap-2 uppercase">
-          {icon ? (
-            <FontAwesomeIcon icon={icon} size="xl" className="w-8" />
+          {budgetConfig?.icon ? (
+            <FontAwesomeIcon
+              icon={budgetConfig?.icon}
+              size="xl"
+              className="w-8"
+            />
           ) : null}
           {budget.budgetType.name}{' '}
         </span>
