@@ -4,4 +4,4 @@ handlers:
     secure: always
     script: auto
 env_variables:
-  spring.profiles.active: "gcp"
+  spring_profiles_active: "gcp"
