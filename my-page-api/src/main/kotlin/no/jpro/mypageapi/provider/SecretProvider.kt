@@ -23,7 +23,7 @@ class SecretProviderLocal: SecretProvider {
 }
 
 @Component
-@Profile("gcp")
+@Profile("!local", "!h2" ) //Midlertidig løsning for å få deployet til GCP
 class SecretProviderGcp : SecretProvider {
     @Value("\${OpenAI_API:PLACEHOLDER}")
     private val apiKey: String = "PLACEHOLDER"
