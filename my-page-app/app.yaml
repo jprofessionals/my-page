@@ -3,5 +3,3 @@ handlers:
   - url: /.*
     secure: always
     script: auto
-env_variables:
-  SPRING_PROFILES_ACTIVE: "gcp"
