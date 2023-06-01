@@ -19,4 +19,4 @@ handlers:
   script: auto
 
 env_variables:
-  SPRING_PROFILES_ACTIVE: "gcp", "mysql"
+  SPRING_PROFILES_ACTIVE: "gcp"
