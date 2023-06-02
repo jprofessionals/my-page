@@ -5,8 +5,13 @@ terraform {
   }
 }
 
+variable "google_cloud_project_id" {
+  type = string
+  description = "The ID of the Google Cloud Platform project"
+}
+
 provider "google" {
-  project = "plenary-plane-385610"
+  project = var.google_cloud_project_id
   region  = "europe-west1"
   zone    = "europe-west1-c"
 }
@@ -68,4 +73,76 @@ resource "google_bigquery_table" "validated-emails" {
   dataset_id = google_bigquery_dataset.pubsub.dataset_id
 
   schema = file("${path.module}/../smtp-to-pubsub/bigquery-raw-emails-schema.json")
+}
+
+resource "google_artifact_registry_repository" "images" {
+  format        = "docker"
+  repository_id = "images"
+}
+
+resource "google_compute_address" "smtp-to-pubsub" {
+  name = "smtp-to-pubsub"
+}
+
+module "gce-container" {
+  source = "terraform-google-modules/container-vm/google"
+  version = "~> 3.1.0"
+
+  container = {
+    image = "${google_artifact_registry_repository.images.location}-docker.pkg.dev/${var.google_cloud_project_id}/images/smtp-to-pubsub:1.0-SNAPSHOT"
+    name = "smtp-to-pubsub"
+  }
+
+  restart_policy = "Always"
+}
+
+resource "google_compute_instance" "smtp-to-pubsub" {
+  name         = "smtp-to-pubsub"
+  machine_type = "f1-micro"
+  allow_stopping_for_update = true
+
+  boot_disk {
+    initialize_params {
+      image = module.gce-container.source_image
+    }
+  }
+
+  metadata = {
+    gce-container-declaration = module.gce-container.metadata_value
+    google-logging-enabled    = "true"
+    google-monitoring-enabled = "true"
+  }
+
+  labels = {
+    container-vm = module.gce-container.vm_container_label
+  }
+
+  tags = ["smtp-to-pubsub"]
+
+  network_interface {
+    network = "default"
+    access_config {
+      nat_ip = google_compute_address.smtp-to-pubsub.address
+    }
+  }
+
+  service_account {
+    email = "${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+    scopes = [
+      "cloud-platform"
+    ]
+  }
+}
+
+resource "google_compute_firewall" "allow-smtp" {
+  name        = "allow-smtp"
+  network     = "default"
+
+  allow {
+    protocol  = "tcp"
+    ports     = ["25"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags = ["smtp-to-pubsub"]
 }
