@@ -12,11 +12,22 @@ import {
   forwardRef,
 } from 'react'
 
-const Dialog = DialogPrimitive.Root
+const Modal = DialogPrimitive.Root
 const Trigger = DialogPrimitive.Trigger
 const Close = DialogPrimitive.Close
 
-const DialogPortal = ({
+/*
+ * Modal component. In radix-ui it is known as 'Dialog', but Modal is a more
+ * common name for this component.
+ *
+ * With this component we are simply importing primitives from
+ * Radix-ui, applying our own styling with Tailwind and re-exporting for re-use.
+ *
+ * Documentation: https://ui.shadcn.com/docs/components/dialog
+ *
+ */
+
+const Portal = ({
   className,
   children,
   ...props
@@ -27,46 +38,46 @@ const DialogPortal = ({
     </div>
   </DialogPrimitive.Portal>
 )
-DialogPortal.displayName = DialogPrimitive.Portal.displayName
+Portal.displayName = DialogPrimitive.Portal.displayName
 
-const DialogOverlay = forwardRef<
+const Overlay = forwardRef<
   ElementRef<typeof DialogPrimitive.Overlay>,
   ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'fixed inset-0 z-50 bg-white/80 backdrop-blur-sm transition-all duration-100 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in',
+      'fixed inset-0 z-50 bg-white/80 backdrop-blur-sm transition-all duration-100 data-closed:animate-out data-closed:fade-out data-open:fade-in',
       className,
     )}
     {...props}
   />
 ))
-DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+Overlay.displayName = DialogPrimitive.Overlay.displayName
 
 const Content = forwardRef<
   ElementRef<typeof DialogPrimitive.Content>,
   ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { showX?: boolean }
 >(({ className, children, showX: showClose, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
+  <Portal>
+    <Overlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed z-50 grid w-full gap-4 rounded-b-lg border bg-white p-6 shadow-lg animate-in data-[state=open]:fade-in-90 data-[state=open]:slide-in-from-bottom-10 sm:max-w-lg sm:rounded-lg sm:zoom-in-90 data-[state=open]:sm:slide-in-from-bottom-0',
+        'fixed z-50 grid gap-4 rounded-b-lg border bg-white p-6 shadow-lg animate-in data-open:fade-in-90 data-open:slide-in-from-bottom-10 sm:max-w-lg sm:rounded-lg sm:zoom-in-90 data-open:sm:slide-in-from-bottom-0',
         className,
       )}
       {...props}
     >
       {children}
       {showClose ? (
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+        <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none ring-offset-background data-open:bg-accent data-open:text-muted-foreground focus:ring-ring">
           <FontAwesomeIcon icon={faX} className="w-4 h-4" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       ) : null}
     </DialogPrimitive.Content>
-  </DialogPortal>
+  </Portal>
 ))
 Content.displayName = DialogPrimitive.Content.displayName
 
@@ -119,4 +130,4 @@ const Description = forwardRef<
 ))
 Description.displayName = DialogPrimitive.Description.displayName
 
-export { Dialog, Trigger, Close, Content, Header, Footer, Title, Description }
+export { Modal, Trigger, Close, Content, Header, Footer, Title, Description }

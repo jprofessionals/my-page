@@ -2,7 +2,7 @@ import ApiService from '../../services/api.service'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import * as Dialog from '../ui/dialog'
+import * as Modal from '../ui/modal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '../ui/button'
@@ -29,8 +29,8 @@ const DeleteBudgetPostModal = ({ refreshBudgets, post }: Props) => {
     )
   }
   return (
-    <Dialog.Dialog>
-      <Dialog.Trigger asChild>
+    <Modal.Modal>
+      <Modal.Trigger asChild>
         <Button
           className="text-white btn btn-error btn-sm"
           type="button"
@@ -47,8 +47,8 @@ const DeleteBudgetPostModal = ({ refreshBudgets, post }: Props) => {
             'Slett'
           )}
         </Button>
-      </Dialog.Trigger>
-      <Dialog.Content>
+      </Modal.Trigger>
+      <Modal.Content>
         <div className="mb-6 prose">
           <h2>Slett post</h2>
           <p>
@@ -56,18 +56,18 @@ const DeleteBudgetPostModal = ({ refreshBudgets, post }: Props) => {
             <span className="text-xl">&ldquo;{post.description}&rdquo;</span>?
           </p>
         </div>
-        <Dialog.Footer>
-          <Dialog.Close asChild>
+        <Modal.Footer>
+          <Modal.Close asChild>
             <Button variant="error" onClick={handleDeletePost} size="sm">
               Slett post
             </Button>
-          </Dialog.Close>
-          <Dialog.Close asChild>
+          </Modal.Close>
+          <Modal.Close asChild>
             <Button size="sm">Avbryt</Button>
-          </Dialog.Close>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog.Dialog>
+          </Modal.Close>
+        </Modal.Footer>
+      </Modal.Content>
+    </Modal.Modal>
   )
 }
 

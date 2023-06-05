@@ -4,6 +4,13 @@ import { VariantProps, cva } from 'class-variance-authority'
 import cn from '@/utils/cn'
 import { ButtonHTMLAttributes, forwardRef } from 'react'
 
+/*
+ * Button component fetched from
+ * https://ui.shadcn.com/docs/components/button
+ *
+ * Styled with daisyui button classes
+ */
+
 const buttonVariants = cva('btn', {
   variants: {
     variant: {

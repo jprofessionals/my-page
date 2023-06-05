@@ -2,6 +2,13 @@ import { VariantProps, cva } from 'class-variance-authority'
 import cn from '@/utils/cn'
 import { HTMLAttributes, forwardRef } from 'react'
 
+/*
+ * Alert component retrieved from the @shadcn/ui project.
+ * https://ui.shadcn.com/docs/components/alert
+ *
+ * Styled with daisyui alert class
+ */
+
 const alertVariants = cva('relative w-full rounded-lg border p-4', {
   variants: {
     variant: {

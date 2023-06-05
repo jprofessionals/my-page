@@ -7,8 +7,8 @@ import { API_URL } from '@/services/api.service'
 import authHeader from '@/services/auth-header'
 import { toast } from 'react-toastify'
 import { Button } from '../ui/button'
-import * as Dialog from '../ui/dialog'
 import { Alert } from '../ui/alert'
+import * as Modal from '../ui/modal'
 
 // @jpro.no in the form is now optional, indicated by a new label on the input.
 // Add the @jpro.no if no @ is provided, otherwise let it through like normal
@@ -78,31 +78,29 @@ export default function NewUserModal() {
   }
 
   return (
-    <Dialog.Dialog>
-      <Dialog.Trigger asChild>
+    <Modal.Modal>
+      <Modal.Trigger asChild>
         <Button variant="outline">Legg til ny ansatt</Button>
-      </Dialog.Trigger>
+      </Modal.Trigger>
 
-      <Dialog.Content>
-        <Dialog.Header>
-          <Dialog.Title>Legg til ny ansatt</Dialog.Title>
-        </Dialog.Header>
-        <div>
-          {error && <Alert variant="error">{error}</Alert>}
-          <NewEmployeeForm inputData={inputData} setInputData={setInputData} />
-        </div>
-        <Dialog.Footer>
-          <Dialog.Close asChild>
+      <Modal.Content>
+        <Modal.Header>
+          <Modal.Title>Legg til ny ansatt</Modal.Title>
+        </Modal.Header>
+        {error && <Alert variant="error">{error}</Alert>}
+        <NewEmployeeForm inputData={inputData} setInputData={setInputData} />
+        <Modal.Footer>
+          <Modal.Close asChild>
             <Button onClick={handleClose}>Lukk</Button>
-          </Dialog.Close>
+          </Modal.Close>
 
-          <Dialog.Close asChild>
+          <Modal.Close asChild>
             <Button onClick={handleSubmit} variant="primary">
               Lagre
             </Button>
-          </Dialog.Close>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog.Dialog>
+          </Modal.Close>
+        </Modal.Footer>
+      </Modal.Content>
+    </Modal.Modal>
   )
 }
