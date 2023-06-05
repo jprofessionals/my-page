@@ -6,9 +6,9 @@ import BudgetList from '@/components/budget/BudgetList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown'
 import NewUserModal from '@/components/admin/NewUserModal'
-import clsx from 'clsx'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { faRefresh } from '@fortawesome/free-solid-svg-icons'
+import cn from '@/utils/cn'
 
 function compareUsers(a: User, b: User): number {
   if (a.name === null && b.name === null) {
@@ -196,8 +196,9 @@ function Admin() {
                   <Fragment key={userRow.email}>
                     <tr
                       key={userRow.email}
-                      className={clsx(
+                      className={cn(
                         userRow.email === expandedUser && 'active',
+                        'hover',
                       )}
                     >
                       {/* pass event object to handleExpandUser */}
@@ -226,7 +227,7 @@ function Admin() {
                         <FontAwesomeIcon
                           icon={faChevronCircleDown}
                           size="xl"
-                          className={clsx(
+                          className={cn(
                             userRow.email === expandedUser && 'rotate-180',
                           )}
                         />
