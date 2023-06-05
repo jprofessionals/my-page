@@ -10,6 +10,9 @@ module.exports = {
     './src/**/*.tsx',
   ],
   theme: {
+    data: {
+      open: 'state~="open"',
+    },
     extend: {
       colors: {
         orange: {
