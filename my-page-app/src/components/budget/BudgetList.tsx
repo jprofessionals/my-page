@@ -1,6 +1,7 @@
 import { Budget } from '@/types'
 import BudgetItem from '@/components/budget/BudgetItem'
-import clsx from 'clsx'
+import { Accordion } from '../ui/accordion'
+import cn from '@/utils/cn'
 
 type Props = {
   budgets: Budget[]
@@ -34,9 +35,13 @@ const BudgetList = ({
             Oversikt over dine budsjetter
           </h3>
         ) : null}
-        <div
-          className={clsx(
-            type === 'tiles' ? 'grid gap-2 gap-x-3 md:grid-cols-2' : '',
+        <Accordion
+          type="single"
+          collapsible
+          className={cn(
+            type === 'tiles'
+              ? 'grid gap-2 gap-x-3 md:grid-cols-2'
+              : 'flex flex-col gap-2',
           )}
         >
           {budgets.map((budget) => (
@@ -49,7 +54,7 @@ const BudgetList = ({
               type={type}
             />
           ))}
-        </div>
+        </Accordion>
       </div>
     )
   }
