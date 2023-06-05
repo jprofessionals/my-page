@@ -171,7 +171,7 @@ function Admin() {
             <NewUserModal />
           </div>
 
-          <table className="table overflow-x-auto mt-4 rounded-lg shadow-md table-xs border-slate-600">
+          <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
             <thead>
               <tr className="text-[1rem]">
                 <th className="rounded-tl-lg bg-slate-300">Brukere</th>
@@ -186,7 +186,7 @@ function Admin() {
                 <th key="action" className="px-6 rounded-tr-lg bg-slate-300" />
               </tr>
             </thead>
-            <tbody className="border-solid border-x-gray-500">
+            <tbody>
               {users
                 .filter((user) =>
                   (user.name
