@@ -34,18 +34,18 @@ provider "google" {
 data "google_project" "project" {
 }
 
-resource "google_pubsub_schema" "raw-email-message" {
-  name = "raw-email-message"
+resource "google_pubsub_schema" "email-message" {
+  name = "email-message"
   type = "AVRO"
-  definition = file("${path.module}/../schemas/src/main/resources/avro/raw-email-message.avsc")
+  definition = file("${path.module}/../schemas/src/main/resources/avro/email-message.avsc")
 }
 
-resource "google_pubsub_topic" "validated-emails" {
-  name = "validated-emails"
+resource "google_pubsub_topic" "raw-emails" {
+  name = "raw-emails"
 
-  depends_on = [google_pubsub_schema.raw-email-message]
+  depends_on = [google_pubsub_schema.email-message]
   schema_settings {
-    schema = "${data.google_project.project.id}/schemas/${google_pubsub_schema.raw-email-message.name}"
+    schema = "${data.google_project.project.id}/schemas/${google_pubsub_schema.email-message.name}"
     encoding = "BINARY"
   }
   message_retention_duration = "${31*24*60*60}s"
@@ -53,6 +53,21 @@ resource "google_pubsub_topic" "validated-emails" {
     allowed_persistence_regions = [var.google_cloud_region]
   }
 }
+
+resource "google_pubsub_topic" "validated-emails" {
+  name = "validated-emails"
+
+  depends_on = [google_pubsub_schema.email-message]
+  schema_settings {
+    schema = "${data.google_project.project.id}/schemas/${google_pubsub_schema.email-message.name}"
+    encoding = "BINARY"
+  }
+  message_retention_duration = "${31*24*60*60}s"
+  message_storage_policy {
+    allowed_persistence_regions = [var.google_cloud_region]
+  }
+}
+
 resource "google_pubsub_subscription" "validated-emails-to-bigquery" {
   name  = "validated-emails-to-bigquery"
   topic = google_pubsub_topic.validated-emails.name
@@ -82,12 +97,20 @@ resource "google_bigquery_dataset" "pubsub" {
   dataset_id = "pubsub"
 }
 
+resource "google_bigquery_table" "raw-emails" {
+  deletion_protection = false
+  table_id   = "raw-emails"
+  dataset_id = google_bigquery_dataset.pubsub.dataset_id
+
+  schema = file("${path.module}/bigquery-emails-schema.json")
+}
+
 resource "google_bigquery_table" "validated-emails" {
   deletion_protection = false
   table_id   = "validated-emails"
   dataset_id = google_bigquery_dataset.pubsub.dataset_id
 
-  schema = file("${path.module}/../smtp-to-pubsub/bigquery-raw-emails-schema.json")
+  schema = file("${path.module}/bigquery-emails-schema.json")
 }
 
 resource "google_artifact_registry_repository" "images" {

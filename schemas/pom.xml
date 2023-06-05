@@ -18,7 +18,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <avro.version>1.11.0</avro.version>
+        <jackson.version>2.15.1</jackson.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>

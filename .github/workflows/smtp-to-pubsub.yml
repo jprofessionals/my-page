@@ -5,15 +5,38 @@ on:
       - main
       - smtp-pubsub-pipeline
     paths:
+      - '.github/**'
       - 'smtp-to-pubsub/**'
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: test
     steps:
       - uses: actions/checkout@v3
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: 'latest'
+          java-version: '17'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: 'maven'
+      - name: Perform build
+        run: |
+          ./mvnw -pl smtp-to-pubsub -am -P docker -Dimage.tag=europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }} package
+      - name: Attach image as artifact
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
+  deploy-test:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Download image artifact
+        uses: ishworkh/docker-image-artifact-download@v1
+        with:
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
       - uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
@@ -22,22 +45,5 @@ jobs:
           project_id: my-page-jpro-test
       - run: |-
           gcloud auth configure-docker europe-west1-docker.pkg.dev
-      - name: Build and push Docker image
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-        with:
-          context: ./
-          file: ./smtp-to-pubsub/Dockerfile
-          push: true
-          tags: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
-  deploy-test:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: test
-    steps:
-      - name: Deploy to test
-        uses: actions-hub/gcloud@master
-        env:
-          PROJECT_ID: my-page-jpro-test
-          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-        with:
-          args: compute instances update-container smtp-to-pubsub --zone=europe-west1-c --container-image=europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
+      - run: |-
+          docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}

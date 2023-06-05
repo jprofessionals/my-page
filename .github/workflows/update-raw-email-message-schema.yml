@@ -1,11 +1,12 @@
-name: update-raw-email-message-schema
+name: update-email-message-schema
 on:
   push:
     branches:
       - main
       - smtp-pubsub-pipeline
     paths:
-      - 'schemas/src/main/resources/avro/raw-email-message.avsc'
+      - '.github/**'
+      - 'schemas/src/main/resources/avro/email-message.avsc'
   workflow_dispatch:
 
 jobs:
@@ -26,4 +27,4 @@ jobs:
           PROJECT_ID: my-page-jpro-test
           APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         with:
-          args: pubsub schemas commit raw-email --type avro --definition-file schemas/src/main/resources/avro/raw-email-message.avsc
+          args: pubsub schemas commit raw-email --type avro --definition-file schemas/src/main/resources/avro/email-message.avsc

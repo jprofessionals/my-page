@@ -126,14 +126,6 @@
                 <version>2.22.2</version>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <configuration>
-                    <mainClass>MainKt</mainClass>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.5.0</version>
@@ -163,32 +155,32 @@
 
     <profiles>
         <profile>
-            <id>native</id>
+            <id>docker</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.graalvm.buildtools</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <version>0.9.22</version>
-                        <extensions>true</extensions>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
                         <executions>
                             <execution>
-                                <id>build-native</id>
-                                <goals>
-                                    <goal>compile-no-fork</goal>
-                                </goals>
+                                <id>docker-package</id>
                                 <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <workingDirectory>${project.basedir}</workingDirectory>
+                                    <arguments>
+                                        <argument>build</argument>
+                                        <argument>-t</argument>
+                                        <argument>${image.tag}</argument>
+                                        <argument>.</argument>
+                                    </arguments>
+                                </configuration>
                             </execution>
                         </executions>
-                        <configuration>
-                            <imageName>smtp-to-pubsub</imageName>
-                            <buildArgs>
-                                <buildArg>-H:+ReportExceptionStackTraces</buildArg>
-                                <buildArg>--no-fallback</buildArg>
-                                <buildArg>--static</buildArg>
-                                <buildArg>--libc=musl</buildArg>
-                            </buildArgs>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
