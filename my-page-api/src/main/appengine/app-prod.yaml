@@ -20,3 +20,4 @@ handlers:
 
 env_variables:
   DATABASE_INSTANCE: my-page-jpro:europe-west1:my-page-db-instance
+  SPRING_PROFILES_ACTIVE: "gcp"

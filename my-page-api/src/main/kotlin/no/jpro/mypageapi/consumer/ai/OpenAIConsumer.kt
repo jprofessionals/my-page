@@ -7,6 +7,7 @@ import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import kotlinx.coroutines.runBlocking
+import no.jpro.mypageapi.provider.SecretProvider
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
@@ -15,12 +16,9 @@ const val GPT_4 = "gpt-4"
 
 @Service
 class OpenAIConsumer(
-    //For lokal kjøring, sett denne i for eksempel application-local.yml og legg den til .gitignore så den ikke blir committed
-    //kontakt Roger for å få OpenAI API key hvis du ikke har allerede.
-    @Value("\${openai.apiKey:PLACEHOLDER}")
-    private val apiKey: String
+    secretProvider: SecretProvider
 ) {
-    private val openAI: OpenAI = OpenAI(apiKey)
+    private val openAI: OpenAI = OpenAI(secretProvider.getApiKey())
 
     @OptIn(BetaOpenAI::class)
     fun chatCompletion(model: String, messages: List<ChatMessage>): ChatCompletion {
