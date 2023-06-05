@@ -38,10 +38,15 @@
 
   <dependencies>
     <dependency>
+      <groupId>no.jpro</groupId>
+      <artifactId>schemas</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.cloud.functions</groupId>
       <artifactId>functions-framework-api</artifactId>
       <version>1.0.4</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -92,48 +97,84 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.3.1</version>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.1.0</version>
       </plugin>
       <plugin>
-        <groupId>org.apache.avro</groupId>
-        <artifactId>avro-maven-plugin</artifactId>
-        <version>${avro.version}</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.5.0</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>EmailValidatorFunction</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
         <executions>
           <execution>
-            <id>schemas</id>
-            <phase>generate-sources</phase>
+            <id>make-assembly</id>
+            <phase>package</phase>
             <goals>
-              <goal>schema</goal>
+              <goal>single</goal>
             </goals>
-            <configuration>
-              <sourceDirectory>${project.basedir}/src/main/resources/avro/</sourceDirectory>
-              <outputDirectory>${project.build.directory}/generated-sources/java/</outputDirectory>
-            </configuration>
           </execution>
         </executions>
       </plugin>
       <plugin>
-        <!--
-          Google Cloud Functions Framework Maven plugin
-
-          This plugin allows you to run Cloud Functions Java code
-          locally. Use the following terminal command to run a
-          given function locally:
-
-          mvn function:run -Drun.functionTarget=your.package.yourFunction
-        -->
-        <groupId>com.google.cloud.functions</groupId>
-        <artifactId>function-maven-plugin</artifactId>
-        <version>0.10.1</version>
+        <groupId>org.graalvm.buildtools</groupId>
+        <artifactId>native-maven-plugin</artifactId>
+        <version>0.9.22</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>build-native</id>
+            <goals>
+              <goal>compile-no-fork</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
         <configuration>
-          <functionTarget>EmailValidatorFunction</functionTarget>
+          <imageName>email-validator</imageName>
+          <buildArgs>
+            <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+            <buildArg>--no-fallback</buildArg>
+<!--            <buildArg>&#45;&#45;static</buildArg>-->
+<!--            <buildArg>&#45;&#45;libc=musl</buildArg>-->
+          </buildArgs>
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.1.0</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <configuration>
+          <mainClass>MainKt</mainClass>
+        </configuration>
+        <executions>
+          <execution>
+            <id>docker-package</id>
+            <phase>package</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>docker</executable>
+              <workingDirectory>${project.basedir}</workingDirectory>
+              <arguments>
+                <argument>build</argument>
+                <argument>.</argument>
+                <argument>-t</argument>
+                <argument>${image.tag}</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

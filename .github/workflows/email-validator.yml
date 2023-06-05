@@ -9,11 +9,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-test:
+  build:
     runs-on: ubuntu-latest
-    environment: test
     steps:
       - uses: actions/checkout@v3
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: 'latest'
+          java-version: '17'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: 'maven'
+      - name: Perform build
+        run: |
+          ./mvnw -pl email-validator -am -Dimage.tag=europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }} package
+      - name: Attach image as artifact
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
+  deploy-test:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: test
+    steps:
+      - name: Download image
+        uses: ishworkh/docker-image-artifact-download@v1
+        with:
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
       - uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
@@ -21,6 +43,6 @@ jobs:
         with:
           project_id: my-page-jpro-test
       - run: |-
-          gcloud functions list
+          gcloud auth configure-docker europe-west1-docker.pkg.dev
       - run: |-
-          gcloud functions deploy email-validator --gen2 --region=europe-west1 --runtime=java17 --source=./email-validator --entry-point=EmailValidatorFunction --trigger-topic=raw-email
+          docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}

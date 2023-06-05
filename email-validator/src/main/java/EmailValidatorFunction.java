@@ -1,5 +1,6 @@
 import com.google.cloud.functions.CloudEventsFunction;
 import com.google.gson.Gson;
+import com.sun.net.httpserver.HttpServer;
 import event.PubSubBody;
 import io.cloudevents.CloudEvent;
 import no.jpro.mypage.RawEmail;
@@ -12,6 +13,8 @@ import validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -75,5 +78,18 @@ public class EmailValidatorFunction implements CloudEventsFunction {
         logger.info(messagePrefix + validators.stream()
                 .map(validator -> validator.getClass().getName())
                 .collect(Collectors.joining(", ")));
+    }
+
+    public static void main(String[] args) throws IOException {
+        System.out.println("Starting email-validator");
+        HttpServer httpServer = HttpServer.create(new InetSocketAddress(8080), 16);
+        EmailValidatorFunction emailValidatorFunction = new EmailValidatorFunction();
+        Gson gson = new Gson();
+        httpServer.createContext("/", exchange -> {
+            InputStreamReader inputStreamReader = new InputStreamReader(exchange.getRequestBody());
+            CloudEvent cloudEvent = gson.fromJson(inputStreamReader, CloudEvent.class);
+            emailValidatorFunction.accept(cloudEvent);
+        });
+        httpServer.start();
     }
 }
