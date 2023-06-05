@@ -10,10 +10,25 @@ variable "google_cloud_project_id" {
   description = "The ID of the Google Cloud Platform project"
 }
 
+variable "google_cloud_region" {
+  type = string
+  description = "The region to be used for resources"
+}
+
+variable "google_cloud_zone" {
+  type = string
+  description = "The zone to be used for the zonal resources"
+}
+
+variable "k8s_cluster_name" {
+  type = string
+  description = "The name of the Google Kubernetes Engine cluster"
+}
+
 provider "google" {
   project = var.google_cloud_project_id
-  region  = "europe-west1"
-  zone    = "europe-west1-c"
+  region  = var.google_cloud_region
+  zone    = var.google_cloud_zone
 }
 
 data "google_project" "project" {
@@ -35,7 +50,7 @@ resource "google_pubsub_topic" "validated-emails" {
   }
   message_retention_duration = "${31*24*60*60}s"
   message_storage_policy {
-    allowed_persistence_regions = ["europe-west1"]
+    allowed_persistence_regions = [var.google_cloud_region]
   }
 }
 resource "google_pubsub_subscription" "validated-emails-to-bigquery" {
@@ -84,65 +99,47 @@ resource "google_compute_address" "smtp-to-pubsub" {
   name = "smtp-to-pubsub"
 }
 
-module "gce-container" {
-  source = "terraform-google-modules/container-vm/google"
-  version = "~> 3.1.0"
-
-  container = {
-    image = "${google_artifact_registry_repository.images.location}-docker.pkg.dev/${var.google_cloud_project_id}/images/smtp-to-pubsub:1.0-SNAPSHOT"
-    name = "smtp-to-pubsub"
-  }
-
-  restart_policy = "Always"
+resource "google_compute_network" "k8s-main-cluster-network" {
+  name = "k8s-${var.k8s_cluster_name}-cluster-network"
+  auto_create_subnetworks = false
 }
 
-resource "google_compute_instance" "smtp-to-pubsub" {
-  name         = "smtp-to-pubsub"
-  machine_type = "f1-micro"
-  allow_stopping_for_update = true
-
-  boot_disk {
-    initialize_params {
-      image = module.gce-container.source_image
+resource "google_compute_subnetwork" "k8s-main-cluster-subnetwork" {
+  name = "k8s-${var.k8s_cluster_name}-cluster-subnetwork"
+  network = google_compute_network.k8s-main-cluster-network.name
+  ip_cidr_range = "10.132.0.0/20"
+  secondary_ip_range = [
+    {
+      range_name    = "k8s-${var.k8s_cluster_name}-cluster-pod-range"
+      ip_cidr_range = "172.16.0.0/16"
+    },
+    {
+      range_name    = "k8s-${var.k8s_cluster_name}-cluster-service-range"
+      ip_cidr_range = "192.168.0.0/20"
     }
-  }
-
-  metadata = {
-    gce-container-declaration = module.gce-container.metadata_value
-    google-logging-enabled    = "true"
-    google-monitoring-enabled = "true"
-  }
-
-  labels = {
-    container-vm = module.gce-container.vm_container_label
-  }
-
-  tags = ["smtp-to-pubsub"]
-
-  network_interface {
-    network = "default"
-    access_config {
-      nat_ip = google_compute_address.smtp-to-pubsub.address
-    }
-  }
-
-  service_account {
-    email = "${data.google_project.project.number}-compute@developer.gserviceaccount.com"
-    scopes = [
-      "cloud-platform"
-    ]
-  }
+  ]
 }
 
-resource "google_compute_firewall" "allow-smtp" {
-  name        = "allow-smtp"
-  network     = "default"
+module "kubernetes-engine_safer-cluster" {
+  source  = "terraform-google-modules/kubernetes-engine/google//modules/safer-cluster"
+  version = "26.1.1"
 
-  allow {
-    protocol  = "tcp"
-    ports     = ["25"]
-  }
+  name = "${var.k8s_cluster_name}-cluster"
+  project_id = var.google_cloud_project_id
+  region = var.google_cloud_region
 
-  source_ranges = ["0.0.0.0/0"]
-  target_tags = ["smtp-to-pubsub"]
+  network = google_compute_network.k8s-main-cluster-network.name
+  subnetwork = google_compute_subnetwork.k8s-main-cluster-subnetwork.name
+  ip_range_pods = "k8s-${var.k8s_cluster_name}-cluster-pod-range"
+  ip_range_services = "k8s-${var.k8s_cluster_name}-cluster-service-range"
+
+  enable_private_endpoint = false
+
+  node_pools = [
+    {
+      name = "${var.k8s_cluster_name}-node-pool"
+      machine_type = "e2-medium"
+      preemptible = true
+    }
+  ]
 }
