@@ -173,7 +173,7 @@ function Admin() {
 
           <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
             <thead>
-              <tr className="text-[1rem]">
+              <tr className="text-base text-slate-900">
                 <th className="rounded-tl-lg bg-slate-300">Brukere</th>
                 {budgetTypes.map((budgetType) => (
                   <th
