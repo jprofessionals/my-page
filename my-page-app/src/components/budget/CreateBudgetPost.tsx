@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import ApiService from '../../services/api.service'
-import Moment from 'moment'
-import { Card, Button, Spinner } from 'react-bootstrap'
+import moment from 'moment'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Budget } from '@/types'
 import Loading from '@/components/Loading'
+import { Button } from '../ui/button'
 
 type Props = {
   budget: Budget
@@ -16,7 +16,7 @@ type Props = {
 const CreateBudgetPost = ({ budget, refreshBudgets, toggle }: Props) => {
   const [description, setDescription] = useState('')
   const [amountExMva, setAmountExMva] = useState(0)
-  const [date, setDate] = useState(Moment().format('YYYY-MM-DD'))
+  const [date, setDate] = useState(moment().format('YYYY-MM-DD'))
   const [isLoadingPost, setIsLoadingPost] = useState(false)
 
   const isValid = amountExMva > 0 && description && description !== ''
@@ -34,13 +34,13 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }: Props) => {
         expense: true,
       }
       ApiService.createBudgetPost(budgetPost, budget.id).then(
-        (response) => {
+        () => {
           refreshBudgets()
           toggle()
           setIsLoadingPost(false)
           toast.success('Lagret ' + description)
         },
-        (error) => {
+        () => {
           setIsLoadingPost(false)
           toast.error('Fikk ikke opprettet ' + description + ', prøv igjen')
         },
@@ -62,57 +62,48 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }: Props) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Card className="inputCard">
-        <Card.Header>
+      <div className="overflow-hidden w-full rounded-xl border border-gray-500 shadow-sm">
+        <div className="flex justify-between items-center p-2 w-full text-sm bg-accent/80">
           <input
-            className="description"
+            className="input input-md"
             type="text"
             name="description"
             placeholder="Beskrivelse"
             onChange={handleDescriptionChange}
             value={description}
-            required
           />
-        </Card.Header>
-        <Card.Body>
-          <ul className="addPost">
-            <li>
-              <span className="priceTitle">Pris:</span>
-              <input
-                type="number"
-                name="amountExMva"
-                placeholder="Pris inkludert mva"
-                onChange={handleAmountChange}
-                value={amountExMva}
-                required
-              />
-            </li>
-            <li>
-              <span className="datoTitle">Dato:</span>
-              <input
-                className="inputDate"
-                type="date"
-                name="date"
-                onChange={handleDateChange}
-                value={date}
-                // format="DD.MM.YYYY"
-              ></input>
-            </li>
-          </ul>
-          {isValid ? (
-            <Button
-              className="addPostBtn"
-              type="submit"
-              style={isValid ? {} : { display: 'none' }}
-            >
-              <div className="d-flex align-items-center">
-                Legg til utlegget
-                <Loading isLoading={isLoadingPost} />
-              </div>
-            </Button>
-          ) : null}
-        </Card.Body>
-      </Card>
+        </div>
+        <div className="flex flex-col gap-2 items-start p-3">
+          <strong>Pris:</strong>
+          <label>
+            <input
+              type="number"
+              className="w-48 input input-bordered input-sm"
+              name="amountExMva"
+              placeholder="Pris"
+              onChange={handleAmountChange}
+              value={amountExMva}
+            />
+          </label>
+          <strong>Dato:</strong>
+          <label>
+            <input
+              className="w-48 input input-bordered input-sm"
+              type="date"
+              name="date"
+              onChange={handleDateChange}
+              value={date}
+              placeholder={date}
+            />
+          </label>
+          <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
+            <span>
+              Legg til utlegg
+              <Loading isLoading={isLoadingPost} />
+            </span>
+          </Button>
+        </div>
+      </div>
     </form>
   )
 }

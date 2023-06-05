@@ -1,20 +1,11 @@
 import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
-import {
-  Tooltip,
-  OverlayTrigger,
-  Card,
-  InputGroup,
-  Form,
-  Container,
-  Col,
-  Row,
-  Button,
-} from 'react-bootstrap'
-import styles from './Kalkulator.module.scss'
 import getBillableHours, { getBillabeHoursEntireYear } from './getBillableHours'
 import moment from 'moment'
+import { Button } from '../ui/button'
+import getInNok from '@/utils/getInNok'
+import clsx from 'clsx'
 
 const defaultValues: Record<string, number> = {
   garantilonn: 50000,
@@ -111,10 +102,6 @@ function Kalkulator() {
     return billableHoursThisYear * timeprisProsjekt * 0.52 * 1.12 + +bonus
   }
 
-  function GarantilonnBenyttet() {
-    return BeregnetGarantilonn() > SumBetaltTid()
-  }
-
   const handleMonthAndYearChange = () => {
     const billableHoursForMonth = getBillableHours(selectedYear, selectedMonth)
     setBillableHoursThisYear(getBillabeHoursEntireYear(selectedYear))
@@ -174,9 +161,9 @@ function Kalkulator() {
   }
 
   return (
-    <Container fluid>
-      <div className="topp">
-        <h3>Lønnskalkulator</h3>
+    <div className="flex flex-col gap-4 p-4">
+      <div className="prose">
+        <h2>Lønnskalkulator</h2>
         <p>
           Her kan du se omtrentlig hvordan vi beregner lønn hver måned. Du kan
           selv leke med tallene for å se hvordan dette påvirker beregningen av
@@ -190,14 +177,12 @@ function Kalkulator() {
           </a>
           .
         </p>
-      </div>
-      <div>
-        <p style={{ width: '100%' }}>Se utregning basert på år og måned:</p>
-        <div className={styles.month_year_group}>
-          <InputGroup>
-            <InputGroup.Text>År</InputGroup.Text>
-            <Form.Select
-              className={styles.year_select}
+        <p>Se utregning basert på år og måned:</p>
+        <div className="flex gap-2 p-2 -mt-4 rounded-lg border border-gray-300 border-solid w-fit calculator-group">
+          <label className="input-group">
+            <span>År</span>
+            <select
+              className="text-right input input-bordered"
               onChange={(e) => setSelectedYear(e.target.value)}
               value={selectedYear}
             >
@@ -206,12 +191,13 @@ function Kalkulator() {
                   {year}
                 </option>
               ))}
-            </Form.Select>
-          </InputGroup>
-          <InputGroup>
-            <InputGroup.Text>Måned</InputGroup.Text>
-            <Form.Select
-              className={styles.month_select}
+            </select>
+          </label>
+          <label className="input-group">
+            <span>Måned</span>
+
+            <select
+              className="text-right input input-bordered"
               onChange={(e) => setSelectedMonth(e.target.value)}
               value={selectedMonth}
             >
@@ -220,297 +206,225 @@ function Kalkulator() {
                   {month.name}
                 </option>
               ))}
-            </Form.Select>
-          </InputGroup>
-          <Button onClick={handleMonthAndYearChange}>Oppdater</Button>
+            </select>
+          </label>
+          <Button onClick={handleMonthAndYearChange} variant="primary">
+            Oppdater
+          </Button>
         </div>
       </div>
-      <Row>
-        <Col className={styles.form}>
-          <Card>
-            <Card.Header>Basis</Card.Header>
-            <Card.Body>
-              <InputGroup>
-                <InputGroup.Text>
-                  Syntetisk timepris
-                  <ReadMoreIcon
-                    id="tooltip-1"
-                    text="Benyttes som timepris for kompetanse (innenfor årlig budsjett)"
-                  />
-                </InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  disabled
-                  value={timeprisKompetanse}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>Garantilønn</InputGroup.Text>
-                <Form.Control type="number" disabled value={garantilonn} />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>Grunnbeløp</InputGroup.Text>
-                <Form.Control type="number" disabled value={grunnbelop} />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>
-                  Timer i måned
-                  <ReadMoreIcon
-                    id="tooltip-2"
-                    text="Antall arbeidstimer i den aktuelle måneden"
-                  />
-                </InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  value={antallTimerMnd}
-                  onChange={handleAntallTimerMndChange}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>
-                  Rest komperansetimer
-                  <ReadMoreIcon
-                    id="tooltip-3"
-                    text="Antall timer du har igjen på årlig kompetansebudjett før eventuelt uttak"
-                  />
-                </InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  value={restKompetanseBudsjett}
-                  onChange={handleRestKompetanseBudsjettChange}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>Timepris på prosjekt</InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  value={timeprisProsjekt}
-                  onChange={handleTimeprisProsjektChange}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>
-                  Bonus
-                  <ReadMoreIcon
-                    id="tooltip-bonus"
-                    text="Bonus denne måneden. Eksempelvis presentasjonsbonus og rekrutteringsbonus, mer info på intranettet."
-                  />
-                </InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  value={bonus}
-                  onChange={handleBonusChange}
-                />
-              </InputGroup>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col className={styles.form}>
-          <Card>
-            <Card.Header>Timer</Card.Header>
-            <Card.Body>
-              <InputGroup>
-                <InputGroup.Text>Fakturert</InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  value={antallTimerFakturert}
-                  onChange={handleAntallTimerFakturertChange}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>Kompetanseheving</InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  value={antallTimerKompetanse}
-                  onChange={handleAntallTimerKompetanseChange}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>Interntid</InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  value={antallTimerInterntid}
-                  onChange={handleAntallTimerInterntidChange}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>
-                  Interntid m/komp
-                  <ReadMoreIcon
-                    id="tooltip-4"
-                    text="Interntid som kompanseres som fakturert tid, se intranett for retningslinjer"
-                  />
-                </InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  value={antallTimerInterntidMedKomp}
-                  onChange={handleAntallTimerInterntidMedKomChange}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>Ferie</InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  value={antallTimerFerie}
-                  onChange={handleAntallTimerFerieChange}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>
-                  Sykdom
-                  <ReadMoreIcon
-                    id="tooltip-5"
-                    text="Egenmelding, sykemelding, sykt barn og foreldre permisjon"
-                  />
-                </InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  value={antallTimerSyk}
-                  onChange={handleAntallTimerSykChange}
-                />
-              </InputGroup>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col className={styles.calculator}>
-          <Card>
-            <Card.Header>
-              Resultat
-              <ReadMoreIcon
-                id="tooltip-6"
-                text="Viser resultat av beregningen og hvilke faktorer som blir med i beregnet bruttolønn"
+      <div className="flex flex-wrap gap-6 items-start">
+        <div className="rounded-b-lg card card-bordered grow shrink-0">
+          <div className="p-4 rounded-t-lg border-b border-gray-300 bg-slate-200">
+            Basis
+          </div>
+          <div className="gap-2 p-4 form-control calculator-group">
+            <label className="input-group">
+              <span>
+                Syntetisk timepris
+                <ReadMoreIcon text="Benyttes som timepris for kompetanse (innenfor årlig budsjett)" />
+              </span>
+              <input
+                type="number"
+                disabled
+                value={timeprisKompetanse}
+                className="input input-disabled"
               />
-            </Card.Header>
-            <Card.Body>
-              <ul className="result">
-                <li className={GarantilonnBenyttet() ? 'notSelected' : ''}>
-                  9G timelønn:{' '}
-                  <span>
-                    {Timelonn9G().toLocaleString('no-NO', {
-                      maximumFractionDigits: 2,
-                      style: 'currency',
-                      currency: 'NOK',
-                    })}
-                  </span>
-                </li>
-                <li className={GarantilonnBenyttet() ? 'notSelected' : ''}>
-                  Sum sykelønn:{' '}
-                  <span>
-                    {SumSykeLonn().toLocaleString('no-NO', {
-                      maximumFractionDigits: 2,
-                      style: 'currency',
-                      currency: 'NOK',
-                    })}
-                  </span>
-                </li>
-                <li className={GarantilonnBenyttet() ? 'notSelected' : ''}>
-                  Sum fakturert tid:{' '}
-                  <span>
-                    {SumFakturertTid().toLocaleString('no-NO', {
-                      maximumFractionDigits: 2,
-                      style: 'currency',
-                      currency: 'NOK',
-                    })}
-                  </span>
-                </li>
-                <li className={GarantilonnBenyttet() ? 'notSelected' : ''}>
-                  Sum interntid m/komp:{' '}
-                  <span>
-                    {SumIntertidMedKomp().toLocaleString('no-NO', {
-                      maximumFractionDigits: 2,
-                      style: 'currency',
-                      currency: 'NOK',
-                    })}
-                  </span>
-                </li>
-                <li className={GarantilonnBenyttet() ? 'notSelected' : ''}>
-                  Sum kompetanse:{' '}
-                  <span>
-                    {SumKompetanse().toLocaleString('no-NO', {
-                      maximumFractionDigits: 2,
-                      style: 'currency',
-                      currency: 'NOK',
-                    })}
-                  </span>
-                </li>
-                <li
-                  className={
-                    GarantilonnBenyttet() ? 'line notSelected' : 'line '
-                  }
-                >
-                  Sum betalt tid:{' '}
-                  <span>
-                    {SumBetaltTid().toLocaleString('no-NO', {
-                      maximumFractionDigits: 2,
-                      style: 'currency',
-                      currency: 'NOK',
-                    })}
-                  </span>
-                </li>
-                <li className={GarantilonnBenyttet() ? '' : 'notSelected'}>
-                  Tilgjengelig tid:{' '}
-                  <span>
-                    {SumTilgjengeligTid()} av {antallTimerMnd}
-                  </span>
-                </li>
-                <li
-                  className={
-                    GarantilonnBenyttet() ? 'line ' : 'line notSelected'
-                  }
-                >
-                  Beregnet garantilønn:{' '}
-                  <span>
-                    {BeregnetGarantilonn().toLocaleString('no-NO', {
-                      maximumFractionDigits: 2,
-                      style: 'currency',
-                      currency: 'NOK',
-                    })}
-                  </span>
-                </li>
-                <li className="line">
-                  Bonus: <span>{bonus}</span>
-                </li>
-                <li className="bold line">
-                  Bruttolønn:{' '}
-                  <span>
-                    {Bruttolonn().toLocaleString('no-NO', {
-                      maximumFractionDigits: 2,
-                      style: 'currency',
-                      currency: 'NOK',
-                    })}
-                  </span>
-                </li>
-                <li>
-                  <span>
-                    Ca årslønn:
-                    <ReadMoreIcon
-                      id="arslonn"
-                      text={`Utregning: Antall fakturerbare timer i ${selectedYear} er ${
-                        billableHoursThisYear + 25 * 7.5
-                      }. Trekker fra 25 feriedager og legger på feriepenger (12%). Regnestykket blir: \n\n${billableHoursThisYear}t * ${timeprisProsjekt}kr/t * 0.52 * 1.12`}
-                    />
-                  </span>
-                  <span>
-                    {BruttoArsLonn().toLocaleString('no-NO', {
-                      maximumFractionDigits: 2,
-                      style: 'currency',
-                      currency: 'NOK',
-                    })}
-                  </span>
-                </li>
-              </ul>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+            </label>
+            <label className="input-group">
+              <span>Garantilønn</span>
+              <input
+                className="input"
+                type="number"
+                disabled
+                value={garantilonn}
+              />
+            </label>
+            <label className="input-group">
+              <span>Grunnbeløp</span>
+              <input
+                className="input"
+                type="number"
+                disabled
+                value={grunnbelop}
+              />
+            </label>
+            <label className="input-group">
+              <span>
+                Timer i måned
+                <ReadMoreIcon text="Antall arbeidstimer i den aktuelle måneden" />
+              </span>
+              <input
+                type="number"
+                className="input input-bordered"
+                value={antallTimerMnd}
+                onChange={handleAntallTimerMndChange}
+              />
+            </label>
+            <label className="input-group">
+              <span>
+                Rest komperansetimer
+                <ReadMoreIcon text="Antall timer du har igjen på årlig kompetansebudjett før eventuelt uttak" />
+              </span>
+              <input
+                type="number"
+                value={restKompetanseBudsjett}
+                onChange={handleRestKompetanseBudsjettChange}
+                className="input input-bordered"
+              />
+            </label>
+            <label className="input-group">
+              <span>Timepris på prosjekt</span>
+              <input
+                type="number"
+                value={timeprisProsjekt}
+                onChange={handleTimeprisProsjektChange}
+                className="input input-bordered"
+              />
+            </label>
+            <label className="input-group">
+              <span>
+                Bonus
+                <ReadMoreIcon text="Bonus denne måneden. Eksempelvis presentasjonsbonus og rekrutteringsbonus, mer info på intranettet." />
+              </span>
+              <input
+                type="number"
+                value={bonus}
+                onChange={handleBonusChange}
+                className="input input-bordered"
+              />
+            </label>
+          </div>
+        </div>
+        <div className="rounded-lg border border-gray-300 border-solid grow shrink-0">
+          <div className="p-4 border-b border-gray-300 bg-slate-200">Timer</div>
+          <div className="gap-2 p-4 form-control calculator-group">
+            <label className="input-group">
+              <span>Fakturert</span>
+              <input
+                type="number"
+                value={antallTimerFakturert}
+                onChange={handleAntallTimerFakturertChange}
+                className="input input-bordered"
+              />
+            </label>
+            <label className="input-group">
+              <span>Kompetanseheving</span>
+              <input
+                type="number"
+                className="input input-bordered"
+                value={antallTimerKompetanse}
+                onChange={handleAntallTimerKompetanseChange}
+              />
+            </label>
+            <label className="input-group">
+              <span>Interntid</span>
+              <input
+                type="number"
+                className="input input-bordered"
+                value={antallTimerInterntid}
+                onChange={handleAntallTimerInterntidChange}
+              />
+            </label>
+            <label className="input-group">
+              <span>
+                Interntid m/komp
+                <ReadMoreIcon text="Interntid som kompanseres som fakturert tid, se intranett for retningslinjer" />
+              </span>
+              <input
+                type="number"
+                value={antallTimerInterntidMedKomp}
+                className="input input-bordered"
+                onChange={handleAntallTimerInterntidMedKomChange}
+              />
+            </label>
+            <label className="input-group">
+              <span>Ferie</span>
+              <input
+                type="number"
+                className="input input-bordered"
+                value={antallTimerFerie}
+                onChange={handleAntallTimerFerieChange}
+              />
+            </label>
+            <label className="input-group">
+              <span>
+                Sykdom
+                <ReadMoreIcon text="Egenmelding, sykemelding, sykt barn og foreldre permisjon" />
+              </span>
+              <input
+                type="number"
+                value={antallTimerSyk}
+                onChange={handleAntallTimerSykChange}
+                className="input input-bordered"
+              />
+            </label>
+          </div>
+        </div>
+        <div className="rounded-lg border border-gray-300 border-solid grow shrink-0 min-w-[310px]">
+          <div className="flex justify-between p-4 text-white bg-green-brand">
+            Resultat
+            <ReadMoreIcon text="Viser resultat av beregningen og hvilke faktorer som blir med i beregnet bruttolønn" />
+          </div>
+          <ul className="flex flex-col gap-2 justify-between p-4">
+            <li className="flex justify-between">
+              9G timelønn:
+              <span>{getInNok(Timelonn9G())}</span>
+            </li>
+            <li className="flex justify-between">
+              Sum sykelønn: <span>{getInNok(SumSykeLonn())}</span>
+            </li>
+            <li className="flex justify-between">
+              Sum fakturert tid: <span>{getInNok(SumFakturertTid())}</span>
+            </li>
+            <li className="flex justify-between">
+              Sum interntid m/komp:{' '}
+              <span>{getInNok(SumIntertidMedKomp())}</span>
+            </li>
+            <li className="flex justify-between">
+              Sum kompetanse: <span>{getInNok(SumKompetanse())}</span>
+            </li>
+            <li className="flex justify-between border-b-2 border-solid border-b-black-nav">
+              Sum betalt tid: <span>{getInNok(SumBetaltTid())}</span>
+            </li>
+            <li className="flex justify-between text-gray-400">
+              Tilgjengelig tid:
+              <span>
+                {SumTilgjengeligTid()} av {antallTimerMnd}
+              </span>
+            </li>
+            <li className="flex justify-between text-gray-400 border-b-2 border-solid border-b-black-nav">
+              Beregnet garantilønn:{' '}
+              <span>{getInNok(BeregnetGarantilonn())}</span>
+            </li>
+            <li className="flex justify-between border-b-2 border-solid border-b-black-nav">
+              Bonus: <span>{bonus}</span>
+            </li>
+            <li className="flex justify-between border-b-2 border-solid border-b-black-nav">
+              Bruttolønn: <span>{getInNok(Bruttolonn())}</span>
+            </li>
+            <li className="flex gap-4 justify-between">
+              <span className="flex justify-between w-full">
+                Ca årslønn:
+                <ReadMoreIcon
+                  text={`Utregning: Antall fakturerbare timer i ${selectedYear} er ${
+                    billableHoursThisYear + 25 * 7.5
+                  }. Trekker fra 25 feriedager og legger på feriepenger (12%). Regnestykket blir: \n\n${billableHoursThisYear}t * ${timeprisProsjekt}kr/t * 0.52 * 1.12`}
+                />
+              </span>
+              <span>{getInNok(BruttoArsLonn())}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   )
 }
 
-const ReadMoreIcon = ({ text, id }: { text: string; id: string }) => (
-  <OverlayTrigger overlay={<Tooltip id={id}>{text}</Tooltip>}>
+const ReadMoreIcon = ({ text }: { text: string }) => (
+  <div className="tooltip tooltip-left" data-tip={text}>
     <FontAwesomeIcon icon={faQuestionCircle} />
-  </OverlayTrigger>
+  </div>
 )
 
 const months = [

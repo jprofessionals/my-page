@@ -1,69 +1,73 @@
-import { Modal } from 'react-bootstrap'
 import ApiService from '../../services/api.service'
-import React from 'react'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import * as Dialog from '../ui/dialog'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
+import { Button } from '../ui/button'
 type Props = {
-  isDeleteModalOpen: boolean
-  toggler: Function
   refreshBudgets: Function
   post: any
-  setIsLoadingDeletePost: Function
 }
 
-const DeleteBudgetPostModal = ({
-  isDeleteModalOpen,
-  toggler,
-  refreshBudgets,
-  post,
-  setIsLoadingDeletePost,
-}: Props) => {
+const DeleteBudgetPostModal = ({ refreshBudgets, post }: Props) => {
+  const [isLoading, setIsLoading] = useState(false)
   const handleDeletePost = (e: any) => {
-    setIsLoadingDeletePost(true)
+    setIsLoading(true)
     e.preventDefault()
     ApiService.deleteBudgetPost(post.id).then(
-      (response) => {
+      () => {
         refreshBudgets()
-        setIsLoadingDeletePost(false)
+        setIsLoading(false)
         toast.success('Slettet ' + post.description)
       },
-      (error) => {
-        setIsLoadingDeletePost(false)
+      () => {
+        setIsLoading(false)
         toast.error('Får ikke slettet posten, prøv igjen senere')
       },
     )
   }
   return (
-    <div>
-      <Modal
-        show={isDeleteModalOpen}
-        className="modal d-flex align-items-center"
-        backdrop="static"
-      >
-        <div className="modal-body">
-          <div className="container ">
-            <h1>Slett post</h1>
-            <p>Er du sikker på at du vil slette {post.description}?</p>
-            <div className="modalBtns">
-              <button
-                type="button"
-                className="deletebtn btn"
-                onClick={handleDeletePost}
-              >
-                Slett post
-              </button>
-              <button
-                type="button"
-                className="cancelbtn btn"
-                onClick={() => toggler()}
-              >
-                Avbryt
-              </button>
-            </div>
-          </div>
+    <Dialog.Dialog>
+      <Dialog.Trigger asChild>
+        <Button
+          className="text-white btn btn-error btn-sm"
+          type="button"
+          title="Slett post"
+          disabled={post.locked}
+        >
+          {isLoading ? (
+            <FontAwesomeIcon
+              icon={faRefresh}
+              className="animate-spin"
+              size="sm"
+            />
+          ) : (
+            'Slett'
+          )}
+        </Button>
+      </Dialog.Trigger>
+      <Dialog.Content>
+        <div className="mb-6 prose">
+          <h2>Slett post</h2>
+          <p>
+            Er du sikker på at du vil slette{' '}
+            <span className="text-xl">&ldquo;{post.description}&rdquo;</span>?
+          </p>
         </div>
-      </Modal>
-    </div>
+        <Dialog.Footer>
+          <Dialog.Close asChild>
+            <Button variant="error" onClick={handleDeletePost} size="sm">
+              Slett post
+            </Button>
+          </Dialog.Close>
+          <Dialog.Close asChild>
+            <Button size="sm">Avbryt</Button>
+          </Dialog.Close>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog.Dialog>
   )
 }
 

@@ -1,17 +1,22 @@
 import { Budget } from '@/types'
 import BudgetItem from '@/components/budget/BudgetItem'
-import styles from './BudgetList.module.scss'
-import { Accordion } from 'react-bootstrap'
-import {AccordionEventKey} from "react-bootstrap/AccordionContext";
+import clsx from 'clsx'
 
 type Props = {
   budgets: Budget[]
   refreshBudgets: (userId?: string) => void
-  activeBudgetId: AccordionEventKey | null
-  updateActiveBudget: (budgetId: AccordionEventKey) => void
+  activeBudgetId: string | null
+  updateActiveBudget: (budgetId: string) => void
+  type: 'tiles' | 'list'
 }
 
-const BudgetList = ({ budgets, refreshBudgets,activeBudgetId, updateActiveBudget }: Props) => {
+const BudgetList = ({
+  budgets,
+  refreshBudgets,
+  type,
+  activeBudgetId,
+  updateActiveBudget,
+}: Props) => {
   if (budgets.length === 0) {
     return (
       <div>
@@ -23,25 +28,27 @@ const BudgetList = ({ budgets, refreshBudgets,activeBudgetId, updateActiveBudget
     )
   } else {
     return (
-      <div className={styles.budgets}>
-        <div className={styles.headerBudgets}>
-          <h3>Dine budsjetter</h3>
-        </div>
-        <div>
-          <Accordion
-              activeKey={activeBudgetId}
-              onSelect={(selectedBudget) => {
-                  updateActiveBudget(selectedBudget)
-              }}
-          >
-            {budgets.map((budget) => (
-              <BudgetItem
-                key={budget.id}
-                budget={budget}
-                refreshBudgets={refreshBudgets}
-              />
-            ))}
-          </Accordion>
+      <div className="p-4">
+        {type === 'tiles' ? (
+          <h3 className="mb-6 text-3xl font-light">
+            Oversikt over dine budsjetter
+          </h3>
+        ) : null}
+        <div
+          className={clsx(
+            type === 'tiles' ? 'grid gap-2 gap-x-3 md:grid-cols-2' : '',
+          )}
+        >
+          {budgets.map((budget) => (
+            <BudgetItem
+              key={budget.id}
+              isActive={budget.id === activeBudgetId}
+              budget={budget}
+              refreshBudgets={refreshBudgets}
+              setActiveId={updateActiveBudget}
+              type={type}
+            />
+          ))}
         </div>
       </div>
     )

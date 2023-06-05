@@ -1,14 +1,14 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import apiService from '../../services/api.service'
 import { toast } from 'react-toastify'
-import { Spinner, Table } from 'react-bootstrap'
 import { Budget, BudgetType, User } from '@/types'
 import BudgetList from '@/components/budget/BudgetList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronCircleUp } from '@fortawesome/free-solid-svg-icons'
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown'
-import { AccordionEventKey } from 'react-bootstrap/AccordionContext'
 import NewUserModal from '@/components/admin/NewUserModal'
+import clsx from 'clsx'
+import { useAuthContext } from '@/providers/AuthProvider'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 
 function compareUsers(a: User, b: User): number {
   if (a.name === null && b.name === null) {
@@ -28,9 +28,8 @@ function Admin() {
   const [isLoading, setIsLoading] = useState(true)
   const [expandedUser, setExpandedUser] = useState<string>('')
   const [filterValue, setFilterValue] = useState('')
-  const [activeBudget, setActiveBudget] = useState<AccordionEventKey | null>(
-    null,
-  )
+  const [activeBudget, setActiveBudget] = useState<string | null>(null)
+  const { user } = useAuthContext()
 
   useEffect(() => {
     refreshTable()
@@ -92,14 +91,6 @@ function Admin() {
     }
   }
 
-  const budgetBalanceHours = (budget: Budget) => {
-    if (budget) {
-      return budget.sumHours + (budget.sumHours === 1 ? ' time' : ' timer')
-    } else {
-      return '-'
-    }
-  }
-
   const budgetBalanceHoursCurrentYear = (budget: Budget) => {
     if (budget) {
       return (
@@ -131,10 +122,12 @@ function Admin() {
       })
   }
 
+  if (!user?.admin) return null
+
   if (isLoading) {
     return (
-      <div className="loadSpin d-flex align-items-center">
-        <Spinner animation="border" className="spinn" />
+      <div className="flex flex-col justify-center items-center mt-[30%] gap-4">
+        <FontAwesomeIcon icon={faRefresh} className="animate-spin" size="3x" />
         <h3>Laster inn oversikt</h3>
       </div>
     )
@@ -143,34 +136,43 @@ function Admin() {
   } else {
     return (
       <>
-        <div className="admin-container">
-          <h2>Brukere</h2>
+        <div className="overflow-auto p-4">
+          <h2 className="prose prose-xl">Våre ansatte</h2>
 
           {/* Add text input field */}
-          <div className="mb-3">
-            <label htmlFor="filterInput" className="form-label">
-              Filtrer brukere:
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="filterInput"
-              onChange={(e) => setFilterValue(e.target.value)}
-              style={{ width: '300px' }}
-            />
+          <div className="flex gap-16">
+            <div className="mb-4 form-control">
+              <div className="input-group">
+                <input
+                  type="text"
+                  placeholder="Filtrer ansatte…"
+                  className="input input-bordered"
+                  onChange={(e) => setFilterValue(e.target.value)}
+                />
+                <button className="btn btn-square">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-6 h-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <NewUserModal />
           </div>
 
-          <NewUserModal />
-
-          <Table
-            striped
-            bordered
-            hover
-            style={
-              !isLoading && budgetTypes.length > 0 ? {} : { display: 'none' }
-            }
-          >
-            <thead>
+          <table className="table overflow-x-auto mt-4 shadow-md table-compact">
+            <thead className="">
               <tr key={'headerRow'}>
                 <th key={'brukerHeader'}>Brukere</th>
                 {budgetTypes.map((budgetType) => (
@@ -178,9 +180,10 @@ function Admin() {
                     {budgetType.name}
                   </th>
                 ))}
+                <th key="action" className="px-6" />
               </tr>
             </thead>
-            <tbody>
+            <tbody className="border-solid border-x-gray-500">
               {users
                 .filter((user) =>
                   (user.name
@@ -191,7 +194,12 @@ function Admin() {
                 .sort((a, b) => compareUsers(a, b))
                 .map((userRow) => (
                   <Fragment key={userRow.email}>
-                    <tr key={userRow.email}>
+                    <tr
+                      key={userRow.email}
+                      className={clsx(
+                        userRow.email === expandedUser && 'active',
+                      )}
+                    >
                       {/* pass event object to handleExpandUser */}
                       <td key={userRow.email}>
                         {userRow.name ? userRow.name : userRow.email}
@@ -213,20 +221,14 @@ function Admin() {
                       ))}
                       <td
                         onClick={() => handleExpandUser(userRow)}
-                        style={{
-                          display: 'flex',
-                          height: 41,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                        }}
+                        className="text-center cursor-pointer hover:brightness-90"
                       >
                         <FontAwesomeIcon
-                          icon={
-                            userRow.email === expandedUser
-                              ? faChevronCircleUp
-                              : faChevronCircleDown
-                          }
+                          icon={faChevronCircleDown}
+                          size="xl"
+                          className={clsx(
+                            userRow.email === expandedUser && 'rotate-180',
+                          )}
                         />
                       </td>
                     </tr>
@@ -234,7 +236,11 @@ function Admin() {
                       <tr key={`${userRow.email}-expanded`}>
                         <td colSpan={budgetTypes.length + 2}>
                           {/* +2 for brukere and expand button columns */}
+                          <span className="text-lg font-bold">
+                            {userRow.name}
+                          </span>
                           <BudgetList
+                            type="list"
                             budgets={userRow.budgets ?? []}
                             refreshBudgets={refreshTable}
                             activeBudgetId={activeBudget}
@@ -246,7 +252,7 @@ function Admin() {
                   </Fragment>
                 ))}
             </tbody>
-          </Table>
+          </table>
         </div>
       </>
     )

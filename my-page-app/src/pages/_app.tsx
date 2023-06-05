@@ -1,19 +1,15 @@
 import '@/styles/globals.scss'
 import type { AppProps } from 'next/app'
 import { AuthProvider } from '@/providers/AuthProvider'
-import dynamic from 'next/dynamic'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from 'react-query'
+import NavBar from '@/components/navbar/NavBar'
 
 export default function App({
   Component,
   pageProps: { ...pageProps },
 }: AppProps) {
-  const NavBar = dynamic(() => import('@/components/navbar/NavBar'), {
-    ssr: false,
-  })
-
   const queryClient = new QueryClient()
 
   return (
@@ -29,8 +25,10 @@ export default function App({
       />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <NavBar />
-          <Component {...pageProps} />
+          <main data-theme="jpro">
+            <NavBar />
+            <Component {...pageProps} />
+          </main>
         </AuthProvider>
       </QueryClientProvider>
     </>

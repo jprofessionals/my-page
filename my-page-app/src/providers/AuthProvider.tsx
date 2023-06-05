@@ -1,17 +1,24 @@
 import {
   createContext,
   PropsWithChildren,
-  useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react'
+import * as _ from 'radash'
 import { User } from '@/types'
-import { CredentialResponse } from 'google-one-tap'
 import ApiService from '@/services/api.service'
 import config from '../config/config'
+import { useSessionStorage } from 'usehooks-ts'
+import { useRouter } from 'next/router'
 
-type UserFetchStatus = 'init' | 'fetchingUser' | 'fetched' | 'fetchFailed'
+type UserFetchStatus =
+  | 'init'
+  | 'fetchingUser'
+  | 'fetched'
+  | 'fetchFailed'
+  | 'signedOut'
 
 type AuthContext = {
   isAuthenticated: boolean
@@ -19,6 +26,7 @@ type AuthContext = {
   authenticate: () => void
   userFetchStatus: UserFetchStatus
   user: User | null
+  logout: () => void
   setUser: (user: User | null) => void
 }
 
@@ -26,15 +34,17 @@ const Context = createContext<AuthContext | null>(null)
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null)
-  const [userToken, setUserToken] = useState<string | null>(null)
+  const [userToken, setUserToken] = useSessionStorage<string | null>(
+    'user_token',
+    null,
+  )
+
   const [userFetchStatus, setUserFetchStatus] =
     useState<UserFetchStatus>('init')
   const isAuthenticated = useMemo(() => !!userToken, [userToken])
 
-  const authHandler = useCallback(async (response: CredentialResponse) => {
-    if (response.credential) {
-      setUserToken(response.credential)
-      localStorage.setItem('user_token', response.credential)
+  useEffect(() => {
+    const getUser = async () => {
       setUserFetchStatus('fetchingUser')
       try {
         const user = await ApiService.getUser()
@@ -44,20 +54,38 @@ export function AuthProvider({ children }: PropsWithChildren) {
         })
         setUserFetchStatus('fetched')
       } catch (e) {
+        const headerAuthToken = _.get(
+          e,
+          'response.headers.[www-authenticate]',
+          '',
+        ) // Then the token was either expired or otherwise invalid
+        if (headerAuthToken?.includes('invalid_token')) {
+          setUserToken(null)
+        }
         setUserFetchStatus('fetchFailed')
       }
     }
-  }, [])
+    if (isAuthenticated && !user) {
+      getUser()
+    }
+  }, [isAuthenticated, setUserToken, user])
 
-  const authenticate = useCallback(async () => {
-    const { googleClientId } = config();
-    console.log('googleClientId: ', googleClientId)
+  const router = useRouter()
+  const logout = () => {
+    setUserFetchStatus('signedOut')
+    setUserToken(null)
+    setUser(null)
+    router.push('/loggut')
+  }
+
+  const authenticate = async () => {
+    const { googleClientId } = config()
 
     window.google.accounts.id.initialize({
       client_id: googleClientId,
       auto_select: true,
       prompt_parent_id: 'signInDiv',
-      callback: authHandler,
+      callback: (response) => setUserToken(response.credential),
     })
 
     window.google.accounts.id.prompt((notification) => {
@@ -73,7 +101,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
           })
       }
     })
-  }, [authHandler])
+  }
 
   return (
     <Context.Provider
@@ -84,6 +112,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setUser,
         authenticate,
         userFetchStatus,
+        logout,
       }}
     >
       {children}

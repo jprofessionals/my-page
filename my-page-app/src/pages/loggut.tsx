@@ -1,3 +1,3 @@
 export default function loggut() {
-  return <h1>Logg ut</h1>
+  return <div className="flex justify-center mt-20">Logget ut ✅</div>
 }

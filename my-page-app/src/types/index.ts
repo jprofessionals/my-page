@@ -1,6 +1,3 @@
-import { Property } from 'csstype'
-import Float = Property.Float
-
 export type User = {
   name: string
   email: string

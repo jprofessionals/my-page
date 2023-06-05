@@ -1,18 +1,29 @@
 import { FormEvent, useState } from 'react'
-import Button from 'react-bootstrap/Button'
-import Modal from 'react-bootstrap/Modal'
 import NewEmployeeForm from '@/components/newemployee/NewEmployeeForm'
 import { NewEmployee } from '@/types'
 import { useMutation } from 'react-query'
 import axios, { AxiosError } from 'axios'
 import { API_URL } from '@/services/api.service'
 import authHeader from '@/services/auth-header'
-import { Alert } from 'react-bootstrap'
 import { toast } from 'react-toastify'
+import { Button } from '../ui/button'
+import * as Dialog from '../ui/dialog'
+import { Alert } from '../ui/alert'
+
+// @jpro.no in the form is now optional, indicated by a new label on the input.
+// Add the @jpro.no if no @ is provided, otherwise let it through like normal
+const parseEmail = (email?: string) => {
+  if (email?.includes('@')) {
+    return email
+  }
+  // If no manual @ is added, append @jpro.no to value
+  return `${email}@jpro.no`
+}
 
 const createNewEmployee = async (newEmployee: NewEmployee) => {
   const modifiedNewEmployee = {
     ...newEmployee,
+    email: parseEmail(newEmployee.email),
     employeeNumber: parseInt(newEmployee.employeeNumber, 10),
   }
 
@@ -28,7 +39,6 @@ const initialInputData: NewEmployee = {
 }
 
 export default function NewUserModal() {
-  const [show, setShow] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [inputData, setInputData] = useState<NewEmployee>(initialInputData)
 
@@ -36,17 +46,15 @@ export default function NewUserModal() {
     onSuccess: () => {
       toast.info('Opprettet bruker')
       resetInputData()
-      setShow(false)
       setError(null)
     },
     onError: (error: AxiosError) => {
-      toast.error(`Klarte ikke opprette ny bruker: ${error.message}`)
+      toast.error(`Klarte ikke opprette ny bruker: ${error.response?.data}`)
     },
   })
 
   const handleClose = () => {
     resetInputData()
-    setShow(false)
     setError(null)
   }
 
@@ -65,35 +73,36 @@ export default function NewUserModal() {
     }
   }
 
-  const handleShow = () => setShow(true)
-
   const resetInputData = () => {
     setInputData(initialInputData)
   }
 
   return (
-    <>
-      <Button variant="primary" onClick={handleShow}>
-        Legg til ny ansatt
-      </Button>
+    <Dialog.Dialog>
+      <Dialog.Trigger asChild>
+        <Button variant="outline">Legg til ny ansatt</Button>
+      </Dialog.Trigger>
 
-      <Modal show={show} onHide={handleClose} animation={false}>
-        <Modal.Header closeButton>
-          <Modal.Title>Legg til ny ansatt</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {error && <Alert variant="danger">{error}</Alert>}
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>Legg til ny ansatt</Dialog.Title>
+        </Dialog.Header>
+        <div>
+          {error && <Alert variant="error">{error}</Alert>}
           <NewEmployeeForm inputData={inputData} setInputData={setInputData} />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Lukk
-          </Button>
-          <Button variant="primary" onClick={handleSubmit}>
-            Lagre
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+        </div>
+        <Dialog.Footer>
+          <Dialog.Close asChild>
+            <Button onClick={handleClose}>Lukk</Button>
+          </Dialog.Close>
+
+          <Dialog.Close asChild>
+            <Button onClick={handleSubmit} variant="primary">
+              Lagre
+            </Button>
+          </Dialog.Close>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog.Dialog>
   )
 }

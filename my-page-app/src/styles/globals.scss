@@ -1,117 +1,31 @@
-@use './mixins';
-@import '~bootstrap/scss/bootstrap';
-
-
-#root {
-  min-width: 350px;
-}
-
-html {
-  height: 100%;
-  overflow-x: scroll;
-  @keyframes App-logo-spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
-  @media screen and (max-width: 575px) {
-    .icon {
-      display: none;
-    }
-    .ms-auto {
-      display: none;
-    }
-  }
-  @media screen and (min-width: 575px) {
-    .smallNav {
-      display: none;
-    }
-  }
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-.innhold {
-  padding: 10px;
 
-  .kalkulator {
-    .input {
-      display: flex;
-      flex-wrap: wrap;
-
-      .column {
-        max-width: 500px;
-        min-width: 300px;
-        margin-right: 10px;
-      }
-    }
-
-    ul {
-      list-style: none;
-      padding-left: 15px;
-
-      li {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 5px;
-      }
-      li.bold {
-        font-weight: bold;
-      }
-      li.notSelected {
-        font-weight: lighter;
-      }
-      li.line {
-        border-bottom: 1px solid;
-        padding-bottom: 5px;
-      }
-    }
-
-    input {
-      max-width: 100px;
-    }
-  }
-}
-.bidra-container {
-  margin-top: 15px;
-  margin-left: 5px;
-  margin-right: 5px;
+.table th:first-child {
+  position: unset;
 }
 
+.calculator-group {
+  &>.input-group {
+    @apply grid;
+    grid-template-columns: 4fr 110px;
 
-.accordion-button {
-  &:focus {
-    box-shadow: 0px 0px 0px 0.1rem mixins.$jpro-orange;
-  }
-  &:not(.collapsed) {
-    color: mixins.$black;
-    background-color: mixins.$lighter-orange;
-    &::after {
-      color: mixins.$black;
-      background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27 fill=%27%23212529%27%3e%3cpath fill-rule=%27evenodd%27 d=%27M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z%27/%3e%3c/svg%3e');
+    &>span {
+      @apply flex justify-between gap-2;
+    }
+
+    &>.input {
+      @apply text-right pr-0 h-10;
     }
   }
-  &:hover {
-    background-color: mixins.$lighter-orange;
-  }
-}
 
-.card {
-  margin-bottom: 5px;
-  margin-top: 5px;
+  &>.btn {
+    @apply h-10 min-h-6;
+  }
 }
