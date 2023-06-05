@@ -144,8 +144,8 @@
           <buildArgs>
             <buildArg>-H:+ReportExceptionStackTraces</buildArg>
             <buildArg>--no-fallback</buildArg>
-<!--            <buildArg>&#45;&#45;static</buildArg>-->
-<!--            <buildArg>&#45;&#45;libc=musl</buildArg>-->
+            <buildArg>--static</buildArg>
+            <buildArg>--libc=musl</buildArg>
           </buildArgs>
         </configuration>
       </plugin>
