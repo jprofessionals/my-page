@@ -10,5 +10,19 @@
     "allDeclaredFields": true,
     "allDeclaredClasses": true,
     "unsafeAllocated": true
+  },
+  {
+    "name" : "no.jpro.mypage.RawEmail",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "queryAllPublicMethods": true,
+    "queryAllPublicConstructors": true,
+    "unsafeAllocated": true
   }
 ]
