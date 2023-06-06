@@ -1,8 +1,6 @@
-import com.google.cloud.functions.CloudEventsFunction;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 import event.PubSubBody;
-import io.cloudevents.CloudEvent;
 import no.jpro.mypage.RawEmail;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
@@ -15,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class EmailValidatorFunction implements CloudEventsFunction {
+public class EmailValidatorFunction {
     private static final Logger logger = Logger.getLogger(EmailValidatorFunction.class.getName());
     private static final SpecificDatumReader<RawEmail> reader = new SpecificDatumReader<>(RawEmail.getClassSchema());
 
@@ -39,17 +36,9 @@ public class EmailValidatorFunction implements CloudEventsFunction {
         ));
     }
 
-    @Override
-    public void accept(CloudEvent event) {
-        // The Pub/Sub message is passed as the CloudEvent's data payload.
-        if (event.getData() != null) {
-            // Extract Cloud Event data and convert to PubSubBody
-            String cloudEventData = new String(event.getData().toBytes(), StandardCharsets.UTF_8);
-            logger.info("Raw event data: " + cloudEventData);
-            Gson gson = new Gson();
-            PubSubBody body = gson.fromJson(cloudEventData, PubSubBody.class);
-            // Retrieve and decode PubSub message data
-            String encodedData = body.getMessage().getData();
+    public void accept(PubSubBody message) {
+        if (message != null) {
+            String encodedData = message.getMessage().getData();
             byte[] data = Base64.getDecoder().decode(encodedData);
             InputStream inputStream = new ByteArrayInputStream(data);
 
@@ -81,14 +70,22 @@ public class EmailValidatorFunction implements CloudEventsFunction {
     }
 
     public static void main(String[] args) throws IOException {
-        System.out.println("Starting email-validator");
+        logger.info("Starting email-validator");
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(8080), 16);
         EmailValidatorFunction emailValidatorFunction = new EmailValidatorFunction();
         Gson gson = new Gson();
         httpServer.createContext("/", exchange -> {
-            InputStreamReader inputStreamReader = new InputStreamReader(exchange.getRequestBody());
-            CloudEvent cloudEvent = gson.fromJson(inputStreamReader, CloudEvent.class);
-            emailValidatorFunction.accept(cloudEvent);
+            logger.info("Handling request, method=" + exchange.getRequestMethod() + ", path="+exchange.getHttpContext().getPath());
+            try {
+                InputStreamReader inputStreamReader = new InputStreamReader(exchange.getRequestBody());
+                PubSubBody message = gson.fromJson(inputStreamReader, PubSubBody.class);
+                emailValidatorFunction.accept(message);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error processing request", e);
+            }
+            exchange.sendResponseHeaders(200, 0);
+            exchange.getResponseBody().close();
+            logger.info("Request complete");
         });
         httpServer.start();
     }
