@@ -6,9 +6,9 @@ import BudgetList from '@/components/budget/BudgetList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown'
 import NewUserModal from '@/components/admin/NewUserModal'
-import clsx from 'clsx'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { faRefresh } from '@fortawesome/free-solid-svg-icons'
+import cn from '@/utils/cn'
 
 function compareUsers(a: User, b: User): number {
   if (a.name === null && b.name === null) {
@@ -171,19 +171,22 @@ function Admin() {
             <NewUserModal />
           </div>
 
-          <table className="table overflow-x-auto mt-4 shadow-md table-compact">
-            <thead className="">
-              <tr key={'headerRow'}>
-                <th key={'brukerHeader'}>Brukere</th>
+          <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
+            <thead>
+              <tr className="text-base text-slate-900">
+                <th className="rounded-tl-lg bg-slate-300">Brukere</th>
                 {budgetTypes.map((budgetType) => (
-                  <th key={budgetType.id + '' + budgetType.balanceIsHours}>
+                  <th
+                    key={budgetType.id + '' + budgetType.balanceIsHours}
+                    className="bg-slate-300"
+                  >
                     {budgetType.name}
                   </th>
                 ))}
-                <th key="action" className="px-6" />
+                <th key="action" className="px-6 rounded-tr-lg bg-slate-300" />
               </tr>
             </thead>
-            <tbody className="border-solid border-x-gray-500">
+            <tbody>
               {users
                 .filter((user) =>
                   (user.name
@@ -196,8 +199,9 @@ function Admin() {
                   <Fragment key={userRow.email}>
                     <tr
                       key={userRow.email}
-                      className={clsx(
+                      className={cn(
                         userRow.email === expandedUser && 'active',
+                        'hover',
                       )}
                     >
                       {/* pass event object to handleExpandUser */}
@@ -226,7 +230,7 @@ function Admin() {
                         <FontAwesomeIcon
                           icon={faChevronCircleDown}
                           size="xl"
-                          className={clsx(
+                          className={cn(
                             userRow.email === expandedUser && 'rotate-180',
                           )}
                         />

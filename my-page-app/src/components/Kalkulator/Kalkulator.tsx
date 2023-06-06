@@ -5,7 +5,6 @@ import getBillableHours, { getBillabeHoursEntireYear } from './getBillableHours'
 import moment from 'moment'
 import { Button } from '../ui/button'
 import getInNok from '@/utils/getInNok'
-import clsx from 'clsx'
 
 const defaultValues: Record<string, number> = {
   garantilonn: 50000,

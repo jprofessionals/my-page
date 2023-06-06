@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Fragment, useMemo } from 'react'
 import { Button } from '../ui/button'
-import clsx from 'clsx'
+import cn from '@/utils/cn'
 
 const navigation = [
   { href: '/admin', name: 'Admin 🛠️', requiresAdmin: true },
@@ -66,7 +66,7 @@ const NavBar = () => {
                           {name}
                         </a>
                         <div
-                          className={clsx(
+                          className={cn(
                             href !== router.pathname || 'bg-orange-brand',
                             'h-2',
                           )}
@@ -78,7 +78,7 @@ const NavBar = () => {
               </div>
               <div className="hidden md:block md:ml-6">
                 <div
-                  className={clsx(
+                  className={cn(
                     !user ? 'pointer-events-none' : '',
                     'flex items-center',
                   )}

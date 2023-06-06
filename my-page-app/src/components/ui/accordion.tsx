@@ -37,7 +37,7 @@ const Trigger = forwardRef<
       {children}
       <FontAwesomeIcon
         icon={faChevronDown}
-        className="w-4 h-4 transition-transform duration-200"
+        className="self-center place-self-end w-4 h-4 transition-transform duration-200"
       />
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
