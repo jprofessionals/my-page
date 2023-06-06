@@ -1,6 +1,7 @@
 FROM ghcr.io/graalvm/native-image:muslib-ol9-java17-22.3.2 AS graal
 WORKDIR /app
 COPY target/email-validator-1.0-SNAPSHOT-jar-with-dependencies.jar /app
+COPY reflect-config.json /app
 RUN ls -al /app
 RUN native-image \
     --no-fallback \
@@ -8,6 +9,7 @@ RUN native-image \
     --static \
     --libc=musl \
     -H:+ReportExceptionStackTraces \
+    -H:ReflectionConfigurationFiles=reflect-config.json \
     -H:Name=email-validator
 
 

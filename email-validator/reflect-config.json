@@ -1,0 +1,14 @@
+[
+  {
+    "name" : "event.PubSubBody",
+    "allDeclaredFields": true,
+    "allDeclaredClasses": true,
+    "unsafeAllocated": true
+  },
+  {
+    "name" : "event.PubSubBody$PubsubMessage",
+    "allDeclaredFields": true,
+    "allDeclaredClasses": true,
+    "unsafeAllocated": true
+  }
+]
