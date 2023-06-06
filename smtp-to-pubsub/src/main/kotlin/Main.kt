@@ -14,6 +14,7 @@ import org.subethamail.smtp.server.SessionHandler
 import sun.misc.Signal
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.lang.Exception
 import java.net.InetAddress
 import java.nio.ByteBuffer
 import kotlin.system.exitProcess
@@ -125,7 +126,12 @@ class MyMessageHandler(
             .setData(ByteString.copyFrom(encodeToAvro(email)))
             .build()
         log.info("Ready to publish message")
-        val messageId = publisher.publish(message).get()
+        val messageId = try {
+            publisher.publish(message).get()
+        } catch (e: Exception) {
+            log.error("Message send failed: ", e)
+            "<SEND FAILED>"
+        }
         log.info("MAIL FROM: $from")
         to.forEach { log.info("RCPT TO: $it") }
         log.info("---BODY---")
