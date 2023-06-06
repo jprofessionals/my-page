@@ -1,6 +1,5 @@
 terraform {
   backend "gcs" {
-    bucket  = "terraform-state-plenary-plane-385610"
     prefix  = "terraform/state"
   }
 }
@@ -66,6 +65,19 @@ resource "google_pubsub_topic" "validated-emails" {
   message_storage_policy {
     allowed_persistence_regions = [var.google_cloud_region]
   }
+}
+
+resource "google_pubsub_subscription" "raw-emails-to-bigquery" {
+  name  = "raw-emails-to-bigquery"
+  topic = google_pubsub_topic.raw-emails.name
+
+  bigquery_config {
+    table = "${google_bigquery_table.raw-emails.project}.${google_bigquery_table.raw-emails.dataset_id}.${google_bigquery_table.raw-emails.table_id}"
+    use_topic_schema = true
+    write_metadata = true
+  }
+
+  depends_on = [google_project_iam_member.viewer, google_project_iam_member.editor]
 }
 
 resource "google_pubsub_subscription" "validated-emails-to-bigquery" {
@@ -165,4 +177,40 @@ module "kubernetes-engine_safer-cluster" {
       preemptible = true
     }
   ]
+}
+
+resource "google_project_iam_member" "k8s-pubsub-access" {
+  project = var.google_cloud_project_id
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:${module.kubernetes-engine_safer-cluster.service_account}"
+}
+
+variable "github_sha" {
+  type = string
+}
+
+resource "google_cloud_run_v2_service" "email-validator" {
+  name     = "email-validator"
+  location = var.google_cloud_region
+  ingress = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+
+  template {
+    containers {
+      image = "europe-west1-docker.pkg.dev/${var.google_cloud_project_id}/images/email-validator:${var.github_sha}"
+    }
+  }
+}
+
+resource "google_pubsub_subscription" "email-validator" {
+  name  = "email-validator"
+  topic = google_pubsub_topic.raw-emails.name
+  push_config {
+    push_endpoint = google_cloud_run_v2_service.email-validator.uri
+    oidc_token {
+      service_account_email = "${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+    }
+    attributes = {
+      x-goog-version = "v1"
+    }
+  }
 }

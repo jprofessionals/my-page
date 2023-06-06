@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: smtp-to-pubsub
-          image: europe-west1-docker.pkg.dev/bram-my-page/images/smtp-to-pubsub:cb94506ce2f477e170ede2bf6842cacf685eeb90
+          image: europe-west1-docker.pkg.dev/bram-my-page/images/smtp-to-pubsub:aa48c2799558f751a89679ce409744d1adedaa58
           imagePullPolicy: Always
           resources:
             requests:
