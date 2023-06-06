@@ -10,10 +10,7 @@ import org.slf4j.LoggerFactory;
 import validation.DKIMValidator;
 import validation.Validator;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.util.Base64;
 import java.util.List;
@@ -79,7 +76,10 @@ public class EmailValidatorFunction {
             logger.info("Handling request, method=" + exchange.getRequestMethod() + ", path="+exchange.getHttpContext().getPath());
             try {
                 InputStreamReader inputStreamReader = new InputStreamReader(exchange.getRequestBody());
-                PubSubBody message = gson.fromJson(inputStreamReader, PubSubBody.class);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String bodyAsString = bufferedReader.lines().collect(Collectors.joining("\n"));
+                logger.info("Body: '" + bodyAsString + "'");
+                PubSubBody message = gson.fromJson(bodyAsString, PubSubBody.class);
                 emailValidatorFunction.accept(message);
             } catch (Exception e) {
                 logger.warn("Error processing request", e);
