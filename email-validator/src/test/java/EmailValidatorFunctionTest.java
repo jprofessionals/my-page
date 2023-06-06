@@ -1,27 +1,25 @@
-import com.google.common.testing.TestLogHandler;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.google.gson.Gson;
 import event.PubSubBody;
-import io.cloudevents.CloudEvent;
-import io.cloudevents.core.builder.CloudEventBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(JUnit4.class)
 public class EmailValidatorFunctionTest {
-  private static final Logger logger = Logger.getLogger(EmailValidatorFunction.class.getName());
-  private static final TestLogHandler logHandler = new TestLogHandler();
+  private static final Logger logger = LoggerFactory.getLogger("ROOT");
+  private static final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
 
   @BeforeClass
   public static void beforeClass() {
-    logger.addHandler(logHandler);
+    listAppender.start();
+    ((ch.qos.logback.classic.Logger) logger).addAppender(listAppender);
   }
 
   @Test
@@ -32,7 +30,7 @@ public class EmailValidatorFunctionTest {
 
     new EmailValidatorFunction().accept(message);
 
-    assertThat(logHandler.getStoredLogRecords().stream().anyMatch(log -> log.getMessage().equals("ALL VALIDATIONS SUCCESSFUL")))
+    assertThat(listAppender.list.stream().anyMatch(log -> log.getMessage().equals("ALL VALIDATIONS SUCCESSFUL")))
             .isTrue();
   }
 }

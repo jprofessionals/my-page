@@ -5,6 +5,8 @@ import no.jpro.mypage.RawEmail;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.specific.SpecificDatumReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import validation.DKIMValidator;
 import validation.Validator;
 
@@ -16,13 +18,13 @@ import java.net.InetSocketAddress;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class EmailValidatorFunction {
-    private static final Logger logger = Logger.getLogger(EmailValidatorFunction.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(EmailValidatorFunction.class);
     private static final SpecificDatumReader<RawEmail> reader = new SpecificDatumReader<>(RawEmail.getClassSchema());
+
+    private static final Gson gson = new Gson();
 
     private final List<Validator<RawEmail>> validators;
 
@@ -56,7 +58,7 @@ public class EmailValidatorFunction {
                     logger.info("ALL VALIDATIONS SUCCESSFUL");
                 }
             } catch (IOException e) {
-                logger.log(Level.WARNING, "Error decoding Avro", e);
+                logger.warn("Error decoding Avro", e);
             }
 
             logger.info("Validation complete");
@@ -73,7 +75,6 @@ public class EmailValidatorFunction {
         logger.info("Starting email-validator");
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(8080), 16);
         EmailValidatorFunction emailValidatorFunction = new EmailValidatorFunction();
-        Gson gson = new Gson();
         httpServer.createContext("/", exchange -> {
             logger.info("Handling request, method=" + exchange.getRequestMethod() + ", path="+exchange.getHttpContext().getPath());
             try {
@@ -81,7 +82,7 @@ public class EmailValidatorFunction {
                 PubSubBody message = gson.fromJson(inputStreamReader, PubSubBody.class);
                 emailValidatorFunction.accept(message);
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Error processing request", e);
+                logger.warn("Error processing request", e);
             }
             exchange.sendResponseHeaders(200, 0);
             exchange.getResponseBody().close();

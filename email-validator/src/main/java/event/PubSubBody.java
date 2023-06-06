@@ -3,6 +3,10 @@ package event;
 import java.util.Map;
 
 public class PubSubBody {
+
+  public PubSubBody() {
+  }
+
   private PubsubMessage message;
 
   public PubsubMessage getMessage() {
