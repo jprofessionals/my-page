@@ -14,16 +14,16 @@ import org.subethamail.smtp.server.SessionHandler
 import sun.misc.Signal
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.lang.Exception
 import java.net.InetAddress
 import java.nio.ByteBuffer
+import kotlin.Exception
 import kotlin.system.exitProcess
 
 fun main() {
     val log = LoggerFactory.getLogger("main")
 
-    val projectId = "my-page-jpro-test"
-    val topicId = "email"
+    val projectId: String = getEnvVariableOrThrow("GOOGLE_CLOUD_PROJECT_NAME")
+    val topicId = "raw-emails"
     val topicName = TopicName.of(projectId, topicId)
     val publisher: Publisher =
         Publisher.newBuilder(topicName)
@@ -48,6 +48,9 @@ fun main() {
         exitProcess(0)
     }
 }
+
+private fun getEnvVariableOrThrow(variableName: String) = (System.getenv().get(variableName)
+    ?: throw Exception("$variableName not defined in environment variables"))
 
 class MySessionHandler : SessionHandler {
     private val log = LoggerFactory.getLogger(MySessionHandler::class.java)

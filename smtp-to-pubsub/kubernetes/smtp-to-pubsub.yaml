@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: smtp-to-pubsub
-          image: europe-west1-docker.pkg.dev/plenary-plane-385610/images/smtp-to-pubsub:1.0-SNAPSHOT
+          image: europe-west1-docker.pkg.dev/bram-my-page/images/smtp-to-pubsub:cb94506ce2f477e170ede2bf6842cacf685eeb90
           imagePullPolicy: Always
           resources:
             requests:
@@ -25,6 +25,9 @@ spec:
           ports:
             - name: smtp
               containerPort: 25
+          env:
+            - name: GOOGLE_CLOUD_PROJECT_NAME
+              value: bram-my-page
 ---
 apiVersion: v1
 kind: Service
@@ -45,6 +48,7 @@ spec:
   externalTrafficPolicy: Local
   loadBalancerSourceRanges:
     - 0.0.0.0/0
+  loadBalancerIP: 34.22.166.251
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
