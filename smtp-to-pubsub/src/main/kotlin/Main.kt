@@ -12,10 +12,8 @@ import org.subethamail.smtp.server.SMTPServer
 import org.subethamail.smtp.server.Session
 import org.subethamail.smtp.server.SessionHandler
 import sun.misc.Signal
-import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.io.InputStreamReader
 import java.net.InetAddress
 import java.nio.ByteBuffer
 import kotlin.system.exitProcess
@@ -86,19 +84,21 @@ class MyMessageHandler(
 
     private var from: String? = null
     private val to: MutableList<String> = mutableListOf()
-    private var bodyAsString: String? = null
+    private var body: ByteArray? = null
 
     override fun from(from: String) {
         this.from = from
+        log.info("From added")
     }
 
     override fun recipient(recipient: String) {
         this.to.add(recipient)
+        log.info("Recipient added")
     }
 
     override fun data(data: InputStream): String? {
-        val dataAsString = BufferedReader(InputStreamReader(data)).readLines().joinToString("\n")
-        bodyAsString = dataAsString
+        this.body = data.readAllBytes()
+        log.info("Body received. Length: ${this.body?.size}")
         return null
     }
 
@@ -119,16 +119,17 @@ class MyMessageHandler(
         val email = RawEmail.newBuilder()
             .setFrom(from)
             .setTo(to as List<CharSequence>)
-            .setContent(ByteBuffer.wrap(bodyAsString?.encodeToByteArray()))
+            .setContent(ByteBuffer.wrap(body))
             .build()
         val message = PubsubMessage.newBuilder()
             .setData(ByteString.copyFrom(encodeToAvro(email)))
             .build()
+        log.info("Ready to publish message")
         val messageId = publisher.publish(message).get()
         log.info("MAIL FROM: $from")
         to.forEach { log.info("RCPT TO: $it") }
         log.info("---BODY---")
-        log.info(bodyAsString)
+        log.info(body?.toString(Charsets.US_ASCII))
         log.info("---END-BODY---")
         log.info("Done. Message ID: $messageId")
     }
