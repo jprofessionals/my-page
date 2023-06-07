@@ -94,6 +94,12 @@ jobs:
       - uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: my-page-jpro-test
+      - run: |-
+          gcloud components install gke-gcloud-auth-plugin
+          gcloud container clusters get-credentials test-cluster --location europe-west1
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.4.6
@@ -157,6 +163,12 @@ jobs:
       - uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: my-page-jpro
+      - run: |-
+          gcloud components install gke-gcloud-auth-plugin
+          gcloud container clusters get-credentials prod-cluster --location europe-west1
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.4.6
