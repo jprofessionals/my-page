@@ -1,4 +1,4 @@
-name: maven
+name: email
 on:
   push:
     branches:
@@ -102,4 +102,67 @@ jobs:
       - run: terraform init -backend-config="bucket=terraform-state-my-page-jpro-test"
         working-directory: infrastructure
       - run: terraform apply -auto-approve -input=false -var-file=test.tfvars -var="github_sha=${{ github.sha }}"
+        working-directory: infrastructure
+
+  deploy-email-validator-prod:
+    needs: run-terraform-test
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Download image artifact
+        uses: ishworkh/docker-image-artifact-download@v1
+        with:
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: my-page-jpro
+      - run: |-
+          gcloud auth configure-docker europe-west1-docker.pkg.dev
+      - run: |-
+          docker tag europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }} europe-west1-docker.pkg.dev/my-page-jpro/images/email-validator:${{ github.sha }}
+          docker push europe-west1-docker.pkg.dev/my-page-jpro/images/email-validator:${{ github.sha }}
+
+  deploy-smtp-to-pubsub-prod:
+    needs: run-terraform-test
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Download image artifact
+        uses: ishworkh/docker-image-artifact-download@v1
+        with:
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: my-page-jpro
+      - run: |-
+          gcloud auth configure-docker europe-west1-docker.pkg.dev
+      - run: |-
+          docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }} europe-west1-docker.pkg.dev/my-page-jpro/images/smtp-to-pubsub:${{ github.sha }}
+          docker push europe-west1-docker.pkg.dev/my-page-jpro/images/smtp-to-pubsub:${{ github.sha }}
+
+  run-terraform-prod:
+    needs:
+      - deploy-email-validator-prod
+      - deploy-smtp-to-pubsub-prod
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v3
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.6
+      - run: terraform get
+        working-directory: infrastructure
+      - run: terraform init -backend-config="bucket=terraform-state-my-page-jpro"
+        working-directory: infrastructure
+      - run: terraform apply -auto-approve -input=false -var-file=prod.tfvars -var="github_sha=${{ github.sha }}"
         working-directory: infrastructure
