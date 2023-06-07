@@ -23,6 +23,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class EmailValidatorFunction {
@@ -93,9 +94,12 @@ public class EmailValidatorFunction {
             PubsubMessage message = PubsubMessage.newBuilder()
                     .setData(ByteString.copyFrom(encodeToAvro(email)))
                     .build();
-            publisher.publish(message);
+            String messageId = publisher.publish(message).get();
+            logger.info("Message sent successfully, messageId="+messageId);
         } catch (IOException e) {
             logger.warn("Error encoding Avro", e);
+        } catch (ExecutionException | InterruptedException e) {
+            logger.warn("Error publishing message to PubSub", e);
         }
     }
 
