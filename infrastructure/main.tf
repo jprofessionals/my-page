@@ -217,4 +217,8 @@ resource "google_pubsub_subscription" "email-validator" {
       x-goog-version = "v1"
     }
   }
+  retry_policy {
+    minimum_backoff = "10s"
+    maximum_backoff = "600s"
+  }
 }
