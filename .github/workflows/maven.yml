@@ -1,0 +1,105 @@
+name: maven
+on:
+  push:
+    branches:
+      - main
+      - smtp-pubsub-pipeline
+  workflow_dispatch:
+
+jobs:
+  build-email-validator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: 'latest'
+          java-version: '17'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: 'maven'
+      - name: Perform build
+        run: |
+          ./mvnw -pl email-validator -am -P docker -Dimage.tag=europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }} package
+      - name: Attach image as artifact
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
+  deploy-email-validator-test:
+    needs: build-email-validator
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Download image artifact
+        uses: ishworkh/docker-image-artifact-download@v1
+        with:
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: my-page-jpro-test
+      - run: |-
+          gcloud auth configure-docker europe-west1-docker.pkg.dev
+      - run: |-
+          docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
+
+  build-smtp-to-pubsub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: 'latest'
+          java-version: '17'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: 'maven'
+      - name: Perform build
+        run: |
+          ./mvnw -pl smtp-to-pubsub -am -P docker -Dimage.tag=europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }} package
+      - name: Attach image as artifact
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
+  deploy-smtp-to-pubsub-test:
+    needs: build-smtp-to-pubsub
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Download image artifact
+        uses: ishworkh/docker-image-artifact-download@v1
+        with:
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: my-page-jpro-test
+      - run: |-
+          gcloud auth configure-docker europe-west1-docker.pkg.dev
+      - run: |-
+          docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
+
+  run-terraform-test:
+    needs:
+      - deploy-email-validator-test
+      - deploy-smtp-to-pubsub-test
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v3
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.6
+      - run: terraform get
+        working-directory: infrastructure
+      - run: terraform init -backend-config="bucket=terraform-state-my-page-jpro-test"
+        working-directory: infrastructure
+      - run: terraform apply -auto-approve -input=false -var-file=test.tfvars -var="github_sha=${{ github.sha }}"
+        working-directory: infrastructure

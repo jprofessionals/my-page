@@ -4,26 +4,6 @@ terraform {
   }
 }
 
-variable "google_cloud_project_id" {
-  type        = string
-  description = "The ID of the Google Cloud Platform project"
-}
-
-variable "google_cloud_region" {
-  type        = string
-  description = "The region to be used for resources"
-}
-
-variable "google_cloud_zone" {
-  type        = string
-  description = "The zone to be used for the zonal resources"
-}
-
-variable "k8s_cluster_name" {
-  type        = string
-  description = "The name of the Google Kubernetes Engine cluster"
-}
-
 provider "google" {
   project = var.google_cloud_project_id
   region  = var.google_cloud_region
@@ -107,6 +87,7 @@ resource "google_project_iam_member" "editor" {
 
 resource "google_bigquery_dataset" "pubsub" {
   dataset_id = "pubsub"
+  location = "EU"
 }
 
 resource "google_bigquery_table" "raw-emails" {
@@ -193,10 +174,6 @@ resource "google_service_account_iam_binding" "k8s-workload-account-binding" {
   service_account_id = google_service_account.k8s-default-workload-account.name
   role               = "roles/iam.workloadIdentityUser"
   members            = ["serviceAccount:${var.google_cloud_project_id}.svc.id.goog[default/default]"]
-}
-
-variable "github_sha" {
-  type = string
 }
 
 resource "google_cloud_run_v2_service" "email-validator" {
