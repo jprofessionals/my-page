@@ -60,20 +60,22 @@ public class EmailValidatorFunction {
 
             Decoder decoder = DecoderFactory.get().directBinaryDecoder(inputStream, /*reuse=*/ null);
 
+            final RawEmail email;
             try {
-                RawEmail email = reader.read(null, decoder);
-                logger.info("Validating email from: " + email.getFrom());
-                Map<Boolean, List<Validator<RawEmail>>> partitionedValidators = validators.stream()
-                        .collect(Collectors.partitioningBy(validator -> validator.isValid(email)));
-                log(partitionedValidators.get(Boolean.FALSE), "Failed validators: ");
-                log(partitionedValidators.get(Boolean.TRUE), "Successful validators: ");
-
-                if (partitionedValidators.get(Boolean.FALSE).isEmpty()) {
-                    logger.info("ALL VALIDATIONS SUCCESSFUL");
-                    onAllPass(email);
-                }
+                email = reader.read(null, decoder);
             } catch (IOException e) {
-                logger.warn("Error decoding or encoding Avro", e);
+                logger.warn("Error decoding Avro", e);
+                return;
+            }
+            logger.info("Validating email from: " + email.getFrom());
+            Map<Boolean, List<Validator<RawEmail>>> partitionedValidators = validators.stream()
+                    .collect(Collectors.partitioningBy(validator -> validator.isValid(email)));
+            log(partitionedValidators.get(Boolean.FALSE), "Failed validators: ");
+            log(partitionedValidators.get(Boolean.TRUE), "Successful validators: ");
+
+            if (partitionedValidators.get(Boolean.FALSE).isEmpty()) {
+                logger.info("ALL VALIDATIONS SUCCESSFUL");
+                onAllPass(email);
             }
 
             logger.info("Validation complete");
@@ -86,11 +88,15 @@ public class EmailValidatorFunction {
                 .collect(Collectors.joining(", ")));
     }
 
-    private void onAllPass(RawEmail email) throws IOException {
-        PubsubMessage message = PubsubMessage.newBuilder()
-                .setData(ByteString.copyFrom(encodeToAvro(email)))
-                .build();
-        publisher.publish(message);
+    private void onAllPass(RawEmail email) {
+        try {
+            PubsubMessage message = PubsubMessage.newBuilder()
+                    .setData(ByteString.copyFrom(encodeToAvro(email)))
+                    .build();
+            publisher.publish(message);
+        } catch (IOException e) {
+            logger.warn("Error encoding Avro", e);
+        }
     }
 
     private byte[] encodeToAvro(RawEmail email) throws IOException {
