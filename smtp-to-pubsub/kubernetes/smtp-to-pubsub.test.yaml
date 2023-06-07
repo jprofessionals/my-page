@@ -1,3 +1,10 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default
+  annotations:
+    iam.gke.io/gcp-service-account: k8s-default-workload-account@my-page-jpro-test.iam.gserviceaccount.com
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5,7 +12,7 @@ metadata:
   labels:
     app: smtp-to-pubsub
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: smtp-to-pubsub
@@ -14,9 +21,10 @@ spec:
       labels:
         app: smtp-to-pubsub
     spec:
+      serviceAccountName: "default"
       containers:
         - name: smtp-to-pubsub
-          image: europe-west1-docker.pkg.dev/bram-my-page/images/smtp-to-pubsub:aa48c2799558f751a89679ce409744d1adedaa58
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:3cd8bd4f0a9d826b9bb084a02e7b7481ee9cdd1d
           imagePullPolicy: Always
           resources:
             requests:
@@ -27,7 +35,7 @@ spec:
               containerPort: 25
           env:
             - name: GOOGLE_CLOUD_PROJECT_NAME
-              value: bram-my-page
+              value: my-page-jpro-test
 ---
 apiVersion: v1
 kind: Service
@@ -48,7 +56,7 @@ spec:
   externalTrafficPolicy: Local
   loadBalancerSourceRanges:
     - 0.0.0.0/0
-  loadBalancerIP: 34.22.166.251
+  loadBalancerIP: 34.79.55.132
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
