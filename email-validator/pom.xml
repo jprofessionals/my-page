@@ -78,6 +78,10 @@
       <artifactId>apache-jdkim-library</artifactId>
       <version>0.3</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-pubsub</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>com.google.truth</groupId>

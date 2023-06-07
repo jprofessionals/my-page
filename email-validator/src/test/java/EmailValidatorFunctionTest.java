@@ -1,6 +1,11 @@
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.google.api.core.ApiFuture;
+import com.google.api.core.ApiFutures;
+import com.google.cloud.pubsub.v1.Publisher;
+import com.google.cloud.pubsub.v1.PublisherInterface;
 import com.google.gson.Gson;
+import com.google.pubsub.v1.PubsubMessage;
 import event.PubSubBody;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -8,6 +13,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import validation.DKIMValidator;
+
+import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -28,9 +36,16 @@ public class EmailValidatorFunctionTest {
 
     PubSubBody message = new Gson().fromJson(json, PubSubBody.class);
 
-    new EmailValidatorFunction().accept(message);
+    new EmailValidatorFunction(List.of(new DKIMValidator()), new DummyPublisher()).accept(message);
 
     assertThat(listAppender.list.stream().anyMatch(log -> log.getMessage().equals("ALL VALIDATIONS SUCCESSFUL")))
             .isTrue();
+  }
+
+  static class DummyPublisher implements PublisherInterface {
+    @Override
+    public ApiFuture<String> publish(PubsubMessage pubsubMessage) {
+      return ApiFutures.immediateFuture("dummy message ID");
+    }
   }
 }

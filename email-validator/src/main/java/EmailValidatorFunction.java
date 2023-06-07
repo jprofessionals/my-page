@@ -1,9 +1,16 @@
+import com.google.cloud.pubsub.v1.Publisher;
+import com.google.cloud.pubsub.v1.PublisherInterface;
 import com.google.gson.Gson;
+import com.google.protobuf.ByteString;
+import com.google.pubsub.v1.PubsubMessage;
+import com.google.pubsub.v1.TopicName;
 import com.sun.net.httpserver.HttpServer;
 import event.PubSubBody;
 import no.jpro.mypage.RawEmail;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.io.Encoder;
+import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +22,7 @@ import java.net.InetSocketAddress;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EmailValidatorFunction {
@@ -23,16 +31,25 @@ public class EmailValidatorFunction {
 
     private static final Gson gson = new Gson();
 
+    private final PublisherInterface publisher;
+
     private final List<Validator<RawEmail>> validators;
 
-    public EmailValidatorFunction(List<Validator<RawEmail>> validators) {
+    public EmailValidatorFunction(
+            List<Validator<RawEmail>> validators,
+            PublisherInterface publisher
+    ) {
         this.validators = validators;
+        this.publisher = publisher;
     }
 
     public EmailValidatorFunction() {
-        this(List.of(
-                new DKIMValidator()
-        ));
+        this(
+                List.of(
+                        new DKIMValidator()
+                ),
+                tryCreatePublisher()
+        );
     }
 
     public void accept(PubSubBody message) {
@@ -53,9 +70,10 @@ public class EmailValidatorFunction {
 
                 if (partitionedValidators.get(Boolean.FALSE).isEmpty()) {
                     logger.info("ALL VALIDATIONS SUCCESSFUL");
+                    onAllPass(email);
                 }
             } catch (IOException e) {
-                logger.warn("Error decoding Avro", e);
+                logger.warn("Error decoding or encoding Avro", e);
             }
 
             logger.info("Validation complete");
@@ -66,6 +84,21 @@ public class EmailValidatorFunction {
         logger.info(messagePrefix + validators.stream()
                 .map(validator -> validator.getClass().getName())
                 .collect(Collectors.joining(", ")));
+    }
+
+    private void onAllPass(RawEmail email) throws IOException {
+        PubsubMessage message = PubsubMessage.newBuilder()
+                .setData(ByteString.copyFrom(encodeToAvro(email)))
+                .build();
+        publisher.publish(message);
+    }
+
+    private byte[] encodeToAvro(RawEmail email) throws IOException {
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        Encoder encoder = EncoderFactory.get().directBinaryEncoder(byteStream, /*reuse=*/ null);
+        email.customEncode(encoder);
+        encoder.flush();
+        return byteStream.toByteArray();
     }
 
     public static void main(String[] args) throws IOException {
@@ -89,5 +122,24 @@ public class EmailValidatorFunction {
             logger.info("Request complete");
         });
         httpServer.start();
+    }
+
+    private static String getEnvVariableOrThrow(String variableName) {
+        return Optional.ofNullable(System.getenv().get(variableName))
+                .orElseThrow(() -> new RuntimeException(variableName + " not defined in environment variables"));
+    }
+
+    private static PublisherInterface tryCreatePublisher() {
+        final String projectId = getEnvVariableOrThrow("GOOGLE_CLOUD_PROJECT_NAME");
+        final String topicId = "validated-emails";
+        final TopicName topicName = TopicName.of(projectId, topicId);
+        try {
+            return Publisher.newBuilder(topicName)
+                    .setEndpoint("europe-west1-pubsub.googleapis.com:443")
+                    .setEnableMessageOrdering(true)
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

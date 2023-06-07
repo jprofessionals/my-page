@@ -197,6 +197,10 @@ resource "google_cloud_run_v2_service" "email-validator" {
   template {
     containers {
       image = "europe-west1-docker.pkg.dev/${var.google_cloud_project_id}/images/email-validator:${var.github_sha}"
+      env {
+        name = "GOOGLE_CLOUD_PROJECT_NAME"
+        value = var.google_cloud_project_id
+      }
     }
   }
 }
