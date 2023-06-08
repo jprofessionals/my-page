@@ -149,7 +149,7 @@ jobs:
       - run: |-
           gcloud auth configure-docker europe-west1-docker.pkg.dev
       - run: |-
-          docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }} europe-west1-docker.pkg.dev/my-page-jpro/images/smtp-to-pubsub:${{ github.sha }}
+          docker tag europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }} europe-west1-docker.pkg.dev/my-page-jpro/images/smtp-to-pubsub:${{ github.sha }}
           docker push europe-west1-docker.pkg.dev/my-page-jpro/images/smtp-to-pubsub:${{ github.sha }}
 
   run-terraform-prod:
