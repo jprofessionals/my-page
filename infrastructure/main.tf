@@ -160,16 +160,6 @@ module "kubernetes-engine_safer-cluster" {
   ]
 }
 
-module "kubernetes-engine_auth" {
-  source               = "terraform-google-modules/kubernetes-engine/google//modules/auth"
-  version              = "26.1.1"
-
-  project_id           = var.google_cloud_project_id
-  cluster_name         = module.kubernetes-engine_safer-cluster.name
-  location             = module.kubernetes-engine_safer-cluster.location
-  use_private_endpoint = false
-}
-
 resource "google_service_account" "k8s-default-workload-account" {
   account_id = "k8s-default-workload-account"
 }
