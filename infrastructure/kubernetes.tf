@@ -1,6 +1,7 @@
 provider "kubernetes" {
-  config_path    = "~/.kube/config"
-  config_context = "gke_${var.google_cloud_project_id}_${var.google_cloud_region}_${var.k8s_cluster_name}-cluster"
+  cluster_ca_certificate = module.gke_auth.cluster_ca_certificate
+  host                   = module.gke_auth.host
+  token                  = module.gke_auth.token
 }
 
 resource "kubernetes_default_service_account_v1" "default" {

@@ -25,25 +25,6 @@ jobs:
         uses: ishworkh/docker-image-artifact-upload@v1
         with:
           image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
-  deploy-email-validator-test:
-    needs: build-email-validator
-    runs-on: ubuntu-latest
-    environment: test
-    steps:
-      - name: Download image artifact
-        uses: ishworkh/docker-image-artifact-download@v1
-        with:
-          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
-      - uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      - uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: my-page-jpro-test
-      - run: |-
-          gcloud auth configure-docker europe-west1-docker.pkg.dev
-      - run: |-
-          docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
 
   build-smtp-to-pubsub:
     runs-on: ubuntu-latest
@@ -63,8 +44,48 @@ jobs:
         uses: ishworkh/docker-image-artifact-upload@v1
         with:
           image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
+
+  run-terraform-test-docker-repository-only:
+    needs:
+      - build-smtp-to-pubsub
+      - build-email-validator
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v3
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.6
+      - run: terraform init -backend-config="bucket=terraform-state-my-page-jpro-test"
+        working-directory: infrastructure
+      - run: terraform apply -auto-approve -input=false -var-file=test.tfvars -var="github_sha=${{ github.sha }}" -target google_artifact_registry_repository.images
+        working-directory: infrastructure
+
+  deploy-email-validator-test:
+    needs: run-terraform-test-docker-repository-only
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Download image artifact
+        uses: ishworkh/docker-image-artifact-download@v1
+        with:
+          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: my-page-jpro-test
+      - run: |-
+          gcloud auth configure-docker europe-west1-docker.pkg.dev
+      - run: |-
+          docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
+
   deploy-smtp-to-pubsub-test:
-    needs: build-smtp-to-pubsub
+    needs: run-terraform-test-docker-repository-only
     runs-on: ubuntu-latest
     environment: test
     steps:
@@ -94,12 +115,6 @@ jobs:
       - uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      - uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: my-page-jpro-test
-      - run: |-
-          gcloud components install gke-gcloud-auth-plugin
-          gcloud container clusters get-credentials test-cluster --location europe-west1
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.4.6
@@ -182,12 +197,6 @@ jobs:
       - uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      - uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: my-page-jpro
-      - run: |-
-          gcloud components install gke-gcloud-auth-plugin
-          gcloud container clusters get-credentials prod-cluster --location europe-west1
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.4.6

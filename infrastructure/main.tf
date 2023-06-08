@@ -140,7 +140,7 @@ module "kubernetes-engine_safer-cluster" {
   source  = "terraform-google-modules/kubernetes-engine/google//modules/safer-cluster"
   version = "26.1.1"
 
-  name       = "${var.k8s_cluster_name}-cluster"
+  name       = var.k8s_cluster_name
   project_id = var.google_cloud_project_id
   region     = var.google_cloud_region
 
@@ -158,6 +158,16 @@ module "kubernetes-engine_safer-cluster" {
       preemptible  = true
     }
   ]
+}
+
+module "gke_auth" {
+  source               = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+  version              = "26.1.1"
+
+  project_id           = var.google_cloud_project_id
+  cluster_name         = var.k8s_cluster_name
+  location             = module.kubernetes-engine_safer-cluster.location
+  use_private_endpoint = false
 }
 
 resource "google_service_account" "k8s-default-workload-account" {
