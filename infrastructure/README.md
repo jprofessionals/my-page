@@ -1,3 +1,4 @@
+### Setup up a GCP account for terraform by creating a bucket for state and enabling APIs to be used
 ```shell
 gcloud storage buckets create "gs://terraform-state-$(gcloud config get project)" --location europe-west1 --public-access-prevention
 gcloud storage buckets update "gs://terraform-state-$(gcloud config get project)" --versioning

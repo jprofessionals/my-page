@@ -160,12 +160,12 @@ module "kubernetes-engine_safer-cluster" {
   ]
 }
 
-module "gke_auth" {
+module "kubernetes-engine_auth" {
   source               = "terraform-google-modules/kubernetes-engine/google//modules/auth"
   version              = "26.1.1"
 
   project_id           = var.google_cloud_project_id
-  cluster_name         = var.k8s_cluster_name
+  cluster_name         = module.kubernetes-engine_safer-cluster.name
   location             = module.kubernetes-engine_safer-cluster.location
   use_private_endpoint = false
 }
