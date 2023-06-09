@@ -38,7 +38,7 @@ resource "kubernetes_deployment_v1" "smtp-to-pubsub" {
         service_account_name = kubernetes_default_service_account_v1.default.metadata[0].name
         container {
           name  = "smtp-to-pubsub"
-          image = "europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${var.github_sha}"
+          image = "europe-west1-docker.pkg.dev/${var.google_cloud_project_id}/images/smtp-to-pubsub:${var.github_sha}"
           resources {
             requests = {
               cpu    = "200m"
