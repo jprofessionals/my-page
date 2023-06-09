@@ -1,9 +1,7 @@
-data "google_client_config" "default" {}
-
 provider "kubernetes" {
-  host                   = "https://${module.kubernetes-engine_safer-cluster.endpoint}"
-  token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(module.kubernetes-engine_safer-cluster.ca_certificate)
+  cluster_ca_certificate = module.kubernetes-engine_auth.cluster_ca_certificate
+  host                   = module.kubernetes-engine_auth.host
+  token                  = module.kubernetes-engine_auth.token
 }
 
 resource "kubernetes_default_service_account_v1" "default" {
