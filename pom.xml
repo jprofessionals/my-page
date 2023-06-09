@@ -13,6 +13,5 @@
         <module>schemas</module>
         <module>smtp-to-pubsub</module>
         <module>email-validator</module>
-        <module>infrastructure</module>
     </modules>
 </project>
