@@ -84,7 +84,7 @@ class MyMessageHandler(
     private val log = LoggerFactory.getLogger(MyMessageHandler::class.java)
 
     private val fromFilter = Regex("[a-z0-9._\\-]@jpro.no")
-    private val toFilter = Regex("utlysninger(-test)?@mail(-test)?.cr3.me")
+    private val toFilter = Regex("utlysninger@minside(-test)?.jpro.no")
 
     private var from: String? = null
     private val to: MutableList<String> = mutableListOf()
