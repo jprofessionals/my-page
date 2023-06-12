@@ -53,7 +53,7 @@ public class EmailValidatorFunction {
         );
     }
 
-    public void accept(PubSubBody message) {
+    public boolean validate(PubSubBody message) {
         if (message != null) {
             String encodedData = message.getMessage().getData();
             byte[] data = Base64.getDecoder().decode(encodedData);
@@ -66,7 +66,7 @@ public class EmailValidatorFunction {
                 email = reader.read(null, decoder);
             } catch (IOException e) {
                 logger.warn("Error decoding Avro", e);
-                return;
+                return false;
             }
             logger.info("Validating email from: " + email.getFrom());
             Map<Boolean, List<Validator<RawEmail>>> partitionedValidators = validators.stream()
@@ -77,10 +77,11 @@ public class EmailValidatorFunction {
             if (partitionedValidators.get(Boolean.FALSE).isEmpty()) {
                 logger.info("ALL VALIDATIONS SUCCESSFUL");
                 onAllPass(email);
+                return true;
             }
-
-            logger.info("Validation complete");
         }
+        logger.info("VALIDATION FAILED");
+        return false;
     }
 
     private void log(List<Validator<RawEmail>> validators, String messagePrefix) {
@@ -123,7 +124,7 @@ public class EmailValidatorFunction {
                 String bodyAsString = bufferedReader.lines().collect(Collectors.joining("\n"));
                 logger.info("Body: '" + bodyAsString + "'");
                 PubSubBody message = gson.fromJson(bodyAsString, PubSubBody.class);
-                emailValidatorFunction.accept(message);
+                emailValidatorFunction.validate(message);
             } catch (Exception e) {
                 logger.warn("Error processing request", e);
             }
