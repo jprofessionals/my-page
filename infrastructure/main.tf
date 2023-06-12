@@ -87,7 +87,7 @@ resource "google_project_iam_member" "editor" {
 
 resource "google_bigquery_dataset" "pubsub" {
   dataset_id = "pubsub"
-  location = "EU"
+  location   = "EU"
 }
 
 resource "google_bigquery_table" "raw-emails" {
@@ -113,6 +113,9 @@ resource "google_artifact_registry_repository" "images" {
 
 resource "google_compute_address" "smtp-to-pubsub" {
   name = "smtp-to-pubsub"
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "google_compute_network" "k8s-main-cluster-network" {
@@ -161,8 +164,8 @@ module "kubernetes-engine_safer-cluster" {
 }
 
 module "kubernetes-engine_auth" {
-  source               = "terraform-google-modules/kubernetes-engine/google//modules/auth"
-  version              = "26.1.1"
+  source  = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+  version = "26.1.1"
 
   project_id           = var.google_cloud_project_id
   cluster_name         = module.kubernetes-engine_safer-cluster.name
