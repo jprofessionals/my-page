@@ -98,6 +98,7 @@ gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount
 gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/compute.admin
 gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/bigquery.dataOwner
 gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/resourcemanager.projectIamAdmin
+gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/monitoring.editor
 gcloud iam service-accounts keys create ./github-actions-service-account-private-key.json --iam-account github-actions@my-page-jpro-test.iam.gserviceaccount.com
 base64 -i github-actions-service-account-private-key.json | pbcopy
 ```
