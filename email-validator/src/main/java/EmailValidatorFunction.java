@@ -1,7 +1,8 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.google.cloud.pubsub.v1.Publisher;
 import com.google.cloud.pubsub.v1.PublisherInterface;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.TopicName;
@@ -31,7 +32,7 @@ public class EmailValidatorFunction {
     private static final Logger logger = LoggerFactory.getLogger(EmailValidatorFunction.class);
     private static final SpecificDatumReader<RawEmail> reader = new SpecificDatumReader<>(RawEmail.getClassSchema());
 
-    private static final Gson gson = new GsonBuilder().create();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final PublisherInterface publisher;
 
@@ -120,7 +121,7 @@ public class EmailValidatorFunction {
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(exchange.getRequestBody()))) {
                 String bodyAsString = bufferedReader.lines().collect(Collectors.joining("\n"));
                 logger.info("Body: '" + bodyAsString + "'");
-                PubSubBody message = gson.fromJson(bodyAsString, PubSubBody.class);
+                PubSubBody message = objectMapper.readValue(bodyAsString, PubSubBody.class);
                 emailValidatorFunction.validate(message);
             } catch (Exception e) {
                 logger.warn("Error processing request", e);
