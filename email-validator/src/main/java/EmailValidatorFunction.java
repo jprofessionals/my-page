@@ -55,14 +55,12 @@ public class EmailValidatorFunction {
 
     public boolean validate(PubSubBody message) {
         if (message != null) {
-            String encodedData = message.getMessage().getData();
+            String encodedData = message.message().data();
             byte[] data = Base64.getDecoder().decode(encodedData);
-            InputStream inputStream = new ByteArrayInputStream(data);
-
-            Decoder decoder = DecoderFactory.get().directBinaryDecoder(inputStream, /*reuse=*/ null);
 
             final RawEmail email;
-            try {
+            try (InputStream inputStream = new ByteArrayInputStream(data)) {
+                Decoder decoder = DecoderFactory.get().directBinaryDecoder(inputStream, /*reuse=*/ null);
                 email = reader.read(null, decoder);
             } catch (IOException e) {
                 logger.warn("Error decoding Avro", e);
@@ -96,7 +94,7 @@ public class EmailValidatorFunction {
                     .setData(ByteString.copyFrom(encodeToAvro(email)))
                     .build();
             String messageId = publisher.publish(message).get();
-            logger.info("Message sent successfully, messageId="+messageId);
+            logger.info("Message sent successfully, messageId=" + messageId);
         } catch (IOException e) {
             logger.warn("Error encoding Avro", e);
         } catch (ExecutionException | InterruptedException e) {
@@ -117,10 +115,8 @@ public class EmailValidatorFunction {
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(8080), 16);
         EmailValidatorFunction emailValidatorFunction = new EmailValidatorFunction();
         httpServer.createContext("/", exchange -> {
-            logger.info("Handling request, method=" + exchange.getRequestMethod() + ", path="+exchange.getHttpContext().getPath());
-            try {
-                InputStreamReader inputStreamReader = new InputStreamReader(exchange.getRequestBody());
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            logger.info("Handling request, method=" + exchange.getRequestMethod() + ", path=" + exchange.getHttpContext().getPath());
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(exchange.getRequestBody()))) {
                 String bodyAsString = bufferedReader.lines().collect(Collectors.joining("\n"));
                 logger.info("Body: '" + bodyAsString + "'");
                 PubSubBody message = gson.fromJson(bodyAsString, PubSubBody.class);

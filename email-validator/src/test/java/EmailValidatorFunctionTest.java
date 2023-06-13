@@ -4,16 +4,13 @@ import com.google.cloud.pubsub.v1.PublisherInterface;
 import com.google.gson.Gson;
 import com.google.pubsub.v1.PubsubMessage;
 import event.PubSubBody;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 import validation.DKIMValidator;
 
 import java.util.List;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(JUnit4.class)
 public class EmailValidatorFunctionTest {
 
   @Test
