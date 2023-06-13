@@ -151,6 +151,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     steps:
+      - uses: actions/checkout@v3
       - name: Download image artifact
         uses: ishworkh/docker-image-artifact-download@v1
         with:

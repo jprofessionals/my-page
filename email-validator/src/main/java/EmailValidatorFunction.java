@@ -1,6 +1,7 @@
 import com.google.cloud.pubsub.v1.Publisher;
 import com.google.cloud.pubsub.v1.PublisherInterface;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.TopicName;
@@ -30,7 +31,7 @@ public class EmailValidatorFunction {
     private static final Logger logger = LoggerFactory.getLogger(EmailValidatorFunction.class);
     private static final SpecificDatumReader<RawEmail> reader = new SpecificDatumReader<>(RawEmail.getClassSchema());
 
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().create();
 
     private final PublisherInterface publisher;
 
