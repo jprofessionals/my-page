@@ -1,0 +1,15 @@
+@startuml
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+actor "Email server"
+participant "smtp-to-pubsub"
+queue "raw-emails"
+participant "email-validator"
+queue "validated-emails"
+"Email server" -> "smtp-to-pubsub": SMTP message
+"smtp-to-pubsub" -> "raw-emails": publish \n avro Email
+"raw-emails" -> "email-validator": subscribe \n avro Email
+"email-validator" -> "validated-emails": publish \n avro Email
+"validated-emails" --> "my-page-api": Not Implemented
+@enduml
