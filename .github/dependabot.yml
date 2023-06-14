@@ -13,3 +13,19 @@ updates:
     directory: "/my-page-api" # Location of package manifests
     schedule:
       interval: "daily"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/email-validator"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/schemas"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/smtp-to-pubsub"
+    schedule:
+      interval: "weekly"

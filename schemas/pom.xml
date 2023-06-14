@@ -17,8 +17,8 @@
         <maven.compiler.source>17</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <avro.version>1.11.0</avro.version>
-        <jackson.version>2.15.1</jackson.version>
+        <avro.version>1.11.1</avro.version>
+        <jackson.version>2.15.2</jackson.version>
     </properties>
 
     <dependencyManagement>
