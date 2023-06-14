@@ -9,12 +9,12 @@ class JobPosting(
 
     @Lob
     @Column(length = 16777216)
-    val description: String?,
+    val description: String? = null,
     val customer: String,
-    val location: String?,
-    val dueDateForApplication: LocalDate?,
-    val requiredYearsOfExperience: Int?,
-    val resourcesNeeded: Int?,
+    val location: String? = null,
+    val dueDateForApplication: LocalDate? = null,
+    val requiredYearsOfExperience: Int? = null,
+    val resourcesNeeded: Int? = null,
     @ManyToMany(
         cascade = [CascadeType.PERSIST, CascadeType.MERGE],
     )

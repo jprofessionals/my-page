@@ -18,6 +18,7 @@
         <java.version>17</java.version>
         <kotlin.version>1.8.22</kotlin.version>
         <testcontainers.version>1.18.3</testcontainers.version>
+        <avro.version>1.11.1</avro.version>
     </properties>
 
     <dependencies>
@@ -151,6 +152,21 @@
             <artifactId>google-auth-library-oauth2-http</artifactId>
             <version>1.18.0</version>
         </dependency>
+        <dependency>
+            <groupId>no.jpro</groupId>
+            <artifactId>schemas</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+            <version>${avro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
