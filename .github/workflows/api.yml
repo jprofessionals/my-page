@@ -20,7 +20,7 @@ jobs:
           cache: 'maven'
       - name: Perform build
         run: |
-          ../mvnw -DskipTests package
+          ../mvnw package
         working-directory: ./my-page-api
       - name: Upload jar
         uses: actions/upload-artifact@v3
