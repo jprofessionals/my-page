@@ -9,7 +9,7 @@ import getInNok from '@/utils/getInNok'
 const defaultValues: Record<string, number> = {
   garantilonn: 50000,
   bonus: 0,
-  grunnbelop: 111477,
+  grunnbelop: 118620, //111477
   restKompetanse: 50,
   timepris: 1650,
   timeprisKompetanse: 1259,
