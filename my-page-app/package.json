@@ -30,7 +30,7 @@
     "eslint-config-next": "13.4.6",
     "moment": "^2.29.4",
     "next": "13.4.6",
-    "radash": "^10.8.1",
+    "radash": "^10.9.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-query": "^3.39.3",
