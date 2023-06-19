@@ -16,7 +16,7 @@ Install node - `nvm install node`
 
 Running the API locally (in IDEA or on commandline) requires a database - activate the profile `h2` or `local` (the `local`profile requires a running MySQL db (see application-local.properties for connection details))
 
-The API can also be run using the maven wrapper locally `./mvnw -DskipTests -Dspring-boot.run.profiles=local clean spring-boot:run`
+The API can also be run using the maven wrapper locally `./mvnw -Dspring-boot.run.profiles=local clean spring-boot:run`
 
 The api will run on localhost:8080 - See http://localhost:8080/api/swagger-ui/index.html for api doc
 
@@ -121,7 +121,7 @@ cd ..
 ##### API
 ```
 cd my-page-api
-./mvnw -DskipTests package appengine:deploy
+./mvnw package appengine:deploy
 cd ..
 ```
 
