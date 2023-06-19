@@ -48,7 +48,7 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: my-page-jpro-test
-      - run: gcloud app versions list --service=default --filter="version.createTime < $(date -Idate --date='last month')" --format="value(version.id)" | xargs gcloud app versions delete
+      - run: gcloud app versions list --service=default --filter="version.createTime < $(date -Idate --date='last month')" --format="value(version.id)" | xargs --no-run-if-empty gcloud app versions delete
   deploy-prod:
     needs: deploy-test
     runs-on: ubuntu-latest
