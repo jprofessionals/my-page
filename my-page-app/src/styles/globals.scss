@@ -12,20 +12,20 @@ code {
 }
 
 .calculator-group {
-  &>.input-group {
+  & > .input-group {
     @apply grid;
     grid-template-columns: 4fr 110px;
 
-    &>span {
+    & > span {
       @apply flex justify-between gap-2;
     }
 
-    &>.input {
+    & > .input {
       @apply text-right pr-0 h-10;
     }
   }
 
-  &>.btn {
+  & > .btn {
     @apply h-10 min-h-6;
   }
 }
