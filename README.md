@@ -71,7 +71,7 @@ gcloud auth application-default login
 #### In the main shell run
 ```
 cd my-page-api
-./mvnw -Dliquibase.url=jdbc:mysql://root:@localhost:3306/my-page liquibase:update
+../mvnw -Dliquibase.url=jdbc:mysql://root:@localhost:3306/my-page liquibase:update
 cd..
 ```
 
