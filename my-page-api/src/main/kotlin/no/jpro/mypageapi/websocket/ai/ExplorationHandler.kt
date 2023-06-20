@@ -8,11 +8,11 @@ import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
-import java.util.logging.Logger
+import org.slf4j.LoggerFactory
 
 
 class ExplorationHandler(val explorationService: ExplorationService, val googleJwtValidator: GoogleJwtValidator) : TextWebSocketHandler() {
-    private val logger = Logger.getLogger(ExplorationService::class.java.name)
+    private val logger = LoggerFactory.getLogger(ExplorationService::class.java.name)
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
         val payload = message.payload
 
@@ -21,7 +21,7 @@ class ExplorationHandler(val explorationService: ExplorationService, val googleJ
             if (googleJwtValidator.isValidToken(payload)) {
                 session.attributes["token"] = payload
             } else {
-                logger.log(java.util.logging.Level.WARNING, "Invalid token received, closing connection")
+                logger.warn("Invalid token received, closing connection")
                 session.close(CloseStatus(CloseStatus.PROTOCOL_ERROR.code, "Invalid token"))
             }
         } else if(payload == "reset") {
