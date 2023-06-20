@@ -11,10 +11,10 @@ function AI() {
 
 
             <p>
-                <Link href="/explorer">
-                    <a className="text-warning">
+                <Link href="/explorer" className="text-warning">
+                {/*    <a className="text-warning">*/}
                         AI explorer.
-                    </a>
+                   {/* </a>*/}
                 </Link>
                 &nbsp;Her kan du reise verden rundt med kunstig intelligens.
             </p>

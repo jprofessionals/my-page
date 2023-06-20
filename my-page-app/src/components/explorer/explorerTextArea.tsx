@@ -38,6 +38,12 @@ function ExplorerTextArea(): JSX.Element {
             };
         }
 
+        if (socketRef.current) {
+            socketRef.current.onclose  = function(event) {
+                alert('Connection closed');
+            };
+        }
+
         // Clean up the WebSocket connection when this component unmounts
         return () => {
             if (socketRef.current) {
@@ -52,9 +58,9 @@ function ExplorerTextArea(): JSX.Element {
 
         try {
             if (text.trim()) {
+                alert('Connection status'+socketRef?.current?.readyState);
                 const tx = JSON.stringify(text);
                 if (socketRef.current)
-
                     socketRef.current.send(JSON.stringify(text));
             }
         } catch (err) {
