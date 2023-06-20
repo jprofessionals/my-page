@@ -10,14 +10,14 @@ interface SecretProvider {
 
 @Component
 @Profile("local", "h2")
-class SecretProviderLocal: SecretProvider {
+class SecretProviderLocal : SecretProvider {
     //For lokal kjøring, sett denne i for eksempel application-local.yml og legg den til .gitignore så den ikke blir committed
     //kontakt Roger for å få OpenAI API key hvis du ikke har allerede.
     @Value("\${openai.apiKey:PLACEHOLDER}")
     private var apiKey: String = "PLACEHOLDER"
 
-
     override fun getApiKey(): String {
+        if (apiKey == "PLACEHOLDER") throw SecurityException("OpenAI API key not set. See SecretProviderLocal")
         return apiKey
     }
 }

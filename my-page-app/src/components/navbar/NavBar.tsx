@@ -16,6 +16,7 @@ const navigation = [
   { href: '/utlysninger', name: 'Utlysninger' },
   { href: '/kalkulator', name: 'Lønnskalkulator' },
   { href: '/bidra', name: 'Bidra til min side' },
+  { href: '/ai', name: 'AI' },
   { href: 'https://intranet.jpro.no', name: 'Intranett 🔗' },
 ]
 
