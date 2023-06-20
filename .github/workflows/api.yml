@@ -1,8 +1,6 @@
 name: API
 on:
   push:
-    branches:
-      - main
     paths:
       - '.github/**'
       - 'my-page-api/**'
@@ -38,6 +36,7 @@ jobs:
           name: app-prod.yaml
           path: my-page-api/src/main/appengine/app-prod.yaml
   deploy-test:
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     environment: test
@@ -58,6 +57,7 @@ jobs:
         with:
           args: app deploy my-page-api-0.0.1-SNAPSHOT.jar --appyaml=app.yaml
   remove-old-versions-test:
+    if: github.ref == 'refs/heads/main'
     needs: deploy-test
     runs-on: ubuntu-latest
     environment: test
@@ -72,6 +72,7 @@ jobs:
       - run: gcloud app versions list --service=api --filter="version.createTime < $(date -Idate --date='last month')" --format="value(version.id)" | xargs --no-run-if-empty gcloud app versions delete
 
   deploy-prod:
+    if: github.ref == 'refs/heads/main'
     needs: deploy-test
     runs-on: ubuntu-latest
     environment: prod
@@ -92,6 +93,7 @@ jobs:
         with:
           args: app deploy my-page-api-0.0.1-SNAPSHOT.jar --appyaml=app-prod.yaml
   remove-old-versions-prod:
+    if: github.ref == 'refs/heads/main'
     needs: deploy-prod
     runs-on: ubuntu-latest
     environment: prod
