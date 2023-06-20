@@ -104,12 +104,7 @@ class ExplorationService(
 
         val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_4, listOf(newMessage))
 
-        val responsMessage = completion.choices.first().message
-        if (responsMessage == null) {
-            throw Exception("No response from GPT")
-        }
-
-        return responsMessage.content
+        return completion.choices.first().message?.content ?: throw Exception("No response from GPT")
     }
 
     fun extractJsonFromString(input: String): ExplorationChatDTO {
