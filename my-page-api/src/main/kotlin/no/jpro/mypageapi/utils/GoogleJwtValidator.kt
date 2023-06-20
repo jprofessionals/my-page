@@ -16,7 +16,7 @@ interface GoogleJwtValidator {
 }
 
 @Component
-@Profile("local", "h2")
+@Profile("!gcp")
 class GoogleJwtValidatorImpl(@Value("\${google.clientid}") clientId: String) : GoogleJwtValidator {
     private val transport: HttpTransport = NetHttpTransport()
     private val jsonFactory: JsonFactory = GsonFactory()
