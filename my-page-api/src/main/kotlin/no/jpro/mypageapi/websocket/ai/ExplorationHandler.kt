@@ -17,9 +17,6 @@ class ExplorationHandler(val explorationService: ExplorationService, val googleJ
         val payload = message.payload
 
         if (session.attributes["token"] == null) {
-            session.close(CloseStatus(CloseStatus.PROTOCOL_ERROR.code, "No token received"))
-            return
-//TODO: don't return
             // verify the token and store it in the session or close the connection if the token is not valid
             if (googleJwtValidator.isValidToken(payload)) {
                 session.attributes["token"] = payload
