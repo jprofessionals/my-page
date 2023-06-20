@@ -1,8 +1,6 @@
 name: App
 on:
   push:
-    branches:
-      - main
     paths:
       - '.github/**'
       - 'my-page-app/**'
@@ -24,6 +22,7 @@ jobs:
           npm run build
         working-directory: ./my-page-app
   deploy-test:
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     environment: test
@@ -37,6 +36,7 @@ jobs:
         with:
           args: app deploy my-page-app/app.yaml
   remove-old-versions-test:
+    if: github.ref == 'refs/heads/main'
     needs: deploy-test
     runs-on: ubuntu-latest
     environment: test
@@ -50,6 +50,7 @@ jobs:
           project_id: my-page-jpro-test
       - run: gcloud app versions list --service=default --filter="version.createTime < $(date -Idate --date='last month')" --format="value(version.id)" | xargs --no-run-if-empty gcloud app versions delete
   deploy-prod:
+    if: github.ref == 'refs/heads/main'
     needs: deploy-test
     runs-on: ubuntu-latest
     environment: prod
@@ -63,6 +64,7 @@ jobs:
         with:
           args: app deploy my-page-app/app.yaml
   remove-old-versions-prod:
+    if: github.ref == 'refs/heads/main'
     needs: deploy-prod
     runs-on: ubuntu-latest
     environment: prod

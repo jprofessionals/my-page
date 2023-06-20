@@ -1,9 +1,6 @@
 name: email
 on:
   push:
-    branches:
-      - main
-      - smtp-pubsub-pipeline
   workflow_dispatch:
 
 jobs:
@@ -46,6 +43,7 @@ jobs:
           image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
 
   run-terraform-test-docker-repository-only:
+    if: github.ref == 'refs/heads/main'
     needs:
       - build-smtp-to-pubsub
       - build-email-validator
@@ -66,6 +64,7 @@ jobs:
         working-directory: infrastructure
 
   deploy-email-validator-test:
+    if: github.ref == 'refs/heads/main'
     needs: run-terraform-test-docker-repository-only
     runs-on: ubuntu-latest
     environment: test
@@ -87,6 +86,7 @@ jobs:
           docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
 
   deploy-smtp-to-pubsub-test:
+    if: github.ref == 'refs/heads/main'
     needs: run-terraform-test-docker-repository-only
     runs-on: ubuntu-latest
     environment: test
@@ -108,6 +108,7 @@ jobs:
           docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
 
   run-terraform-test:
+    if: github.ref == 'refs/heads/main'
     needs:
       - deploy-email-validator-test
       - deploy-smtp-to-pubsub-test
@@ -130,6 +131,7 @@ jobs:
         working-directory: infrastructure
 
   run-terraform-prod-docker-repository-only:
+    if: github.ref == 'refs/heads/main'
     needs: run-terraform-test
     runs-on: ubuntu-latest
     environment: prod
@@ -150,6 +152,7 @@ jobs:
         working-directory: infrastructure
 
   deploy-email-validator-prod:
+    if: github.ref == 'refs/heads/main'
     needs: run-terraform-prod-docker-repository-only
     runs-on: ubuntu-latest
     environment: prod
@@ -172,6 +175,7 @@ jobs:
           docker push europe-west1-docker.pkg.dev/my-page-jpro/images/email-validator:${{ github.sha }}
 
   deploy-smtp-to-pubsub-prod:
+    if: github.ref == 'refs/heads/main'
     needs: run-terraform-prod-docker-repository-only
     runs-on: ubuntu-latest
     environment: prod
@@ -194,6 +198,7 @@ jobs:
           docker push europe-west1-docker.pkg.dev/my-page-jpro/images/smtp-to-pubsub:${{ github.sha }}
 
   run-terraform-prod:
+    if: github.ref == 'refs/heads/main'
     needs:
       - deploy-email-validator-prod
       - deploy-smtp-to-pubsub-prod
