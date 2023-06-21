@@ -22,7 +22,7 @@ jobs:
           npm run build
         working-directory: ./my-page-app
   deploy-test:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/ai-explorer-fix'
     needs: build
     runs-on: ubuntu-latest
     environment: test
@@ -36,7 +36,7 @@ jobs:
         with:
           args: app deploy my-page-app/app.yaml
   remove-old-versions-test:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/ai-explorer-fix'
     needs: deploy-test
     runs-on: ubuntu-latest
     environment: test
