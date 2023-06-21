@@ -3,8 +3,8 @@ import {useState} from 'react'
 import Image from 'next/image'
 
 import { PickDate } from '@/components/ui/pickDate'
-import MonthOverview from '@/components/hyttebooking/monthOverview'
-import YearOverview from '@/components/hyttebooking/yearOverview'
+import MonthOverview from '@/components/hyttebooking/MonthOverview'
+import YearOverview from '@/components/hyttebooking/YearOverview'
 
 import { Button } from '@/components/ui/button'
 

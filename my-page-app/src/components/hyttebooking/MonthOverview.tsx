@@ -1,10 +1,10 @@
-import React from 'react'
+import { useState } from 'react'
 import { Calendar } from '@/components/ui/calendar'
 
 
 
-export default function monthOverview(){
-    const [date, setDate] = React.useState<Date | undefined>(new Date())
+export default function MonthOverview(){
+    const [date, setDate] = useState<Date | undefined>(new Date())
 
 
     return(
