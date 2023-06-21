@@ -79,7 +79,7 @@ jobs:
     # Add any additional setup or environment preparation steps if required
 
   deploy-prod:
-    if: ${{ github.ref == 'refs/heads/main' && (needs.deploy-test.result == 'success' || needs.deploy-test.result == 'skipped') }}
+    if: github.ref == 'refs/heads/main'
     needs: [always-run, deploy-test]
     runs-on: ubuntu-latest
     environment: prod
