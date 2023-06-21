@@ -2,7 +2,7 @@ import { Calendar } from '@/components/ui/calendar'
 import jPro_Hytte from '../images/jPro_Hytte.png'
 import React from 'react'
 import Image from 'next/image'
-import { pickDate } from '@/components/ui/pickDate'
+import { PickDate } from '@/components/ui/pickDate'
 import Loading from '@/components/Loading'
 import { Button } from '@/components/ui/button'
 
@@ -31,7 +31,7 @@ function Hyttebooking() {
           />
         </div>
 
-        <div>{pickDate()}</div>
+        <div>{PickDate()}</div>
 
         <p>
           <span>
