@@ -21,6 +21,7 @@ import org.apache.avro.io.Decoder
 import org.apache.avro.io.DecoderFactory
 import org.apache.avro.specific.SpecificDatumReader
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
@@ -58,9 +59,10 @@ class JobPostingController(
     @PostMapping
     @Operation(summary = "Create a new job posting from an PubSub event")
     @ApiResponse(
-        responseCode = "200",
+        responseCode = "201",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = UserDTO::class))]
     )
+    @ResponseStatus(HttpStatus.CREATED)
     fun createJobPosting(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @RequestBody event: PubSubBody

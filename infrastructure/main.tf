@@ -227,7 +227,7 @@ resource "google_pubsub_subscription" "my-page-api" {
   name  = "my-page-api"
   topic = google_pubsub_topic.validated-emails.name
   push_config {
-    push_endpoint = api_jobposting_endpoint
+    push_endpoint = var.api_jobposting_endpoint
     oidc_token {
       service_account_email = "${data.google_project.project.number}-compute@developer.gserviceaccount.com"
     }
