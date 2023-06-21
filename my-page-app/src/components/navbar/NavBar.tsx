@@ -12,6 +12,7 @@ import cn from '@/utils/cn'
 
 const navigation = [
   { href: '/admin', name: 'Admin 🛠️', requiresAdmin: true },
+  { href: '/hyttebooking', name: 'Hyttebooking' },
   { href: '/', name: 'Budsjett' },
   { href: '/utlysninger', name: 'Utlysninger' },
   { href: '/kalkulator', name: 'Lønnskalkulator' },
