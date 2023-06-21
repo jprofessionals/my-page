@@ -222,3 +222,21 @@ resource "google_pubsub_subscription" "email-validator" {
     maximum_backoff = "600s"
   }
 }
+
+resource "google_pubsub_subscription" "my-page-api" {
+  name  = "my-page-api"
+  topic = google_pubsub_topic.validated-emails.name
+  push_config {
+    push_endpoint = api_jobposting_endpoint
+    oidc_token {
+      service_account_email = "${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+    }
+    attributes = {
+      x-goog-version = "v1"
+    }
+  }
+  retry_policy {
+    minimum_backoff = "60s"
+    maximum_backoff = "600s"
+  }
+}
