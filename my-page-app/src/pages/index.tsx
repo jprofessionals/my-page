@@ -52,6 +52,8 @@ export default function HomePage() {
       <RequireAuth>
         <div>
           <UserInformation />
+          <h3 className="ml-4 mb-6 text-3xl font-light">Dine hyttebookinger: </h3>
+          <p className='ml-4 mb-4'>Her vil det legges inn noe om brukerens hyttebookinger når vi kommer så langt - hilsen sommerstudentene</p>
           <Loading
             isLoading={['loading', 'init'].includes(budgetLoadingStatus)}
             loadingText="Laster inn ditt budsjett..."
@@ -68,6 +70,25 @@ export default function HomePage() {
               <ErrorPage errorText="Din bruker er autentisert, men vi klarte likevel ikke å hente ut dine budsjetter. Prøv igjen senere." />
             )}
           </Loading>
+          <div className="p-4 prose">
+            <h3 className="mb-6 text-3xl font-light mt-2">Bidra til Min side</h3>
+            <p>
+              Min Side er en side som utvikles internt i JPro. Alle bidrag til siden
+              mottas med takk, og er i tillegg en fin mulighet til å drive med litt
+              egenutvikling.
+            </p>
+            <p>
+              Applikasjonen er en Kotlin/Spring+React+MySQL applikasjon som hostes på
+              GCP. Koden er å finne på{' '}
+              <a
+                  href="https://github.com/jprofessionals/my-page"
+                  className="text-warning"
+              >
+                GitHub.
+              </a>
+            </p>
+            <p>Kontakt Roger for å få rettigheter til å dytte kode til repoet.</p>
+          </div>
         </div>
       </RequireAuth>
     </>

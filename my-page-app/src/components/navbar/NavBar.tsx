@@ -13,10 +13,10 @@ import cn from '@/utils/cn'
 const navigation = [
   { href: '/admin', name: 'Admin 🛠️', requiresAdmin: true },
   //{ href: '/hyttebooking', name: 'Firmahytte' },
-  { href: '/', name: 'Budsjett' },
+  { href: '/', name: 'Hjem' },
   { href: '/utlysninger', name: 'Utlysninger' },
   { href: '/kalkulator', name: 'Lønnskalkulator' },
-  { href: '/bidra', name: 'Bidra til min side' },
+  //{ href: '/bidra', name: 'Bidra til min side' }, //Todo: slett "bidra" filene.
   { href: '/ai', name: 'AI' },
   { href: 'https://intranet.jpro.no', name: 'Intranett 🔗' },
 ]
