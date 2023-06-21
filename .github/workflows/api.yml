@@ -36,7 +36,7 @@ jobs:
           name: app-prod.yaml
           path: my-page-api/src/main/appengine/app-prod.yaml
   deploy-test:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/ai-explorer-fix'
     needs: build
     runs-on: ubuntu-latest
     environment: test
@@ -57,7 +57,7 @@ jobs:
         with:
           args: app deploy my-page-api-0.0.1-SNAPSHOT.jar --appyaml=app.yaml
   remove-old-versions-test:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/ai-explorer-fix'
     needs: deploy-test
     runs-on: ubuntu-latest
     environment: test
