@@ -13,9 +13,13 @@ import org.slf4j.LoggerFactory
 
 class ExplorationHandler(val explorationService: ExplorationService, val googleJwtValidator: GoogleJwtValidator) : TextWebSocketHandler() {
     private val logger = LoggerFactory.getLogger(ExplorationService::class.java.name)
+
+    init{
+        logger.info("ExplorationHandler created")
+    }
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
         val payload = message.payload
-
+        logger.info("Received websocket message: $payload")
         if (session.attributes["token"] == null) {
             // verify the token and store it in the session or close the connection if the token is not valid
             if (googleJwtValidator.isValidToken(payload)) {
