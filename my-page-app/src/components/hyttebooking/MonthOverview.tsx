@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Calendar } from '@/components/ui/calendar'
+import { MonthCalendar } from '@/components/ui/monthCalendar'
 
 
 
@@ -9,7 +9,7 @@ export default function MonthOverview(){
 
     return(
         <div className="flex flex-col gap-4 p-4">
-        <Calendar
+        <MonthCalendar
             mode="single"
             selected={date}
             onSelect={setDate}
