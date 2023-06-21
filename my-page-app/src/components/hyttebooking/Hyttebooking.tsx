@@ -1,13 +1,27 @@
-import { Calendar } from '@/components/ui/calendar'
 import jPro_Hytte from '../images/jPro_Hytte.png'
-import React from 'react'
+import {useState} from 'react'
 import Image from 'next/image'
+
 import { PickDate } from '@/components/ui/pickDate'
-import Loading from '@/components/Loading'
+import MonthOverview from '@/components/hyttebooking/MonthOverview'
+import YearOverview from '@/components/hyttebooking/YearOverview'
+
 import { Button } from '@/components/ui/button'
 
 function Hyttebooking() {
-  const [date, setDate] = React.useState<Date | undefined>(new Date())
+
+  const [showMonthOverview, setShowMonthOverview] = useState(true);
+  const [showYearOverview, setShowYearOverview] = useState(false);
+
+  const handleShowMonthOverview = () => {
+    setShowMonthOverview(true);
+    setShowYearOverview(false);
+  };
+
+  const handleShowYearOverview = () => {
+    setShowYearOverview(true);
+    setShowMonthOverview(false);
+  }
 
   return (
     <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -64,25 +78,25 @@ function Hyttebooking() {
 
 
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }} className="p-4 ">
-        <Button type="submit" size="sm" className="mt-4 mr-4">
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }} className="p-4">
+        <Button
+            size="sm"
+            className={`mt-4 mr-4 ${showMonthOverview ? 'bg-orange-500' : ''}`}
+            onClick={handleShowMonthOverview}
+        >
           <span>Måned oversikt</span>
         </Button>
-        <Button type="submit" size="sm" className="mt-4 mr-4">
+        <Button
+            size="sm"
+            className={`mt-4 mr-4 ${showYearOverview ? 'bg-orange-500' : ''}`}
+            onClick={handleShowYearOverview}
+        >
           <span>År oversikt</span>
         </Button>
       </div>
 
-      <div className="flex flex-col gap-4 p-4">
-        <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            className="rounded-md border"
-        />
-      </div>
-
-
+      {showMonthOverview && <MonthOverview />}
+      {showYearOverview && <YearOverview />}
     </div>
   )
 }
