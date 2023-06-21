@@ -71,7 +71,7 @@ jobs:
       - run: gcloud app versions list --service=api --filter="version.createTime < $(date -Idate --date='last month')" --format="value(version.id)" | xargs --no-run-if-empty gcloud app versions delete
 
   deploy-prod:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && (needs.deploy-test.result == 'success' || needs.deploy-test.result == 'skipped')
     needs: deploy-test
     runs-on: ubuntu-latest
     environment: prod
