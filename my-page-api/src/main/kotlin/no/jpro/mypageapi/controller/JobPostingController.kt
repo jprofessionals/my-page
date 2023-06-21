@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import jakarta.mail.Session
 import jakarta.mail.internet.MimeMessage
 import no.jpro.mypage.RawEmail
 import no.jpro.mypageapi.dto.JobPostingDTO
@@ -15,6 +16,7 @@ import no.jpro.mypageapi.event.PubSubBody
 import no.jpro.mypageapi.service.ChatGPTEmailService
 import no.jpro.mypageapi.service.JobPostingService
 import no.jpro.mypageapi.utils.mapper.JobPostingMapper
+import no.jpro.mypageapi.utils.mapper.JobPostingMapper.toJobPosting
 import org.apache.avro.io.Decoder
 import org.apache.avro.io.DecoderFactory
 import org.apache.avro.specific.SpecificDatumReader
@@ -23,7 +25,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
 import java.io.ByteArrayInputStream
-import java.time.LocalDate
 import java.util.*
 
 @RestController
@@ -63,25 +64,23 @@ class JobPostingController(
     fun createJobPosting(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @RequestBody event: PubSubBody
-    ): Long? {
+    ) {
         logger.info("Creating new job posting: messageId={}, publishTime={}",
             event.message.messageId, event.message.publishTime)
         val data = decodeBase64(event)
-        val email = decodeAvro(data) ?: return null
-        val jobPosting = mapToJobPosting(email)
-        return jobPostingService.createJobPosting(jobPosting)
+        val email = decodeAvro(data) ?: return
+        val jobPosting = mapToJobPostings(email)
+        jobPostingService.createJobPostings(jobPosting)
     }
 
-    private fun mapToJobPosting(email: RawEmail): JobPosting {
+    private fun mapToJobPostings(email: RawEmail): List<JobPosting> {
         ByteArrayInputStream(email.content.array()).use { inputStream ->
-            val mimeMessage = MimeMessage(null, inputStream)
+            val mimeMessage = MimeMessage(Session.getDefaultInstance(System.getProperties()), inputStream)
             val chatGPTJobPostings = chatGPTEmailService.chatGPTJobPosting(mimeMessage)
-            chatGPTJobPostings.forEach { logger.info("ChatGPT JobPosting: $it") }
-            return JobPosting(
-                title = mimeMessage.subject,
-                customer = "UNKNOWN",
-                dueDateForApplication = LocalDate.now().plusDays(7),
-            )
+            val jobPostings = chatGPTJobPostings.map {
+                toJobPosting(mimeMessage.subject, it)
+            }
+            return jobPostings
         }
     }
 

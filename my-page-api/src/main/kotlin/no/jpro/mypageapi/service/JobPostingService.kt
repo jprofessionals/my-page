@@ -13,8 +13,7 @@ class JobPostingService(
         return jobPostingRepository.findAll()
     }
 
-    fun createJobPosting(jobPosting: JobPosting): Long {
-        return jobPostingRepository.save(jobPosting).id
-            ?: throw Exception("Save succeeded without returning an ID")
+    fun createJobPostings(jobPostings: List<JobPosting>) {
+        jobPostingRepository.saveAll(jobPostings)
     }
 }

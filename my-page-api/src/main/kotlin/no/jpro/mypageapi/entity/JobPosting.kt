@@ -1,6 +1,7 @@
 package no.jpro.mypageapi.entity
 
 import jakarta.persistence.*
+import java.time.Instant
 import java.time.LocalDate
 
 @Entity
@@ -26,5 +27,17 @@ class JobPosting(
     val tags: Set<JobPostingTag> = HashSet(),
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null
-)
+    val id: Long? = null,
+) {
+    private var created: Instant? = null
+    private var updated: Instant? = null
+    @PrePersist
+    private fun onCreate() {
+        created = Instant.now()
+    }
+
+    @PreUpdate
+    private fun onUpdate() {
+        updated = Instant.now()
+    }
+}

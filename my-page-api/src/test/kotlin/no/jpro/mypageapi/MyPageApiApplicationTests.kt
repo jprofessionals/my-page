@@ -41,7 +41,22 @@ class MyPageApiApplicationTests @Autowired constructor(private val chatGPTEmailS
 	@Test
 	fun chatGPTEmail() {
 		if (gptConversationService is GptConversationServiceMock) {
-			gptConversationService.setMockResponses(listOf("{\"id\":0, \"title\":\"mock job posting\", \"customer\":\"mock customer\"}"))
+			gptConversationService.setMockResponses(listOf("""
+				[
+				  {
+					"kunde": "Statnett",
+					"rolle": "senior utvikler",
+					"antallStillinger": 3,
+					"arbeidssted": "Nydalen",
+					"totaltAntallÅrsErfaring": 0,
+					"søknadsfrist": "2023-06-02T10:00:00Z",
+					"systemEllerProsjekt": "Fosweb",
+					"teknologier": [
+					  ".Net"
+					]
+				  }
+				]
+			""".trimIndent()))
 		}
 
 		val message = MimeMessage(Session.getDefaultInstance(System.getProperties()),
