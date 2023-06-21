@@ -70,9 +70,16 @@ jobs:
           project_id: my-page-jpro-test
       - run: gcloud app versions list --service=api --filter="version.createTime < $(date -Idate --date='last month')" --format="value(version.id)" | xargs --no-run-if-empty gcloud app versions delete
 
+  always-run:
+    runs-on: ubuntu-latest
+    steps:
+    # Dummy step that always runs
+    # This job ensures that deploy-prod does not get skipped even if deploy-test is skipped
+    # Add any additional setup or environment preparation steps if required
+
   deploy-prod:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: deploy-test
+    if: github.ref == 'refs/heads/main'
+    needs: [always-run, deploy-test]
     runs-on: ubuntu-latest
     environment: prod
     steps:
