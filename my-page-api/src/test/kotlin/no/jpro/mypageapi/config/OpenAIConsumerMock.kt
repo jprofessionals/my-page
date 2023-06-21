@@ -6,5 +6,4 @@ import org.springframework.stereotype.Component
 
 
 @Component
-class OpenAIConsumerMock(secretProvider: SecretProvider) : OpenAIConsumer(secretProvider) {
-}
+class OpenAIConsumerMock(secretProvider: SecretProvider) : OpenAIConsumer(secretProvider)

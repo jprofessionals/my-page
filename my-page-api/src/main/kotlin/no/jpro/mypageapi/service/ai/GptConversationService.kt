@@ -5,7 +5,7 @@ import com.aallam.openai.api.chat.ChatCompletion
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
 import kotlinx.coroutines.runBlocking
-import no.jpro.mypageapi.consumer.ai.GPT_3_5_TURBO
+import no.jpro.mypageapi.consumer.ai.GPT_4
 import no.jpro.mypageapi.consumer.ai.OpenAIConsumer
 import org.springframework.stereotype.Service
 import java.util.*
@@ -38,7 +38,7 @@ class GptConversationService(
         val messages = conversations.getOrPut(conversationId) { mutableListOf() }
         messages.add(newMessage)
 
-        val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_3_5_TURBO, messages)
+        val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_4, messages)
 
         val responsMessage = completion.choices.first().message
         if (responsMessage != null) {

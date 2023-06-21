@@ -13,4 +13,7 @@ class JobPostingService(
         return jobPostingRepository.findAll()
     }
 
+    fun createJobPostings(jobPostings: List<JobPosting>) {
+        jobPostingRepository.saveAll(jobPostings)
+    }
 }

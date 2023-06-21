@@ -10,6 +10,5 @@ class CustomJwtAuthenticationConverter(private val authoritiesConverter: CustomJ
     override fun convert(source: Jwt): AbstractAuthenticationToken {
         val authorities = authoritiesConverter.convert(source)
         return JwtAuthenticationToken(source, authorities)
-
     }
 }

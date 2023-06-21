@@ -21,3 +21,8 @@ variable "k8s_cluster_name" {
 variable "github_sha" {
   type = string
 }
+
+variable api_jobposting_endpoint {
+  type = string
+}
+
