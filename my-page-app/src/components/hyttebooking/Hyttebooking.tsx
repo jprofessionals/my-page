@@ -78,20 +78,20 @@ function Hyttebooking() {
 
 
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }} className="p-4">
+      <div className="p-4 flex justify-end">
         <Button
             size="sm"
             className={`mt-4 mr-4 ${showMonthOverview ? 'bg-orange-500' : ''}`}
             onClick={handleShowMonthOverview}
         >
-          <span>Måned oversikt</span>
+          Måned oversikt
         </Button>
         <Button
             size="sm"
             className={`mt-4 mr-4 ${showYearOverview ? 'bg-orange-500' : ''}`}
             onClick={handleShowYearOverview}
         >
-          <span>År oversikt</span>
+          År oversikt
         </Button>
       </div>
 

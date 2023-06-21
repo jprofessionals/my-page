@@ -6,7 +6,7 @@ import { Calendar as CalendarIcon } from 'lucide-react'
 
 import cn from '@/utils/cn'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
+import { MonthCalendar } from '@/components/ui/monthCalendar'
 import {
   Popover,
   PopoverContent,
@@ -31,7 +31,7 @@ export function PickDate() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
-        <Calendar
+        <MonthCalendar
           mode="single"
           selected={pickDate}
           onSelect={setPickDate}

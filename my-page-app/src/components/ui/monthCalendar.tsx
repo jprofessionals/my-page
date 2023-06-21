@@ -7,7 +7,7 @@ import { buttonVariants } from '@/components/ui/button'
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
-function Calendar({
+function MonthCalendar({
   className,
   classNames,
   showOutsideDays = true,
@@ -17,10 +17,11 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn('p-3', className)}
+      weekStartsOn={1}
       classNames={{
         months:
           'flex flex-col sm:flex-row space-y-10 sm:space-x-10 sm:space-y-0',
-        month: 'space-y-4',
+        month: 'space-y-4 w-screen',
         caption: 'flex justify-center pt-1 relative items-center',
         caption_label: 'text-sm font-medium',
         nav: 'space-x-1 flex items-center',
@@ -31,10 +32,10 @@ function Calendar({
         nav_button_previous: 'absolute left-1',
         nav_button_next: 'absolute right-1',
         table: 'w-full border-collapse space-y-1',
-        head_row: 'flex',
+        head_row: 'flex justify-between',
         head_cell:
-          'text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]',
-        row: 'flex w-full mt-2',
+          'text-muted-foreground rounded-md font-normal text-[0.8rem]',
+        row: 'flex justify-between mt-2',
         cell: 'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
         day: cn(
           buttonVariants({ variant: 'ghost' }),
@@ -58,6 +59,6 @@ function Calendar({
     />
   )
 }
-Calendar.displayName = 'Calendar'
+MonthCalendar.displayName = 'MonthCalendar'
 
-export { Calendar }
+export { MonthCalendar }
