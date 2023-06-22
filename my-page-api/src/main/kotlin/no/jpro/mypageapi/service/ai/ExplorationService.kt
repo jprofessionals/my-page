@@ -22,8 +22,10 @@ class ExplorationService(
 
     fun explore(exploreRequest: ExplorationRequest): ExplorationDTO {
         val sessionId =
-            if (exploreRequest.sessionId.isNotBlank()) exploreRequest.sessionId else UUID.randomUUID()
-                .toString()
+                exploreRequest.sessionId.ifBlank {
+                    UUID.randomUUID()
+                        .toString()
+                }
 
         val explorationHistory = explorationStatusService.getHistory(sessionId)
 
