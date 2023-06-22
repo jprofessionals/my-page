@@ -11,7 +11,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler
 import org.slf4j.LoggerFactory
 
 
-class ExplorationHandler(val explorationService: ExplorationService, val googleJwtValidator: GoogleJwtValidator) : TextWebSocketHandler() {
+class ExplorationHandler(private val explorationService: ExplorationService, private val googleJwtValidator: GoogleJwtValidator) : TextWebSocketHandler() {
     private val logger = LoggerFactory.getLogger(ExplorationService::class.java.name)
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
         val payload = message.payload

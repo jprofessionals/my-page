@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.jwt.Jwt
 
-class CustomJwtGrantedAuthoritiesConverter(val jdbcTemplate: JdbcTemplate) : Converter<Jwt, Collection<GrantedAuthority>> {
+class CustomJwtGrantedAuthoritiesConverter(private val jdbcTemplate: JdbcTemplate) : Converter<Jwt, Collection<GrantedAuthority>> {
 
     override fun convert(source: Jwt): Collection<GrantedAuthority> {
         val userSub = source.getSub()
