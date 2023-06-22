@@ -30,7 +30,7 @@
     "date-fns": "^2.30.0",
     "date-holidays": "^3.21.1",
     "eslint": "8.43.0",
-    "eslint-config-next": "13.4.6",
+    "eslint-config-next": "13.4.7",
     "lucide-react": "^0.248.0",
     "moment": "^2.29.4",
     "next": "13.4.7",
