@@ -24,7 +24,7 @@ class GptConversationServiceMock(openAIConsumer: OpenAIConsumer) : GptConversati
         logger.info(message)
 
         var response = DEFAULT_MOCK_RESPONSE
-        if (!mockResponses.isEmpty()) {
+        if (mockResponses.isNotEmpty()) {
             response = mockResponses[currentResponseIndex]
             currentResponseIndex = (currentResponseIndex + 1) % mockResponses.size
         }
