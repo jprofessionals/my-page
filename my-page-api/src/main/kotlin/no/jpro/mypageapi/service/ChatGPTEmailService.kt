@@ -42,7 +42,7 @@ class ChatGPTEmailService(
             val pdfReader = PdfReader(part.inputStream)
             val pdfExtractor = PdfTextExtractor(pdfReader)
             val sb = StringBuilder()
-            var i = 0;
+            var i = 0
             while (i < pdfReader.numberOfPages) {
                 sb.append(pdfExtractor.getTextFromPage(i++))
                 sb.append('\n')
@@ -114,7 +114,7 @@ class ChatGPTEmailService(
 
     private fun getContentToInclude(parts: List<ParsedPart>): String {
         val maxLength = 20_000
-        val stringBuilder = StringBuilder();
+        val stringBuilder = StringBuilder()
         parts
             .filterNot { it.documentType == DocumentType.HTML }
             .sortedWith(compareBy({ it.documentType.order }, { it.parsedContent.length } ))

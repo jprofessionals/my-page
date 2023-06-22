@@ -2,7 +2,6 @@ package no.jpro.mypageapi.repository
 
 import no.jpro.mypageapi.entity.*
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository

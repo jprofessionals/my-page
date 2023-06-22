@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.jwt.Jwt
 
 class CustomJwtGrantedAuthoritiesConverter(val jdbcTemplate: JdbcTemplate) : Converter<Jwt, Collection<GrantedAuthority>> {
 
-    override fun convert(source: Jwt): Collection<GrantedAuthority>? {
+    override fun convert(source: Jwt): Collection<GrantedAuthority> {
         val userSub = source.getSub()
         val admin = try  {
             jdbcTemplate.queryForObject("SELECT admin from user where sub = $userSub", Boolean::class.java)
