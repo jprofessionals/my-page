@@ -106,10 +106,9 @@ class ChatGPTEmailService(
             ]
         """
         val finalResponse = gptConversationService.converseWithGpt(
-            prompt.trimIndent(), conversationId)
-        val result = objectMapper.readValue(finalResponse, object : TypeReference<List<ChatGPTResponse>>() {})
+                prompt.trimIndent(), conversationId)
 
-        return result
+        return objectMapper.readValue(finalResponse, object : TypeReference<List<ChatGPTResponse>>() {})
     }
 
     private fun getContentToInclude(parts: List<ParsedPart>): String {
