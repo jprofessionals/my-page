@@ -48,12 +48,7 @@ class ExplorationService(
 
             val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_4, requestMessages)
 
-            val responsMessage = completion.choices.first().message
-
-            if (responsMessage == null) {
-                throw Exception("No response from GPT")
-            }
-
+            val responsMessage = completion.choices.first().message ?: throw Exception("No response from GPT")
 
             val explorationDTO = processResponse(responsMessage.content)
 
