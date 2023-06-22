@@ -19,9 +19,9 @@ const val GPT_4 = "gpt-4"
 
 @Service
 class OpenAIConsumer(
-    secretProvider: SecretProvider
+    val secretProvider: SecretProvider
 ) {
-    private val openAI: OpenAI = OpenAI(secretProvider.getApiKey())
+    private var openAI: OpenAI = OpenAI(secretProvider.getApiKey())
 
     @OptIn(BetaOpenAI::class)
     fun chatCompletion(model: String, messages: List<ChatMessage>): ChatCompletion {
