@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.provider
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
@@ -9,15 +10,14 @@ interface SecretProvider {
 }
 
 @Component
-@Profile("local", "h2")
+@Profile("!gcp")
 class SecretProviderLocal : SecretProvider {
-    //For lokal kjøring, sett denne i for eksempel application-local.yml og legg den til .gitignore så den ikke blir committed
+    //For lokal kjøring av AI tjenester, sett denne i for eksempel application-local.yml og legg den til .gitignore så den ikke blir committed
     //kontakt Roger for å få OpenAI API key hvis du ikke har allerede.
     @Value("\${openai.apiKey:PLACEHOLDER}")
     private var apiKey: String = "PLACEHOLDER"
 
     override fun getApiKey(): String {
-        if (apiKey == "PLACEHOLDER") throw SecurityException("OpenAI API key not set. See SecretProviderLocal")
         return apiKey
     }
 }
@@ -25,10 +25,15 @@ class SecretProviderLocal : SecretProvider {
 @Component
 @Profile("gcp")
 class SecretProviderGcp : SecretProvider {
-    @Value("\${OpenAI_API:PLACEHOLDER}")
+    @Value("\${sm://OpenAI_API}")
     private val apiKey: String = "PLACEHOLDER"
 
+    private val logger = LoggerFactory.getLogger(SecretProviderGcp::class.java.name)
+
     override fun getApiKey(): String {
+        if(apiKey=="PLACEHOLDER") {
+            logger.error("OpenAI API key not set")
+        }
         return apiKey
     }
 }

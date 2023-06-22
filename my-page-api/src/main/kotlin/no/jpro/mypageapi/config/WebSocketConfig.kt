@@ -17,7 +17,6 @@ class WebSocketConfig(val explorationService: ExplorationService, val googleJwtV
 
     override fun registerWebSocketHandlers(registry: WebSocketHandlerRegistry) {
         logger.info("Registering ExplorationHandler")
-        println("registering ExplorationHandler!")
 
         registry.addHandler(ExplorationHandler(explorationService, googleJwtValidator), "/explorationSock").setAllowedOriginPatterns("*").withSockJS()
     }

@@ -10,6 +10,7 @@ import no.jpro.explorer.ExplorationDTO
 import no.jpro.explorer.ExplorationRequest
 import no.jpro.mypageapi.consumer.ai.GPT_4
 import no.jpro.mypageapi.consumer.ai.OpenAIConsumer
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -19,6 +20,8 @@ class ExplorationService(
     private val openAIConsumer: OpenAIConsumer,
     private val explorationStatusService: ExplorationStatusService
 ) {
+
+    private val logger = LoggerFactory.getLogger(ExplorationService::class.java.name)
 
     fun explore(exploreRequest: ExplorationRequest): ExplorationDTO {
         val sessionId =
@@ -48,17 +51,18 @@ class ExplorationService(
 
             val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_4, requestMessages)
 
-            val responsMessage = completion.choices.first().message ?: throw Exception("No response from GPT")
+            val responseMessage = completion.choices.first().message ?: throw Exception("No response from GPT")
 
-            val explorationDTO = processResponse(responsMessage.content)
+            val explorationDTO = processResponse(responseMessage.content)
 
             explorationHistory.latestExploration = explorationDTO
 
             explorationHistory.messages.add(newMessage)
-            explorationHistory.messages.add(responsMessage)
+            explorationHistory.messages.add(responseMessage)
 
             return explorationDTO
         } catch (e: Exception) {
+            logger.error("Error ChatGPT GPT:", e)
             return ExplorationDTO(
                 "Something went wrong, try a different option",
                 explorationHistory.latestExploration.imageUrl,
