@@ -95,7 +95,7 @@ class ExplorationService(
     @OptIn(BetaOpenAI::class)
     private fun shortify(description: String): String {
         val prompt =
-            "Shorten the following description to at most 300 letters, and focus on the visual elements: " + description
+                "Shorten the following description to at most 300 letters, and focus on the visual elements: $description"
 
         val newMessage = ChatMessage(
             role = ChatRole.User,
