@@ -27,7 +27,7 @@ export function PickDate() {
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {pickDate ? format(pickDate, 'PPP') : <span>Pick a date</span>}
+          {pickDate ? format(pickDate, 'PPP') : <span>Ledige datoer</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
