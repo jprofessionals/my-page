@@ -53,7 +53,7 @@ function ExplorerTextArea(): JSX.Element {
             if (text.trim()) {
                 const tx = JSON.stringify(text);
                 if (socketRef.current)
-                    socketRef.current.send(JSON.stringify(text));
+                    socketRef.current.send("explore:"+JSON.stringify(text));
             }
         } catch (err) {
             setError(err as Error);
