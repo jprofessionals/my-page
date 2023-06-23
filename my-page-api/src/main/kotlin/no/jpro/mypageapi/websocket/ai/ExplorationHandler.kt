@@ -10,7 +10,7 @@ import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
 
 
-class ExplorationHandler(val explorationService: ExplorationService, val googleJwtValidator: GoogleJwtValidator) :
+class ExplorationHandler(private val explorationService: ExplorationService, private val googleJwtValidator: GoogleJwtValidator) :
     TextWebSocketHandler() {
     private val logger = LoggerFactory.getLogger(ExplorationHandler::class.java.name)
 

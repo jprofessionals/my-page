@@ -25,8 +25,10 @@ class ExplorationService(
 
     fun explore(exploreRequest: ExplorationRequest): ExplorationDTO {
         val sessionId =
-            if (exploreRequest.sessionId.isNotBlank()) exploreRequest.sessionId else UUID.randomUUID()
-                .toString()
+                exploreRequest.sessionId.ifBlank {
+                    UUID.randomUUID()
+                        .toString()
+                }
 
         val explorationHistory = explorationStatusService.getHistory(sessionId)
 
@@ -49,12 +51,7 @@ class ExplorationService(
 
             val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_4, requestMessages)
 
-            val responseMessage = completion.choices.first().message
-
-            if (responseMessage == null) {
-                throw Exception("No response from ChatGPT")
-            }
-
+            val responseMessage = completion.choices.first().message ?: throw Exception("No response from GPT")
 
             val explorationDTO = processResponse(responseMessage.content)
 
@@ -99,7 +96,7 @@ class ExplorationService(
     @OptIn(BetaOpenAI::class)
     private fun shortify(description: String): String {
         val prompt =
-            "Shorten the following description to at most 300 letters, and focus on the visual elements: " + description
+                "Shorten the following description to at most 300 letters, and focus on the visual elements: $description"
 
         val newMessage = ChatMessage(
             role = ChatRole.User,
