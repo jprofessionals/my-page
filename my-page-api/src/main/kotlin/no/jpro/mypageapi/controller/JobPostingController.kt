@@ -59,20 +59,23 @@ class JobPostingController(
     @PostMapping
     @Operation(summary = "Create a new job posting from an PubSub event")
     @ApiResponse(
-        responseCode = "201",
+        responseCode = "200",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = UserDTO::class))]
     )
-    @ResponseStatus(HttpStatus.CREATED)
     fun createJobPosting(
         @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt,
         @RequestBody event: PubSubBody
     ) {
-        logger.info("Creating new job posting: messageId={}, publishTime={}",
-            event.message.messageId, event.message.publishTime)
-        val data = decodeBase64(event)
-        val email = decodeAvro(data) ?: return
-        val jobPosting = mapToJobPostings(email)
-        jobPostingService.createJobPostings(jobPosting)
+        try {
+            logger.info("Creating new job posting: messageId={}, publishTime={}",
+                event.message.messageId, event.message.publishTime)
+            val data = decodeBase64(event)
+            val email = decodeAvro(data) ?: return
+            val jobPosting = mapToJobPostings(email)
+            jobPostingService.createJobPostings(jobPosting)
+        } catch (e: Exception) {
+            logger.warn("Error creating new job posting", e)
+        }
     }
 
     private fun mapToJobPostings(email: RawEmail): List<JobPosting> {

@@ -75,6 +75,7 @@ resource "google_monitoring_alert_policy" "oldest-unacked-message-age" {
     google_pubsub_subscription.email-validator.name,
     google_pubsub_subscription.raw-emails-to-bigquery.name,
     google_pubsub_subscription.validated-emails-to-bigquery.name,
+    google_pubsub_subscription.my-page-api.name,
   ])
   display_name = "${var.alert_policy_prefix} ${each.key}-oldest-unacked-message-age"
   notification_channels = [data.google_monitoring_notification_channel.slack.name]

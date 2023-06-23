@@ -226,6 +226,8 @@ resource "google_pubsub_subscription" "email-validator" {
 resource "google_pubsub_subscription" "my-page-api" {
   name  = "my-page-api"
   topic = google_pubsub_topic.validated-emails.name
+
+  ack_deadline_seconds = 600s
   push_config {
     push_endpoint = var.api_jobposting_endpoint
     oidc_token {
