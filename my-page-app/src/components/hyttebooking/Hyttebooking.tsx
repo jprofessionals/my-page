@@ -45,8 +45,6 @@ function Hyttebooking() {
           />
         </div>
 
-        <div>{PickDate()}</div>
-
         <p>
           <span>
             <strong>Overtagelse:</strong>

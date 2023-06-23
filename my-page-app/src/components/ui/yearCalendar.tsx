@@ -20,7 +20,7 @@ function YearCalendar({
       weekStartsOn={1}
       classNames={{
         months:
-          'flex flex-col sm:flex-row space-y-10 sm:space-x-10 sm:space-y-0 flex-wrap justify-between',
+          'flex flex-col sm:flex-row flex-wrap justify-between',
         month: 'space-y-4',
         caption: 'flex justify-center pt-1 relative items-center',
         caption_label: 'text-sm font-medium',
