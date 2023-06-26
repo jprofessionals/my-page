@@ -1,6 +1,6 @@
 package no.jpro.mypageapi.repository
 
-import no.jpro.mypageapi.dto.BookingDTO
+//import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.entity.*
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
@@ -34,7 +34,7 @@ interface PostRepository : JpaRepository<Post, Long> {
 @Repository
 interface JobPostingRepository : JpaRepository<JobPosting, Long>
 
-
+/*
 //Todo: lage ferdig booking repository
 @Repository
 interface BookingRepository : JpaRepository<Booking, Long> {
@@ -42,3 +42,7 @@ interface BookingRepository : JpaRepository<Booking, Long> {
 //    fun findBookingByEmployeeId(employee_id: Long): List<Booking>
 
 }
+
+ */
+
+
