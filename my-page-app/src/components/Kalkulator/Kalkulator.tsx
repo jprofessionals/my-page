@@ -177,7 +177,7 @@ function Kalkulator() {
           .
         </p>
         <p>Se utregning basert på år og måned:</p>
-        <div className="flex gap-2 p-2 -mt-4 rounded-lg border border-gray-300 border-solid w-fit calculator-group">
+        <div className="flex flex-wrap gap-2 p-2 -mt-4 rounded-lg border border-gray-300 border-solid calculator-group w-fit">
           <label className="input-group">
             <span>År</span>
             <select
