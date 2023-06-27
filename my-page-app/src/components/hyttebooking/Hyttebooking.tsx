@@ -91,34 +91,31 @@ function Hyttebooking() {
       {showMonthOverview && <MonthOverview />}
       {showYearOverview && <YearOverview />}
 
-      <div className="mt-7 mb-3 bg-gray-100 p-0 rounded-lg">
-        <div className="relative">
-          <div className="h-full w-6 absolute left-0 rounded-l-lg" style = {{backgroundColor: '#FF7A0C'}}></div>
-          <p className="ml-4 pl-4"> Stor leilighet: 13 sengeplasser - ikke dyr tilatt</p>
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-2 mt-7 bg-gray-100 rounded-lg">
+          <div className="w-6 rounded-l-lg bg-orange-brand" />
+          <span>
+            Stor leilighet: 13 sengeplasser (dyr <strong>ikke</strong> tilatt)
+          </span>
+        </div>
+
+        <div className="flex gap-2 bg-gray-100 rounded-lg">
+          <div className="w-6 rounded-l-lg bg-blue-small-appartment" />
+          Liten leilighet: 11 sengeplasser (dyr tilatt, men ikke på soverom)
+        </div>
+
+        <div className="flex gap-2 bg-gray-100 rounded-lg">
+          <div className="w-6 rounded-l-lg bg-teal-annex" />
+          <span>
+            Annekset: 10 sengeplasser (dyr <strong>ikke</strong> tilatt)
+          </span>
+        </div>
+
+        <div className="flex gap-2 p-0 mb-10 bg-gray-100 rounded-lg">
+          <div className="w-6 rounded-l-lg bg-red-not-available" />
+          Ikke tilgjengelig - arbeid på hytta
         </div>
       </div>
-
-      <div className="mb-3 bg-gray-100 p-0 rounded-lg">
-        <div className="relative">
-          <div className="h-full w-6 absolute left-0 rounded-l-lg" style = {{backgroundColor: '#2B809B'}}></div>
-          <p className="ml-4 pl-4"> Liten leilighet: 11 sengeplasser - dyr tilatt men ikke på soverom</p>
-        </div>
-      </div>
-
-      <div className="mb-3 bg-gray-100 p-0 rounded-lg">
-        <div className="relative">
-          <div className="h-full w-6 absolute left-0 rounded-l-lg" style = {{backgroundColor: '#5BCEAE'}}></div>
-          <p className="ml-4 pl-4"> Annekset: 10 sengeplasser - ikke dyr tilatt</p>
-        </div>
-      </div>
-
-      <div className="mb-10 bg-gray-100 p-0 rounded-lg">
-        <div className="relative">
-          <div className="h-full w-6 absolute left-0 rounded-l-lg" style = {{backgroundColor: '#FC1E1E'}}></div>
-          <p className="ml-4 pl-4"> Ikke tilgjengelig - arbeid på hytta</p>
-        </div>
-      </div>
-
     </div>
   )
 }
