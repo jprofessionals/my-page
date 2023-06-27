@@ -15,17 +15,18 @@ import no.jpro.mypageapi.entity.JobPosting
 import no.jpro.mypageapi.event.PubSubBody
 import no.jpro.mypageapi.service.ChatGPTEmailService
 import no.jpro.mypageapi.service.JobPostingService
+import no.jpro.mypageapi.service.ParsedPart
 import no.jpro.mypageapi.utils.mapper.JobPostingMapper
 import no.jpro.mypageapi.utils.mapper.JobPostingMapper.toJobPosting
 import org.apache.avro.io.Decoder
 import org.apache.avro.io.DecoderFactory
 import org.apache.avro.specific.SpecificDatumReader
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
 import java.io.ByteArrayInputStream
+import java.security.MessageDigest
 import java.util.*
 
 @RestController
@@ -69,24 +70,49 @@ class JobPostingController(
         try {
             logger.info("Creating new job posting: messageId={}, publishTime={}",
                 event.message.messageId, event.message.publishTime)
+            if (jobPostingService.existsByMessageId(event.message.messageId)) {
+                logger.info("Job posting already exists for: messageId={}", event.message.messageId)
+                return
+            }
             val data = decodeBase64(event)
             val email = decodeAvro(data) ?: return
-            val jobPosting = mapToJobPostings(email)
-            jobPostingService.createJobPostings(jobPosting)
+            ByteArrayInputStream(email.content.array()).use { inputStream ->
+                val mimeMessage = MimeMessage(Session.getDefaultInstance(System.getProperties()), inputStream)
+                val parsedParts = chatGPTEmailService.parsePartRecursive(mimeMessage)
+                val contentDigest = hashMultiparts(parsedParts)
+                if (jobPostingService.existsByContentDigest(contentDigest)) {
+                    logger.info("Job posting already exists for: contentDigest={}", contentDigest)
+                    return
+                }
+                val jobPosting = mapToJobPostings(mimeMessage.subject, parsedParts, contentDigest, event.message.messageId)
+                jobPostingService.createJobPostings(jobPosting)
+            }
         } catch (e: Exception) {
             logger.warn("Error creating new job posting", e)
         }
     }
 
-    private fun mapToJobPostings(email: RawEmail): List<JobPosting> {
-        ByteArrayInputStream(email.content.array()).use { inputStream ->
-            val mimeMessage = MimeMessage(Session.getDefaultInstance(System.getProperties()), inputStream)
-            val chatGPTJobPostings = chatGPTEmailService.chatGPTJobPosting(mimeMessage)
-            val jobPostings = chatGPTJobPostings.map {
-                toJobPosting(mimeMessage.subject, it)
-            }
-            return jobPostings
+    private fun hashMultiparts(parsedParts: List<ParsedPart>): String {
+        return hash(parsedParts.joinToString("\n") { it.parsedContent }.toByteArray())
+    }
+
+    fun hash(content: ByteArray): String {
+        return MessageDigest.getInstance("SHA256")
+            .digest(content)
+            .joinToString("") { String.format("%02x", it) }
+    }
+
+    private fun mapToJobPostings(
+        subject: String,
+        parsedParts: List<ParsedPart>,
+        contentDigest: String,
+        messageId: String
+    ): List<JobPosting> {
+        val chatGPTJobPostings = chatGPTEmailService.chatGPTJobPosting(parsedParts)
+        val jobPostings = chatGPTJobPostings.map {
+            toJobPosting(subject, it, contentDigest, messageId)
         }
+        return jobPostings
     }
 
     private fun decodeAvro(data: ByteArray): RawEmail? {

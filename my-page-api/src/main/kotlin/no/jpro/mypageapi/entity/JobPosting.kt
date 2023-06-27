@@ -16,6 +16,8 @@ class JobPosting(
     val dueDateForApplication: LocalDate? = null,
     val requiredYearsOfExperience: Int? = null,
     val resourcesNeeded: Int? = null,
+    val contentDigest: String? = null,
+    val messageId: String? = null,
     @ManyToMany(
         cascade = [CascadeType.PERSIST, CascadeType.MERGE],
     )
