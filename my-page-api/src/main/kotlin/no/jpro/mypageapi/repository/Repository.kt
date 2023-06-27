@@ -1,11 +1,9 @@
 package no.jpro.mypageapi.repository
 
-//import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.entity.*
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
-import java.util.Date
 
 @Repository
 interface UserRepository : JpaRepository<User, String> {
@@ -40,7 +38,10 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long>
 interface BookingRepository : JpaRepository<Booking, Long> {
     fun findBookingById(bookingId: Long): Booking
     fun findBookingByEmployeeId(employeeId: Int): List<Booking>
-    fun findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(startDate: LocalDate, endDate: LocalDate): List<Booking>
+    fun findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
+        startDate: LocalDate,
+        endDate: LocalDate
+    ): List<Booking>
 }
 
 

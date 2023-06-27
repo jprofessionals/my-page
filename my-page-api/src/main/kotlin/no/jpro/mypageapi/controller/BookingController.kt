@@ -20,7 +20,7 @@ import java.time.LocalDate
 @RestController
 @RequestMapping("booking")
 @SecurityRequirement(name = "Bearer Authentication")
-class BookingController (private val bookingService: BookingService) {
+class BookingController(private val bookingService: BookingService) {
     @GetMapping("{bookingID}")
     @RequiresAdmin
     @Operation(summary = "Get the booking connected to the booking id")
@@ -41,7 +41,7 @@ class BookingController (private val bookingService: BookingService) {
 
     @GetMapping("{startDate}/{endDate}")
     @RequiresAdmin
-    @Operation(summary = "Get the booking connected to the month")
+    @Operation(summary = "Get all bookings in the given month")
     @ApiResponse(
         responseCode = "200",
         content = [Content(
@@ -55,7 +55,7 @@ class BookingController (private val bookingService: BookingService) {
         @PathVariable("startDate") startDate: LocalDate,
         @PathVariable("endDate") endDate: LocalDate,
     ): List<BookingDTO>? {
-        return bookingService.getBookingsPerMonth(startDate, endDate)
+        return bookingService.getBookingsBetweenDates(startDate, endDate)
     }
 
     @GetMapping("booking/{employee_id}")

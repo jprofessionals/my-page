@@ -8,18 +8,22 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class BookingService (private val bookingRepository: BookingRepository,
-    private val bookingMapper: BookingMapper,){
+class BookingService(
+    private val bookingRepository: BookingRepository,
+    private val bookingMapper: BookingMapper,
+) {
     fun getBooking(bookingId: Long): Booking? {
         return bookingRepository.findBookingById(bookingId)
     }
+
     fun getBookings(employeeId: Int): List<BookingDTO> {
         val bookings = bookingRepository.findBookingByEmployeeId(employeeId)
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 
-    fun getBookingsPerMonth(startDate: LocalDate, endDate: LocalDate): List<BookingDTO>{
-        val bookings = bookingRepository.findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(startDate, endDate)
-        return bookings.map {bookingMapper.toBookingDTO(it) }
+    fun getBookingsBetweenDates(startDate: LocalDate, endDate: LocalDate): List<BookingDTO> {
+        val bookings =
+            bookingRepository.findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(startDate, endDate)
+        return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 }
