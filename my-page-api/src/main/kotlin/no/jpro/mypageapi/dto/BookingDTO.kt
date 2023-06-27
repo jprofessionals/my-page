@@ -1,16 +1,15 @@
 package no.jpro.mypageapi.dto
 
-//import no.jpro.mypageapi.entity.House
-import no.jpro.mypageapi.entity.User
+import no.jpro.mypageapi.entity.Apartment
 import java.time.LocalDate
-/*
-data class BookingDTO (    //todo: make
+
+data class BookingDTO(
     val id: Long? = null,
-    val start_date: LocalDate,
-    val end_date: LocalDate,
-    val house: House?,
-    val employee_id: User? = null,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val apartment: Apartment?,
+    val employeeName: String?
 )
 
- */
+
 

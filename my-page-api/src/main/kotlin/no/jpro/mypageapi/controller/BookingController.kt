@@ -1,5 +1,5 @@
 package no.jpro.mypageapi.controller
-/*
+
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
@@ -15,14 +15,15 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("booking")
 @SecurityRequirement(name = "Bearer Authentication")
-class BookingController (private val bookingService: BookingService) {
+class BookingController(private val bookingService: BookingService) {
     @GetMapping("{bookingID}")
     @RequiresAdmin
-    @Operation(summary = "Get the booking connected to the id")
+    @Operation(summary = "Get the booking connected to the booking id")
     @ApiResponse(
         responseCode = "200",
         content = [Content(
@@ -37,10 +38,29 @@ class BookingController (private val bookingService: BookingService) {
     ): Booking? {
         return bookingService.getBooking(bookingID)
     }
-/* todo: fix
-    @GetMapping("{employee_id}")
+
+    @GetMapping("{startDate}/{endDate}")
     @RequiresAdmin
-    @Operation(summary = "Get the booking connected to the id")
+    @Operation(summary = "Get all bookings in the given month")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json", array = ArraySchema(
+                schema = Schema(implementation = BookingDTO::class)
+            )
+        )]
+    )
+    fun getBookingsPerMonth(
+        token: JwtAuthenticationToken,
+        @PathVariable("startDate") startDate: LocalDate,
+        @PathVariable("endDate") endDate: LocalDate,
+    ): List<BookingDTO>? {
+        return bookingService.getBookingsBetweenDates(startDate, endDate)
+    }
+
+    @GetMapping("booking/{employee_id}")
+    @RequiresAdmin
+    @Operation(summary = "Get the booking connected to the employee id")
     @ApiResponse(
         responseCode = "200",
         content = [Content(
@@ -51,12 +71,11 @@ class BookingController (private val bookingService: BookingService) {
     )
     fun getBookings(
         token: JwtAuthenticationToken,
-        @PathVariable("employee_id") employee_id: Long,
+        @PathVariable("employee_id") employee_id: Int,
     ): List<BookingDTO>? {
         return bookingService.getBookings(employee_id)
     }
 
- */
+
 }
 
- */

@@ -5,12 +5,11 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 
-/*@Entity
-data class House (
+@Entity
+data class Apartment(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-    val description: String?,
-    )
+    val cabin_name: String?,
+)
 
- */
