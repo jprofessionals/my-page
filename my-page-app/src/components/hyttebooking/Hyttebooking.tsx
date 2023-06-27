@@ -91,8 +91,8 @@ function Hyttebooking() {
       {showMonthOverview && <MonthOverview />}
       {showYearOverview && <YearOverview />}
 
-      <div className="flex flex-col gap-3">
-        <div className="flex gap-2 mt-7 bg-gray-100 rounded-lg">
+      <div className="flex flex-col gap-3 mt-7">
+        <div className="flex gap-2 bg-gray-100 rounded-lg">
           <div className="w-6 rounded-l-lg bg-orange-brand" />
           <span>
             Stor leilighet: 13 sengeplasser (dyr <strong>ikke</strong> tilatt)
