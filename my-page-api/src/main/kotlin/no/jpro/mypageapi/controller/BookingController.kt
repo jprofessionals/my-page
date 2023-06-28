@@ -11,11 +11,9 @@ import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.service.BookingService
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
+import java.util.*
 
 @RestController
 @RequestMapping("booking")
@@ -39,7 +37,7 @@ class BookingController(private val bookingService: BookingService) {
         return bookingService.getBooking(bookingID)
     }
 
-    @GetMapping("{startDate}/{endDate}")
+    @GetMapping("")
     @RequiresAdmin
     @Operation(summary = "Get all bookings in the given month")
     @ApiResponse(
@@ -52,9 +50,11 @@ class BookingController(private val bookingService: BookingService) {
     )
     fun getBookingsPerMonth(
         token: JwtAuthenticationToken,
-        @PathVariable("startDate") startDate: LocalDate,
-        @PathVariable("endDate") endDate: LocalDate,
+        @RequestParam("startDate") startDate: String,
+        @RequestParam("endDate") endDate: String,
     ): List<BookingDTO>? {
+        val startDate: LocalDate = LocalDate.parse(startDate)
+        val endDate: LocalDate = LocalDate.parse(endDate)
         return bookingService.getBookingsBetweenDates(startDate, endDate)
     }
 
