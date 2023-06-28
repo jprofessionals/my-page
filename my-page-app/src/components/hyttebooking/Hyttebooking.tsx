@@ -1,5 +1,5 @@
 import jPro_Hytte from '../images/jPro_Hytte.png'
-import {useState} from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 
 import { PickDate } from '@/components/ui/pickDate'
@@ -9,27 +9,26 @@ import YearOverview from '@/components/hyttebooking/YearOverview'
 import { Button } from '@/components/ui/button'
 
 function Hyttebooking() {
-
-  const [showMonthOverview, setShowMonthOverview] = useState(true);
-  const [showYearOverview, setShowYearOverview] = useState(false);
+  const [showMonthOverview, setShowMonthOverview] = useState(true)
+  const [showYearOverview, setShowYearOverview] = useState(false)
 
   const handleShowMonthOverview = () => {
-    setShowMonthOverview(true);
-    setShowYearOverview(false);
-  };
+    setShowMonthOverview(true)
+    setShowYearOverview(false)
+  }
 
   const handleShowYearOverview = () => {
-    setShowYearOverview(true);
-    setShowMonthOverview(false);
+    setShowYearOverview(true)
+    setShowMonthOverview(false)
   }
 
   return (
     <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 p-4">
-        <div className="prose items-center rounded-lg max-w-7xl overflow-hidden border bgColor: bg-slate-200 gap-2 p-2 flex">
-          <div className=" flex-1 relative">
+        <div className="flex overflow-hidden gap-2 items-center p-2 max-w-7xl rounded-lg border prose bgColor: bg-slate-200">
+          <div className="relative flex-1">
             <h1>Påmelding firmahytte</h1>
-            <div className="bg-orange-500 h-1.5"></div>
+            <div className="h-1.5 bg-orange-500"></div>
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
@@ -71,23 +70,19 @@ function Hyttebooking() {
           -&gt; Revision history), så skal vi trekke. Eventuelt kan man kanskje
           snakke sammen?
         </p>
-
-
-
-
       </div>
-      <div className="p-4 flex justify-end">
+      <div className="flex justify-end p-4">
         <Button
-            size="sm"
-            className={`mt-4 mr-4 ${showMonthOverview ? 'bg-orange-500' : ''}`}
-            onClick={handleShowMonthOverview}
+          size="sm"
+          className={`mt-4 mr-4 ${showMonthOverview ? 'bg-orange-500' : ''}`}
+          onClick={handleShowMonthOverview}
         >
           Måned oversikt
         </Button>
         <Button
-            size="sm"
-            className={`mt-4 mr-4 ${showYearOverview ? 'bg-orange-500' : ''}`}
-            onClick={handleShowYearOverview}
+          size="sm"
+          className={`mt-4 mr-4 ${showYearOverview ? 'bg-orange-500' : ''}`}
+          onClick={handleShowYearOverview}
         >
           År oversikt
         </Button>
@@ -96,34 +91,31 @@ function Hyttebooking() {
       {showMonthOverview && <MonthOverview />}
       {showYearOverview && <YearOverview />}
 
-      <div className="mt-7 mb-3 bg-gray-100 p-0 rounded-lg">
-        <div className="relative">
-          <div className="h-full w-6 absolute left-0 rounded-l-lg" style = {{backgroundColor: '#FF7A0C'}}></div>
-          <p className="ml-4 pl-4"> Stor leilighet: 13 sengeplasser - ikke dyr tilatt</p>
+      <div className="flex flex-col gap-3 mt-7">
+        <div className="flex gap-2 bg-gray-100 rounded-lg">
+          <div className="w-6 rounded-l-lg bg-orange-brand" />
+          <span>
+            Stor leilighet: 13 sengeplasser (dyr <strong>ikke</strong> tilatt)
+          </span>
+        </div>
+
+        <div className="flex gap-2 bg-gray-100 rounded-lg">
+          <div className="w-6 rounded-l-lg bg-blue-small-appartment" />
+          Liten leilighet: 11 sengeplasser (dyr tilatt, men ikke på soverom)
+        </div>
+
+        <div className="flex gap-2 bg-gray-100 rounded-lg">
+          <div className="w-6 rounded-l-lg bg-teal-annex" />
+          <span>
+            Annekset: 10 sengeplasser (dyr <strong>ikke</strong> tilatt)
+          </span>
+        </div>
+
+        <div className="flex gap-2 p-0 mb-10 bg-gray-100 rounded-lg">
+          <div className="w-6 rounded-l-lg bg-red-not-available" />
+          Ikke tilgjengelig - arbeid på hytta
         </div>
       </div>
-
-      <div className="mb-3 bg-gray-100 p-0 rounded-lg">
-        <div className="relative">
-          <div className="h-full w-6 absolute left-0 rounded-l-lg" style = {{backgroundColor: '#2B809B'}}></div>
-          <p className="ml-4 pl-4"> Liten leilighet: 11 sengeplasser - dyr tilatt men ikke på soverom</p>
-        </div>
-      </div>
-
-      <div className="mb-3 bg-gray-100 p-0 rounded-lg">
-        <div className="relative">
-          <div className="h-full w-6 absolute left-0 rounded-l-lg" style = {{backgroundColor: '#5BCEAE'}}></div>
-          <p className="ml-4 pl-4"> Annekset: 10 sengeplasser - ikke dyr tilatt</p>
-        </div>
-      </div>
-
-      <div className="mb-10 bg-gray-100 p-0 rounded-lg">
-        <div className="relative">
-          <div className="h-full w-6 absolute left-0 rounded-l-lg" style = {{backgroundColor: '#FC1E1E'}}></div>
-          <p className="ml-4 pl-4"> Ikke tilgjengelig - arbeid på hytta</p>
-        </div>
-      </div>
-
     </div>
   )
 }

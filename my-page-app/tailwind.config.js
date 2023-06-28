@@ -29,6 +29,15 @@ module.exports = {
           brand: '#2f4f4f',
           success: '#3c5c5c',
         },
+        blue: {
+          'small-appartment': '#2B809B',
+        },
+        red: {
+          'not-available': '#FC1E1E',
+        },
+        teal: {
+          annex: '#5BCEAE',
+        },
       },
     },
     keyframes: {
