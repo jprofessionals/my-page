@@ -74,7 +74,7 @@ export default function HomePage() {
         <title>Min side</title>
       </Head>
       <RequireAuth>
-        <div>
+        <div style={{ minWidth: "375px" }}>
           <UserInformation />
           <h3 className="ml-4 mb-6 text-3xl font-light">Dine hyttebookinger: </h3>
           {bookingLoadingStatus === 'completed' ? (

@@ -160,7 +160,7 @@ function Kalkulator() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4" style={{ minWidth: "375px" }}>
       <div className="prose">
         <h2>Lønnskalkulator</h2>
         <p>

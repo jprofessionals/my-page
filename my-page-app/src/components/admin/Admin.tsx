@@ -136,7 +136,7 @@ function Admin() {
   } else {
     return (
       <>
-        <div className="overflow-auto p-4">
+        <div className="overflow-auto p-4" style={{ minWidth: "375px" }}>
           <h2 className="prose prose-xl">Våre ansatte</h2>
 
           {/* Add text input field */}
