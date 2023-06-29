@@ -1,12 +1,12 @@
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
-import { useCallback, useEffect, useState } from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import ApiService from '@/services/api.service'
-import { toast } from 'react-toastify'
-import { Budget } from '@/types'
+import {toast} from 'react-toastify'
+import {Booking, Budget} from '@/types'
 import Loading from '@/components/Loading'
 import UserInformation from '@/components/UserInformation'
-import { useAuthContext } from '@/providers/AuthProvider'
+import {useAuthContext} from '@/providers/AuthProvider'
 import ErrorPage from '@/components/ErrorPage'
 
 const BudgetList = dynamic(() => import('@/components/budget/BudgetList'), {
@@ -17,6 +17,7 @@ const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
 })
 
 type BudgetLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
+type BookingLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
 
 export default function HomePage() {
   const [budgets, setBudgets] = useState<Budget[]>([])
@@ -24,6 +25,28 @@ export default function HomePage() {
     useState<BudgetLoadingStatus>('init')
   const { userFetchStatus } = useAuthContext()
   const [activeBudget, setActiveBudget] = useState<string | null>(null)
+
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [bookingLoadingStatus, setBookingLoadingStatus] =
+      useState<BookingLoadingStatus>('init')
+
+  const refreshBookings = useCallback(async () => {
+    setBookingLoadingStatus('loading')
+
+    try{
+      const loadedBookings = await ApiService.getBookingsForUser()
+      setBookingLoadingStatus('completed')
+      setBookings(loadedBookings)
+    } catch (e) {
+      setBookingLoadingStatus('failed')
+      toast.error('Klarte ikke laste bookings, prøv igjen senere')
+    }
+  }, [])
+
+  useEffect(() => {
+    if (bookingLoadingStatus !== 'init') return
+    if (userFetchStatus === 'fetched') refreshBookings()
+  }, [userFetchStatus, bookingLoadingStatus])
 
   const refreshBudgets = useCallback(async () => {
     setBudgetLoadingStatus('loading')
@@ -44,6 +67,7 @@ export default function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userFetchStatus, budgetLoadingStatus])
 
+
   return (
     <>
       <Head>
@@ -53,7 +77,23 @@ export default function HomePage() {
         <div>
           <UserInformation />
           <h3 className="ml-4 mb-6 text-3xl font-light">Dine hyttebookinger: </h3>
-          <p className='ml-4 mb-4'>Her vil det legges inn noe om brukerens hyttebookinger når vi kommer så langt - hilsen sommerstudentene</p>
+          {bookingLoadingStatus === 'completed' ? (
+              <>
+                {bookings.length > 0 ? (
+                    bookings.map((booking) => (
+                        <div key={booking.id} className="ml-10 mb-3">
+                          <p>Hytte: {booking.apartment.cabin_name}</p>
+                          <p>Start dato: {booking.startDate}</p>
+                          <p>Slutt dato: {booking.endDate}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p className = "ml-10">Du har ingen hyttebookinger. Se oversikt over ledige dager og book i kalenderen på hyttebookingsiden.</p>
+                )}
+              </>
+          ) : (
+              <ErrorPage errorText="Klarte ikke laste bookinger, prøv igjen senere." />
+          )}
           <Loading
             isLoading={['loading', 'init'].includes(budgetLoadingStatus)}
             loadingText="Laster inn ditt budsjett..."

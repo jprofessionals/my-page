@@ -46,6 +46,18 @@ const editBudgetPost = (postId, editPostRequest) => {
   })
 }
 
+const getBookingsForUser = async () => {
+  const response = await axios.get(API_URL + 'me/bookings', {
+    headers: authHeader(),
+  })
+
+  const bookings = response.data
+  return bookings.map((booking) => ({
+    ...booking,
+    id: String(booking.id),
+  }))
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -54,5 +66,6 @@ const ApiService = {
   createBudgetPost,
   deleteBudgetPost,
   editBudgetPost,
+  getBookingsForUser,
 }
 export default ApiService
