@@ -39,9 +39,9 @@ interface BookingRepository : JpaRepository<Booking, Long> {
     fun findBookingById(bookingId: Long): Booking
     fun findBookingByEmployeeId(employeeId: Int): List<Booking>
     fun findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
-        startDate: LocalDate,
-        endDate: LocalDate
+        startDate: LocalDate, endDate: LocalDate
     ): List<Booking>
+    fun findBookingsByEmployeeSub(employeeSub: String): List<Booking>
 }
 
 

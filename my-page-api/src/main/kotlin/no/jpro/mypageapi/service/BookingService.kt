@@ -1,9 +1,9 @@
 package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.dto.BookingDTO
-import no.jpro.mypageapi.utils.mapper.BookingMapper
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.repository.BookingRepository
+import no.jpro.mypageapi.utils.mapper.BookingMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -19,6 +19,10 @@ class BookingService(
     fun getBookings(employeeId: Int): List<BookingDTO> {
         val bookings = bookingRepository.findBookingByEmployeeId(employeeId)
         return bookings.map { bookingMapper.toBookingDTO(it) }
+    }
+    fun getUserBookings(userSub: String): List<BookingDTO> {
+        val bookings = bookingRepository.findBookingsByEmployeeSub(userSub)
+        return bookings.map { bookingMapper.toBookingDTO(it)}
     }
 
     fun getBookingsBetweenDates(startDate: LocalDate, endDate: LocalDate): List<BookingDTO> {

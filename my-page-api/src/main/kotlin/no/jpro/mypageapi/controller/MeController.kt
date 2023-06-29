@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.extensions.getSub
+import no.jpro.mypageapi.service.BookingService
 import no.jpro.mypageapi.service.BudgetService
 import no.jpro.mypageapi.service.UserService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -21,7 +22,8 @@ import org.springframework.web.bind.annotation.*
 @SecurityRequirement(name = "Bearer Authentication")
 class MeController(
     private val userService: UserService,
-    private val budgetService: BudgetService
+    private val budgetService: BudgetService,
+    private val bookingService: BookingService
 ) {
 
     @GetMapping("")
@@ -45,5 +47,19 @@ class MeController(
     )
     fun getBudgets(token: JwtAuthenticationToken): List<BudgetDTO> {
         return budgetService.getBudgets(token.getSub())
+    }
+
+    @GetMapping("bookings")
+    @Operation(summary = "Get the different cabin bookings that belong to logged in user.")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json", array = ArraySchema(
+                schema = Schema(implementation = BookingDTO::class)
+            )
+        )]
+    )
+    fun getBookings(token: JwtAuthenticationToken): List<BookingDTO> {
+        return bookingService.getUserBookings(token.getSub())
     }
 }
