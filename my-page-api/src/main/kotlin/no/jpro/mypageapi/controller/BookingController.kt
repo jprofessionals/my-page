@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.controller
 
+import io.ktor.util.date.*
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
@@ -10,9 +11,12 @@ import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.service.BookingService
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
+import java.time.format.DateTimeParseException
 import java.util.*
 
 @RestController
@@ -37,7 +41,7 @@ class BookingController(private val bookingService: BookingService) {
         return bookingService.getBooking(bookingID)
     }
 
-    @GetMapping("")
+    @GetMapping
     @RequiresAdmin
     @Operation(summary = "Get all bookings in the given month")
     @ApiResponse(
@@ -48,15 +52,31 @@ class BookingController(private val bookingService: BookingService) {
             )
         )]
     )
+
     fun getBookingsPerMonth(
         token: JwtAuthenticationToken,
         @RequestParam("startDate") startDate: String,
         @RequestParam("endDate") endDate: String,
-    ): List<BookingDTO>? {
-        val startDate: LocalDate = LocalDate.parse(startDate)
-        val endDate: LocalDate = LocalDate.parse(endDate)
-        return bookingService.getBookingsBetweenDates(startDate, endDate)
+    ): ResponseEntity<List<BookingDTO>?> {
+        try {
+            val parsedStartDate: LocalDate = LocalDate.parse(startDate)
+            val parsedEndDate: LocalDate = LocalDate.parse(endDate)
+            val bookings: List<BookingDTO> = bookingService.getBookingsBetweenDates(parsedStartDate, parsedEndDate)
+            return ResponseEntity.ok(bookings)
+        } catch (e: DateTimeParseException) {
+            throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
+        }
     }
+
+    @ExceptionHandler(InvalidDateException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleInvalidDateException(e: InvalidDateException): ErrorResponse {
+        return ErrorResponse(e.message)
+    }
+
+    data class ErrorResponse(val message: String?)
+
+    class InvalidDateException(message: String) : RuntimeException(message)
 
     @GetMapping("booking/{employee_id}")
     @RequiresAdmin
