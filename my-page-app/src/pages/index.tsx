@@ -109,7 +109,7 @@ export default function HomePage() {
                     <Accordion type="multiple" className="w-full">
                       <Item value="bookings" className="border-none">
                         <Trigger className={cn(
-                            'text-sm rounded-lg items-center px-3 gap-1 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none ',
+                            'text-sm rounded-lg items-center px-3 gap-2 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none ',
                             bookingConfig?.textColor,
                             bookingConfig?.bgColor,
                         )}
