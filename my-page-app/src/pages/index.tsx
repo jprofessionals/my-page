@@ -8,6 +8,11 @@ import Loading from '@/components/Loading'
 import UserInformation from '@/components/UserInformation'
 import {useAuthContext} from '@/providers/AuthProvider'
 import ErrorPage from '@/components/ErrorPage'
+import {Accordion, Content, Item, Trigger} from '@/components/ui/accordion'
+import {faHotel, IconDefinition} from "@fortawesome/free-solid-svg-icons";
+import cn from "@/utils/cn";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {get} from "radash";
 
 const BudgetList = dynamic(() => import('@/components/budget/BudgetList'), {
   ssr: false,
@@ -67,6 +72,26 @@ export default function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userFetchStatus, budgetLoadingStatus])
 
+  const bookingConfigs: Record<
+    string,
+    {
+      bgColor: string
+      textColor: string
+      icon: IconDefinition
+    }
+  > = {
+    default: {
+      bgColor: 'bg-yellow-hotel',
+      textColor: 'text-white',
+      icon: faHotel,
+    },
+  }
+
+  const bookingConfig = get(
+      bookingConfigs,
+      'default',
+      bookingConfigs.default,
+  )
 
   return (
     <>
@@ -80,13 +105,44 @@ export default function HomePage() {
           {bookingLoadingStatus === 'completed' ? (
               <>
                 {bookings.length > 0 ? (
-                    bookings.map((booking) => (
-                        <div key={booking.id} className="ml-10 mb-3">
-                          <p>Hytte: {booking.apartment.cabin_name}</p>
-                          <p>Start dato: {booking.startDate}</p>
-                          <p>Slutt dato: {booking.endDate}</p>
-                        </div>
-                    ))
+                  <div className="px-4">
+                    <Accordion type="multiple" className="w-full">
+                      <Item value="bookings" className="border-none">
+                        <Trigger className={cn(
+                            'text-sm rounded-lg items-center px-3 gap-1 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none ',
+                            bookingConfig?.textColor,
+                            bookingConfig?.bgColor,
+                        )}
+                      >
+                          <div className="flex flex-1 gap-4 justify-between">
+                            <span
+                              title="Hyttebooking"
+                              className="flex flex-wrap gap-2 justify-center uppercase"
+                            >
+                              {bookingConfig?.icon ? (
+                                <FontAwesomeIcon
+                                  icon={bookingConfig?.icon}
+                                  size="xl"
+                                  className="w-8"
+                                />
+                               ) : null}
+                              Bookinger
+                            </span>
+                            <span> Vis hyttebookinger</span>
+                          </div>
+                        </Trigger>
+                        <Content className="p-2 rounded-b-lg data-open:border-2">
+                          {bookings.map((booking) => (
+                              <div key={booking.id} className="ml-10 mb-3">
+                                <p>Hytte: {booking.apartment.cabin_name}</p>
+                                <p>Start dato: {booking.startDate}</p>
+                                <p>Slutt dato: {booking.endDate}</p>
+                              </div>
+                          ))}
+                        </Content>
+                      </Item>
+                    </Accordion>
+                  </div>
                 ) : (
                     <p className = "ml-10">Du har ingen hyttebookinger. Se oversikt over ledige dager og book i kalenderen på hyttebookingsiden.</p>
                 )}
