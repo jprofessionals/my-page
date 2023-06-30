@@ -106,7 +106,7 @@ export default function HomePage() {
               <>
                 {bookings.length > 0 ? (
                   <div className="px-4">
-                    <Accordion type="multiple" className="w-full">
+                    <Accordion type="multiple" className="mb-3 w-full">
                       <Item value="bookings" className="border-none">
                         <Trigger className={cn(
                             'text-sm rounded-lg items-center px-3 gap-2 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none ',
