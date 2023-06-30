@@ -1,11 +1,22 @@
 import * as React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { DayPicker } from 'react-day-picker'
-
 import cn from '@/utils/cn'
+import { format } from 'date-fns'
+import ApiService from '@/services/api.service'
+
 import { buttonVariants } from '@/components/ui/button'
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
+
+const startDate = '2023-06-01' // Replace with the desired start date
+const endDate = '2023-06-30' // Replace with the desired end date
+
+const cabinColors = {
+  1: 'bg-orange-brand',
+  2: 'bg-blue-small-appartment',
+  3: 'bg-teal-annex',
+}
 
 function MonthCalendar({
   className,
@@ -13,6 +24,34 @@ function MonthCalendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
+  const [bookings, setBookings] = React.useState([])
+
+  React.useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const bookings = await ApiService.getBookings(startDate, endDate)
+        setBookings(bookings)
+        console.log(bookings)
+        console.log(bookings[0].apartment.id)
+      } catch (error) {
+        console.error('Error:', error)
+      }
+    }
+    fetchBookings()
+  }, [])
+
+  const getBookings = (date: string) => {
+    return bookings.filter(
+      (booking) => date >= booking.startDate && date <= booking.endDate,
+    )
+  }
+
+  const getInitials = (name: string): string => {
+    const nameParts = name.split(' ')
+    const initials = nameParts.map((part) => part[0].toUpperCase()).join('')
+    return initials
+  }
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -33,13 +72,12 @@ function MonthCalendar({
         nav_button_next: 'absolute right-1',
         table: 'w-full border-collapse space-y-1',
         head_row: 'flex justify-between',
-        head_cell:
-          'text-muted-foreground rounded-md font-normal text-[0.8rem]',
+        head_cell: 'text-muted-foreground rounded-md font-normal text-[0.8rem]',
         row: 'flex justify-between mt-2',
         cell: 'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
         day: cn(
-          buttonVariants({ variant: 'ghost' }),
-          'h-9 w-9 p-0 font-normal aria-selected:opacity-100',
+          buttonVariants({ variant: 'avatar' }),
+          'h-40 w-40 p-0 font-normal aria-selected:opacity-100',
         ),
         day_selected:
           'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
@@ -54,11 +92,35 @@ function MonthCalendar({
       components={{
         IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        DayContent: (props) => {
+          const dateCalendar = format(props.date, 'dd')
+          const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
+
+          return (
+            <div>
+              <span>{dateCalendar}</span>
+              {bookingList.length > 0 && (
+                <div className="flex gap-3 p-5">
+                  {bookingList.map((booking) => (
+                    <span
+                      className={`p-2 rounded-full ${
+                        cabinColors[booking.apartment.id]
+                      } text-white`}
+                    >
+                      {getInitials(booking.employeeName)}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        },
       }}
       {...props}
     />
   )
 }
+
 MonthCalendar.displayName = 'MonthCalendar'
 
 export { MonthCalendar }

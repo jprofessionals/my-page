@@ -7,6 +7,8 @@ import MonthOverview from '@/components/hyttebooking/MonthOverview'
 import YearOverview from '@/components/hyttebooking/YearOverview'
 
 import { Button } from '@/components/ui/button'
+import * as React from 'react'
+import ApiService from '@/services/api.service'
 
 function Hyttebooking() {
   const [showMonthOverview, setShowMonthOverview] = useState(true)
@@ -90,32 +92,6 @@ function Hyttebooking() {
 
       {showMonthOverview && <MonthOverview />}
       {showYearOverview && <YearOverview />}
-
-      <div className="flex flex-col gap-3 mt-7">
-        <div className="flex gap-2 bg-gray-100 rounded-lg">
-          <div className="w-6 rounded-l-lg bg-orange-brand" />
-          <span>
-            Stor leilighet: 13 sengeplasser (dyr <strong>ikke</strong> tilatt)
-          </span>
-        </div>
-
-        <div className="flex gap-2 bg-gray-100 rounded-lg">
-          <div className="w-6 rounded-l-lg bg-blue-small-appartment" />
-          Liten leilighet: 11 sengeplasser (dyr tilatt, men ikke på soverom)
-        </div>
-
-        <div className="flex gap-2 bg-gray-100 rounded-lg">
-          <div className="w-6 rounded-l-lg bg-teal-annex" />
-          <span>
-            Annekset: 10 sengeplasser (dyr <strong>ikke</strong> tilatt)
-          </span>
-        </div>
-
-        <div className="flex gap-2 p-0 mb-10 bg-gray-100 rounded-lg">
-          <div className="w-6 rounded-l-lg bg-red-not-available" />
-          Ikke tilgjengelig - arbeid på hytta
-        </div>
-      </div>
     </div>
   )
 }

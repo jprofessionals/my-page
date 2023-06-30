@@ -46,6 +46,32 @@ const editBudgetPost = (postId, editPostRequest) => {
   })
 }
 
+const getBookings = (startDate, endDate) => {
+  const params = {
+    startDate: startDate,
+    endDate: endDate,
+  }
+
+  return axios
+    .get(API_URL + 'booking', {
+      headers: authHeader(),
+      params: params,
+    })
+    .then((response) => {
+      const bookings = response.data
+      return bookings.map((booking) => ({
+        id: String(booking.id),
+        startDate: booking.startDate,
+        endDate: booking.endDate,
+        apartment: {
+          id: booking.apartment.id,
+          cabin_name: booking.apartment.cabin_name,
+        },
+        employeeName: booking.employeeName,
+      }))
+    })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -54,5 +80,6 @@ const ApiService = {
   createBudgetPost,
   deleteBudgetPost,
   editBudgetPost,
+  getBookings,
 }
 export default ApiService
