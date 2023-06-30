@@ -103,6 +103,7 @@ function MonthCalendar({
                 <div className="flex gap-3 p-5">
                   {bookingList.map((booking) => (
                     <span
+                      key={booking.id} // Add key prop with a unique identifier
                       className={`p-2 rounded-full ${
                         cabinColors[booking.apartment.id]
                       } text-white`}
