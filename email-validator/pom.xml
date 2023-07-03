@@ -49,9 +49,14 @@
       <version>2.0.7</version>
     </dependency>
     <dependency>
-      <groupId>com.hkupty.penna</groupId>
-      <artifactId>penna-core</artifactId>
-      <version>0.6.2</version>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.4.7</version>
+    </dependency>
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+        <artifactId>logstash-logback-encoder</artifactId>
+      <version>7.4</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
