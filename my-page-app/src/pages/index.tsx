@@ -9,6 +9,7 @@ import UserInformation from '@/components/UserInformation'
 import {useAuthContext} from '@/providers/AuthProvider'
 import ErrorPage from '@/components/ErrorPage'
 import {Accordion, Content, Item, Trigger} from '@/components/ui/accordion'
+import {Accordions, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/bookingAccordion'
 import {faHotel, IconDefinition} from "@fortawesome/free-solid-svg-icons";
 import cn from "@/utils/cn";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -106,9 +107,9 @@ export default function HomePage() {
               <>
                 {bookings.length > 0 ? (
                   <div className="px-4">
-                    <Accordion type="multiple" className="mb-3 w-full">
-                      <Item value="bookings" className="border-none">
-                        <Trigger className={cn(
+                    <Accordions type="multiple" className="mb-3 w-full">
+                      <AccordionItem value="bookings" className="border-none">
+                        <AccordionTrigger className={cn(
                             'text-sm rounded-lg items-center px-3 gap-2 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none ',
                             bookingConfig?.textColor,
                             bookingConfig?.bgColor,
@@ -130,8 +131,8 @@ export default function HomePage() {
                             </span>
                             <span> Vis hyttebookinger</span>
                           </div>
-                        </Trigger>
-                        <Content className="p-2 rounded-b-lg data-open:border-2">
+                        </AccordionTrigger>
+                        <AccordionContent className="p-2 rounded-b-lg data-open:border-2">
                           {bookings.map((booking) => (
                               <div key={booking.id} className="ml-10 mb-3">
                                 <p>Hytte: {booking.apartment.cabin_name}</p>
@@ -139,9 +140,9 @@ export default function HomePage() {
                                 <p>Slutt dato: {booking.endDate}</p>
                               </div>
                           ))}
-                        </Content>
-                      </Item>
-                    </Accordion>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordions>
                   </div>
                 ) : (
                     <p className = "ml-10">Du har ingen hyttebookinger. Se oversikt over ledige dager og book i kalenderen på hyttebookingsiden.</p>
