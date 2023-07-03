@@ -21,7 +21,7 @@ class JobPostingService(
         return jobPostingRepository.existsByMessageId(messageId)
     }
 
-    fun existsByContentDigest(sha3: String): Boolean {
-        return jobPostingRepository.existsByContentDigest(sha3)
+    fun existsByContentDigest(digest: String): Boolean {
+        return jobPostingRepository.existsByContentDigest(digest)
     }
 }
