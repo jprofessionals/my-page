@@ -24,6 +24,7 @@ import org.apache.avro.specific.SpecificDatumReader
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import java.io.ByteArrayInputStream
 import java.security.MessageDigest
@@ -42,6 +43,7 @@ class JobPostingController(
     private val reader = SpecificDatumReader(RawEmail::class.java)
 
     @GetMapping
+    @Transactional
     @Operation(summary = "Get all job postings")
     @ApiResponse(
         responseCode = "200",
@@ -58,9 +60,10 @@ class JobPostingController(
     }
 
     @PostMapping
+    @Transactional
     @Operation(summary = "Create a new job posting from an PubSub event")
     @ApiResponse(
-        responseCode = "200",
+        responseCode = "201",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = UserDTO::class))]
     )
     fun createJobPosting(

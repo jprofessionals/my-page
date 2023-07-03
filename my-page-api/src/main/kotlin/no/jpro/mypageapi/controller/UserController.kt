@@ -13,6 +13,7 @@ import no.jpro.mypageapi.service.UserService
 import no.jpro.mypageapi.utils.mapper.UserMapper
 import org.slf4j.LoggerFactory
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -26,14 +27,16 @@ class UserController(
     private val logger = LoggerFactory.getLogger(UserController::class.java)
 
     @GetMapping
+    @Transactional
     @RequiresAdmin
     fun getAllUsers(): List<UserDTO> = userService.getAllUsers()
 
     @PostMapping
+    @Transactional
     @RequiresAdmin
     @Operation(summary = "Create a new employee")
     @ApiResponse(
-        responseCode = "200",
+        responseCode = "201",
         description = "Employee created",
         content = [Content(schema = Schema(implementation = UserDTO::class))]
     )
