@@ -38,6 +38,9 @@ module.exports = {
         teal: {
           annex: '#5BCEAE',
         },
+        yellow: {
+          hotel: '#F6B26B'
+        },
       },
     },
     keyframes: {
