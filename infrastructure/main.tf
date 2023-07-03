@@ -243,3 +243,13 @@ resource "google_pubsub_subscription" "my-page-api" {
     maximum_backoff = "600s"
   }
 }
+
+resource "google_service_account" "cloud-sql-proxy" {
+  account_id = "cloud-sql-proxy"
+}
+
+resource "google_project_iam_member" "cloud-sql-proxy-client" {
+  project = data.google_project.project.project_id
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.cloud-sql-proxy.email}"
+}

@@ -16,4 +16,12 @@ class JobPostingService(
     fun createJobPostings(jobPostings: List<JobPosting>) {
         jobPostingRepository.saveAll(jobPostings)
     }
+
+    fun existsByMessageId(messageId: String): Boolean {
+        return jobPostingRepository.existsByMessageId(messageId)
+    }
+
+    fun existsByContentDigest(digest: String): Boolean {
+        return jobPostingRepository.existsByContentDigest(digest)
+    }
 }

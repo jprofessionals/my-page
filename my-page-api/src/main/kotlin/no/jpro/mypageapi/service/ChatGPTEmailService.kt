@@ -6,7 +6,6 @@ import com.lowagie.text.pdf.PdfReader
 import com.lowagie.text.pdf.parser.PdfTextExtractor
 import jakarta.mail.Multipart
 import jakarta.mail.Part
-import jakarta.mail.internet.MimeMessage
 import no.jpro.mypageapi.dto.JobPostingDTO
 import no.jpro.mypageapi.service.ai.GptConversationService
 import org.jsoup.Jsoup
@@ -33,7 +32,7 @@ class ChatGPTEmailService(
     private final val logger = LoggerFactory.getLogger(ChatGPTEmailService::class.java)
 
 
-    private fun parsePartRecursive(part: Part): List<ParsedPart> {
+    fun parsePartRecursive(part: Part): List<ParsedPart> {
         if (part.isMimeType("text/plain")) {
             return listOf(ParsedPart(DocumentType.PLAINTEXT, part.content as String))
         } else if (part.isMimeType("text/html")) {
@@ -77,9 +76,7 @@ class ChatGPTEmailService(
         }
     }
 
-    fun chatGPTJobPosting(message: MimeMessage): List<ChatGPTResponse> {
-        val parts = parsePartRecursive(message)
-
+    fun chatGPTJobPosting(parts: List<ParsedPart>): List<ChatGPTResponse> {
         val conversationId: UUID = UUID.randomUUID()
 
         val prompt = """
@@ -89,7 +86,7 @@ class ChatGPTEmailService(
             
             Basert på teksten, kan du fylle ut følgende JSON objekt? 
             Svar kun med JSON og uten ekstra tekst eller tegn.
-            Tidspunkt skal være i RFC3339 format.
+            Tidspunkt skal være i ISO8601 format og husk å inkludere offset eller Z.
             [    
                 {
                   "kunde": "",
@@ -140,7 +137,7 @@ data class ChatGPTResponse(
     val antallStillinger: Int,
     val arbeidssted: String,
     val totaltAntallÅrsErfaring: Int,
-    val søknadsfrist: ZonedDateTime,
+    val søknadsfrist: String,
     val systemEllerProsjekt: String,
     val teknologier: List<String>,
 )

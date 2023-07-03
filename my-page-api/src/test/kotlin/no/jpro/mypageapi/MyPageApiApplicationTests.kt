@@ -62,7 +62,9 @@ class MyPageApiApplicationTests @Autowired constructor(private val chatGPTEmailS
 		val message = MimeMessage(Session.getDefaultInstance(System.getProperties()),
 				                  BufferedInputStream(this::class.java.getResourceAsStream("/email1.rfc822")))
 
-		val result = chatGPTEmailService.chatGPTJobPosting(message)
+		val parts = chatGPTEmailService.parsePartRecursive(message)
+		val result = chatGPTEmailService.chatGPTJobPosting(parts)
+
 		Assertions.assertTrue(result.isNotEmpty())
 	}
 }
