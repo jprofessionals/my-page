@@ -15,9 +15,9 @@ const startDate = '2023-06-01' // Replace with the desired start date
 const endDate = '2023-12-30' // Replace with the desired end date
 
 const cabinColors = {
-  1: 'bg-orange-brand',
-  2: 'bg-blue-small-appartment',
-  3: 'bg-teal-annex',
+  6: 'bg-orange-brand',
+  4: 'bg-blue-small-appartment',
+  5: 'bg-teal-annex',
 }
 
 function MonthCalendar({
@@ -82,6 +82,8 @@ function MonthCalendar({
         day: cn(
           buttonVariants({ variant: 'avatar' }),
           'h-40 w-40 p-0 font-normal aria-selected:opacity-100',
+          'flex flex-col items-center justify-start',
+          'p-3', // Existing styles
         ),
         day_selected:
           'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
@@ -99,12 +101,29 @@ function MonthCalendar({
         DayContent: (props) => {
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
+
+          // Group bookings by apartment ID
+          const groupedBookings: { [apartmentId: string]: Booking[] } =
+            bookingList.reduce(
+              (groups, booking) => {
+                const apartmentId = String(booking.apartment?.id)
+                if (apartmentId) {
+                  if (!groups[apartmentId]) {
+                    groups[apartmentId] = []
+                  }
+                  groups[apartmentId].push(booking)
+                }
+                return groups
+              },
+              {} as { [apartmentId: string]: Booking[] }, // Type assertion for the initial value of groups
+            )
+
           return (
             <div>
               <span>{dateCalendar}</span>
-              {bookingList.length > 0 && (
-                <div className="flex gap-3 p-5">
-                  {bookingList.map((booking) => (
+              {Object.values(groupedBookings).map((group) => (
+                <div className="flex gap-3 p-1">
+                  {group.map((booking) => (
                     <span
                       key={booking.id}
                       className={`p-2 rounded-full ${
@@ -118,7 +137,7 @@ function MonthCalendar({
                     </span>
                   ))}
                 </div>
-              )}
+              ))}
             </div>
           )
         },
