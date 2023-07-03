@@ -15,6 +15,7 @@ import no.jpro.mypageapi.service.UserService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -26,7 +27,8 @@ class MeController(
     private val bookingService: BookingService
 ) {
 
-    @GetMapping("")
+    @GetMapping
+    @Transactional
     @Operation(summary = "Get data for user identified by the bearer token")
     @ApiResponse(
         responseCode = "200",
@@ -36,6 +38,7 @@ class MeController(
         userService.getOrCreateUser(jwt).apply { this.budgets = null }
 
     @GetMapping("budgets")
+    @Transactional
     @Operation(summary = "Get the different budgets that belong to logged in user.")
     @ApiResponse(
         responseCode = "200",
@@ -50,6 +53,7 @@ class MeController(
     }
 
     @GetMapping("bookings")
+    @Transactional
     @Operation(summary = "Get the different cabin bookings that belong to logged in user.")
     @ApiResponse(
         responseCode = "200",

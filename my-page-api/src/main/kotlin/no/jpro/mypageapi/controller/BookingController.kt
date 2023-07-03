@@ -14,6 +14,7 @@ import no.jpro.mypageapi.service.BookingService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
@@ -24,6 +25,7 @@ import java.util.*
 @SecurityRequirement(name = "Bearer Authentication")
 class BookingController(private val bookingService: BookingService) {
     @GetMapping("{bookingID}")
+    @Transactional
     @RequiresAdmin
     @Operation(summary = "Get the booking connected to the booking id")
     @ApiResponse(
@@ -42,6 +44,7 @@ class BookingController(private val bookingService: BookingService) {
     }
 
     @GetMapping
+    @Transactional
     @RequiresAdmin
     @Operation(summary = "Get all bookings in the given month")
     @ApiResponse(
@@ -79,6 +82,7 @@ class BookingController(private val bookingService: BookingService) {
     class InvalidDateException(message: String) : RuntimeException(message)
 
     @GetMapping("booking/{employee_id}")
+    @Transactional
     @RequiresAdmin
     @Operation(summary = "Get the booking connected to the employee id")
     @ApiResponse(

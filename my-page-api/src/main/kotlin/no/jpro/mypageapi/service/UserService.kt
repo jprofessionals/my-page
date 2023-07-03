@@ -17,7 +17,6 @@ class UserService(
     private val budgetService: BudgetService
 ) {
 
-    @Transactional
     fun initializeNewEmployee(email: String, employeeNumber: Int, budgetStartDate: LocalDate): User {
         val existingUser = getUserByEmail(email)
 
