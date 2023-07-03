@@ -77,3 +77,15 @@ export type JobPostingType = {
   requiredYearsOfExperience?: number
   resourcesNeeded?: number
 }
+
+export type Apartment = {
+  id?: number
+  cabin_name: string
+}
+export type Booking = {
+  id?: number
+  startDate: string
+  endDate: string
+  apartment: Apartment
+  employeeName: string
+}

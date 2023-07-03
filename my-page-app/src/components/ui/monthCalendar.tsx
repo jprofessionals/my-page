@@ -1,16 +1,18 @@
-import * as React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { DayPicker } from 'react-day-picker'
 import cn from '@/utils/cn'
 import { format } from 'date-fns'
+import { Booking } from '@/types'
+
 import ApiService from '@/services/api.service'
 
 import { buttonVariants } from '@/components/ui/button'
+import { ComponentProps, useEffect, useState } from 'react'
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+export type CalendarProps = ComponentProps<typeof DayPicker>
 
 const startDate = '2023-06-01' // Replace with the desired start date
-const endDate = '2023-06-30' // Replace with the desired end date
+const endDate = '2023-12-30' // Replace with the desired end date
 
 const cabinColors = {
   1: 'bg-orange-brand',
@@ -24,19 +26,18 @@ function MonthCalendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
-  const [bookings, setBookings] = React.useState([])
+  const [bookings, setBookings] = useState<Booking[]>([])
 
-  React.useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const bookings = await ApiService.getBookings(startDate, endDate)
-        setBookings(bookings)
-        console.log(bookings)
-        console.log(bookings[0].apartment.id)
-      } catch (error) {
-        console.error('Error:', error)
-      }
+  const fetchBookings = async () => {
+    try {
+      const bookings = await ApiService.getBookings(startDate, endDate)
+      setBookings(bookings)
+    } catch (error) {
+      console.error('Error:', error)
     }
+  }
+
+  useEffect(() => {
     fetchBookings()
   }, [])
 
@@ -47,6 +48,9 @@ function MonthCalendar({
   }
 
   const getInitials = (name: string): string => {
+    if (!name) {
+      return '' // Return an empty string or handle the case when name is null
+    }
     const nameParts = name.split(' ')
     const initials = nameParts.map((part) => part[0].toUpperCase()).join('')
     return initials
@@ -95,7 +99,9 @@ function MonthCalendar({
         DayContent: (props) => {
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
+          console.log('Hello')
 
+          console.log(bookingList)
           return (
             <div>
               <span>{dateCalendar}</span>
@@ -105,7 +111,10 @@ function MonthCalendar({
                     <span
                       key={booking.id} // Add key prop with a unique identifier
                       className={`p-2 rounded-full ${
-                        cabinColors[booking.apartment.id]
+                        cabinColors[
+                          (booking.apartment?.id ||
+                            '') as keyof typeof cabinColors
+                        ]
                       } text-white`}
                     >
                       {getInitials(booking.employeeName)}
