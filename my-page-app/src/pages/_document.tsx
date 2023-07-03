@@ -29,7 +29,7 @@ export default function Document() {
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
       </Head>
-      <body>
+      <body className="min-w-[375px]">
         <Main />
         <NextScript />
       </body>
