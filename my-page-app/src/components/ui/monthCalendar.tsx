@@ -49,7 +49,7 @@ function MonthCalendar({
 
   const getInitials = (name: string): string => {
     if (!name) {
-      return '' // Return an empty string or handle the case when name is null
+      return ''
     }
     const nameParts = name.split(' ')
     const initials = nameParts.map((part) => part[0].toUpperCase()).join('')
@@ -99,9 +99,6 @@ function MonthCalendar({
         DayContent: (props) => {
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
-          console.log('Hello')
-
-          console.log(bookingList)
           return (
             <div>
               <span>{dateCalendar}</span>
@@ -109,7 +106,7 @@ function MonthCalendar({
                 <div className="flex gap-3 p-5">
                   {bookingList.map((booking) => (
                     <span
-                      key={booking.id} // Add key prop with a unique identifier
+                      key={booking.id}
                       className={`p-2 rounded-full ${
                         cabinColors[
                           (booking.apartment?.id ||
