@@ -1,0 +1,6 @@
+[
+  {
+    "pattern": "logback.xml",
+    "action": "copy"
+  }
+]
