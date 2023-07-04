@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import jakarta.transaction.Transactional
 import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.entity.Booking
@@ -15,6 +14,7 @@ import no.jpro.mypageapi.service.BookingService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
