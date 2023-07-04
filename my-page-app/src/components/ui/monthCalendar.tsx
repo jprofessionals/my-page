@@ -45,6 +45,14 @@ function MonthCalendar({
     )
   }
 
+  /*
+  const getMyBookings = (bookings) => {
+      return bookings.filter(
+          (myBookings) =>
+      )
+  }
+   */
+
   const getInitials = (name: string): string => {
     if (!name) {
       return ''
@@ -64,7 +72,7 @@ function MonthCalendar({
           'flex flex-col sm:flex-row space-y-10 sm:space-x-10 sm:space-y-0',
         month: 'space-y-4 w-screen',
         caption: 'flex justify-center pt-1 relative items-center',
-        caption_label: 'text-sm font-medium',
+        caption_label: 'text-sm font-medium font-size: xx-large',
         nav: 'space-x-1 flex items-center',
         nav_button: cn(
           buttonVariants({ variant: 'outline' }),
@@ -76,16 +84,16 @@ function MonthCalendar({
         head_row: 'flex justify-between',
         head_cell: 'text-muted-foreground rounded-md font-normal text-[0.8rem]',
         row: 'flex justify-between mt-2',
-        cell: 'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+        cell: 'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent:has([aria-selected]) first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
         day: cn(
           buttonVariants({ variant: 'avatar' }),
           'h-40 w-40 p-0 font-normal aria-selected:opacity-100',
           'flex flex-col items-center justify-start',
           'p-3',
+          'tw-bg-opacity: 0',
         ),
-        day_selected:
-          'bg-primary bg-opacity-75 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
-        day_today: 'bg-accent text-accent-foreground',
+        day_selected: 'tw-bg-opacity: 0',
+        day_today: 'outline bg-calendar text-accent-foreground',
         day_outside: 'text-muted-foreground opacity-50',
         day_disabled: 'text-muted-foreground opacity-50',
         day_range_middle:
@@ -100,35 +108,49 @@ function MonthCalendar({
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
 
-          const groupedBookings: { [apartmentId: string]: Booking[] } =
-            bookingList.reduce((groups, booking) => {
-              const apartmentId = String(booking.apartment?.id)
-              if (apartmentId) {
-                if (!groups[apartmentId]) {
-                  groups[apartmentId] = []
-                }
-                groups[apartmentId].push(booking)
-              }
-              return groups
-            }, {} as { [apartmentId: string]: Booking[] })
+          const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
+
+          const bookingsByCabin: { [key: string]: Booking[] } =
+            cabinOrder.reduce((result: { [key: string]: Booking[] }, cabin) => {
+              result[cabin] = bookingList.filter(
+                (booking) => booking.apartment?.cabin_name === cabin,
+              )
+              return result
+            }, {})
+
+          const cabinBookings = cabinOrder.map((cabin) => {
+            const cabinBookings = bookingsByCabin[cabin] || []
+            return cabinBookings.length > 0 ? (
+              <div
+                key={cabin}
+                className="flex gap-3 p-1"
+                style={{ width: '140px' }}
+              >
+                {cabinBookings.map((booking) => (
+                  <span
+                    key={booking.id}
+                    className={`p-2 w-full h-full rounded-full ${
+                      cabinColors[booking.apartment?.cabin_name || '']
+                    } text-white`}
+                  >
+                    {getInitials(booking.employeeName)}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <div key={cabin} className="flex gap-3 p-1">
+                <span
+                  className="p-2 rounded-full height=30"
+                  style={{ visibility: 'hidden', height: '30px' }}
+                />
+              </div>
+            )
+          })
 
           return (
             <div>
-              <span>{dateCalendar}</span>
-              {Object.values(groupedBookings).map((group) => (
-                <div key={group[0].id} className="flex gap-3 p-1">
-                  {group.map((booking) => (
-                    <span
-                      key={booking.id}
-                      className={`p-2 rounded-full ${
-                        cabinColors[booking.apartment?.cabin_name || '']
-                      } text-white`}
-                    >
-                      {getInitials(booking.employeeName)}
-                    </span>
-                  ))}
-                </div>
-              ))}
+              <span style={{ fontSize: '20px' }}>{dateCalendar}</span>
+              {cabinBookings}
             </div>
           )
         },

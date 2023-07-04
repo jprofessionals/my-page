@@ -39,7 +39,7 @@ module.exports = {
           annex: '#5BCEAE',
         },
         yellow: {
-          hotel: '#F6B26B'
+          hotel: '#F6B26B',
         },
       },
     },
