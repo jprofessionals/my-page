@@ -1,6 +1,9 @@
-[
-  {
-    "pattern": "logback.xml",
-    "action": "copy"
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "logback.xml"
+      }
+    ]
   }
-]
+}
