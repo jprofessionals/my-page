@@ -30,4 +30,10 @@ class BookingService(
             bookingRepository.findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(startDate, endDate)
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
+
+    fun getBookingsOnDay(date: LocalDate): List<BookingDTO> {
+        val bookings =
+            bookingRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(date, date)
+        return bookings.map { bookingMapper.toBookingDTO(it) }
+    }
 }

@@ -81,7 +81,8 @@ class BookingController(private val bookingService: BookingService) {
 
     class InvalidDateException(message: String) : RuntimeException(message)
 
-    @GetMapping("booking/{employee_id}")
+
+    @GetMapping("employee/{employee_id}")
     @Transactional
     @RequiresAdmin
     @Operation(summary = "Get the booking connected to the employee id")
@@ -100,6 +101,30 @@ class BookingController(private val bookingService: BookingService) {
         return bookingService.getBookings(employee_id)
     }
 
+    @GetMapping("/date")
+    @Transactional
+    @RequiresAdmin
+    @Operation(summary = "Get all bookings on the specified date")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json", array = ArraySchema(
+                schema = Schema(implementation = BookingDTO::class)
+            )
+        )]
+    )
 
+    fun getBookingsPerDay(
+        token: JwtAuthenticationToken,
+        @RequestParam("date") date: String,
+    ): ResponseEntity<List<BookingDTO>?> {
+        try {
+            val parsedDate: LocalDate = LocalDate.parse(date)
+            val bookings: List<BookingDTO> = bookingService.getBookingsOnDay(parsedDate)
+            return ResponseEntity.ok(bookings)
+        } catch (e: DateTimeParseException) {
+            throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
+        }
+    }
 }
 
