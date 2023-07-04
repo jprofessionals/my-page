@@ -56,5 +56,33 @@
     "queryAllPublicMethods": true,
     "queryAllPublicConstructors": true,
     "unsafeAllocated": true
+  },
+  {
+    "name" : "net.logstash.logback.encoder.LogstashEncoder",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "queryAllPublicMethods": true,
+    "queryAllPublicConstructors": true,
+    "unsafeAllocated": true
+  },
+  {
+    "name" : "logging.SeverityAddingFilter",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "queryAllPublicMethods": true,
+    "queryAllPublicConstructors": true,
+    "unsafeAllocated": true
   }
 ]
