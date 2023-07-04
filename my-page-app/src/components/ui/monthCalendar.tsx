@@ -12,10 +12,10 @@ export type CalendarProps = ComponentProps<typeof DayPicker>
 const startDate = '2023-06-01'
 const endDate = '2023-12-30'
 
-const cabinColors = {
-  6: 'bg-orange-brand',
-  4: 'bg-blue-small-appartment',
-  5: 'bg-teal-annex',
+const cabinColors: { [key: string]: string } = {
+  Annekset: 'bg-teal-annex',
+  'Liten leilighet': 'bg-blue-small-appartment',
+  'Stor leilighet': 'bg-orange-brand',
 }
 
 function MonthCalendar({
@@ -84,7 +84,7 @@ function MonthCalendar({
           'p-3', // Existing styles
         ),
         day_selected:
-          'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
+          'bg-primary bg-opacity-75 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
         day_today: 'bg-accent text-accent-foreground',
         day_outside: 'text-muted-foreground opacity-50',
         day_disabled: 'text-muted-foreground opacity-50',
@@ -121,10 +121,7 @@ function MonthCalendar({
                     <span
                       key={booking.id}
                       className={`p-2 rounded-full ${
-                        cabinColors[
-                          (booking.apartment?.id ||
-                            '') as keyof typeof cabinColors
-                        ]
+                        cabinColors[booking.apartment?.cabin_name || '']
                       } text-white`}
                     >
                       {getInitials(booking.employeeName)}
