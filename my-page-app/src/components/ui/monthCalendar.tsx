@@ -3,16 +3,14 @@ import { DayPicker } from 'react-day-picker'
 import cn from '@/utils/cn'
 import { format } from 'date-fns'
 import { Booking } from '@/types'
-
-import ApiService from '@/services/api.service'
-
-import { buttonVariants } from '@/components/ui/button'
 import { ComponentProps, useEffect, useState } from 'react'
+import { buttonVariants } from '@/components/ui/button'
+import ApiService from '@/services/api.service'
 
 export type CalendarProps = ComponentProps<typeof DayPicker>
 
-const startDate = '2023-06-01' // Replace with the desired start date
-const endDate = '2023-12-30' // Replace with the desired end date
+const startDate = '2023-06-01'
+const endDate = '2023-12-30'
 
 const cabinColors = {
   6: 'bg-orange-brand',
@@ -102,27 +100,23 @@ function MonthCalendar({
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
 
-          // Group bookings by apartment ID
           const groupedBookings: { [apartmentId: string]: Booking[] } =
-            bookingList.reduce(
-              (groups, booking) => {
-                const apartmentId = String(booking.apartment?.id)
-                if (apartmentId) {
-                  if (!groups[apartmentId]) {
-                    groups[apartmentId] = []
-                  }
-                  groups[apartmentId].push(booking)
+            bookingList.reduce((groups, booking) => {
+              const apartmentId = String(booking.apartment?.id)
+              if (apartmentId) {
+                if (!groups[apartmentId]) {
+                  groups[apartmentId] = []
                 }
-                return groups
-              },
-              {} as { [apartmentId: string]: Booking[] }, // Type assertion for the initial value of groups
-            )
+                groups[apartmentId].push(booking)
+              }
+              return groups
+            }, {} as { [apartmentId: string]: Booking[] })
 
           return (
             <div>
               <span>{dateCalendar}</span>
               {Object.values(groupedBookings).map((group) => (
-                <div className="flex gap-3 p-1">
+                <div key={group[0].id} className="flex gap-3 p-1">
                   {group.map((booking) => (
                     <span
                       key={booking.id}
