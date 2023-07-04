@@ -81,7 +81,7 @@ function MonthCalendar({
           buttonVariants({ variant: 'avatar' }),
           'h-40 w-40 p-0 font-normal aria-selected:opacity-100',
           'flex flex-col items-center justify-start',
-          'p-3', // Existing styles
+          'p-3',
         ),
         day_selected:
           'bg-primary bg-opacity-75 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
