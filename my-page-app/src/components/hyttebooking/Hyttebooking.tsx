@@ -30,10 +30,9 @@ function Hyttebooking() {
             <h1>Påmelding firmahytte</h1>
             <div className="h-1.5 bg-orange-500"></div>
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
+              Denne siden er under produksjon av årets tre sommerstudenter. Vi håper dere får god nytte av denne i nærmeste fremtid!
+              Med vennlig hilsen,
+              Sophie, Ulrik og Torbjørn.
             </p>
           </div>
 
@@ -79,13 +78,13 @@ function Hyttebooking() {
         >
           Måned oversikt
         </Button>
-        <Button
+        {/*<Button
           size="sm"
           className={`mt-4 mr-4 ${showYearOverview ? 'bg-orange-500' : ''}`}
           onClick={handleShowYearOverview}
         >
           År oversikt
-        </Button>
+        </Button>*/}
       </div>
 
       {showMonthOverview && <MonthOverview />}
