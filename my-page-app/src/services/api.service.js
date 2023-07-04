@@ -84,6 +84,31 @@ const getBookingsForUser = async () => {
   }))
 }
 
+const getBookingsForDay = (selectedDate) => {
+  const params = {
+    date: selectedDate
+  }
+
+  return axios
+      .get(API_URL + 'booking/date', {
+        headers: authHeader(),
+        params: params
+      })
+      .then((response) => {
+        const bookings = response.data;
+        return bookings.map((booking) => ({
+          id: String(booking.id),
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          apartment: {
+            id: booking.apartment.id,
+            cabin_name: booking.apartment.cabin_name,
+          },
+          employeeName: booking.employeeName,
+        }))
+      })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -94,5 +119,6 @@ const ApiService = {
   editBudgetPost,
   getBookings,
   getBookingsForUser,
+  getBookingsForDay,
 }
 export default ApiService
