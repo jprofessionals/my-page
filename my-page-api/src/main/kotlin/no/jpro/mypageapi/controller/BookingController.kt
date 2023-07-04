@@ -25,6 +25,7 @@ import java.util.*
 @SecurityRequirement(name = "Bearer Authentication")
 class BookingController(private val bookingService: BookingService) {
     @GetMapping("{bookingID}")
+    @Transactional
     @RequiresAdmin
     @Operation(summary = "Get the booking connected to the booking id")
     @ApiResponse(
@@ -43,6 +44,7 @@ class BookingController(private val bookingService: BookingService) {
     }
 
     @GetMapping
+    @Transactional
     @RequiresAdmin
     @Operation(summary = "Get all bookings in the given month")
     @ApiResponse(
@@ -78,6 +80,7 @@ class BookingController(private val bookingService: BookingService) {
     data class ErrorResponse(val message: String?)
 
     class InvalidDateException(message: String) : RuntimeException(message)
+
 
     @GetMapping("employee/{employee_id}")
     @Transactional

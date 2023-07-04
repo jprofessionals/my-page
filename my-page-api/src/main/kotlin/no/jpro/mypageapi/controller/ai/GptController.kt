@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.jpro.mypageapi.service.ai.GptConversationService
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -13,6 +14,7 @@ import java.util.*
 class GptController(val conversationService: GptConversationService) {
 
     @PostMapping("/chat")
+    @Transactional
     @Operation(summary = "Chat with GPT", description = "Converse with the GPT model")
     fun chatWithGpt(
         @RequestBody
