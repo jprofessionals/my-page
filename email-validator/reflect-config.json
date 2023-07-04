@@ -42,5 +42,19 @@
     "queryAllPublicMethods": true,
     "queryAllPublicConstructors": true,
     "unsafeAllocated": true
+  },
+  {
+    "name" : "ch.qos.logback.core.ConsoleAppender",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "queryAllPublicMethods": true,
+    "queryAllPublicConstructors": true,
+    "unsafeAllocated": true
   }
 ]
