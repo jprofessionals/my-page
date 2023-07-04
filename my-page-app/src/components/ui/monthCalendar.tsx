@@ -3,21 +3,19 @@ import { DayPicker } from 'react-day-picker'
 import cn from '@/utils/cn'
 import { format } from 'date-fns'
 import { Booking } from '@/types'
-
-import ApiService from '@/services/api.service'
-
-import { buttonVariants } from '@/components/ui/button'
 import { ComponentProps, useEffect, useState } from 'react'
+import { buttonVariants } from '@/components/ui/button'
+import ApiService from '@/services/api.service'
 
 export type CalendarProps = ComponentProps<typeof DayPicker>
 
-const startDate = '2023-06-01' // Replace with the desired start date
-const endDate = '2023-12-30' // Replace with the desired end date
+const startDate = '2023-06-01'
+const endDate = '2023-12-30'
 
-const cabinColors = {
-  1: 'bg-orange-brand',
-  2: 'bg-blue-small-appartment',
-  3: 'bg-teal-annex',
+const cabinColors: { [key: string]: string } = {
+  Annekset: 'bg-teal-annex',
+  'Liten leilighet': 'bg-blue-small-appartment',
+  'Stor leilighet': 'bg-orange-brand',
 }
 
 function MonthCalendar({
@@ -82,9 +80,11 @@ function MonthCalendar({
         day: cn(
           buttonVariants({ variant: 'avatar' }),
           'h-40 w-40 p-0 font-normal aria-selected:opacity-100',
+          'flex flex-col items-center justify-start',
+          'p-3',
         ),
         day_selected:
-          'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
+          'bg-primary bg-opacity-75 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
         day_today: 'bg-accent text-accent-foreground',
         day_outside: 'text-muted-foreground opacity-50',
         day_disabled: 'text-muted-foreground opacity-50',
@@ -99,26 +99,36 @@ function MonthCalendar({
         DayContent: (props) => {
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
+
+          const groupedBookings: { [apartmentId: string]: Booking[] } =
+            bookingList.reduce((groups, booking) => {
+              const apartmentId = String(booking.apartment?.id)
+              if (apartmentId) {
+                if (!groups[apartmentId]) {
+                  groups[apartmentId] = []
+                }
+                groups[apartmentId].push(booking)
+              }
+              return groups
+            }, {} as { [apartmentId: string]: Booking[] })
+
           return (
             <div>
               <span>{dateCalendar}</span>
-              {bookingList.length > 0 && (
-                <div className="flex gap-3 p-5">
-                  {bookingList.map((booking) => (
+              {Object.values(groupedBookings).map((group) => (
+                <div key={group[0].id} className="flex gap-3 p-1">
+                  {group.map((booking) => (
                     <span
                       key={booking.id}
                       className={`p-2 rounded-full ${
-                        cabinColors[
-                          (booking.apartment?.id ||
-                            '') as keyof typeof cabinColors
-                        ]
+                        cabinColors[booking.apartment?.cabin_name || '']
                       } text-white`}
                     >
                       {getInitials(booking.employeeName)}
                     </span>
                   ))}
                 </div>
-              )}
+              ))}
             </div>
           )
         },

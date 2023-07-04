@@ -20,6 +20,7 @@ import no.jpro.mypageapi.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -31,6 +32,7 @@ class BudgetController(
 ) {
 
     @GetMapping("{employeeNumber}")
+    @Transactional
     @RequiresAdmin
     @Operation(summary = "Get the different budgets that belong to specified user.")
     @ApiResponse(
@@ -49,9 +51,10 @@ class BudgetController(
     }
 
     @PostMapping("{budgetId}/posts")
+    @Transactional
     @Operation(summary = "Create a new post related to an existing budget.")
     @ApiResponse(
-        responseCode = "200",
+        responseCode = "201",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = PostDTO::class))]
     )
     fun createPost(
@@ -69,6 +72,7 @@ class BudgetController(
     }
 
     @DeleteMapping("posts/{postId}")
+    @Transactional
     @Operation(summary = "Delete a post from based on PostID")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     fun deletePost(token: JwtAuthenticationToken, @PathVariable("postId") postId: Long): ResponseEntity<Void> {
@@ -87,6 +91,7 @@ class BudgetController(
     }
 
     @PatchMapping("posts/{postId}")
+    @Transactional
     @Operation(summary = "Edit an existing budget post")
     fun editPost(
         token: JwtAuthenticationToken,
