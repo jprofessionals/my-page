@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import Modal from 'react-modal';
 import {MonthCalendar} from '@/components/ui/monthCalendar';
 import {PickDate} from '@/components/ui/pickDate';
-import ApiService from '@/services/api.service'; // Import the ApiService
+import ApiService from '@/services/api.service';
 import {Booking} from '@/types'
 
 export default function MonthOverview() {
@@ -21,12 +21,10 @@ export default function MonthOverview() {
 
     const fetchBookingItems = async (selectedDate: Date) => {
         try {
-            console.log(selectedDate)
             const year = selectedDate.getFullYear();
             const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
             const day = String(selectedDate.getDate()).padStart(2, '0');
             const formattedDate = `${year}-${month}-${day}`;
-            console.log(formattedDate)
             const bookings = await ApiService.getBookingsForDay(formattedDate)
             setBookingItems(bookings)
         } catch (error) {

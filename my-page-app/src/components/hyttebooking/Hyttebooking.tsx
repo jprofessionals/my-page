@@ -1,12 +1,9 @@
 import jPro_Hytte from '../images/jPro_Hytte.png'
-import { useState } from 'react'
+import {useState} from 'react'
 import Image from 'next/image'
-
-import { PickDate } from '@/components/ui/pickDate'
 import MonthOverview from '@/components/hyttebooking/MonthOverview'
 import YearOverview from '@/components/hyttebooking/YearOverview'
-
-import { Button } from '@/components/ui/button'
+import {Button} from '@/components/ui/button'
 
 function Hyttebooking() {
   const [showMonthOverview, setShowMonthOverview] = useState(true)

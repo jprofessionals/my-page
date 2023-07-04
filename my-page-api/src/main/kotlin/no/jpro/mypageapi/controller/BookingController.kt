@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import jakarta.transaction.Transactional
 import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.entity.Booking
@@ -79,6 +80,7 @@ class BookingController(private val bookingService: BookingService) {
     class InvalidDateException(message: String) : RuntimeException(message)
 
     @GetMapping("employee/{employee_id}")
+    @Transactional
     @RequiresAdmin
     @Operation(summary = "Get the booking connected to the employee id")
     @ApiResponse(
@@ -97,6 +99,7 @@ class BookingController(private val bookingService: BookingService) {
     }
 
     @GetMapping("/date")
+    @Transactional
     @RequiresAdmin
     @Operation(summary = "Get all bookings on the specified date")
     @ApiResponse(
