@@ -12,8 +12,8 @@ import cn from '@/utils/cn'
 
 const navigation = [
   { href: '/admin', name: 'Admin 🛠️', requiresAdmin: true },
-  { href: '/hyttebooking', name: 'Firmahytte' },
   { href: '/', name: 'Hjem' },
+  { href: '/hyttebooking', name: 'Firmahytte' },
   { href: '/utlysninger', name: 'Utlysninger' },
   { href: '/kalkulator', name: 'Lønnskalkulator' },
   //{ href: '/bidra', name: 'Bidra til min side' }, //Todo: slett "bidra" filene.
