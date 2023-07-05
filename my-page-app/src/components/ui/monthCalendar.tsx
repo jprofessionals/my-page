@@ -45,14 +45,6 @@ function MonthCalendar({
     )
   }
 
-  /*
-  const getMyBookings = (bookings) => {
-      return bookings.filter(
-          (myBookings) =>
-      )
-  }
-   */
-
   const getInitials = (name: string): string => {
     if (!name) {
       return ''
