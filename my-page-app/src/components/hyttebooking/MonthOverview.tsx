@@ -4,6 +4,7 @@ import {MonthCalendar} from '@/components/ui/monthCalendar';
 import {PickDate} from '@/components/ui/pickDate';
 import ApiService from '@/services/api.service';
 import {Booking} from '@/types'
+import autoprefixer from "autoprefixer";
 
 export default function MonthOverview() {
     const [date, setDate] = useState<Date | undefined>(new Date())
@@ -15,6 +16,20 @@ export default function MonthOverview() {
         fetchBookingItems(date)
     }
 
+    const customModalStyles = {
+        content: {
+            width: 'auto',
+            minWidth: '300px',
+            margin: 'auto',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            top: '50%',
+            left: '50%',
+            right:'auto',
+            bottom:'auto',
+            transform: 'translate(-50%, -50%)',
+        }
+    }
     const closeModal = () => {
         setShowModal(false)
     }
@@ -46,33 +61,35 @@ export default function MonthOverview() {
                 isOpen={showModal}
                 onRequestClose={closeModal}
                 contentLabel="Selected Date"
+                style = {customModalStyles}
             >
                 <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 prose">
-
                     {bookingItems.length > 0 ? (
                         <div>
                             <h2>Bookinger for denne datoen:</h2>
-                            {bookingItems.map((booking, index) => (
-                                <div key={booking.id} className="mb-7">
-                                    <p>Ansatt: {booking.employeeName}</p>
-                                    <p>Hytte: {booking.apartment.cabin_name}</p>
-                                    <p>Startdato: {booking.startDate}</p>
-                                    <p>Sluttdato: {booking.endDate}</p>
-                                    {index !== bookingItems.length - 1 && <hr />}
-                                </div>
-                            ))}
+                            {bookingItems.map((booking, index) => {
+                                const startDate = new Date(booking.startDate)
+                                const endDate = new Date(booking.endDate)
+                                const formattedStartDate = `${startDate.getDate()}-${startDate.getMonth() + 1}-${startDate.getFullYear()}`
+                                const formattedEndDate = `${endDate.getDate()}-${endDate.getMonth() + 1}-${endDate.getFullYear()}`
+
+                                return (
+                                    <div key={booking.id}>
+                                        <p>
+                                            {booking.employeeName} har booket hytten {booking.apartment.cabin_name} i
+                                            perioden {formattedStartDate} til {formattedEndDate}.
+                                        </p>
+                                        {index !== bookingItems.length - 1 && <hr/>}
+                                    </div>
+                                )
+                            })}
                         </div>
                     ) : (
                         <div>
-                        <h2>Bookinger for denne datoen:</h2>
-                        <p className="mt-10">Det er ingen bookinger på denne dagen</p>
+                            <h2>Bookinger for denne datoen:</h2>
+                            <p className="mt-10">Det er ingen bookinger på denne dagen</p>
                         </div>
                     )}
-
-                    <h2>Lag en booking: OBS Denne er under konstruksjon</h2>
-                    <h3>Valgt dato:</h3>
-                    <p>{date?.toDateString()}</p>
-                    <div>{PickDate()}</div>
 
                     <button
                         onClick={closeModal}
@@ -86,3 +103,9 @@ export default function MonthOverview() {
     )
 }
 
+/* Denne funksjonen gjemmes foreløpig inntil logikken er ferdi implementert
+             <h2>Lag en booking:</h2>
+                    <h3>Valgt dato:</h3>
+                    <p>{date?.toDateString()}</p>
+                    <div>{PickDate()}</div>
+ */

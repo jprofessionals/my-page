@@ -56,15 +56,7 @@ const AccordionContent = forwardRef<
         )}
         {...props}
     >
-        {Array.isArray(children) ? (
-            children.map((child, index) => (
-                <div key={index} className="p-2 border-b">
-                    {child}
-                </div>
-            ))
-        ) : (
-            <div className="p-2 border-b">{children}</div>
-        )}
+        <div className="pt-0 pb-3">{children}</div>
     </AccordionPrimitive.Content>
 ))
 
