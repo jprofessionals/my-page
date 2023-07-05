@@ -1,10 +1,9 @@
 import React, {useState} from 'react';
 import Modal from 'react-modal';
 import {MonthCalendar} from '@/components/ui/monthCalendar';
-import {PickDate} from '@/components/ui/pickDate';
+//import {PickDate} from '@/components/ui/pickDate';
 import ApiService from '@/services/api.service';
 import {Booking} from '@/types'
-import autoprefixer from "autoprefixer";
 
 export default function MonthOverview() {
     const [date, setDate] = useState<Date | undefined>(new Date())
