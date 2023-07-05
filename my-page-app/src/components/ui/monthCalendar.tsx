@@ -3,7 +3,7 @@ import { DayPicker } from 'react-day-picker'
 import cn from '@/utils/cn'
 import { format } from 'date-fns'
 import { Booking } from '@/types'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, useCallback, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import ApiService from '@/services/api.service'
 
@@ -25,6 +25,20 @@ function MonthCalendar({
   ...props
 }: CalendarProps) {
   const [bookings, setBookings] = useState<Booking[]>([])
+  const [yourBookings, setYourBookings] = useState<Booking[]>([])
+
+  const getYourBookings = async () => {
+    try {
+      const yourBookings = await ApiService.getBookingsForUser()
+      setYourBookings(yourBookings)
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
+
+  useEffect(() => {
+    getYourBookings()
+  }, [])
 
   const fetchBookings = async () => {
     try {
@@ -118,16 +132,23 @@ function MonthCalendar({
                 className="flex gap-3 p-1"
                 style={{ width: '140px' }}
               >
-                {cabinBookings.map((booking) => (
-                  <span
-                    key={booking.id}
-                    className={`p-2 w-full h-full rounded-full ${
-                      cabinColors[booking.apartment?.cabin_name || '']
-                    } text-white`}
-                  >
-                    {getInitials(booking.employeeName)}
-                  </span>
-                ))}
+                {cabinBookings.map((booking) => {
+                  const isYourBooking = yourBookings.some(
+                    (yourBooking) => yourBooking.id === booking.id,
+                  )
+                  return (
+                    <span
+                      key={booking.id}
+                      className={`p-2 w-full h-full rounded-full ${
+                        cabinColors[booking.apartment?.cabin_name || '']
+                      } text-white ${
+                        isYourBooking ? 'border-2 border-black-nav' : ''
+                      }`}
+                    >
+                      {getInitials(booking.employeeName)}
+                    </span>
+                  )
+                })}
               </div>
             ) : (
               <div key={cabin} className="flex gap-3 p-1">
