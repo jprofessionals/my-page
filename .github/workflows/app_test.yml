@@ -1,0 +1,51 @@
+name: AppTest
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Navn på branch som skal deployes til test'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch_name }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: my-page-app/package-lock.json
+      - name: Perform build
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./my-page-app
+  deploy-test:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to test
+        uses: actions-hub/gcloud@master
+        env:
+          PROJECT_ID: my-page-jpro-test
+          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        with:
+          args: app deploy my-page-app/app.yaml
+  remove-old-versions-test:
+    needs: deploy-test
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v3
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: my-page-jpro-test
+      - run: gcloud app versions list --service=default --filter="version.createTime < $(date -Idate --date='last month')" --format="value(version.id)" | xargs --no-run-if-empty gcloud app versions delete
