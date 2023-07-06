@@ -126,5 +126,43 @@ class BookingController(private val bookingService: BookingService) {
             throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
     }
+    @GetMapping("/available")
+    @Transactional
+    @RequiresAdmin
+    @Operation(summary = "Checks booking availability for the specified apartment id on a certain day")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = String::class)
+        )]
+    )
+
+    fun getAvailableBookingsForApartment(
+        token: JwtAuthenticationToken,
+        @RequestParam("apartmentId") apartmentId: Long,
+        @RequestParam("date") date: String,
+
+        ): ResponseEntity<String> {
+        val apartments = bookingService.getAllApartments()
+        val apartmentIds = apartments.map {it.id}
+
+        if (!apartmentIds.contains(apartmentId)) {
+            throw InvalidApartmentIdException("Invalid apartmentId. There is no apartment with that id.")
+        }
+        try {
+            val parsedDate: LocalDate = LocalDate.parse(date)
+            val availabilityString: String = bookingService.getAvailableBookingsOnDay(parsedDate,apartmentId)
+            return ResponseEntity.ok(availabilityString)
+        } catch (e: DateTimeParseException) {
+            throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
+        }
+    }
+    @ExceptionHandler(InvalidApartmentIdException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun InvalidApartmentIdException(e: InvalidApartmentIdException): ErrorResponse {
+        return ErrorResponse(e.message)
+    }
+    class InvalidApartmentIdException(message: String) : RuntimeException(message)
 }
 

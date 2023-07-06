@@ -9,8 +9,8 @@ import ApiService from '@/services/api.service'
 
 export type CalendarProps = ComponentProps<typeof DayPicker>
 
-const startDate = '2023-06-01'
-const endDate = '2023-12-30'
+const startDate = '2023-01-01' //These control the timeperiod in which the bookings are rendered on the calendar.
+const endDate = '2023-12-30' //Bookings outside of this period will not be rendered.
 
 const cabinColors: { [key: string]: string } = {
   Annekset: 'bg-teal-annex',

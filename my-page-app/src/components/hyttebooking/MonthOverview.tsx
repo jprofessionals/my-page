@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import Modal from 'react-modal';
 import {MonthCalendar} from '@/components/ui/monthCalendar';
-//import {PickDate} from '@/components/ui/pickDate';
 import ApiService from '@/services/api.service';
 import {Booking} from '@/types'
 
@@ -9,10 +8,12 @@ export default function MonthOverview() {
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [showModal, setShowModal] = useState(false)
     const [bookingItems, setBookingItems] = useState<Booking[]>([])
+    const [expandedApartments, setExpandedApartments] = useState<number[]>([])
     const handleDateClick = (date: Date) => {
         setShowModal(true)
         setDate(date)
         fetchBookingItems(date)
+        checkAvailability(date)
     }
 
     const customModalStyles = {
@@ -24,8 +25,8 @@ export default function MonthOverview() {
             overflow: 'auto',
             top: '50%',
             left: '50%',
-            right:'auto',
-            bottom:'auto',
+            right: 'auto',
+            bottom: 'auto',
             transform: 'translate(-50%, -50%)',
         }
     }
@@ -33,14 +34,45 @@ export default function MonthOverview() {
         setShowModal(false)
     }
 
+    const handleApartmentClick = (apartmentId: number) => {
+        setExpandedApartments((prevExpandedApartments) => {
+            const isExpanded = prevExpandedApartments.includes(apartmentId)
+            if (isExpanded) {
+                return prevExpandedApartments.filter((id) => id !== apartmentId)
+            } else {
+                return [...prevExpandedApartments, apartmentId]
+            }
+        })
+    }
+
     const fetchBookingItems = async (selectedDate: Date) => {
         try {
-            const year = selectedDate.getFullYear();
-            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-            const day = String(selectedDate.getDate()).padStart(2, '0');
-            const formattedDate = `${year}-${month}-${day}`;
+            const year = selectedDate.getFullYear()
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0')
+            const day = String(selectedDate.getDate()).padStart(2, '0')
+            const formattedDate = `${year}-${month}-${day}`
             const bookings = await ApiService.getBookingsForDay(formattedDate)
             setBookingItems(bookings)
+        } catch (error) {
+            console.error('Error:', error)
+        }
+    }
+
+    const [apartmentOneAvailable, setapartmentOneAvailable] = useState<String>("")
+    const [apartmentTwoAvailable, setapartmentTwoAvailable] = useState<String>("")
+    const [apartmentThreeAvailable, setapartmentThreeAvailable] = useState<String>("")
+    const checkAvailability = async (selectedDate: Date) => {
+        try {
+            const year = selectedDate.getFullYear()
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0')
+            const day = String(selectedDate.getDate()).padStart(2, '0')
+            const formattedDate = `${year}-${month}-${day}`
+            const availableOne = await ApiService.getAvailableBookingsForDay(formattedDate, 1)
+            const availableTwo = await ApiService.getAvailableBookingsForDay(formattedDate, 2)
+            const availableThree = await ApiService.getAvailableBookingsForDay(formattedDate, 3)
+            setapartmentOneAvailable(availableOne)
+            setapartmentTwoAvailable(availableTwo)
+            setapartmentThreeAvailable(availableThree)
         } catch (error) {
             console.error('Error:', error)
         }
@@ -60,7 +92,7 @@ export default function MonthOverview() {
                 isOpen={showModal}
                 onRequestClose={closeModal}
                 contentLabel="Selected Date"
-                style = {customModalStyles}
+                style={customModalStyles}
             >
                 <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 prose">
                     {bookingItems.length > 0 ? (
@@ -82,11 +114,101 @@ export default function MonthOverview() {
                                     </div>
                                 )
                             })}
+                            <h2>Ledige hytter:</h2>
+                            <p>
+                                <span className="apartment-text">{apartmentOneAvailable}</span>
+                                <button
+                                    onClick={() => handleApartmentClick(1)}
+                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
+                                >
+                                    Book
+                                </button>
+                            </p>
+                            {expandedApartments.includes(1) && (
+                                <div className="expanded-content">
+                                    Her vil det komme mulighet for å gjøre en booking
+                                </div>
+                            )}
+
+                            <p>
+                                <span className="apartment-text">{apartmentTwoAvailable}</span>
+                                <button
+                                    onClick={() => handleApartmentClick(2)}
+                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
+                                >
+                                    Book
+                                </button>
+                            </p>
+                            {expandedApartments.includes(2) && (
+                                <div className="expanded-content">
+                                    Her vil det komme mulighet for å gjøre en booking
+                                </div>
+                            )}
+
+                            <p>
+                                <span className="apartment-text">{apartmentThreeAvailable}</span>
+                                <button
+                                    onClick={() => handleApartmentClick(3)}
+                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
+                                >
+                                    Book
+                                </button>
+                            </p>
+                            {expandedApartments.includes(3) && (
+                                <div className="expanded-content">
+                                    Her vil det komme mulighet for å gjøre en booking
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <div>
                             <h2>Bookinger for denne datoen:</h2>
-                            <p className="mt-10">Det er ingen bookinger på denne dagen</p>
+                            <p>Ingen bookinger for denne dagen</p>
+                            <h3 className="mt-10">Ledige hytter: </h3>
+                            <p>
+                                <span className="apartment-text">{apartmentOneAvailable}</span>
+                                <button
+                                    onClick={() => handleApartmentClick(1)}
+                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
+                                >
+                                    Book
+                                </button>
+                            </p>
+                            {expandedApartments.includes(1) && (
+                                <div className="expanded-content">
+                                    Her vil det komme mulighet for å gjøre en booking
+                                </div>
+                            )}
+
+                            <p>
+                                <span className="apartment-text">{apartmentTwoAvailable}</span>
+                                <button
+                                    onClick={() => handleApartmentClick(2)}
+                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
+                                >
+                                    Book
+                                </button>
+                            </p>
+                            {expandedApartments.includes(2) && (
+                                <div className="expanded-content">
+                                    Her vil det komme mulighet for å gjøre en booking
+                                </div>
+                            )}
+
+                            <p>
+                                <span className="apartment-text">{apartmentThreeAvailable}</span>
+                                <button
+                                    onClick={() => handleApartmentClick(3)}
+                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
+                                >
+                                    Book
+                                </button>
+                            </p>
+                            {expandedApartments.includes(3) && (
+                                <div className="expanded-content">
+                                    Her vil det komme mulighet for å gjøre en booking
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -101,10 +223,3 @@ export default function MonthOverview() {
         </div>
     )
 }
-
-/* Denne funksjonen gjemmes foreløpig inntil logikken er ferdi implementert
-             <h2>Lag en booking:</h2>
-                    <h3>Valgt dato:</h3>
-                    <p>{date?.toDateString()}</p>
-                    <div>{PickDate()}</div>
- */
