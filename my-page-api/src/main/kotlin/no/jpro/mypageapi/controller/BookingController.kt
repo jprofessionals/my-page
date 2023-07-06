@@ -137,6 +137,7 @@ class BookingController(private val bookingService: BookingService) {
             schema = Schema(implementation = String::class)
         )]
     )
+    //String er ikke pent, lag heller en DTO klasse og bruk den i stedet.
 
     fun getAvailableBookingsForApartment(
         token: JwtAuthenticationToken,
