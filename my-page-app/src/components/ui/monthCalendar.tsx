@@ -143,16 +143,16 @@ function MonthCalendar({
                     props.date,
                     booking,
                   )
-                  console.log({ isFirstDay, isLastDay, isWithinInterval })
                   return (
                     <span
                       key={booking.id}
                       className={cn(
-                        'p-2 text-white',
+                        'p-2 text-white tooltip tooltip-top',
                         getCabinBookingStyle(props.date, booking),
                         isYourBooking && 'border-2 border-black-nav',
                         get(cabinColors, booking.apartment?.cabin_name),
                       )}
+                      data-tip={`Booket av: ${booking.employeeName}`}
                     >
                       {(isFirstDay || isLastDay) &&
                         getInitials(booking.employeeName)}
