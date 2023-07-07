@@ -42,24 +42,55 @@ class BookingService(
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 
-    fun getAvailableBookingsOnDay(date: LocalDate, apartmentId: Long): String {
+    /*fun getAvailableBookingsOnDay(date: LocalDate, apartmentId: Long): List<>{
         val bookings =
             bookingRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(date, date)
-        return checkApartmentAvailability(bookings, apartmentId, date)
-    }
-    fun checkApartmentAvailability(existingBookingList: List<Booking>, apartmentId: Long, date: LocalDate): String {
+        val vacancyExist = checkApartmentAvailability(bookings, apartmentId, date)
+        if (vacancyExist) {
+            return "blablbalbla"
+        }
+    }*/
+    fun checkApartmentAvailability(existingBookingList: List<Booking>, apartmentId: Long?, date: LocalDate): Boolean {
         val apartmentBookings = existingBookingList.filter { booking -> booking.apartment?.id == apartmentId }
-        //val dates = //lag en liste med alle datoene i et år
-       // val availableDates =
-            //Lag en liste med alle ledige datoer, if ledig -> legg inn i listen
         return when {
-            apartmentBookings.size >= 2 -> "Apartment with id $apartmentId exists in existingBookings, cannot make new booking."
-            apartmentBookings.size == 1 && apartmentBookings[0].startDate == date -> "Apartment with id $apartmentId is available, can make new booking with this day as end date."
-            apartmentBookings.size == 1 && apartmentBookings[0].endDate == date -> "Apartment with id $apartmentId is available, can make new booking with this day as start date."
-            apartmentBookings.isEmpty() -> "No reservations on this day. Apartment with id $apartmentId is available"
-            else -> "Apartment with id $apartmentId exists in existingBookings, cannot make new booking."
+            apartmentBookings.size >= 2 -> false
+            (apartmentBookings.size == 1 && apartmentBookings[0].startDate == date) || (apartmentBookings.size == 1 && apartmentBookings[0].endDate == date) -> true //"Apartment with id $apartmentId is available, can make new booking with this day as end date."
+            apartmentBookings.isEmpty() -> true
+            else -> false
         }
     }
+    fun getAllVacanciesInAPeriod(startDate: LocalDate, endDate: LocalDate): List<HashMap<Long, List<LocalDate>>> {
+        val datesInRange = mutableListOf<LocalDate>()
+        var currentDate = startDate
+        while (!currentDate.isAfter(endDate)) {
+            datesInRange.add(currentDate)
+            currentDate = currentDate.plusDays(1)
+        }
+
+        val apartmentVacancies = mutableListOf<HashMap<Long, List<LocalDate>>>()
+
+        val apartments = getAllApartments()
+
+        for (apartment in apartments) {
+            val apartmentId = apartment.id!!
+            val vacancies = mutableListOf<LocalDate>()
+            for (date in datesInRange) {
+                val bookings = bookingRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(date, date)
+                val vacancyExists = checkApartmentAvailability(bookings, apartmentId, date)
+                if (vacancyExists) {
+                    vacancies.add(date)
+                }
+            }
+            if (vacancies.isNotEmpty()) {
+                val apartmentVacancy = hashMapOf(apartmentId to vacancies.toList())
+                apartmentVacancies.add(apartmentVacancy)
+            }
+        }
+
+        return apartmentVacancies
+    }
+
+
     fun getAllApartments(): List<ApartmentDTO>{
         val apartments = apartmentRepository.findAll()
         return apartments.map{apartmentMapper.toApartmentDTO(it)}

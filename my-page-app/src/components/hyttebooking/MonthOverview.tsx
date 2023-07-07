@@ -13,7 +13,7 @@ export default function MonthOverview() {
         setShowModal(true)
         setDate(date)
         fetchBookingItems(date)
-        checkAvailability(date)
+        //checkAvailability(date)
     }
 
     const customModalStyles = {
@@ -58,7 +58,7 @@ export default function MonthOverview() {
         }
     }
 
-    const [apartmentOneAvailable, setapartmentOneAvailable] = useState<String>("")
+/*    const [apartmentOneAvailable, setapartmentOneAvailable] = useState<String>("")
     const [apartmentTwoAvailable, setapartmentTwoAvailable] = useState<String>("")
     const [apartmentThreeAvailable, setapartmentThreeAvailable] = useState<String>("")
     const checkAvailability = async (selectedDate: Date) => {
@@ -76,7 +76,7 @@ export default function MonthOverview() {
         } catch (error) {
             console.error('Error:', error)
         }
-    }
+    }*/
 
     return (
         <div className="flex flex-col gap-4 p-4">
@@ -116,7 +116,7 @@ export default function MonthOverview() {
                             })}
                             <h2>Ledige hytter:</h2>
                             <p>
-                                <span className="apartment-text">{apartmentOneAvailable}</span>
+                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
                                 <button
                                     onClick={() => handleApartmentClick(1)}
                                     className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
@@ -131,7 +131,7 @@ export default function MonthOverview() {
                             )}
 
                             <p>
-                                <span className="apartment-text">{apartmentTwoAvailable}</span>
+                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
                                 <button
                                     onClick={() => handleApartmentClick(2)}
                                     className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
@@ -146,7 +146,7 @@ export default function MonthOverview() {
                             )}
 
                             <p>
-                                <span className="apartment-text">{apartmentThreeAvailable}</span>
+                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
                                 <button
                                     onClick={() => handleApartmentClick(3)}
                                     className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
@@ -166,7 +166,7 @@ export default function MonthOverview() {
                             <p>Ingen bookinger for denne dagen</p>
                             <h3 className="mt-10">Ledige hytter: </h3>
                             <p>
-                                <span className="apartment-text">{apartmentOneAvailable}</span>
+                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
                                 <button
                                     onClick={() => handleApartmentClick(1)}
                                     className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
@@ -181,7 +181,7 @@ export default function MonthOverview() {
                             )}
 
                             <p>
-                                <span className="apartment-text">{apartmentTwoAvailable}</span>
+                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
                                 <button
                                     onClick={() => handleApartmentClick(2)}
                                     className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
@@ -196,7 +196,7 @@ export default function MonthOverview() {
                             )}
 
                             <p>
-                                <span className="apartment-text">{apartmentThreeAvailable}</span>
+                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
                                 <button
                                     onClick={() => handleApartmentClick(3)}
                                     className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"

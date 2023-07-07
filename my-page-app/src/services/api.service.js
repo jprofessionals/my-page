@@ -109,14 +109,14 @@ const getBookingsForDay = (selectedDate) => {
       })
 }
 
-const getAvailableBookingsForDay = (selectedDate, apartmentId) => {
+/*const getAvailableBookingsForDay = (selectedDate, apartmentId) => {
   const params = {
     date: selectedDate,
     apartmentId: apartmentId
   }
 
   return axios
-      .get(API_URL + 'booking/available', {
+      .get(API_URL + 'booking/vacancy', {
         headers: authHeader(),
         params: params
       })
@@ -124,7 +124,7 @@ const getAvailableBookingsForDay = (selectedDate, apartmentId) => {
         const availability = response.data;
         return availability
       })
-}
+}*/
 
 const ApiService = {
   getUsers,
@@ -137,6 +137,6 @@ const ApiService = {
   getBookings,
   getBookingsForUser,
   getBookingsForDay,
-  getAvailableBookingsForDay
+  //getAvailableBookingsForDay
 }
 export default ApiService

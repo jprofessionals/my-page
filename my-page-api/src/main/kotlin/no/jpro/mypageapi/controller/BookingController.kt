@@ -126,44 +126,41 @@ class BookingController(private val bookingService: BookingService) {
             throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
     }
-    @GetMapping("/available")
+    @GetMapping("/vacancy")
     @Transactional
     @RequiresAdmin
-    @Operation(summary = "Checks booking availability for the specified apartment id on a certain day")
+    @Operation(summary = "Gets booking vacancies in a time period for all apartments")
     @ApiResponse(
         responseCode = "200",
         content = [Content(
             mediaType = "application/json",
-            schema = Schema(implementation = String::class)
+            schema = Schema(implementation = BookingDTO::class)
         )]
     )
-    //String er ikke pent, lag heller en DTO klasse og bruk den i stedet.
+    //Lag en ny DTO klasse og bruk den i stedet for BookingDTO ?.
 
-    fun getAvailableBookingsForApartment(
+    fun getVacancies(
         token: JwtAuthenticationToken,
-        @RequestParam("apartmentId") apartmentId: Long,
-        @RequestParam("date") date: String,
+        @RequestParam("startdate") startdate: String,
+        @RequestParam("enddate") enddate: String,
 
-        ): ResponseEntity<String> {
-        val apartments = bookingService.getAllApartments()
-        val apartmentIds = apartments.map {it.id}
+        ): ResponseEntity<List<HashMap<Long, List<LocalDate>>>> {
 
-        if (!apartmentIds.contains(apartmentId)) {
-            throw InvalidApartmentIdException("Invalid apartmentId. There is no apartment with that id.")
-        }
         try {
-            val parsedDate: LocalDate = LocalDate.parse(date)
-            val availabilityString: String = bookingService.getAvailableBookingsOnDay(parsedDate,apartmentId)
-            return ResponseEntity.ok(availabilityString)
+            val parsedStartDate: LocalDate = LocalDate.parse(startdate)
+            val parsedEndDate: LocalDate = LocalDate.parse(enddate)
+            val availability = bookingService.getAllVacanciesInAPeriod(parsedStartDate,parsedEndDate)
+            return ResponseEntity.ok(availability)
         } catch (e: DateTimeParseException) {
             throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
     }
-    @ExceptionHandler(InvalidApartmentIdException::class)
+
+  /*  @ExceptionHandler(InvalidApartmentIdException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun InvalidApartmentIdException(e: InvalidApartmentIdException): ErrorResponse {
         return ErrorResponse(e.message)
     }
-    class InvalidApartmentIdException(message: String) : RuntimeException(message)
+    class InvalidApartmentIdException(message: String) : RuntimeException(message)*/
 }
 
