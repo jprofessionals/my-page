@@ -1,11 +1,18 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { DayPicker } from 'react-day-picker'
 import cn from '@/utils/cn'
-import { format } from 'date-fns'
+import {
+  format,
+  isMonday,
+  isSameDay,
+  isSunday,
+  isWithinInterval,
+} from 'date-fns'
 import { Booking } from '@/types'
-import { ComponentProps, useCallback, useEffect, useState } from 'react'
+import { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import ApiService from '@/services/api.service'
+import { get } from 'radash'
 
 export type CalendarProps = ComponentProps<typeof DayPicker>
 
@@ -90,16 +97,15 @@ function MonthCalendar({
         head_row: 'flex justify-between',
         head_cell: 'text-muted-foreground rounded-md font-normal text-[0.8rem]',
         row: 'flex justify-between mt-2',
-        cell: 'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent:has([aria-selected]) first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+        cell: 'text-center text-sm p-0 relative flex-1 [&:has([aria-selected])]:bg-accent:has([aria-selected]) first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
         day: cn(
           buttonVariants({ variant: 'avatar' }),
-          'h-40 w-40 p-0 font-normal aria-selected:opacity-100',
+          'h-full w-full xl:h-40 xl:w-40 p-0 font-normal aria-selected:opacity-100',
           'flex flex-col items-center justify-start',
-          'p-3',
-          'tw-bg-opacity: 0',
+          'py-3 border-none tw-bg-opacity: 0',
         ),
         day_selected: 'tw-bg-opacity: 0',
-        day_today: 'outline bg-calendar text-accent-foreground',
+        day_today: 'bg-calendar text-accent-foreground',
         day_outside: 'text-muted-foreground opacity-50',
         day_disabled: 'text-muted-foreground opacity-50',
         day_range_middle:
@@ -108,8 +114,8 @@ function MonthCalendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        IconLeft: () => <ChevronLeft className="w-4 h-4" />,
+        IconRight: () => <ChevronRight className="w-4 h-4" />,
         DayContent: (props) => {
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
@@ -129,47 +135,79 @@ function MonthCalendar({
             return cabinBookings.length > 0 ? (
               <div
                 key={cabin}
-                className="flex gap-3 p-1"
-                style={{ width: '140px' }}
+                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
               >
                 {cabinBookings.map((booking) => {
                   const isYourBooking = yourBookings.some(
                     (yourBooking) => yourBooking.id === booking.id,
                   )
+                  const { isFirstDay, isLastDay } = getBookingDateInfo(
+                    props.date,
+                    booking,
+                  )
                   return (
                     <span
                       key={booking.id}
-                      className={`p-2 w-full h-full rounded-full ${
-                        cabinColors[booking.apartment?.cabin_name || '']
-                      } text-white ${
-                        isYourBooking ? 'border-2 border-black-nav' : ''
-                      }`}
+                      className={cn(
+                        'p-2 text-white tooltip tooltip-top shadow-xl',
+                        getCabinBookingStyle(props.date, booking),
+                        isYourBooking && 'shadow-y-2',
+                        get(cabinColors, booking.apartment?.cabin_name),
+                      )}
+                      data-tip={`Booket av: ${booking.employeeName}`}
                     >
-                      {getInitials(booking.employeeName)}
+                      {(isFirstDay || isLastDay) &&
+                        getInitials(booking.employeeName)}
                     </span>
                   )
                 })}
               </div>
             ) : (
-              <div key={cabin} className="flex gap-3 p-1">
-                <span
-                  className="p-2 rounded-full height=30"
-                  style={{ visibility: 'hidden', height: '30px' }}
-                />
+              <div key={cabin} className="invisible h-4 md:h-8">
+                hey
               </div>
             )
           })
 
           return (
-            <div>
-              <span style={{ fontSize: '20px' }}>{dateCalendar}</span>
+            <>
+              {dateCalendar}
               {cabinBookings}
-            </div>
+            </>
           )
         },
       }}
       {...props}
     />
+  )
+}
+
+const getBookingDateInfo = (date: Date, booking: Booking) => {
+  const isFirstDay = isSameDay(new Date(date), new Date(booking.startDate))
+  const isLastDay = isSameDay(new Date(date), new Date(booking.endDate))
+  const isInInterval =
+    isWithinInterval(new Date(date), {
+      start: new Date(booking.startDate),
+      end: new Date(booking.endDate),
+    }) &&
+    !isFirstDay &&
+    !isLastDay
+  return { isFirstDay, isLastDay, isInInterval }
+}
+
+const getCabinBookingStyle = (date: Date, booking: Booking) => {
+  const { isFirstDay, isLastDay, isInInterval } = getBookingDateInfo(
+    date,
+    booking,
+  )
+  return cn(
+    isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
+    isFirstDay && !isSunday(date) && '-mr-2',
+    isLastDay && 'rounded-r-full col-start-1 row-start-1',
+    isLastDay && !isMonday(date) && '-ml-2',
+    isInInterval && 'col-span-2 ',
+    isInInterval && !isMonday(date) && '-ml-1',
+    isInInterval && !isSunday(date) && '-mr-1',
   )
 }
 
