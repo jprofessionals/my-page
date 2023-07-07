@@ -4,6 +4,7 @@ COPY target/email-validator-1.0-SNAPSHOT.jar /app/
 COPY reflect-config.json resource-config.json /app/
 RUN ls -al /app
 RUN native-image \
+    -J-Xmx4G -J-Xms2G \
     --no-fallback \
     -jar email-validator-1.0-SNAPSHOT.jar \
     --static \
