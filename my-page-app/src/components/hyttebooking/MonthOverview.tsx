@@ -105,10 +105,3 @@ export default function MonthOverview() {
     </div>
   )
 }
-
-/* Denne funksjonen gjemmes foreløpig inntil logikken er ferdi implementert
-             <h2>Lag en booking:</h2>
-                    <h3>Valgt dato:</h3>
-                    <p>{date?.toDateString()}</p>
-                    <div>{PickDate()}</div>
- */
