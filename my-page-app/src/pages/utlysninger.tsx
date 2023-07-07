@@ -32,6 +32,10 @@ export default function Utlysninger() {
     moment(jobPosting.dueDateForApplication).isBefore(currentDate, 'day'),
   )
 
+  const jobPostingsWithoutDueDate = jobPostings.filter((jobPosting) =>
+    jobPosting.dueDateForApplication === null,
+  )
+
   return (
     <RequireAuth>
       <div className="flex flex-col gap-4 p-4">
@@ -55,6 +59,14 @@ export default function Utlysninger() {
           <JobPostings jobPostings={pastJobPostings} />
         ) : (
           <p>Ingen tidligere utlysninger</p>
+        )}
+        <span className="prose">
+          <h2>Utlysninger som mangler dato</h2>
+        </span>
+        {jobPostingsWithoutDueDate.length > 0 ? (
+            <JobPostings jobPostings={jobPostingsWithoutDueDate} />
+        ) : (
+            <p>Ingen utlysninger som mangler dato</p>
         )}
       </div>
     </RequireAuth>
