@@ -165,8 +165,6 @@ function MonthCalendar({
             )
           })
 
-          if (bookingList.length > 0) console.log(props, bookingList)
-
           return (
             <>
               {dateCalendar}
