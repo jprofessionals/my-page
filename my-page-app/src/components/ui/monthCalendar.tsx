@@ -134,7 +134,10 @@ function MonthCalendar({
           const cabinBookings = cabinOrder.map((cabin) => {
             const cabinBookings = bookingsByCabin[cabin] || []
             return cabinBookings.length > 0 ? (
-              <div key={cabin} className="grid grid-cols-2 gap-3 w-full h-8">
+              <div
+                key={cabin}
+                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
+              >
                 {cabinBookings.map((booking) => {
                   const isYourBooking = yourBookings.some(
                     (yourBooking) => yourBooking.id === booking.id,
@@ -147,9 +150,9 @@ function MonthCalendar({
                     <span
                       key={booking.id}
                       className={cn(
-                        'p-2 text-white tooltip tooltip-top',
+                        'p-2 text-white tooltip tooltip-top shadow-xl',
                         getCabinBookingStyle(props.date, booking),
-                        isYourBooking && 'border-2 border-black-nav',
+                        isYourBooking && 'shadow-y-2',
                         get(cabinColors, booking.apartment?.cabin_name),
                       )}
                       data-tip={`Booket av: ${booking.employeeName}`}
@@ -161,7 +164,9 @@ function MonthCalendar({
                 })}
               </div>
             ) : (
-              <div key={cabin} className="h-8" />
+              <div key={cabin} className="invisible h-4 md:h-8">
+                hey
+              </div>
             )
           })
 
@@ -197,11 +202,11 @@ const getCabinBookingStyle = (date: Date, booking: Booking) => {
     booking,
   )
   return cn(
-    isFirstDay && 'rounded-l-full col-start-2',
+    isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
     isFirstDay && !isSunday(date) && '-mr-2',
     isLastDay && 'rounded-r-full col-start-1 row-start-1',
     isLastDay && !isMonday(date) && '-ml-2',
-    isInInterval && 'col-span-2',
+    isInInterval && 'col-span-2 ',
     isInInterval && !isMonday(date) && '-ml-1',
     isInInterval && !isSunday(date) && '-mr-1',
   )

@@ -15,6 +15,9 @@ module.exports = {
       closed: 'state~="closed"',
     },
     extend: {
+      boxShadow: {
+        'y-2': '0 -3px 0px 0 #333, 0 3px 0px 0px #333',
+      },
       colors: {
         orange: {
           brand: '#ff7a0c',
