@@ -45,6 +45,7 @@ class BookingService(
 
     fun checkApartmentAvailability(existingBookingList: List<Booking>, apartmentId: Long?, date: LocalDate): Boolean {
         val apartmentBookings = existingBookingList.filter { booking -> booking.apartment?.id == apartmentId }
+            .filter { booking -> booking.startDate <= date && booking.endDate >= date }
         return when {
             apartmentBookings.size >= 2 -> false
             (apartmentBookings.size == 1 && apartmentBookings[0].startDate == date) || (apartmentBookings.size == 1 && apartmentBookings[0].endDate == date) -> true //"Apartment with id $apartmentId is available, can make new booking with this day as end date."
@@ -63,13 +64,14 @@ class BookingService(
 
         val apartmentVacancies = mutableListOf<HashMap<Long, List<LocalDate>>>()
 
+        val bookings = bookingRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(endDate, startDate)
+
         val apartments = getAllApartments()
 
         for (apartment in apartments) {
             val apartmentId = apartment.id!!
             val vacancies = mutableListOf<LocalDate>()
             for (date in datesInRange) {
-                val bookings = bookingRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(date, date)
                 val vacancyExists = checkApartmentAvailability(bookings, apartmentId, date)
                 if (vacancyExists) {
                     vacancies.add(date)

@@ -3,15 +3,19 @@ package no.jpro.mypageapi.service
 import com.google.api.gax.core.CredentialsProvider
 import com.google.cloud.spring.core.GcpProjectIdProvider
 import jakarta.persistence.*
+import no.jpro.mypageapi.MockitoHelper.anyObject
 import no.jpro.mypageapi.config.MockApplicationConfig
 import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.User
+import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.BookingRepository
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -41,6 +45,9 @@ class BookingServiceTests  @Autowired constructor(private val bookingService: Bo
     @MockBean
     lateinit var bookingRepository: BookingRepository //Used by BookingService
 
+    @MockBean
+    lateinit var apartmentRepository: ApartmentRepository
+
 
     private fun createBookings(): List<Booking> {
         return listOf(Booking(id=1L,
@@ -65,7 +72,26 @@ class BookingServiceTests  @Autowired constructor(private val bookingService: Bo
                                             name="name",
                                             givenName="givenName",
                                             familyName="familyName",
-                                            budgets=Collections.emptyList())))
+                                            budgets=Collections.emptyList())),
+                      Booking(id=3L,
+                              startDate=LocalDate.now().plusDays(2),
+                              endDate=LocalDate.now().plusDays(2+2),
+                              apartment=Apartment(id=1L,
+                                                  cabin_name="cabin_name"),
+                              employee=User(id=1L,
+                                            email="email",
+                                            name="name",
+                                            givenName="givenName",
+                                            familyName="familyName",
+                                            budgets=Collections.emptyList())),
+        )
+    }
+
+    private fun createApartments(): List<Apartment> {
+        return listOf(
+            Apartment(1L, "Hytte 1"),
+            Apartment(2L, "Hytte 2"),
+        )
     }
 
     @Test
@@ -79,7 +105,7 @@ class BookingServiceTests  @Autowired constructor(private val bookingService: Bo
 
         //Verify result
 
-        Assertions.assertEquals(2, userBookings.size)
+        Assertions.assertEquals(3, userBookings.size)
 
         val bookingDTO1 = userBookings.find { booking -> booking.id==1L }
         Assertions.assertEquals(bookings[0].startDate, bookingDTO1?.startDate)
@@ -94,4 +120,20 @@ class BookingServiceTests  @Autowired constructor(private val bookingService: Bo
         Assertions.assertEquals(bookings[1].employee?.name, bookingDTO2?.employeeName)
     }
 
+    @Test
+    fun shouldGetAllVacantDate() {
+        val startDate = LocalDate.now().minusDays(1)
+        val endDate = LocalDate.now().plusDays(8)
+        val apartments = createApartments()
+        val bookings = createBookings()
+        `when`(bookingRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(endDate, startDate))
+            .thenReturn(bookings)
+        `when`(apartmentRepository.findAll()).thenReturn(apartments)
+
+        val vacancies = bookingService.getAllVacanciesInAPeriod(startDate, endDate)
+
+        assertThat(vacancies).hasSize(2)
+        assertThat(vacancies[0][1L]).hasSize(6)
+        assertThat(vacancies[1][2L]).hasSize(10)
+    }
 }
