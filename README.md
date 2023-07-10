@@ -121,7 +121,7 @@ cd ..
 ##### API
 ```
 cd my-page-api
-./mvnw package appengine:deploy
+../mvnw package appengine:deploy
 cd ..
 ```
 

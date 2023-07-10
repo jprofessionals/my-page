@@ -83,7 +83,7 @@ export default function MonthOverview() {
             const month_end = String(unformattedEndDate.getMonth() + 1).padStart(2, '0');
             const day_end = String(unformattedEndDate.getDate()).padStart(2, '0');
             const endDate = `${year_end}-${month_end}-${day_end}`;
-            //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward.
+            //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward. These control the time period in which vacancies will be searched for.
 
             const loadedVacancies = await ApiService.getAllVacancies(startDate, endDate)
             setVacancyLoadingStatus('completed')
