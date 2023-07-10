@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import Modal from 'react-modal';
 import {MonthCalendar} from '@/components/ui/monthCalendar';
 import ApiService from '@/services/api.service';
-import {Booking} from '@/types'
+import {Apartment, Booking} from '@/types'
 import {toast} from "react-toastify";
 import {useAuthContext} from "@/providers/AuthProvider";
 
@@ -67,6 +67,7 @@ export default function MonthOverview() {
     const { userFetchStatus } = useAuthContext()
     const [vacancies, setVacancies] = useState<{ [key: number]: Date[] } | undefined>(undefined)
     const [vacantApartments, setVacantApartments] = useState<string[]>([])
+    const [apartments, setApartments] = useState<Apartment[]>([])
 
     const refreshVacancies = useCallback(async () => {
         setVacancyLoadingStatus('loading')
@@ -96,9 +97,16 @@ export default function MonthOverview() {
 
     useEffect(() => {
         if (vacancyLoadingStatus !== 'init') return
-        if (userFetchStatus === 'fetched') refreshVacancies()
+        if (userFetchStatus === 'fetched') {
+            refreshVacancies()
+            getAllApartments()
+        }
     }, [userFetchStatus, vacancyLoadingStatus])
 
+    const getAllApartments = async ()=> {
+        const response = await ApiService.getAllApartments()
+        setApartments(response)
+    }
     const getVacancyForDay = async (selectedDate: Date) => {
         try {
             const year = selectedDate.getFullYear()
@@ -108,7 +116,6 @@ export default function MonthOverview() {
 
             if (vacancies) {
                 const availableApartments: string[] = []
-                const apartments = await ApiService.getAllApartments()
 
                 for (const key in vacancies) {
                     if (vacancies.hasOwnProperty(key)) {
@@ -122,7 +129,7 @@ export default function MonthOverview() {
                         for (const date of vacancyDates) {
                             if (date === formattedDate) {
                                 for (const apartment of apartments) {
-                                    if(apartment.id.toString() === vacancyApartmentId){
+                                    if(apartment.id!.toString() === vacancyApartmentId){
                                         availableApartments.push(apartment.cabin_name)
                                         break
                                     }
