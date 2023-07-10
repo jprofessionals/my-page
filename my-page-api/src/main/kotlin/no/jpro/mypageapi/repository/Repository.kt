@@ -12,6 +12,7 @@ interface UserRepository : JpaRepository<User, String> {
     fun findUserByEmailAndSubIsNull(email: String): User?
     fun findUserByEmail(email: String): User?
     fun findUserByName(name: String): User?
+    fun findUserById(id: Long): User
 }
 
 @Repository
@@ -51,4 +52,9 @@ interface BookingRepository : JpaRepository<Booking, Long> {
     fun findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(
         selectedDate: LocalDate, alsoSelectedDate: LocalDate
     ): List<Booking>
+}
+
+@Repository
+interface ApartmentRepository : JpaRepository<Apartment, Long> {
+    fun findApartmentById(apartmentId: Long)
 }
