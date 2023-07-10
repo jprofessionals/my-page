@@ -43,16 +43,10 @@ class BookingService(
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 
-    //TODO create a new method for createBooking method
     fun createBooking(apartmentId: Long, startDate: LocalDate, endDate: LocalDate, employeeName: String?): Booking {
-        if (startDate.isAfter(endDate)) {
-            throw IllegalArgumentException("Start date must be before end date.")
-        }
         val employee = if (employeeName != null) {
             userRepository.findUserByName(employeeName)
         } else {
-            // Handle the case when employeeName is null
-            // throw IllegalArgumentException("Employee name is required.")
             null
         }
 
