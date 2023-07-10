@@ -171,7 +171,7 @@
                         <version>3.1.0</version>
                         <executions>
                             <execution>
-                                <id>docker-package</id>
+                                <id>docker-buildx-build</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>exec</goal>
@@ -180,7 +180,13 @@
                                     <executable>docker</executable>
                                     <workingDirectory>${project.basedir}</workingDirectory>
                                     <arguments>
+                                        <argument>buildx</argument>
                                         <argument>build</argument>
+                                        <argument>--load</argument>
+                                        <argument>--platform</argument>
+                                        <argument>linux/amd64</argument>
+                                        <argument>-f</argument>
+                                        <argument>Dockerfile</argument>
                                         <argument>-t</argument>
                                         <argument>${image.tag}</argument>
                                         <argument>.</argument>

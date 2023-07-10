@@ -8,15 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: graalvm/setup-graalvm@v1
+      - uses: docker/setup-buildx-action@v2
+      - uses: actions/setup-java@v3
         with:
-          version: 'latest'
+          distribution: 'liberica'
           java-version: '17'
-          components: 'native-image'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           cache: 'maven'
       - name: Perform build
         run: |
+          echo $(docker --version)
           ./mvnw -pl email-validator -am -P docker -Dimage.tag=europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }} package
       - name: Attach image as artifact
         uses: ishworkh/docker-image-artifact-upload@v1
@@ -27,12 +27,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: graalvm/setup-graalvm@v1
+      - uses: docker/setup-buildx-action@v2
+      - uses: actions/setup-java@v3
         with:
-          version: 'latest'
+          distribution: 'liberica'
           java-version: '17'
-          components: 'native-image'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           cache: 'maven'
       - name: Perform build
         run: |
