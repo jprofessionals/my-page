@@ -36,4 +36,10 @@ class BookingService(
             bookingRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(date, date)
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
+    fun deleteBooking(bookingId: Long) {
+        return bookingRepository.deleteById(bookingId)
+    }
+    fun existsBookingById(bookingId: Long): Boolean{
+        return bookingRepository.existsBookingById(bookingId)
+    }
 }

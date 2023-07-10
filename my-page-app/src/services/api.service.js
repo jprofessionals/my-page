@@ -109,6 +109,12 @@ const getBookingsForDay = (selectedDate) => {
       })
 }
 
+const deleteBooking = (bookingId) => {
+  return axios.delete(API_URL + 'booking/' + bookingId, {
+    headers: authHeader(),
+  })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -120,5 +126,6 @@ const ApiService = {
   getBookings,
   getBookingsForUser,
   getBookingsForDay,
+  deleteBooking,
 }
 export default ApiService

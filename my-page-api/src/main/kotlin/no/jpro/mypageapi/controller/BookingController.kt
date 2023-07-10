@@ -126,5 +126,25 @@ class BookingController(private val bookingService: BookingService) {
             throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
     }
+
+    @DeleteMapping("{bookingID}")
+    @Transactional
+    @Operation(summary = "Delete the booking connected to the booking id")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json")]
+    )
+    fun deleteBooking(
+        token: JwtAuthenticationToken,
+        @PathVariable("bookingID") bookingID: Long
+    ): ResponseEntity<String> {
+        val bookingExists = bookingService.existsBookingById(bookingID)
+        if (bookingExists) {
+            bookingService.deleteBooking(bookingID)
+            return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
+        } else {
+            return ResponseEntity("Booking with ID $bookingID not found", HttpStatus.NOT_FOUND)
+        }
+    }
 }
 

@@ -50,4 +50,5 @@ interface BookingRepository : JpaRepository<Booking, Long> {
     fun findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(
         selectedDate: LocalDate, alsoSelectedDate: LocalDate
     ): List<Booking>
+    fun existsBookingById(bookingId: Long): Boolean
 }

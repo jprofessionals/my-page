@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Modal from 'react-modal'
 import { MonthCalendar } from '@/components/ui/monthCalendar'
 //import {PickDate} from '@/components/ui/pickDate';
@@ -9,6 +9,28 @@ export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [showModal, setShowModal] = useState(false)
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
+  const [yourBookings, setYourBookings] = useState<Booking[]>([])
+  const getYourBookings = async () => {
+    try {
+      const yourBookings = await ApiService.getBookingsForUser()
+      setYourBookings(yourBookings)
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
+
+  useEffect(() => {
+    getYourBookings()
+  }, [])
+
+  const handleDeleteBooking = async (bookingId: number | undefined) => {
+    try {
+      await ApiService.deleteBooking(bookingId)
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
+
   const handleDateClick = (date: Date) => {
     setShowModal(true)
     setDate(date)
@@ -74,6 +96,7 @@ export default function MonthOverview() {
                 const formattedEndDate = `${endDate.getDate()}-${
                   endDate.getMonth() + 1
                 }-${endDate.getFullYear()}`
+                const isYourBooking = yourBookings.some((yourBooking) => yourBooking.id === booking.id)
 
                 return (
                   <div key={booking.id}>
@@ -82,6 +105,13 @@ export default function MonthOverview() {
                       {booking.apartment.cabin_name} i perioden{' '}
                       {formattedStartDate} til {formattedEndDate}.
                     </p>
+                    {isYourBooking &&(
+                        <button
+                            onClick={() => handleDeleteBooking(booking.id)}
+                            className="mt-4 mr-4 bg-orange-500 text-white px-4 py-2 rounded-md">
+                          Delete Booking
+                        </button>
+                    )}
                     {index !== bookingItems.length - 1 && <hr />}
                   </div>
                 )
