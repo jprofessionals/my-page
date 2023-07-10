@@ -1,16 +1,13 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { DayPicker } from 'react-day-picker'
+import {ChevronLeft, ChevronRight} from 'lucide-react'
+import {DayPicker} from 'react-day-picker'
 import cn from '@/utils/cn'
-import { format } from 'date-fns'
-import { Booking } from '@/types'
-import { ComponentProps, useCallback, useEffect, useState } from 'react'
-import { buttonVariants } from '@/components/ui/button'
+import {format} from 'date-fns'
+import {Booking} from '@/types'
+import {ComponentProps, useEffect, useState} from 'react'
+import {buttonVariants} from '@/components/ui/button'
 import ApiService from '@/services/api.service'
 
 export type CalendarProps = ComponentProps<typeof DayPicker>
-
-const startDate = '2023-01-01' //These control the timeperiod in which the bookings are rendered on the calendar.
-const endDate = '2023-12-30' //Bookings outside of this period will not be rendered.
 
 const cabinColors: { [key: string]: string } = {
   Annekset: 'bg-teal-annex',
@@ -26,7 +23,6 @@ function MonthCalendar({
 }: CalendarProps) {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [yourBookings, setYourBookings] = useState<Booking[]>([])
-
   const getYourBookings = async () => {
     try {
       const yourBookings = await ApiService.getBookingsForUser()
@@ -42,6 +38,19 @@ function MonthCalendar({
 
   const fetchBookings = async () => {
     try {
+      const currentDate = new Date();
+      const unformattedStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate())
+      const unformattedEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate())
+      const year = unformattedStartDate.getFullYear();
+      const month = String(unformattedStartDate.getMonth() + 1).padStart(2, '0');
+      const day = String(unformattedStartDate.getDate()).padStart(2, '0');
+      const startDate = `${year}-${month}-${day}`;
+      const year_end = unformattedEndDate.getFullYear();
+      const month_end = String(unformattedEndDate.getMonth() + 1).padStart(2, '0');
+      const day_end = String(unformattedEndDate.getDate()).padStart(2, '0');
+      const endDate = `${year_end}-${month_end}-${day_end}`;
+      //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward.
+
       const bookings = await ApiService.getBookings(startDate, endDate)
       setBookings(bookings)
     } catch (error) {

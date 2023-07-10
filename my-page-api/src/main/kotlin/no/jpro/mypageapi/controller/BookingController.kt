@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import no.jpro.mypageapi.config.RequiresAdmin
+import no.jpro.mypageapi.dto.ApartmentDTO
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.service.BookingService
@@ -26,7 +26,6 @@ import java.util.*
 class BookingController(private val bookingService: BookingService) {
     @GetMapping("{bookingID}")
     @Transactional
-    @RequiresAdmin
     @Operation(summary = "Get the booking connected to the booking id")
     @ApiResponse(
         responseCode = "200",
@@ -45,7 +44,6 @@ class BookingController(private val bookingService: BookingService) {
 
     @GetMapping
     @Transactional
-    @RequiresAdmin
     @Operation(summary = "Get all bookings in the given month")
     @ApiResponse(
         responseCode = "200",
@@ -84,7 +82,6 @@ class BookingController(private val bookingService: BookingService) {
 
     @GetMapping("employee/{employee_id}")
     @Transactional
-    @RequiresAdmin
     @Operation(summary = "Get the booking connected to the employee id")
     @ApiResponse(
         responseCode = "200",
@@ -103,7 +100,6 @@ class BookingController(private val bookingService: BookingService) {
 
     @GetMapping("/date")
     @Transactional
-    @RequiresAdmin
     @Operation(summary = "Get all bookings on the specified date")
     @ApiResponse(
         responseCode = "200",
@@ -128,7 +124,6 @@ class BookingController(private val bookingService: BookingService) {
     }
     @GetMapping("/vacancy")
     @Transactional
-    @RequiresAdmin
     @Operation(summary = "Gets booking vacancies in a time period for all apartments")
     @ApiResponse(
         responseCode = "200",
@@ -156,11 +151,22 @@ class BookingController(private val bookingService: BookingService) {
         }
     }
 
-  /*  @ExceptionHandler(InvalidApartmentIdException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun InvalidApartmentIdException(e: InvalidApartmentIdException): ErrorResponse {
-        return ErrorResponse(e.message)
+    @GetMapping("/apartment")
+    @Transactional
+    @Operation(summary = "Gets all apartments")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ApartmentDTO::class)
+        )]
+    )
+
+    fun getApartments(
+        token: JwtAuthenticationToken,
+
+        ): List<ApartmentDTO> {
+        return bookingService.getAllApartments()
     }
-    class InvalidApartmentIdException(message: String) : RuntimeException(message)*/
 }
 

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import authHeader from './auth-header'
+
 export const API_URL = '/api/'
 
 const getUsers = () => {
@@ -109,22 +110,28 @@ const getBookingsForDay = (selectedDate) => {
       })
 }
 
-/*const getAvailableBookingsForDay = (selectedDate, apartmentId) => {
+const getAllVacancies = async (startDate, endDate) => {
   const params = {
-    date: selectedDate,
-    apartmentId: apartmentId
+    startdate: startDate,
+    enddate: endDate
   }
-
-  return axios
-      .get(API_URL + 'booking/vacancy', {
+  return axios.get(API_URL + 'booking/vacancy', {
         headers: authHeader(),
         params: params
-      })
-      .then((response) => {
+      }).then((response) => {
         const availability = response.data;
         return availability
       })
-}*/
+}
+
+const getAllApartments = async () => {
+  const response = await axios.get(API_URL + 'booking/apartment', {
+    headers: authHeader(),
+  })
+  const apartments = response.data
+  return apartments
+}
+
 
 const ApiService = {
   getUsers,
@@ -137,6 +144,7 @@ const ApiService = {
   getBookings,
   getBookingsForUser,
   getBookingsForDay,
-  //getAvailableBookingsForDay
+  getAllVacancies,
+  getAllApartments,
 }
 export default ApiService

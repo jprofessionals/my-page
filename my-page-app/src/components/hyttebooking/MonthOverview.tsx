@@ -1,19 +1,22 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Modal from 'react-modal';
 import {MonthCalendar} from '@/components/ui/monthCalendar';
 import ApiService from '@/services/api.service';
 import {Booking} from '@/types'
+import {toast} from "react-toastify";
+import {useAuthContext} from "@/providers/AuthProvider";
 
 export default function MonthOverview() {
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [showModal, setShowModal] = useState(false)
     const [bookingItems, setBookingItems] = useState<Booking[]>([])
     const [expandedApartments, setExpandedApartments] = useState<number[]>([])
+
     const handleDateClick = (date: Date) => {
         setShowModal(true)
         setDate(date)
         fetchBookingItems(date)
-        //checkAvailability(date)
+        getVacancyForDay(date)
     }
 
     const customModalStyles = {
@@ -58,25 +61,90 @@ export default function MonthOverview() {
         }
     }
 
-/*    const [apartmentOneAvailable, setapartmentOneAvailable] = useState<String>("")
-    const [apartmentTwoAvailable, setapartmentTwoAvailable] = useState<String>("")
-    const [apartmentThreeAvailable, setapartmentThreeAvailable] = useState<String>("")
-    const checkAvailability = async (selectedDate: Date) => {
+    type VacancyLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
+    const [vacancyLoadingStatus, setVacancyLoadingStatus] =
+        useState<VacancyLoadingStatus>('init')
+    const { userFetchStatus } = useAuthContext()
+    const [vacancies, setVacancies] = useState<{ [key: number]: Date[] } | undefined>(undefined)
+    const [vacantApartments, setVacantApartments] = useState<string[]>([])
+
+    const refreshVacancies = useCallback(async () => {
+        setVacancyLoadingStatus('loading')
+
+        try {
+            const currentDate = new Date();
+            const unformattedStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate())
+            const unformattedEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate())
+            const year = unformattedStartDate.getFullYear();
+            const month = String(unformattedStartDate.getMonth() + 1).padStart(2, '0');
+            const day = String(unformattedStartDate.getDate()).padStart(2, '0');
+            const startDate = `${year}-${month}-${day}`;
+            const year_end = unformattedEndDate.getFullYear();
+            const month_end = String(unformattedEndDate.getMonth() + 1).padStart(2, '0');
+            const day_end = String(unformattedEndDate.getDate()).padStart(2, '0');
+            const endDate = `${year_end}-${month_end}-${day_end}`;
+            //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward.
+
+            const loadedVacancies = await ApiService.getAllVacancies(startDate, endDate)
+            setVacancyLoadingStatus('completed')
+            setVacancies(loadedVacancies)
+        } catch (e) {
+            setVacancyLoadingStatus('failed')
+            toast.error('Klarte ikke laste ledige bookinger, prøv igjen senere')
+        }
+    }, [])
+
+    useEffect(() => {
+        if (vacancyLoadingStatus !== 'init') return
+        if (userFetchStatus === 'fetched') refreshVacancies()
+    }, [userFetchStatus, vacancyLoadingStatus])
+
+    const getVacancyForDay = async (selectedDate: Date) => {
         try {
             const year = selectedDate.getFullYear()
             const month = String(selectedDate.getMonth() + 1).padStart(2, '0')
             const day = String(selectedDate.getDate()).padStart(2, '0')
             const formattedDate = `${year}-${month}-${day}`
-            const availableOne = await ApiService.getAvailableBookingsForDay(formattedDate, 1)
-            const availableTwo = await ApiService.getAvailableBookingsForDay(formattedDate, 2)
-            const availableThree = await ApiService.getAvailableBookingsForDay(formattedDate, 3)
-            setapartmentOneAvailable(availableOne)
-            setapartmentTwoAvailable(availableTwo)
-            setapartmentThreeAvailable(availableThree)
+
+            if (vacancies) {
+                const availableApartments: string[] = []
+                const apartments = await ApiService.getAllApartments()
+
+                for (const key in vacancies) {
+                    if (vacancies.hasOwnProperty(key)) {
+                        const vacancy = vacancies[key]
+
+                        const vacancyValue = Object.values(vacancy)
+                        const vacancyDates = vacancyValue [0] as unknown as string[]
+                        const vacancyKey = Object.keys(vacancy)
+                        const vacancyApartmentId = vacancyKey[0]
+
+                        for (const date of vacancyDates) {
+                            if (date === formattedDate) {
+                                for (const apartment of apartments) {
+                                    if(apartment.id.toString() === vacancyApartmentId){
+                                        availableApartments.push(apartment.cabin_name)
+                                        break
+                                    }
+                                }
+                                break
+                            }
+                        }
+                    }
+                }
+
+                if (availableApartments.length !== 0) {
+                    setVacantApartments(availableApartments)
+                    return vacantApartments
+                } else {
+                    setVacantApartments([])
+                    return
+                }
+            }
         } catch (error) {
             console.error('Error:', error)
         }
-    }*/
+    }
 
     return (
         <div className="flex flex-col gap-4 p-4">
@@ -115,49 +183,27 @@ export default function MonthOverview() {
                                 )
                             })}
                             <h2>Ledige hytter:</h2>
-                            <p>
-                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
-                                <button
-                                    onClick={() => handleApartmentClick(1)}
-                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
-                                >
-                                    Book
-                                </button>
-                            </p>
-                            {expandedApartments.includes(1) && (
-                                <div className="expanded-content">
-                                    Her vil det komme mulighet for å gjøre en booking
-                                </div>
-                            )}
-
-                            <p>
-                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
-                                <button
-                                    onClick={() => handleApartmentClick(2)}
-                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
-                                >
-                                    Book
-                                </button>
-                            </p>
-                            {expandedApartments.includes(2) && (
-                                <div className="expanded-content">
-                                    Her vil det komme mulighet for å gjøre en booking
-                                </div>
-                            )}
-
-                            <p>
-                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
-                                <button
-                                    onClick={() => handleApartmentClick(3)}
-                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
-                                >
-                                    Book
-                                </button>
-                            </p>
-                            {expandedApartments.includes(3) && (
-                                <div className="expanded-content">
-                                    Her vil det komme mulighet for å gjøre en booking
-                                </div>
+                            {vacantApartments.length === 0 ? (
+                                <p>Ingen ledige hytter</p>
+                            ) : (
+                                vacantApartments.map((apartment, index) => (
+                                    <div key={index}>
+                                        <p>
+                                            <span className="apartment-text">{apartment}</span>
+                                            <button
+                                                onClick={() => handleApartmentClick(index + 1)}
+                                                className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
+                                            >
+                                                Book
+                                            </button>
+                                        </p>
+                                        {expandedApartments.includes(index + 1) && (
+                                            <div className="expanded-content">
+                                                Her vil det komme mulighet for å gjøre en booking
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
                             )}
                         </div>
                     ) : (
@@ -165,50 +211,25 @@ export default function MonthOverview() {
                             <h2>Bookinger for denne datoen:</h2>
                             <p>Ingen bookinger for denne dagen</p>
                             <h3 className="mt-10">Ledige hytter: </h3>
-                            <p>
-                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
-                                <button
-                                    onClick={() => handleApartmentClick(1)}
-                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
-                                >
-                                    Book
-                                </button>
-                            </p>
-                            {expandedApartments.includes(1) && (
-                                <div className="expanded-content">
-                                    Her vil det komme mulighet for å gjøre en booking
+                            {vacantApartments.map((apartment, index) => (
+                                <div key={index}>
+                                    <p>
+                                        <span className="apartment-text">{apartment} er ledig</span>
+                                        <button
+                                            onClick={() => handleApartmentClick(index + 1)}
+                                            className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
+                                        >
+                                            Book
+                                        </button>
+                                    </p>
+                                    {expandedApartments.includes(index + 1) && (
+                                        <div className="expanded-content">
+                                            Her vil det komme mulighet for å gjøre en booking
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+                            ))}
 
-                            <p>
-                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
-                                <button
-                                    onClick={() => handleApartmentClick(2)}
-                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
-                                >
-                                    Book
-                                </button>
-                            </p>
-                            {expandedApartments.includes(2) && (
-                                <div className="expanded-content">
-                                    Her vil det komme mulighet for å gjøre en booking
-                                </div>
-                            )}
-
-                            <p>
-                                <span className="apartment-text">Her kommmer ledige leiligheter</span>
-                                <button
-                                    onClick={() => handleApartmentClick(3)}
-                                    className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
-                                >
-                                    Book
-                                </button>
-                            </p>
-                            {expandedApartments.includes(3) && (
-                                <div className="expanded-content">
-                                    Her vil det komme mulighet for å gjøre en booking
-                                </div>
-                            )}
                         </div>
                     )}
 

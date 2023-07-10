@@ -25,9 +25,10 @@ class BookingService(
         val bookings = bookingRepository.findBookingByEmployeeId(employeeId)
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
+
     fun getUserBookings(userSub: String): List<BookingDTO> {
         val bookings = bookingRepository.findBookingsByEmployeeSub(userSub)
-        return bookings.map { bookingMapper.toBookingDTO(it)}
+        return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 
     fun getBookingsBetweenDates(startDate: LocalDate, endDate: LocalDate): List<BookingDTO> {
@@ -42,14 +43,6 @@ class BookingService(
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 
-    /*fun getAvailableBookingsOnDay(date: LocalDate, apartmentId: Long): List<>{
-        val bookings =
-            bookingRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(date, date)
-        val vacancyExist = checkApartmentAvailability(bookings, apartmentId, date)
-        if (vacancyExist) {
-            return "blablbalbla"
-        }
-    }*/
     fun checkApartmentAvailability(existingBookingList: List<Booking>, apartmentId: Long?, date: LocalDate): Boolean {
         val apartmentBookings = existingBookingList.filter { booking -> booking.apartment?.id == apartmentId }
         return when {
@@ -59,6 +52,7 @@ class BookingService(
             else -> false
         }
     }
+
     fun getAllVacanciesInAPeriod(startDate: LocalDate, endDate: LocalDate): List<HashMap<Long, List<LocalDate>>> {
         val datesInRange = mutableListOf<LocalDate>()
         var currentDate = startDate
@@ -91,9 +85,9 @@ class BookingService(
     }
 
 
-    fun getAllApartments(): List<ApartmentDTO>{
+    fun getAllApartments(): List<ApartmentDTO> {
         val apartments = apartmentRepository.findAll()
-        return apartments.map{apartmentMapper.toApartmentDTO(it)}
+        return apartments.map { apartmentMapper.toApartmentDTO(it) }
     }
 
 }
