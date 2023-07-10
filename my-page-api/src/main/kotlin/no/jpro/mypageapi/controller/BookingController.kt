@@ -1,20 +1,30 @@
 package no.jpro.mypageapi.controller
 
+import com.aallam.openai.api.exception.InvalidRequestException
 import io.ktor.util.date.*
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import jakarta.validation.Valid
 import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.BookingDTO
+import no.jpro.mypageapi.dto.CreateBookingDTO
+import no.jpro.mypageapi.dto.PostDTO
+import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
+import no.jpro.mypageapi.entity.User
+import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.BookingService
+import no.jpro.mypageapi.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
@@ -23,7 +33,10 @@ import java.util.*
 @RestController
 @RequestMapping("booking")
 @SecurityRequirement(name = "Bearer Authentication")
-class BookingController(private val bookingService: BookingService) {
+class BookingController(
+    private val bookingService: BookingService,
+    private val userService: UserService,
+    ) {
     @GetMapping("{bookingID}")
     @Transactional
     @RequiresAdmin
@@ -125,6 +138,54 @@ class BookingController(private val bookingService: BookingService) {
         } catch (e: DateTimeParseException) {
             throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
+    }
+    @PostMapping("/createBooking")
+    @Transactional
+    @RequiresAdmin
+    @Operation(summary = "Create a new booking")
+    @ApiResponse(
+        responseCode = "201",
+        description = "New booking created",
+        content = [Content(schema = Schema(implementation = BookingDTO::class))]
+    )
+    fun createBooking(
+        token: JwtAuthenticationToken,
+        @Validated @Valid @RequestBody createBookingDTO: CreateBookingDTO
+    ): ResponseEntity<Any> {
+        val startDate = createBookingDTO.startDate
+        val endDate = createBookingDTO.endDate
+        if (startDate.isAfter(endDate)) {
+            val errorMessage = "Start date cannot be after the end date."
+            val errorResponse = ErrorResponse(errorMessage)
+            return ResponseEntity.badRequest().body(errorResponse)
+        }
+
+        val apartmentId = createBookingDTO.apartmentId
+        if (apartmentId <= 0 || apartmentId > 3) {
+            val errorMessage = "There is no apartment with that ID."
+            val errorResponse = ErrorResponse(errorMessage)
+            return ResponseEntity.badRequest().body(errorResponse)
+        }
+
+        val user = userService.getUserBySub(token.getSub())
+        val employeeName = user?.name
+
+        val booking = bookingService.createBooking(apartmentId, startDate, endDate, employeeName)
+
+        val apartmentDTO = Apartment(
+            id = booking.apartment?.id,
+            cabin_name = booking.apartment?.cabin_name
+        )
+
+        val bookingDTO = BookingDTO(
+            id = booking.id,
+            startDate = booking.startDate,
+            endDate = booking.endDate,
+            apartment = apartmentDTO,
+            employeeName = employeeName
+        )
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookingDTO)
     }
 }
 
