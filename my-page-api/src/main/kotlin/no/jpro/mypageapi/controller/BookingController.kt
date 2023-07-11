@@ -6,16 +6,13 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.dto.CreateBookingDTO
-import no.jpro.mypageapi.dto.PostDTO
 import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
-import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.BookingService
 import no.jpro.mypageapi.service.UserService
@@ -39,7 +36,6 @@ class BookingController(
     ) {
     @GetMapping("{bookingID}")
     @Transactional
-    @RequiresAdmin
     @Operation(summary = "Get the booking connected to the booking id")
     @ApiResponse(
         responseCode = "200",
@@ -58,7 +54,6 @@ class BookingController(
 
     @GetMapping
     @Transactional
-    @RequiresAdmin
     @Operation(summary = "Get all bookings in the given month")
     @ApiResponse(
         responseCode = "200",
@@ -97,7 +92,6 @@ class BookingController(
 
     @GetMapping("employee/{employee_id}")
     @Transactional
-    @RequiresAdmin
     @Operation(summary = "Get the booking connected to the employee id")
     @ApiResponse(
         responseCode = "200",
@@ -116,7 +110,6 @@ class BookingController(
 
     @GetMapping("/date")
     @Transactional
-    @RequiresAdmin
     @Operation(summary = "Get all bookings on the specified date")
     @ApiResponse(
         responseCode = "200",
@@ -141,7 +134,6 @@ class BookingController(
     }
     @PostMapping
     @Transactional
-    @RequiresAdmin
     @Operation(summary = "Create a new booking")
     @ApiResponse(
         responseCode = "201",
