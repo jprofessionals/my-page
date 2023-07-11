@@ -1,6 +1,5 @@
 package no.jpro.mypageapi.controller
 
-import com.aallam.openai.api.exception.InvalidRequestException
 import io.ktor.util.date.*
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
@@ -26,6 +25,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import java.net.URI
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 import java.util.*
@@ -139,7 +139,7 @@ class BookingController(
             throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
     }
-    @PostMapping("/createBooking")
+    @PostMapping
     @Transactional
     @RequiresAdmin
     @Operation(summary = "Create a new booking")
@@ -152,40 +152,66 @@ class BookingController(
         token: JwtAuthenticationToken,
         @Validated @Valid @RequestBody createBookingDTO: CreateBookingDTO
     ): ResponseEntity<Any> {
-        val startDate = createBookingDTO.startDate
-        val endDate = createBookingDTO.endDate
-        if (startDate.isAfter(endDate)) {
-            val errorMessage = "Start date cannot be after the end date."
+        val minApartmentID = 1
+        val maxApartmentID = 3
+
+        try {
+            val startDate = createBookingDTO.startDate
+            val endDate = createBookingDTO.endDate
+
+            if (startDate.isAfter(endDate)) {
+                throw InvalidBookingDatesException("Start date cannot be after the end date.")
+            }
+
+            val apartmentId = createBookingDTO.apartmentId
+            if (apartmentId < minApartmentID || apartmentId > maxApartmentID) {
+                throw InvalidApartmentIdException("There is no apartment with that ID.")
+            }
+
+            val user = userService.getUserBySub(token.getSub())
+            val employeeName = user?.name
+
+            val booking = bookingService.createBooking(apartmentId, startDate, endDate, employeeName)
+
+            val apartmentDTO = Apartment(
+                id = booking.apartment?.id,
+                cabin_name = booking.apartment?.cabin_name
+            )
+
+            val bookingDTO = BookingDTO(
+                id = booking.id,
+                startDate = booking.startDate,
+                endDate = booking.endDate,
+                apartment = apartmentDTO,
+                employeeName = employeeName
+            )
+
+            val location = URI.create("booking/${booking.id}")
+
+            return ResponseEntity.created(location).body(bookingDTO)
+        } catch (e: InvalidBookingDatesException) {
+            val errorMessage = e.message ?: "Invalid booking dates"
+            val errorResponse = ErrorResponse(errorMessage)
+            return ResponseEntity.badRequest().body(errorResponse)
+        } catch (e: InvalidApartmentIdException) {
+            val errorMessage = e.message ?: "Invalid apartment ID"
             val errorResponse = ErrorResponse(errorMessage)
             return ResponseEntity.badRequest().body(errorResponse)
         }
-
-        val apartmentId = createBookingDTO.apartmentId
-        if (apartmentId <= 0 || apartmentId > 3) {
-            val errorMessage = "There is no apartment with that ID."
-            val errorResponse = ErrorResponse(errorMessage)
-            return ResponseEntity.badRequest().body(errorResponse)
-        }
-
-        val user = userService.getUserBySub(token.getSub())
-        val employeeName = user?.name
-
-        val booking = bookingService.createBooking(apartmentId, startDate, endDate, employeeName)
-
-        val apartmentDTO = Apartment(
-            id = booking.apartment?.id,
-            cabin_name = booking.apartment?.cabin_name
-        )
-
-        val bookingDTO = BookingDTO(
-            id = booking.id,
-            startDate = booking.startDate,
-            endDate = booking.endDate,
-            apartment = apartmentDTO,
-            employeeName = employeeName
-        )
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookingDTO)
     }
+
+    @ExceptionHandler(InvalidBookingDatesException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleInvalidBookingDatesException(e: InvalidBookingDatesException): ErrorResponse {
+        return ErrorResponse(e.message)
+    }
+    class InvalidBookingDatesException(message: String) : RuntimeException(message)
+
+    @ExceptionHandler(InvalidApartmentIdException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleInvalidApartmentIdException(e: InvalidApartmentIdException): ErrorResponse {
+        return ErrorResponse(e.message)
+    }
+    class InvalidApartmentIdException(message: String) : RuntimeException(message)
 }
 
