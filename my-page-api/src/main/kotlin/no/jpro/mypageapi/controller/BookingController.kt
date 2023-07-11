@@ -139,7 +139,7 @@ class BookingController(private val bookingService: BookingService) {
         @RequestParam("startdate") startdate: String,
         @RequestParam("enddate") enddate: String,
 
-        ): ResponseEntity<List<HashMap<Long, List<LocalDate>>>> {
+        ): ResponseEntity<Map<Long, List<LocalDate>>> {
 
         try {
             val parsedStartDate: LocalDate = LocalDate.parse(startdate)

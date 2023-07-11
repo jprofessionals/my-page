@@ -9,6 +9,7 @@ import no.jpro.mypageapi.utils.mapper.ApartmentMapper
 import no.jpro.mypageapi.utils.mapper.BookingMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @Service
 class BookingService(
@@ -43,47 +44,22 @@ class BookingService(
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 
-    fun checkApartmentAvailability(existingBookingList: List<Booking>, apartmentId: Long?, date: LocalDate): Boolean {
-        val apartmentBookings = existingBookingList.filter { booking -> booking.apartment?.id == apartmentId }
-        return when {
-            apartmentBookings.size >= 2 -> false
-            (apartmentBookings.size == 1 && apartmentBookings[0].startDate == date) || (apartmentBookings.size == 1 && apartmentBookings[0].endDate == date) -> true //"Apartment with id $apartmentId is available, can make new booking with this day as end date."
-            apartmentBookings.isEmpty() -> true
-            else -> false
-        }
-    }
-
-    fun getAllVacanciesInAPeriod(startDate: LocalDate, endDate: LocalDate): List<HashMap<Long, List<LocalDate>>> {
-        val datesInRange = mutableListOf<LocalDate>()
-        var currentDate = startDate
-        while (!currentDate.isAfter(endDate)) {
-            datesInRange.add(currentDate)
-            currentDate = currentDate.plusDays(1)
-        }
-
-        val apartmentVacancies = mutableListOf<HashMap<Long, List<LocalDate>>>()
-
-        val apartments = getAllApartments()
-
-        for (apartment in apartments) {
-            val apartmentId = apartment.id!!
-            val vacancies = mutableListOf<LocalDate>()
-            for (date in datesInRange) {
-                val bookings = bookingRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(date, date)
-                val vacancyExists = checkApartmentAvailability(bookings, apartmentId, date)
-                if (vacancyExists) {
-                    vacancies.add(date)
-                }
-            }
-            if (vacancies.isNotEmpty()) {
-                val apartmentVacancy = hashMapOf(apartmentId to vacancies.toList())
-                apartmentVacancies.add(apartmentVacancy)
-            }
-        }
+    fun getAllVacanciesInAPeriod(startDate: LocalDate, endDate: LocalDate): Map<Long, List<LocalDate>> {
+        val datesInRange = LongRange(0, ChronoUnit.DAYS.between(startDate, endDate))
+            .map { startDate.plusDays(it) }
+        val bookings = bookingRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(endDate, startDate)
+        val bookedDays = bookings
+            .flatMap { booking ->
+                LongRange(0, ChronoUnit.DAYS.between(booking.startDate, booking.endDate))
+                    .map { Pair(booking.apartment!!.id!!, booking.startDate.plusDays(it)) }
+            }.groupBy { it.first }
+            .mapValues { it.value.map { it.second }.toSet() }
+        val apartmentVacancies = apartmentRepository.findAll()
+            .map { it.id!! }
+            .associateWith { apartmentId -> datesInRange.minus(bookedDays[apartmentId].orEmpty()) }
 
         return apartmentVacancies
     }
-
 
     fun getAllApartments(): List<ApartmentDTO> {
         val apartments = apartmentRepository.findAll()
