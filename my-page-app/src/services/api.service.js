@@ -87,41 +87,43 @@ const getBookingsForUser = async () => {
 
 const getBookingsForDay = (selectedDate) => {
   const params = {
-    date: selectedDate
+    date: selectedDate,
   }
 
   return axios
-      .get(API_URL + 'booking/date', {
-        headers: authHeader(),
-        params: params
-      })
-      .then((response) => {
-        const bookings = response.data;
-        return bookings.map((booking) => ({
-          id: String(booking.id),
-          startDate: booking.startDate,
-          endDate: booking.endDate,
-          apartment: {
-            id: booking.apartment.id,
-            cabin_name: booking.apartment.cabin_name,
-          },
-          employeeName: booking.employeeName,
-        }))
-      })
+    .get(API_URL + 'booking/date', {
+      headers: authHeader(),
+      params: params,
+    })
+    .then((response) => {
+      const bookings = response.data
+      return bookings.map((booking) => ({
+        id: String(booking.id),
+        startDate: booking.startDate,
+        endDate: booking.endDate,
+        apartment: {
+          id: booking.apartment.id,
+          cabin_name: booking.apartment.cabin_name,
+        },
+        employeeName: booking.employeeName,
+      }))
+    })
 }
 
 const getAllVacancies = async (startDate, endDate) => {
   const params = {
     startdate: startDate,
-    enddate: endDate
+    enddate: endDate,
   }
-  return axios.get(API_URL + 'booking/vacancy', {
-        headers: authHeader(),
-        params: params
-      }).then((response) => {
-        const availability = response.data;
-        return availability
-      })
+  return axios
+    .get(API_URL + 'booking/vacancy', {
+      headers: authHeader(),
+      params: params,
+    })
+    .then((response) => {
+      const availability = response.data
+      return availability
+    })
 }
 
 const getAllApartments = async () => {
@@ -131,7 +133,6 @@ const getAllApartments = async () => {
   const apartments = response.data
   return apartments
 }
-
 
 const ApiService = {
   getUsers,

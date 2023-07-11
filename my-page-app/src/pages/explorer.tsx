@@ -1,10 +1,8 @@
-import React from 'react';
-import ExplorerTextArea from "@/components/explorer/explorerTextArea";
+import React from 'react'
+import ExplorerTextArea from '@/components/explorer/explorerTextArea'
 
 function Explorer() {
-    return (
-        <ExplorerTextArea/>
-    );
+  return <ExplorerTextArea />
 }
 
-export default Explorer;
+export default Explorer

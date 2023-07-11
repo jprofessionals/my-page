@@ -1,18 +1,23 @@
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
-import React, {useCallback, useEffect, useState} from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import ApiService from '@/services/api.service'
-import {toast} from 'react-toastify'
-import {Booking, Budget} from '@/types'
+import { toast } from 'react-toastify'
+import { Booking, Budget } from '@/types'
 import Loading from '@/components/Loading'
 import UserInformation from '@/components/UserInformation'
-import {useAuthContext} from '@/providers/AuthProvider'
+import { useAuthContext } from '@/providers/AuthProvider'
 import ErrorPage from '@/components/ErrorPage'
-import {AccordionContent, AccordionItem, Accordions, AccordionTrigger,} from '@/components/ui/bookingAccordion'
-import {faHotel, IconDefinition} from '@fortawesome/free-solid-svg-icons'
+import {
+  AccordionContent,
+  AccordionItem,
+  Accordions,
+  AccordionTrigger,
+} from '@/components/ui/bookingAccordion'
+import { faHotel, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import cn from '@/utils/cn'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {get} from 'radash'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { get } from 'radash'
 
 const BudgetList = dynamic(() => import('@/components/budget/BudgetList'), {
   ssr: false,
@@ -134,14 +139,24 @@ export default function HomePage() {
                         {bookings.map((booking, index) => {
                           const startDate = new Date(booking.startDate)
                           const endDate = new Date(booking.endDate)
-                          const formattedStartDate = `${startDate.getDate()}-${startDate.getMonth() + 1}-${startDate.getFullYear()}`
-                          const formattedEndDate = `${endDate.getDate()}-${endDate.getMonth() + 1}-${endDate.getFullYear()}`
+                          const formattedStartDate = `${startDate.getDate()}-${
+                            startDate.getMonth() + 1
+                          }-${startDate.getFullYear()}`
+                          const formattedEndDate = `${endDate.getDate()}-${
+                            endDate.getMonth() + 1
+                          }-${endDate.getFullYear()}`
 
                           return (
-                              <div key={booking.id} className="ml-10 mt-3 ">
-                                <p>Du har booket hytten {booking.apartment.cabin_name} i perioden {formattedStartDate} til {formattedEndDate}</p>
-                                {index !== bookings.length - 1 && <hr className="mt-3" />}
-                              </div>
+                            <div key={booking.id} className="ml-10 mt-3 ">
+                              <p>
+                                Du har booket hytten{' '}
+                                {booking.apartment.cabin_name} i perioden{' '}
+                                {formattedStartDate} til {formattedEndDate}
+                              </p>
+                              {index !== bookings.length - 1 && (
+                                <hr className="mt-3" />
+                              )}
+                            </div>
                           )
                         })}
                       </AccordionContent>

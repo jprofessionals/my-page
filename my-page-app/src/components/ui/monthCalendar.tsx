@@ -1,5 +1,5 @@
-import {ChevronLeft, ChevronRight} from 'lucide-react'
-import {DayPicker} from 'react-day-picker'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { DayPicker } from 'react-day-picker'
 import cn from '@/utils/cn'
 import {
   format,
@@ -45,17 +45,19 @@ function MonthCalendar({
 
   const fetchBookings = async () => {
     try {
-      const currentDate = new Date();
-      const unformattedStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate())
-      const unformattedEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate())
-      const year = unformattedStartDate.getFullYear();
-      const month = String(unformattedStartDate.getMonth() + 1).padStart(2, '0');
-      const day = String(unformattedStartDate.getDate()).padStart(2, '0');
-      const startDate = `${year}-${month}-${day}`;
-      const year_end = unformattedEndDate.getFullYear();
-      const month_end = String(unformattedEndDate.getMonth() + 1).padStart(2, '0');
-      const day_end = String(unformattedEndDate.getDate()).padStart(2, '0');
-      const endDate = `${year_end}-${month_end}-${day_end}`;
+      const currentDate = new Date()
+      const unformattedStartDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - 1,
+        currentDate.getDate(),
+      )
+      const unformattedEndDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        currentDate.getDate(),
+      )
+      const startDate = format(unformattedStartDate, 'yyyy-MM-dd')
+      const endDate = format(unformattedEndDate, 'yyyy-MM-dd')
       //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward. These control the time period in which bookings will be rendered on the calendar.
 
       const bookings = await ApiService.getBookings(startDate, endDate)
