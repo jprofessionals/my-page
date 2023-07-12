@@ -5,7 +5,7 @@ import ApiService from '@/services/api.service'
 import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
-import { format } from 'date-fns'
+import { format, parse } from 'date-fns'
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>(new Date())
@@ -18,6 +18,7 @@ export default function MonthOverview() {
     setDate(date)
     fetchBookingItems(date)
     getVacancyForDay(date)
+    getVacantApartments(date)
   }
 
   const customModalStyles = {
@@ -63,29 +64,28 @@ export default function MonthOverview() {
   const [vacancyLoadingStatus, setVacancyLoadingStatus] =
     useState<VacancyLoadingStatus>('init')
   const { userFetchStatus } = useAuthContext()
-  const [vacancies, setVacancies] = useState<
-    { [key: number]: Date[] } | undefined
-  >(undefined)
-  const [vacantApartments, setVacantApartments] = useState<string[]>([])
+  const [vacancies, setVacancies] =
+      useState<{ [key: number]: string[] } | undefined>({})
+  const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<string[]>([])
   const [apartments, setApartments] = useState<Apartment[]>([])
 
   const refreshVacancies = useCallback(async () => {
     setVacancyLoadingStatus('loading')
 
     try {
-      const currentDate = new Date()
-      const unformattedStartDate = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth() - 1,
-        currentDate.getDate(),
-      )
-      const unformattedEndDate = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth() + 1,
-        currentDate.getDate(),
-      )
-      const startDate = format(unformattedStartDate, 'yyyy-MM-dd')
-      const endDate = format(unformattedEndDate, 'yyyy-MM-dd')
+      /*const currentDate = new Date()
+            const unformattedStartDate = new Date(
+              currentDate.getFullYear(),
+              currentDate.getMonth() - 1,
+              currentDate.getDate(),
+            )
+            const unformattedEndDate = new Date(
+              currentDate.getFullYear(),
+              currentDate.getMonth() + 1,
+              currentDate.getDate(),
+            )*/
+      const startDate = '2023-06-01' //format(unformattedStartDate, 'yyyy-MM-dd')
+      const endDate = '2023-08-31' //format(unformattedEndDate, 'yyyy-MM-dd')
       //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward. These control the time period in which vacancies will be searched for.
 
       const loadedVacancies = await ApiService.getAllVacancies(
@@ -112,47 +112,42 @@ export default function MonthOverview() {
     const response = await ApiService.getAllApartments()
     setApartments(response)
   }
-  const getVacancyForDay = async (selectedDate: Date) => {
-    try {
-      const formattedDate = format(selectedDate, 'yyyy-MM-dd')
+  const getVacantApartments = (selectedDate: Date) => {
+    const vacantApartments: number[] = []
+    const apartmentsInVacancies = Object.keys(vacancies!)
 
-      if (vacancies) {
-        const availableApartments: string[] = []
+    const formattedDate = format(selectedDate, 'yyyy-MM-dd')
+    const nextDate = new Date(selectedDate)
+    nextDate.setDate(selectedDate.getDate() + 1)
+    const formattedNextDate = format(nextDate, 'yyyy-MM-dd')
+    const previousDate = new Date(selectedDate)
+    previousDate.setDate(selectedDate.getDate() - 1)
+    const formattedPreviousDate = format(previousDate, 'yyyy-MM-dd')
 
-        for (const key in vacancies) {
-          if (vacancies.hasOwnProperty(key)) {
-            const vacancy = vacancies[key]
+    for (const apartment of apartmentsInVacancies) {
+      const dates = vacancies![Number(apartment)]
 
-            const vacancyValue = Object.values(vacancy)
-            const vacancyDates = vacancyValue[0] as unknown as string[]
-            const vacancyKey = Object.keys(vacancy)
-            const vacancyApartmentId = vacancyKey[0]
-
-            for (const date of vacancyDates) {
-              if (date === formattedDate) {
-                for (const apartment of apartments) {
-                  if (apartment.id!.toString() === vacancyApartmentId) {
-                    availableApartments.push(apartment.cabin_name)
-                    break
-                  }
-                }
-                break
-              }
-            }
-          }
-        }
-
-        if (availableApartments.length !== 0) {
-          setVacantApartments(availableApartments)
-          return vacantApartments
-        } else {
-          setVacantApartments([])
-          return
-        }
+      if (
+        dates.includes(formattedDate) ||
+        dates.includes(formattedNextDate) ||
+        dates.includes(formattedPreviousDate)
+      ) {
+        vacantApartments.push(Number(apartment))
       }
-    } catch (error) {
-      console.error('Error:', error)
     }
+    return vacantApartments
+  }
+
+  const getVacancyForDay = async (selectedDate: Date) => {
+    const availableApartments: string[] = []
+    const vacantApartmentsInPeriod = getVacantApartments(selectedDate)
+    for (const apartment of apartments) {
+      if (vacantApartmentsInPeriod.includes(apartment.id!)) {
+        availableApartments.push(apartment.cabin_name)
+      }
+    }
+    setVacantApartmentsOnDay(availableApartments)
+    return vacantApartmentsOnDay
   }
 
   return (
@@ -174,7 +169,7 @@ export default function MonthOverview() {
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 prose">
           {bookingItems.length > 0 ? (
             <div>
-              <h2>Bookinger for denne datoen:</h2>
+              <h2>Valgt dato: Legg inn dato</h2>
               {bookingItems.map((booking, index) => {
                 const startDate = new Date(booking.startDate)
                 const endDate = new Date(booking.endDate)
@@ -184,8 +179,7 @@ export default function MonthOverview() {
                 return (
                   <div key={booking.id}>
                     <p>
-                      {booking.employeeName} har booket hytten{' '}
-                      {booking.apartment.cabin_name} i perioden{' '}
+                      {booking.employeeName} har {booking.apartment.cabin_name}{' '}
                       {formattedStartDate} til {formattedEndDate}.
                     </p>
                     {index !== bookingItems.length - 1 && <hr />}
@@ -193,10 +187,10 @@ export default function MonthOverview() {
                 )
               })}
               <h2>Ledige hytter:</h2>
-              {vacantApartments.length === 0 ? (
+              {vacantApartmentsOnDay.length === 0 ? (
                 <p>Ingen ledige hytter</p>
               ) : (
-                vacantApartments.map((apartment, index) => (
+                vacantApartmentsOnDay.map((apartment, index) => (
                   <div key={index}>
                     <p>
                       <span className="apartment-text">{apartment}</span>
@@ -218,10 +212,10 @@ export default function MonthOverview() {
             </div>
           ) : (
             <div>
-              <h2>Bookinger for denne datoen:</h2>
+              <h2>Valgt dato: Legg inn dato</h2>
               <p>Ingen bookinger for denne dagen</p>
               <h3 className="mt-10">Ledige hytter: </h3>
-              {vacantApartments.map((apartment, index) => (
+              {vacantApartmentsOnDay.map((apartment, index) => (
                 <div key={index}>
                   <p>
                     <span className="apartment-text">{apartment} er ledig</span>
