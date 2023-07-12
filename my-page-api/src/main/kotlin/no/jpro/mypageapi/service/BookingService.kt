@@ -2,10 +2,13 @@ package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.dto.ApartmentDTO
 import no.jpro.mypageapi.dto.BookingDTO
+import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
+import no.jpro.mypageapi.utils.mapper.ApartmentMapper
+import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.BookingRepository
-import no.jpro.mypageapi.utils.mapper.ApartmentMapper
+import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.BookingMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -17,7 +20,9 @@ class BookingService(
     private val bookingMapper: BookingMapper,
     private val apartmentRepository: ApartmentRepository,
     private val apartmentMapper: ApartmentMapper,
+    private val userRepository: UserRepository,
 ) {
+
     fun getBooking(bookingId: Long): Booking? {
         return bookingRepository.findBookingById(bookingId)
     }
@@ -64,6 +69,27 @@ class BookingService(
     fun getAllApartments(): List<ApartmentDTO> {
         val apartments = apartmentRepository.findAll()
         return apartments.map { apartmentMapper.toApartmentDTO(it) }
+    }
+
+    fun createBooking(apartmentId: Long, startDate: LocalDate, endDate: LocalDate, employeeName: String?): Booking {
+        val employee = if (employeeName != null) {
+            userRepository.findUserByName(employeeName)
+        } else {
+            null
+        }
+
+        val apartment = apartmentRepository.findById(apartmentId).orElseThrow {
+            throw IllegalArgumentException("Apartment not found for ID: $apartmentId")
+        }
+
+        val booking = Booking(
+            startDate = startDate,
+            endDate = endDate,
+            apartment = apartment,
+            employee = employee
+        )
+
+        return bookingRepository.save(booking)
     }
 
 }
