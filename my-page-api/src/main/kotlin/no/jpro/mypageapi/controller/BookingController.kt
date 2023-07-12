@@ -11,8 +11,11 @@ import jakarta.validation.Valid
 import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.dto.CreateBookingDTO
+import no.jpro.mypageapi.dto.UpdateBookingDTO
 import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
+import no.jpro.mypageapi.entity.Budget
+import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.BookingService
 import no.jpro.mypageapi.service.UserService
@@ -205,5 +208,28 @@ class BookingController(
         return ErrorResponse(e.message)
     }
     class InvalidApartmentIdException(message: String) : RuntimeException(message)
+
+
+    @PatchMapping("{bookingId}")
+    @Transactional
+    @Operation(summary = "Edit an existing booking")
+    fun editBooking(
+        token: JwtAuthenticationToken,
+        @PathVariable("bookingId") bookingId: Long,
+        @Valid @RequestBody editBookingRequest: UpdateBookingDTO,
+    ): ResponseEntity<BookingDTO> {
+        val bookingToEdit = bookingService.getBooking(bookingId) ?: return ResponseEntity.notFound().build()
+        val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity.badRequest().build()
+
+        if (!userPermittedToManageBooking(bookingToEdit, user)) {
+            return ResponseEntity(HttpStatus.FORBIDDEN)
+        }
+
+        return ResponseEntity.ok(bookingService.editBooking(editBookingRequest, bookingToEdit))
+    }
+    private fun userPermittedToManageBooking(booking: Booking, employee: User) = (booking.employee?.id == employee.id || employee.admin)
+
+
+
 }
 

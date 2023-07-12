@@ -1,6 +1,7 @@
 package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.dto.BookingDTO
+import no.jpro.mypageapi.dto.UpdateBookingDTO
 import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.User
@@ -62,5 +63,16 @@ class BookingService(
         )
 
         return bookingRepository.save(booking)
+    }
+
+    fun editBooking(editPostRequest: UpdateBookingDTO, bookingToEdit: Booking): BookingDTO {
+        return bookingMapper.toBookingDTO(
+            bookingRepository.save(
+                bookingToEdit.copy(
+                    startDate = editPostRequest.startDate ?: bookingToEdit.startDate,
+                    endDate = editPostRequest.endDate ?: bookingToEdit.endDate,
+                )
+            )
+        )
     }
 }
