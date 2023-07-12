@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import Modal from 'react-modal'
-import { MonthCalendar } from '@/components/ui/monthCalendar'
+import {MonthCalendar} from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import { Apartment, Booking } from '@/types'
-import { toast } from 'react-toastify'
-import { useAuthContext } from '@/providers/AuthProvider'
-import { format, parse } from 'date-fns'
+import {Apartment, Booking} from '@/types'
+import {toast} from 'react-toastify'
+import {useAuthContext} from '@/providers/AuthProvider'
+import {format} from 'date-fns'
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>(new Date())
