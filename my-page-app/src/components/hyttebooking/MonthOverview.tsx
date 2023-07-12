@@ -18,7 +18,6 @@ export default function MonthOverview() {
     setDate(date)
     fetchBookingItems(date)
     getVacancyForDay(date)
-    getVacantApartments(date)
   }
 
   const customModalStyles = {

@@ -2,13 +2,11 @@ package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.dto.ApartmentDTO
 import no.jpro.mypageapi.dto.BookingDTO
-import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
-import no.jpro.mypageapi.utils.mapper.ApartmentMapper
-import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.BookingRepository
 import no.jpro.mypageapi.repository.UserRepository
+import no.jpro.mypageapi.utils.mapper.ApartmentMapper
 import no.jpro.mypageapi.utils.mapper.BookingMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
