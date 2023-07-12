@@ -56,7 +56,4 @@ interface BookingRepository : JpaRepository<Booking, Long> {
 @Repository
 interface  ApartmentRepository : JpaRepository<Apartment, Long> {
     override fun findAll(): List<Apartment>
-
-interface ApartmentRepository : JpaRepository<Apartment, Long> {
-    fun findApartmentById(apartmentId: Long)
 }
