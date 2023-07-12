@@ -227,7 +227,7 @@ class BookingController(
 
         return ResponseEntity.ok(bookingService.editBooking(editBookingRequest, bookingToEdit))
     }
-    private fun userPermittedToManageBooking(booking: Booking, employee: User) = (booking.employee?.id == employee.id || employee.admin)
+    private fun userPermittedToManageBooking(booking: Booking, employee: User) = (booking.employee?.id == employee.id)
 
 
 
