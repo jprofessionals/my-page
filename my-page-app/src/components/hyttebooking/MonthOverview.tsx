@@ -151,7 +151,7 @@ export default function MonthOverview() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-1 p-4">
       <MonthCalendar
         onDayClick={handleDateClick}
         mode="single"
@@ -169,7 +169,7 @@ export default function MonthOverview() {
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 prose">
           {bookingItems.length > 0 ? (
             <div>
-              <h2>Valgt dato: {format(date!, 'dd-MM-yyyy')}</h2>
+              <h3 className="mt-1 mb-1">Valgt dato: {format(date!, 'dd-MM-yyyy')}</h3>
               {bookingItems.map((booking, index) => {
                 const startDate = new Date(booking.startDate)
                 const endDate = new Date(booking.endDate)
@@ -178,25 +178,25 @@ export default function MonthOverview() {
 
                 return (
                   <div key={booking.id}>
-                    <p>
+                    <p className="mt-2 mb-1">
                       {booking.employeeName} har {booking.apartment.cabin_name}{' '}
                       {formattedStartDate} til {formattedEndDate}.
                     </p>
-                    {index !== bookingItems.length - 1 && <hr />}
+                    {index !== bookingItems.length - 1 && (<hr className="mt-1 mb-1" />)}
                   </div>
                 )
               })}
-              <h2>Ledige hytter:</h2>
+              <h3 className = "mt-3 mb-1">Ledige hytter:</h3>
               {vacantApartmentsOnDay.length === 0 ? (
-                <p>Ingen ledige hytter</p>
+                <p className="mb-1">Ingen ledige hytter</p>
               ) : (
                 vacantApartmentsOnDay.map((apartment, index) => (
                   <div key={index}>
-                    <p>
+                    <p className="mt-1 mb-1">
                       <span className="apartment-text">{apartment}</span>
                       <button
                         onClick={() => handleApartmentClick(index + 1)}
-                        className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
+                        className="mt-2 ml-2 bg-orange-500 text-white px-2 py-1 rounded-md"
                       >
                         Book
                       </button>
@@ -212,16 +212,16 @@ export default function MonthOverview() {
             </div>
           ) : (
             <div>
-              <h2>Valgt dato: {format(date!, 'dd-MM-yyyy')}</h2>
-              <p>Ingen bookinger for denne dagen</p>
-              <h3 className="mt-10">Ledige hytter: </h3>
+              <h3 className="mt-1 mb-2">Valgt dato: {format(date!, 'dd-MM-yyyy')}</h3>
+              <p className="mb-1">Ingen bookinger for denne dagen</p>
+              <h3 className="mt-2 mb-1">Ledige hytter: </h3>
               {vacantApartmentsOnDay.map((apartment, index) => (
                 <div key={index}>
-                  <p>
+                  <p className="mt-1 mb-1">
                     <span className="apartment-text">{apartment} er ledig</span>
                     <button
                       onClick={() => handleApartmentClick(index + 1)}
-                      className="mt-4 ml-2 bg-orange-500 text-white px-4 py-2 rounded-md"
+                      className="mt-2 ml-2 bg-orange-500 text-white px-2 py-1 rounded-md"
                     >
                       Book
                     </button>
@@ -238,7 +238,7 @@ export default function MonthOverview() {
 
           <button
             onClick={closeModal}
-            className="mt-4 mr-4 bg-orange-500 text-white px-4 py-2 rounded-md"
+            className="mt-3 mr-4 bg-red-not-available text-white px-2 py-1 rounded-md"
           >
             Lukk
           </button>
