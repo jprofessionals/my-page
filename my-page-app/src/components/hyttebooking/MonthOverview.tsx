@@ -1,11 +1,11 @@
-import React, {useCallback, useEffect, useState} from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
-import {MonthCalendar} from '@/components/ui/monthCalendar'
+import { MonthCalendar } from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import {Apartment, Booking} from '@/types'
-import {toast} from 'react-toastify'
-import {useAuthContext} from '@/providers/AuthProvider'
-import {format} from 'date-fns'
+import { Apartment, Booking } from '@/types'
+import { toast } from 'react-toastify'
+import { useAuthContext } from '@/providers/AuthProvider'
+import { format } from 'date-fns'
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>(new Date())
@@ -64,9 +64,12 @@ export default function MonthOverview() {
   const [vacancyLoadingStatus, setVacancyLoadingStatus] =
     useState<VacancyLoadingStatus>('init')
   const { userFetchStatus } = useAuthContext()
-  const [vacancies, setVacancies] =
-      useState<{ [key: number]: string[] } | undefined>({})
-  const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<string[]>([])
+  const [vacancies, setVacancies] = useState<
+    { [key: number]: string[] } | undefined
+  >({})
+  const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<string[]>(
+    [],
+  )
   const [apartments, setApartments] = useState<Apartment[]>([])
 
   const refreshVacancies = useCallback(async () => {
@@ -168,60 +171,65 @@ export default function MonthOverview() {
       >
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 prose">
           {date ? (
-              <div>
-                <h3 className="mt-1 mb-1">Valgt dato: {format(date, 'dd-MM-yyyy')}</h3>
-                {bookingItems.length > 0 ? (
-                    <div>
-                      {bookingItems.map((booking, index) => {
-                        const startDate = new Date(booking.startDate)
-                        const endDate = new Date(booking.endDate)
-                        const formattedStartDate = format(startDate, 'dd-MM-yyyy')
-                        const formattedEndDate = format(endDate, 'dd-MM-yyyy')
+            <div>
+              <h3 className="mt-1 mb-1">
+                Valgt dato: {format(date, 'dd-MM-yyyy')}
+              </h3>
+              {bookingItems.length > 0 ? (
+                <div>
+                  {bookingItems.map((booking, index) => {
+                    const startDate = new Date(booking.startDate)
+                    const endDate = new Date(booking.endDate)
+                    const formattedStartDate = format(startDate, 'dd-MM-yyyy')
+                    const formattedEndDate = format(endDate, 'dd-MM-yyyy')
 
-                        return (
-                            <div key={booking.id}>
-                              <p className="mt-2 mb-1">
-                                {booking.employeeName} har {booking.apartment.cabin_name}{' '}
-                                {formattedStartDate} til {formattedEndDate}.
-                              </p>
-                              {index !== bookingItems.length - 1 && <hr className="mt-1 mb-1" />}
-                            </div>
-                        )
-                      })}
-                    </div>
-                ) : (
-                    <div>
-                      <p>Ingen bookinger for denne dagen</p>
-                    </div>
-                )}
-                <h3 className="mt-3 mb-1">Ledige hytter:</h3>
-                {vacantApartmentsOnDay.length === 0 ? (
-                    <p className="mb-1">Ingen ledige hytter</p>
-                ) : (
-                    vacantApartmentsOnDay.map((apartment, index) => (
-                        <div key={index}>
-                          <p className="mt-1 mb-1">
-                            <span className="apartment-text">{apartment}</span>
-                            <button
-                                onClick={() => handleApartmentClick(index + 1)}
-                                className="mt-2 ml-2 bg-orange-500 text-white px-2 py-1 rounded-md"
-                            >
-                              Book
-                            </button>
-                          </p>
-                          {expandedApartments.includes(index + 1) && (
-                              <div className="expanded-content">
-                                Her vil det komme mulighet for å gjøre en booking
-                              </div>
-                          )}
-                        </div>
-                    ))
-                )}
-              </div>
+                    return (
+                      <div key={booking.id}>
+                        <p className="mt-2 mb-1">
+                          {booking.employeeName} har{' '}
+                          {booking.apartment.cabin_name} {formattedStartDate}{' '}
+                          til {formattedEndDate}.
+                        </p>
+                        {index !== bookingItems.length - 1 && (
+                          <hr className="mt-1 mb-1" />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div>
+                  <p>Ingen bookinger for denne dagen</p>
+                </div>
+              )}
+              <h3 className="mt-3 mb-1">Ledige hytter:</h3>
+              {vacantApartmentsOnDay.length === 0 ? (
+                <p className="mb-1">Ingen ledige hytter</p>
+              ) : (
+                vacantApartmentsOnDay.map((apartment, index) => (
+                  <div key={index}>
+                    <p className="mt-1 mb-1">
+                      <span className="apartment-text">{apartment}</span>
+                      <button
+                        onClick={() => handleApartmentClick(index + 1)}
+                        className="mt-2 ml-2 bg-orange-500 text-white px-2 py-1 rounded-md"
+                      >
+                        Book
+                      </button>
+                    </p>
+                    {expandedApartments.includes(index + 1) && (
+                      <div className="expanded-content">
+                        Her vil det komme mulighet for å gjøre en booking
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
           ) : (
-              <div>
-                <p>Ingen valgt dato</p>
-              </div>
+            <div>
+              <p>Ingen valgt dato</p>
+            </div>
           )}
 
           <button
