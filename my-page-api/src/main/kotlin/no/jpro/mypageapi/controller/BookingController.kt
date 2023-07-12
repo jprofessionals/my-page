@@ -10,7 +10,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.entity.Booking
+import no.jpro.mypageapi.entity.Budget
+import no.jpro.mypageapi.entity.User
+import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.BookingService
+import no.jpro.mypageapi.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
@@ -23,7 +27,10 @@ import java.util.*
 @RestController
 @RequestMapping("booking")
 @SecurityRequirement(name = "Bearer Authentication")
-class BookingController(private val bookingService: BookingService) {
+class BookingController(
+    private val bookingService: BookingService,
+    private val userService: UserService
+) {
     @GetMapping("{bookingID}")
     @Transactional
     @RequiresAdmin
@@ -136,15 +143,19 @@ class BookingController(private val bookingService: BookingService) {
     )
     fun deleteBooking(
         token: JwtAuthenticationToken,
-        @PathVariable("bookingID") bookingID: Long
+        @PathVariable("bookingID") bookingID: Long,
     ): ResponseEntity<String> {
-        val bookingExists = bookingService.existsBookingById(bookingID)
-        if (bookingExists) {
-            bookingService.deleteBooking(bookingID)
-            return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
-        } else {
-            return ResponseEntity("Booking with ID $bookingID not found", HttpStatus.NOT_FOUND)
+
+        val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity(HttpStatus.FORBIDDEN)
+        val booking = bookingService.getBooking(bookingID) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+
+        if (!userPermittedToDeleteBooking(booking, user)) {
+            return ResponseEntity(HttpStatus.FORBIDDEN)
         }
+
+        bookingService.deleteBooking(bookingID)
+        return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
     }
+    private fun userPermittedToDeleteBooking(booking: Booking, user: User) = (booking.employee?.id == user.id)
 }
 

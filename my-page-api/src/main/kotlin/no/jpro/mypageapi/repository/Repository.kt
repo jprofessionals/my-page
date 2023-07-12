@@ -11,6 +11,7 @@ interface UserRepository : JpaRepository<User, String> {
     fun findUserBySub(sub: String): User?
     fun findUserByEmailAndSubIsNull(email: String): User?
     fun findUserByEmail(email: String): User?
+    fun findUserById(userId: Long): User?
 }
 
 @Repository
@@ -40,7 +41,7 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long> {
 
 @Repository
 interface BookingRepository : JpaRepository<Booking, Long> {
-    fun findBookingById(bookingId: Long): Booking
+    fun findBookingById(bookingId: Long): Booking?
     fun findBookingByEmployeeId(employeeId: Int): List<Booking>
     fun findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
         startDate: LocalDate, endDate: LocalDate
@@ -50,5 +51,4 @@ interface BookingRepository : JpaRepository<Booking, Long> {
     fun findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(
         selectedDate: LocalDate, alsoSelectedDate: LocalDate
     ): List<Booking>
-    fun existsBookingById(bookingId: Long): Boolean
 }
