@@ -169,7 +169,7 @@ export default function MonthOverview() {
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 prose">
           {bookingItems.length > 0 ? (
             <div>
-              <h2>Valgt dato: Legg inn dato</h2>
+              <h2>Valgt dato: {format(date!, 'dd-MM-yyyy')}</h2>
               {bookingItems.map((booking, index) => {
                 const startDate = new Date(booking.startDate)
                 const endDate = new Date(booking.endDate)
@@ -212,7 +212,7 @@ export default function MonthOverview() {
             </div>
           ) : (
             <div>
-              <h2>Valgt dato: Legg inn dato</h2>
+              <h2>Valgt dato: {format(date!, 'dd-MM-yyyy')}</h2>
               <p>Ingen bookinger for denne dagen</p>
               <h3 className="mt-10">Ledige hytter: </h3>
               {vacantApartmentsOnDay.map((apartment, index) => (
