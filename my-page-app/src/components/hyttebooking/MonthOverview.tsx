@@ -8,7 +8,7 @@ import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
 
 export default function MonthOverview() {
-  const [date, setDate] = useState<Date | undefined>(new Date())
+  const [date, setDate] = useState<Date | undefined>()
   const [showModal, setShowModal] = useState(false)
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
@@ -173,7 +173,7 @@ export default function MonthOverview() {
           {date ? (
             <div>
               <h3 className="mt-1 mb-1">
-                Valgt dato: {format(date, 'dd-MM-yyyy')}
+                {format(date, 'dd-MM-yyyy')}
               </h3>
               {bookingItems.length > 0 ? (
                 <div>
