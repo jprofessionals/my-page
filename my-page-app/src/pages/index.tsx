@@ -137,36 +137,37 @@ export default function HomePage() {
                       </AccordionTrigger>
                       <AccordionContent className="p-2 rounded-b-lg data-open:border-2">
                         {bookings
-                            .sort((a, b) => {
-                              const startDateComparison = Date.parse(a.startDate) - Date.parse(b.startDate)
-                              if (startDateComparison !== 0) {
-                                return startDateComparison
-                              }
-                              return Date.parse(a.endDate) - Date.parse(b.endDate)
-                            })
-                            .map((booking, index) => {
-                          const startDate = new Date(booking.startDate)
-                          const endDate = new Date(booking.endDate)
-                          const formattedStartDate = `${startDate.getDate()}-${
-                            startDate.getMonth() + 1
-                          }-${startDate.getFullYear()}`
-                          const formattedEndDate = `${endDate.getDate()}-${
-                            endDate.getMonth() + 1
-                          }-${endDate.getFullYear()}`
+                          .sort((a, b) => {
+                            const startDateComparison =
+                              Date.parse(a.startDate) - Date.parse(b.startDate)
+                            if (startDateComparison !== 0) {
+                              return startDateComparison
+                            }
+                            return Date.parse(a.endDate) - Date.parse(b.endDate)
+                          })
+                          .map((booking, index) => {
+                            const startDate = new Date(booking.startDate)
+                            const endDate = new Date(booking.endDate)
+                            const formattedStartDate = `${startDate.getDate()}-${
+                              startDate.getMonth() + 1
+                            }-${startDate.getFullYear()}`
+                            const formattedEndDate = `${endDate.getDate()}-${
+                              endDate.getMonth() + 1
+                            }-${endDate.getFullYear()}`
 
-                          return (
-                            <div key={booking.id} className="ml-10 mt-3 ">
-                              <p>
-                                Du har booket hytten{' '}
-                                {booking.apartment.cabin_name} i perioden{' '}
-                                {formattedStartDate} til {formattedEndDate}
-                              </p>
-                              {index !== bookings.length - 1 && (
-                                <hr className="mt-3" />
-                              )}
-                            </div>
-                          )
-                        })}
+                            return (
+                              <div key={booking.id} className="ml-10 mt-3 ">
+                                <p>
+                                  Du har booket hytten{' '}
+                                  {booking.apartment.cabin_name} i perioden{' '}
+                                  {formattedStartDate} til {formattedEndDate}
+                                </p>
+                                {index !== bookings.length - 1 && (
+                                  <hr className="mt-3" />
+                                )}
+                              </div>
+                            )
+                          })}
                       </AccordionContent>
                     </AccordionItem>
                   </Accordions>

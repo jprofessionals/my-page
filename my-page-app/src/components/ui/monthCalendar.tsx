@@ -169,7 +169,7 @@ function MonthCalendar({
                         getCabinBookingStyle(props.date, booking),
                         isYourBooking && 'shadow-y-2',
                         get(cabinColors, booking.apartment?.cabin_name),
-                        'normal-case'
+                        'normal-case',
                       )}
                       data-tip={`Booket av: ${booking.employeeName}`}
                     >
