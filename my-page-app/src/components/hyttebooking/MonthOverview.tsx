@@ -177,25 +177,56 @@ export default function MonthOverview() {
               </h3>
               {bookingItems.length > 0 ? (
                 <div>
-                  {bookingItems.map((booking, index) => {
-                    const startDate = new Date(booking.startDate)
-                    const endDate = new Date(booking.endDate)
-                    const formattedStartDate = format(startDate, 'dd-MM-yyyy')
-                    const formattedEndDate = format(endDate, 'dd-MM-yyyy')
+                  {bookingItems
+                    .sort((a, b) => {
+                      const cabinOrder = [
+                        'Stor leilighet',
+                        'Liten leilighet',
+                        'Annekset',
+                      ]
+                      const cabinIndexA = cabinOrder.indexOf(
+                        a.apartment.cabin_name,
+                      )
+                      const cabinIndexB = cabinOrder.indexOf(
+                        b.apartment.cabin_name,
+                      )
 
-                    return (
-                      <div key={booking.id}>
-                        <p className="mt-2 mb-1">
-                          {booking.employeeName} har{' '}
-                          {booking.apartment.cabin_name} {formattedStartDate}{' '}
-                          til {formattedEndDate}.
-                        </p>
-                        {index !== bookingItems.length - 1 && (
-                          <hr className="mt-1 mb-1" />
-                        )}
-                      </div>
-                    )
-                  })}
+                      if (cabinIndexA !== cabinIndexB) {
+                        return cabinIndexA - cabinIndexB
+                      }
+                      const startDateComparison =
+                        Date.parse(a.startDate) - Date.parse(b.startDate)
+                      if (startDateComparison !== 0) {
+                        return startDateComparison
+                      }
+                      return Date.parse(a.endDate) - Date.parse(b.endDate)
+                    })
+                    .map((booking, index) => {
+                      const startDate = new Date(booking.startDate)
+                      const endDate = new Date(booking.endDate)
+                      const formattedStartDate = format(startDate, 'dd-MM-yyyy')
+                      const formattedEndDate = format(endDate, 'dd-MM-yyyy')
+
+                      const prevCabinName =
+                        index > 0
+                          ? bookingItems[index - 1].apartment.cabin_name
+                          : null
+                      const currentCabinName = booking.apartment.cabin_name
+                      const shouldRenderDivider =
+                        prevCabinName !== currentCabinName
+
+                      return (
+                        <div key={booking.id}>
+                          {shouldRenderDivider && index !== 0 && (
+                            <hr className="mt-1 mb-1" />
+                          )}
+                          <p className="mt-2 mb-1">
+                            {booking.employeeName} har {currentCabinName}{' '}
+                            {formattedStartDate} til {formattedEndDate}.
+                          </p>
+                        </div>
+                      )
+                    })}
                 </div>
               ) : (
                 <div>
