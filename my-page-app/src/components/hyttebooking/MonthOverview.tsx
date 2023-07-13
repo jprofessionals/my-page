@@ -69,7 +69,7 @@ export default function MonthOverview() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col overflow-hidden gap-4 p-4">
       <MonthCalendar
         onDayClick={handleDateClick}
         mode="single"

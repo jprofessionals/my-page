@@ -66,13 +66,29 @@ function MonthCalendar({
     )
   }
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const handleResize = () => {
+    setWindowWidth(window.innerWidth)
+  }
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
   const getInitials = (name: string): string => {
     if (!name) {
       return ''
     }
     const nameParts = name.split(' ')
     const initials = nameParts.map((part) => part[0].toUpperCase()).join('')
-    return initials
+    if (windowWidth >= 800) {
+      return initials
+    } else {
+      return ''
+    }
   }
 
   return (
@@ -83,7 +99,7 @@ function MonthCalendar({
       classNames={{
         months:
           'flex flex-col sm:flex-row space-y-10 sm:space-x-10 sm:space-y-0',
-        month: 'space-y-4 w-screen',
+        month: 'space-y-4 w-full',
         caption: 'flex justify-center pt-1 relative items-center',
         caption_label: 'text-sm font-medium font-size: xx-large',
         nav: 'space-x-1 flex items-center',
@@ -153,6 +169,7 @@ function MonthCalendar({
                         getCabinBookingStyle(props.date, booking),
                         isYourBooking && 'shadow-y-2',
                         get(cabinColors, booking.apartment?.cabin_name),
+                        'normal-case',
                       )}
                       data-tip={`Booket av: ${booking.employeeName}`}
                     >
@@ -202,12 +219,12 @@ const getCabinBookingStyle = (date: Date, booking: Booking) => {
   )
   return cn(
     isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
-    isFirstDay && !isSunday(date) && '-mr-2',
+    isFirstDay && !isSunday(date) && 'md:-mr-2',
     isLastDay && 'rounded-r-full col-start-1 row-start-1',
-    isLastDay && !isMonday(date) && '-ml-2',
+    isLastDay && !isMonday(date) && 'md:-ml-2',
     isInInterval && 'col-span-2 ',
-    isInInterval && !isMonday(date) && '-ml-1',
-    isInInterval && !isSunday(date) && '-mr-1',
+    isInInterval && !isMonday(date) && 'md:-ml-1',
+    isInInterval && !isSunday(date) && 'md:-mr-1',
   )
 }
 
