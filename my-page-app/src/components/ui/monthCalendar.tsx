@@ -219,12 +219,12 @@ const getCabinBookingStyle = (date: Date, booking: Booking) => {
   )
   return cn(
     isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
-    isFirstDay && !isSunday(date) && '-mr-2',
+    isFirstDay && !isSunday(date) && 'md:-mr-2',
     isLastDay && 'rounded-r-full col-start-1 row-start-1',
-    isLastDay && !isMonday(date) && '-ml-2',
+    isLastDay && !isMonday(date) && 'md:-ml-2',
     isInInterval && 'col-span-2 ',
-    isInInterval && !isMonday(date) && '-ml-1',
-    isInInterval && !isSunday(date) && '-mr-1',
+    isInInterval && !isMonday(date) && 'md:-ml-1',
+    isInInterval && !isSunday(date) && 'md:-mr-1',
   )
 }
 
