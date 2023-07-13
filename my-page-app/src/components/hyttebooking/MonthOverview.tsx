@@ -1,3 +1,4 @@
+
 import React, { useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { MonthCalendar } from '@/components/ui/monthCalendar'
@@ -11,7 +12,30 @@ export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
   const [showModal, setShowModal] = useState(false)
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
+
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
+
+  const [yourBookings, setYourBookings] = useState<Booking[]>([])
+  const getYourBookings = async () => {
+    try {
+      const yourBookings = await ApiService.getBookingsForUser()
+      setYourBookings(yourBookings)
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
+
+  useEffect(() => {
+    getYourBookings()
+  }, [])
+
+  const handleDeleteBooking = async (bookingId: number | undefined) => {
+    try {
+      await ApiService.deleteBooking(bookingId)
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
 
   const handleDateClick = (date: Date) => {
     setShowModal(true)
@@ -206,6 +230,8 @@ export default function MonthOverview() {
                       const endDate = new Date(booking.endDate)
                       const formattedStartDate = format(startDate, 'dd-MM-yyyy')
                       const formattedEndDate = format(endDate, 'dd-MM-yyyy')
+                      
+                      const isYourBooking = yourBookings.some((yourBooking) => yourBooking.id === booking.id)
 
                       const prevCabinName =
                         index > 0
@@ -224,6 +250,13 @@ export default function MonthOverview() {
                             {booking.employeeName} har {currentCabinName}{' '}
                             {formattedStartDate} til {formattedEndDate}.
                           </p>
+                          {isYourBooking &&(
+                        <button
+                            onClick={() => handleDeleteBooking(booking.id)}
+                            className="mt-4 mr-4 bg-orange-500 text-white px-4 py-2 rounded-md">
+                          Delete Booking
+                        </button>
+                    )}
                         </div>
                       )
                     })}

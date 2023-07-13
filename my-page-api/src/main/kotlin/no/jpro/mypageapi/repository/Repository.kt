@@ -42,7 +42,7 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long> {
 
 @Repository
 interface BookingRepository : JpaRepository<Booking, Long> {
-    fun findBookingById(bookingId: Long): Booking
+    fun findBookingById(bookingId: Long): Booking?
     fun findBookingByEmployeeId(employeeId: Int): List<Booking>
     fun findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
         startDate: LocalDate, endDate: LocalDate

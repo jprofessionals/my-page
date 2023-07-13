@@ -13,6 +13,7 @@ import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.dto.CreateBookingDTO
 import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
+import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.BookingService
 import no.jpro.mypageapi.service.UserService
@@ -179,6 +180,31 @@ class BookingController(
         ): List<ApartmentDTO> {
         return bookingService.getAllApartments()
     }
+
+    @DeleteMapping("{bookingID}")
+    @Transactional
+    @Operation(summary = "Delete the booking connected to the booking id")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json")]
+    )
+    fun deleteBooking(
+        token: JwtAuthenticationToken,
+        @PathVariable("bookingID") bookingID: Long,
+    ): ResponseEntity<String> {
+
+        val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity(HttpStatus.FORBIDDEN)
+        val booking = bookingService.getBooking(bookingID) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+
+        if (!userPermittedToDeleteBooking(booking, user)) {
+            return ResponseEntity(HttpStatus.FORBIDDEN)
+        }
+
+        bookingService.deleteBooking(bookingID)
+        return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
+    }
+    private fun userPermittedToDeleteBooking(booking: Booking, user: User) = (booking.employee?.id == user.id)
+
 
     @PostMapping
     @Transactional

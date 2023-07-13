@@ -69,6 +69,10 @@ class BookingService(
         return apartments.map { apartmentMapper.toApartmentDTO(it) }
     }
 
+    fun deleteBooking(bookingId: Long) {
+        return bookingRepository.deleteById(bookingId)
+    }
+
     fun createBooking(apartmentId: Long, startDate: LocalDate, endDate: LocalDate, employeeName: String?): Booking {
         val employee = if (employeeName != null) {
             userRepository.findUserByName(employeeName)
