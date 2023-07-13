@@ -66,13 +66,29 @@ function MonthCalendar({
     )
   }
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const handleResize = () => {
+    setWindowWidth(window.innerWidth)
+  }
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
   const getInitials = (name: string): string => {
     if (!name) {
       return ''
     }
     const nameParts = name.split(' ')
     const initials = nameParts.map((part) => part[0].toUpperCase()).join('')
-    return initials
+    if (windowWidth >= 800) {
+      return initials
+    } else {
+      return ''
+    }
   }
 
   return (
