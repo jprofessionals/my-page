@@ -16,9 +16,6 @@ import { get } from 'radash'
 
 export type CalendarProps = ComponentProps<typeof DayPicker>
 
-const startDate = '2023-06-01'
-const endDate = '2023-12-30'
-
 const cabinColors: { [key: string]: string } = {
   Annekset: 'bg-teal-annex',
   'Liten leilighet': 'bg-blue-small-appartment',
@@ -33,7 +30,6 @@ function MonthCalendar({
 }: CalendarProps) {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [yourBookings, setYourBookings] = useState<Booking[]>([])
-
   const getYourBookings = async () => {
     try {
       const yourBookings = await ApiService.getBookingsForUser()
@@ -49,6 +45,21 @@ function MonthCalendar({
 
   const fetchBookings = async () => {
     try {
+      const currentDate = new Date()
+      const unformattedStartDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - 1,
+        currentDate.getDate(),
+      )
+      const unformattedEndDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        currentDate.getDate(),
+      )
+      const startDate = format(unformattedStartDate, 'yyyy-MM-dd')
+      const endDate = format(unformattedEndDate, 'yyyy-MM-dd')
+      //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward. These control the time period in which bookings will be rendered on the calendar.
+
       const bookings = await ApiService.getBookings(startDate, endDate)
       setBookings(bookings)
     } catch (error) {

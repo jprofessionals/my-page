@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import no.jpro.mypageapi.dto.ApartmentDTO
 import jakarta.validation.Valid
-import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.dto.CreateBookingDTO
 import no.jpro.mypageapi.entity.Apartment
@@ -134,6 +134,53 @@ class BookingController(
         }
     }
 
+    @GetMapping("/vacancy")
+    @Transactional
+    @Operation(summary = "Gets booking vacancies in a time period for all apartments")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = BookingDTO::class)
+        )]
+    )
+    //Lag en ny DTO klasse og bruk den i stedet for BookingDTO ?.
+
+    fun getVacancies(
+        token: JwtAuthenticationToken,
+        @RequestParam("startdate") startdate: String,
+        @RequestParam("enddate") enddate: String,
+
+        ): ResponseEntity<Map<Long, List<LocalDate>>> {
+
+        try {
+            val parsedStartDate: LocalDate = LocalDate.parse(startdate)
+            val parsedEndDate: LocalDate = LocalDate.parse(enddate)
+            val availability = bookingService.getAllVacanciesInAPeriod(parsedStartDate,parsedEndDate)
+            return ResponseEntity.ok(availability)
+        } catch (e: DateTimeParseException) {
+            throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
+        }
+    }
+
+    @GetMapping("/apartment")
+    @Transactional
+    @Operation(summary = "Gets all apartments")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ApartmentDTO::class)
+        )]
+    )
+
+    fun getApartments(
+        token: JwtAuthenticationToken,
+
+        ): List<ApartmentDTO> {
+        return bookingService.getAllApartments()
+    }
+
     @DeleteMapping("{bookingID}")
     @Transactional
     @Operation(summary = "Delete the booking connected to the booking id")
@@ -157,6 +204,7 @@ class BookingController(
         return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
     }
     private fun userPermittedToDeleteBooking(booking: Booking, user: User) = (booking.employee?.id == user.id)
+
 
     @PostMapping
     @Transactional
@@ -231,5 +279,6 @@ class BookingController(
         return ErrorResponse(e.message)
     }
     class InvalidApartmentIdException(message: String) : RuntimeException(message)
+
 }
 

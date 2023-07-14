@@ -1,23 +1,26 @@
 package no.jpro.mypageapi.service
 
+import no.jpro.mypageapi.dto.ApartmentDTO
 import no.jpro.mypageapi.dto.BookingDTO
-import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
-import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.BookingRepository
 import no.jpro.mypageapi.repository.UserRepository
+import no.jpro.mypageapi.utils.mapper.ApartmentMapper
 import no.jpro.mypageapi.utils.mapper.BookingMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @Service
 class BookingService(
     private val bookingRepository: BookingRepository,
     private val bookingMapper: BookingMapper,
-    private val userRepository: UserRepository,
     private val apartmentRepository: ApartmentRepository,
-    ) {
+    private val apartmentMapper: ApartmentMapper,
+    private val userRepository: UserRepository,
+) {
+
     fun getBooking(bookingId: Long): Booking? {
         return bookingRepository.findBookingById(bookingId)
     }
@@ -26,9 +29,10 @@ class BookingService(
         val bookings = bookingRepository.findBookingByEmployeeId(employeeId)
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
+
     fun getUserBookings(userSub: String): List<BookingDTO> {
         val bookings = bookingRepository.findBookingsByEmployeeSub(userSub)
-        return bookings.map { bookingMapper.toBookingDTO(it)}
+        return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 
     fun getBookingsBetweenDates(startDate: LocalDate, endDate: LocalDate): List<BookingDTO> {
@@ -43,10 +47,31 @@ class BookingService(
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 
+    fun getAllVacanciesInAPeriod(startDate: LocalDate, endDate: LocalDate): Map<Long, List<LocalDate>> {
+        val datesInRange = LongRange(0, ChronoUnit.DAYS.between(startDate, endDate))
+            .map { startDate.plusDays(it) }
+        val bookings = bookingRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(endDate, startDate)
+        val bookedDays = bookings
+            .flatMap { booking ->
+                LongRange(0, ChronoUnit.DAYS.between(booking.startDate, booking.endDate))
+                    .map { Pair(booking.apartment!!.id!!, booking.startDate.plusDays(it)) }
+            }.groupBy { it.first }
+            .mapValues { it.value.map { it.second }.toSet() }
+        val apartmentVacancies = apartmentRepository.findAll()
+            .map { it.id!! }
+            .associateWith { apartmentId -> datesInRange.minus(bookedDays[apartmentId].orEmpty()) }
+
+        return apartmentVacancies
+    }
+
+    fun getAllApartments(): List<ApartmentDTO> {
+        val apartments = apartmentRepository.findAll()
+        return apartments.map { apartmentMapper.toApartmentDTO(it) }
+    }
+
     fun deleteBooking(bookingId: Long) {
         return bookingRepository.deleteById(bookingId)
     }
-
 
     fun createBooking(apartmentId: Long, startDate: LocalDate, endDate: LocalDate, employeeName: String?): Booking {
         val employee = if (employeeName != null) {
@@ -68,4 +93,5 @@ class BookingService(
 
         return bookingRepository.save(booking)
     }
+
 }
