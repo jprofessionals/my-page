@@ -30,11 +30,11 @@ export default function MonthOverview() {
   }, [])
 
   const handleDeleteBooking = async (bookingId: number | undefined) => {
-    try {
+    /*try {
       await ApiService.deleteBooking(bookingId)
     } catch (error) {
       console.error('Error:', error)
-    }
+    }*/
   }
 
   const handleDateClick = (date: Date) => {
