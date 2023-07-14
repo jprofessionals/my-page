@@ -29,12 +29,14 @@ export default function MonthOverview() {
   }, [])
 
   const handleDeleteBooking = async (bookingId: number | undefined) => {
-    try {
+    /*try {
       await ApiService.deleteBooking(bookingId)
     } catch (error) {
       console.error('Error:', error)
-    }
+    }*/
   }
+
+  const handleEditBooking = async () => {}
 
   const handleDateClick = (date: Date) => {
     setShowModal(true)
@@ -263,22 +265,38 @@ export default function MonthOverview() {
                             </h4>
                           )}
                           <p
-                            className={`mt-2 mb-1 ${
-                              shouldRenderDivider ? 'pl-2' : ''
-                            } ${
-                              cabinBorderColorClasses[currentCabinName]
-                            } border-l-2`}
+                            className={`mt-2 mb-1 pl-2 flex ${cabinBorderColorClasses[currentCabinName]} border-l-2`}
                           >
-                            {isYourBooking
-                              ? `Du har fra ${formattedStartDate} til ${formattedEndDate}.`
-                              : `${booking.employeeName} har fra ${formattedStartDate} til ${formattedEndDate}.`}
-                            {isYourBooking && (
-                              <button
-                                onClick={() => handleDeleteBooking(booking.id)}
-                                className="ml-2 bg-red-not-available text-white px-2 py-1 rounded-md"
-                              >
-                                Slett
-                              </button>
+                            {isYourBooking ? (
+                              <>
+                                <span>
+                                  Du har fra {formattedStartDate} til{' '}
+                                  {formattedEndDate}.
+                                </span>
+                                <div className="ml-5">
+                                  <button
+                                    onClick={() => handleEditBooking()}
+                                    className="bg-yellow-hotel text-white px-2 py-1 rounded-md"
+                                  >
+                                    Rediger
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleDeleteBooking(booking.id)
+                                    }
+                                    className="ml-5 bg-red-not-available text-white px-2 py-1 rounded-md"
+                                  >
+                                    Slett
+                                  </button>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <span>
+                                  {booking.employeeName} har fra{' '}
+                                  {formattedStartDate} til {formattedEndDate}.
+                                </span>
+                              </>
                             )}
                           </p>
                         </div>
@@ -320,12 +338,14 @@ export default function MonthOverview() {
             </div>
           )}
 
-          <button
-            onClick={closeModal}
-            className="mt-3 mr-4 bg-red-not-available text-white px-2 py-1 rounded-md"
-          >
-            Lukk
-          </button>
+          <div className="flex justify-end">
+            <button
+              onClick={closeModal}
+              className="mt-3 bg-red-not-available text-white px-2 py-1 rounded-md"
+            >
+              Lukk
+            </button>
+          </div>
         </div>
       </Modal>
     </div>
