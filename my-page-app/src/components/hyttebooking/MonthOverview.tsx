@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { MonthCalendar } from '@/components/ui/monthCalendar'
@@ -196,9 +195,7 @@ export default function MonthOverview() {
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 prose">
           {date ? (
             <div>
-              <h3 className="mt-1 mb-1">
-                {format(date, 'dd-MM-yyyy')}
-              </h3>
+              <h3 className="mt-1 mb-1">{format(date, 'dd-MM-yyyy')}</h3>
               {bookingItems.length > 0 ? (
                 <div>
                   {bookingItems
@@ -225,38 +222,65 @@ export default function MonthOverview() {
                       }
                       return Date.parse(a.endDate) - Date.parse(b.endDate)
                     })
-                    .map((booking, index) => {
+                    .map((booking, index, array) => {
                       const startDate = new Date(booking.startDate)
                       const endDate = new Date(booking.endDate)
                       const formattedStartDate = format(startDate, 'dd-MM-yyyy')
                       const formattedEndDate = format(endDate, 'dd-MM-yyyy')
-                      
-                      const isYourBooking = yourBookings.some((yourBooking) => yourBooking.id === booking.id)
+
+                      const isYourBooking = yourBookings.some(
+                        (yourBooking) => yourBooking.id === booking.id,
+                      )
 
                       const prevCabinName =
-                        index > 0
-                          ? bookingItems[index - 1].apartment.cabin_name
-                          : null
+                        index > 0 ? array[index - 1].apartment.cabin_name : null
                       const currentCabinName = booking.apartment.cabin_name
                       const shouldRenderDivider =
                         prevCabinName !== currentCabinName
 
+                      type CabinColorClasses = {
+                        [key: string]: string
+                      }
+                      const cabinTextColorClasses: CabinColorClasses = {
+                        'Stor leilighet': 'text-orange-brand',
+                        'Liten leilighet': 'text-blue-small-appartment',
+                        Annekset: 'text-teal-annex',
+                      }
+
+                      const cabinBorderColorClasses: CabinColorClasses = {
+                        'Stor leilighet': 'border-orange-brand',
+                        'Liten leilighet': 'border-blue-small-appartment',
+                        Annekset: 'border-teal-annex',
+                      }
+
                       return (
                         <div key={booking.id}>
-                          {shouldRenderDivider && index !== 0 && (
-                            <hr className="mt-1 mb-1" />
+                          {shouldRenderDivider && (
+                            <h4
+                              className={`mt-2 mb-1 ${cabinTextColorClasses[currentCabinName]}`}
+                            >
+                              {currentCabinName}:
+                            </h4>
                           )}
-                          <p className="mt-2 mb-1">
-                            {booking.employeeName} har {currentCabinName}{' '}
-                            {formattedStartDate} til {formattedEndDate}.
+                          <p
+                            className={`mt-2 mb-1 ${
+                              shouldRenderDivider ? 'pl-2' : ''
+                            } ${
+                              cabinBorderColorClasses[currentCabinName]
+                            } border-l-2`}
+                          >
+                            {isYourBooking
+                              ? `Du har fra ${formattedStartDate} til ${formattedEndDate}.`
+                              : `${booking.employeeName} har fra ${formattedStartDate} til ${formattedEndDate}.`}
+                            {isYourBooking && (
+                              <button
+                                onClick={() => handleDeleteBooking(booking.id)}
+                                className="ml-2 bg-red-not-available text-white px-2 py-1 rounded-md"
+                              >
+                                Slett
+                              </button>
+                            )}
                           </p>
-                          {isYourBooking &&(
-                        <button
-                            onClick={() => handleDeleteBooking(booking.id)}
-                            className="mt-4 mr-4 bg-orange-500 text-white px-4 py-2 rounded-md">
-                          Delete Booking
-                        </button>
-                    )}
                         </div>
                       )
                     })}
