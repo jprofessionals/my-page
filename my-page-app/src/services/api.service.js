@@ -140,6 +140,12 @@ const deleteBooking = (bookingId) => {
   })
 }
 
+const createBookingPost = (post) => {
+  return axios.post(API_URL+'booking/post', post,{
+    headers: authHeader(),
+  })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -154,5 +160,6 @@ const ApiService = {
   getAllVacancies,
   getAllApartments,
   deleteBooking,
+  createBookingPost,
 }
 export default ApiService

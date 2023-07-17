@@ -7,6 +7,7 @@ import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
+import CreateBookingPost from "@/components/hyttebooking/CreateBookingPost";
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
@@ -32,6 +33,7 @@ export default function MonthOverview() {
   const handleDeleteBooking = async (bookingId: number | undefined) => {
     /*try {
       await ApiService.deleteBooking(bookingId)
+      toast.success('Slettet booking')
     } catch (error) {
       console.error('Error:', error)
     }*/
@@ -79,6 +81,7 @@ export default function MonthOverview() {
       const formattedDate = format(selectedDate, 'yyyy-MM-dd')
       const bookings = await ApiService.getBookingsForDay(formattedDate)
       setBookingItems(bookings)
+
     } catch (error) {
       console.error('Error:', error)
     }
@@ -91,7 +94,7 @@ export default function MonthOverview() {
   const [vacancies, setVacancies] = useState<
     { [key: number]: string[] } | undefined
   >({})
-  const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<string[]>(
+  const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<Apartment[]>(
     [],
   )
   const [apartments, setApartments] = useState<Apartment[]>([])
@@ -166,15 +169,30 @@ export default function MonthOverview() {
   }
 
   const getVacancyForDay = async (selectedDate: Date) => {
-    const availableApartments: string[] = []
+    const availableApartments: Apartment[] = []
     const vacantApartmentsInPeriod = getVacantApartments(selectedDate)
     for (const apartment of apartments) {
       if (vacantApartmentsInPeriod.includes(apartment.id!)) {
-        availableApartments.push(apartment.cabin_name)
+        availableApartments.push(apartment)
       }
     }
     setVacantApartmentsOnDay(availableApartments)
     return vacantApartmentsOnDay
+  }
+
+  type CabinColorClasses = {
+    [key: string]: string
+  }
+  const cabinTextColorClasses: CabinColorClasses = {
+    'Stor leilighet': 'text-orange-brand',
+    'Liten leilighet': 'text-blue-small-appartment',
+    Annekset: 'text-teal-annex',
+  }
+
+  const cabinBorderColorClasses: CabinColorClasses = {
+    'Stor leilighet': 'border-orange-brand',
+    'Liten leilighet': 'border-blue-small-appartment',
+    Annekset: 'border-teal-annex',
   }
 
   return (
@@ -273,7 +291,7 @@ export default function MonthOverview() {
                 vacantApartmentsOnDay.map((apartment, index) => (
                   <div key={index}>
                     <p className="mt-1 mb-1">
-                      <span className="apartment-text">{apartment}</span>
+                      <span className="apartment-text">{apartment.cabin_name}</span>
                       <button
                         onClick={() => handleApartmentClick(index + 1)}
                         className="mt-2 ml-2 bg-orange-500 text-white px-2 py-1 rounded-md"
@@ -283,7 +301,7 @@ export default function MonthOverview() {
                     </p>
                     {expandedApartments.includes(index + 1) && (
                       <div className="expanded-content">
-                        Her vil det komme mulighet for å gjøre en booking
+                        <CreateBookingPost apartmentId={apartment.id} />
                       </div>
                     )}
                   </div>

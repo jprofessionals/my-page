@@ -206,7 +206,7 @@ class BookingController(
     private fun userPermittedToDeleteBooking(booking: Booking, user: User) = (booking.employee?.id == user.id)
 
 
-    @PostMapping
+    @PostMapping ("/post")
     @Transactional
     @Operation(summary = "Create a new booking")
     @ApiResponse(
