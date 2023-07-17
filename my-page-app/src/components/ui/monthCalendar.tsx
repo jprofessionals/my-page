@@ -48,7 +48,7 @@ function MonthCalendar({
       const currentDate = new Date()
       const unformattedStartDate = new Date(
         currentDate.getFullYear(),
-        currentDate.getMonth() - 1,
+        currentDate.getMonth() - 2,
         currentDate.getDate(),
       )
       const unformattedEndDate = new Date(
