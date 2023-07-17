@@ -1,8 +1,13 @@
 package no.jpro.mypageapi.service
 
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import no.jpro.mypageapi.dto.ApartmentDTO
 import no.jpro.mypageapi.dto.BookingDTO
+import no.jpro.mypageapi.dto.CreateBookingDTO
+import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
+import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.BookingRepository
 import no.jpro.mypageapi.repository.UserRepository
@@ -73,25 +78,58 @@ class BookingService(
         return bookingRepository.deleteById(bookingId)
     }
 
-    fun createBooking(apartmentId: Long, startDate: LocalDate, endDate: LocalDate, employeeName: String?): Booking {
-        val employee = if (employeeName != null) {
-            userRepository.findUserByName(employeeName)
-        } else {
-            null
-        }
-
-        val apartment = apartmentRepository.findById(apartmentId).orElseThrow {
+    fun getApartment(apartmentId: Long): Apartment {
+        if(!apartmentRepository.existsApartmentById(apartmentId)){
             throw IllegalArgumentException("Apartment not found for ID: $apartmentId")
         }
-
-        val booking = Booking(
-            startDate = startDate,
-            endDate = endDate,
-            apartment = apartment,
-            employee = employee
-        )
-
-        return bookingRepository.save(booking)
+        return apartmentRepository.findApartmentById(apartmentId)
     }
 
+    @PersistenceContext
+    private lateinit var entityManager: EntityManager
+
+    fun getOldBookingsWithinDates(wishStartDate: LocalDate, wishEndDate: LocalDate): List<Booking> {
+        val query = entityManager.createQuery(
+            "SELECT b FROM Booking b " +
+                    "WHERE (:wishStartDate BETWEEN b.startDate AND b.endDate " +
+                    "OR :wishEndDate BETWEEN b.startDate AND b.endDate) " +
+                    "OR (b.startDate BETWEEN :wishStartDate AND :wishEndDate " +
+                    "AND b.endDate BETWEEN :wishStartDate AND :wishEndDate)",
+            Booking::class.java
+        )
+        query.setParameter("wishStartDate", wishStartDate)
+        query.setParameter("wishEndDate", wishEndDate)
+        return query.resultList
+    }
+
+    fun filterOverlappingBookings(apartmentId: Long, wishStartDate: LocalDate, wishEndDate: LocalDate): List<Booking> {
+        val bookingsOverlappingWishedBooking = getOldBookingsWithinDates(wishStartDate, wishEndDate)
+
+        val filteredBookings = bookingsOverlappingWishedBooking.filter { booking ->
+            booking.apartment?.id == apartmentId &&
+                    ((wishStartDate.isBefore(booking.endDate) && (wishEndDate.isAfter(booking.startDate))) ||
+                            (wishStartDate.isBefore(booking.endDate) && (wishEndDate.isAfter(booking.endDate))) ||
+                            (wishStartDate.isAfter(booking.startDate) && (wishEndDate.isBefore(booking.endDate))) ||
+                            (wishStartDate.isBefore(booking.startDate) && (wishEndDate.isAfter(booking.endDate))))
+        }
+        return filteredBookings
+    }
+
+    fun createBooking(bookingRequest: CreateBookingDTO, createdBy: User): BookingDTO {
+        val apartment = getApartment(bookingRequest.apartmentID)
+
+        val checkBookingAvailable = filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
+
+        if(checkBookingAvailable.isEmpty()) {
+            val booking = bookingMapper.toBooking(
+                bookingRequest,
+                apartment
+            ).copy(
+                employee = createdBy
+            )
+            return bookingMapper.toBookingDTO(bookingRepository.save(booking))
+        } else {
+            throw IllegalArgumentException("Cannot create booking, since there is already a booking in the date range.")
+        }
+    }
 }
