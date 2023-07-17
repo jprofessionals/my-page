@@ -178,6 +178,27 @@ export default function MonthOverview() {
     return vacantApartmentsOnDay
   }
 
+  type CabinColorClasses = {
+    [key: string]: string
+  }
+  const cabinTextColorClasses: CabinColorClasses = {
+    'Stor leilighet': 'text-orange-brand',
+    'Liten leilighet': 'text-blue-small-appartment',
+    Annekset: 'text-teal-annex',
+  }
+
+  const cabinBorderColorClasses: CabinColorClasses = {
+    'Stor leilighet': 'border-orange-brand',
+    'Liten leilighet': 'border-blue-small-appartment',
+    Annekset: 'border-teal-annex',
+  }
+
+  const cabinOrder = [
+    'Stor leilighet',
+    'Liten leilighet',
+    'Annekset',
+  ]
+
   return (
     <div className="flex flex-col overflow-hidden gap-4 p-4">
       <MonthCalendar
@@ -202,11 +223,6 @@ export default function MonthOverview() {
                 <div>
                   {bookingItems
                     .sort((a, b) => {
-                      const cabinOrder = [
-                        'Stor leilighet',
-                        'Liten leilighet',
-                        'Annekset',
-                      ]
                       const cabinIndexA = cabinOrder.indexOf(
                         a.apartment.cabin_name,
                       )
@@ -239,21 +255,6 @@ export default function MonthOverview() {
                       const currentCabinName = booking.apartment.cabin_name
                       const shouldRenderDivider =
                         prevCabinName !== currentCabinName
-
-                      type CabinColorClasses = {
-                        [key: string]: string
-                      }
-                      const cabinTextColorClasses: CabinColorClasses = {
-                        'Stor leilighet': 'text-orange-brand',
-                        'Liten leilighet': 'text-blue-small-appartment',
-                        Annekset: 'text-teal-annex',
-                      }
-
-                      const cabinBorderColorClasses: CabinColorClasses = {
-                        'Stor leilighet': 'border-orange-brand',
-                        'Liten leilighet': 'border-blue-small-appartment',
-                        Annekset: 'border-teal-annex',
-                      }
 
                       return (
                         <div key={booking.id}>
