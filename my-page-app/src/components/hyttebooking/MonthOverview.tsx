@@ -276,7 +276,7 @@ export default function MonthOverview() {
                                 <div className="ml-5">
                                   <button
                                     onClick={() => handleEditBooking()}
-                                    className="bg-yellow-hotel text-white px-2 py-1 rounded-md"
+                                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
                                   >
                                     Rediger
                                   </button>
@@ -284,7 +284,7 @@ export default function MonthOverview() {
                                     onClick={() =>
                                       handleDeleteBooking(booking.id)
                                     }
-                                    className="ml-5 bg-red-not-available text-white px-2 py-1 rounded-md"
+                                    className="ml-3 bg-red-not-available text-white px-2 py-0.5 rounded-md"
                                   >
                                     Slett
                                   </button>
