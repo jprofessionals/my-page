@@ -24,9 +24,9 @@ const CreateBookingPost = ({apartmentId}: Props) => {
         } else {
             setIsLoadingPost(true)
             const bookingPost = {
+                apartmentID: apartmentId,
                 startDate: startDate,
                 endDate: endDate,
-                apartmentId: apartmentId
             }
             ApiService.createBookingPost(bookingPost).then(
                 () => {

@@ -293,13 +293,13 @@ export default function MonthOverview() {
                     <p className="mt-1 mb-1">
                       <span className="apartment-text">{apartment.cabin_name}</span>
                       <button
-                        onClick={() => handleApartmentClick(index + 1)}
+                        onClick={() => handleApartmentClick(apartment.id)}
                         className="mt-2 ml-2 bg-orange-500 text-white px-2 py-1 rounded-md"
                       >
                         Book
                       </button>
                     </p>
-                    {expandedApartments.includes(index + 1) && (
+                    {expandedApartments.includes(apartment.id) && (
                       <div className="expanded-content">
                         <CreateBookingPost apartmentId={apartment.id} />
                       </div>
