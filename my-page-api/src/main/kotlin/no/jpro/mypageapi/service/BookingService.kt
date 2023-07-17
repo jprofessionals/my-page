@@ -78,24 +78,6 @@ class BookingService(
         return bookingRepository.deleteById(bookingId)
     }
 
-    fun createBooking(bookingRequest: CreateBookingDTO, createdBy: User): BookingDTO {
-        val apartment = getApartment(bookingRequest.apartmentID)
-
-        val checkBookingAvailable = filterBookingsWithinWishedBooking(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
-
-        if(checkBookingAvailable.isEmpty()) {
-            val booking = bookingMapper.toBooking(
-                bookingRequest,
-                apartment
-            ).copy(
-                employee = createdBy
-            )
-            return bookingMapper.toBookingDTO(bookingRepository.save(booking))
-        } else {
-            throw IllegalArgumentException("Cannot create booking, since there is already a booking in the date range.")
-        }
-    }
-
     fun getApartment(apartmentId: Long): Apartment {
         if(!apartmentRepository.existsApartmentById(apartmentId)){
             throw IllegalArgumentException("Apartment not found for ID: $apartmentId")
@@ -106,7 +88,7 @@ class BookingService(
     @PersistenceContext
     private lateinit var entityManager: EntityManager
 
-    fun findBookingsWithinWishedBooking(wishStartDate: LocalDate, wishEndDate: LocalDate): List<Booking> {
+    fun getOldBookingsWithinDates(wishStartDate: LocalDate, wishEndDate: LocalDate): List<Booking> {
         val query = entityManager.createQuery(
             "SELECT b FROM Booking b " +
                     "WHERE (:wishStartDate BETWEEN b.startDate AND b.endDate " +
@@ -120,8 +102,8 @@ class BookingService(
         return query.resultList
     }
 
-    fun filterBookingsWithinWishedBooking(apartmentId: Long, wishStartDate: LocalDate, wishEndDate: LocalDate): List<Booking> {
-        val bookingsOverlappingWishedBooking = findBookingsWithinWishedBooking(wishStartDate, wishEndDate)
+    fun filterOverlappingBookings(apartmentId: Long, wishStartDate: LocalDate, wishEndDate: LocalDate): List<Booking> {
+        val bookingsOverlappingWishedBooking = getOldBookingsWithinDates(wishStartDate, wishEndDate)
 
         val filteredBookings = bookingsOverlappingWishedBooking.filter { booking ->
             booking.apartment?.id == apartmentId &&
@@ -131,5 +113,23 @@ class BookingService(
                             (wishStartDate.isBefore(booking.startDate) && (wishEndDate.isAfter(booking.endDate))))
         }
         return filteredBookings
+    }
+
+    fun createBooking(bookingRequest: CreateBookingDTO, createdBy: User): BookingDTO {
+        val apartment = getApartment(bookingRequest.apartmentID)
+
+        val checkBookingAvailable = filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
+
+        if(checkBookingAvailable.isEmpty()) {
+            val booking = bookingMapper.toBooking(
+                bookingRequest,
+                apartment
+            ).copy(
+                employee = createdBy
+            )
+            return bookingMapper.toBookingDTO(bookingRepository.save(booking))
+        } else {
+            throw IllegalArgumentException("Cannot create booking, since there is already a booking in the date range.")
+        }
     }
 }
