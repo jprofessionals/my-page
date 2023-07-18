@@ -7,11 +7,8 @@ import Loading from '@/components/Loading'
 import { Button } from '../ui/button'
 import {Booking} from "@/types";
 
-type Props = {
-    booking: Booking
-}
 
-const EditBooking = ({booking}: Props) => {
+const EditBooking = ({booking}: { booking: Booking }) => {
     const [startDate, setStartDate] = useState(booking.startDate)
     const [endDate, setEndDate] = useState(booking.endDate)
     const [isLoadingEdit, setIsLoadingEdit] = useState(false)

@@ -36,9 +36,11 @@ export default function MonthOverview() {
       console.error('Error:', error)
     }*/
   }
-
-  const handleEditBooking = async (booking: Booking) => {
-    //expand booking downwards and show the editBooking form.
+  const [showEditForm, setShowEditForm] = useState(false)
+  const handleEditBooking = () => {
+    if (showEditForm){
+      setShowEditForm(false)
+    } else {setShowEditForm(true)}
   }
 
   const handleDateClick = (date: Date) => {
@@ -279,7 +281,7 @@ export default function MonthOverview() {
                                 </span>
                                 <div className="ml-5">
                                   <button
-                                    onClick={() => handleEditBooking(booking)}
+                                    onClick={() => handleEditBooking()}
                                     className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
                                   >
                                     Rediger
@@ -293,6 +295,7 @@ export default function MonthOverview() {
                                     Slett
                                   </button>
                                 </div>
+                                {showEditForm && <EditBooking booking = {booking} />}
                               </>
                             ) : (
                               <>
