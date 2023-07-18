@@ -182,7 +182,9 @@ function MonthCalendar({
                         get(cabinColors, booking.apartment?.cabin_name),
                         'normal-case',
                       )}
-                      data-tip={`Booket av: ${booking.employeeName}`}
+                      {...(windowWidth > 800 && {
+                        'data-tip': `Booket av: ${booking.employeeName}`,
+                      })}
                     >
                       {(isFirstDay || isLastDay) &&
                         getInitials(booking.employeeName)}
