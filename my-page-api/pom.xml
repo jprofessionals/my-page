@@ -19,6 +19,7 @@
         <kotlin.version>1.9.0</kotlin.version>
         <testcontainers.version>1.18.3</testcontainers.version>
         <avro.version>1.11.2</avro.version>
+        <slack.version>1.30.0</slack.version>
     </properties>
 
     <dependencies>
@@ -171,6 +172,12 @@
             <groupId>jakarta.mail</groupId>
             <artifactId>jakarta.mail-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.slack.api</groupId>
+            <artifactId>slack-api-client</artifactId>
+            <version>${slack.version}</version>
+        </dependency>
+
 
     </dependencies>
 
