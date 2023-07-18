@@ -39,7 +39,7 @@ export default function MonthOverview() {
       toast.success('Bookingen din er slettet')
       setShowModal(false)
     } catch (error) {
-      console.error('Error:', error)
+      toast.error('Bookingen din er ikke slettet')
     }
   }
 
