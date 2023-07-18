@@ -39,20 +39,21 @@ function Admin() {
   const extractListOfBudgets = (users: User[]) => {
     if (users.length > 0) {
       const extractedBudgetTypes: BudgetType[] = []
-      users.map((user) =>
-        user?.budgets?.forEach((budget) => {
-          if (!budgetTypeListContains(extractedBudgetTypes, budget)) {
-            extractedBudgetTypes.push(budget.budgetType)
-            if (budget.budgetType.allowTimeBalance) {
-              const budgetType = {
-                ...budget.budgetType,
-                balanceIsHours: true,
-                name: budget.budgetType.name + '(timer)',
+      users.map(
+        (user) =>
+          user?.budgets?.forEach((budget) => {
+            if (!budgetTypeListContains(extractedBudgetTypes, budget)) {
+              extractedBudgetTypes.push(budget.budgetType)
+              if (budget.budgetType.allowTimeBalance) {
+                const budgetType = {
+                  ...budget.budgetType,
+                  balanceIsHours: true,
+                  name: budget.budgetType.name + '(timer)',
+                }
+                extractedBudgetTypes.push(budgetType)
               }
-              extractedBudgetTypes.push(budgetType)
             }
-          }
-        }),
+          }),
       )
       setBudgetTypes(extractedBudgetTypes)
     }

@@ -2,8 +2,7 @@ package no.jpro.mypageapi.dto
 
 import java.time.LocalDate
 
-data class CreateBookingDTO(
-    val apartmentID: Long,
+data class UpdateBookingDTO (
     val startDate: LocalDate,
-    val endDate: LocalDate
+    val endDate: LocalDate,
 )

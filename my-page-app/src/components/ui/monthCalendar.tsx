@@ -16,9 +16,6 @@ import { get } from 'radash'
 
 export type CalendarProps = ComponentProps<typeof DayPicker>
 
-const startDate = '2023-06-01'
-const endDate = '2023-12-30'
-
 const cabinColors: { [key: string]: string } = {
   Annekset: 'bg-teal-annex',
   'Liten leilighet': 'bg-blue-small-appartment',
@@ -33,7 +30,6 @@ function MonthCalendar({
 }: CalendarProps) {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [yourBookings, setYourBookings] = useState<Booking[]>([])
-
   const getYourBookings = async () => {
     try {
       const yourBookings = await ApiService.getBookingsForUser()
@@ -49,6 +45,21 @@ function MonthCalendar({
 
   const fetchBookings = async () => {
     try {
+      const currentDate = new Date()
+      const unformattedStartDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - 6,
+        currentDate.getDate(),
+      )
+      const unformattedEndDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 12,
+        currentDate.getDate(),
+      )
+      const startDate = format(unformattedStartDate, 'yyyy-MM-dd')
+      const endDate = format(unformattedEndDate, 'yyyy-MM-dd')
+      //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward. These control the time period in which bookings will be rendered on the calendar.
+
       const bookings = await ApiService.getBookings(startDate, endDate)
       setBookings(bookings)
     } catch (error) {
@@ -66,24 +77,40 @@ function MonthCalendar({
     )
   }
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const handleResize = () => {
+    setWindowWidth(window.innerWidth)
+  }
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
   const getInitials = (name: string): string => {
     if (!name) {
       return ''
     }
     const nameParts = name.split(' ')
     const initials = nameParts.map((part) => part[0].toUpperCase()).join('')
-    return initials
+    if (windowWidth >= 800) {
+      return initials
+    } else {
+      return ''
+    }
   }
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn('p-3', className)}
+      className={cn('p-3 border-none', className)}
       weekStartsOn={1}
       classNames={{
         months:
           'flex flex-col sm:flex-row space-y-10 sm:space-x-10 sm:space-y-0',
-        month: 'space-y-4 w-screen',
+        month: 'space-y-4 w-full',
         caption: 'flex justify-center pt-1 relative items-center',
         caption_label: 'text-sm font-medium font-size: xx-large',
         nav: 'space-x-1 flex items-center',
@@ -105,7 +132,7 @@ function MonthCalendar({
           'py-3 border-none tw-bg-opacity: 0',
         ),
         day_selected: 'tw-bg-opacity: 0',
-        day_today: 'bg-calendar text-accent-foreground',
+        day_today: cn('text-accent-foreground', 'bg-gray-400'),
         day_outside: 'text-muted-foreground opacity-50',
         day_disabled: 'text-muted-foreground opacity-50',
         day_range_middle:
@@ -153,8 +180,11 @@ function MonthCalendar({
                         getCabinBookingStyle(props.date, booking),
                         isYourBooking && 'shadow-y-2',
                         get(cabinColors, booking.apartment?.cabin_name),
+                        'normal-case',
                       )}
-                      data-tip={`Booket av: ${booking.employeeName}`}
+                      {...(windowWidth > 800 && {
+                        'data-tip': `Booket av: ${booking.employeeName}`,
+                      })}
                     >
                       {(isFirstDay || isLastDay) &&
                         getInitials(booking.employeeName)}
@@ -202,12 +232,12 @@ const getCabinBookingStyle = (date: Date, booking: Booking) => {
   )
   return cn(
     isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
-    isFirstDay && !isSunday(date) && '-mr-2',
+    isFirstDay && !isSunday(date) && 'md:-mr-2',
     isLastDay && 'rounded-r-full col-start-1 row-start-1',
-    isLastDay && !isMonday(date) && '-ml-2',
+    isLastDay && !isMonday(date) && 'md:-ml-2',
     isInInterval && 'col-span-2 ',
-    isInInterval && !isMonday(date) && '-ml-1',
-    isInInterval && !isSunday(date) && '-mr-1',
+    isInInterval && !isMonday(date) && 'md:-ml-1',
+    isInInterval && !isSunday(date) && 'md:-mr-1',
   )
 }
 

@@ -42,19 +42,20 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long> {
 
 @Repository
 interface BookingRepository : JpaRepository<Booking, Long> {
-    fun findBookingById(bookingId: Long): Booking
+    fun findBookingById(bookingId: Long): Booking?
     fun findBookingByEmployeeId(employeeId: Int): List<Booking>
     fun findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
         startDate: LocalDate, endDate: LocalDate
     ): List<Booking>
     fun findBookingsByEmployeeSub(employeeSub: String): List<Booking>
-
     fun findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(
-        selectedDate: LocalDate, alsoSelectedDate: LocalDate
+        date: LocalDate, anotherDate: LocalDate
     ): List<Booking>
 }
 
 @Repository
-interface ApartmentRepository : JpaRepository<Apartment, Long> {
-    fun findApartmentById(apartmentId: Long)
+interface  ApartmentRepository : JpaRepository<Apartment, Long> {
+    override fun findAll(): List<Apartment>
+    fun findApartmentById(apartmentId: Long): Apartment
+    fun existsApartmentById(apartmentId: Long): Boolean
 }

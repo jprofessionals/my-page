@@ -7,12 +7,14 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import no.jpro.mypageapi.dto.ApartmentDTO
 import jakarta.validation.Valid
-import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.dto.CreateBookingDTO
+import no.jpro.mypageapi.dto.UpdateBookingDTO
 import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
+import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.BookingService
 import no.jpro.mypageapi.service.UserService
@@ -132,7 +134,80 @@ class BookingController(
             throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
     }
-    @PostMapping
+
+    @GetMapping("/vacancy")
+    @Transactional
+    @Operation(summary = "Gets booking vacancies in a time period for all apartments")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = BookingDTO::class)
+        )]
+    )
+    //Lag en ny DTO klasse og bruk den i stedet for BookingDTO ?.
+
+    fun getVacancies(
+        token: JwtAuthenticationToken,
+        @RequestParam("startdate") startdate: String,
+        @RequestParam("enddate") enddate: String,
+
+        ): ResponseEntity<Map<Long, List<LocalDate>>> {
+
+        try {
+            val parsedStartDate: LocalDate = LocalDate.parse(startdate)
+            val parsedEndDate: LocalDate = LocalDate.parse(enddate)
+            val availability = bookingService.getAllVacanciesInAPeriod(parsedStartDate,parsedEndDate)
+            return ResponseEntity.ok(availability)
+        } catch (e: DateTimeParseException) {
+            throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
+        }
+    }
+
+    @GetMapping("/apartment")
+    @Transactional
+    @Operation(summary = "Gets all apartments")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ApartmentDTO::class)
+        )]
+    )
+
+    fun getApartments(
+        token: JwtAuthenticationToken,
+
+        ): List<ApartmentDTO> {
+        return bookingService.getAllApartments()
+    }
+
+    @DeleteMapping("{bookingID}")
+    @Transactional
+    @Operation(summary = "Delete the booking connected to the booking id")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json")]
+    )
+    fun deleteBooking(
+        token: JwtAuthenticationToken,
+        @PathVariable("bookingID") bookingID: Long,
+    ): ResponseEntity<String> {
+
+        val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity(HttpStatus.FORBIDDEN)
+        val booking = bookingService.getBooking(bookingID) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+
+        if (!userPermittedToDeleteBooking(booking, user)) {
+            return ResponseEntity(HttpStatus.FORBIDDEN)
+        }
+
+        bookingService.deleteBooking(bookingID)
+        return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
+    }
+    private fun userPermittedToDeleteBooking(booking: Booking, user: User) = (booking.employee?.id == user.id)
+
+
+    @PostMapping ("/post")
     @Transactional
     @Operation(summary = "Create a new booking")
     @ApiResponse(
@@ -142,68 +217,34 @@ class BookingController(
     )
     fun createBooking(
         token: JwtAuthenticationToken,
-        @Validated @Valid @RequestBody createBookingDTO: CreateBookingDTO
-    ): ResponseEntity<Any> {
-        val minApartmentID = 1
-        val maxApartmentID = 3
-
+        @Valid @RequestBody bookingRequest: CreateBookingDTO,
+    ): ResponseEntity<String> {
+        val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         try {
-            val startDate = createBookingDTO.startDate
-            val endDate = createBookingDTO.endDate
-
-            if (startDate.isAfter(endDate)) {
-                throw InvalidBookingDatesException("Start date cannot be after the end date.")
-            }
-
-            val apartmentId = createBookingDTO.apartmentId
-            if (apartmentId < minApartmentID || apartmentId > maxApartmentID) {
-                throw InvalidApartmentIdException("There is no apartment with that ID.")
-            }
-
-            val user = userService.getUserBySub(token.getSub())
-            val employeeName = user?.name
-
-            val booking = bookingService.createBooking(apartmentId, startDate, endDate, employeeName)
-
-            val apartmentDTO = Apartment(
-                id = booking.apartment?.id,
-                cabin_name = booking.apartment?.cabin_name
-            )
-
-            val bookingDTO = BookingDTO(
-                id = booking.id,
-                startDate = booking.startDate,
-                endDate = booking.endDate,
-                apartment = apartmentDTO,
-                employeeName = employeeName
-            )
-
-            val location = URI.create("booking/${booking.id}")
-
-            return ResponseEntity.created(location).body(bookingDTO)
-        } catch (e: InvalidBookingDatesException) {
-            val errorMessage = e.message ?: "Invalid booking dates"
-            val errorResponse = ErrorResponse(errorMessage)
-            return ResponseEntity.badRequest().body(errorResponse)
-        } catch (e: InvalidApartmentIdException) {
-            val errorMessage = e.message ?: "Invalid apartment ID"
-            val errorResponse = ErrorResponse(errorMessage)
-            return ResponseEntity.badRequest().body(errorResponse)
+            bookingService.createBooking(bookingRequest, user)
+            return ResponseEntity.ok("A new booking has been successfully created")
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.badRequest().body(e.message)
         }
     }
 
-    @ExceptionHandler(InvalidBookingDatesException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun handleInvalidBookingDatesException(e: InvalidBookingDatesException): ErrorResponse {
-        return ErrorResponse(e.message)
-    }
-    class InvalidBookingDatesException(message: String) : RuntimeException(message)
+    @PatchMapping("{bookingId}")
+    @Transactional
+    @Operation(summary = "Edit an existing booking")
+    fun editBooking(
+        token: JwtAuthenticationToken,
+        @PathVariable("bookingId") bookingId: Long,
+        @Valid @RequestBody editBookingRequest: UpdateBookingDTO,
+    ): ResponseEntity<BookingDTO> {
+        val bookingToEdit = bookingService.getBooking(bookingId) ?: return ResponseEntity.notFound().build()
+        val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
-    @ExceptionHandler(InvalidApartmentIdException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun handleInvalidApartmentIdException(e: InvalidApartmentIdException): ErrorResponse {
-        return ErrorResponse(e.message)
+        if (!userPermittedToEditBooking(bookingToEdit, user)) {
+            return ResponseEntity(HttpStatus.FORBIDDEN)
+        }
+
+        return ResponseEntity.ok(bookingService.editBooking(editBookingRequest, bookingToEdit))
     }
-    class InvalidApartmentIdException(message: String) : RuntimeException(message)
+    private fun userPermittedToEditBooking(booking: Booking, employee: User) = (booking.employee?.id == employee.id)
 }
 
