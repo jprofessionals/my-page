@@ -105,7 +105,7 @@ function MonthCalendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn('p-3', className)}
+      className={cn('p-3 border-none', className)}
       weekStartsOn={1}
       classNames={{
         months:
