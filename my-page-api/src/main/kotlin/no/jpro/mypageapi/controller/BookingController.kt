@@ -235,7 +235,7 @@ class BookingController(
         token: JwtAuthenticationToken,
         @PathVariable("bookingId") bookingId: Long,
         @Valid @RequestBody editBookingRequest: UpdateBookingDTO,
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<BookingDTO> {
         val bookingToEdit = bookingService.getBooking(bookingId) ?: return ResponseEntity.notFound().build()
         val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
@@ -245,7 +245,14 @@ class BookingController(
         try {
             return ResponseEntity.ok(bookingService.editBooking(editBookingRequest, bookingToEdit))
         } catch (e: IllegalArgumentException){
-            return ResponseEntity.badRequest().body(e.message)
+            val errorMessage = e.message ?: "An error occurred while editing the booking."
+            val errorDto = BookingDTO(
+                id = null,
+                startDate = LocalDate.now(),
+                endDate = LocalDate.now(),
+                apartment = null,
+                employeeName = errorMessage)
+            return ResponseEntity.badRequest().body(errorDto)
         }
 
     }
