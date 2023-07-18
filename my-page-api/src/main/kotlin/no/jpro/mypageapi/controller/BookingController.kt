@@ -207,7 +207,7 @@ class BookingController(
     private fun userPermittedToDeleteBooking(booking: Booking, user: User) = (booking.employee?.id == user.id)
 
 
-    @PostMapping("Post")
+    @PostMapping("post")
     @Transactional
     @Operation(summary = "Create a new booking")
     @ApiResponse(
@@ -235,15 +235,19 @@ class BookingController(
         token: JwtAuthenticationToken,
         @PathVariable("bookingId") bookingId: Long,
         @Valid @RequestBody editBookingRequest: UpdateBookingDTO,
-    ): ResponseEntity<BookingDTO> {
+    ): ResponseEntity<Any> {
         val bookingToEdit = bookingService.getBooking(bookingId) ?: return ResponseEntity.notFound().build()
         val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
         if (!userPermittedToEditBooking(bookingToEdit, user)) {
             return ResponseEntity(HttpStatus.FORBIDDEN)
         }
+        try {
+            return ResponseEntity.ok(bookingService.editBooking(editBookingRequest, bookingToEdit))
+        } catch (e: IllegalArgumentException){
+            return ResponseEntity.badRequest().body(e.message)
+        }
 
-        return ResponseEntity.ok(bookingService.editBooking(editBookingRequest, bookingToEdit))
     }
     private fun userPermittedToEditBooking(booking: Booking, employee: User) = (booking.employee?.id == employee.id)
 }
