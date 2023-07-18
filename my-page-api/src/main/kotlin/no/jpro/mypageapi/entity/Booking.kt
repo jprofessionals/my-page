@@ -12,7 +12,7 @@ data class Booking(
     val endDate: LocalDate,
     @ManyToOne
     @JoinColumn(name = "apartment_id", referencedColumnName = "id")
-    val apartment: Apartment? = null,
+    val apartment: Apartment,
     @ManyToOne
     @JoinColumn(name = "employee_id", referencedColumnName = "id")
     val employee: User? = null,

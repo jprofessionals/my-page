@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext
 import no.jpro.mypageapi.dto.ApartmentDTO
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.dto.CreateBookingDTO
+import no.jpro.mypageapi.dto.UpdateBookingDTO
 import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.User
@@ -130,6 +131,28 @@ class BookingService(
             return bookingMapper.toBookingDTO(bookingRepository.save(booking))
         } else {
             throw IllegalArgumentException("Cannot create booking, since there is already a booking in the date range.")
+        }
+    }
+
+    fun filterOverlappingBookingsExcludingOwnBooking(apartmentId: Long, wishStartDate: LocalDate, wishEndDate: LocalDate, bookingToExclude: Booking?): List<Booking> {
+        val filteredBookings = filterOverlappingBookings(apartmentId, wishStartDate, wishEndDate)
+        return filteredBookings.filter { it.id != bookingToExclude?.id }
+    }
+
+    fun editBooking(editPostRequest: UpdateBookingDTO, bookingToEdit: Booking): BookingDTO {
+        val checkIfBookingUpdate = filterOverlappingBookingsExcludingOwnBooking(bookingToEdit.apartment.id, editPostRequest.startDate, editPostRequest.endDate, bookingToEdit)
+
+        if (checkIfBookingUpdate.isEmpty() && (editPostRequest.startDate.isBefore(editPostRequest.endDate))) {
+            return bookingMapper.toBookingDTO(
+                bookingRepository.save(
+                    bookingToEdit.copy(
+                        startDate = editPostRequest.startDate,
+                        endDate = editPostRequest.endDate
+                    )
+                )
+            )
+        } else {
+            throw IllegalArgumentException("Cannot change booking to these dates.")
         }
     }
 }
