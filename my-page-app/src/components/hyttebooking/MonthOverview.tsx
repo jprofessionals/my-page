@@ -332,7 +332,7 @@ export default function MonthOverview() {
                     {expandedApartments.includes(apartment.id) && (
                       <div className="expanded-content">
                         Disabled until the page is ready for use
-                        {/*<CreateBookingPost apartmentId={apartment.id} />*/}
+                        <CreateBookingPost apartmentId={apartment.id} date = {date} />
                       </div>
                     )}
                   </div>

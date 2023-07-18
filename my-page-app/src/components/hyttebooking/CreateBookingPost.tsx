@@ -8,11 +8,12 @@ import { Button } from '../ui/button'
 
 type Props = {
     apartmentId: number
+    date: Date
 }
 
-const CreateBookingPost = ({apartmentId}: Props) => {
-    const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'))
-    const [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'))
+const CreateBookingPost = ({apartmentId, date}: Props) => {
+    const [startDate, setStartDate] = useState(moment(date).format('YYYY-MM-DD'))
+    const [endDate, setEndDate] = useState(moment(date).format('YYYY-MM-DD'))
     const [isLoadingPost, setIsLoadingPost] = useState(false)
 
     const isValid = startDate < endDate && moment(endDate).diff(startDate, 'days') <= 7
