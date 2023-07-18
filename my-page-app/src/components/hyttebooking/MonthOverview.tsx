@@ -245,7 +245,7 @@ export default function MonthOverview() {
                       }
                       return Date.parse(a.endDate) - Date.parse(b.endDate)
                     })
-                    .map((booking, index, array) => {
+                    .map((booking, index) => {
                       const startDate = new Date(booking.startDate)
                       const endDate = new Date(booking.endDate)
                       const formattedStartDate = format(startDate, 'dd-MM-yyyy')
@@ -256,7 +256,7 @@ export default function MonthOverview() {
                       )
 
                       const prevCabinName =
-                        index > 0 ? array[index - 1].apartment.cabin_name : null
+                        index > 0 ? bookingItems[index - 1].apartment.cabin_name : null
                       const currentCabinName = booking.apartment.cabin_name
                       const shouldRenderDivider =
                         prevCabinName !== currentCabinName
