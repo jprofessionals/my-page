@@ -78,11 +78,11 @@ export type JobPostingType = {
   resourcesNeeded?: number
 }
 export type Apartment = {
-  id?: number
+  id: number
   cabin_name: string
 }
 export type Booking = {
-  id?: number
+  id: number
   startDate: string
   endDate: string
   apartment: Apartment

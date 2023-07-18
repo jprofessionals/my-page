@@ -154,6 +154,16 @@ const editBooking = (editedBooking, bookingId) => {
       }
     })
 }
+  
+const createBookingPost = (post) => {
+  return axios.post(API_URL+'booking/post', post,{
+    headers: authHeader(),
+  }).then(response => response.data).catch(error => {
+    if (error.response && error.response.data){
+      throw error.response.data
+    } else {throw 'En feil skjedde under oppretting, prøv igjen.'}
+  })
+}
 
 const ApiService = {
   getUsers,
@@ -170,5 +180,6 @@ const ApiService = {
   getAllApartments,
   deleteBooking,
   editBooking,
+  createBookingPost,
 }
 export default ApiService

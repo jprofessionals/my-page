@@ -48,12 +48,12 @@ function MonthCalendar({
       const currentDate = new Date()
       const unformattedStartDate = new Date(
         currentDate.getFullYear(),
-        currentDate.getMonth() - 2,
+        currentDate.getMonth() - 6,
         currentDate.getDate(),
       )
       const unformattedEndDate = new Date(
         currentDate.getFullYear(),
-        currentDate.getMonth() + 1,
+        currentDate.getMonth() + 12,
         currentDate.getDate(),
       )
       const startDate = format(unformattedStartDate, 'yyyy-MM-dd')
@@ -132,7 +132,7 @@ function MonthCalendar({
           'py-3 border-none tw-bg-opacity: 0',
         ),
         day_selected: 'tw-bg-opacity: 0',
-        day_today: 'bg-calendar text-accent-foreground',
+        day_today: cn('text-accent-foreground', 'bg-gray-400'),
         day_outside: 'text-muted-foreground opacity-50',
         day_disabled: 'text-muted-foreground opacity-50',
         day_range_middle:
@@ -182,7 +182,9 @@ function MonthCalendar({
                         get(cabinColors, booking.apartment?.cabin_name),
                         'normal-case',
                       )}
-                      data-tip={`Booket av: ${booking.employeeName}`}
+                      {...(windowWidth > 800 && {
+                        'data-tip': `Booket av: ${booking.employeeName}`,
+                      })}
                     >
                       {(isFirstDay || isLastDay) &&
                         getInitials(booking.employeeName)}
