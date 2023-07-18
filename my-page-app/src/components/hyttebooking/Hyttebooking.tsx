@@ -51,14 +51,7 @@ function Hyttebooking() {
           </div>
 
           {shouldShowImage && (
-            <Image
-              src={jPro_Hytte}
-              alt="jPro"
-              style={{
-                marginLeft: '10px',
-                borderRadius: '8px',
-              }}
-            />
+            <Image className="hidden md:block" src={jPro_Hytte} alt="jPro" />
           )}
         </div>
 
