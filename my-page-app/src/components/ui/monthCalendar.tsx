@@ -48,12 +48,12 @@ function MonthCalendar({
       const currentDate = new Date()
       const unformattedStartDate = new Date(
         currentDate.getFullYear(),
-        currentDate.getMonth() - 2,
+        currentDate.getMonth() - 6,
         currentDate.getDate(),
       )
       const unformattedEndDate = new Date(
         currentDate.getFullYear(),
-        currentDate.getMonth() + 1,
+        currentDate.getMonth() + 12,
         currentDate.getDate(),
       )
       const startDate = format(unformattedStartDate, 'yyyy-MM-dd')
