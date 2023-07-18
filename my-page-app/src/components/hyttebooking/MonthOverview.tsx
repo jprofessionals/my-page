@@ -65,7 +65,7 @@ export default function MonthOverview() {
     setDate(undefined)
   }
 
-  const handleApartmentClick = (apartmentId: number) => {
+  const handleBookClick = (apartmentId: number) => {
     setExpandedApartments((prevExpandedApartments) => {
       const isExpanded = prevExpandedApartments.includes(apartmentId)
       if (isExpanded) {
@@ -293,7 +293,7 @@ export default function MonthOverview() {
                     <p className="mt-1 mb-1">
                       <span className="apartment-text">{apartment.cabin_name}</span>
                       <button
-                        onClick={() => handleApartmentClick(apartment.id)}
+                        onClick={() => handleBookClick(apartment.id)}
                         className="mt-2 ml-2 bg-orange-500 text-white px-2 py-1 rounded-md"
                       >
                         Book
