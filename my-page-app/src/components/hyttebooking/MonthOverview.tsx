@@ -274,14 +274,14 @@ export default function MonthOverview() {
                             {isYourBooking ? (
                               <>
                                 <div className="flex flex-col">
-                                  <p className="flex-row">
+                                  <p className="flex-row justify-between items-center space-x-2">
                                     <span>
                                       Du har fra {formattedStartDate} til{' '}
                                       {formattedEndDate}.
                                     </span>
                                     <button
                                       onClick={() => handleEditBooking()}
-                                      className="ml-3 bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                                      className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
                                     >
                                       Rediger
                                     </button>
@@ -289,13 +289,13 @@ export default function MonthOverview() {
                                       onClick={() =>
                                         handleDeleteBooking(booking.id)
                                       }
-                                      className="ml-2 bg-red-not-available text-white px-2 py-0.5 rounded-md"
+                                      className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
                                     >
                                       Slett
                                     </button>
                                   </p>
                                   {showEditForm && (
-                                    <EditBooking booking={booking} />
+                                    <EditBooking booking={booking}/>
                                   )}
                                 </div>
                               </>
