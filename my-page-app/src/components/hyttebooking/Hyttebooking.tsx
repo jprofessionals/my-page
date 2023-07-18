@@ -1,5 +1,5 @@
 import jPro_Hytte from '../images/jPro_Hytte.png'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import MonthOverview from '@/components/hyttebooking/MonthOverview'
 import YearOverview from '@/components/hyttebooking/YearOverview'
@@ -19,6 +19,22 @@ function Hyttebooking() {
     setShowMonthOverview(false)
   }
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
+  const shouldShowImage = windowWidth >= 800
+
   return (
     <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 p-4">
@@ -34,11 +50,16 @@ function Hyttebooking() {
             <p>Vi setter pris på tilbakemeldinger for forbedringer:)</p>
           </div>
 
-          <Image
-            src={jPro_Hytte}
-            alt="jPro"
-            style={{ marginLeft: '10px', borderRadius: '8px' }}
-          />
+          {shouldShowImage && (
+            <Image
+              src={jPro_Hytte}
+              alt="jPro"
+              style={{
+                marginLeft: '10px',
+                borderRadius: '8px',
+              }}
+            />
+          )}
         </div>
 
         <p>
