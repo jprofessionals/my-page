@@ -6,7 +6,7 @@ import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
-import EditBooking from "@/components/hyttebooking/EditBooking";
+import EditBooking from '@/components/hyttebooking/EditBooking'
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
@@ -38,9 +38,11 @@ export default function MonthOverview() {
   }
   const [showEditForm, setShowEditForm] = useState(false)
   const handleEditBooking = () => {
-    if (showEditForm){
+    if (showEditForm) {
       setShowEditForm(false)
-    } else {setShowEditForm(true)}
+    } else {
+      setShowEditForm(true)
+    }
   }
 
   const handleDateClick = (date: Date) => {
@@ -198,11 +200,7 @@ export default function MonthOverview() {
     Annekset: 'border-teal-annex',
   }
 
-  const cabinOrder = [
-    'Stor leilighet',
-    'Liten leilighet',
-    'Annekset',
-  ]
+  const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
 
   return (
     <div className="flex flex-col overflow-hidden gap-4 p-4">
@@ -275,27 +273,31 @@ export default function MonthOverview() {
                           >
                             {isYourBooking ? (
                               <>
-                                <span>
-                                  Du har fra {formattedStartDate} til{' '}
-                                  {formattedEndDate}.
-                                </span>
-                                <div className="ml-5">
-                                  <button
-                                    onClick={() => handleEditBooking()}
-                                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
-                                  >
-                                    Rediger
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      handleDeleteBooking(booking.id)
-                                    }
-                                    className="ml-3 bg-red-not-available text-white px-2 py-0.5 rounded-md"
-                                  >
-                                    Slett
-                                  </button>
+                                <div className="flex flex-col">
+                                  <p className="flex-row">
+                                    <span>
+                                      Du har fra {formattedStartDate} til{' '}
+                                      {formattedEndDate}.
+                                    </span>
+                                    <button
+                                      onClick={() => handleEditBooking()}
+                                      className="ml-3 bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                                    >
+                                      Rediger
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteBooking(booking.id)
+                                      }
+                                      className="ml-2 bg-red-not-available text-white px-2 py-0.5 rounded-md"
+                                    >
+                                      Slett
+                                    </button>
+                                  </p>
+                                  {showEditForm && (
+                                    <EditBooking booking={booking} />
+                                  )}
                                 </div>
-                                {showEditForm && <EditBooking booking = {booking} />}
                               </>
                             ) : (
                               <>

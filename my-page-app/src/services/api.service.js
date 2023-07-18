@@ -141,13 +141,18 @@ const deleteBooking = (bookingId) => {
 }
 
 const editBooking = (editedBooking, bookingId) => {
-  return axios.patch(API_URL + 'booking/' + bookingId, editedBooking, {
-    headers: authHeader(),
-  }).then(response => response.data).catch(error => {
-    if (error.response && error.response.data){
-      throw error.response.data
-    } else {throw 'En feil skjedde under redigeringen, prøv igjen.'}
-  })
+  return axios
+    .patch(API_URL + 'booking/' + bookingId, editedBooking, {
+      headers: authHeader(),
+    })
+    .then((response) => response.data)
+    .catch((error) => {
+      if (error.response && error.response.data) {
+        throw error.response.data
+      } else {
+        throw 'En feil skjedde under redigeringen, prøv igjen.'
+      }
+    })
 }
 
 const ApiService = {
