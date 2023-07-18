@@ -6,6 +6,7 @@ import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
+import {useMutation, useQueryClient} from "react-query";
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
@@ -29,12 +30,28 @@ export default function MonthOverview() {
   }, [])
 
   const handleDeleteBooking = async (bookingId: number | undefined) => {
-    /*try {
+    refreshBookings.mutate(bookingId)
+  }
+
+  const deleteBookingByBookingId = async (bookingId: number | undefined) => {
+    try {
       await ApiService.deleteBooking(bookingId)
+      toast.success('Bookingen din er slettet')
+      setShowModal(false)
     } catch (error) {
       console.error('Error:', error)
-    }*/
+    }
   }
+
+  const queryClient = useQueryClient()
+  const refreshBookings = useMutation(deleteBookingByBookingId, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('bookings')
+    },
+    onError: (error) => {
+      console.error('Error:', error)
+    },
+  })
 
   const handleEditBooking = async () => {
 

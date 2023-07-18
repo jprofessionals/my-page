@@ -13,6 +13,7 @@ import { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import ApiService from '@/services/api.service'
 import { get } from 'radash'
+import {useQuery} from "react-query";
 
 export type CalendarProps = ComponentProps<typeof DayPicker>
 
@@ -28,7 +29,6 @@ function MonthCalendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
-  const [bookings, setBookings] = useState<Booking[]>([])
   const [yourBookings, setYourBookings] = useState<Booking[]>([])
   const getYourBookings = async () => {
     try {
@@ -43,39 +43,37 @@ function MonthCalendar({
     getYourBookings()
   }, [])
 
-  const fetchBookings = async () => {
-    try {
-      const currentDate = new Date()
-      const unformattedStartDate = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth() - 6,
-        currentDate.getDate(),
-      )
-      const unformattedEndDate = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth() + 12,
-        currentDate.getDate(),
-      )
-      const startDate = format(unformattedStartDate, 'yyyy-MM-dd')
-      const endDate = format(unformattedEndDate, 'yyyy-MM-dd')
-      //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward. These control the time period in which bookings will be rendered on the calendar.
+    const { data: bookings, refetch: refetchBookings } = useQuery<Booking[]>(
+        "bookings",
+        async () => {
+            const currentDate = new Date()
+            const unformattedStartDate = new Date(
+                currentDate.getFullYear(),
+                currentDate.getMonth() - 2,
+                currentDate.getDate(),
+            )
+            const unformattedEndDate = new Date(
+                currentDate.getFullYear(),
+                currentDate.getMonth() + 1,
+                currentDate.getDate(),
+            )
+            const startDate = format(unformattedStartDate, 'yyyy-MM-dd')
+            const endDate = format(unformattedEndDate, 'yyyy-MM-dd')
 
-      const bookings = await ApiService.getBookings(startDate, endDate)
-      setBookings(bookings)
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
-
-  useEffect(() => {
-    fetchBookings()
-  }, [])
-
-  const getBookings = (date: string) => {
-    return bookings.filter(
-      (booking) => date >= booking.startDate && date <= booking.endDate,
+            const fetchedBookings = await ApiService.getBookings(startDate, endDate);
+            return fetchedBookings;
+        }
     )
-  }
+
+    useEffect(() => {
+        refetchBookings();
+    }, [])
+
+    const getBookings = (date: string) => {
+        return bookings?.filter(
+            (booking) => date >= booking.startDate && date <= booking.endDate,
+        ) || []
+    }
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const handleResize = () => {
