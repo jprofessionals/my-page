@@ -30,7 +30,7 @@ export default function MonthOverview() {
   }, [])
 
   const handleDeleteBooking = async (bookingId: number | undefined) => {
-    /*try {
+   /* try {
       await ApiService.deleteBooking(bookingId)
       toast.success('Slettet booking')
     } catch (error) {
@@ -331,7 +331,8 @@ export default function MonthOverview() {
                     </p>
                     {expandedApartments.includes(apartment.id) && (
                       <div className="expanded-content">
-                        {/*<CreateBookingPost apartmentId={apartment.id} /> Disabled until the page is ready for use so that people cant just make random bookings*/}
+                        Disabled until the page is ready for use
+                        {/*<CreateBookingPost apartmentId={apartment.id} />*/}
                       </div>
                     )}
                   </div>

@@ -15,7 +15,7 @@ const CreateBookingPost = ({apartmentId}: Props) => {
     const [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'))
     const [isLoadingPost, setIsLoadingPost] = useState(false)
 
-    const isValid = startDate < endDate
+    const isValid = startDate < endDate && moment(endDate).diff(startDate, 'days') <= 7
 
     const handleSubmit = (e: any) => {
         e.preventDefault()
