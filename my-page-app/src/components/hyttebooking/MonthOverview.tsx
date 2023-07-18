@@ -6,7 +6,7 @@ import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
-import CreateBookingPost from "@/components/hyttebooking/CreateBookingPost";
+import CreateBookingPost from "@/components/hyttebooking/CreateBookingPost"
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()

@@ -33,9 +33,9 @@ const CreateBookingPost = ({apartmentId}: Props) => {
                     setIsLoadingPost(false)
                     toast.success('Lagret booking')
                 },
-                () => {
+                (error) => {
                     setIsLoadingPost(false)
-                    toast.error('Fikk ikke opprettet bookingen, prøv igjen')
+                    toast.error(error)
                 },
             )
         }
