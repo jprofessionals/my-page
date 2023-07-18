@@ -36,7 +36,9 @@ export default function MonthOverview() {
     }*/
   }
 
-  const handleEditBooking = async () => {}
+  const handleEditBooking = async () => {
+
+  }
 
   const handleDateClick = (date: Date) => {
     setShowModal(true)
@@ -319,7 +321,7 @@ export default function MonthOverview() {
                       <span className="apartment-text">{apartment}</span>
                       <button
                         onClick={() => handleApartmentClick(index + 1)}
-                        className="mt-2 ml-2 bg-orange-500 text-white px-2 py-1 rounded-md"
+                        className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
                       >
                         Book
                       </button>
