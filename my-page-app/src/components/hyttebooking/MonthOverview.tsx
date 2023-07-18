@@ -6,6 +6,7 @@ import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
+import EditBooking from "@/components/hyttebooking/EditBooking";
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
@@ -36,8 +37,8 @@ export default function MonthOverview() {
     }*/
   }
 
-  const handleEditBooking = async () => {
-
+  const handleEditBooking = async (booking: Booking) => {
+    //expand booking downwards and show the editBooking form.
   }
 
   const handleDateClick = (date: Date) => {
@@ -278,7 +279,7 @@ export default function MonthOverview() {
                                 </span>
                                 <div className="ml-5">
                                   <button
-                                    onClick={() => handleEditBooking()}
+                                    onClick={() => handleEditBooking(booking)}
                                     className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
                                   >
                                     Rediger

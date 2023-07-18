@@ -140,6 +140,12 @@ const deleteBooking = (bookingId) => {
   })
 }
 
+const editBooking = (editedBooking, bookingId) => {
+  return axios.patch(API_URL + 'booking/' + bookingId, editedBooking, {
+    headers: authHeader(),
+  })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -154,5 +160,6 @@ const ApiService = {
   getAllVacancies,
   getAllApartments,
   deleteBooking,
+  editBooking,
 }
 export default ApiService
