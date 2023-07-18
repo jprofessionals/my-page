@@ -2,11 +2,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { DayPicker } from 'react-day-picker'
 import cn from '@/utils/cn'
 import {
-  format,
-  isMonday,
-  isSameDay,
-  isSunday,
-  isWithinInterval,
+    add,
+    sub,
+    format,
+    isMonday,
+    isSameDay,
+    isSunday,
+    isWithinInterval,
 } from 'date-fns'
 import { Booking } from '@/types'
 import { ComponentProps, useEffect, useState } from 'react'
@@ -43,31 +45,17 @@ function MonthCalendar({
     getYourBookings()
   }, [])
 
-    const { data: bookings, refetch: refetchBookings } = useQuery<Booking[]>(
+    const { data: bookings} = useQuery<Booking[]>(
         "bookings",
         async () => {
-            const currentDate = new Date()
-            const unformattedStartDate = new Date(
-                currentDate.getFullYear(),
-                currentDate.getMonth() - 2,
-                currentDate.getDate(),
-            )
-            const unformattedEndDate = new Date(
-                currentDate.getFullYear(),
-                currentDate.getMonth() + 1,
-                currentDate.getDate(),
-            )
-            const startDate = format(unformattedStartDate, 'yyyy-MM-dd')
-            const endDate = format(unformattedEndDate, 'yyyy-MM-dd')
+
+            const startDate = format(sub(new Date(), { months: 2 }), 'yyyy-MM-dd')
+            const endDate = format(add(new Date(), { months: 1 }), 'yyyy-MM-dd')
 
             const fetchedBookings = await ApiService.getBookings(startDate, endDate);
             return fetchedBookings;
         }
     )
-
-    useEffect(() => {
-        refetchBookings();
-    }, [])
 
     const getBookings = (date: string) => {
         return bookings?.filter(

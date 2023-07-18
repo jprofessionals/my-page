@@ -30,7 +30,7 @@ export default function MonthOverview() {
   }, [])
 
   const handleDeleteBooking = async (bookingId: number | undefined) => {
-    refreshBookings.mutate(bookingId)
+    deleteBooking.mutate(bookingId)
   }
 
   const deleteBookingByBookingId = async (bookingId: number | undefined) => {
@@ -39,12 +39,12 @@ export default function MonthOverview() {
       toast.success('Bookingen din er slettet')
       setShowModal(false)
     } catch (error) {
-      toast.error('Bookingen din er ikke slettet')
+      toast.error(`Bookingen din ble ikke slettet med følgende feil: ${error}`)
     }
   }
 
   const queryClient = useQueryClient()
-  const refreshBookings = useMutation(deleteBookingByBookingId, {
+  const deleteBooking = useMutation(deleteBookingByBookingId, {
     onSuccess: () => {
       queryClient.invalidateQueries('bookings')
     },
