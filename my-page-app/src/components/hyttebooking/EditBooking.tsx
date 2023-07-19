@@ -8,7 +8,7 @@ import { Button } from '../ui/button'
 import {Booking, EditedBooking} from '@/types'
 import axios from 'axios'
 import authHeader from "@/services/auth-header"
-import {useMutation} from "react-query"
+import {useMutation, useQueryClient} from "react-query"
 
 const editExistingBooking = async ({ editedBooking, bookingId }: { editedBooking: EditedBooking, bookingId: number }) => {
   return axios
@@ -25,7 +25,7 @@ const editExistingBooking = async ({ editedBooking, bookingId }: { editedBooking
       })
 }
 
-const EditBooking = ({ booking }: { booking: Booking }) => {
+const EditBooking = ({ booking, closeModal }: { booking: Booking, closeModal: () => void }) => {
   const [startDate, setStartDate] = useState(booking.startDate)
   const [endDate, setEndDate] = useState(booking.endDate)
   const [isLoadingEdit, setIsLoadingEdit] = useState(false)
@@ -33,8 +33,11 @@ const EditBooking = ({ booking }: { booking: Booking }) => {
   const isValid =
     startDate < endDate && moment(endDate).diff(startDate, 'days') <= 7
 
+  const queryClient = useQueryClient()
   const {mutate} = useMutation(editExistingBooking, {
     onSuccess: () => {
+      closeModal()
+      queryClient.invalidateQueries('bookings')
       setIsLoadingEdit(false)
       toast.success ('Redigert booking')
     },

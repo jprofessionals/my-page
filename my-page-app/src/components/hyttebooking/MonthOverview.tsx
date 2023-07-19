@@ -88,6 +88,7 @@ export default function MonthOverview() {
   const closeModal = () => {
     setShowModal(false)
     setDate(undefined)
+    setShowEditForm(false)
   }
 
   const handleBookClick = (apartmentId: number) => {
@@ -315,7 +316,7 @@ export default function MonthOverview() {
                                     </button>
                                   </p>
                                   {showEditForm && (
-                                    <EditBooking booking={booking}/>
+                                    <EditBooking booking={booking} closeModal = {closeModal}/>
                                   )}
                                 </div>
                               </>
