@@ -115,7 +115,7 @@ function MonthCalendar({
           'py-3 border-none tw-bg-opacity: 0',
         ),
         day_selected: 'tw-bg-opacity: 0',
-        day_today: 'bg-calendar text-accent-foreground',
+        day_today: cn('text-accent-foreground', 'bg-gray-400'),
         day_outside: 'text-muted-foreground opacity-50',
         day_disabled: 'text-muted-foreground opacity-50',
         day_range_middle:
