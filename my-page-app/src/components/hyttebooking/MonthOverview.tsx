@@ -6,7 +6,7 @@ import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
-import {useMutation, useQueryClient} from "react-query";
+import { useMutation, useQueryClient } from 'react-query'
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
@@ -53,9 +53,7 @@ export default function MonthOverview() {
     },
   })
 
-  const handleEditBooking = async () => {
-
-  }
+  const handleEditBooking = async () => {}
 
   const handleDateClick = (date: Date) => {
     setShowModal(true)
@@ -212,11 +210,7 @@ export default function MonthOverview() {
     Annekset: 'border-teal-annex',
   }
 
-  const cabinOrder = [
-    'Stor leilighet',
-    'Liten leilighet',
-    'Annekset',
-  ]
+  const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
 
   return (
     <div className="flex flex-col overflow-hidden gap-4 p-4">

@@ -2,21 +2,20 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { DayPicker } from 'react-day-picker'
 import cn from '@/utils/cn'
 import {
-    add,
-    sub,
-    format,
-    isMonday,
-    isSameDay,
-    isSunday,
-    isWithinInterval,
+  add,
+  sub,
+  format,
+  isMonday,
+  isSameDay,
+  isSunday,
+  isWithinInterval,
 } from 'date-fns'
 import { Booking } from '@/types'
 import { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import ApiService from '@/services/api.service'
 import { get } from 'radash'
-import {useQuery} from "react-query";
-
+import { useQuery } from 'react-query'
 export type CalendarProps = ComponentProps<typeof DayPicker>
 
 const cabinColors: { [key: string]: string } = {
@@ -45,23 +44,21 @@ function MonthCalendar({
     getYourBookings()
   }, [])
 
-    const { data: bookings} = useQuery<Booking[]>(
-        "bookings",
-        async () => {
+  const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
+    const startDate = format(sub(new Date(), { months: 2 }), 'yyyy-MM-dd')
+    const endDate = format(add(new Date(), { months: 1 }), 'yyyy-MM-dd')
 
-            const startDate = format(sub(new Date(), { months: 2 }), 'yyyy-MM-dd')
-            const endDate = format(add(new Date(), { months: 1 }), 'yyyy-MM-dd')
+    const fetchedBookings = await ApiService.getBookings(startDate, endDate)
+    return fetchedBookings
+  })
 
-            const fetchedBookings = await ApiService.getBookings(startDate, endDate);
-            return fetchedBookings;
-        }
+  const getBookings = (date: string) => {
+    return (
+      bookings?.filter(
+        (booking) => date >= booking.startDate && date <= booking.endDate,
+      ) || []
     )
-
-    const getBookings = (date: string) => {
-        return bookings?.filter(
-            (booking) => date >= booking.startDate && date <= booking.endDate,
-        ) || []
-    }
+  }
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const handleResize = () => {
