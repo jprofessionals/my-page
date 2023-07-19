@@ -1,11 +1,30 @@
 import { useState } from 'react'
-import ApiService from '../../services/api.service'
+import ApiService, {API_URL} from '../../services/api.service'
 import moment from 'moment'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
 import { Button } from '../ui/button'
-import { Booking } from '@/types'
+import {Booking, EditedBooking} from '@/types'
+import axios from 'axios'
+import authHeader from "@/services/auth-header";
+import {useMutation} from "react-query";
+import {AxiosError} from "axios";
+
+const editExistingBooking = async ({ editedBooking, bookingId }: { editedBooking: EditedBooking, bookingId: number }) => {
+  return axios
+      .patch(API_URL + 'booking/' + bookingId, editedBooking, {
+        headers: authHeader(),
+      })
+      .then((response) => response.data)
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          throw error.response.data
+        } else {
+          throw 'En feil skjedde under redigeringen, prøv igjen.'
+        }
+      })
+}
 
 const EditBooking = ({ booking }: { booking: Booking }) => {
   const [startDate, setStartDate] = useState(booking.startDate)
@@ -15,26 +34,29 @@ const EditBooking = ({ booking }: { booking: Booking }) => {
   const isValid =
     startDate < endDate && moment(endDate).diff(startDate, 'days') <= 7
 
+  const {mutate} = useMutation(editExistingBooking, {
+    onSuccess: () => {
+      setIsLoadingEdit(false)
+      toast.success ('Redigert booking')
+    },
+    onError: (error: AxiosError) => {
+      setIsLoadingEdit(false)
+      toast.error(`Klarte ikke redigere booking: ${error.response?.data}`)
+    },
+  })
+
   const handleSubmit = (e: any) => {
     e.preventDefault()
     if (!isValid) {
       toast.error('Noen av verdiene var ikke gyldig, prøv igjen')
     } else {
       setIsLoadingEdit(true)
+      const bookingId = booking.id
       const editedBooking = {
         startDate: startDate,
         endDate: endDate,
       }
-      ApiService.editBooking(editedBooking, booking.id).then(
-        () => {
-          setIsLoadingEdit(false)
-          toast.success('Redigert booking')
-        },
-        (error) => {
-          setIsLoadingEdit(false)
-          toast.error(error)
-        },
-      )
+      mutate({editedBooking, bookingId})
     }
   }
 
