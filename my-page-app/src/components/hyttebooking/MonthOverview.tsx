@@ -16,9 +16,9 @@ export default function MonthOverview() {
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
   const [yourBookings, setYourBookings] = useState<Booking[]>([])
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
-  const [bookingIdToDelete, setBookingIdToDelete] = useState<
-    number | undefined
-  >()
+  const [bookingIdToDelete, setBookingIdToDelete] = useState<number | null>(
+    null,
+  )
   const getYourBookings = async () => {
     try {
       const yourBookings = await ApiService.getBookingsForUser()
@@ -32,7 +32,7 @@ export default function MonthOverview() {
     getYourBookings()
   }, [])
 
-  const openDeleteModal = (bookingId: number | undefined) => {
+  const openDeleteModal = (bookingId: number | null) => {
     setBookingIdToDelete(bookingId)
     setDeleteModalIsOpen(true)
   }
@@ -46,11 +46,11 @@ export default function MonthOverview() {
     closeDeleteModal()
   }
 
-  const handleDeleteBooking = async (bookingId: number | undefined) => {
+  const handleDeleteBooking = async (bookingId: number | null) => {
     deleteBooking.mutate(bookingId)
   }
 
-  const deleteBookingByBookingId = async (bookingId: number | undefined) => {
+  const deleteBookingByBookingId = async (bookingId: number | null) => {
     try {
       await ApiService.deleteBooking(bookingId)
       toast.success('Bookingen din er slettet')
@@ -123,9 +123,9 @@ export default function MonthOverview() {
   const [vacancyLoadingStatus, setVacancyLoadingStatus] =
     useState<VacancyLoadingStatus>('init')
   const { userFetchStatus } = useAuthContext()
-  const [vacancies, setVacancies] = useState<
-    { [key: number]: string[] } | undefined
-  >({})
+  const [vacancies, setVacancies] = useState<{
+    [key: number]: string[]
+  } | null>({})
   const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<
     Apartment[]
   >([])
