@@ -5,8 +5,8 @@ import ApiService from '@/services/api.service'
 import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
-import {add, format, sub} from 'date-fns'
-import {useMutation, useQuery, useQueryClient} from 'react-query'
+import { add, format, sub } from 'date-fns'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
@@ -16,10 +16,13 @@ export default function MonthOverview() {
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
 
-  const { data: yourBookings } = useQuery<Booking[]>('yourBookingsButton', async () => {
-    const yourBookings = await ApiService.getBookingsForUser()
-    return yourBookings
-  })
+  const { data: yourBookings } = useQuery<Booking[]>(
+    'yourBookingsButton',
+    async () => {
+      const yourBookings = await ApiService.getBookingsForUser()
+      return yourBookings
+    },
+  )
 
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
   const [bookingIdToDelete, setBookingIdToDelete] = useState<number | null>(
@@ -310,36 +313,38 @@ export default function MonthOverview() {
                                       Rediger
                                     </button>
                                     <button
-                                      onClick={() => openDeleteModal(booking.id)}
+                                      onClick={() =>
+                                        openDeleteModal(booking.id)
+                                      }
                                       className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
                                     >
                                       Slett
                                     </button>
                                     <Modal
-                                    isOpen={deleteModalIsOpen}
-                                    onRequestClose={closeModal}
-                                    contentLabel="Delete Confirmation"
-                                    style={customModalStyles}
+                                      isOpen={deleteModalIsOpen}
+                                      onRequestClose={closeModal}
+                                      contentLabel="Delete Confirmation"
+                                      style={customModalStyles}
                                     >
-                                    <p className="mb-3">
-                                      Er du sikker på at du vil slette
-                                      bookingen?
-                                    </p>
-                                    <div className="flex justify-end">
-                                      <button
-                                        onClick={confirmDelete}
-                                        className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
-                                      >
-                                        Slett booking
-                                      </button>
-                                      <button
-                                        onClick={closeDeleteModal}
-                                        className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
-                                      >
-                                        Avbryt
-                                      </button>
-                                    </div>
-                                  </Modal>
+                                      <p className="mb-3">
+                                        Er du sikker på at du vil slette
+                                        bookingen?
+                                      </p>
+                                      <div className="flex justify-end">
+                                        <button
+                                          onClick={confirmDelete}
+                                          className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                                        >
+                                          Slett booking
+                                        </button>
+                                        <button
+                                          onClick={closeDeleteModal}
+                                          className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                                        >
+                                          Avbryt
+                                        </button>
+                                      </div>
+                                    </Modal>
                                   </p>
                                   {showEditForm && (
                                     <EditBooking
@@ -386,7 +391,12 @@ export default function MonthOverview() {
                     </p>
                     {expandedApartments.includes(apartment.id) && (
                       <div className="expanded-content">
-                        <CreateBookingPost apartmentId={apartment.id} date = {date} closeModal={closeModal} refreshVacancies={refreshVacancies} />
+                        <CreateBookingPost
+                          apartmentId={apartment.id}
+                          date={date}
+                          closeModal={closeModal}
+                          refreshVacancies={refreshVacancies}
+                        />
                       </div>
                     )}
                   </div>

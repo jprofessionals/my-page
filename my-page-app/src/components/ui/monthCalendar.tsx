@@ -30,12 +30,13 @@ function MonthCalendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
-
-  const { data: yourBookings } = useQuery<Booking[]>('yourBookingsOutline', async () => {
+  const { data: yourBookings } = useQuery<Booking[]>(
+    'yourBookingsOutline',
+    async () => {
       const yourBookings = await ApiService.getBookingsForUser()
       return yourBookings
-  })
-
+    },
+  )
 
   const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
     const startDate = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
