@@ -96,6 +96,7 @@ export default function MonthOverview() {
   const closeModal = () => {
     setShowModal(false)
     setDate(undefined)
+    setExpandedApartments([])
   }
 
   const handleBookClick = (apartmentId: number) => {
@@ -123,9 +124,11 @@ export default function MonthOverview() {
   const [vacancyLoadingStatus, setVacancyLoadingStatus] =
     useState<VacancyLoadingStatus>('init')
   const { userFetchStatus } = useAuthContext()
-  const [vacancies, setVacancies] = useState<{
-    [key: number]: string[]
-  } | null>({})
+
+  const [vacancies, setVacancies] = useState<
+    { [key: number]: string[] } | undefined
+  >({})
+
   const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<
     Apartment[]
   >([])
