@@ -89,6 +89,7 @@ export default function MonthOverview() {
     setShowModal(false)
     setDate(undefined)
     setShowEditForm(false)
+    setExpandedApartments([])
   }
 
   const handleBookClick = (apartmentId: number) => {
