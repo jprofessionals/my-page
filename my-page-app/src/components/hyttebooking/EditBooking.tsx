@@ -1,31 +1,43 @@
-import {ChangeEvent, useState} from 'react'
-import {API_URL} from '../../services/api.service'
+import { ChangeEvent, useState } from 'react'
+import { API_URL } from '../../services/api.service'
 import moment from 'moment'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
 import { Button } from '../ui/button'
-import {Booking, EditedBooking} from '@/types'
+import { Booking, EditedBooking } from '@/types'
 import axios from 'axios'
-import authHeader from "@/services/auth-header"
-import {useMutation, useQueryClient} from "react-query"
+import authHeader from '@/services/auth-header'
+import { useMutation, useQueryClient } from 'react-query'
 
-const editExistingBooking = async ({ editedBooking, bookingId }: { editedBooking: EditedBooking, bookingId: number }) => {
+const editExistingBooking = async ({
+  editedBooking,
+  bookingId,
+}: {
+  editedBooking: EditedBooking
+  bookingId: number
+}) => {
   return axios
-      .patch(API_URL + 'booking/' + bookingId, editedBooking, {
-        headers: authHeader(),
-      })
-      .then((response) => response.data)
-      .catch((error) => {
-        if (error.response && error.response.data) {
-          throw error.response.data
-        } else {
-          throw 'En feil skjedde under redigeringen, prøv igjen.'
-        }
-      })
+    .patch(API_URL + 'booking/' + bookingId, editedBooking, {
+      headers: authHeader(),
+    })
+    .then((response) => response.data)
+    .catch((error) => {
+      if (error.response && error.response.data) {
+        throw error.response.data
+      } else {
+        throw 'En feil skjedde under redigeringen, prøv igjen.'
+      }
+    })
 }
 
-const EditBooking = ({ booking, closeModal }: { booking: Booking, closeModal: () => void }) => {
+const EditBooking = ({
+  booking,
+  closeModal,
+}: {
+  booking: Booking
+  closeModal: () => void
+}) => {
   const [startDate, setStartDate] = useState(booking.startDate)
   const [endDate, setEndDate] = useState(booking.endDate)
   const [isLoadingEdit, setIsLoadingEdit] = useState(false)
@@ -34,14 +46,14 @@ const EditBooking = ({ booking, closeModal }: { booking: Booking, closeModal: ()
     startDate < endDate && moment(endDate).diff(startDate, 'days') <= 7
 
   const queryClient = useQueryClient()
-  const {mutate} = useMutation(editExistingBooking, {
+  const { mutate } = useMutation(editExistingBooking, {
     onSuccess: () => {
       closeModal()
       queryClient.invalidateQueries('bookings')
       setIsLoadingEdit(false)
-      toast.success ('Redigert booking')
+      toast.success('Redigert booking')
     },
-    onError: (error:string) => {
+    onError: (error: string) => {
       setIsLoadingEdit(false)
       toast.error(error)
     },
@@ -58,7 +70,7 @@ const EditBooking = ({ booking, closeModal }: { booking: Booking, closeModal: ()
         startDate: startDate,
         endDate: endDate,
       }
-      mutate({editedBooking, bookingId})
+      mutate({ editedBooking, bookingId })
     }
   }
 

@@ -8,7 +8,7 @@ import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import { useMutation, useQueryClient } from 'react-query'
-import CreateBookingPost from "@/components/hyttebooking/CreateBookingPost"
+import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
@@ -107,7 +107,6 @@ export default function MonthOverview() {
       const formattedDate = format(selectedDate, 'yyyy-MM-dd')
       const bookings = await ApiService.getBookingsForDay(formattedDate)
       setBookingItems(bookings)
-
     } catch (error) {
       console.error('Error:', error)
     }
@@ -120,9 +119,9 @@ export default function MonthOverview() {
   const [vacancies, setVacancies] = useState<
     { [key: number]: string[] } | undefined
   >({})
-  const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<Apartment[]>(
-    [],
-  )
+  const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<
+    Apartment[]
+  >([])
   const [apartments, setApartments] = useState<Apartment[]>([])
 
   const refreshVacancies = useCallback(async () => {
@@ -275,7 +274,9 @@ export default function MonthOverview() {
                       )
 
                       const prevCabinName =
-                        index > 0 ? bookingItems[index - 1].apartment.cabin_name : null
+                        index > 0
+                          ? bookingItems[index - 1].apartment.cabin_name
+                          : null
                       const currentCabinName = booking.apartment.cabin_name
                       const shouldRenderDivider =
                         prevCabinName !== currentCabinName
@@ -316,7 +317,10 @@ export default function MonthOverview() {
                                     </button>
                                   </p>
                                   {showEditForm && (
-                                    <EditBooking booking={booking} closeModal = {closeModal}/>
+                                    <EditBooking
+                                      booking={booking}
+                                      closeModal={closeModal}
+                                    />
                                   )}
                                 </div>
                               </>
@@ -345,7 +349,9 @@ export default function MonthOverview() {
                 vacantApartmentsOnDay.map((apartment, index) => (
                   <div key={index}>
                     <p className="mt-1 mb-1">
-                      <span className="apartment-text">{apartment.cabin_name}</span>
+                      <span className="apartment-text">
+                        {apartment.cabin_name}
+                      </span>
                       <button
                         onClick={() => handleBookClick(apartment.id)}
                         className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
