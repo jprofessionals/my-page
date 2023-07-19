@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
 import { Button } from '../ui/button'
 import {Booking, EditedBooking} from '@/types'
-import axios, {AxiosError} from 'axios'
+import axios from 'axios'
 import authHeader from "@/services/auth-header"
 import {useMutation} from "react-query"
 
@@ -38,9 +38,9 @@ const EditBooking = ({ booking }: { booking: Booking }) => {
       setIsLoadingEdit(false)
       toast.success ('Redigert booking')
     },
-    onError: (error: AxiosError) => {
+    onError: (error:string) => {
       setIsLoadingEdit(false)
-      toast.error(`Klarte ikke redigere bookingen ${error.response?.data}`)
+      toast.error(error)
     },
   })
 

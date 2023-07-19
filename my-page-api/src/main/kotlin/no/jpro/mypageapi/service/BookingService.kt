@@ -11,7 +11,6 @@ import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.BookingRepository
-import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.ApartmentMapper
 import no.jpro.mypageapi.utils.mapper.BookingMapper
 import org.springframework.stereotype.Service
@@ -24,7 +23,6 @@ class BookingService(
     private val bookingMapper: BookingMapper,
     private val apartmentRepository: ApartmentRepository,
     private val apartmentMapper: ApartmentMapper,
-    private val userRepository: UserRepository,
 ) {
 
     fun getBooking(bookingId: Long): Booking? {
@@ -130,7 +128,7 @@ class BookingService(
             )
             return bookingMapper.toBookingDTO(bookingRepository.save(booking))
         } else {
-            throw IllegalArgumentException("Cannot create booking, since there is already a booking in the date range.")
+            throw IllegalArgumentException("Ikke mulig å opprette bookingen. Eksisterer en annen booking i ønsket tidsperiode.")
         }
     }
 
@@ -152,7 +150,7 @@ class BookingService(
                 )
             )
         } else {
-            throw IllegalArgumentException("Cannot change booking to these dates.")
+            throw IllegalArgumentException("Kan ikke endre bookingen til disse datoene.")
         }
     }
 }
