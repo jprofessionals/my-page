@@ -19,22 +19,6 @@ function Hyttebooking() {
     setShowMonthOverview(false)
   }
 
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth)
-    }
-
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
-
-  const shouldShowImage = windowWidth >= 800
-
   return (
     <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 p-4">
@@ -49,10 +33,7 @@ function Hyttebooking() {
             </p>
             <p>Vi setter pris på tilbakemeldinger for forbedringer:)</p>
           </div>
-
-          {shouldShowImage && (
-            <Image className="hidden md:block" src={jPro_Hytte} alt="jPro" />
-          )}
+          <Image className="hidden md:block" src={jPro_Hytte} alt="jPro" />
         </div>
 
         <p>
