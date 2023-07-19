@@ -1,5 +1,5 @@
 import jPro_Hytte from '../images/jPro_Hytte.png'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import MonthOverview from '@/components/hyttebooking/MonthOverview'
 import YearOverview from '@/components/hyttebooking/YearOverview'
@@ -33,12 +33,7 @@ function Hyttebooking() {
             </p>
             <p>Vi setter pris på tilbakemeldinger for forbedringer:)</p>
           </div>
-
-          <Image
-            src={jPro_Hytte}
-            alt="jPro"
-            style={{ marginLeft: '10px', borderRadius: '8px' }}
-          />
+          <Image className="hidden md:block" src={jPro_Hytte} alt="jPro" />
         </div>
 
         <p>
