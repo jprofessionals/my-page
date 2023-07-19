@@ -88,3 +88,8 @@ export type Booking = {
   apartment: Apartment
   employeeName: string
 }
+
+export type EditedBooking = {
+  startDate: string
+  endDate: string
+}

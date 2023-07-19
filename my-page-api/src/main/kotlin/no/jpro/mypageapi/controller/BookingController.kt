@@ -7,12 +7,11 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import no.jpro.mypageapi.dto.ApartmentDTO
 import jakarta.validation.Valid
+import no.jpro.mypageapi.dto.ApartmentDTO
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.dto.CreateBookingDTO
 import no.jpro.mypageapi.dto.UpdateBookingDTO
-import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
@@ -22,9 +21,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import java.net.URI
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 import java.util.*
@@ -235,15 +232,21 @@ class BookingController(
         token: JwtAuthenticationToken,
         @PathVariable("bookingId") bookingId: Long,
         @Valid @RequestBody editBookingRequest: UpdateBookingDTO,
-    ): ResponseEntity<BookingDTO> {
+    ): ResponseEntity<String> {
         val bookingToEdit = bookingService.getBooking(bookingId) ?: return ResponseEntity.notFound().build()
         val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
         if (!userPermittedToEditBooking(bookingToEdit, user)) {
             return ResponseEntity(HttpStatus.FORBIDDEN)
         }
+        try {
+            bookingService.editBooking(editBookingRequest, bookingToEdit)
+            return ResponseEntity.ok("The booking has been successfully edited")
+        } catch (e: IllegalArgumentException){
+            val errorMessage = e.message ?: "An error occurred while editing the booking."
+            return ResponseEntity.badRequest().body(errorMessage)
+        }
 
-        return ResponseEntity.ok(bookingService.editBooking(editBookingRequest, bookingToEdit))
     }
     private fun userPermittedToEditBooking(booking: Booking, employee: User) = (booking.employee?.id == employee.id)
 }

@@ -6,6 +6,7 @@ import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
+import EditBooking from '@/components/hyttebooking/EditBooking'
 import { useMutation, useQueryClient } from 'react-query'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
@@ -60,6 +61,15 @@ export default function MonthOverview() {
     }
   }
 
+  const [showEditForm, setShowEditForm] = useState(false)
+  const handleEditBooking = () => {
+    if (showEditForm) {
+      setShowEditForm(false)
+    } else {
+      setShowEditForm(true)
+    }
+  }
+
   const queryClient = useQueryClient()
   const deleteBooking = useMutation(deleteBookingByBookingId, {
     onSuccess: () => {
@@ -69,8 +79,6 @@ export default function MonthOverview() {
       console.error('Error:', error)
     },
   })
-
-  const handleEditBooking = async () => {}
 
   const handleDateClick = (date: Date) => {
     setShowModal(true)
@@ -96,6 +104,7 @@ export default function MonthOverview() {
   const closeModal = () => {
     setShowModal(false)
     setDate(undefined)
+    setShowEditForm(false)
     setExpandedApartments([])
   }
 
@@ -305,29 +314,30 @@ export default function MonthOverview() {
                           >
                             {isYourBooking ? (
                               <>
-                                <span>
-                                  Du har fra {formattedStartDate} til{' '}
-                                  {formattedEndDate}.
-                                </span>
-                                <div className="ml-5">
-                                  <button
-                                    onClick={() => handleEditBooking()}
-                                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
-                                  >
-                                    Rediger
-                                  </button>
-                                  <button
-                                    onClick={() => openDeleteModal(booking.id)}
-                                    className="ml-3 bg-red-not-available text-white px-2 py-0.5 rounded-md"
-                                  >
-                                    Slett
-                                  </button>
-                                  <Modal
+                                <div className="flex flex-col">
+                                  <p className="flex-row justify-between items-center space-x-2">
+                                    <span>
+                                      Du har fra {formattedStartDate} til{' '}
+                                      {formattedEndDate}.
+                                    </span>
+                                    <button
+                                      onClick={() => handleEditBooking()}
+                                      className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                                    >
+                                      Rediger
+                                    </button>
+                                    <button
+                                      onClick={() => openDeleteModal(booking.id)}
+                                      className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
+                                    >
+                                      Slett
+                                    </button>
+                                    <Modal
                                     isOpen={deleteModalIsOpen}
                                     onRequestClose={closeModal}
                                     contentLabel="Delete Confirmation"
                                     style={customModalStyles}
-                                  >
+                                    >
                                     <p className="mb-3">
                                       Er du sikker på at du vil slette
                                       bookingen?
@@ -347,6 +357,13 @@ export default function MonthOverview() {
                                       </button>
                                     </div>
                                   </Modal>
+                                  </p>
+                                  {showEditForm && (
+                                    <EditBooking
+                                      booking={booking}
+                                      closeModal={closeModal}
+                                    />
+                                  )}
                                 </div>
                               </>
                             ) : (
@@ -386,8 +403,7 @@ export default function MonthOverview() {
                     </p>
                     {expandedApartments.includes(apartment.id) && (
                       <div className="expanded-content">
-                        Disabled until the page is ready for use
-                        {/*<CreateBookingPost apartmentId={apartment.id} date = {date} />*/}
+                        <CreateBookingPost apartmentId={apartment.id} date = {date} />
                       </div>
                     )}
                   </div>
