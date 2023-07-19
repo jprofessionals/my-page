@@ -7,16 +7,18 @@ import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
 import { useMutation, useQueryClient } from 'react-query'
-import CreateBookingPost from "@/components/hyttebooking/CreateBookingPost"
+import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
   const [showModal, setShowModal] = useState(false)
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
-
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
-
   const [yourBookings, setYourBookings] = useState<Booking[]>([])
+  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
+  const [bookingIdToDelete, setBookingIdToDelete] = useState<
+    number | undefined
+  >()
   const getYourBookings = async () => {
     try {
       const yourBookings = await ApiService.getBookingsForUser()
@@ -29,6 +31,20 @@ export default function MonthOverview() {
   useEffect(() => {
     getYourBookings()
   }, [])
+
+  const openDeleteModal = (bookingId: number | undefined) => {
+    setBookingIdToDelete(bookingId)
+    setDeleteModalIsOpen(true)
+  }
+
+  const closeDeleteModal = () => {
+    setDeleteModalIsOpen(false)
+  }
+
+  const confirmDelete = () => {
+    handleDeleteBooking(bookingIdToDelete)
+    closeDeleteModal()
+  }
 
   const handleDeleteBooking = async (bookingId: number | undefined) => {
     deleteBooking.mutate(bookingId)
@@ -98,7 +114,6 @@ export default function MonthOverview() {
       const formattedDate = format(selectedDate, 'yyyy-MM-dd')
       const bookings = await ApiService.getBookingsForDay(formattedDate)
       setBookingItems(bookings)
-
     } catch (error) {
       console.error('Error:', error)
     }
@@ -111,9 +126,9 @@ export default function MonthOverview() {
   const [vacancies, setVacancies] = useState<
     { [key: number]: string[] } | undefined
   >({})
-  const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<Apartment[]>(
-    [],
-  )
+  const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<
+    Apartment[]
+  >([])
   const [apartments, setApartments] = useState<Apartment[]>([])
 
   const refreshVacancies = useCallback(async () => {
@@ -266,7 +281,9 @@ export default function MonthOverview() {
                       )
 
                       const prevCabinName =
-                        index > 0 ? bookingItems[index - 1].apartment.cabin_name : null
+                        index > 0
+                          ? bookingItems[index - 1].apartment.cabin_name
+                          : null
                       const currentCabinName = booking.apartment.cabin_name
                       const shouldRenderDivider =
                         prevCabinName !== currentCabinName
@@ -297,13 +314,36 @@ export default function MonthOverview() {
                                     Rediger
                                   </button>
                                   <button
-                                    onClick={() =>
-                                      handleDeleteBooking(booking.id)
-                                    }
+                                    onClick={() => openDeleteModal(booking.id)}
                                     className="ml-3 bg-red-not-available text-white px-2 py-0.5 rounded-md"
                                   >
                                     Slett
                                   </button>
+                                  <Modal
+                                    isOpen={deleteModalIsOpen}
+                                    onRequestClose={closeModal}
+                                    contentLabel="Delete Confirmation"
+                                    style={customModalStyles}
+                                  >
+                                    <p className="mb-3">
+                                      Er du sikker på at du vil slette
+                                      bookingen?
+                                    </p>
+                                    <div className="flex justify-end">
+                                      <button
+                                        onClick={confirmDelete}
+                                        className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                                      >
+                                        Slett booking
+                                      </button>
+                                      <button
+                                        onClick={closeDeleteModal}
+                                        className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                                      >
+                                        Avbryt
+                                      </button>
+                                    </div>
+                                  </Modal>
                                 </div>
                               </>
                             ) : (
@@ -331,7 +371,9 @@ export default function MonthOverview() {
                 vacantApartmentsOnDay.map((apartment, index) => (
                   <div key={index}>
                     <p className="mt-1 mb-1">
-                      <span className="apartment-text">{apartment.cabin_name}</span>
+                      <span className="apartment-text">
+                        {apartment.cabin_name}
+                      </span>
                       <button
                         onClick={() => handleBookClick(apartment.id)}
                         className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
