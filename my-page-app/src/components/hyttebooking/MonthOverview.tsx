@@ -5,7 +5,7 @@ import ApiService from '@/services/api.service'
 import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
-import { format } from 'date-fns'
+import {add, format, sub} from 'date-fns'
 import {useMutation, useQuery, useQueryClient} from 'react-query'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
@@ -112,19 +112,8 @@ export default function MonthOverview() {
     setVacancyLoadingStatus('loading')
 
     try {
-      /*const currentDate = new Date()
-            const unformattedStartDate = new Date(
-              currentDate.getFullYear(),
-              currentDate.getMonth() - 1,
-              currentDate.getDate(),
-            )
-            const unformattedEndDate = new Date(
-              currentDate.getFullYear(),
-              currentDate.getMonth() + 1,
-              currentDate.getDate(),
-            )*/
-      const startDate = '2023-06-01' //format(unformattedStartDate, 'yyyy-MM-dd')
-      const endDate = '2023-08-31' //format(unformattedEndDate, 'yyyy-MM-dd')
+      const startDate = format(sub(new Date(), { days: 1 }), 'yyyy-MM-dd')
+      const endDate = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
       //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward. These control the time period in which vacancies will be searched for.
 
       const loadedVacancies = await ApiService.getAllVacancies(
