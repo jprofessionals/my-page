@@ -7,13 +7,13 @@ import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import {add, format, sub} from 'date-fns'
 import {useMutation, useQuery, useQueryClient} from 'react-query'
+import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
   const [showModal, setShowModal] = useState(false)
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
-
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
 
   const { data: yourBookings } = useQuery<Booking[]>('yourBookingsButton', async () => {
@@ -21,17 +21,45 @@ export default function MonthOverview() {
     return yourBookings
   })
 
-  const handleDeleteBooking = async (bookingId: number | undefined) => {
+  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
+  const [bookingIdToDelete, setBookingIdToDelete] = useState<number | null>(
+    null,
+  )
+
+  const openDeleteModal = (bookingId: number | null) => {
+    setBookingIdToDelete(bookingId)
+    setDeleteModalIsOpen(true)
+  }
+
+  const closeDeleteModal = () => {
+    setDeleteModalIsOpen(false)
+  }
+
+  const confirmDelete = () => {
+    handleDeleteBooking(bookingIdToDelete)
+    closeDeleteModal()
+  }
+
+  const handleDeleteBooking = async (bookingId: number | null) => {
     deleteBooking.mutate(bookingId)
   }
 
-  const deleteBookingByBookingId = async (bookingId: number | undefined) => {
+  const deleteBookingByBookingId = async (bookingId: number | null) => {
     try {
       await ApiService.deleteBooking(bookingId)
       toast.success('Bookingen din er slettet')
       closeModal()
     } catch (error) {
       toast.error(`Bookingen din ble ikke slettet med følgende feil: ${error}`)
+    }
+  }
+
+  const [showEditForm, setShowEditForm] = useState(false)
+  const handleEditBooking = () => {
+    if (showEditForm) {
+      setShowEditForm(false)
+    } else {
+      setShowEditForm(true)
     }
   }
 
@@ -45,8 +73,6 @@ export default function MonthOverview() {
       console.error('Error:', error)
     },
   })
-
-  const handleEditBooking = async () => {}
 
   const handleDateClick = (date: Date) => {
     setDate(date)
@@ -72,6 +98,7 @@ export default function MonthOverview() {
   const closeModal = () => {
     setShowModal(false)
     setDate(undefined)
+    setShowEditForm(false)
     setExpandedApartments([])
   }
 
@@ -100,9 +127,11 @@ export default function MonthOverview() {
   const [vacancyLoadingStatus, setVacancyLoadingStatus] =
     useState<VacancyLoadingStatus>('init')
   const { userFetchStatus } = useAuthContext()
+
   const [vacancies, setVacancies] = useState<
     { [key: number]: string[] } | undefined
   >({})
+
   const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<
     Apartment[]
   >([])
@@ -268,25 +297,56 @@ export default function MonthOverview() {
                           >
                             {isYourBooking ? (
                               <>
-                                <span>
-                                  Du har fra {formattedStartDate} til{' '}
-                                  {formattedEndDate}.
-                                </span>
-                                <div className="ml-5">
-                                  <button
-                                    onClick={() => handleEditBooking()}
-                                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
-                                  >
-                                    Rediger
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      handleDeleteBooking(booking.id)
-                                    }
-                                    className="ml-3 bg-red-not-available text-white px-2 py-0.5 rounded-md"
-                                  >
-                                    Slett
-                                  </button>
+                                <div className="flex flex-col">
+                                  <p className="flex-row justify-between items-center space-x-2">
+                                    <span>
+                                      Du har fra {formattedStartDate} til{' '}
+                                      {formattedEndDate}.
+                                    </span>
+                                    <button
+                                      onClick={() => handleEditBooking()}
+                                      className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                                    >
+                                      Rediger
+                                    </button>
+                                    <button
+                                      onClick={() => openDeleteModal(booking.id)}
+                                      className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
+                                    >
+                                      Slett
+                                    </button>
+                                    <Modal
+                                    isOpen={deleteModalIsOpen}
+                                    onRequestClose={closeModal}
+                                    contentLabel="Delete Confirmation"
+                                    style={customModalStyles}
+                                    >
+                                    <p className="mb-3">
+                                      Er du sikker på at du vil slette
+                                      bookingen?
+                                    </p>
+                                    <div className="flex justify-end">
+                                      <button
+                                        onClick={confirmDelete}
+                                        className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                                      >
+                                        Slett booking
+                                      </button>
+                                      <button
+                                        onClick={closeDeleteModal}
+                                        className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                                      >
+                                        Avbryt
+                                      </button>
+                                    </div>
+                                  </Modal>
+                                  </p>
+                                  {showEditForm && (
+                                    <EditBooking
+                                      booking={booking}
+                                      closeModal={closeModal}
+                                    />
+                                  )}
                                 </div>
                               </>
                             ) : (
@@ -326,7 +386,6 @@ export default function MonthOverview() {
                     </p>
                     {expandedApartments.includes(apartment.id) && (
                       <div className="expanded-content">
-                        Disabled until the page is ready for use
                         <CreateBookingPost apartmentId={apartment.id} date = {date} closeModal={closeModal} refreshVacancies={refreshVacancies} />
                       </div>
                     )}

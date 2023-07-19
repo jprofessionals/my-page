@@ -94,3 +94,8 @@ export type BookingPost = {
   startDate: string
   endDate: string
 }
+
+export type EditedBooking = {
+  startDate: string
+  endDate: string
+}

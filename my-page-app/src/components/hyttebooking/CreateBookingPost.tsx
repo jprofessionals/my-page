@@ -65,49 +65,49 @@ const CreateBookingPost = ({apartmentId, date, closeModal, refreshVacancies}: Pr
         }
     }
 
-    const handleStartDateChange = (e: any) => {
-        setStartDate(e.target.value)
-    }
-    const handleEndDateChange = (e: any) => {
-        setEndDate(e.target.value)
-    }
+  const handleStartDateChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value)
+  }
+  const handleEndDateChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setEndDate(e.target.value)
+  }
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <div className="overflow-hidden w-full rounded-xl border border-gray-500 shadow-sm">
-                <div className="flex flex-col gap-2 items-start p-3">
-                    <strong>Startdato:</strong>
-                    <label>
-                        <input
-                            type="date"
-                            className="w-48 input input-bordered input-sm"
-                            name="startDate"
-                            onChange={handleStartDateChange}
-                            value={startDate}
-                            placeholder={startDate}
-                        />
-                    </label>
-                    <strong>Sluttdato:</strong>
-                    <label>
-                        <input
-                            className="w-48 input input-bordered input-sm"
-                            type="date"
-                            name="endDate"
-                            onChange={handleEndDateChange}
-                            value={endDate}
-                            placeholder={endDate}
-                        />
-                    </label>
-                    <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="overflow-hidden w-full rounded-xl border border-gray-500 shadow-sm">
+        <div className="flex flex-col gap-2 items-start p-3">
+          <strong>Startdato:</strong>
+          <label>
+            <input
+              type="date"
+              className="w-48 input input-bordered input-sm"
+              name="startDate"
+              onChange={handleStartDateChange}
+              value={startDate}
+              placeholder={startDate}
+            />
+          </label>
+          <strong>Sluttdato:</strong>
+          <label>
+            <input
+              className="w-48 input input-bordered input-sm"
+              type="date"
+              name="endDate"
+              onChange={handleEndDateChange}
+              value={endDate}
+              placeholder={endDate}
+            />
+          </label>
+          <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
             <span>
               Legg til booking
               <Loading isLoading={isLoadingPost} />
             </span>
-                    </Button>
-                </div>
-            </div>
-        </form>
-    )
+          </Button>
+        </div>
+      </div>
+    </form>
+  )
 }
 
 export default CreateBookingPost
