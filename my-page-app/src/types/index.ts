@@ -88,3 +88,9 @@ export type Booking = {
   apartment: Apartment
   employeeName: string
 }
+
+export type BookingPost = {
+  apartmentID: number
+  startDate: string
+  endDate: string
+}

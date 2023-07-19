@@ -6,7 +6,7 @@ import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
-import { useMutation, useQueryClient } from 'react-query'
+import {useMutation, useQuery, useQueryClient} from 'react-query'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
 export default function MonthOverview() {
@@ -16,19 +16,10 @@ export default function MonthOverview() {
 
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
 
-  const [yourBookings, setYourBookings] = useState<Booking[]>([])
-  const getYourBookings = async () => {
-    try {
-      const yourBookings = await ApiService.getBookingsForUser()
-      setYourBookings(yourBookings)
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
-
-  useEffect(() => {
-    getYourBookings()
-  }, [])
+  const { data: yourBookings } = useQuery<Booking[]>('yourBookingsButton', async () => {
+    const yourBookings = await ApiService.getBookingsForUser()
+    return yourBookings
+  })
 
   const handleDeleteBooking = async (bookingId: number | undefined) => {
     deleteBooking.mutate(bookingId)
@@ -38,7 +29,7 @@ export default function MonthOverview() {
     try {
       await ApiService.deleteBooking(bookingId)
       toast.success('Bookingen din er slettet')
-      setShowModal(false)
+      closeModal()
     } catch (error) {
       toast.error(`Bookingen din ble ikke slettet med følgende feil: ${error}`)
     }
@@ -48,6 +39,7 @@ export default function MonthOverview() {
   const deleteBooking = useMutation(deleteBookingByBookingId, {
     onSuccess: () => {
       queryClient.invalidateQueries('bookings')
+      refreshVacancies()
     },
     onError: (error) => {
       console.error('Error:', error)
@@ -57,10 +49,10 @@ export default function MonthOverview() {
   const handleEditBooking = async () => {}
 
   const handleDateClick = (date: Date) => {
-    setShowModal(true)
     setDate(date)
     fetchBookingItems(date)
     getVacancyForDay(date)
+    setShowModal(true)
   }
 
   const customModalStyles = {
@@ -261,7 +253,7 @@ export default function MonthOverview() {
                       const formattedStartDate = format(startDate, 'dd-MM-yyyy')
                       const formattedEndDate = format(endDate, 'dd-MM-yyyy')
 
-                      const isYourBooking = yourBookings.some(
+                      const isYourBooking = yourBookings?.some(
                         (yourBooking) => yourBooking.id === booking.id,
                       )
 
@@ -346,7 +338,7 @@ export default function MonthOverview() {
                     {expandedApartments.includes(apartment.id) && (
                       <div className="expanded-content">
                         Disabled until the page is ready for use
-                        {/*<CreateBookingPost apartmentId={apartment.id} date = {date} />*/}
+                        <CreateBookingPost apartmentId={apartment.id} date = {date} closeModal={closeModal} refreshVacancies={refreshVacancies} />
                       </div>
                     )}
                   </div>
