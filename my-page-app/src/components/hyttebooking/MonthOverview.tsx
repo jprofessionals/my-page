@@ -13,10 +13,12 @@ export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
   const [showModal, setShowModal] = useState(false)
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
-
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
-
   const [yourBookings, setYourBookings] = useState<Booking[]>([])
+  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
+  const [bookingIdToDelete, setBookingIdToDelete] = useState<number | null>(
+    null,
+  )
   const getYourBookings = async () => {
     try {
       const yourBookings = await ApiService.getBookingsForUser()
@@ -30,11 +32,25 @@ export default function MonthOverview() {
     getYourBookings()
   }, [])
 
-  const handleDeleteBooking = async (bookingId: number | undefined) => {
+  const openDeleteModal = (bookingId: number | null) => {
+    setBookingIdToDelete(bookingId)
+    setDeleteModalIsOpen(true)
+  }
+
+  const closeDeleteModal = () => {
+    setDeleteModalIsOpen(false)
+  }
+
+  const confirmDelete = () => {
+    handleDeleteBooking(bookingIdToDelete)
+    closeDeleteModal()
+  }
+
+  const handleDeleteBooking = async (bookingId: number | null) => {
     deleteBooking.mutate(bookingId)
   }
 
-  const deleteBookingByBookingId = async (bookingId: number | undefined) => {
+  const deleteBookingByBookingId = async (bookingId: number | null) => {
     try {
       await ApiService.deleteBooking(bookingId)
       toast.success('Bookingen din er slettet')
@@ -108,9 +124,11 @@ export default function MonthOverview() {
   const [vacancyLoadingStatus, setVacancyLoadingStatus] =
     useState<VacancyLoadingStatus>('init')
   const { userFetchStatus } = useAuthContext()
+
   const [vacancies, setVacancies] = useState<
     { [key: number]: string[] } | undefined
   >({})
+
   const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<
     Apartment[]
   >([])
@@ -299,13 +317,36 @@ export default function MonthOverview() {
                                     Rediger
                                   </button>
                                   <button
-                                    onClick={() =>
-                                      handleDeleteBooking(booking.id)
-                                    }
+                                    onClick={() => openDeleteModal(booking.id)}
                                     className="ml-3 bg-red-not-available text-white px-2 py-0.5 rounded-md"
                                   >
                                     Slett
                                   </button>
+                                  <Modal
+                                    isOpen={deleteModalIsOpen}
+                                    onRequestClose={closeModal}
+                                    contentLabel="Delete Confirmation"
+                                    style={customModalStyles}
+                                  >
+                                    <p className="mb-3">
+                                      Er du sikker på at du vil slette
+                                      bookingen?
+                                    </p>
+                                    <div className="flex justify-end">
+                                      <button
+                                        onClick={confirmDelete}
+                                        className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                                      >
+                                        Slett booking
+                                      </button>
+                                      <button
+                                        onClick={closeDeleteModal}
+                                        className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                                      >
+                                        Avbryt
+                                      </button>
+                                    </div>
+                                  </Modal>
                                 </div>
                               </>
                             ) : (
