@@ -6,6 +6,7 @@ import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
+import { useMutation, useQueryClient } from 'react-query'
 import CreateBookingPost from "@/components/hyttebooking/CreateBookingPost"
 
 export default function MonthOverview() {
@@ -30,17 +31,30 @@ export default function MonthOverview() {
   }, [])
 
   const handleDeleteBooking = async (bookingId: number | undefined) => {
-   /* try {
+    deleteBooking.mutate(bookingId)
+  }
+
+  const deleteBookingByBookingId = async (bookingId: number | undefined) => {
+    try {
       await ApiService.deleteBooking(bookingId)
-      toast.success('Slettet booking')
+      toast.success('Bookingen din er slettet')
+      setShowModal(false)
     } catch (error) {
+      toast.error(`Bookingen din ble ikke slettet med følgende feil: ${error}`)
+    }
+  }
+
+  const queryClient = useQueryClient()
+  const deleteBooking = useMutation(deleteBookingByBookingId, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('bookings')
+    },
+    onError: (error) => {
       console.error('Error:', error)
-    }*/
-  }
+    },
+  })
 
-  const handleEditBooking = async () => {
-
-  }
+  const handleEditBooking = async () => {}
 
   const handleDateClick = (date: Date) => {
     setShowModal(true)
@@ -198,12 +212,8 @@ export default function MonthOverview() {
     Annekset: 'border-teal-annex',
   }
 
-  const cabinOrder = [
-    'Stor leilighet',
-    'Liten leilighet',
-    'Annekset',
-  ]
-        
+  const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
+
   return (
     <div className="flex flex-col overflow-hidden gap-4 p-4">
       <MonthCalendar
