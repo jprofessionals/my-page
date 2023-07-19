@@ -38,8 +38,8 @@ function MonthCalendar({
 
 
   const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
-    const startDate = format(sub(new Date(), { months: 2 }), 'yyyy-MM-dd')
-    const endDate = format(add(new Date(), { months: 2 }), 'yyyy-MM-dd')
+    const startDate = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
+    const endDate = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
 
     const fetchedBookings = await ApiService.getBookings(startDate, endDate)
     return fetchedBookings
