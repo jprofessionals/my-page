@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import {ChangeEvent, useState} from 'react'
 import {API_URL} from '../../services/api.service'
 import moment from 'moment'
 import { toast } from 'react-toastify'
@@ -62,10 +62,10 @@ const EditBooking = ({ booking, closeModal }: { booking: Booking, closeModal: ()
     }
   }
 
-  const handleStartDateChange = (e: any) => {
+  const handleStartDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setStartDate(e.target.value)
   }
-  const handleEndDateChange = (e: any) => {
+  const handleEndDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEndDate(e.target.value)
   }
 
