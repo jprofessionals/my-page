@@ -327,9 +327,7 @@ export default function MonthOverview() {
                                       Rediger
                                     </button>
                                     <button
-                                      onClick={() =>
-                                        handleDeleteBooking(booking.id)
-                                      }
+                                      onClick={() => openDeleteModal(booking.id)}
                                       className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
                                     >
                                       Slett
@@ -339,7 +337,7 @@ export default function MonthOverview() {
                                     onRequestClose={closeModal}
                                     contentLabel="Delete Confirmation"
                                     style={customModalStyles}
-                                  >
+                                    >
                                     <p className="mb-3">
                                       Er du sikker på at du vil slette
                                       bookingen?
@@ -405,8 +403,7 @@ export default function MonthOverview() {
                     </p>
                     {expandedApartments.includes(apartment.id) && (
                       <div className="expanded-content">
-                        Disabled until the page is ready for use
-                        {/*<CreateBookingPost apartmentId={apartment.id} date = {date} />*/}
+                        <CreateBookingPost apartmentId={apartment.id} date = {date} />
                       </div>
                     )}
                   </div>
