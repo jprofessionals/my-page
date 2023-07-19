@@ -139,21 +139,6 @@ const deleteBooking = (bookingId) => {
     headers: authHeader(),
   })
 }
-
-const editBooking = (editedBooking, bookingId) => {
-  return axios
-    .patch(API_URL + 'booking/' + bookingId, editedBooking, {
-      headers: authHeader(),
-    })
-    .then((response) => response.data)
-    .catch((error) => {
-      if (error.response && error.response.data) {
-        throw error.response.data
-      } else {
-        throw 'En feil skjedde under redigeringen, prøv igjen.'
-      }
-    })
-}
   
 const createBookingPost = (post) => {
   return axios.post(API_URL+'booking/post', post,{
@@ -179,7 +164,6 @@ const ApiService = {
   getAllVacancies,
   getAllApartments,
   deleteBooking,
-  editBooking,
   createBookingPost,
 }
 export default ApiService

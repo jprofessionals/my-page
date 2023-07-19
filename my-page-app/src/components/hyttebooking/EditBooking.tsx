@@ -1,15 +1,14 @@
 import { useState } from 'react'
-import ApiService, {API_URL} from '../../services/api.service'
+import {API_URL} from '../../services/api.service'
 import moment from 'moment'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
 import { Button } from '../ui/button'
 import {Booking, EditedBooking} from '@/types'
-import axios from 'axios'
-import authHeader from "@/services/auth-header";
-import {useMutation} from "react-query";
-import {AxiosError} from "axios";
+import axios, {AxiosError} from 'axios'
+import authHeader from "@/services/auth-header"
+import {useMutation} from "react-query"
 
 const editExistingBooking = async ({ editedBooking, bookingId }: { editedBooking: EditedBooking, bookingId: number }) => {
   return axios
@@ -41,7 +40,7 @@ const EditBooking = ({ booking }: { booking: Booking }) => {
     },
     onError: (error: AxiosError) => {
       setIsLoadingEdit(false)
-      toast.error(`Klarte ikke redigere booking: ${error.response?.data}`)
+      toast.error(`Klarte ikke redigere bookingen ${error.response?.data}`)
     },
   })
 
