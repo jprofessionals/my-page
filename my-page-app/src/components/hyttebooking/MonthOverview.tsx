@@ -6,6 +6,8 @@ import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format } from 'date-fns'
+import { useMutation, useQueryClient } from 'react-query'
+import CreateBookingPost from "@/components/hyttebooking/CreateBookingPost"
 
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
@@ -29,16 +31,30 @@ export default function MonthOverview() {
   }, [])
 
   const handleDeleteBooking = async (bookingId: number | undefined) => {
-    /*try {
+    deleteBooking.mutate(bookingId)
+  }
+
+  const deleteBookingByBookingId = async (bookingId: number | undefined) => {
+    try {
       await ApiService.deleteBooking(bookingId)
+      toast.success('Bookingen din er slettet')
+      setShowModal(false)
     } catch (error) {
+      toast.error(`Bookingen din ble ikke slettet med følgende feil: ${error}`)
+    }
+  }
+
+  const queryClient = useQueryClient()
+  const deleteBooking = useMutation(deleteBookingByBookingId, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('bookings')
+    },
+    onError: (error) => {
       console.error('Error:', error)
-    }*/
-  }
+    },
+  })
 
-  const handleEditBooking = async () => {
-
-  }
+  const handleEditBooking = async () => {}
 
   const handleDateClick = (date: Date) => {
     setShowModal(true)
@@ -66,7 +82,7 @@ export default function MonthOverview() {
     setDate(undefined)
   }
 
-  const handleApartmentClick = (apartmentId: number) => {
+  const handleBookClick = (apartmentId: number) => {
     setExpandedApartments((prevExpandedApartments) => {
       const isExpanded = prevExpandedApartments.includes(apartmentId)
       if (isExpanded) {
@@ -82,6 +98,7 @@ export default function MonthOverview() {
       const formattedDate = format(selectedDate, 'yyyy-MM-dd')
       const bookings = await ApiService.getBookingsForDay(formattedDate)
       setBookingItems(bookings)
+
     } catch (error) {
       console.error('Error:', error)
     }
@@ -94,7 +111,7 @@ export default function MonthOverview() {
   const [vacancies, setVacancies] = useState<
     { [key: number]: string[] } | undefined
   >({})
-  const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<string[]>(
+  const [vacantApartmentsOnDay, setVacantApartmentsOnDay] = useState<Apartment[]>(
     [],
   )
   const [apartments, setApartments] = useState<Apartment[]>([])
@@ -169,11 +186,11 @@ export default function MonthOverview() {
   }
 
   const getVacancyForDay = async (selectedDate: Date) => {
-    const availableApartments: string[] = []
+    const availableApartments: Apartment[] = []
     const vacantApartmentsInPeriod = getVacantApartments(selectedDate)
     for (const apartment of apartments) {
       if (vacantApartmentsInPeriod.includes(apartment.id!)) {
-        availableApartments.push(apartment.cabin_name)
+        availableApartments.push(apartment)
       }
     }
     setVacantApartmentsOnDay(availableApartments)
@@ -195,11 +212,7 @@ export default function MonthOverview() {
     Annekset: 'border-teal-annex',
   }
 
-  const cabinOrder = [
-    'Stor leilighet',
-    'Liten leilighet',
-    'Annekset',
-  ]
+  const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
 
   return (
     <div className="flex flex-col overflow-hidden gap-4 p-4">
@@ -242,7 +255,7 @@ export default function MonthOverview() {
                       }
                       return Date.parse(a.endDate) - Date.parse(b.endDate)
                     })
-                    .map((booking, index, array) => {
+                    .map((booking, index) => {
                       const startDate = new Date(booking.startDate)
                       const endDate = new Date(booking.endDate)
                       const formattedStartDate = format(startDate, 'dd-MM-yyyy')
@@ -253,7 +266,7 @@ export default function MonthOverview() {
                       )
 
                       const prevCabinName =
-                        index > 0 ? array[index - 1].apartment.cabin_name : null
+                        index > 0 ? bookingItems[index - 1].apartment.cabin_name : null
                       const currentCabinName = booking.apartment.cabin_name
                       const shouldRenderDivider =
                         prevCabinName !== currentCabinName
@@ -318,17 +331,18 @@ export default function MonthOverview() {
                 vacantApartmentsOnDay.map((apartment, index) => (
                   <div key={index}>
                     <p className="mt-1 mb-1">
-                      <span className="apartment-text">{apartment}</span>
+                      <span className="apartment-text">{apartment.cabin_name}</span>
                       <button
-                        onClick={() => handleApartmentClick(index + 1)}
+                        onClick={() => handleBookClick(apartment.id)}
                         className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
                       >
                         Book
                       </button>
                     </p>
-                    {expandedApartments.includes(index + 1) && (
+                    {expandedApartments.includes(apartment.id) && (
                       <div className="expanded-content">
-                        Her vil det komme mulighet for å gjøre en booking
+                        Disabled until the page is ready for use
+                        {/*<CreateBookingPost apartmentId={apartment.id} date = {date} />*/}
                       </div>
                     )}
                   </div>
