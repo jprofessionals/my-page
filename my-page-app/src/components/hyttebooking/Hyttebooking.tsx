@@ -33,7 +33,11 @@ function Hyttebooking() {
             </p>
             <p>Vi setter pris på tilbakemeldinger for forbedringer:)</p>
           </div>
-          <Image className="hidden md:block" src={jPro_Hytte} alt="jPro" />
+          <Image
+            className="hidden md:block mt-0 rounded"
+            src={jPro_Hytte}
+            alt="jPro"
+          />
         </div>
 
         <p>
@@ -53,7 +57,8 @@ function Hyttebooking() {
           satt. Alle som melder interesse vil bli satt opp i en tilfeldig
           rangert liste. Deretter velger folk etter tur, fra topp til bunn.
           Kommer vi til slutten av listen, snur vi trekkrekkefølgen og
-          fortsetter til toppen av listen.
+          fortsetter til toppen av listen. Det er ingen funksjonalitet for dette
+          så trekningen vil skje eksternt.
         </p>
 
         <p>
@@ -64,7 +69,7 @@ function Hyttebooking() {
           ledig. Her er det førstemann til mølla som gjelder. Med unntak, hvis
           en annen melder interesse innen 7 dager (foreløpig ingen
           funksjonalitet for dette). De interesserte må da selv gjennomføre en
-          trekning.
+          trekning, da det ikke er funksjonalitet for dette enda.
         </p>
 
         <p>
@@ -72,9 +77,9 @@ function Hyttebooking() {
             <strong>Booking:</strong>
           </span>{' '}
           oppretting, endring og sletting av bookinger vil foregå når man
-          trykker på en bestemt dato. Dette er foreløpig under produksjon. Her
-          planlegges det å opprette et varslingssytem på slack så alle ansatte
-          blir oppdatert på visse endringer.
+          trykker på en bestemt dato. Her planlegges det å opprette et
+          varslingssytem på slack så alle ansatte blir oppdatert på visse
+          endringer.
         </p>
 
         <p>
@@ -85,7 +90,8 @@ function Hyttebooking() {
           over alle hyttene, hvem som har booket de, og i hvilken periode. I
           tillegg får man opp eventuelle ledige hytter på den dagen. Dersom du
           lurer på hvem som eier en spesifikk booking kan du holde musa over
-          bookingen i kalenderen.
+          bookingen i kalenderen. Dine egne bookinger markeres med en svart
+          kant.
         </p>
 
         <p>

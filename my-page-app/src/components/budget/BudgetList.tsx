@@ -21,9 +21,15 @@ const BudgetList = ({
   if (budgets.length === 0) {
     return (
       <div>
-        <div>
-          <h3>Du har ingen budsjetter</h3>
-          <p>Kontakt ledelsen for å få opprettet budsjettene dine</p>
+        <div className="prose">
+          <h3 className="ml-4 mb-3 text-3xl font-light mt-5">
+            Oversikt over dine budsjetter
+          </h3>
+          <p className="ml-4 mt-5">
+            {' '}
+            Du har ingen budsjetter. <br />
+            Kontakt ledelsen for å få opprettet budsjettene dine.
+          </p>
         </div>
       </div>
     )

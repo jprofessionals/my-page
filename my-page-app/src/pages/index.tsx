@@ -77,6 +77,15 @@ export default function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userFetchStatus, budgetLoadingStatus])
 
+  type CabinColorClasses = {
+    [key: string]: string
+  }
+  const cabinTextColorClasses: CabinColorClasses = {
+    'Stor leilighet': 'text-orange-brand',
+    'Liten leilighet': 'text-blue-small-appartment',
+    Annekset: 'text-teal-annex',
+  }
+
   const bookingConfigs: Record<
     string,
     {
@@ -103,7 +112,7 @@ export default function HomePage() {
         <div>
           <UserInformation />
           <h3 className="ml-4 mb-6 text-3xl font-light">
-            Dine hyttebookinger:{' '}
+            Dine hyttebookinger{' '}
           </h3>
           {bookingLoadingStatus === 'completed' ? (
             <>
@@ -158,9 +167,18 @@ export default function HomePage() {
                             return (
                               <div key={booking.id} className="ml-10 mt-3 ">
                                 <p>
-                                  Du har booket hytten{' '}
-                                  {booking.apartment.cabin_name} i perioden{' '}
-                                  {formattedStartDate} til {formattedEndDate}
+                                  Du har booket{' '}
+                                  <span
+                                    className={
+                                      cabinTextColorClasses[
+                                        booking.apartment.cabin_name
+                                      ]
+                                    }
+                                  >
+                                    {booking.apartment.cabin_name}
+                                  </span>{' '}
+                                  fra {formattedStartDate} til{' '}
+                                  {formattedEndDate}
                                 </p>
                                 {index !== bookings.length - 1 && (
                                   <hr className="mt-3" />
@@ -173,7 +191,7 @@ export default function HomePage() {
                   </Accordions>
                 </div>
               ) : (
-                <p className="ml-10">
+                <p className="ml-4 prose">
                   Du har ingen hyttebookinger. Se oversikt over ledige dager og
                   book i kalenderen på hyttebookingsiden.
                 </p>
