@@ -85,7 +85,7 @@ function Hyttebooking() {
           over alle hyttene, hvem som har booket de, og i hvilken periode. I
           tillegg får man opp eventuelle ledige hytter på den dagen. Dersom du
           lurer på hvem som eier en spesifikk booking kan du holde musa over
-          bookingen i kalenderen.
+          bookingen i kalenderen. Dine egne bookinger markeres med en svart kant.
         </p>
 
         <p>
