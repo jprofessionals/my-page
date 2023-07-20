@@ -72,9 +72,9 @@ function Hyttebooking() {
             <strong>Booking:</strong>
           </span>{' '}
           oppretting, endring og sletting av bookinger vil foregå når man
-          trykker på en bestemt dato. Dette er foreløpig under produksjon, men her
-          planlegges det å opprette et varslingssytem på slack så alle ansatte
-          blir oppdatert på visse endringer.
+          trykker på en bestemt dato. Dette er foreløpig under produksjon, men
+          her planlegges det å opprette et varslingssytem på slack så alle
+          ansatte blir oppdatert på visse endringer.
         </p>
 
         <p>
@@ -85,7 +85,8 @@ function Hyttebooking() {
           over alle hyttene, hvem som har booket de, og i hvilken periode. I
           tillegg får man opp eventuelle ledige hytter på den dagen. Dersom du
           lurer på hvem som eier en spesifikk booking kan du holde musa over
-          bookingen i kalenderen. Dine egne bookinger markeres med en svart kant.
+          bookingen i kalenderen. Dine egne bookinger markeres med en svart
+          kant.
         </p>
 
         <p>
