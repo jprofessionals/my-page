@@ -30,23 +30,17 @@ function MonthCalendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
-  const [yourBookings, setYourBookings] = useState<Booking[]>([])
-  const getYourBookings = async () => {
-    try {
+  const { data: yourBookings } = useQuery<Booking[]>(
+    'yourBookingsOutline',
+    async () => {
       const yourBookings = await ApiService.getBookingsForUser()
-      setYourBookings(yourBookings)
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
-
-  useEffect(() => {
-    getYourBookings()
-  }, [])
+      return yourBookings
+    },
+  )
 
   const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
-    const startDate = format(sub(new Date(), { months: 2 }), 'yyyy-MM-dd')
-    const endDate = format(add(new Date(), { months: 1 }), 'yyyy-MM-dd')
+    const startDate = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
+    const endDate = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
 
     const fetchedBookings = await ApiService.getBookings(startDate, endDate)
     return fetchedBookings
@@ -148,7 +142,7 @@ function MonthCalendar({
                 className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
               >
                 {cabinBookings.map((booking) => {
-                  const isYourBooking = yourBookings.some(
+                  const isYourBooking = yourBookings?.some(
                     (yourBooking) => yourBooking.id === booking.id,
                   )
                   const { isFirstDay, isLastDay } = getBookingDateInfo(

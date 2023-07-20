@@ -1,23 +1,65 @@
-import { useState } from 'react'
-import ApiService from '../../services/api.service'
+import { ChangeEvent, useState } from 'react'
+import { API_URL } from '../../services/api.service'
 import moment from 'moment'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
 import { Button } from '../ui/button'
+import { BookingPost } from '@/types'
+import axios from 'axios'
+import authHeader from '@/services/auth-header'
+import { useMutation, useQueryClient } from 'react-query'
 
 type Props = {
   apartmentId: number
   date: Date
+  closeModal: () => void
+  refreshVacancies: Function
+}
+const createBooking = async ({ bookingPost }: { bookingPost: BookingPost }) => {
+  return axios
+    .post(API_URL + 'booking/post', bookingPost, {
+      headers: authHeader(),
+    })
+    .then((response) => response.data)
+    .catch((error) => {
+      if (error.response && error.response.data) {
+        throw error.response.data
+      } else {
+        throw 'En feil skjedde under oppretting, prøv igjen.'
+      }
+    })
 }
 
-const CreateBookingPost = ({ apartmentId, date }: Props) => {
+const CreateBookingPost = ({
+  apartmentId,
+  date,
+  closeModal,
+  refreshVacancies,
+}: Props) => {
   const [startDate, setStartDate] = useState(moment(date).format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(moment(date).format('YYYY-MM-DD'))
   const [isLoadingPost, setIsLoadingPost] = useState(false)
 
   const isValid =
     startDate < endDate && moment(endDate).diff(startDate, 'days') <= 7
+
+  const queryClient = useQueryClient()
+  const { mutate } = useMutation(createBooking, {
+    onSuccess: () => {
+      closeModal()
+      queryClient.invalidateQueries('yourBookingsOutline')
+      queryClient.invalidateQueries('bookings')
+      queryClient.invalidateQueries('yourBookingsButton')
+      setIsLoadingPost(false)
+      toast.success('Lagret booking')
+      refreshVacancies()
+    },
+    onError: (error: string) => {
+      setIsLoadingPost(false)
+      toast.error(error)
+    },
+  })
 
   const handleSubmit = (e: any) => {
     e.preventDefault()
@@ -30,23 +72,14 @@ const CreateBookingPost = ({ apartmentId, date }: Props) => {
         startDate: startDate,
         endDate: endDate,
       }
-      ApiService.createBookingPost(bookingPost).then(
-        () => {
-          setIsLoadingPost(false)
-          toast.success('Lagret booking')
-        },
-        (error) => {
-          setIsLoadingPost(false)
-          toast.error(error)
-        },
-      )
+      mutate({ bookingPost })
     }
   }
 
-  const handleStartDateChange = (e: any) => {
+  const handleStartDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setStartDate(e.target.value)
   }
-  const handleEndDateChange = (e: any) => {
+  const handleEndDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEndDate(e.target.value)
   }
 

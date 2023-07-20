@@ -5,9 +5,9 @@ import ApiService from '@/services/api.service'
 import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
-import { format } from 'date-fns'
+import { add, format, sub } from 'date-fns'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
-import { useMutation, useQueryClient } from 'react-query'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
 export default function MonthOverview() {
@@ -15,23 +15,19 @@ export default function MonthOverview() {
   const [showModal, setShowModal] = useState(false)
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
-  const [yourBookings, setYourBookings] = useState<Booking[]>([])
+
+  const { data: yourBookings } = useQuery<Booking[]>(
+    'yourBookingsButton',
+    async () => {
+      const yourBookings = await ApiService.getBookingsForUser()
+      return yourBookings
+    },
+  )
+
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
   const [bookingIdToDelete, setBookingIdToDelete] = useState<number | null>(
     null,
   )
-  const getYourBookings = async () => {
-    try {
-      const yourBookings = await ApiService.getBookingsForUser()
-      setYourBookings(yourBookings)
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
-
-  useEffect(() => {
-    getYourBookings()
-  }, [])
 
   const openDeleteModal = (bookingId: number | null) => {
     setBookingIdToDelete(bookingId)
@@ -55,7 +51,7 @@ export default function MonthOverview() {
     try {
       await ApiService.deleteBooking(bookingId)
       toast.success('Bookingen din er slettet')
-      setShowModal(false)
+      closeModal()
     } catch (error) {
       toast.error(`Bookingen din ble ikke slettet med følgende feil: ${error}`)
     }
@@ -74,6 +70,7 @@ export default function MonthOverview() {
   const deleteBooking = useMutation(deleteBookingByBookingId, {
     onSuccess: () => {
       queryClient.invalidateQueries('bookings')
+      refreshVacancies()
     },
     onError: (error) => {
       console.error('Error:', error)
@@ -81,10 +78,10 @@ export default function MonthOverview() {
   })
 
   const handleDateClick = (date: Date) => {
-    setShowModal(true)
     setDate(date)
     fetchBookingItems(date)
     getVacancyForDay(date)
+    setShowModal(true)
   }
 
   const customModalStyles = {
@@ -147,19 +144,8 @@ export default function MonthOverview() {
     setVacancyLoadingStatus('loading')
 
     try {
-      /*const currentDate = new Date()
-            const unformattedStartDate = new Date(
-              currentDate.getFullYear(),
-              currentDate.getMonth() - 1,
-              currentDate.getDate(),
-            )
-            const unformattedEndDate = new Date(
-              currentDate.getFullYear(),
-              currentDate.getMonth() + 1,
-              currentDate.getDate(),
-            )*/
-      const startDate = '2023-06-01' //format(unformattedStartDate, 'yyyy-MM-dd')
-      const endDate = '2023-08-31' //format(unformattedEndDate, 'yyyy-MM-dd')
+      const startDate = format(sub(new Date(), { days: 1 }), 'yyyy-MM-dd')
+      const endDate = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
       //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward. These control the time period in which vacancies will be searched for.
 
       const loadedVacancies = await ApiService.getAllVacancies(
@@ -288,7 +274,7 @@ export default function MonthOverview() {
                       const formattedStartDate = format(startDate, 'dd-MM-yyyy')
                       const formattedEndDate = format(endDate, 'dd-MM-yyyy')
 
-                      const isYourBooking = yourBookings.some(
+                      const isYourBooking = yourBookings?.some(
                         (yourBooking) => yourBooking.id === booking.id,
                       )
 
@@ -327,36 +313,38 @@ export default function MonthOverview() {
                                       Rediger
                                     </button>
                                     <button
-                                      onClick={() => openDeleteModal(booking.id)}
+                                      onClick={() =>
+                                        openDeleteModal(booking.id)
+                                      }
                                       className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
                                     >
                                       Slett
                                     </button>
                                     <Modal
-                                    isOpen={deleteModalIsOpen}
-                                    onRequestClose={closeModal}
-                                    contentLabel="Delete Confirmation"
-                                    style={customModalStyles}
+                                      isOpen={deleteModalIsOpen}
+                                      onRequestClose={closeModal}
+                                      contentLabel="Delete Confirmation"
+                                      style={customModalStyles}
                                     >
-                                    <p className="mb-3">
-                                      Er du sikker på at du vil slette
-                                      bookingen?
-                                    </p>
-                                    <div className="flex justify-end">
-                                      <button
-                                        onClick={confirmDelete}
-                                        className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
-                                      >
-                                        Slett booking
-                                      </button>
-                                      <button
-                                        onClick={closeDeleteModal}
-                                        className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
-                                      >
-                                        Avbryt
-                                      </button>
-                                    </div>
-                                  </Modal>
+                                      <p className="mb-3">
+                                        Er du sikker på at du vil slette
+                                        bookingen?
+                                      </p>
+                                      <div className="flex justify-end">
+                                        <button
+                                          onClick={confirmDelete}
+                                          className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                                        >
+                                          Slett booking
+                                        </button>
+                                        <button
+                                          onClick={closeDeleteModal}
+                                          className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                                        >
+                                          Avbryt
+                                        </button>
+                                      </div>
+                                    </Modal>
                                   </p>
                                   {showEditForm && (
                                     <EditBooking
@@ -403,7 +391,12 @@ export default function MonthOverview() {
                     </p>
                     {expandedApartments.includes(apartment.id) && (
                       <div className="expanded-content">
-                        <CreateBookingPost apartmentId={apartment.id} date = {date} />
+                        <CreateBookingPost
+                          apartmentId={apartment.id}
+                          date={date}
+                          closeModal={closeModal}
+                          refreshVacancies={refreshVacancies}
+                        />
                       </div>
                     )}
                   </div>
