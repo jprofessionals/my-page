@@ -72,7 +72,7 @@ function Hyttebooking() {
             <strong>Booking:</strong>
           </span>{' '}
           oppretting, endring og sletting av bookinger vil foregå når man
-          trykker på en bestemt dato. Dette er foreløpig under produksjon. Her
+          trykker på en bestemt dato. Dette er foreløpig under produksjon, men her
           planlegges det å opprette et varslingssytem på slack så alle ansatte
           blir oppdatert på visse endringer.
         </p>

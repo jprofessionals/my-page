@@ -77,6 +77,15 @@ export default function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userFetchStatus, budgetLoadingStatus])
 
+  type CabinColorClasses = {
+    [key: string]: string
+  }
+  const cabinTextColorClasses: CabinColorClasses = {
+    'Stor leilighet': 'text-orange-brand',
+    'Liten leilighet': 'text-blue-small-appartment',
+    Annekset: 'text-teal-annex',
+  }
+
   const bookingConfigs: Record<
     string,
     {
@@ -158,8 +167,17 @@ export default function HomePage() {
                             return (
                               <div key={booking.id} className="ml-10 mt-3 ">
                                 <p>
-                                  Du har booket hytten{' '}
-                                  {booking.apartment.cabin_name} i perioden{' '}
+                                  Du har booket {' '}
+                                  <span
+                                      className={
+                                        cabinTextColorClasses[
+                                            booking.apartment.cabin_name
+                                            ]
+                                      }
+                                  >
+                                    {booking.apartment.cabin_name}
+                                  </span>{' '}
+                                  fra{' '}
                                   {formattedStartDate} til {formattedEndDate}
                                 </p>
                                 {index !== bookings.length - 1 && (
