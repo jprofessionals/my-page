@@ -34,9 +34,11 @@ const editExistingBooking = async ({
 const EditBooking = ({
   booking,
   closeModal,
+  refreshVacancies,
 }: {
   booking: Booking
   closeModal: () => void
+  refreshVacancies: () => void
 }) => {
   const [startDate, setStartDate] = useState(booking.startDate)
   const [endDate, setEndDate] = useState(booking.endDate)
@@ -52,6 +54,7 @@ const EditBooking = ({
       queryClient.invalidateQueries('bookings')
       setIsLoadingEdit(false)
       toast.success('Redigert booking')
+      refreshVacancies()
     },
     onError: (error: string) => {
       setIsLoadingEdit(false)

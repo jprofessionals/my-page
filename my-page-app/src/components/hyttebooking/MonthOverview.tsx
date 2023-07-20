@@ -350,6 +350,7 @@ export default function MonthOverview() {
                                     <EditBooking
                                       booking={booking}
                                       closeModal={closeModal}
+                                      refreshVacancies={refreshVacancies}
                                     />
                                   )}
                                 </div>
