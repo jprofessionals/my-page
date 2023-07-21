@@ -68,7 +68,10 @@ export default function MonthOverview() {
     }
   }
 
-  const [showEditFormForBooking, setShowEditFormForBookingId] = useState<number | null>(null)
+  const [showEditFormForBooking, setShowEditFormForBookingId] = useState<
+    number | null
+  >(null)
+
   const handleEditBooking = (bookingId: number) => {
     if (showEditFormForBooking !== bookingId) {
       setShowEditFormForBookingId(bookingId)
@@ -319,7 +322,9 @@ export default function MonthOverview() {
                                         : `${booking.employeeName} har fra ${formattedStartDate} til ${formattedEndDate}.`}
                                     </span>
                                     <button
-                                      onClick={() => handleEditBooking(booking.id)}
+                                      onClick={() =>
+                                        handleEditBooking(booking.id)
+                                      }
                                       className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
                                     >
                                       Rediger
