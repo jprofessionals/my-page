@@ -194,7 +194,7 @@ class BookingController(
         val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity(HttpStatus.FORBIDDEN)
         val booking = bookingService.getBooking(bookingID) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
 
-        if (!userPermittedToDeleteBooking(booking, user)) {
+        if (!userPermittedToDeleteBooking(booking, user) && !user.admin) {
             return ResponseEntity(HttpStatus.FORBIDDEN)
         }
 
@@ -236,7 +236,7 @@ class BookingController(
         val bookingToEdit = bookingService.getBooking(bookingId) ?: return ResponseEntity.notFound().build()
         val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
-        if (!userPermittedToEditBooking(bookingToEdit, user)) {
+        if (!userPermittedToEditBooking(bookingToEdit, user) && !user.admin) {
             return ResponseEntity(HttpStatus.FORBIDDEN)
         }
         try {

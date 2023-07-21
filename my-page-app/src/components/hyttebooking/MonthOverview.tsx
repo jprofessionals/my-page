@@ -15,6 +15,7 @@ export default function MonthOverview() {
   const [showModal, setShowModal] = useState(false)
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
+  const [userAdminStatus, setUserAdminStatus] = useState<boolean>(false)
 
   const { data: yourBookings } = useQuery<Booking[]>(
     'yourBookingsButton',
@@ -23,6 +24,16 @@ export default function MonthOverview() {
       return yourBookings
     },
   )
+  const userIsAdmin = async () => {
+    try {
+      const response = await ApiService.getUser()
+      const user = response.data
+      const adminStatus = user.admin
+      setUserAdminStatus(adminStatus)
+    } catch (e) {
+      toast.error('Kunne ikke hente brukers admin status')
+    }
+  }
 
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
   const [bookingIdToDelete, setBookingIdToDelete] = useState<number | null>(
@@ -103,6 +114,7 @@ export default function MonthOverview() {
     setDate(undefined)
     setShowEditForm(false)
     setExpandedApartments([])
+    setDeleteModalIsOpen(false)
   }
 
   const handleBookClick = (apartmentId: number) => {
@@ -165,6 +177,7 @@ export default function MonthOverview() {
     if (userFetchStatus === 'fetched') {
       refreshVacancies()
       getAllApartments()
+      userIsAdmin()
     }
   }, [userFetchStatus, vacancyLoadingStatus])
 
@@ -298,13 +311,14 @@ export default function MonthOverview() {
                           <p
                             className={`mt-2 mb-1 pl-2 flex ${cabinBorderColorClasses[currentCabinName]} border-l-2`}
                           >
-                            {isYourBooking ? (
+                            {isYourBooking || userAdminStatus ? (
                               <>
                                 <div className="flex flex-col">
                                   <p className="flex-row justify-between items-center space-x-2">
                                     <span>
-                                      Du har fra {formattedStartDate} til{' '}
-                                      {formattedEndDate}.
+                                      {isYourBooking
+                                        ? `Du har fra ${formattedStartDate} til ${formattedEndDate}.`
+                                        : `${booking.employeeName} har fra ${formattedStartDate} til ${formattedEndDate}.`}
                                     </span>
                                     <button
                                       onClick={() => handleEditBooking()}
