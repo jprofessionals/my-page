@@ -68,13 +68,11 @@ export default function MonthOverview() {
     }
   }
 
-  const [showEditForm, setShowEditForm] = useState(false)
-  const handleEditBooking = () => {
-    if (showEditForm) {
-      setShowEditForm(false)
-    } else {
-      setShowEditForm(true)
-    }
+  const [showEditFormForBooking, setShowEditFormForBookingId] = useState<number | null>(null)
+  const handleEditBooking = (bookingId: number) => {
+    if (showEditFormForBooking !== bookingId) {
+      setShowEditFormForBookingId(bookingId)
+    } else setShowEditFormForBookingId(null)
   }
 
   const queryClient = useQueryClient()
@@ -112,7 +110,7 @@ export default function MonthOverview() {
   const closeModal = () => {
     setShowModal(false)
     setDate(undefined)
-    setShowEditForm(false)
+    setShowEditFormForBookingId(null)
     setExpandedApartments([])
     setDeleteModalIsOpen(false)
   }
@@ -321,7 +319,7 @@ export default function MonthOverview() {
                                         : `${booking.employeeName} har fra ${formattedStartDate} til ${formattedEndDate}.`}
                                     </span>
                                     <button
-                                      onClick={() => handleEditBooking()}
+                                      onClick={() => handleEditBooking(booking.id)}
                                       className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
                                     >
                                       Rediger
@@ -360,7 +358,7 @@ export default function MonthOverview() {
                                       </div>
                                     </Modal>
                                   </p>
-                                  {showEditForm && (
+                                  {showEditFormForBooking === booking.id && (
                                     <EditBooking
                                       booking={booking}
                                       closeModal={closeModal}
