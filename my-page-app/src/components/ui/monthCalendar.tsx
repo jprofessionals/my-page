@@ -9,6 +9,7 @@ import {
   isSameDay,
   isSunday,
   isWithinInterval,
+  isAfter,
 } from 'date-fns'
 import { Booking } from '@/types'
 import { ComponentProps, useEffect, useState } from 'react'
@@ -22,6 +23,12 @@ const cabinColors: { [key: string]: string } = {
   Annekset: 'bg-teal-annex',
   'Liten leilighet': 'bg-blue-small-appartment',
   'Stor leilighet': 'bg-orange-brand',
+}
+
+const cabinColorsOpacity: { [key: string]: string } = {
+  Annekset: 'bg-teal-200',
+  'Liten leilighet': 'bg-blue-200',
+  'Stor leilighet': 'bg-orange-200',
 }
 
 function MonthCalendar({
@@ -124,7 +131,6 @@ function MonthCalendar({
         ),
         day_selected: 'tw-bg-opacity: 0',
         day_today: cn('text-accent-foreground', 'bg-gray-400'),
-        day_outside: 'text-muted-foreground opacity-50',
         day_disabled: 'text-muted-foreground opacity-50',
         day_range_middle:
           'aria-selected:bg-accent aria-selected:text-accent-foreground',
@@ -170,7 +176,12 @@ function MonthCalendar({
                         'p-2 text-white tooltip tooltip-top shadow-xl',
                         getCabinBookingStyle(props.date, booking),
                         isYourBooking && 'shadow-y-2',
-                        get(cabinColors, booking.apartment?.cabin_name),
+                        isAfter(add(props.date, { days: 1 }), new Date())
+                          ? get(cabinColors, booking.apartment?.cabin_name)
+                          : get(
+                              cabinColorsOpacity,
+                              booking.apartment?.cabin_name,
+                            ),
                         'normal-case',
                       )}
                       {...(windowWidth > 800 && {
