@@ -9,7 +9,6 @@ import {
   isSameDay,
   isSunday,
   isWithinInterval,
-  isBefore,
   isAfter,
 } from 'date-fns'
 import { Booking } from '@/types'
@@ -49,8 +48,6 @@ function MonthCalendar({
   const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
     const startDate = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
     const endDate = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
-
-    const todayDate = format(new Date(), 'yyyy-MM-dd')
 
     const fetchedBookings = await ApiService.getBookings(startDate, endDate)
     return fetchedBookings
@@ -120,7 +117,6 @@ function MonthCalendar({
         ),
         day_selected: 'tw-bg-opacity: 0',
         day_today: cn('text-accent-foreground', 'bg-gray-400'),
-        day_outside: '',
         day_disabled: 'text-muted-foreground opacity-50',
         day_range_middle:
           'aria-selected:bg-accent aria-selected:text-accent-foreground',
