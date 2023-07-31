@@ -38,11 +38,23 @@ function MonthCalendar({
     },
   )
 
-  const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
-    const startDate = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
-    const endDate = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
+  const startDateBookings = format(
+    sub(new Date(), { months: 6, days: 7 }),
+    'yyyy-MM-dd',
+  )
+  const endDateBookings = format(
+    add(new Date(), { months: 12, days: 7 }),
+    'yyyy-MM-dd',
+  )
+  const startDateCalendar = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
+  const endDateCalendar = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
+  //Todo: implement something to prevent people from booking anything on the last day and forward.
 
-    const fetchedBookings = await ApiService.getBookings(startDate, endDate)
+  const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
+    const fetchedBookings = await ApiService.getBookings(
+      startDateBookings,
+      endDateBookings,
+    )
     return fetchedBookings
   })
 
@@ -84,6 +96,8 @@ function MonthCalendar({
       showOutsideDays={showOutsideDays}
       className={cn('p-3 border-none', className)}
       weekStartsOn={1}
+      fromDate={new Date(startDateCalendar)}
+      toDate={new Date(endDateCalendar)}
       classNames={{
         months:
           'flex flex-col sm:flex-row space-y-10 sm:space-x-10 sm:space-y-0',
