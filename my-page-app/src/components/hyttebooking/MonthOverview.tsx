@@ -390,42 +390,42 @@ export default function MonthOverview() {
                   <p>Ingen bookinger for denne dagen</p>
                 </div>
               )}
-              <h3 className="mt-3 mb-1">Ledige hytter:</h3>
-              {vacantApartmentsOnDay.length === 0 ? (
-                <p className="mb-1">Ingen ledige hytter</p>
+              {vacantApartmentsOnDay.length !== 0 ? (
+                <h3 className="mt-3 mb-1">Ledige hytter:</h3>
               ) : (
-                vacantApartmentsOnDay
-                  .sort(
-                    (a, b) =>
-                      cabinOrder.indexOf(a.cabin_name) -
-                      cabinOrder.indexOf(b.cabin_name),
-                  )
-                  .map((apartment, index) => (
-                    <div key={index}>
-                      <p className="mt-1 mb-1">
-                        <span className="apartment-text">
-                          {apartment.cabin_name}
-                        </span>
-                        <button
-                          onClick={() => handleBookClick(apartment.id)}
-                          className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
-                        >
-                          Book
-                        </button>
-                      </p>
-                      {expandedApartments.includes(apartment.id) && (
-                        <div className="expanded-content">
-                          <CreateBookingPost
-                            apartmentId={apartment.id}
-                            date={date}
-                            closeModal={closeModal}
-                            refreshVacancies={refreshVacancies}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))
+                ''
               )}
+              {vacantApartmentsOnDay
+                .sort(
+                  (a, b) =>
+                    cabinOrder.indexOf(a.cabin_name) -
+                    cabinOrder.indexOf(b.cabin_name),
+                )
+                .map((apartment, index) => (
+                  <div key={index}>
+                    <p className="mt-1 mb-1">
+                      <span className="apartment-text">
+                        {apartment.cabin_name}
+                      </span>
+                      <button
+                        onClick={() => handleBookClick(apartment.id)}
+                        className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
+                      >
+                        Book
+                      </button>
+                    </p>
+                    {expandedApartments.includes(apartment.id) && (
+                      <div className="expanded-content">
+                        <CreateBookingPost
+                          apartmentId={apartment.id}
+                          date={date}
+                          closeModal={closeModal}
+                          refreshVacancies={refreshVacancies}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
             </div>
           ) : (
             <div>
