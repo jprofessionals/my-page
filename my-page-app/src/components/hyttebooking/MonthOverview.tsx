@@ -50,12 +50,18 @@ export default function MonthOverview() {
   }
 
   const confirmDelete = () => {
-    handleDeleteBooking(bookingIdToDelete)
+    if (userAdminStatus) {
+      handleAdminDeleteBooking(bookingIdToDelete)
+    } else {handleDeleteBooking(bookingIdToDelete)}
     closeDeleteModal()
   }
 
   const handleDeleteBooking = async (bookingId: number | null) => {
     deleteBooking.mutate(bookingId)
+  }
+
+  const handleAdminDeleteBooking = async (bookingId: number | null) => {
+    adminDeleteBooking.mutate(bookingId)
   }
 
   const deleteBookingByBookingId = async (bookingId: number | null) => {
@@ -67,15 +73,14 @@ export default function MonthOverview() {
       toast.error(`Bookingen din ble ikke slettet med følgende feil: ${error}`)
     }
   }
-
-  const [showEditFormForBooking, setShowEditFormForBookingId] = useState<
-    number | null
-  >(null)
-
-  const handleEditBooking = (bookingId: number) => {
-    if (showEditFormForBooking !== bookingId) {
-      setShowEditFormForBookingId(bookingId)
-    } else setShowEditFormForBookingId(null)
+  const adminDeleteBookingByBookingId = async (bookingId: number | null) => {
+    try {
+      await ApiService.adminDeleteBooking(bookingId)
+      toast.success('Bookingen er slettet')
+      closeModal()
+    } catch (error) {
+      toast.error(`Bookingen ble ikke slettet med følgende feil: ${error}`)
+    }
   }
 
   const queryClient = useQueryClient()
@@ -88,6 +93,25 @@ export default function MonthOverview() {
       console.error('Error:', error)
     },
   })
+  const adminDeleteBooking = useMutation(adminDeleteBookingByBookingId, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('bookings')
+      refreshVacancies()
+    },
+    onError: (error) => {
+      console.error('Error:', error)
+    },
+  })
+
+  const [showEditFormForBooking, setShowEditFormForBookingId] = useState<
+      number | null
+  >(null)
+
+  const handleEditBooking = (bookingId: number) => {
+    if (showEditFormForBooking !== bookingId) {
+      setShowEditFormForBookingId(bookingId)
+    } else setShowEditFormForBookingId(null)
+  }
 
   const handleDateClick = (date: Date) => {
     setDate(date)
@@ -368,6 +392,7 @@ export default function MonthOverview() {
                                       booking={booking}
                                       closeModal={closeModal}
                                       refreshVacancies={refreshVacancies}
+                                      userAdminStatus={userAdminStatus}
                                     />
                                   )}
                                 </div>

@@ -13,11 +13,26 @@ import { useMutation, useQueryClient } from 'react-query'
 const editExistingBooking = async ({
   editedBooking,
   bookingId,
+  userAdminStatus,
 }: {
   editedBooking: EditedBooking
   bookingId: number
+  userAdminStatus: boolean
 }) => {
-  return axios
+  if (userAdminStatus) {
+    return axios.patch(API_URL + 'booking/admin/' + bookingId, editedBooking, {
+      headers: authHeader(),
+    })
+        .then((response) => response.data)
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            throw error.response.data
+          } else {
+            throw 'En feil skjedde under redigeringen, prøv igjen.'
+          }
+        })
+  } else {
+    return axios
     .patch(API_URL + 'booking/' + bookingId, editedBooking, {
       headers: authHeader(),
     })
@@ -29,16 +44,19 @@ const editExistingBooking = async ({
         throw 'En feil skjedde under redigeringen, prøv igjen.'
       }
     })
+  }
 }
 
 const EditBooking = ({
   booking,
   closeModal,
   refreshVacancies,
+  userAdminStatus,
 }: {
   booking: Booking
   closeModal: () => void
   refreshVacancies: () => void
+  userAdminStatus: boolean
 }) => {
   const [startDate, setStartDate] = useState(booking.startDate)
   const [endDate, setEndDate] = useState(booking.endDate)
@@ -73,7 +91,7 @@ const EditBooking = ({
         startDate: startDate,
         endDate: endDate,
       }
-      mutate({ editedBooking, bookingId })
+      mutate({ editedBooking, bookingId, userAdminStatus })
     }
   }
 
@@ -112,7 +130,7 @@ const EditBooking = ({
           </label>
           <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
             <span>
-              Rediger booking
+              Lagre
               <Loading isLoading={isLoadingEdit} />
             </span>
           </Button>
