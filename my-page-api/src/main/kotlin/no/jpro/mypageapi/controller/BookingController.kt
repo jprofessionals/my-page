@@ -288,5 +288,27 @@ class BookingController(
         bookingService.deleteBooking(bookingID)
         return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
     }
+
+    @PostMapping ("/admin/post")
+    @Transactional
+    @RequiresAdmin
+    @Operation(summary = "Admin creates a new booking for a user")
+    @ApiResponse(
+        responseCode = "201",
+        description = "New booking created",
+        content = [Content(schema = Schema(implementation = BookingDTO::class))]
+    )
+    fun adminCreateBooking(
+        token: JwtAuthenticationToken,
+        @Valid @RequestBody bookingRequest: CreateBookingDTO, bookingOwnerName: String,
+    ): ResponseEntity<String> {
+        val bookingOwner = userService.getUserByName(bookingOwnerName)?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        try {
+            bookingService.createBooking(bookingRequest, bookingOwner)
+            return ResponseEntity.ok("A new booking has been successfully created")
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.badRequest().body(e.message)
+        }
+    }
 }
 
