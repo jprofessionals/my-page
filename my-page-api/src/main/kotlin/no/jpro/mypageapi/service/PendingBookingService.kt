@@ -25,39 +25,9 @@ class PendingBookingService(
     private val pendingBookingMapper: PendingBookingMapper
     ) {
 
-    @PersistenceContext
-    private lateinit var entityManager: EntityManager
-    fun getOldBookingsWithinDates(wishStartDate: LocalDate, wishEndDate: LocalDate): List<Booking> {
-        val query = entityManager.createQuery(
-            "SELECT b FROM Booking b " +
-                    "WHERE (:wishStartDate BETWEEN b.startDate AND b.endDate " +
-                    "OR :wishEndDate BETWEEN b.startDate AND b.endDate) " +
-                    "OR (b.startDate BETWEEN :wishStartDate AND :wishEndDate " +
-                    "AND b.endDate BETWEEN :wishStartDate AND :wishEndDate)",
-            Booking::class.java
-        )
-        query.setParameter("wishStartDate", wishStartDate)
-        query.setParameter("wishEndDate", wishEndDate)
-        return query.resultList
-    }
-
-    fun filterOverlappingBookings(apartmentId: Long, wishStartDate: LocalDate, wishEndDate: LocalDate): List<Booking> {
-        val bookingsOverlappingWishedBooking = getOldBookingsWithinDates(wishStartDate, wishEndDate)
-
-        val filteredBookings = bookingsOverlappingWishedBooking.filter { booking ->
-            booking.apartment?.id == apartmentId &&
-                    ((wishStartDate.isBefore(booking.endDate) && (wishEndDate.isAfter(booking.startDate))) ||
-                            (wishStartDate.isBefore(booking.endDate) && (wishEndDate.isAfter(booking.endDate))) ||
-                            (wishStartDate.isAfter(booking.startDate) && (wishEndDate.isBefore(booking.endDate))) ||
-                            (wishStartDate.isBefore(booking.startDate) && (wishEndDate.isAfter(booking.endDate))))
-        }
-        return filteredBookings
-    }
-
-
     fun createPendingBooking(bookingRequest: CreatePendingBookingDTO, createdBy: User): PendingBookingDTO {
         val apartment = bookingService.getApartment(bookingRequest.apartmentID)
-        val checkBookingAvailable = filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
+        val checkBookingAvailable = bookingService.filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
 
         if(checkBookingAvailable.isEmpty()) {
             val pendingBooking = pendingBookingMapper.toPendingBooking(
@@ -71,5 +41,10 @@ class PendingBookingService(
             throw IllegalArgumentException("Ikke mulig å opprette bookingen.")
         }
     }
+
+
+
+
+
 
 }
