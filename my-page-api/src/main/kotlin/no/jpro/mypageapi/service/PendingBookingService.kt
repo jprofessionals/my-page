@@ -16,6 +16,7 @@ import no.jpro.mypageapi.utils.mapper.BookingMapper
 import no.jpro.mypageapi.utils.mapper.PendingBookingMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.util.*
 
 @Service
 
@@ -70,6 +71,12 @@ class PendingBookingService(
         } else {
             throw IllegalArgumentException("Ikke mulig å opprette bookingen.")
         }
+    }
+
+    fun getBookingsBetweenDates(startDate: LocalDate, endDate: LocalDate): List<PendingBookingDTO> {
+        val pendingBookings =
+            pendingBookingRepository.findPendingBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(startDate, endDate)
+        return pendingBookings.map { pendingBookingMapper.toPendingBookingDTO(it) }
     }
 
 }
