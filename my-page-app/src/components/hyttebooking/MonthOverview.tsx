@@ -52,7 +52,9 @@ export default function MonthOverview() {
   const confirmDelete = () => {
     if (userAdminStatus) {
       handleAdminDeleteBooking(bookingIdToDelete)
-    } else {handleDeleteBooking(bookingIdToDelete)}
+    } else {
+      handleDeleteBooking(bookingIdToDelete)
+    }
     closeDeleteModal()
   }
 
@@ -104,7 +106,7 @@ export default function MonthOverview() {
   })
 
   const [showEditFormForBooking, setShowEditFormForBookingId] = useState<
-      number | null
+    number | null
   >(null)
 
   const handleEditBooking = (bookingId: number) => {
@@ -446,6 +448,7 @@ export default function MonthOverview() {
                           date={date}
                           closeModal={closeModal}
                           refreshVacancies={refreshVacancies}
+                          userAdminStatus={userAdminStatus}
                         />
                       </div>
                     )}

@@ -20,30 +20,31 @@ const editExistingBooking = async ({
   userAdminStatus: boolean
 }) => {
   if (userAdminStatus) {
-    return axios.patch(API_URL + 'booking/admin/' + bookingId, editedBooking, {
-      headers: authHeader(),
-    })
-        .then((response) => response.data)
-        .catch((error) => {
-          if (error.response && error.response.data) {
-            throw error.response.data
-          } else {
-            throw 'En feil skjedde under redigeringen, prøv igjen.'
-          }
-        })
+    return axios
+      .patch(API_URL + 'booking/admin/' + bookingId, editedBooking, {
+        headers: authHeader(),
+      })
+      .then((response) => response.data)
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          throw error.response.data
+        } else {
+          throw 'En feil skjedde under redigeringen, prøv igjen.'
+        }
+      })
   } else {
     return axios
-    .patch(API_URL + 'booking/' + bookingId, editedBooking, {
-      headers: authHeader(),
-    })
-    .then((response) => response.data)
-    .catch((error) => {
-      if (error.response && error.response.data) {
-        throw error.response.data
-      } else {
-        throw 'En feil skjedde under redigeringen, prøv igjen.'
-      }
-    })
+      .patch(API_URL + 'booking/' + bookingId, editedBooking, {
+        headers: authHeader(),
+      })
+      .then((response) => response.data)
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          throw error.response.data
+        } else {
+          throw 'En feil skjedde under redigeringen, prøv igjen.'
+        }
+      })
   }
 }
 
