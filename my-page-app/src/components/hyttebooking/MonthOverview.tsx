@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { MonthCalendar } from '@/components/ui/monthCalendar'
-import ApiService from '@/services/api.service'
-import { Apartment, Booking } from '@/types'
+import ApiService, {API_URL} from '@/services/api.service'
+import {Apartment, Booking, User} from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { add, format, sub } from 'date-fns'
@@ -33,6 +33,17 @@ export default function MonthOverview() {
     } catch (e) {
       toast.error('Kunne ikke hente brukers admin status')
     }
+  }
+
+  const [allUsersNames, setAllUsersNames] = useState<string[]>([])
+  const fetchAllUsers = async () => {
+    const response = await ApiService.getUsers()
+    const users = response.data
+    const usersNames: string[] = []
+    for (const user of users) {
+      usersNames.push(user.name)
+    }
+    setAllUsersNames(usersNames)
   }
 
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
@@ -205,6 +216,7 @@ export default function MonthOverview() {
       refreshVacancies()
       getAllApartments()
       userIsAdmin()
+      fetchAllUsers()
     }
   }, [userFetchStatus, vacancyLoadingStatus])
 
@@ -449,6 +461,7 @@ export default function MonthOverview() {
                           closeModal={closeModal}
                           refreshVacancies={refreshVacancies}
                           userAdminStatus={userAdminStatus}
+                          allUsersNames = {allUsersNames}
                         />
                       </div>
                     )}

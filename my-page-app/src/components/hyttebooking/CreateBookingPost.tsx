@@ -16,6 +16,7 @@ type Props = {
   closeModal: () => void
   refreshVacancies: Function
   userAdminStatus: boolean
+  allUsersNames: string[]
 }
 const createBooking = async ({
   bookingPost,
@@ -24,7 +25,7 @@ const createBooking = async ({
 }: {
   bookingPost: BookingPost
   userAdminStatus: boolean
-  bookingOwnerName: String
+  bookingOwnerName: string
 }) => {
   if (userAdminStatus) {
     return axios
@@ -61,11 +62,13 @@ const CreateBookingPost = ({
   closeModal,
   refreshVacancies,
   userAdminStatus,
+  allUsersNames,
 }: Props) => {
   const [startDate, setStartDate] = useState(moment(date).format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(moment(date).format('YYYY-MM-DD'))
   const [isLoadingPost, setIsLoadingPost] = useState(false)
-  const [bookingOwnerName, setBookingOwnerName] = useState('')
+  const [bookingOwnerName, setBookingOwnerName] = useState<string>('')
+  const [showDropdown, setShowDropdown] = useState(false)
 
   const isValid =
     startDate < endDate && moment(endDate).diff(startDate, 'days') <= 7
@@ -108,7 +111,7 @@ const CreateBookingPost = ({
   const handleEndDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEndDate(e.target.value)
   }
-  const handleBookingOwnerNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleBookingOwnerNameChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setBookingOwnerName(e.target.value)
   }
 
@@ -120,14 +123,19 @@ const CreateBookingPost = ({
             <>
               <strong> Navn: </strong>
               <label>
-                <input
-                  type="string"
+                <select
                   className="w-48 input input-bordered input-sm"
                   name="bookingOwnerName"
                   onChange={handleBookingOwnerNameChange}
                   value={bookingOwnerName}
-                  placeholder="Navn Navnesen"
-                />
+                >
+                  <option value="">Velg navn</option>
+                  {allUsersNames.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
               </label>
             </>
           ) : (
