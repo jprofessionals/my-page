@@ -68,7 +68,6 @@ const CreateBookingPost = ({
   const [endDate, setEndDate] = useState(moment(date).format('YYYY-MM-DD'))
   const [isLoadingPost, setIsLoadingPost] = useState(false)
   const [bookingOwnerName, setBookingOwnerName] = useState<string>('')
-  const [showDropdown, setShowDropdown] = useState(false)
 
   const isValid =
     startDate < endDate && moment(endDate).diff(startDate, 'days') <= 7
