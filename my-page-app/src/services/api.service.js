@@ -140,6 +140,33 @@ const deleteBooking = (bookingId) => {
   })
 }
 
+const getPendingBookings = (startDate, endDate) => {
+  const params = {
+    startDate: startDate,
+    endDate: endDate,
+  }
+
+  return axios
+    .get(API_URL + 'pendingBooking', {
+      headers: authHeader(),
+      params: params,
+    })
+    .then((response) => {
+      const pendingBookings = response.data
+      return pendingBookings.map((pendingBooking) => ({
+        id: String(pendingBooking.id),
+        startDate: pendingBooking.startDate,
+        endDate: pendingBooking.endDate,
+        createdDate: pendingBooking.createdDate,
+        apartment: {
+          id: pendingBooking.apartment.id,
+          cabin_name: pendingBooking.apartment.cabin_name,
+        },
+        employeeName: pendingBooking.employeeName,
+      }))
+    })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -154,5 +181,6 @@ const ApiService = {
   getAllVacancies,
   getAllApartments,
   deleteBooking,
+  getPendingBookings,
 }
 export default ApiService

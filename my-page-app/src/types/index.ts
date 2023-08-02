@@ -99,3 +99,12 @@ export type EditedBooking = {
   startDate: string
   endDate: string
 }
+
+export type PendingBooking = {
+  id: number
+  employeeName: string
+  apartment: Apartment
+  startDate: string
+  endDate: string
+  createdDate: string
+}

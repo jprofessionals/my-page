@@ -11,7 +11,7 @@ import {
   isWithinInterval,
   isAfter,
 } from 'date-fns'
-import { Booking } from '@/types'
+import { Booking, PendingBooking } from '@/types'
 import { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import ApiService from '@/services/api.service'
@@ -29,6 +29,12 @@ const cabinColorsOpacity: { [key: string]: string } = {
   Annekset: 'bg-teal-200',
   'Liten leilighet': 'bg-blue-200',
   'Stor leilighet': 'bg-orange-200',
+}
+
+const pendingBookingCabinColors: { [key: string]: string } = {
+  Annekset: 'bg-green-200',
+  'Liten leilighet': 'bg-purple-200',
+  'Stor leilighet': 'bg-yellow-200',
 }
 
 function MonthCalendar({
@@ -69,6 +75,26 @@ function MonthCalendar({
     return (
       bookings?.filter(
         (booking) => date >= booking.startDate && date <= booking.endDate,
+      ) || []
+    )
+  }
+
+  const { data: pendingBookings } = useQuery<PendingBooking[]>(
+    'pendingBookings',
+    async () => {
+      const fetchedPendingBookings = await ApiService.getPendingBookings(
+        startDateBookings,
+        endDateBookings,
+      )
+      return fetchedPendingBookings
+    },
+  )
+
+  const getPendingBookings = (date: string) => {
+    return (
+      pendingBookings?.filter(
+        (pendingBooking) =>
+          date >= pendingBooking.startDate && date <= pendingBooking.endDate,
       ) || []
     )
   }
@@ -143,6 +169,9 @@ function MonthCalendar({
         DayContent: (props) => {
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
+          const pendingBookingList = getPendingBookings(
+            format(props.date, 'yyyy-MM-dd'),
+          )
 
           const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
 
@@ -201,10 +230,44 @@ function MonthCalendar({
             )
           })
 
+          const cabinPendingBookings = cabinOrder.map((cabin) => {
+            const cabinPendingBookings = pendingBookingList.filter(
+              (pendingBooking) =>
+                pendingBooking.apartment?.cabin_name === cabin,
+            )
+            return cabinPendingBookings.length > 0 ? (
+              <div
+                key={cabin}
+                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
+              >
+                {cabinPendingBookings.map((pendingBooking) => {
+                  return (
+                    <span
+                      key={pendingBooking.id}
+                      className={cn(
+                        getCabinPendingBookingStyle(props.date, pendingBooking),
+                        get(
+                          pendingBookingCabinColors,
+                          pendingBooking.apartment?.cabin_name,
+                        ),
+                        'normal-case',
+                      )}
+                    ></span>
+                  )
+                })}
+              </div>
+            ) : (
+              <div key={cabin} className="invisible h-4 md:h-8">
+                hey
+              </div>
+            )
+          })
+
           return (
             <>
               {dateCalendar}
               {cabinBookings}
+              {cabinPendingBookings}
             </>
           )
         },
@@ -231,6 +294,44 @@ const getCabinBookingStyle = (date: Date, booking: Booking) => {
   const { isFirstDay, isLastDay, isInInterval } = getBookingDateInfo(
     date,
     booking,
+  )
+  return cn(
+    isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
+    isFirstDay && !isSunday(date) && 'md:-mr-2',
+    isLastDay && 'rounded-r-full col-start-1 row-start-1',
+    isLastDay && !isMonday(date) && 'md:-ml-2',
+    isInInterval && 'col-span-2 ',
+    isInInterval && !isMonday(date) && 'md:-ml-1',
+    isInInterval && !isSunday(date) && 'md:-mr-1',
+  )
+}
+
+const getPendingBookingDateInfo = (
+  date: Date,
+  pendingBooking: PendingBooking,
+) => {
+  const isFirstDay = isSameDay(
+    new Date(date),
+    new Date(pendingBooking.startDate),
+  )
+  const isLastDay = isSameDay(new Date(date), new Date(pendingBooking.endDate))
+  const isInInterval =
+    isWithinInterval(new Date(date), {
+      start: new Date(pendingBooking.startDate),
+      end: new Date(pendingBooking.endDate),
+    }) &&
+    !isFirstDay &&
+    !isLastDay
+  return { isFirstDay, isLastDay, isInInterval }
+}
+
+const getCabinPendingBookingStyle = (
+  date: Date,
+  pendingBooking: PendingBooking,
+) => {
+  const { isFirstDay, isLastDay, isInInterval } = getPendingBookingDateInfo(
+    date,
+    pendingBooking,
   )
   return cn(
     isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
