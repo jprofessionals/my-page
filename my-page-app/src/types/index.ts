@@ -100,11 +100,6 @@ export type EditedBooking = {
   endDate: string
 }
 
-export type PendingBooking = {
-  id: number
-  employeeName: string
-  apartment: Apartment
-  startDate: string
-  endDate: string
+export type PendingBooking = Booking & {
   createdDate: string
 }

@@ -183,78 +183,87 @@ function MonthCalendar({
               return result
             }, {})
 
-          const cabinBookings = cabinOrder.map((cabin) => {
-            const cabinBookings = bookingsByCabin[cabin] || []
-            return cabinBookings.length > 0 ? (
-              <div
-                key={cabin}
-                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
-              >
-                {cabinBookings.map((booking) => {
-                  const isYourBooking = yourBookings?.some(
-                    (yourBooking) => yourBooking.id === booking.id,
-                  )
-                  const { isFirstDay, isLastDay } = getBookingDateInfo(
-                    props.date,
-                    booking,
-                  )
-                  return (
-                    <span
-                      key={booking.id}
-                      className={cn(
-                        'p-2 text-white tooltip tooltip-top shadow-xl',
-                        getCabinBookingStyle(props.date, booking),
-                        isYourBooking && 'shadow-y-2',
-                        isAfter(add(props.date, { days: 1 }), new Date())
-                          ? get(cabinColors, booking.apartment?.cabin_name)
-                          : get(
-                              cabinColorsOpacity,
-                              booking.apartment?.cabin_name,
-                            ),
-                        'normal-case',
-                      )}
-                      {...(windowWidth > 800 && {
-                        'data-tip': `Booket av: ${booking.employeeName}`,
-                      })}
-                    >
-                      {(isFirstDay || isLastDay) &&
-                        getInitials(booking.employeeName)}
-                    </span>
-                  )
-                })}
-              </div>
-            ) : (
-              <div key={cabin} className="invisible h-4 md:h-8">
-                hey
-              </div>
+          const pendingBookingsByCabin: { [key: string]: PendingBooking[] } =
+            cabinOrder.reduce(
+              (result: { [key: string]: PendingBooking[] }, cabin) => {
+                result[cabin] = pendingBookingList.filter(
+                  (pendingBooking) =>
+                    pendingBooking.apartment?.cabin_name === cabin,
+                )
+                return result
+              },
+              {},
             )
-          })
 
-          const cabinPendingBookings = cabinOrder.map((cabin) => {
-            const cabinPendingBookings = pendingBookingList.filter(
-              (pendingBooking) =>
-                pendingBooking.apartment?.cabin_name === cabin,
-            )
-            return cabinPendingBookings.length > 0 ? (
+          const getCabinItems = (cabin: string) => {
+            const cabinBookings = bookingsByCabin[cabin] || []
+            const cabinPendingBookings = pendingBookingsByCabin[cabin] || []
+
+            const allItems: (Booking | PendingBooking)[] = [
+              ...cabinBookings,
+              ...cabinPendingBookings,
+            ]
+
+            return allItems
+              .sort((a, b) => (a.id < b.id ? -1 : 1))
+              .map((item) => {
+                const isBooking = bookingList.some(
+                  (booking) => booking.id === item.id,
+                )
+                const isYourBooking = yourBookings?.some(
+                  (yourBooking) => yourBooking.id === item.id,
+                )
+                const { isFirstDay, isLastDay } = isBooking
+                  ? getBookingDateInfo(props.date, item as Booking)
+                  : getPendingBookingDateInfo(
+                      props.date,
+                      item as PendingBooking,
+                    )
+
+                return (
+                  <span
+                    key={item.id}
+                    className={cn(
+                      'p-2 text-white tooltip tooltip-top shadow-xl',
+                      getCabinBookingStyle(props.date, item),
+                      isYourBooking && 'shadow-y-2',
+                      isAfter(add(props.date, { days: 1 }), new Date())
+                        ? isBooking
+                          ? get(cabinColors, item.apartment?.cabin_name)
+                          : get(
+                              pendingBookingCabinColors,
+                              item.apartment?.cabin_name,
+                            )
+                        : isBooking
+                        ? get(cabinColorsOpacity, item.apartment?.cabin_name)
+                        : get(
+                            pendingBookingCabinColors,
+                            item.apartment?.cabin_name,
+                          ),
+                      'normal-case',
+                    )}
+                    {...(windowWidth > 800 && isBooking && {
+                      'data-tip': `${
+                        isBooking ? 'Booket av' : 'Pending booking by'
+                      }: ${item.employeeName}`,
+                    })}
+                  >
+                    {isBooking && (isFirstDay || isLastDay) &&
+                      getInitials(item.employeeName)}
+                  </span>
+                )
+              })
+          }
+
+          const cabinItems = cabinOrder.map((cabin) => {
+            const items = getCabinItems(cabin)
+
+            return items.length > 0 ? (
               <div
                 key={cabin}
                 className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
               >
-                {cabinPendingBookings.map((pendingBooking) => {
-                  return (
-                    <span
-                      key={pendingBooking.id}
-                      className={cn(
-                        getCabinPendingBookingStyle(props.date, pendingBooking),
-                        get(
-                          pendingBookingCabinColors,
-                          pendingBooking.apartment?.cabin_name,
-                        ),
-                        'normal-case',
-                      )}
-                    ></span>
-                  )
-                })}
+                {items}
               </div>
             ) : (
               <div key={cabin} className="invisible h-4 md:h-8">
@@ -266,8 +275,7 @@ function MonthCalendar({
           return (
             <>
               {dateCalendar}
-              {cabinBookings}
-              {cabinPendingBookings}
+              {cabinItems}
             </>
           )
         },
