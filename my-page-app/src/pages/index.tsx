@@ -157,12 +157,12 @@ export default function HomePage() {
                           .map((booking, index) => {
                             const startDate = new Date(booking.startDate)
                             const endDate = new Date(booking.endDate)
-                            const formattedStartDate = `${startDate.getDate()}-${
+                            const formattedStartDate = `${startDate.getDate()}.${
                               startDate.getMonth() + 1
-                            }-${startDate.getFullYear()}`
-                            const formattedEndDate = `${endDate.getDate()}-${
+                            }.${startDate.getFullYear()}`
+                            const formattedEndDate = `${endDate.getDate()}.${
                               endDate.getMonth() + 1
-                            }-${endDate.getFullYear()}`
+                            }.${endDate.getFullYear()}`
 
                             return (
                               <div key={booking.id} className="ml-10 mt-3 ">

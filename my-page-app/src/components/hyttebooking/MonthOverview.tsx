@@ -260,7 +260,7 @@ export default function MonthOverview() {
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 prose">
           {date ? (
             <div>
-              <h3 className="mt-1 mb-1">{format(date, 'dd-MM-yyyy')}</h3>
+              <h3 className="mt-1 mb-1">{format(date, 'dd.MM.yyyy')}</h3>
               {bookingItems.length > 0 ? (
                 <div>
                   {bookingItems
@@ -285,8 +285,8 @@ export default function MonthOverview() {
                     .map((booking, index) => {
                       const startDate = new Date(booking.startDate)
                       const endDate = new Date(booking.endDate)
-                      const formattedStartDate = format(startDate, 'dd-MM-yyyy')
-                      const formattedEndDate = format(endDate, 'dd-MM-yyyy')
+                      const formattedStartDate = format(startDate, 'dd.MM.yyyy')
+                      const formattedEndDate = format(endDate, 'dd.MM.yyyy')
 
                       const isYourBooking = yourBookings?.some(
                         (yourBooking) => yourBooking.id === booking.id,
