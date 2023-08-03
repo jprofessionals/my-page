@@ -18,6 +18,8 @@ import { faHotel, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import cn from '@/utils/cn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { get } from 'radash'
+import Modal from "react-modal";
+import {useMutation, useQuery, useQueryClient} from "react-query";
 
 const BudgetList = dynamic(() => import('@/components/budget/BudgetList'), {
   ssr: false,
@@ -40,6 +42,21 @@ export default function HomePage() {
   const [bookingLoadingStatus, setBookingLoadingStatus] =
     useState<BookingLoadingStatus>('init')
 
+  const customModalStyles = {
+    content: {
+      width: 'auto',
+      minWidth: '300px',
+      margin: 'auto',
+      maxHeight: '80vh',
+      overflow: 'auto',
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      transform: 'translate(-50%, -50%)',
+    },
+  }
+
   const refreshBookings = useCallback(async () => {
     setBookingLoadingStatus('loading')
 
@@ -57,6 +74,51 @@ export default function HomePage() {
     if (bookingLoadingStatus !== 'init') return
     if (userFetchStatus === 'fetched') refreshBookings()
   }, [userFetchStatus, bookingLoadingStatus])
+
+  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
+  const [bookingIdToDelete, setBookingIdToDelete] = useState<number | null>(
+      null,
+  )
+
+  const openDeleteModal = (bookingId: number | null) => {
+    setBookingIdToDelete(bookingId)
+    setDeleteModalIsOpen(true)
+  }
+
+  const closeDeleteModal = () => {
+    setDeleteModalIsOpen(false)
+  }
+
+  const confirmDelete = async () => {
+    if (bookingIdToDelete) {
+      await handleDeleteBooking(bookingIdToDelete)
+      closeDeleteModal()
+    }
+  }
+
+  const handleDeleteBooking = async (bookingId: number | null) => {
+    deleteBooking.mutate(bookingId)
+  }
+
+  const deleteBookingByBookingId = async (bookingId: number | null) => {
+    try {
+      await ApiService.deleteBooking(bookingId)
+      toast.success('Reservasjonen din er slettet')
+    } catch (error) {
+      toast.error(
+          `Reservasjonen din ble ikke slettet med følgende feil: ${error}`,
+      )
+    }
+  }
+
+  const deleteBooking = useMutation(deleteBookingByBookingId, {
+    onSuccess: () => {
+      refreshBookings()
+    },
+    onError: (error) => {
+      console.error('Error:', error)
+    },
+  })
 
   const refreshBudgets = useCallback(async () => {
     setBudgetLoadingStatus('loading')
@@ -164,7 +226,7 @@ export default function HomePage() {
                             }.${endDate.getFullYear()}`
 
                             return (
-                              <div key={booking.id} className="ml-10 mt-3 ">
+                              <div key={booking.id} className="ml-10 mt-3">
                                 <p>
                                   Du har reservert{' '}
                                   <span
@@ -178,6 +240,43 @@ export default function HomePage() {
                                   </span>{' '}
                                   fra {formattedStartDate} til{' '}
                                   {formattedEndDate}
+                                  <button
+
+                                      className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md ml-3"
+                                  >
+                                    Rediger
+                                  </button>
+                                  <button
+                                      onClick={() => openDeleteModal(booking.id)}
+                                      className="bg-red-not-available text-white px-2 py-0.5 rounded-md ml-2"
+                                  >
+                                    Slett
+                                  </button>
+                                  <Modal
+                                      isOpen={deleteModalIsOpen}
+                                      onRequestClose={closeDeleteModal}
+                                      contentLabel="Delete Confirmation"
+                                      style={customModalStyles}
+                                  >
+                                    <p className="mb-3">
+                                      Er du sikker på at du vil slette
+                                      reservasjonen?
+                                    </p>
+                                    <div className="flex justify-end">
+                                      <button
+                                          onClick={confirmDelete}
+                                          className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                                      >
+                                        Slett reservasjon
+                                      </button>
+                                      <button
+                                          onClick={closeDeleteModal}
+                                          className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                                      >
+                                        Avbryt
+                                      </button>
+                                    </div>
+                                  </Modal>
                                 </p>
                                 {index !== bookings.length - 1 && (
                                   <hr className="mt-3" />
