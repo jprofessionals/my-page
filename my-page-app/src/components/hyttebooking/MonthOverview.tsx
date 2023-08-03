@@ -165,7 +165,7 @@ export default function MonthOverview() {
 
   const startDateVacancies = format(sub(new Date(), { days: 1 }), 'yyyy-MM-dd')
   //const endDateVacancies = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
-  const cutOffDateVacancies: string = '2023-10-01'
+  const cutOffDateVacancies = '2023-10-01'
   //TODO: Hardkodet cutoff date som styrer hva man kan booke.
   const refreshVacancies = useCallback(async () => {
     setVacancyLoadingStatus('loading')
@@ -260,6 +260,7 @@ export default function MonthOverview() {
         selected={date}
         onSelect={setDate}
         className="rounded-md border"
+        cutOffDateVacancies={cutOffDateVacancies}
       />
       <Modal
         className=""
