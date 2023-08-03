@@ -18,8 +18,9 @@ import { faHotel, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import cn from '@/utils/cn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { get } from 'radash'
-import Modal from "react-modal";
-import {useMutation, useQuery, useQueryClient} from "react-query";
+import Modal from "react-modal"
+import {useMutation, useQuery, useQueryClient} from "react-query"
+import { useRouter } from 'next/router'
 
 const BudgetList = dynamic(() => import('@/components/budget/BudgetList'), {
   ssr: false,
@@ -32,6 +33,7 @@ type BudgetLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
 type BookingLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
 
 export default function HomePage() {
+  const router = useRouter()
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [budgetLoadingStatus, setBudgetLoadingStatus] =
     useState<BudgetLoadingStatus>('init')
@@ -119,6 +121,10 @@ export default function HomePage() {
       console.error('Error:', error)
     },
   })
+
+  const handleEditBooking = () => {
+    router.push('http://localhost:3000/hyttebooking')
+  }
 
   const refreshBudgets = useCallback(async () => {
     setBudgetLoadingStatus('loading')
@@ -241,7 +247,7 @@ export default function HomePage() {
                                   fra {formattedStartDate} til{' '}
                                   {formattedEndDate}
                                   <button
-
+                                      onClick={handleEditBooking}
                                       className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md ml-3"
                                   >
                                     Rediger
