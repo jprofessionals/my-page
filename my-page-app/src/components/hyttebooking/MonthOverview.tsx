@@ -384,7 +384,6 @@ export default function MonthOverview() {
                   })}
               </div>
               <h3 className="mt-3 mb-1">Ledige hytter:</h3>
-              <p className = "">
               {vacantApartmentsOnDay.length === 0 ? (
                 <p className="mb-1">Ingen ledige hytter</p>
               ) : (
@@ -420,7 +419,6 @@ export default function MonthOverview() {
                     </div>
                   ))
               )}
-              </p>
             </div>
           ) : (
             <div>
