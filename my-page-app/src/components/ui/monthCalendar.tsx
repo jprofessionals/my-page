@@ -55,7 +55,6 @@ function MonthCalendar({
   )
   const startDateCalendar = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
   const endDateCalendar = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
-  //Todo: implement something to prevent people from booking anything on the last day and forward.
 
   const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
     const fetchedBookings = await ApiService.getBookings(
