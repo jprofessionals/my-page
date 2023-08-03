@@ -10,6 +10,8 @@ import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
+const cutOffDateVacancies = '2023-10-01'
+//TODO: Hardkodet cutoff date som styrer hva man kan booke.
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
   const [showModal, setShowModal] = useState(false)
@@ -90,18 +92,11 @@ export default function MonthOverview() {
       console.error('Error:', error)
     },
   })
-
-  const [isDateValidForReservation, setIsDateValidForReservation] =
-    useState(true)
   const handleDateClick = (date: Date) => {
     setDate(date)
     fetchBookingItems(date)
     getVacancyForDay(date)
     setShowModal(true)
-
-setIsDateValidForReservation(
-    isBefore(date, new Date(cutOffDateVacancies))
-)
   }
 
   const customModalStyles = {
@@ -163,8 +158,6 @@ setIsDateValidForReservation(
 
   const startDateVacancies = format(sub(new Date(), { days: 1 }), 'yyyy-MM-dd')
   //const endDateVacancies = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
-  const cutOffDateVacancies = '2023-10-01'
-  //TODO: Hardkodet cutoff date som styrer hva man kan booke.
   const refreshVacancies = useCallback(async () => {
     setVacancyLoadingStatus('loading')
 
@@ -271,8 +264,8 @@ setIsDateValidForReservation(
           {date ? (
             <div>
               <h3 className="mt-1 mb-1">{format(date, 'dd.MM.yyyy')}</h3>
-              {isDateValidForReservation ? (
-                ''
+              {isBefore(date, new Date(cutOffDateVacancies)) ? (
+                null
               ) : (
                 <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
               )}
@@ -400,7 +393,7 @@ setIsDateValidForReservation(
               {vacantApartmentsOnDay.length !== 0 ? (
                 <h3 className="mt-3 mb-1">Ledige hytter:</h3>
               ) : (
-                ''
+                null
               )}
               {vacantApartmentsOnDay
                 .sort(
