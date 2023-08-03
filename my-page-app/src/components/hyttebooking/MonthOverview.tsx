@@ -99,11 +99,9 @@ export default function MonthOverview() {
     getVacancyForDay(date)
     setShowModal(true)
 
-    if (isBefore(date, new Date(cutOffDateVacancies))) {
-      setIsDateValidForReservation(true)
-    } else {
-      setIsDateValidForReservation(false)
-    }
+setIsDateValidForReservation(
+    isBefore(date, new Date(cutOffDateVacancies))
+)
   }
 
   const customModalStyles = {
