@@ -53,7 +53,7 @@ const EditBooking = ({
       closeModal()
       queryClient.invalidateQueries('bookings')
       setIsLoadingEdit(false)
-      toast.success('Redigert booking')
+      toast.success('Redigert reservasjon')
       refreshVacancies()
     },
     onError: (error: string) => {
@@ -112,7 +112,7 @@ const EditBooking = ({
           </label>
           <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
             <span>
-              Rediger booking
+              Lagre
               <Loading isLoading={isLoadingEdit} />
             </span>
           </Button>

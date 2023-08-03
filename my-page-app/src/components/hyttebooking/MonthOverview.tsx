@@ -61,10 +61,12 @@ export default function MonthOverview() {
   const deleteBookingByBookingId = async (bookingId: number | null) => {
     try {
       await ApiService.deleteBooking(bookingId)
-      toast.success('Bookingen din er slettet')
+      toast.success('Reservasjonen din er slettet')
       closeModal()
     } catch (error) {
-      toast.error(`Bookingen din ble ikke slettet med følgende feil: ${error}`)
+      toast.error(
+        `Reservasjonen din ble ikke slettet med følgende feil: ${error}`,
+      )
     }
   }
 
@@ -159,7 +161,6 @@ export default function MonthOverview() {
     try {
       const startDate = format(sub(new Date(), { days: 1 }), 'yyyy-MM-dd')
       const endDate = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
-      //Todo: change the start and enddates later once booking is in place so it is more than just a month but six months back and twelve months forward. These control the time period in which vacancies will be searched for.
 
       const loadedVacancies = await ApiService.getAllVacancies(
         startDate,
@@ -169,7 +170,7 @@ export default function MonthOverview() {
       setVacancies(loadedVacancies)
     } catch (e) {
       setVacancyLoadingStatus('failed')
-      toast.error('Klarte ikke laste ledige bookinger, prøv igjen senere')
+      toast.error('Klarte ikke laste ledige reservasjoner, prøv igjen senere')
     }
   }, [])
 
@@ -260,136 +261,128 @@ export default function MonthOverview() {
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 prose">
           {date ? (
             <div>
-              <h3 className="mt-1 mb-1">{format(date, 'dd-MM-yyyy')}</h3>
-              {bookingItems.length > 0 ? (
-                <div>
-                  {bookingItems
-                    .sort((a, b) => {
-                      const cabinIndexA = cabinOrder.indexOf(
-                        a.apartment.cabin_name,
-                      )
-                      const cabinIndexB = cabinOrder.indexOf(
-                        b.apartment.cabin_name,
-                      )
+              <h3 className="mt-1 mb-1">{format(date, 'dd.MM.yyyy')}</h3>
+              <div>
+                {bookingItems
+                  .sort((a, b) => {
+                    const cabinIndexA = cabinOrder.indexOf(
+                      a.apartment.cabin_name,
+                    )
+                    const cabinIndexB = cabinOrder.indexOf(
+                      b.apartment.cabin_name,
+                    )
 
-                      if (cabinIndexA !== cabinIndexB) {
-                        return cabinIndexA - cabinIndexB
-                      }
-                      const startDateComparison =
-                        Date.parse(a.startDate) - Date.parse(b.startDate)
-                      if (startDateComparison !== 0) {
-                        return startDateComparison
-                      }
-                      return Date.parse(a.endDate) - Date.parse(b.endDate)
-                    })
-                    .map((booking, index) => {
-                      const startDate = new Date(booking.startDate)
-                      const endDate = new Date(booking.endDate)
-                      const formattedStartDate = format(startDate, 'dd-MM-yyyy')
-                      const formattedEndDate = format(endDate, 'dd-MM-yyyy')
+                    if (cabinIndexA !== cabinIndexB) {
+                      return cabinIndexA - cabinIndexB
+                    }
+                    const startDateComparison =
+                      Date.parse(a.startDate) - Date.parse(b.startDate)
+                    if (startDateComparison !== 0) {
+                      return startDateComparison
+                    }
+                    return Date.parse(a.endDate) - Date.parse(b.endDate)
+                  })
+                  .map((booking, index) => {
+                    const startDate = new Date(booking.startDate)
+                    const endDate = new Date(booking.endDate)
+                    const formattedStartDate = format(startDate, 'dd.MM.yyyy')
+                    const formattedEndDate = format(endDate, 'dd.MM.yyyy')
 
-                      const isYourBooking = yourBookings?.some(
-                        (yourBooking) => yourBooking.id === booking.id,
-                      )
+                    const isYourBooking = yourBookings?.some(
+                      (yourBooking) => yourBooking.id === booking.id,
+                    )
 
-                      const prevCabinName =
-                        index > 0
-                          ? bookingItems[index - 1].apartment.cabin_name
-                          : null
-                      const currentCabinName = booking.apartment.cabin_name
-                      const shouldRenderDivider =
-                        prevCabinName !== currentCabinName
+                    const prevCabinName =
+                      index > 0
+                        ? bookingItems[index - 1].apartment.cabin_name
+                        : null
+                    const currentCabinName = booking.apartment.cabin_name
+                    const shouldRenderDivider =
+                      prevCabinName !== currentCabinName
 
-                      return (
-                        <div key={booking.id}>
-                          {shouldRenderDivider && (
-                            <h4
-                              className={`mt-2 mb-1 ${cabinTextColorClasses[currentCabinName]}`}
-                            >
-                              {currentCabinName}:
-                            </h4>
-                          )}
-                          <p
-                            className={`mt-2 mb-1 pl-2 flex ${cabinBorderColorClasses[currentCabinName]} border-l-2`}
+                    return (
+                      <div key={booking.id}>
+                        {shouldRenderDivider && (
+                          <h4
+                            className={`mt-2 mb-1 ${cabinTextColorClasses[currentCabinName]}`}
                           >
-                            {isYourBooking || userAdminStatus ? (
-                              <>
-                                <div className="flex flex-col">
-                                  <p className="flex-row justify-between items-center space-x-2">
-                                    <span>
-                                      {isYourBooking
-                                        ? `Du har fra ${formattedStartDate} til ${formattedEndDate}.`
-                                        : `${booking.employeeName} har fra ${formattedStartDate} til ${formattedEndDate}.`}
-                                    </span>
-                                    <button
-                                      onClick={() =>
-                                        handleEditBooking(booking.id)
-                                      }
-                                      className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
-                                    >
-                                      Rediger
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        openDeleteModal(booking.id)
-                                      }
-                                      className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
-                                    >
-                                      Slett
-                                    </button>
-                                    <Modal
-                                      isOpen={deleteModalIsOpen}
-                                      onRequestClose={closeModal}
-                                      contentLabel="Delete Confirmation"
-                                      style={customModalStyles}
-                                    >
-                                      <p className="mb-3">
-                                        Er du sikker på at du vil slette
-                                        bookingen?
-                                      </p>
-                                      <div className="flex justify-end">
-                                        <button
-                                          onClick={confirmDelete}
-                                          className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
-                                        >
-                                          Slett booking
-                                        </button>
-                                        <button
-                                          onClick={closeDeleteModal}
-                                          className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
-                                        >
-                                          Avbryt
-                                        </button>
-                                      </div>
-                                    </Modal>
-                                  </p>
-                                  {showEditFormForBooking === booking.id && (
-                                    <EditBooking
-                                      booking={booking}
-                                      closeModal={closeModal}
-                                      refreshVacancies={refreshVacancies}
-                                    />
-                                  )}
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <span>
-                                  {booking.employeeName} har fra{' '}
-                                  {formattedStartDate} til {formattedEndDate}.
-                                </span>
-                              </>
-                            )}
-                          </p>
-                        </div>
-                      )
-                    })}
-                </div>
-              ) : (
-                <div>
-                  <p>Ingen bookinger for denne dagen</p>
-                </div>
-              )}
+                            {currentCabinName}:
+                          </h4>
+                        )}
+                        <p
+                          className={`mt-2 mb-1 pl-2 flex ${cabinBorderColorClasses[currentCabinName]} border-l-2`}
+                        >
+                          {isYourBooking || userAdminStatus ? (
+                            <>
+                              <div className="flex flex-col">
+                                <p className="flex-row justify-between items-center space-x-2">
+                                  <span>
+                                    {isYourBooking
+                                      ? `Du har hytten fra ${formattedStartDate} til ${formattedEndDate}.`
+                                      : `${booking.employeeName} har hytten fra ${formattedStartDate} til ${formattedEndDate}.`}
+                                  </span>
+                                  <button
+                                    onClick={() =>
+                                      handleEditBooking(booking.id)
+                                    }
+                                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                                  >
+                                    Rediger
+                                  </button>
+                                  <button
+                                    onClick={() => openDeleteModal(booking.id)}
+                                    className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
+                                  >
+                                    Slett
+                                  </button>
+                                  <Modal
+                                    isOpen={deleteModalIsOpen}
+                                    onRequestClose={closeModal}
+                                    contentLabel="Delete Confirmation"
+                                    style={customModalStyles}
+                                  >
+                                    <p className="mb-3">
+                                      Er du sikker på at du vil slette
+                                      reservasjonen?
+                                    </p>
+                                    <div className="flex justify-end">
+                                      <button
+                                        onClick={confirmDelete}
+                                        className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                                      >
+                                        Slett reservasjon
+                                      </button>
+                                      <button
+                                        onClick={closeDeleteModal}
+                                        className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                                      >
+                                        Avbryt
+                                      </button>
+                                    </div>
+                                  </Modal>
+                                </p>
+                                {showEditFormForBooking === booking.id && (
+                                  <EditBooking
+                                    booking={booking}
+                                    closeModal={closeModal}
+                                    refreshVacancies={refreshVacancies}
+                                  />
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <span>
+                                {booking.employeeName} har hytten fra{' '}
+                                {formattedStartDate} til {formattedEndDate}.
+                              </span>
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    )
+                  })}
+              </div>
               <h3 className="mt-3 mb-1">Ledige hytter:</h3>
               {vacantApartmentsOnDay.length === 0 ? (
                 <p className="mb-1">Ingen ledige hytter</p>
@@ -402,7 +395,7 @@ export default function MonthOverview() {
                   )
                   .map((apartment, index) => (
                     <div key={index}>
-                      <p className="mt-1 mb-1">
+                      <p className= {`mt-1 mb-1 ${cabinBorderColorClasses[apartment.cabin_name]} pl-2 border-l-2 `}>
                         <span className="apartment-text">
                           {apartment.cabin_name}
                         </span>
@@ -410,7 +403,7 @@ export default function MonthOverview() {
                           onClick={() => handleBookClick(apartment.id)}
                           className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
                         >
-                          Book
+                          Reserver
                         </button>
                       </p>
                       {expandedApartments.includes(apartment.id) && (

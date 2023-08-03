@@ -38,7 +38,9 @@ const CreateBookingPost = ({
   refreshVacancies,
 }: Props) => {
   const [startDate, setStartDate] = useState(moment(date).format('YYYY-MM-DD'))
-  const [endDate, setEndDate] = useState(moment(date).add(7, 'days').format('YYYY-MM-DD'))
+  const [endDate, setEndDate] = useState(
+    moment(date).add(7, 'days').format('YYYY-MM-DD'),
+  )
   const [isLoadingPost, setIsLoadingPost] = useState(false)
 
   const isValid =
@@ -52,7 +54,7 @@ const CreateBookingPost = ({
       queryClient.invalidateQueries('bookings')
       queryClient.invalidateQueries('yourBookingsButton')
       setIsLoadingPost(false)
-      toast.success('Lagret booking')
+      toast.success('Lagret reservasjon')
       refreshVacancies()
     },
     onError: (error: string) => {
@@ -111,7 +113,7 @@ const CreateBookingPost = ({
           </label>
           <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
             <span>
-              Legg til booking
+              Legg til reservasjon
               <Loading isLoading={isLoadingPost} />
             </span>
           </Button>
