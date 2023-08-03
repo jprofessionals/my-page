@@ -112,7 +112,7 @@ export default function HomePage() {
         <div>
           <UserInformation />
           <h3 className="ml-4 mb-6 text-3xl font-light">
-            Dine hyttebookinger{' '}
+            Dine hyttereservasjoner{' '}
           </h3>
           {bookingLoadingStatus === 'completed' ? (
             <>
@@ -139,9 +139,8 @@ export default function HomePage() {
                                 className="w-8"
                               />
                             ) : null}
-                            Bookinger
+                            Reservasjoner
                           </span>
-                          <span> Vis hyttebookinger</span>
                         </div>
                       </AccordionTrigger>
                       <AccordionContent className="p-2 rounded-b-lg data-open:border-2">
@@ -167,7 +166,7 @@ export default function HomePage() {
                             return (
                               <div key={booking.id} className="ml-10 mt-3 ">
                                 <p>
-                                  Du har booket{' '}
+                                  Du har reservert{' '}
                                   <span
                                     className={
                                       cabinTextColorClasses[
@@ -192,13 +191,13 @@ export default function HomePage() {
                 </div>
               ) : (
                 <p className="ml-4 prose">
-                  Du har ingen hyttebookinger. Se oversikt over ledige dager og
-                  book i kalenderen på hyttebookingsiden.
+                  Du har ingen hyttereservasjoner. Se oversikt over ledige dager
+                  og reserver i kalenderen på firmahyttesiden.
                 </p>
               )}
             </>
           ) : (
-            <ErrorPage errorText="Klarte ikke laste bookinger, prøv igjen senere." />
+            <ErrorPage errorText="Klarte ikke laste reservasjoner, prøv igjen senere." />
           )}
           <Loading
             isLoading={['loading', 'init'].includes(budgetLoadingStatus)}

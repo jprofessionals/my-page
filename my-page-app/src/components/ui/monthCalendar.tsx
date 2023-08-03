@@ -185,7 +185,7 @@ function MonthCalendar({
                         'normal-case',
                       )}
                       {...(windowWidth > 800 && {
-                        'data-tip': `Booket av: ${booking.employeeName}`,
+                        'data-tip': `Reservert av: ${booking.employeeName}`,
                       })}
                     >
                       {(isFirstDay || isLastDay) &&
