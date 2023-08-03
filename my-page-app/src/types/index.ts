@@ -118,3 +118,14 @@ export type EditedInfoNotice = {
   endDate: string
   description: string
 }
+
+export type BudgetSummary = {
+  year: number  
+  yearSummary?: BudgetYearSummary[]
+}
+
+export type BudgetYearSummary = {
+  budgetType: BudgetType
+  sum: number
+  hours: number
+}

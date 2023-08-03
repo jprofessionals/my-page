@@ -1,9 +1,6 @@
 package no.jpro.mypageapi.service
 
-import no.jpro.mypageapi.dto.BudgetDTO
-import no.jpro.mypageapi.dto.CreatePostDTO
-import no.jpro.mypageapi.dto.PostDTO
-import no.jpro.mypageapi.dto.UpdatePostDTO
+import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.entity.Budget
 import no.jpro.mypageapi.entity.BudgetType
 import no.jpro.mypageapi.entity.Post
@@ -11,6 +8,7 @@ import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.BudgetRepository
 import no.jpro.mypageapi.repository.PostRepository
 import no.jpro.mypageapi.utils.mapper.BudgetPostMapper
+import no.jpro.mypageapi.utils.mapper.BudgetTypeMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -19,7 +17,8 @@ class BudgetService(
     private val budgetRepository: BudgetRepository,
     private val budgetPostMapper: BudgetPostMapper,
     private val postRepository: PostRepository,
-    private val budgetTypeService: BudgetTypeService
+    private val budgetTypeService: BudgetTypeService,
+    private val budgetTypeMapper: BudgetTypeMapper
 ) {
 
     fun getBudgets(userSub: String): List<BudgetDTO> {
@@ -113,5 +112,20 @@ class BudgetService(
             throw IllegalArgumentException("User already has budgets for default budget types")
         }
     }
+
+    fun getSummary(): List<BudgetSummary> {
+        return postRepository.findAll().filter { it.budget?.budgetType != null }.groupBy { post -> post.date.year }.map { postsByYear ->
+            BudgetSummary(
+                postsByYear.key,
+                postsByYear.value.groupBy { postsInYear -> postsInYear.budget?.budgetType }.map { postsByBudgetType ->
+                    BudgetYearSummary(
+                        postsByBudgetType.key?.let { budgetTypeMapper.toBudgetTypeDTO(it) },
+                        postsByBudgetType.value.sumOf { postInBudgetType -> postInBudgetType.amountExMva ?: 0.0 },
+                        0.0)
+                })
+        }
+    }
+
+
 
 }

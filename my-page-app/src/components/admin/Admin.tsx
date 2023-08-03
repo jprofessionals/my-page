@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import apiService from '../../services/api.service'
 import { toast } from 'react-toastify'
-import { Budget, BudgetType, User } from '@/types'
+import { Budget, BudgetType, User, BudgetSummary, BudgetYearSummary } from '@/types'
 import BudgetList from '@/components/budget/BudgetList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown'
@@ -9,6 +9,7 @@ import NewUserModal from '@/components/admin/NewUserModal'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 import cn from '@/utils/cn'
+import { it } from 'node:test'
 
 function compareUsers(a: User, b: User): number {
   if (a.name === null && b.name === null) {
@@ -29,6 +30,7 @@ function Admin() {
   const [expandedUser, setExpandedUser] = useState<string>('')
   const [filterValue, setFilterValue] = useState('')
   const [activeBudget, setActiveBudget] = useState<string | null>(null)
+  const [budgetSummary, setBudgetsummary] = useState<BudgetSummary[]>([])
   const { user } = useAuthContext()
 
   useEffect(() => {
@@ -80,9 +82,33 @@ function Admin() {
     }
   }
 
+  const getBudgetBalanceForSummary = (budgets: BudgetYearSummary[], type: BudgetType) => {
+    const foundBudget = budgets.find(
+      (budget) => budget.budgetType.id === type.id,
+    )
+    if (!foundBudget) return null
+    if (type.balanceIsHours) {
+      return budgetBalanceHoursCurrentYearForSummary(foundBudget)
+    } else {
+      return budgetBalanceForSummary(foundBudget)
+    }
+  }
+
   const budgetBalance = (budget: Budget) => {
     if (budget) {
       return budget.balance.toLocaleString('no-NO', {
+        maximumFractionDigits: 2,
+        style: 'currency',
+        currency: 'NOK',
+      })
+    } else {
+      return '-'
+    }
+  }
+
+  const budgetBalanceForSummary = (budget: BudgetYearSummary) => {
+    if (budget) {
+      return budget.sum.toLocaleString('no-NO', {
         maximumFractionDigits: 2,
         style: 'currency',
         currency: 'NOK',
@@ -103,6 +129,17 @@ function Admin() {
     }
   }
 
+  const budgetBalanceHoursCurrentYearForSummary = (budget: BudgetYearSummary) => {
+    if (budget) {
+      return (
+        budget.hours +
+        (budget.hours === 1 ? ' time' : ' timer')
+      )
+    } else {
+      return '-'
+    }
+  }
+
   const handleExpandUser = (user: User) => {
     // Check if the clicked target is not a child of the expanded area
     setExpandedUser(expandedUser === user.email ? '' : user.email)
@@ -115,7 +152,15 @@ function Admin() {
       .then((responseSummary) => {
         setUsers(responseSummary.data)
         extractListOfBudgets(responseSummary.data)
-        setIsLoading(false)
+
+        apiService.getBudgetSummary()
+        .then((budgetSummary) => {
+          setBudgetsummary(budgetSummary)
+          setIsLoading(false)
+        }).catch(() => {
+          setIsLoading(false)
+          toast.error('Klarte ikke laste oppsumeringen, prøv igjen senere')
+        })
       })
       .catch(() => {
         setIsLoading(false)
@@ -137,7 +182,7 @@ function Admin() {
   } else {
     return (
       <>
-        <div className="overflow-auto p-4">
+        <div className="overflow-auto p-4">          
           <h2 className="prose prose-xl">Våre ansatte</h2>
 
           {/* Add text input field */}
@@ -255,6 +300,56 @@ function Admin() {
                       </tr>
                     ) : null}
                   </Fragment>
+                ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="overflow-auto p-4">          
+          <h2 className="prose prose-xl">Oppsumering</h2>       
+          <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
+            <thead>
+              <tr className="text-base text-slate-900">
+                <th className="rounded-tl-lg bg-slate-300">År</th>
+                {budgetTypes.map((budgetType) => (
+                  <th
+                    key={budgetType.id + '' + budgetType.balanceIsHours}
+                    className="bg-slate-300"
+                  >
+                    {budgetType.name}
+                  </th>
+                ))}
+                <th key="action" className="px-6 rounded-tr-lg bg-slate-300" />
+              </tr>
+            </thead>
+            <tbody>
+            {budgetSummary
+            .sort((a, b) => (a.year - b.year) )
+            .map((budgetYearSummary) => (
+              <Fragment key={budgetYearSummary.year}>
+                <tr
+                  key={budgetYearSummary.year}
+                >
+                  <td key={budgetYearSummary.year}>
+                    {budgetYearSummary.year}
+                  </td>
+                  {budgetTypes.map((budgetColumn) => (
+                        <td
+                          key={
+                            budgetYearSummary.year +
+                            budgetColumn.id +
+                            '' +
+                            budgetColumn.balanceIsHours
+                          }
+                        >                          
+                          {getBudgetBalanceForSummary(
+                            budgetYearSummary.yearSummary!,
+                            budgetColumn,
+                          )}
+                        </td>
+                      ))}
+                </tr>
+                    
+                </Fragment>
                 ))}
             </tbody>
           </table>
