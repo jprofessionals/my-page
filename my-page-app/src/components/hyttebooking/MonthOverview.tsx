@@ -384,6 +384,7 @@ export default function MonthOverview() {
                   })}
               </div>
               <h3 className="mt-3 mb-1">Ledige hytter:</h3>
+              <p className = "">
               {vacantApartmentsOnDay.length === 0 ? (
                 <p className="mb-1">Ingen ledige hytter</p>
               ) : (
@@ -395,7 +396,7 @@ export default function MonthOverview() {
                   )
                   .map((apartment, index) => (
                     <div key={index}>
-                      <p className="mt-1 mb-1">
+                      <p className= {`mt-1 mb-1 ${cabinBorderColorClasses[apartment.cabin_name]} pl-2 border-l-2 `}>
                         <span className="apartment-text">
                           {apartment.cabin_name}
                         </span>
@@ -419,6 +420,7 @@ export default function MonthOverview() {
                     </div>
                   ))
               )}
+              </p>
             </div>
           ) : (
             <div>
