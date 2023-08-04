@@ -9,7 +9,7 @@ import { BookingPost } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
 import { useMutation, useQueryClient } from 'react-query'
-import { isBefore } from 'date-fns'
+import { isBefore, isEqual } from 'date-fns'
 
 type Props = {
   apartmentId: number
@@ -43,7 +43,7 @@ const createBooking = async ({
         if (error.response && error.response.data) {
           throw error.response.data
         } else {
-          throw 'En feil skjedde under oppretting, prøv igjen.'
+          throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
         }
       })
   } else {
@@ -56,7 +56,7 @@ const createBooking = async ({
         if (error.response && error.response.data) {
           throw error.response.data
         } else {
-          throw 'En feil skjedde under oppretting, prøv igjen.'
+          throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
         }
       })
   }
@@ -81,7 +81,8 @@ const CreateBookingPost = ({
   const isValid =
     startDate < endDate &&
     moment(endDate).diff(startDate, 'days') <= 7 &&
-    isBefore(new Date(endDate), new Date(cutOffDateVacancies))
+    (isBefore(new Date(endDate), new Date(cutOffDateVacancies)) ||
+      isEqual(new Date(endDate), new Date(cutOffDateVacancies)))
 
   const queryClient = useQueryClient()
   const { mutate } = useMutation(createBooking, {

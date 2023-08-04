@@ -304,9 +304,7 @@ export default function MonthOverview() {
           {date ? (
             <div>
               <h3 className="mt-1 mb-1">{format(date, 'dd-MM-yyyy')}</h3>
-              {isBefore(date, new Date(cutOffDateVacancies)) ? (
-                null
-              ) : (
+              {isBefore(date, new Date(cutOffDateVacancies)) ? null : (
                 <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
               )}
               {bookingItems.length > 0 ? (
@@ -434,11 +432,10 @@ export default function MonthOverview() {
                       )
                     })}
                 </div>
+              ) : null}
               {vacantApartmentsOnDay.length !== 0 ? (
                 <h3 className="mt-3 mb-1">Ledige hytter:</h3>
-              ) : (
-                null
-              )}
+              ) : null}
               {vacantApartmentsOnDay
                 .sort(
                   (a, b) =>

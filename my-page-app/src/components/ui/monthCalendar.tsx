@@ -209,8 +209,11 @@ function MonthCalendar({
               {dateCalendar}
               {cabinBookings}
               <span
-                  className={`absolute top-0 left-0 w-full h-full ${getCutOffDateStyle(props.date, cutOffDate)}`}
-                  aria-hidden="true"
+                className={`absolute top-0 left-0 w-full h-full ${getCutOffDateStyle(
+                  props.date,
+                  cutOffDate,
+                )}`}
+                aria-hidden="true"
               />
             </>
           )
