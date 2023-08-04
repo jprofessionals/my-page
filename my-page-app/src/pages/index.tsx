@@ -123,7 +123,8 @@ export default function HomePage() {
   })
 
   const handleEditBooking = () => {
-    router.push('http://localhost:3000/hyttebooking')
+    router.push('/hyttebooking')
+    //Todo: Make it so that when redirected opens the modal on the day where the booking starts.
   }
 
   const refreshBudgets = useCallback(async () => {
