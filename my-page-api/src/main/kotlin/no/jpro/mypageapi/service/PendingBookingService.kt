@@ -20,6 +20,9 @@ class PendingBookingService(
     private val pendingBookingMapper: PendingBookingMapper
     ) {
 
+    val todayDate = LocalDate.now()
+    val cutOffDate = LocalDate.now().plusMonths(5)
+
     fun createPendingBooking(bookingRequest: CreatePendingBookingDTO, createdBy: User): PendingBookingDTO {
         val apartment = bookingService.getApartment(bookingRequest.apartmentID)
         val checkBookingAvailable = bookingService.filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
@@ -38,32 +41,19 @@ class PendingBookingService(
     }
 
 
-    fun getDatesAllPendingBookings(apartmentId: Long, startDate: LocalDate, endDate: LocalDate): List<LocalDate>{
+    fun getDateListOfPendingBookingTrains(apartmentId: Long, startDate: LocalDate, endDate: LocalDate): List<List<LocalDate>>{
         val pendingBookings = pendingBookingRepository.findPendingBookingsByApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(apartmentId, startDate, endDate)
         val pendingBookedDays = pendingBookings
             .flatMap { pendingBooking ->
                 LongRange(0, ChronoUnit.DAYS.between(pendingBooking.startDate, pendingBooking.endDate))
                     .map { pendingBooking.startDate.plusDays(it) }
-            }
-        return pendingBookedDays
-    }
+            }.distinct().sorted()
 
-    fun getDateListOfPendingBookingTrains(
-        apartmentId: Long,
-        startDate: LocalDate,
-        endDate: LocalDate
-    ): List<List<LocalDate>> {
-        val pendingBookedDays = getDatesAllPendingBookings(apartmentId, startDate, endDate).distinct().sorted()
-
-        return pendingBookedDays
-            .groupBy { it.minusDays(pendingBookedDays.indexOf(it).toLong()) }
+        return pendingBookedDays.groupBy { it.minusDays(pendingBookedDays.indexOf(it).toLong()) }
             .values.toList()
     }
 
-    val todayDate = LocalDate.now()
-    val cutOffDate = LocalDate.now().plusMonths(5)
 
-    //  getDatesForPendingBookingTrainOnSelectedDate
     fun getDatesForPendingBookingTrainOnSelectedDate(apartmentId: Long, selectedDate: LocalDate): List<LocalDate>? {
         val pendingBookingsDateListNoDuplicates = getDateListOfPendingBookingTrains(apartmentId, todayDate, cutOffDate)
 
@@ -80,21 +70,6 @@ class PendingBookingService(
         return allPendingBookings.filter { booking ->
             datesInPendingBookingTrain?.any { it.isEqual(booking.startDate) } == true
         }
-    }
-
-    fun getTrainAndPendingBookings(apartmentId: Long, selectedDate: LocalDate): PendingBookingTrainDTO {
-        val pendingBookingTrain = getDatesForPendingBookingTrainOnSelectedDate(apartmentId, selectedDate)
-        val startDate = pendingBookingTrain?.firstOrNull()
-        val endDate = pendingBookingTrain?.lastOrNull()
-
-        val pendingBookingsInTrain = getPendingBookingsInTrain(apartmentId, selectedDate)
-
-        return PendingBookingTrainDTO(
-            apartmentId = apartmentId,
-            startDate = startDate!!,
-            endDate = endDate!!,
-            pendingBookingList = pendingBookingsInTrain
-        )
     }
 
     fun getPendingBookingsInTrainPeriod(apartmentId: Long): List<PendingBookingDTO> {
@@ -123,14 +98,6 @@ class PendingBookingService(
         }
     }
 
-    fun getSortedPendingBookingsPeriod(apartmentId: Long): List<List<LocalDate>> {
-        val allPendingBookingsDTO = getDateListOfPendingBookingTrains(apartmentId, todayDate, cutOffDate)
-
-        return allPendingBookingsDTO
-    }
-
-
-    //---------------------------------------------------------
     fun getTrainAndPendingBookingsPeriodAllApartment(): List<List<PendingBookingTrainDTO>> {
         val apartments = apartmentRepository.findAll()
 

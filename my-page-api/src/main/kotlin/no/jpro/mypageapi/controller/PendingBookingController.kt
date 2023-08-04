@@ -51,9 +51,10 @@ class PendingBookingController (
         }
     }
 
+    //TODO SLETT
     @GetMapping("/pendingBookingDateList")
     @Transactional
-    @Operation(summary = "Get all pending booking dates with no duplicates in date range")
+    @Operation(summary = "Get all pending booking train dates with no duplicates")
     @ApiResponse(
         responseCode = "200",
         content = [Content(
@@ -122,29 +123,6 @@ class PendingBookingController (
         }
     }
 
-    @GetMapping("/trainDTO")
-    @Transactional
-    @Operation(summary = "Get pending booking train DTO when specific date clicked")
-    @ApiResponse(
-        responseCode = "200",
-        content = [Content(
-            mediaType = "application/json", array = ArraySchema(
-                schema = Schema(implementation = PendingBookingTrainDTO::class)
-            )
-        )]
-    )
-    fun getTrainAndPendingBookings(
-        token: JwtAuthenticationToken,
-        @RequestParam("apartmentID") apartmentID: Long,
-        @RequestParam("selectedDate") selectedDate: LocalDate,
-    ): PendingBookingTrainDTO {
-        try {
-            return pendingBookingService.getTrainAndPendingBookings(apartmentID, selectedDate)
-        } catch (e: DateTimeParseException) {
-            throw BookingController.InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
-        }
-    }
-
     @GetMapping("/trainDTOPeriod")
     @Transactional
     @Operation(summary = "Get pending booking train DTO for period")
@@ -167,27 +145,6 @@ class PendingBookingController (
         }
     }
 
-    @GetMapping("/pendingBookingTrainsDateList")
-    @Transactional
-    @Operation(summary = "Get pendingBookingTrainsDateList")
-    @ApiResponse(
-        responseCode = "200",
-        content = [Content(
-            mediaType = "application/json", array = ArraySchema(
-                schema = Schema(implementation = PendingBookingDTO::class)
-            )
-        )]
-    )
-    fun getSortedPendingBookingsPeriod(
-        token: JwtAuthenticationToken,
-        @RequestParam("apartmentID") apartmentID: Long,
-    ): List<List<LocalDate>> {
-        try {
-            return pendingBookingService.getSortedPendingBookingsPeriod(apartmentID)
-        } catch (e: DateTimeParseException) {
-            throw BookingController.InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
-        }
-    }
 
     @GetMapping("/trainDTOPeriodAllApartments")
     @Transactional
