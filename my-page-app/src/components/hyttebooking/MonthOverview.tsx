@@ -5,7 +5,7 @@ import ApiService from '@/services/api.service'
 import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
-import {format, isAfter, isBefore, isEqual, sub} from 'date-fns'
+import { format, isAfter, isBefore, isEqual, sub } from 'date-fns'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
@@ -199,7 +199,10 @@ export default function MonthOverview() {
     previousDate.setDate(selectedDate.getDate() - 1)
     const formattedPreviousDate = format(previousDate, 'yyyy-MM-dd')
 
-    if (isBefore(selectedDate, new Date(cutOffDateVacancies)) && (isAfter(selectedDate, sub(new Date(), { days: 1 })))) {
+    if (
+      isBefore(selectedDate, new Date(cutOffDateVacancies)) &&
+      isAfter(selectedDate, sub(new Date(), { days: 1 }))
+    ) {
       for (const apartment of apartmentsInVacancies) {
         const dates = vacancies![Number(apartment)]
         if (
@@ -264,9 +267,7 @@ export default function MonthOverview() {
           {date ? (
             <div>
               <h3 className="mt-1 mb-1">{format(date, 'dd.MM.yyyy')}</h3>
-              {isBefore(date, new Date(cutOffDateVacancies)) ? (
-                null
-              ) : (
+              {isBefore(date, new Date(cutOffDateVacancies)) ? null : (
                 <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
               )}
               <div>
@@ -392,9 +393,7 @@ export default function MonthOverview() {
               </div>
               {vacantApartmentsOnDay.length !== 0 ? (
                 <h3 className="mt-3 mb-1">Ledige hytter:</h3>
-              ) : (
-                null
-              )}
+              ) : null}
               {vacantApartmentsOnDay
                 .sort(
                   (a, b) =>
@@ -426,7 +425,7 @@ export default function MonthOverview() {
                           closeModal={closeModal}
                           refreshVacancies={refreshVacancies}
                           cutOffDateVacancies={cutOffDateVacancies}
-                          vacancies = {vacancies}
+                          vacancies={vacancies}
                         />
                       </div>
                     )}
