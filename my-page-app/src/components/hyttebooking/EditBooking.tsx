@@ -13,13 +13,13 @@ import { useMutation, useQueryClient } from 'react-query'
 const editExistingBooking = async ({
   editedBooking,
   bookingId,
-  userAdminStatus,
+  userIsAdmin,
 }: {
   editedBooking: EditedBooking
   bookingId: number
-  userAdminStatus: boolean
+  userIsAdmin: boolean
 }) => {
-  if (userAdminStatus) {
+  if (userIsAdmin) {
     return axios
       .patch(API_URL + 'booking/admin/' + bookingId, editedBooking, {
         headers: authHeader(),
@@ -52,12 +52,12 @@ const EditBooking = ({
   booking,
   closeModal,
   refreshVacancies,
-  userAdminStatus,
+  userIsAdmin,
 }: {
   booking: Booking
   closeModal: () => void
   refreshVacancies: () => void
-  userAdminStatus: boolean
+  userIsAdmin: boolean
 }) => {
   const [startDate, setStartDate] = useState(booking.startDate)
   const [endDate, setEndDate] = useState(booking.endDate)
@@ -92,7 +92,7 @@ const EditBooking = ({
         startDate: startDate,
         endDate: endDate,
       }
-      mutate({ editedBooking, bookingId, userAdminStatus })
+      mutate({ editedBooking, bookingId, userIsAdmin: userIsAdmin })
     }
   }
 

@@ -1,12 +1,12 @@
-import React, {useCallback, useEffect, useState} from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
-import {MonthCalendar} from '@/components/ui/monthCalendar'
+import { MonthCalendar } from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import {Apartment, Booking} from '@/types'
-import {toast} from 'react-toastify'
-import {useAuthContext} from '@/providers/AuthProvider'
-import {add, format, sub} from 'date-fns'
-import {useMutation, useQuery, useQueryClient} from 'react-query'
+import { Apartment, Booking } from '@/types'
+import { toast } from 'react-toastify'
+import { useAuthContext } from '@/providers/AuthProvider'
+import { add, format, sub } from 'date-fns'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
@@ -15,7 +15,7 @@ export default function MonthOverview() {
   const [showModal, setShowModal] = useState(false)
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
-  const [userAdminStatus, setUserAdminStatus] = useState<boolean>(false)
+  const [userIsAdmin, setUserIsAdmin] = useState<boolean>(false)
 
   const { data: yourBookings } = useQuery<Booking[]>(
     'yourBookingsButton',
@@ -24,12 +24,12 @@ export default function MonthOverview() {
       return yourBookings
     },
   )
-  const userIsAdmin = async () => {
+  const getUserIsAdmin = async () => {
     try {
       const response = await ApiService.getUser()
       const user = response.data
       const adminStatus = user.admin
-      setUserAdminStatus(adminStatus)
+      setUserIsAdmin(adminStatus)
     } catch (e) {
       toast.error('Kunne ikke hente brukers admin status')
     }
@@ -61,7 +61,7 @@ export default function MonthOverview() {
   }
 
   const confirmDelete = () => {
-    if (userAdminStatus) {
+    if (userIsAdmin) {
       handleAdminDeleteBooking(bookingIdToDelete)
     } else {
       handleDeleteBooking(bookingIdToDelete)
@@ -215,7 +215,7 @@ export default function MonthOverview() {
     if (userFetchStatus === 'fetched') {
       refreshVacancies()
       getAllApartments()
-      userIsAdmin()
+      getUserIsAdmin()
       fetchAllUsers()
     }
   }, [userFetchStatus, vacancyLoadingStatus])
@@ -350,7 +350,7 @@ export default function MonthOverview() {
                           <p
                             className={`mt-2 mb-1 pl-2 flex ${cabinBorderColorClasses[currentCabinName]} border-l-2`}
                           >
-                            {isYourBooking || userAdminStatus ? (
+                            {isYourBooking || userIsAdmin ? (
                               <>
                                 <div className="flex flex-col">
                                   <p className="flex-row justify-between items-center space-x-2">
@@ -406,7 +406,7 @@ export default function MonthOverview() {
                                       booking={booking}
                                       closeModal={closeModal}
                                       refreshVacancies={refreshVacancies}
-                                      userAdminStatus={userAdminStatus}
+                                      userIsAdmin={userIsAdmin}
                                     />
                                   )}
                                 </div>
@@ -460,8 +460,8 @@ export default function MonthOverview() {
                           date={date}
                           closeModal={closeModal}
                           refreshVacancies={refreshVacancies}
-                          userAdminStatus={userAdminStatus}
-                          allUsersNames = {allUsersNames}
+                          userIsAdmin={userIsAdmin}
+                          allUsersNames={allUsersNames}
                         />
                       </div>
                     )}

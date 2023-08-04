@@ -15,23 +15,27 @@ type Props = {
   date: Date
   closeModal: () => void
   refreshVacancies: Function
-  userAdminStatus: boolean
+  userIsAdmin: boolean
   allUsersNames: string[]
 }
 const createBooking = async ({
   bookingPost,
-  userAdminStatus,
+  userIsAdmin,
   bookingOwnerName,
 }: {
   bookingPost: BookingPost
-  userAdminStatus: boolean
+  userIsAdmin: boolean
   bookingOwnerName: string
 }) => {
-  if (userAdminStatus) {
+  if (userIsAdmin) {
     return axios
-      .post(API_URL + 'booking/admin/post?bookingOwnerName=' + bookingOwnerName, bookingPost, {
-        headers: authHeader(),
-      })
+      .post(
+        API_URL + 'booking/admin/post?bookingOwnerName=' + bookingOwnerName,
+        bookingPost,
+        {
+          headers: authHeader(),
+        },
+      )
       .then((response) => response.data)
       .catch((error) => {
         if (error.response && error.response.data) {
@@ -61,7 +65,7 @@ const CreateBookingPost = ({
   date,
   closeModal,
   refreshVacancies,
-  userAdminStatus,
+  userIsAdmin,
   allUsersNames,
 }: Props) => {
   const [startDate, setStartDate] = useState(moment(date).format('YYYY-MM-DD'))
@@ -100,7 +104,7 @@ const CreateBookingPost = ({
         startDate: startDate,
         endDate: endDate,
       }
-      mutate({ bookingPost, userAdminStatus, bookingOwnerName })
+      mutate({ bookingPost, userIsAdmin, bookingOwnerName })
     }
   }
 
@@ -118,7 +122,7 @@ const CreateBookingPost = ({
     <form onSubmit={handleSubmit}>
       <div className="overflow-hidden w-full rounded-xl border border-gray-500 shadow-sm">
         <div className="flex flex-col gap-2 items-start p-3">
-          {userAdminStatus ? (
+          {userIsAdmin ? (
             <>
               <strong> Navn: </strong>
               <label>
@@ -128,7 +132,7 @@ const CreateBookingPost = ({
                   onChange={handleBookingOwnerNameChange}
                   value={bookingOwnerName}
                 >
-                  <option value="">Velg navn</option>
+                  <option value="">Velg ansatt</option>
                   {allUsersNames.map((name) => (
                     <option key={name} value={name}>
                       {name}
@@ -137,9 +141,7 @@ const CreateBookingPost = ({
                 </select>
               </label>
             </>
-          ) : (
-            ''
-          )}
+          ) : null}
           <strong>Startdato:</strong>
           <label>
             <input
