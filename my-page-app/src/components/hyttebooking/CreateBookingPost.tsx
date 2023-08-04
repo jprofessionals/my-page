@@ -9,7 +9,7 @@ import { BookingPost } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
 import { useMutation, useQueryClient } from 'react-query'
-import { isBefore, isEqual } from 'date-fns'
+import {add, isBefore, isEqual} from 'date-fns'
 
 type Props = {
   apartmentId: number
@@ -81,8 +81,8 @@ const CreateBookingPost = ({
   const isValid =
     startDate < endDate &&
     moment(endDate).diff(startDate, 'days') <= 7 &&
-    (isBefore(new Date(endDate), new Date(cutOffDateVacancies)) ||
-      isEqual(new Date(endDate), new Date(cutOffDateVacancies)))
+    isBefore(new Date(endDate), add(new Date(cutOffDateVacancies), {days: 1})) &&
+    bookingOwnerName!== ''
 
   const queryClient = useQueryClient()
   const { mutate } = useMutation(createBooking, {
