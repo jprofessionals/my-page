@@ -17,6 +17,7 @@ type Props = {
   closeModal: () => void
   refreshVacancies: Function
   cutOffDateVacancies: string
+  vacancies: {[key: number]: string[]} | undefined
 }
 const createBooking = async ({ bookingPost }: { bookingPost: BookingPost }) => {
   return axios
@@ -39,8 +40,12 @@ const CreateBookingPost = ({
   closeModal,
   refreshVacancies,
   cutOffDateVacancies,
+  vacancies,
 }: Props) => {
   const [startDate, setStartDate] = useState(moment(date).format('YYYY-MM-DD'))
+
+  const vacantDaysForApartment = vacancies![Number(apartmentId)]
+
   const [endDate, setEndDate] = useState(
     moment(date).add(7, 'days').format('YYYY-MM-DD'),
   )
@@ -85,6 +90,7 @@ const CreateBookingPost = ({
 
   const handleStartDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setStartDate(e.target.value)
+    console.log(vacantDaysForApartment)
   }
   const handleEndDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEndDate(e.target.value)
