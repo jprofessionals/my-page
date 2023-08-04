@@ -143,7 +143,6 @@ class BookingController(
             schema = Schema(implementation = BookingDTO::class)
         )]
     )
-    //Lag en ny DTO klasse og bruk den i stedet for BookingDTO ?.
 
     fun getVacancies(
         token: JwtAuthenticationToken,

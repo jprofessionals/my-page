@@ -31,12 +31,6 @@ export function PickDate() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
-        <MonthCalendar
-          mode="single"
-          selected={pickDate}
-          onSelect={setPickDate}
-          initialFocus
-        />
       </PopoverContent>
     </Popover>
   )

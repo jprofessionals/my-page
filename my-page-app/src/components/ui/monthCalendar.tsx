@@ -9,6 +9,7 @@ import {
   isSameDay,
   isSunday,
   isWithinInterval,
+  isAfter,
 } from 'date-fns'
 import { Booking } from '@/types'
 import { ComponentProps, useEffect, useState } from 'react'
@@ -16,7 +17,9 @@ import { buttonVariants } from '@/components/ui/button'
 import ApiService from '@/services/api.service'
 import { get } from 'radash'
 import { useQuery } from 'react-query'
-export type CalendarProps = ComponentProps<typeof DayPicker>
+export type CalendarProps = ComponentProps<typeof DayPicker> & {
+  cutOffDateVacancies: string
+}
 
 const cabinColors: { [key: string]: string } = {
   Annekset: 'bg-teal-annex',
@@ -24,10 +27,17 @@ const cabinColors: { [key: string]: string } = {
   'Stor leilighet': 'bg-orange-brand',
 }
 
+const cabinColorsOpacity: { [key: string]: string } = {
+  Annekset: 'bg-teal-200',
+  'Liten leilighet': 'bg-blue-200',
+  'Stor leilighet': 'bg-orange-200',
+}
+
 function MonthCalendar({
   className,
   classNames,
   showOutsideDays = true,
+  cutOffDateVacancies,
   ...props
 }: CalendarProps) {
   const { data: yourBookings } = useQuery<Booking[]>(
@@ -38,11 +48,22 @@ function MonthCalendar({
     },
   )
 
-  const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
-    const startDate = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
-    const endDate = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
+  const startDateBookings = format(
+    sub(new Date(), { months: 6, days: 7 }),
+    'yyyy-MM-dd',
+  )
+  const endDateBookings = format(
+    add(new Date(), { months: 12, days: 7 }),
+    'yyyy-MM-dd',
+  )
+  const startDateCalendar = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
+  const endDateCalendar = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
 
-    const fetchedBookings = await ApiService.getBookings(startDate, endDate)
+  const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
+    const fetchedBookings = await ApiService.getBookings(
+      startDateBookings,
+      endDateBookings,
+    )
     return fetchedBookings
   })
 
@@ -84,6 +105,8 @@ function MonthCalendar({
       showOutsideDays={showOutsideDays}
       className={cn('p-3 border-none', className)}
       weekStartsOn={1}
+      fromDate={new Date(startDateCalendar)}
+      toDate={new Date(endDateCalendar)}
       classNames={{
         months:
           'flex flex-col sm:flex-row space-y-10 sm:space-x-10 sm:space-y-0',
@@ -110,7 +133,6 @@ function MonthCalendar({
         ),
         day_selected: 'tw-bg-opacity: 0',
         day_today: cn('text-accent-foreground', 'bg-gray-400'),
-        day_outside: 'text-muted-foreground opacity-50',
         day_disabled: 'text-muted-foreground opacity-50',
         day_range_middle:
           'aria-selected:bg-accent aria-selected:text-accent-foreground',
@@ -121,6 +143,7 @@ function MonthCalendar({
         IconLeft: () => <ChevronLeft className="w-4 h-4" />,
         IconRight: () => <ChevronRight className="w-4 h-4" />,
         DayContent: (props) => {
+          const cutOffDate = new Date(cutOffDateVacancies)
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
 
@@ -156,11 +179,16 @@ function MonthCalendar({
                         'p-2 text-white tooltip tooltip-top shadow-xl',
                         getCabinBookingStyle(props.date, booking),
                         isYourBooking && 'shadow-y-2',
-                        get(cabinColors, booking.apartment?.cabin_name),
+                        isAfter(add(props.date, { days: 1 }), new Date())
+                          ? get(cabinColors, booking.apartment?.cabin_name)
+                          : get(
+                              cabinColorsOpacity,
+                              booking.apartment?.cabin_name,
+                            ),
                         'normal-case',
                       )}
                       {...(windowWidth > 800 && {
-                        'data-tip': `Booket av: ${booking.employeeName}`,
+                        'data-tip': `Reservert av: ${booking.employeeName}`,
                       })}
                     >
                       {(isFirstDay || isLastDay) &&
@@ -180,6 +208,10 @@ function MonthCalendar({
             <>
               {dateCalendar}
               {cabinBookings}
+              <span
+                  className={`absolute top-0 left-0 w-full h-full ${getCutOffDateStyle(props.date, cutOffDate)}`}
+                  aria-hidden="true"
+              />
             </>
           )
         },
@@ -216,6 +248,10 @@ const getCabinBookingStyle = (date: Date, booking: Booking) => {
     isInInterval && !isMonday(date) && 'md:-ml-1',
     isInInterval && !isSunday(date) && 'md:-mr-1',
   )
+}
+const getCutOffDateStyle = (date: Date, cutOffDate: Date) => {
+  const isCutOffDay = isSameDay(date, cutOffDate)
+  return isCutOffDay ? 'border-2 border-red-500 rounded-lg' : ''
 }
 
 MonthCalendar.displayName = 'MonthCalendar'

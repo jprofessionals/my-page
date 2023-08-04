@@ -72,7 +72,7 @@ const EditBooking = ({
       closeModal()
       queryClient.invalidateQueries('bookings')
       setIsLoadingEdit(false)
-      toast.success('Redigert booking')
+      toast.success('Redigert reservasjon')
       refreshVacancies()
     },
     onError: (error: string) => {

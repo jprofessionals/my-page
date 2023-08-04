@@ -24,7 +24,7 @@ function Hyttebooking() {
       <div className="flex flex-col gap-4 p-4">
         <div className="flex overflow-hidden gap-2 items-center p-2 max-w-7xl rounded-lg border prose bgColor: bg-slate-200">
           <div className="relative flex-1">
-            <h1>Påmelding firmahytte</h1>
+            <h1>Reservasjon av firmahytte</h1>
             <div className="h-1.5 bg-orange-500"></div>
             <p>
               Denne siden er under produksjon av årets sommerstudenter. Vi håper
@@ -74,24 +74,24 @@ function Hyttebooking() {
 
         <p>
           <span>
-            <strong>Booking:</strong>
+            <strong>Reservering:</strong>
           </span>{' '}
-          oppretting, endring og sletting av bookinger vil foregå når man
+          oppretting, endring og sletting av reservasjoner vil foregå når man
           trykker på en bestemt dato. Her planlegges det å opprette et
           varslingssytem på slack så alle ansatte blir oppdatert på visse
-          endringer.
+          endringer. Siste reserverbare dato markeres med en <span className="text-red-500">rød</span> kant i kalenderen, og
+          det er ikke mulig å reservere datoer etter denne dagen.
         </p>
 
         <p>
           <span>
-            <strong>Bookinginformasjon:</strong>
+            <strong>Informasjon om reservasjoner:</strong>
           </span>{' '}
           Ved å trykke på en bestemt dag får man opp en fullstendig oversikt
-          over alle hyttene, hvem som har booket de, og i hvilken periode. I
+          over alle hyttene, hvem som har reservert, og i hvilken periode. I
           tillegg får man opp eventuelle ledige hytter på den dagen. Dersom du
-          lurer på hvem som eier en spesifikk booking kan du holde musa over
-          bookingen i kalenderen. Dine egne bookinger markeres med en svart
-          kant.
+          lurer på hvem som eier en spesifikk reservasjon kan du holde musa over
+          den i kalenderen. Dine egne reservasjoner markeres med en svart kant.
         </p>
 
         <p>

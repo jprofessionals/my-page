@@ -9,6 +9,7 @@ import { BookingPost } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
 import { useMutation, useQueryClient } from 'react-query'
+import { isBefore } from 'date-fns'
 
 type Props = {
   apartmentId: number
@@ -17,6 +18,7 @@ type Props = {
   refreshVacancies: Function
   userIsAdmin: boolean
   allUsersNames: string[]
+  cutOffDateVacancies: string
 }
 const createBooking = async ({
   bookingPost,
@@ -67,14 +69,19 @@ const CreateBookingPost = ({
   refreshVacancies,
   userIsAdmin,
   allUsersNames,
+  cutOffDateVacancies,
 }: Props) => {
   const [startDate, setStartDate] = useState(moment(date).format('YYYY-MM-DD'))
-  const [endDate, setEndDate] = useState(moment(date).format('YYYY-MM-DD'))
+  const [endDate, setEndDate] = useState(
+    moment(date).add(7, 'days').format('YYYY-MM-DD'),
+  )
   const [isLoadingPost, setIsLoadingPost] = useState(false)
   const [bookingOwnerName, setBookingOwnerName] = useState<string>('')
 
   const isValid =
-    startDate < endDate && moment(endDate).diff(startDate, 'days') <= 7
+    startDate < endDate &&
+    moment(endDate).diff(startDate, 'days') <= 7 &&
+    isBefore(new Date(endDate), new Date(cutOffDateVacancies))
 
   const queryClient = useQueryClient()
   const { mutate } = useMutation(createBooking, {
@@ -84,7 +91,7 @@ const CreateBookingPost = ({
       queryClient.invalidateQueries('bookings')
       queryClient.invalidateQueries('yourBookingsButton')
       setIsLoadingPost(false)
-      toast.success('Lagret booking')
+      toast.success('Lagret reservasjon')
       refreshVacancies()
     },
     onError: (error: string) => {
@@ -166,7 +173,7 @@ const CreateBookingPost = ({
           </label>
           <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
             <span>
-              Legg til booking
+              Legg til reservasjon
               <Loading isLoading={isLoadingPost} />
             </span>
           </Button>
