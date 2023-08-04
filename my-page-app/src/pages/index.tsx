@@ -49,7 +49,7 @@ export default function HomePage() {
       setBookings(loadedBookings)
     } catch (e) {
       setBookingLoadingStatus('failed')
-      toast.error('Klarte ikke laste bookings, prøv igjen senere')
+      toast.error('Klarte ikke laste reservasjoner, prøv igjen senere')
     }
   }, [])
 

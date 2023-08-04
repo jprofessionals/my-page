@@ -9,12 +9,14 @@ import { BookingPost } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
 import { useMutation, useQueryClient } from 'react-query'
+import { isBefore } from 'date-fns'
 
 type Props = {
   apartmentId: number
   date: Date
   closeModal: () => void
   refreshVacancies: Function
+  cutOffDateVacancies: string
 }
 const createBooking = async ({ bookingPost }: { bookingPost: BookingPost }) => {
   return axios
@@ -36,6 +38,7 @@ const CreateBookingPost = ({
   date,
   closeModal,
   refreshVacancies,
+  cutOffDateVacancies,
 }: Props) => {
   const [startDate, setStartDate] = useState(moment(date).format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(
@@ -44,7 +47,9 @@ const CreateBookingPost = ({
   const [isLoadingPost, setIsLoadingPost] = useState(false)
 
   const isValid =
-    startDate < endDate && moment(endDate).diff(startDate, 'days') <= 7
+    startDate < endDate &&
+    moment(endDate).diff(startDate, 'days') <= 7 &&
+    isBefore(new Date(endDate), new Date(cutOffDateVacancies))
 
   const queryClient = useQueryClient()
   const { mutate } = useMutation(createBooking, {

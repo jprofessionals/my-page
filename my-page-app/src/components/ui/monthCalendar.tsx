@@ -17,7 +17,9 @@ import { buttonVariants } from '@/components/ui/button'
 import ApiService from '@/services/api.service'
 import { get } from 'radash'
 import { useQuery } from 'react-query'
-export type CalendarProps = ComponentProps<typeof DayPicker>
+export type CalendarProps = ComponentProps<typeof DayPicker> & {
+  cutOffDateVacancies: string
+}
 
 const cabinColors: { [key: string]: string } = {
   Annekset: 'bg-teal-annex',
@@ -35,6 +37,7 @@ function MonthCalendar({
   className,
   classNames,
   showOutsideDays = true,
+  cutOffDateVacancies,
   ...props
 }: CalendarProps) {
   const { data: yourBookings } = useQuery<Booking[]>(
@@ -55,7 +58,6 @@ function MonthCalendar({
   )
   const startDateCalendar = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
   const endDateCalendar = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
-  //Todo: implement something to prevent people from booking anything on the last day and forward.
 
   const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
     const fetchedBookings = await ApiService.getBookings(
@@ -141,6 +143,7 @@ function MonthCalendar({
         IconLeft: () => <ChevronLeft className="w-4 h-4" />,
         IconRight: () => <ChevronRight className="w-4 h-4" />,
         DayContent: (props) => {
+          const cutOffDate = new Date(cutOffDateVacancies)
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
 
@@ -205,6 +208,10 @@ function MonthCalendar({
             <>
               {dateCalendar}
               {cabinBookings}
+              <span
+                  className={`absolute top-0 left-0 w-full h-full ${getCutOffDateStyle(props.date, cutOffDate)}`}
+                  aria-hidden="true"
+              />
             </>
           )
         },
@@ -241,6 +248,10 @@ const getCabinBookingStyle = (date: Date, booking: Booking) => {
     isInInterval && !isMonday(date) && 'md:-ml-1',
     isInInterval && !isSunday(date) && 'md:-mr-1',
   )
+}
+const getCutOffDateStyle = (date: Date, cutOffDate: Date) => {
+  const isCutOffDay = isSameDay(date, cutOffDate)
+  return isCutOffDay ? 'border-2 border-red-500 rounded-lg' : ''
 }
 
 MonthCalendar.displayName = 'MonthCalendar'
