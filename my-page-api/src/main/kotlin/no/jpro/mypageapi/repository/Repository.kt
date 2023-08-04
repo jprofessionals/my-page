@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.repository
 
+import no.jpro.mypageapi.dto.PendingBookingDTO
 import no.jpro.mypageapi.entity.*
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
@@ -55,15 +56,13 @@ interface BookingRepository : JpaRepository<Booking, Long> {
 
 @Repository
 interface PendingBookingRepository : JpaRepository<PendingBooking, Long> {
-    fun findPendingBookingById(bookingId: Long): PendingBooking?
-    fun findPendingBookingByEmployeeId(employeeId: Int): List<PendingBooking>
+    fun findPendingBookingsByApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
+        apartmentId: Long, startDate: LocalDate, endDate: LocalDate
+    ): List<PendingBookingDTO>
+
     fun findPendingBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
         startDate: LocalDate, endDate: LocalDate
-    ): List<PendingBooking>
-    fun findPendingBookingsByEmployeeSub(employeeSub: String): List<PendingBooking>
-    fun findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(
-        date: LocalDate, anotherDate: LocalDate
-    ): List<PendingBooking>
+    ): List<PendingBookingDTO>
 }
 
 @Repository
