@@ -432,7 +432,7 @@ export default function MonthOverview() {
               {vacantApartmentsOnDay.length !== 0 ? (
                 <h3 className="mt-3 mb-1">Ledige hytter:</h3>
               ) : (
-                ''
+                null
               )}
               {vacantApartmentsOnDay
                 .sort(
