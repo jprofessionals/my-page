@@ -31,10 +31,10 @@ const cabinColorsOpacity: { [key: string]: string } = {
   'Stor leilighet': 'bg-orange-200',
 }
 
-const pendingBookingCabinColors: { [key: number]: string } = {
-  3: 'bg-green-200',
-  2: 'bg-purple-200',
-  1: 'bg-yellow-200',
+const pendingBookingCabinColors: { [key: string]: string } = {
+  Annekset: 'bg-green-200',
+  'Liten leilighet': 'bg-purple-200',
+  'Stor leilighet': 'bg-yellow-200',
 }
 
 function MonthCalendar({
@@ -182,7 +182,6 @@ function MonthCalendar({
             )
 
           const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
-          const cabinIdOrder = [1, 2, 3]
 
           const bookingsByCabin: { [key: string]: Booking[] } =
             cabinOrder.reduce((result: { [key: string]: Booking[] }, cabin) => {
@@ -241,23 +240,23 @@ function MonthCalendar({
 
           const pendingBookingsByCabin: {
             [key: string]: PendingBookingTrain[]
-          } = cabinIdOrder.reduce(
-            (result: { [key: string]: PendingBookingTrain[] }, cabinId) => {
-              result[cabinId] = pendingBookingsTrains.filter(
+          } = cabinOrder.reduce(
+            (result: { [key: string]: PendingBookingTrain[] }, cabin) => {
+              result[cabin] = pendingBookingsTrains.filter(
                 (pendingBookingTrain) =>
-                  pendingBookingTrain.apartmentId === cabinId,
+                  pendingBookingTrain.apartment.cabin_name === cabin,
               )
               return result
             },
             {},
           )
 
-          const pendingBookingTrains = cabinIdOrder.map((cabinId) => {
+          const pendingBookingTrains = cabinOrder.map((cabin) => {
             const cabinPendingBookingTrains =
-              pendingBookingsByCabin[cabinId] || []
+              pendingBookingsByCabin[cabin] || []
             return cabinPendingBookingTrains.length > 0 ? (
               <div
-                key={cabinId}
+                key={cabin}
                 className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
               >
                 {cabinPendingBookingTrains.map((pendingBookingTrain) => {
@@ -272,7 +271,7 @@ function MonthCalendar({
                         isAfter(add(props.date, { days: 1 }), new Date())
                           ? get(
                               pendingBookingCabinColors,
-                              String(pendingBookingTrain.apartmentId),
+                              pendingBookingTrain.apartment.cabin_name,
                             )
                           : null,
                         'normal-case',
@@ -282,7 +281,7 @@ function MonthCalendar({
                 })}
               </div>
             ) : (
-              <div key={cabinId} className="invisible h-4 md:h-8">
+              <div key={cabin} className="invisible h-4 md:h-8">
                 hey
               </div>
             )
