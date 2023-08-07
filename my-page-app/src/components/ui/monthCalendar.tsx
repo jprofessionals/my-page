@@ -11,7 +11,7 @@ import {
   isWithinInterval,
   isAfter,
 } from 'date-fns'
-import { Booking } from '@/types'
+import { Booking, PendingBookingTrain } from '@/types'
 import { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import ApiService from '@/services/api.service'
@@ -29,6 +29,12 @@ const cabinColorsOpacity: { [key: string]: string } = {
   Annekset: 'bg-teal-200',
   'Liten leilighet': 'bg-blue-200',
   'Stor leilighet': 'bg-orange-200',
+}
+
+const pendingBookingCabinColors: { [key: number]: string } = {
+  3: 'bg-green-200',
+  2: 'bg-purple-200',
+  1: 'bg-yellow-200',
 }
 
 function MonthCalendar({
@@ -64,11 +70,38 @@ function MonthCalendar({
     )
     return fetchedBookings
   })
+  const [
+    fetchedPendingBookingTrainsAllApartments,
+    setFetchedPendingBookingTrainsAllApartments,
+  ] = useState([])
+  const { data: allPendingBookingTrainsAllApartments } = useQuery(
+    'allPendingBookingsAllApartments',
+    async () => {
+      const fetchedPendingBookingsTrains =
+        await ApiService.getAllPendingBookingTrainsForAllApartments()
+      setFetchedPendingBookingTrainsAllApartments(fetchedPendingBookingsTrains)
+    },
+  )
 
   const getBookings = (date: string) => {
     return (
       bookings?.filter(
         (booking) => date >= booking.startDate && date <= booking.endDate,
+      ) || []
+    )
+  }
+  const getAllPendingBookingTrainsAllApartmentsSplit = (date: string) => {
+    const allPendingBookingTrainsAllApartments = []
+    for (const apartmentPendingTrain of fetchedPendingBookingTrainsAllApartments) {
+      for (const pendingTrain of apartmentPendingTrain) {
+        allPendingBookingTrainsAllApartments.push(pendingTrain)
+      }
+    }
+    return (
+      allPendingBookingTrainsAllApartments.filter(
+        (pendingBookingTrain) =>
+          date >= pendingBookingTrain.startDate &&
+          date <= pendingBookingTrain.endDate,
       ) || []
     )
   }
@@ -143,8 +176,13 @@ function MonthCalendar({
         DayContent: (props) => {
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
+          const pendingBookingsTrains =
+            getAllPendingBookingTrainsAllApartmentsSplit(
+              format(props.date, 'yyyy-MM-dd'),
+            )
 
           const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
+          const cabinIdOrder = [1, 2, 3]
 
           const bookingsByCabin: { [key: string]: Booking[] } =
             cabinOrder.reduce((result: { [key: string]: Booking[] }, cabin) => {
@@ -201,10 +239,60 @@ function MonthCalendar({
             )
           })
 
+          const pendingBookingsByCabin: {
+            [key: string]: PendingBookingTrain[]
+          } = cabinIdOrder.reduce(
+            (result: { [key: string]: PendingBookingTrain[] }, cabinId) => {
+              result[cabinId] = pendingBookingsTrains.filter(
+                (pendingBookingTrain) =>
+                  pendingBookingTrain.apartmentId === cabinId,
+              )
+              return result
+            },
+            {},
+          )
+
+          const pendingBookingTrains = cabinIdOrder.map((cabinId) => {
+            const cabinPendingBookingTrains =
+              pendingBookingsByCabin[cabinId] || []
+            return cabinPendingBookingTrains.length > 0 ? (
+              <div
+                key={cabinId}
+                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
+              >
+                {cabinPendingBookingTrains.map((pendingBookingTrain) => {
+                  return (
+                    <span
+                      key={pendingBookingTrain.id}
+                      className={cn(
+                        getPendingBookingCabinStyle(
+                          props.date,
+                          pendingBookingTrain,
+                        ),
+                        isAfter(add(props.date, { days: 1 }), new Date())
+                          ? get(
+                              pendingBookingCabinColors,
+                              String(pendingBookingTrain.apartmentId),
+                            )
+                          : null,
+                        'normal-case',
+                      )}
+                    ></span>
+                  )
+                })}
+              </div>
+            ) : (
+              <div key={cabinId} className="invisible h-4 md:h-8">
+                hey
+              </div>
+            )
+          })
+
           return (
             <>
               {dateCalendar}
               {cabinBookings}
+              {pendingBookingTrains}
             </>
           )
         },
@@ -227,10 +315,51 @@ const getBookingDateInfo = (date: Date, booking: Booking) => {
   return { isFirstDay, isLastDay, isInInterval }
 }
 
+const getPendingBookingDateInfo = (
+  date: Date,
+  pendingBookingTrain: PendingBookingTrain,
+) => {
+  const isFirstDay = isSameDay(
+    new Date(date),
+    new Date(pendingBookingTrain.startDate),
+  )
+  const isLastDay = isSameDay(
+    new Date(date),
+    new Date(pendingBookingTrain.endDate),
+  )
+  const isInInterval =
+    isWithinInterval(new Date(date), {
+      start: new Date(pendingBookingTrain.startDate),
+      end: new Date(pendingBookingTrain.endDate),
+    }) &&
+    !isFirstDay &&
+    !isLastDay
+  return { isFirstDay, isLastDay, isInInterval }
+}
+
 const getCabinBookingStyle = (date: Date, booking: Booking) => {
   const { isFirstDay, isLastDay, isInInterval } = getBookingDateInfo(
     date,
     booking,
+  )
+  return cn(
+    isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
+    isFirstDay && !isSunday(date) && 'md:-mr-2',
+    isLastDay && 'rounded-r-full col-start-1 row-start-1',
+    isLastDay && !isMonday(date) && 'md:-ml-2',
+    isInInterval && 'col-span-2 ',
+    isInInterval && !isMonday(date) && 'md:-ml-1',
+    isInInterval && !isSunday(date) && 'md:-mr-1',
+  )
+}
+
+const getPendingBookingCabinStyle = (
+  date: Date,
+  pendingBookingTrain: PendingBookingTrain,
+) => {
+  const { isFirstDay, isLastDay, isInInterval } = getPendingBookingDateInfo(
+    date,
+    pendingBookingTrain,
   )
   return cn(
     isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
