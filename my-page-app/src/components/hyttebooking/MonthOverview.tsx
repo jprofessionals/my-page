@@ -24,6 +24,33 @@ export default function MonthOverview() {
       return yourBookings
     },
   )
+  const [
+    fetchedPendingBookingTrainsAllApartments,
+    setFetchedPendingBookingTrainsAllApartments,
+  ] = useState([])
+  const { data: allPendingBookingTrainsAllApartments } = useQuery(
+      'allPendingBookingsAllApartments',
+      async () => {
+        const fetchedPendingBookingsTrains =
+            await ApiService.getAllPendingBookingTrainsForAllApartments()
+        setFetchedPendingBookingTrainsAllApartments(fetchedPendingBookingsTrains)
+      },
+  )
+  const getAllPendingBookingTrainsAllApartmentsSplit = (date: string) => {
+    const allPendingBookingTrainsAllApartments = []
+    for (const apartmentPendingTrain of fetchedPendingBookingTrainsAllApartments) {
+      for (const pendingTrain of apartmentPendingTrain) {
+        allPendingBookingTrainsAllApartments.push(pendingTrain)
+      }
+    }
+    return (
+        allPendingBookingTrainsAllApartments.filter(
+            (pendingBookingTrain) =>
+                date >= pendingBookingTrain.startDate &&
+                date <= pendingBookingTrain.endDate,
+        ) || []
+    )
+  }
   const userIsAdmin = async () => {
     try {
       const response = await ApiService.getUser()
@@ -249,6 +276,8 @@ export default function MonthOverview() {
         mode="single"
         selected={date}
         onSelect={setDate}
+        getAllPendingBookingTrainsAllApartmentsSplit = {getAllPendingBookingTrainsAllApartmentsSplit}
+        fetchedPendingBookingTrainsAllApartments = {fetchedPendingBookingTrainsAllApartments}
         className="rounded-md border"
       />
       <Modal

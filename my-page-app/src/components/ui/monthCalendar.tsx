@@ -17,7 +17,10 @@ import { buttonVariants } from '@/components/ui/button'
 import ApiService from '@/services/api.service'
 import { get } from 'radash'
 import { useQuery } from 'react-query'
-export type CalendarProps = ComponentProps<typeof DayPicker>
+export type CalendarProps = ComponentProps<typeof DayPicker> & {
+  fetchedPendingBookingTrainsAllApartments: any
+  getAllPendingBookingTrainsAllApartmentsSplit: any
+}
 
 const cabinColors: { [key: string]: string } = {
   Annekset: 'bg-teal-annex',
@@ -41,6 +44,8 @@ function MonthCalendar({
   className,
   classNames,
   showOutsideDays = true,
+  fetchedPendingBookingTrainsAllApartments,
+  getAllPendingBookingTrainsAllApartmentsSplit,
   ...props
 }: CalendarProps) {
   const { data: yourBookings } = useQuery<Booking[]>(
@@ -70,7 +75,7 @@ function MonthCalendar({
     )
     return fetchedBookings
   })
-  const [
+  /*const [
     fetchedPendingBookingTrainsAllApartments,
     setFetchedPendingBookingTrainsAllApartments,
   ] = useState([])
@@ -81,7 +86,7 @@ function MonthCalendar({
         await ApiService.getAllPendingBookingTrainsForAllApartments()
       setFetchedPendingBookingTrainsAllApartments(fetchedPendingBookingsTrains)
     },
-  )
+  )*/
 
   const getBookings = (date: string) => {
     return (
@@ -90,7 +95,7 @@ function MonthCalendar({
       ) || []
     )
   }
-  const getAllPendingBookingTrainsAllApartmentsSplit = (date: string) => {
+  /*const getAllPendingBookingTrainsAllApartmentsSplit = (date: string) => {
     const allPendingBookingTrainsAllApartments = []
     for (const apartmentPendingTrain of fetchedPendingBookingTrainsAllApartments) {
       for (const pendingTrain of apartmentPendingTrain) {
@@ -104,7 +109,7 @@ function MonthCalendar({
           date <= pendingBookingTrain.endDate,
       ) || []
     )
-  }
+  }*/
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const handleResize = () => {
@@ -196,7 +201,7 @@ function MonthCalendar({
           } = cabinOrder.reduce(
             (result: { [key: string]: PendingBookingTrain[] }, cabin) => {
               result[cabin] = pendingBookingsTrains.filter(
-                (pendingBookingTrain) =>
+                (pendingBookingTrain: PendingBookingTrain) =>
                   pendingBookingTrain.apartment.cabin_name === cabin,
               )
               return result
