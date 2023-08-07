@@ -191,53 +191,6 @@ function MonthCalendar({
               return result
             }, {})
 
-          const cabinBookings = cabinOrder.map((cabin) => {
-            const cabinBookings = bookingsByCabin[cabin] || []
-            return cabinBookings.length > 0 ? (
-              <div
-                key={cabin}
-                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
-              >
-                {cabinBookings.map((booking) => {
-                  const isYourBooking = yourBookings?.some(
-                    (yourBooking) => yourBooking.id === booking.id,
-                  )
-                  const { isFirstDay, isLastDay } = getBookingDateInfo(
-                    props.date,
-                    booking,
-                  )
-                  return (
-                    <span
-                      key={booking.id}
-                      className={cn(
-                        'p-2 text-white tooltip tooltip-top shadow-xl',
-                        getCabinBookingStyle(props.date, booking),
-                        isYourBooking && 'shadow-y-2',
-                        isAfter(add(props.date, { days: 1 }), new Date())
-                          ? get(cabinColors, booking.apartment?.cabin_name)
-                          : get(
-                              cabinColorsOpacity,
-                              booking.apartment?.cabin_name,
-                            ),
-                        'normal-case',
-                      )}
-                      {...(windowWidth > 800 && {
-                        'data-tip': `Reservert av: ${booking.employeeName}`,
-                      })}
-                    >
-                      {(isFirstDay || isLastDay) &&
-                        getInitials(booking.employeeName)}
-                    </span>
-                  )
-                })}
-              </div>
-            ) : (
-              <div key={cabin} className="invisible h-4 md:h-8">
-                hey
-              </div>
-            )
-          })
-
           const pendingBookingsByCabin: {
             [key: string]: PendingBookingTrain[]
           } = cabinOrder.reduce(
@@ -251,16 +204,22 @@ function MonthCalendar({
             {},
           )
 
-          const pendingBookingTrains = cabinOrder.map((cabin) => {
+          const renderBookingsAndPendingBookings = (cabin: string) => {
+            const cabinBookings = bookingsByCabin[cabin] || []
             const cabinPendingBookingTrains =
               pendingBookingsByCabin[cabin] || []
-            return cabinPendingBookingTrains.length > 0 ? (
-              <div
-                key={cabin}
-                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
-              >
-                {cabinPendingBookingTrains.map((pendingBookingTrain) => {
-                  return (
+            const combinedEntries: (Booking | PendingBookingTrain)[] = [
+              ...cabinBookings,
+              ...cabinPendingBookingTrains,
+            ]
+
+            if (combinedEntries.length === 0) {
+              return (
+                <div
+                  key={cabin}
+                  className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
+                >
+                  {cabinPendingBookingTrains.map((pendingBookingTrain) => (
                     <span
                       key={pendingBookingTrain.id}
                       className={cn(
@@ -277,21 +236,81 @@ function MonthCalendar({
                         'normal-case',
                       )}
                     ></span>
-                  )
+                  ))}
+                </div>
+              )
+            }
+
+            return (
+              <div
+                key={cabin}
+                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
+              >
+                {combinedEntries.map((entry) => {
+                  if ('employeeName' in entry) {
+                    const booking = entry as Booking
+                    const isYourBooking = yourBookings?.some(
+                      (yourBooking) => yourBooking.id === booking.id,
+                    )
+                    const { isFirstDay, isLastDay } = getBookingDateInfo(
+                      props.date,
+                      booking,
+                    )
+                    return (
+                      <span
+                        key={booking.id}
+                        className={cn(
+                          'p-2 text-white tooltip tooltip-top shadow-xl',
+                          getCabinBookingStyle(props.date, booking),
+                          isYourBooking && 'shadow-y-2',
+                          isAfter(add(props.date, { days: 1 }), new Date())
+                            ? get(cabinColors, booking.apartment?.cabin_name)
+                            : get(
+                                cabinColorsOpacity,
+                                booking.apartment?.cabin_name,
+                              ),
+                          'normal-case',
+                        )}
+                        {...(windowWidth > 800 && {
+                          'data-tip': `Reservert av: ${booking.employeeName}`,
+                        })}
+                      >
+                        {(isFirstDay || isLastDay) &&
+                          getInitials(booking.employeeName)}
+                      </span>
+                    )
+                  } else {
+                    const pendingBookingTrain = entry as PendingBookingTrain
+                    return (
+                      <span
+                        key={pendingBookingTrain.id}
+                        className={cn(
+                          getPendingBookingCabinStyle(
+                            props.date,
+                            pendingBookingTrain,
+                          ),
+                          isAfter(add(props.date, { days: 1 }), new Date())
+                            ? get(
+                                pendingBookingCabinColors,
+                                pendingBookingTrain.apartment.cabin_name,
+                              )
+                            : null,
+                          'normal-case',
+                        )}
+                      ></span>
+                    )
+                  }
                 })}
               </div>
-            ) : (
-              <div key={cabin} className="invisible h-4 md:h-8">
-                hey
-              </div>
             )
-          })
+          }
 
           return (
             <>
               {dateCalendar}
-              {cabinBookings}
-              {pendingBookingTrains}
+              {renderBookingsAndPendingBookings('Stor leilighet')}
+              {renderBookingsAndPendingBookings('Liten leilighet')}
+              {renderBookingsAndPendingBookings('Annekset')}
             </>
           )
         },

@@ -395,7 +395,11 @@ export default function MonthOverview() {
                   )
                   .map((apartment, index) => (
                     <div key={index}>
-                      <p className= {`mt-1 mb-1 ${cabinBorderColorClasses[apartment.cabin_name]} pl-2 border-l-2 `}>
+                      <p
+                        className={`mt-1 mb-1 ${
+                          cabinBorderColorClasses[apartment.cabin_name]
+                        } pl-2 border-l-2 `}
+                      >
                         <span className="apartment-text">
                           {apartment.cabin_name}
                         </span>
