@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react'
 import Modal from 'react-modal'
 import {MonthCalendar} from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import {Apartment, Booking, PendingBookingTrain} from '@/types'
+import {Apartment, Booking} from '@/types'
 import {toast} from 'react-toastify'
 import {useAuthContext} from '@/providers/AuthProvider'
 import {add, format, sub} from 'date-fns'
@@ -249,10 +249,17 @@ export default function MonthOverview() {
         allPendingBookingTrainsAllApartments.push(pendingTrain)
       }
     }
+    const currentDate = new Date(date)
+    currentDate.setHours(0, 0, 0, 0)
     const filteredPendingBookingTrainsAllApartments = allPendingBookingTrainsAllApartments.filter(
-        (pendingBookingTrain) =>
-            new Date (date) >= new Date (pendingBookingTrain.startDate) &&
-            new Date (date) <= new Date (pendingBookingTrain.endDate),
+        (pendingBookingTrain) => {
+          const startDate = new Date(pendingBookingTrain.startDate)
+          const endDate = new Date(pendingBookingTrain.endDate)
+          startDate.setHours(0, 0, 0, 0)
+          endDate.setHours(0, 0, 0, 0)
+
+          return currentDate >= startDate && currentDate <= endDate
+        }
     ) || []
     return (
         filteredPendingBookingTrainsAllApartments
@@ -262,10 +269,8 @@ export default function MonthOverview() {
     const pendingBookingsOnDay = []
     const selectedDateString = selectedDate.toString()
     const filteredPendingBookingTrainsAllApartments = getPendingBookingTrainsOnDay(selectedDateString)
-    console.log(filteredPendingBookingTrainsAllApartments)
 
     for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments){
-      console.log("pendginttrain",pendingBookingTrain)
       pendingBookingsOnDay.push(pendingBookingTrain.pendingBookingList)
     }
     console.log(pendingBookingsOnDay)
