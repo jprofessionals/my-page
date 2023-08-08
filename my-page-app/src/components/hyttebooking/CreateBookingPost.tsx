@@ -87,7 +87,7 @@ const CreateBookingPost = ({
   const isValid =
     startDate < endDate &&
     differenceInDays(new Date(endDate), new Date(startDate)) <= 7 &&
-    isBefore(new Date(endDate), new Date(cutOffDateVacancies))
+    isBefore(new Date(endDate), addDays(new Date(cutOffDateVacancies), 1))
 
   const queryClient = useQueryClient()
   const { mutate } = useMutation(createBooking, {
