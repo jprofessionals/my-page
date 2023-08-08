@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react'
 import Modal from 'react-modal'
 import {MonthCalendar} from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import { Apartment, Booking } from '@/types'
+import {Apartment, Booking, PendingBooking} from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { format, isBefore, sub } from 'date-fns'
@@ -266,15 +266,18 @@ export default function MonthOverview() {
         filteredPendingBookingTrainsAllApartments
     )
   }
+  const [pendingBookingsOnDay, setPendingBookingsOnDay] = useState<PendingBooking[]>([])
   const getPendingBookingsOnDay = (selectedDate: Date) => {
-    const pendingBookingsOnDay = []
+    const pendingBookingsOnDayArrayOfArray = []
     const selectedDateString = selectedDate.toString()
     const filteredPendingBookingTrainsAllApartments = getPendingBookingTrainsOnDay(selectedDateString)
 
     for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments){
-      pendingBookingsOnDay.push(pendingBookingTrain.pendingBookingList)
+      pendingBookingsOnDayArrayOfArray.push(pendingBookingTrain.pendingBookingList)
     }
-    return pendingBookingsOnDay
+    const pendingBookingsOnDayList = pendingBookingsOnDayArrayOfArray.flat()
+    setPendingBookingsOnDay(pendingBookingsOnDayList)
+    return pendingBookingsOnDayList
   }
 
   type CabinColorClasses = {
@@ -290,6 +293,12 @@ export default function MonthOverview() {
     'Stor leilighet': 'border-orange-brand',
     'Liten leilighet': 'border-blue-small-appartment',
     Annekset: 'border-teal-annex',
+  }
+
+  const cabinPendingBorderColorClasses: CabinColorClasses = {
+    Annekset: 'bg-green-200',
+    'Liten leilighet': 'bg-purple-200',
+    'Stor leilighet': 'bg-yellow-200',
   }
 
   const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
@@ -484,6 +493,27 @@ export default function MonthOverview() {
                     )}
                   </div>
                 ))}
+              <h3 className="mt-3 mb-1">Meldt interesse:</h3>
+              {pendingBookingsOnDay.sort(
+                  (a, b) =>
+                      cabinOrder.indexOf(a.apartment.cabin_name) -
+                      cabinOrder.indexOf(b.apartment.cabin_name),
+              ).map((pendingBooking, index) => (
+                  <div key={index}>
+                    <p
+                        className={`mt-1 mb-1 ${
+                            cabinPendingBorderColorClasses[pendingBooking.apartment.cabin_name]
+                        } pl-2 border-l-2 `}
+                    >
+                      <span className="pendingBooking-text">
+                        {pendingBooking.employeeName} har meldt interesse for {pendingBooking.apartment.cabin_name}
+                        {' '} i perioden {pendingBooking.startDate} til {pendingBooking.endDate}.
+                      </span>
+
+                    </p>
+                  </div>
+              ))
+              }
             </div>
           ) : (
             <div>

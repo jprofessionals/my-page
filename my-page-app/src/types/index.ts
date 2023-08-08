@@ -106,6 +106,7 @@ export type PendingBooking = {
   startDate: string
   endDate: string
   createdDate: string
+  employeeName: string
 }
 
 export type PendingBookingTrain = {
