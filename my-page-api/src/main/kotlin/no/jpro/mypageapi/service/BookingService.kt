@@ -15,7 +15,10 @@ import no.jpro.mypageapi.utils.mapper.ApartmentMapper
 import no.jpro.mypageapi.utils.mapper.BookingMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+
+val cutOffDate = "2023-10-01" //Todo: HardCoded cutOffDate of when it is possible to book. Change later.
 
 @Service
 class BookingService(
@@ -115,11 +118,12 @@ class BookingService(
     }
 
     fun createBooking(bookingRequest: CreateBookingDTO, createdBy: User): BookingDTO {
+        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val apartment = getApartment(bookingRequest.apartmentID)
 
         val checkBookingAvailable = filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
 
-        if(checkBookingAvailable.isEmpty()) {
+        if(checkBookingAvailable.isEmpty() && bookingRequest.endDate <= LocalDate.parse(cutOffDate, dateFormatter)) {
             val booking = bookingMapper.toBooking(
                 bookingRequest,
                 apartment

@@ -2,14 +2,16 @@ import React, {useCallback, useEffect, useState} from 'react'
 import Modal from 'react-modal'
 import {MonthCalendar} from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import {Apartment, Booking} from '@/types'
-import {toast} from 'react-toastify'
-import {useAuthContext} from '@/providers/AuthProvider'
-import {add, format, sub} from 'date-fns'
-import {useMutation, useQuery, useQueryClient} from 'react-query'
+import { Apartment, Booking } from '@/types'
+import { toast } from 'react-toastify'
+import { useAuthContext } from '@/providers/AuthProvider'
+import { format, isBefore, sub } from 'date-fns'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
+const cutOffDateVacancies = '2023-10-01'
+//TODO: Hardkodet cutoff date som styrer hva man kan booke.
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
   const [showModal, setShowModal] = useState(false)
@@ -90,7 +92,6 @@ export default function MonthOverview() {
       console.error('Error:', error)
     },
   })
-
   const handleDateClick = (date: Date) => {
     setDate(date)
     fetchBookingItems(date)
@@ -156,16 +157,15 @@ export default function MonthOverview() {
   >([])
   const [apartments, setApartments] = useState<Apartment[]>([])
 
+  const startDateVacancies = format(sub(new Date(), { days: 1 }), 'yyyy-MM-dd')
+  //const endDateVacancies = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
   const refreshVacancies = useCallback(async () => {
     setVacancyLoadingStatus('loading')
 
     try {
-      const startDate = format(sub(new Date(), { days: 1 }), 'yyyy-MM-dd')
-      const endDate = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
-
       const loadedVacancies = await ApiService.getAllVacancies(
-        startDate,
-        endDate,
+        startDateVacancies,
+        cutOffDateVacancies,
       )
       setVacancyLoadingStatus('completed')
       setVacancies(loadedVacancies)
@@ -200,15 +200,16 @@ export default function MonthOverview() {
     previousDate.setDate(selectedDate.getDate() - 1)
     const formattedPreviousDate = format(previousDate, 'yyyy-MM-dd')
 
-    for (const apartment of apartmentsInVacancies) {
-      const dates = vacancies![Number(apartment)]
-
-      if (
-        dates.includes(formattedDate) ||
-        dates.includes(formattedNextDate) ||
-        dates.includes(formattedPreviousDate)
-      ) {
-        vacantApartments.push(Number(apartment))
+    if (isBefore(selectedDate, new Date(cutOffDateVacancies))) {
+      for (const apartment of apartmentsInVacancies) {
+        const dates = vacancies![Number(apartment)]
+        if (
+          dates.includes(formattedDate) ||
+          dates.includes(formattedNextDate) ||
+          dates.includes(formattedPreviousDate)
+        ) {
+          vacantApartments.push(Number(apartment))
+        }
       }
     }
     return vacantApartments
@@ -303,6 +304,7 @@ export default function MonthOverview() {
         getPendingBookingTrainsOnDay = {getPendingBookingTrainsOnDay}
         fetchedPendingBookingTrainsAllApartments = {fetchedPendingBookingTrainsAllApartments}
         className="rounded-md border"
+        cutOffDateVacancies={cutOffDateVacancies}
       />
       <Modal
         className=""
@@ -315,6 +317,11 @@ export default function MonthOverview() {
           {date ? (
             <div>
               <h3 className="mt-1 mb-1">{format(date, 'dd.MM.yyyy')}</h3>
+              {isBefore(date, new Date(cutOffDateVacancies)) ? (
+                null
+              ) : (
+                <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
+              )}
               <div>
                 {bookingItems
                   .sort((a, b) => {
@@ -436,46 +443,47 @@ export default function MonthOverview() {
                     )
                   })}
               </div>
-              <h3 className="mt-3 mb-1">Ledige hytter:</h3>
-              {vacantApartmentsOnDay.length === 0 ? (
-                <p className="mb-1">Ingen ledige hytter</p>
+              {vacantApartmentsOnDay.length !== 0 ? (
+                <h3 className="mt-3 mb-1">Ledige hytter:</h3>
               ) : (
-                vacantApartmentsOnDay
-                  .sort(
-                    (a, b) =>
-                      cabinOrder.indexOf(a.cabin_name) -
-                      cabinOrder.indexOf(b.cabin_name),
-                  )
-                  .map((apartment, index) => (
-                    <div key={index}>
-                      <p
-                        className={`mt-1 mb-1 ${
-                          cabinBorderColorClasses[apartment.cabin_name]
-                        } pl-2 border-l-2 `}
-                      >
-                        <span className="apartment-text">
-                          {apartment.cabin_name}
-                        </span>
-                        <button
-                          onClick={() => handleBookClick(apartment.id)}
-                          className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
-                        >
-                          Reserver
-                        </button>
-                      </p>
-                      {expandedApartments.includes(apartment.id) && (
-                        <div className="expanded-content">
-                          <CreateBookingPost
-                            apartmentId={apartment.id}
-                            date={date}
-                            closeModal={closeModal}
-                            refreshVacancies={refreshVacancies}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))
+                null
               )}
+              {vacantApartmentsOnDay
+                .sort(
+                  (a, b) =>
+                    cabinOrder.indexOf(a.cabin_name) -
+                    cabinOrder.indexOf(b.cabin_name),
+                )
+                .map((apartment, index) => (
+                  <div key={index}>
+                    <p
+                      className={`mt-1 mb-1 ${
+                        cabinBorderColorClasses[apartment.cabin_name]
+                      } pl-2 border-l-2 `}
+                    >
+                      <span className="apartment-text">
+                        {apartment.cabin_name}
+                      </span>
+                      <button
+                        onClick={() => handleBookClick(apartment.id)}
+                        className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
+                      >
+                        Reserver
+                      </button>
+                    </p>
+                    {expandedApartments.includes(apartment.id) && (
+                      <div className="expanded-content">
+                        <CreateBookingPost
+                          apartmentId={apartment.id}
+                          date={date}
+                          closeModal={closeModal}
+                          refreshVacancies={refreshVacancies}
+                          cutOffDateVacancies={cutOffDateVacancies}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
             </div>
           ) : (
             <div>

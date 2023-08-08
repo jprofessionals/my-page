@@ -79,7 +79,8 @@ function Hyttebooking() {
           oppretting, endring og sletting av reservasjoner vil foregå når man
           trykker på en bestemt dato. Her planlegges det å opprette et
           varslingssytem på slack så alle ansatte blir oppdatert på visse
-          endringer.
+          endringer. Siste reserverbare dato markeres med en <span className="text-red-500">rød</span> kant i kalenderen, og
+          det er ikke mulig å reservere datoer etter denne dagen.
         </p>
 
         <p>
