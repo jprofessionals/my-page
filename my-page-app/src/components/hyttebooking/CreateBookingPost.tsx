@@ -1,6 +1,6 @@
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { API_URL } from '../../services/api.service'
-import moment from 'moment'
+import { format, addDays, differenceInDays, isBefore, isEqual } from 'date-fns'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
@@ -9,7 +9,6 @@ import { BookingPost } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
 import { useMutation, useQueryClient } from 'react-query'
-import {add, isBefore, isEqual} from 'date-fns'
 
 type Props = {
   apartmentId: number
@@ -19,6 +18,7 @@ type Props = {
   userIsAdmin: boolean
   allUsersNames: string[]
   cutOffDateVacancies: string
+  vacancies: { [key: number]: string[] } | undefined
 }
 const createBooking = async ({
   bookingPost,
@@ -70,18 +70,59 @@ const CreateBookingPost = ({
   userIsAdmin,
   allUsersNames,
   cutOffDateVacancies,
+  vacancies,
 }: Props) => {
-  const [startDate, setStartDate] = useState(moment(date).format('YYYY-MM-DD'))
-  const [endDate, setEndDate] = useState(
-    moment(date).add(7, 'days').format('YYYY-MM-DD'),
-  )
+  const [startDate, setStartDate] = useState(format(date, 'yyyy-MM-dd'))
+  const [endDate, setEndDate] = useState('')
+
+  const vacantDaysForApartmentWithoutTakeoverDates =
+    vacancies![Number(apartmentId)]
+
+  useEffect(() => {
+    const startDateFns = new Date(startDate)
+    const sevenDaysAfterStart = format(addDays(startDateFns, 7), 'yyyy-MM-dd')
+
+    if (
+      vacantDaysForApartmentWithoutTakeoverDates.includes(sevenDaysAfterStart)
+    ) {
+      setEndDate(sevenDaysAfterStart)
+    } else {
+      const maxAvailableDatesInBooking = []
+      const endFns = addDays(startDateFns, 7)
+
+      for (
+        let currentFns = startDateFns;
+        isBefore(currentFns, endFns);
+        currentFns = addDays(currentFns, 1)
+      ) {
+        const currentDate = format(currentFns, 'yyyy-MM-dd')
+        const previousFns = addDays(currentFns, -1)
+        const previousDate = format(previousFns, 'yyyy-MM-dd')
+        if (
+          vacantDaysForApartmentWithoutTakeoverDates.includes(currentDate) ||
+          vacantDaysForApartmentWithoutTakeoverDates.includes(previousDate)
+        ) {
+          maxAvailableDatesInBooking.push(currentDate)
+        }
+      }
+
+      if (maxAvailableDatesInBooking.length > 0) {
+        setEndDate(
+          maxAvailableDatesInBooking[maxAvailableDatesInBooking.length - 1],
+        )
+      } else {
+        setEndDate(startDate)
+      }
+    }
+  }, [vacantDaysForApartmentWithoutTakeoverDates])
+
   const [isLoadingPost, setIsLoadingPost] = useState(false)
   const [bookingOwnerName, setBookingOwnerName] = useState<string>('')
 
   const isValid =
     startDate < endDate &&
-    moment(endDate).diff(startDate, 'days') <= 7 &&
-    isBefore(new Date(endDate), add(new Date(cutOffDateVacancies), {days: 1})) &&
+    differenceInDays(new Date(endDate), new Date(startDate)) <= 7 &&
+    isBefore(new Date(endDate), addDays(new Date(cutOffDateVacancies), 1)) &&
     bookingOwnerName!== ''
 
   const queryClient = useQueryClient()
