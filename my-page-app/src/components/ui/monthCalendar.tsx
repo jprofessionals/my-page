@@ -17,9 +17,9 @@ import { buttonVariants } from '@/components/ui/button'
 import { get } from 'radash'
 export type CalendarProps = ComponentProps<typeof DayPicker> & {
   cutOffDateVacancies: string
-  bookings: any
-  yourBookings: any
-  getBookings: any
+  bookings: Booking[] | undefined
+  yourBookings: Booking[] | undefined
+  getBookings: Function
 }
 
 const cabinColors: { [key: string]: string } = {
@@ -181,10 +181,10 @@ function MonthCalendar({
               {dateCalendar}
               {cabinBookings}
               <span
-                className={`absolute top-0 left-0 w-full h-full ${getCutOffDateStyle(
-                  props.date,
-                  cutOffDate,
-                )}`}
+                className={cn(
+                  'absolute top-0 left-0 w-full h-full',
+                  getCutOffDateStyle(props.date, cutOffDate),
+                )}
                 aria-hidden="true"
               />
             </>
