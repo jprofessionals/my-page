@@ -273,57 +273,9 @@ export default function MonthOverview() {
     for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments){
       pendingBookingsOnDay.push(pendingBookingTrain.pendingBookingList)
     }
-    console.log(pendingBookingsOnDay)
     return pendingBookingsOnDay
   }
 
-  /*const getAllPendingBookingTrainsAllApartments = () => {
-    const allPendingBookingTrainsAllApartments = []
-    for (const apartmentPendingTrain of fetchedPendingBookingTrainsAllApartments) {
-      for (const pendingTrain of apartmentPendingTrain) {
-        allPendingBookingTrainsAllApartments.push(pendingTrain)
-      }
-    }
-    console.log("test")
-    return (
-        allPendingBookingTrainsAllApartments
-    )
-  }
-  const getPendingBookingTrainsOnDay = (date: Date) => {
-    const filteredPendingBookingTrainsAllApartments = getAllPendingBookingTrainsAllApartments().filter(
-        (pendingBookingTrain) =>
-            date >= pendingBookingTrain.startDate &&
-            date <= pendingBookingTrain.endDate,
-    ) || []
-    return (
-        filteredPendingBookingTrainsAllApartments
-    )
-  }*/
-
-  /*const getPendingBookingsOnDay = (selectedDate: Date) => {
-    const pendingBookingsOnDay = []
-
-    const allPendingBookingTrainsAllApartments = []
-    for (const apartmentPendingTrain of fetchedPendingBookingTrainsAllApartments) {
-      for (const pendingTrain of apartmentPendingTrain) {
-        allPendingBookingTrainsAllApartments.push(pendingTrain)
-      }
-    }
-    const filteredPendingBookingTrainsAllApartments = allPendingBookingTrainsAllApartments.filter(
-        (pendingBookingTrain) =>
-            selectedDate >= new Date (pendingBookingTrain.startDate) &&
-            selectedDate <= new Date (pendingBookingTrain.endDate),
-    ) || []
-    console.log(selectedDate)
-    console.log("filter",filteredPendingBookingTrainsAllApartments)
-    for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments){
-      console.log("pendginttrain",pendingBookingTrain)
-      pendingBookingsOnDay.push(pendingBookingTrain.pendingBookingList)
-    }
-    console.log(pendingBookingsOnDay)
-    return pendingBookingsOnDay
-  }
-*/
   type CabinColorClasses = {
     [key: string]: string
   }
