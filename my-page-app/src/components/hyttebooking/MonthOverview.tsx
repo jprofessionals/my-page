@@ -296,9 +296,9 @@ export default function MonthOverview() {
   }
 
   const cabinPendingBorderColorClasses: CabinColorClasses = {
-    Annekset: 'bg-green-200',
-    'Liten leilighet': 'bg-purple-200',
-    'Stor leilighet': 'bg-yellow-200',
+    'Stor leilighet': 'border-yellow-200',
+    'Liten leilighet': 'border-purple-200',
+    Annekset: 'border-green-200',
   }
 
   const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
