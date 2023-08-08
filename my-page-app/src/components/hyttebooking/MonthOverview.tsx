@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import Modal from 'react-modal'
-import { MonthCalendar } from '@/components/ui/monthCalendar'
+import {MonthCalendar} from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import { Apartment, Booking } from '@/types'
-import { toast } from 'react-toastify'
-import { useAuthContext } from '@/providers/AuthProvider'
-import { add, format, sub } from 'date-fns'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
+import {Apartment, Booking, PendingBookingTrain} from '@/types'
+import {toast} from 'react-toastify'
+import {useAuthContext} from '@/providers/AuthProvider'
+import {add, format, sub} from 'date-fns'
+import {useMutation, useQuery, useQueryClient} from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 
@@ -24,33 +24,6 @@ export default function MonthOverview() {
       return yourBookings
     },
   )
-  const [
-    fetchedPendingBookingTrainsAllApartments,
-    setFetchedPendingBookingTrainsAllApartments,
-  ] = useState([])
-  const { data: allPendingBookingTrainsAllApartments } = useQuery(
-      'allPendingBookingsAllApartments',
-      async () => {
-        const fetchedPendingBookingsTrains =
-            await ApiService.getAllPendingBookingTrainsForAllApartments()
-        setFetchedPendingBookingTrainsAllApartments(fetchedPendingBookingsTrains)
-      },
-  )
-  const getAllPendingBookingTrainsAllApartmentsSplit = (date: string) => {
-    const allPendingBookingTrainsAllApartments = []
-    for (const apartmentPendingTrain of fetchedPendingBookingTrainsAllApartments) {
-      for (const pendingTrain of apartmentPendingTrain) {
-        allPendingBookingTrainsAllApartments.push(pendingTrain)
-      }
-    }
-    return (
-        allPendingBookingTrainsAllApartments.filter(
-            (pendingBookingTrain) =>
-                date >= pendingBookingTrain.startDate &&
-                date <= pendingBookingTrain.endDate,
-        ) || []
-    )
-  }
   const userIsAdmin = async () => {
     try {
       const response = await ApiService.getUser()
@@ -123,6 +96,7 @@ export default function MonthOverview() {
     fetchBookingItems(date)
     getVacancyForDay(date)
     setShowModal(true)
+    getPendingBookingsOnDay(date)
   }
 
   const customModalStyles = {
@@ -252,6 +226,99 @@ export default function MonthOverview() {
     return vacantApartmentsOnDay
   }
 
+  const [
+    fetchedPendingBookingTrainsAllApartments,
+    setFetchedPendingBookingTrainsAllApartments,
+  ] = useState([])
+  const { data: allPendingBookingTrains } = useQuery(
+      'allPendingBookingsAllApartments',
+      async () => {
+        const fetchedPendingBookingsTrains =
+            await ApiService.getAllPendingBookingTrainsForAllApartments()
+        setFetchedPendingBookingTrainsAllApartments(fetchedPendingBookingsTrains)
+        return fetchedPendingBookingsTrains
+      },
+  )
+  const getPendingBookingTrainsOnDay = (date: string) => {
+    if (!allPendingBookingTrains) {
+      return []
+    }
+    const allPendingBookingTrainsAllApartments = []
+    for (const apartmentPendingTrain of allPendingBookingTrains) {
+      for (const pendingTrain of apartmentPendingTrain) {
+        allPendingBookingTrainsAllApartments.push(pendingTrain)
+      }
+    }
+    const filteredPendingBookingTrainsAllApartments = allPendingBookingTrainsAllApartments.filter(
+        (pendingBookingTrain) =>
+            new Date (date) >= new Date (pendingBookingTrain.startDate) &&
+            new Date (date) <= new Date (pendingBookingTrain.endDate),
+    ) || []
+    return (
+        filteredPendingBookingTrainsAllApartments
+    )
+  }
+  const getPendingBookingsOnDay = (selectedDate: Date) => {
+    const pendingBookingsOnDay = []
+    const selectedDateString = selectedDate.toString()
+    const filteredPendingBookingTrainsAllApartments = getPendingBookingTrainsOnDay(selectedDateString)
+    console.log(filteredPendingBookingTrainsAllApartments)
+
+    for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments){
+      console.log("pendginttrain",pendingBookingTrain)
+      pendingBookingsOnDay.push(pendingBookingTrain.pendingBookingList)
+    }
+    console.log(pendingBookingsOnDay)
+    return pendingBookingsOnDay
+  }
+
+  /*const getAllPendingBookingTrainsAllApartments = () => {
+    const allPendingBookingTrainsAllApartments = []
+    for (const apartmentPendingTrain of fetchedPendingBookingTrainsAllApartments) {
+      for (const pendingTrain of apartmentPendingTrain) {
+        allPendingBookingTrainsAllApartments.push(pendingTrain)
+      }
+    }
+    console.log("test")
+    return (
+        allPendingBookingTrainsAllApartments
+    )
+  }
+  const getPendingBookingTrainsOnDay = (date: Date) => {
+    const filteredPendingBookingTrainsAllApartments = getAllPendingBookingTrainsAllApartments().filter(
+        (pendingBookingTrain) =>
+            date >= pendingBookingTrain.startDate &&
+            date <= pendingBookingTrain.endDate,
+    ) || []
+    return (
+        filteredPendingBookingTrainsAllApartments
+    )
+  }*/
+
+  /*const getPendingBookingsOnDay = (selectedDate: Date) => {
+    const pendingBookingsOnDay = []
+
+    const allPendingBookingTrainsAllApartments = []
+    for (const apartmentPendingTrain of fetchedPendingBookingTrainsAllApartments) {
+      for (const pendingTrain of apartmentPendingTrain) {
+        allPendingBookingTrainsAllApartments.push(pendingTrain)
+      }
+    }
+    const filteredPendingBookingTrainsAllApartments = allPendingBookingTrainsAllApartments.filter(
+        (pendingBookingTrain) =>
+            selectedDate >= new Date (pendingBookingTrain.startDate) &&
+            selectedDate <= new Date (pendingBookingTrain.endDate),
+    ) || []
+    console.log(selectedDate)
+    console.log("filter",filteredPendingBookingTrainsAllApartments)
+    for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments){
+      console.log("pendginttrain",pendingBookingTrain)
+      pendingBookingsOnDay.push(pendingBookingTrain.pendingBookingList)
+    }
+    console.log(pendingBookingsOnDay)
+    return pendingBookingsOnDay
+  }
+*/
   type CabinColorClasses = {
     [key: string]: string
   }
@@ -276,7 +343,7 @@ export default function MonthOverview() {
         mode="single"
         selected={date}
         onSelect={setDate}
-        getAllPendingBookingTrainsAllApartmentsSplit = {getAllPendingBookingTrainsAllApartmentsSplit}
+        getPendingBookingTrainsOnDay = {getPendingBookingTrainsOnDay}
         fetchedPendingBookingTrainsAllApartments = {fetchedPendingBookingTrainsAllApartments}
         className="rounded-md border"
       />

@@ -19,7 +19,7 @@ import { get } from 'radash'
 import { useQuery } from 'react-query'
 export type CalendarProps = ComponentProps<typeof DayPicker> & {
   fetchedPendingBookingTrainsAllApartments: any
-  getAllPendingBookingTrainsAllApartmentsSplit: any
+  getPendingBookingTrainsOnDay: any
 }
 
 const cabinColors: { [key: string]: string } = {
@@ -45,7 +45,7 @@ function MonthCalendar({
   classNames,
   showOutsideDays = true,
   fetchedPendingBookingTrainsAllApartments,
-  getAllPendingBookingTrainsAllApartmentsSplit,
+  getPendingBookingTrainsOnDay,
   ...props
 }: CalendarProps) {
   const { data: yourBookings } = useQuery<Booking[]>(
@@ -75,18 +75,6 @@ function MonthCalendar({
     )
     return fetchedBookings
   })
-  /*const [
-    fetchedPendingBookingTrainsAllApartments,
-    setFetchedPendingBookingTrainsAllApartments,
-  ] = useState([])
-  const { data: allPendingBookingTrainsAllApartments } = useQuery(
-    'allPendingBookingsAllApartments',
-    async () => {
-      const fetchedPendingBookingsTrains =
-        await ApiService.getAllPendingBookingTrainsForAllApartments()
-      setFetchedPendingBookingTrainsAllApartments(fetchedPendingBookingsTrains)
-    },
-  )*/
 
   const getBookings = (date: string) => {
     return (
@@ -95,21 +83,6 @@ function MonthCalendar({
       ) || []
     )
   }
-  /*const getAllPendingBookingTrainsAllApartmentsSplit = (date: string) => {
-    const allPendingBookingTrainsAllApartments = []
-    for (const apartmentPendingTrain of fetchedPendingBookingTrainsAllApartments) {
-      for (const pendingTrain of apartmentPendingTrain) {
-        allPendingBookingTrainsAllApartments.push(pendingTrain)
-      }
-    }
-    return (
-      allPendingBookingTrainsAllApartments.filter(
-        (pendingBookingTrain) =>
-          date >= pendingBookingTrain.startDate &&
-          date <= pendingBookingTrain.endDate,
-      ) || []
-    )
-  }*/
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const handleResize = () => {
@@ -182,7 +155,7 @@ function MonthCalendar({
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
           const pendingBookingsTrains =
-            getAllPendingBookingTrainsAllApartmentsSplit(
+              getPendingBookingTrainsOnDay(
               format(props.date, 'yyyy-MM-dd'),
             )
 
