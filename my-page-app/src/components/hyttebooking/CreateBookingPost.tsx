@@ -80,15 +80,8 @@ const CreateBookingPost = ({
 
   useEffect(() => {
     const startDateFns = new Date(startDate)
-    const sevenDaysAfterStart = format(addDays(startDateFns, 7), 'yyyy-MM-dd')
-
-    if (
-      vacantDaysForApartmentWithoutTakeoverDates.includes(sevenDaysAfterStart)
-    ) {
-      setEndDate(sevenDaysAfterStart)
-    } else {
       const maxAvailableDatesInBooking = []
-      const endFns = addDays(startDateFns, 7)
+      const endFns = addDays(startDateFns, 8)
 
       for (
         let currentFns = startDateFns;
@@ -98,11 +91,16 @@ const CreateBookingPost = ({
         const currentDate = format(currentFns, 'yyyy-MM-dd')
         const previousFns = addDays(currentFns, -1)
         const previousDate = format(previousFns, 'yyyy-MM-dd')
+        const nextFns = addDays(currentFns, 1)
+        const nextDate = format(nextFns, 'yyyy-MM-dd')
         if (
-          vacantDaysForApartmentWithoutTakeoverDates.includes(currentDate) ||
-          vacantDaysForApartmentWithoutTakeoverDates.includes(previousDate)
+            (vacantDaysForApartmentWithoutTakeoverDates.includes(currentDate) ||
+          vacantDaysForApartmentWithoutTakeoverDates.includes(previousDate) ||
+            vacantDaysForApartmentWithoutTakeoverDates.includes(nextDate)) && isBefore(new Date(currentDate), addDays(new Date(cutOffDateVacancies), 1))
         ) {
           maxAvailableDatesInBooking.push(currentDate)
+        } else {
+          break
         }
       }
 
@@ -113,7 +111,6 @@ const CreateBookingPost = ({
       } else {
         setEndDate(startDate)
       }
-    }
   }, [vacantDaysForApartmentWithoutTakeoverDates])
 
   const [isLoadingPost, setIsLoadingPost] = useState(false)
