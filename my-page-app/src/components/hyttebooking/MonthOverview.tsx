@@ -5,7 +5,7 @@ import ApiService from '@/services/api.service'
 import { Apartment, Booking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
-import { format, isBefore, sub } from 'date-fns'
+import { add, format, isBefore, sub } from 'date-fns'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
@@ -20,12 +20,44 @@ export default function MonthOverview() {
   const [userAdminStatus, setUserAdminStatus] = useState<boolean>(false)
 
   const { data: yourBookings } = useQuery<Booking[]>(
-    'yourBookingsButton',
+    'yourBookingsOutline',
     async () => {
       const yourBookings = await ApiService.getBookingsForUser()
       return yourBookings
     },
   )
+
+  const startDateBookings = format(
+    sub(new Date(), { months: 6, days: 7 }),
+    'yyyy-MM-dd',
+  )
+  const endDateBookings = format(
+    add(new Date(), { months: 12, days: 7 }),
+    'yyyy-MM-dd',
+  )
+
+  const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
+    const fetchedBookings = await ApiService.getBookings(
+      startDateBookings,
+      endDateBookings,
+    )
+    return fetchedBookings
+  })
+
+  const getBookings = (date: string) => {
+    return (
+      bookings?.filter(
+        (booking) => date >= booking.startDate && date <= booking.endDate,
+      ) || []
+    )
+  }
+
+  const getBookingsOnDay = (date: Date) => {
+    const dateString = format(date, 'yyyy-MM-dd')
+    const bookingsOnDay = getBookings(dateString)
+    setBookingItems(bookingsOnDay)
+  }
+
   const userIsAdmin = async () => {
     try {
       const response = await ApiService.getUser()
@@ -94,9 +126,9 @@ export default function MonthOverview() {
   })
   const handleDateClick = (date: Date) => {
     setDate(date)
-    fetchBookingItems(date)
     getVacancyForDay(date)
     setShowModal(true)
+    getBookingsOnDay(date)
   }
 
   const customModalStyles = {
@@ -130,16 +162,6 @@ export default function MonthOverview() {
         return [...prevExpandedApartments, apartmentId]
       }
     })
-  }
-
-  const fetchBookingItems = async (selectedDate: Date) => {
-    try {
-      const formattedDate = format(selectedDate, 'yyyy-MM-dd')
-      const bookings = await ApiService.getBookingsForDay(formattedDate)
-      setBookingItems(bookings)
-    } catch (error) {
-      console.error('Error:', error)
-    }
   }
 
   type VacancyLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
@@ -252,6 +274,9 @@ export default function MonthOverview() {
         onSelect={setDate}
         className="rounded-md border"
         cutOffDateVacancies={cutOffDateVacancies}
+        getBookings={getBookings}
+        yourBookings={yourBookings}
+        bookings={bookings}
       />
       <Modal
         className=""
@@ -264,9 +289,7 @@ export default function MonthOverview() {
           {date ? (
             <div>
               <h3 className="mt-1 mb-1">{format(date, 'dd.MM.yyyy')}</h3>
-              {isBefore(date, new Date(cutOffDateVacancies)) ? (
-                null
-              ) : (
+              {isBefore(date, new Date(cutOffDateVacancies)) ? null : (
                 <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
               )}
               <div>
@@ -392,9 +415,7 @@ export default function MonthOverview() {
               </div>
               {vacantApartmentsOnDay.length !== 0 ? (
                 <h3 className="mt-3 mb-1">Ledige hytter:</h3>
-              ) : (
-                null
-              )}
+              ) : null}
               {vacantApartmentsOnDay
                 .sort(
                   (a, b) =>
