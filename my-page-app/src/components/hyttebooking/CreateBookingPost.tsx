@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from 'react'
 import { API_URL } from '../../services/api.service'
-import { format, addDays, differenceInDays, isBefore } from 'date-fns'
+import { format, addDays, differenceInDays, isBefore, isEqual } from 'date-fns'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
@@ -15,22 +15,51 @@ type Props = {
   date: Date
   closeModal: () => void
   refreshVacancies: Function
+  userIsAdmin: boolean
+  allUsersNames: string[]
   cutOffDateVacancies: string
   vacancies: { [key: number]: string[] } | undefined
 }
-const createBooking = async ({ bookingPost }: { bookingPost: BookingPost }) => {
-  return axios
-    .post(API_URL + 'booking/post', bookingPost, {
-      headers: authHeader(),
-    })
-    .then((response) => response.data)
-    .catch((error) => {
-      if (error.response && error.response.data) {
-        throw error.response.data
-      } else {
-        throw 'En feil skjedde under oppretting, prøv igjen.'
-      }
-    })
+const createBooking = async ({
+  bookingPost,
+  userIsAdmin,
+  bookingOwnerName,
+}: {
+  bookingPost: BookingPost
+  userIsAdmin: boolean
+  bookingOwnerName: string
+}) => {
+  if (userIsAdmin) {
+    return axios
+      .post(
+        API_URL + 'booking/admin/post?bookingOwnerName=' + bookingOwnerName,
+        bookingPost,
+        {
+          headers: authHeader(),
+        },
+      )
+      .then((response) => response.data)
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          throw error.response.data
+        } else {
+          throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
+        }
+      })
+  } else {
+    return axios
+      .post(API_URL + 'booking/post', bookingPost, {
+        headers: authHeader(),
+      })
+      .then((response) => response.data)
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          throw error.response.data
+        } else {
+          throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
+        }
+      })
+  }
 }
 
 const CreateBookingPost = ({
@@ -38,6 +67,8 @@ const CreateBookingPost = ({
   date,
   closeModal,
   refreshVacancies,
+  userIsAdmin,
+  allUsersNames,
   cutOffDateVacancies,
   vacancies,
 }: Props) => {
@@ -83,11 +114,13 @@ const CreateBookingPost = ({
   }, [vacantDaysForApartmentWithoutTakeoverDates])
 
   const [isLoadingPost, setIsLoadingPost] = useState(false)
+  const [bookingOwnerName, setBookingOwnerName] = useState<string>('')
 
   const isValid =
     startDate < endDate &&
     differenceInDays(new Date(endDate), new Date(startDate)) <= 7 &&
-    isBefore(new Date(endDate), addDays(new Date(cutOffDateVacancies), 1))
+    isBefore(new Date(endDate), addDays(new Date(cutOffDateVacancies), 1)) &&
+    bookingOwnerName!== ''
 
   const queryClient = useQueryClient()
   const { mutate } = useMutation(createBooking, {
@@ -117,7 +150,7 @@ const CreateBookingPost = ({
         startDate: startDate,
         endDate: endDate,
       }
-      mutate({ bookingPost })
+      mutate({ bookingPost, userIsAdmin, bookingOwnerName })
     }
   }
 
@@ -127,11 +160,34 @@ const CreateBookingPost = ({
   const handleEndDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEndDate(e.target.value)
   }
+  const handleBookingOwnerNameChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setBookingOwnerName(e.target.value)
+  }
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="overflow-hidden w-full rounded-xl border border-gray-500 shadow-sm">
         <div className="flex flex-col gap-2 items-start p-3">
+          {userIsAdmin ? (
+            <>
+              <strong> Navn: </strong>
+              <label>
+                <select
+                  className="w-48 input input-bordered input-sm"
+                  name="bookingOwnerName"
+                  onChange={handleBookingOwnerNameChange}
+                  value={bookingOwnerName}
+                >
+                  <option value="">Velg ansatt</option>
+                  {allUsersNames.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </>
+          ) : null}
           <strong>Startdato:</strong>
           <label>
             <input

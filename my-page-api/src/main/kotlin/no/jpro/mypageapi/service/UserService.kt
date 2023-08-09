@@ -81,4 +81,6 @@ class UserService(
     fun getUserBySub(userSub: String) = userRepository.findUserBySub(userSub)
 
     fun getAllUsers() = userRepository.findAll().map { userMapper.toUserDTO(it) }
+
+    fun getUserByName(name: String) = userRepository.findUserByName(name)
 }
