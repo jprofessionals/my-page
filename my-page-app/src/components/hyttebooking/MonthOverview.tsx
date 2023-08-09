@@ -219,9 +219,14 @@ export default function MonthOverview() {
       refreshVacancies()
       getAllApartments()
       getUserIsAdmin()
-      fetchAllUsers()
     }
   }, [userFetchStatus, vacancyLoadingStatus])
+
+  useEffect(() => {
+    if (userIsAdmin) {
+      fetchAllUsers()
+    }
+  }, [userIsAdmin])
 
   const getAllApartments = async () => {
     const response = await ApiService.getAllApartments()
