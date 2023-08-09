@@ -14,11 +14,12 @@ import {
 import { Booking } from '@/types'
 import { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
-import ApiService from '@/services/api.service'
 import { get } from 'radash'
-import { useQuery } from 'react-query'
 export type CalendarProps = ComponentProps<typeof DayPicker> & {
   cutOffDateVacancies: string
+  bookings: Booking[] | undefined
+  yourBookings: Booking[] | undefined
+  getBookings: Function
 }
 
 const cabinColors: { [key: string]: string } = {
@@ -38,42 +39,13 @@ function MonthCalendar({
   classNames,
   showOutsideDays = true,
   cutOffDateVacancies,
+  bookings,
+  yourBookings,
+  getBookings,
   ...props
 }: CalendarProps) {
-  const { data: yourBookings } = useQuery<Booking[]>(
-    'yourBookingsOutline',
-    async () => {
-      const yourBookings = await ApiService.getBookingsForUser()
-      return yourBookings
-    },
-  )
-
-  const startDateBookings = format(
-    sub(new Date(), { months: 6, days: 7 }),
-    'yyyy-MM-dd',
-  )
-  const endDateBookings = format(
-    add(new Date(), { months: 12, days: 7 }),
-    'yyyy-MM-dd',
-  )
   const startDateCalendar = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
   const endDateCalendar = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
-
-  const { data: bookings } = useQuery<Booking[]>('bookings', async () => {
-    const fetchedBookings = await ApiService.getBookings(
-      startDateBookings,
-      endDateBookings,
-    )
-    return fetchedBookings
-  })
-
-  const getBookings = (date: string) => {
-    return (
-      bookings?.filter(
-        (booking) => date >= booking.startDate && date <= booking.endDate,
-      ) || []
-    )
-  }
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const handleResize = () => {
@@ -152,7 +124,7 @@ function MonthCalendar({
           const bookingsByCabin: { [key: string]: Booking[] } =
             cabinOrder.reduce((result: { [key: string]: Booking[] }, cabin) => {
               result[cabin] = bookingList.filter(
-                (booking) => booking.apartment?.cabin_name === cabin,
+                (booking: Booking) => booking.apartment?.cabin_name === cabin,
               )
               return result
             }, {})
@@ -166,7 +138,7 @@ function MonthCalendar({
               >
                 {cabinBookings.map((booking) => {
                   const isYourBooking = yourBookings?.some(
-                    (yourBooking) => yourBooking.id === booking.id,
+                    (yourBooking: Booking) => yourBooking.id === booking.id,
                   )
                   const { isFirstDay, isLastDay } = getBookingDateInfo(
                     props.date,
@@ -209,10 +181,10 @@ function MonthCalendar({
               {dateCalendar}
               {cabinBookings}
               <span
-                className={`absolute top-0 left-0 w-full h-full ${getCutOffDateStyle(
-                  props.date,
-                  cutOffDate,
-                )}`}
+                className={cn(
+                  'absolute top-0 left-0 w-full h-full',
+                  getCutOffDateStyle(props.date, cutOffDate),
+                )}
                 aria-hidden="true"
               />
             </>
