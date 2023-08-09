@@ -48,6 +48,7 @@ interface BookingRepository : JpaRepository<Booking, Long> {
     fun findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
         startDate: LocalDate, endDate: LocalDate
     ): List<Booking>
+
     fun findBookingsByEmployeeSub(employeeSub: String): List<Booking>
     fun findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(
         date: LocalDate, anotherDate: LocalDate
@@ -66,7 +67,7 @@ interface PendingBookingRepository : JpaRepository<PendingBooking, Long> {
 }
 
 @Repository
-interface  ApartmentRepository : JpaRepository<Apartment, Long> {
+interface ApartmentRepository : JpaRepository<Apartment, Long> {
     override fun findAll(): List<Apartment>
     fun findApartmentById(apartmentId: Long): Apartment
     fun existsApartmentById(apartmentId: Long): Boolean

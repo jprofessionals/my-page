@@ -26,9 +26,13 @@ class PendingBookingService(
 
     fun createPendingBooking(bookingRequest: CreatePendingBookingDTO, createdBy: User): PendingBookingDTO {
         val apartment = bookingService.getApartment(bookingRequest.apartmentID)
-        val checkBookingAvailable = bookingService.filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
+        val checkBookingAvailable = bookingService.filterOverlappingBookings(
+            bookingRequest.apartmentID,
+            bookingRequest.startDate,
+            bookingRequest.endDate
+        )
 
-        if(checkBookingAvailable.isEmpty()) {
+        if (checkBookingAvailable.isEmpty()) {
             val pendingBooking = pendingBookingMapper.toPendingBooking(
                 bookingRequest,
                 apartment
@@ -41,8 +45,17 @@ class PendingBookingService(
         }
     }
 
-    fun getDateListOfPendingBookingTrains(apartmentId: Long, startDate: LocalDate, endDate: LocalDate): List<List<LocalDate>>{
-        val pendingBookings = pendingBookingRepository.findPendingBookingsByApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(apartmentId, startDate, endDate)
+    fun getDateListOfPendingBookingTrains(
+        apartmentId: Long,
+        startDate: LocalDate,
+        endDate: LocalDate
+    ): List<List<LocalDate>> {
+        val pendingBookings =
+            pendingBookingRepository.findPendingBookingsByApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
+                apartmentId,
+                startDate,
+                endDate
+            )
         val pendingBookedDays = pendingBookings
             .flatMap { pendingBooking ->
                 LongRange(0, ChronoUnit.DAYS.between(pendingBooking.startDate, pendingBooking.endDate))
@@ -88,7 +101,7 @@ class PendingBookingService(
         }
         return drawPeriodList.map { pendingBookings ->
             val startDate = pendingBookings[0].startDate
-            val endDate = pendingBookings[pendingBookings.size -1].endDate
+            val endDate = pendingBookings[pendingBookings.size - 1].endDate
 
             DrawingPeriodDTO(
                 startDate = startDate!!,
@@ -99,7 +112,8 @@ class PendingBookingService(
     }
 
     fun getPendingBookingInformationForApartment(apartmentId: Long): List<PendingBookingTrainDTO> {
-        val pendingBookingTrainsDateList = getDateListOfPendingBookingTrains(apartmentId, todayDateMinusSevenDays, cutOffDate)
+        val pendingBookingTrainsDateList =
+            getDateListOfPendingBookingTrains(apartmentId, todayDateMinusSevenDays, cutOffDate)
         val allPendingBookingsDTO = getAllPendingBookings(apartmentId).sortedBy { it.startDate }
 
         val allDrawingPeriodDTO = getAllDrawingPeriods(apartmentId)
@@ -107,10 +121,6 @@ class PendingBookingService(
         return pendingBookingTrainsDateList.map { dates ->
             val startDate = dates.minOrNull()
             val endDate = dates.maxOrNull()
-
-            val pendingBookingsInTrain = allPendingBookingsDTO.filter { pendingBooking ->
-                pendingBooking.startDate in dates
-            }
 
             val drawingPeriodDTO = allDrawingPeriodDTO.filter { drawingPeriod ->
                 drawingPeriod.startDate in dates
@@ -120,7 +130,6 @@ class PendingBookingService(
                 apartmentId = apartmentId,
                 startDate = startDate!!,
                 endDate = endDate!!,
-                pendingBookingList = pendingBookingsInTrain,
                 drawingPeriodList = drawingPeriodDTO
             )
         }

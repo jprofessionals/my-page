@@ -21,7 +21,7 @@ import java.time.format.DateTimeParseException
 @RestController
 @RequestMapping("pendingBooking")
 @SecurityRequirement(name = "Bearer Authentication")
-class PendingBookingController (
+class PendingBookingController(
     private val pendingBookingService: PendingBookingService,
     private val userService: UserService,
 ) {
