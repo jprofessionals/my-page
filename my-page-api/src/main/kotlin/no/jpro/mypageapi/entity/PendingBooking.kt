@@ -16,5 +16,5 @@ data class PendingBooking(
     @ManyToOne
     @JoinColumn(name = "employee_id", referencedColumnName = "id")
     val employee: User? = null,
-    val createdDate: LocalDate = LocalDate.now() // Add the createdDate field with a default value of the current date.
+    val createdDate: LocalDate = LocalDate.now()
 )

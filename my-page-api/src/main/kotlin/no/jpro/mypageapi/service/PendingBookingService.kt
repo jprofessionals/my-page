@@ -3,6 +3,7 @@ package no.jpro.mypageapi.service
 import no.jpro.mypageapi.dto.CreatePendingBookingDTO
 import no.jpro.mypageapi.dto.PendingBookingDTO
 import no.jpro.mypageapi.dto.PendingBookingTrainDTO
+import no.jpro.mypageapi.dto.DrawingPeriodDTO
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.PendingBookingRepository
@@ -20,8 +21,8 @@ class PendingBookingService(
     private val pendingBookingMapper: PendingBookingMapper
     ) {
 
-    val todayDate = LocalDate.now()
-    val cutOffDate = LocalDate.now().plusMonths(5)
+    val todayDateMinusSevenDays: LocalDate = LocalDate.now().minusDays(7)
+    val cutOffDate: LocalDate = LocalDate.now().plusMonths(5)
 
     fun createPendingBooking(bookingRequest: CreatePendingBookingDTO, createdBy: User): PendingBookingDTO {
         val apartment = bookingService.getApartment(bookingRequest.apartmentID)
@@ -41,6 +42,7 @@ class PendingBookingService(
     }
 
 
+    // Methods to order pending bookings
     fun getDateListOfPendingBookingTrains(apartmentId: Long, startDate: LocalDate, endDate: LocalDate): List<List<LocalDate>>{
         val pendingBookings = pendingBookingRepository.findPendingBookingsByApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(apartmentId, startDate, endDate)
         val pendingBookedDays = pendingBookings
@@ -53,47 +55,76 @@ class PendingBookingService(
             .values.toList()
     }
 
-
-    fun getDatesForPendingBookingTrainOnSelectedDate(apartmentId: Long, selectedDate: LocalDate): List<LocalDate>? {
-        val pendingBookingsDateListNoDuplicates = getDateListOfPendingBookingTrains(apartmentId, todayDate, cutOffDate)
-
-        val pendingBookingTrain = pendingBookingsDateListNoDuplicates.find { currentList ->
-            currentList.any { selectedDate == it }
-        }
-        return pendingBookingTrain
+    fun getAllPendingBookingDTO(apartmentId: Long): List<PendingBookingDTO> {
+        return pendingBookingRepository.findPendingBookingsByApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
+            apartmentId,
+            todayDateMinusSevenDays,
+            cutOffDate
+        )
     }
 
-    fun getPendingBookingsInTrain(apartmentId: Long, selectedDate: LocalDate): List<PendingBookingDTO> {
-        val allPendingBookings = pendingBookingRepository.findPendingBookingsByApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(apartmentId, todayDate, cutOffDate)
-        val datesInPendingBookingTrain = getDatesForPendingBookingTrainOnSelectedDate(apartmentId, selectedDate)
+    // Methods to find drawing periods
+    fun getPendingBookingDTOForDrawingPeriods(apartmentId: Long): List<DrawingPeriodDTO> {
+        val pendingBookings = pendingBookingRepository
+            .findPendingBookingsByApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
+                apartmentId,
+                todayDateMinusSevenDays,
+                cutOffDate
+            )
+            .sortedBy { it.startDate }
+        val drawPeriodList = mutableListOf<List<PendingBookingDTO>>()
 
-        return allPendingBookings.filter { booking ->
-            datesInPendingBookingTrain?.any { it.isEqual(booking.startDate) } == true
+        if (pendingBookings.isNotEmpty()) {
+            var currentDrawPeriod = mutableListOf<PendingBookingDTO>()
+            currentDrawPeriod.add(pendingBookings[0])
+
+            for (i in 1 until pendingBookings.size) {
+                if (pendingBookings[i].startDate < pendingBookings[i - 1].endDate && pendingBookings[i].startDate >= pendingBookings[i - 1].startDate) {
+                    currentDrawPeriod.add(pendingBookings[i])
+                } else {
+                    drawPeriodList.add(currentDrawPeriod)
+                    currentDrawPeriod = mutableListOf()
+                    currentDrawPeriod.add(pendingBookings[i])
+                }
+            }
+            drawPeriodList.add(currentDrawPeriod)
         }
-    }
+        return drawPeriodList.map { pendingBookings ->
+            val startDate = pendingBookings[0].startDate
+            val endDate = pendingBookings[pendingBookings.size -1].endDate
 
-    fun getPendingBookingsInTrainPeriod(apartmentId: Long): List<PendingBookingDTO> {
-        val allPendingBookings = pendingBookingRepository.findPendingBookingsByApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(apartmentId, todayDate, cutOffDate)
-        return allPendingBookings
+            DrawingPeriodDTO(
+            startDate = startDate!!,
+            endDate = endDate!!,
+            pendingBookings = pendingBookings
+            )
+        }
     }
 
     fun getTrainAndPendingBookingsPeriod(apartmentId: Long): List<PendingBookingTrainDTO> {
-        val pendingBookingTrainsDateList = getDateListOfPendingBookingTrains(apartmentId, todayDate, cutOffDate)
-        val allPendingBookingsDTO = getPendingBookingsInTrainPeriod(apartmentId).sortedBy { it.startDate }
+        val pendingBookingTrainsDateList = getDateListOfPendingBookingTrains(apartmentId, todayDateMinusSevenDays, cutOffDate)
+        val allPendingBookingsDTO = getAllPendingBookingDTO(apartmentId).sortedBy { it.startDate }
+
+        val allDrawingPeriodDTO = getPendingBookingDTOForDrawingPeriods(apartmentId)
 
         return pendingBookingTrainsDateList.map { dates ->
             val startDate = dates.minOrNull()
             val endDate = dates.maxOrNull()
 
-            val pendingBookingsInTrain = allPendingBookingsDTO.filter { booking ->
-                booking.startDate in dates
+            val pendingBookingsInTrain = allPendingBookingsDTO.filter { pendingBooking ->
+                pendingBooking.startDate in dates
+            }
+
+            val drawingPeriodDTO = allDrawingPeriodDTO.filter { drawingPeriod ->
+                drawingPeriod.startDate in dates
             }
 
             PendingBookingTrainDTO(
                 apartmentId = apartmentId,
                 startDate = startDate!!,
                 endDate = endDate!!,
-                pendingBookingList = pendingBookingsInTrain
+                pendingBookingList = pendingBookingsInTrain,
+                drawingPeriodList = drawingPeriodDTO
             )
         }
     }
@@ -106,8 +137,4 @@ class PendingBookingService(
         }
         return allTrainAndPendingBookings
     }
-
-
-
-
 }

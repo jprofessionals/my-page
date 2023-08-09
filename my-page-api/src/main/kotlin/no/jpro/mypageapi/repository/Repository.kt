@@ -65,6 +65,7 @@ interface PendingBookingRepository : JpaRepository<PendingBooking, Long> {
     ): List<PendingBookingDTO>
 }
 
+
 @Repository
 interface  ApartmentRepository : JpaRepository<Apartment, Long> {
     override fun findAll(): List<Apartment>
