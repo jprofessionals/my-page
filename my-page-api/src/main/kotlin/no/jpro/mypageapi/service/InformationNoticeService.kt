@@ -5,7 +5,6 @@ import jakarta.persistence.PersistenceContext
 import no.jpro.mypageapi.dto.CreateInformationNoticeDTO
 import no.jpro.mypageapi.dto.InformationNoticeDTO
 import no.jpro.mypageapi.dto.UpdateInformationNoticeDTO
-import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.InfoBooking
 import no.jpro.mypageapi.repository.InformationNoticeRepository
 import no.jpro.mypageapi.utils.mapper.InformationNoticeMapper
@@ -23,13 +22,13 @@ class InformationNoticeService (
     }
     fun getInformationNoticesInPeriod(startDate: LocalDate, endDate: LocalDate): List<InformationNoticeDTO> {
         val informationNotices =
-            informationNoticeRepository.findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(startDate, endDate)
+            informationNoticeRepository.findInfoBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(startDate, endDate)
         return informationNotices.map { informationNoticeMapper.toInFormationNoticeDTO(it)}
     }
 
     @PersistenceContext
     private lateinit var entityManager: EntityManager
-    fun getOldBookingsWithinDates(wishStartDate: LocalDate, wishEndDate: LocalDate): List<InfoBooking> {
+    fun getOldInfoNoticesWithinDates(wishStartDate: LocalDate, wishEndDate: LocalDate): List<InfoBooking> {
         val query = entityManager.createQuery(
             "SELECT b FROM InfoBooking b " +
                     "WHERE (:wishStartDate BETWEEN b.startDate AND b.endDate " +
@@ -42,8 +41,8 @@ class InformationNoticeService (
         query.setParameter("wishEndDate", wishEndDate)
         return query.resultList
     }
-    fun filterOverlappingBookings(wishStartDate: LocalDate, wishEndDate: LocalDate): List<InfoBooking> {
-        val infoNoticeOverlappingWishedInfoNotice = getOldBookingsWithinDates(wishStartDate, wishEndDate)
+    fun filterOverlappingInfoNotices(wishStartDate: LocalDate, wishEndDate: LocalDate): List<InfoBooking> {
+        val infoNoticeOverlappingWishedInfoNotice = getOldInfoNoticesWithinDates(wishStartDate, wishEndDate)
 
         val filteredInfoNotices = infoNoticeOverlappingWishedInfoNotice.filter { infoNotice ->
             ((wishStartDate.isBefore(infoNotice.endDate) && (wishEndDate.isAfter(infoNotice.startDate))) ||
@@ -54,11 +53,11 @@ class InformationNoticeService (
         return filteredInfoNotices
     }
 
-    fun createBooking(infoNoticeRequest: CreateInformationNoticeDTO): InformationNoticeDTO {
+    fun createInfoNotice(infoNoticeRequest: CreateInformationNoticeDTO): InformationNoticeDTO {
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val checkBookingAvailable = filterOverlappingBookings(infoNoticeRequest.startDate, infoNoticeRequest.endDate)
+        val overlappingInfoNotices = filterOverlappingInfoNotices(infoNoticeRequest.startDate, infoNoticeRequest.endDate)
 
-        if(checkBookingAvailable.isEmpty() && infoNoticeRequest.endDate <= LocalDate.parse(cutOffDate, dateFormatter)) {
+        if(overlappingInfoNotices.isEmpty() && infoNoticeRequest.endDate <= LocalDate.parse(cutOffDate, dateFormatter)) {
             val infoNotice = informationNoticeMapper.toInFormationNotice(
                 infoNoticeRequest,
             )
@@ -69,7 +68,7 @@ class InformationNoticeService (
     }
 
     fun filterOverlappingInfoNoticesExcludingInfoBookingToEdit(wishStartDate: LocalDate, wishEndDate: LocalDate, informationNoticeToExclude: InfoBooking?): List<InfoBooking> {
-        val filteredInformationNotices = filterOverlappingBookings(wishStartDate, wishEndDate)
+        val filteredInformationNotices = filterOverlappingInfoNotices(wishStartDate, wishEndDate)
         return filteredInformationNotices.filter { it.id != informationNoticeToExclude?.id }
     }
 

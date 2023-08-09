@@ -70,7 +70,7 @@ class InformationNoticeController (
         @Valid @RequestBody infoNoticeRequest: CreateInformationNoticeDTO,
     ): ResponseEntity<String> {
         try {
-            informationNoticeService.createBooking(infoNoticeRequest)
+            informationNoticeService.createInfoNotice(infoNoticeRequest)
             return ResponseEntity.ok("A new information notice has been successfully created")
         } catch (e: IllegalArgumentException) {
             return ResponseEntity.badRequest().body(e.message)

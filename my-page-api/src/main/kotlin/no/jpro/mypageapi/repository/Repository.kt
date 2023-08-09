@@ -75,7 +75,7 @@ interface  ApartmentRepository : JpaRepository<Apartment, Long> {
 @Repository
 interface  InformationNoticeRepository : JpaRepository<InfoBooking, Long> {
     fun findInfoBookingById(infoNoticeId: Long): InfoBooking?
-    fun findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
+    fun findInfoBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
         date: LocalDate, anotherDate: LocalDate
     ): List<InfoBooking>
 }
