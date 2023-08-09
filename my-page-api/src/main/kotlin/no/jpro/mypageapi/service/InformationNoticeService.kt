@@ -5,7 +5,6 @@ import jakarta.persistence.PersistenceContext
 import no.jpro.mypageapi.dto.CreateInformationNoticeDTO
 import no.jpro.mypageapi.dto.InformationNoticeDTO
 import no.jpro.mypageapi.dto.UpdateInformationNoticeDTO
-import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.InfoBooking
 import no.jpro.mypageapi.repository.InformationNoticeRepository
 import no.jpro.mypageapi.utils.mapper.InformationNoticeMapper
