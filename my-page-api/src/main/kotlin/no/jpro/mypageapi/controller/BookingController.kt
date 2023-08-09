@@ -8,7 +8,11 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
-import no.jpro.mypageapi.dto.*
+import no.jpro.mypageapi.config.RequiresAdmin
+import no.jpro.mypageapi.dto.ApartmentDTO
+import no.jpro.mypageapi.dto.BookingDTO
+import no.jpro.mypageapi.dto.CreateBookingDTO
+import no.jpro.mypageapi.dto.UpdateBookingDTO
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
@@ -190,7 +194,7 @@ class BookingController(
         val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity(HttpStatus.FORBIDDEN)
         val booking = bookingService.getBooking(bookingID) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
 
-        if (!userPermittedToDeleteBooking(booking, user) && !user.admin) {
+        if (!userPermittedToDeleteBooking(booking, user)) {
             return ResponseEntity(HttpStatus.FORBIDDEN)
         }
 
@@ -232,7 +236,7 @@ class BookingController(
         val bookingToEdit = bookingService.getBooking(bookingId) ?: return ResponseEntity.notFound().build()
         val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
-        if (!userPermittedToEditBooking(bookingToEdit, user) && !user.admin) {
+        if (!userPermittedToEditBooking(bookingToEdit, user)) {
             return ResponseEntity(HttpStatus.FORBIDDEN)
         }
         try {
@@ -245,5 +249,65 @@ class BookingController(
 
     }
     private fun userPermittedToEditBooking(booking: Booking, employee: User) = (booking.employee?.id == employee.id)
+
+    @PatchMapping("admin/{bookingId}")
+    @Transactional
+    @RequiresAdmin
+    @Operation(summary = "An admin edits an existing booking")
+    fun adminEditBooking(
+        token: JwtAuthenticationToken,
+        @PathVariable("bookingId") bookingId: Long,
+        @Valid @RequestBody editBookingRequest: UpdateBookingDTO,
+    ): ResponseEntity<String> {
+        val bookingToEdit = bookingService.getBooking(bookingId) ?: return ResponseEntity.notFound().build()
+        try {
+            bookingService.editBooking(editBookingRequest, bookingToEdit)
+            return ResponseEntity.ok("The booking has been successfully edited")
+        } catch (e: IllegalArgumentException){
+            val errorMessage = e.message ?: "An error occurred while editing the booking."
+            return ResponseEntity.badRequest().body(errorMessage)
+        }
+    }
+    @DeleteMapping("admin/{bookingID}")
+    @Transactional
+    @RequiresAdmin
+    @Operation(summary = "An admin deletes the booking connected to the booking id")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json")]
+    )
+    fun adminDeleteBooking(
+        token: JwtAuthenticationToken,
+        @PathVariable("bookingID") bookingID: Long,
+    ): ResponseEntity<String> {
+        val booking = bookingService.getBooking(bookingID)
+        if (booking === null){
+            return ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+        bookingService.deleteBooking(bookingID)
+        return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
+    }
+
+    @PostMapping ("/admin/post")
+    @Transactional
+    @RequiresAdmin
+    @Operation(summary = "Admin creates a new booking for a user")
+    @ApiResponse(
+        responseCode = "201",
+        description = "New booking created",
+        content = [Content(schema = Schema(implementation = BookingDTO::class))]
+    )
+    fun adminCreateBooking(
+        token: JwtAuthenticationToken,
+        @Valid @RequestBody bookingRequest: CreateBookingDTO, bookingOwnerName: String,
+    ): ResponseEntity<String> {
+        val bookingOwner = userService.getUserByName(bookingOwnerName)?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        try {
+            bookingService.createBooking(bookingRequest, bookingOwner)
+            return ResponseEntity.ok("A new booking has been successfully created")
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.badRequest().body(e.message)
+        }
+    }
 }
 

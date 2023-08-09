@@ -115,6 +115,12 @@ const deleteBooking = (bookingId) => {
   })
 }
 
+const adminDeleteBooking = (bookingId) => {
+  return axios.delete(API_URL + 'booking/admin/' + bookingId, {
+    headers: authHeader(),
+  })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -128,5 +134,6 @@ const ApiService = {
   getAllVacancies,
   getAllApartments,
   deleteBooking,
+  adminDeleteBooking,
 }
 export default ApiService

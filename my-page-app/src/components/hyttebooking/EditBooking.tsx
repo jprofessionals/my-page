@@ -1,6 +1,5 @@
 import { ChangeEvent, useState } from 'react'
 import { API_URL } from '../../services/api.service'
-import moment from 'moment'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
@@ -9,43 +8,63 @@ import { Booking, EditedBooking } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
 import { useMutation, useQueryClient } from 'react-query'
+import {differenceInDays, isBefore} from "date-fns";
 
 const editExistingBooking = async ({
   editedBooking,
   bookingId,
+  userIsAdmin,
 }: {
   editedBooking: EditedBooking
   bookingId: number
+  userIsAdmin: boolean
 }) => {
-  return axios
-    .patch(API_URL + 'booking/' + bookingId, editedBooking, {
-      headers: authHeader(),
-    })
-    .then((response) => response.data)
-    .catch((error) => {
-      if (error.response && error.response.data) {
-        throw error.response.data
-      } else {
-        throw 'En feil skjedde under redigeringen, prøv igjen.'
-      }
-    })
+  if (userIsAdmin) {
+    return axios
+      .patch(API_URL + 'booking/admin/' + bookingId, editedBooking, {
+        headers: authHeader(),
+      })
+      .then((response) => response.data)
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          throw error.response.data
+        } else {
+          throw 'En feil skjedde under redigeringen, prøv igjen.'
+        }
+      })
+  } else {
+    return axios
+      .patch(API_URL + 'booking/' + bookingId, editedBooking, {
+        headers: authHeader(),
+      })
+      .then((response) => response.data)
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          throw error.response.data
+        } else {
+          throw 'En feil skjedde under redigeringen, prøv igjen.'
+        }
+      })
+  }
 }
 
 const EditBooking = ({
   booking,
   closeModal,
   refreshVacancies,
+  userIsAdmin,
 }: {
   booking: Booking
   closeModal: () => void
   refreshVacancies: () => void
+  userIsAdmin: boolean
 }) => {
   const [startDate, setStartDate] = useState(booking.startDate)
   const [endDate, setEndDate] = useState(booking.endDate)
   const [isLoadingEdit, setIsLoadingEdit] = useState(false)
 
   const isValid =
-    startDate < endDate && moment(endDate).diff(startDate, 'days') <= 7
+      (isBefore(new Date(startDate), new Date (endDate)) && differenceInDays(new Date (endDate), new Date(startDate)) <= 7)
 
   const queryClient = useQueryClient()
   const { mutate } = useMutation(editExistingBooking, {
@@ -73,7 +92,7 @@ const EditBooking = ({
         startDate: startDate,
         endDate: endDate,
       }
-      mutate({ editedBooking, bookingId })
+      mutate({ editedBooking, bookingId, userIsAdmin: userIsAdmin })
     }
   }
 
