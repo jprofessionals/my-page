@@ -18,8 +18,7 @@ import ApiService from '@/services/api.service'
 import { get } from 'radash'
 import { useQuery } from 'react-query'
 export type CalendarProps = ComponentProps<typeof DayPicker> & {
-  fetchedPendingBookingTrainsAllApartments: any
-  getPendingBookingTrainsOnDay: any
+  getPendingBookingTrainsOnDay: Function
   cutOffDateVacancies: string
 }
 
@@ -45,7 +44,6 @@ function MonthCalendar({
   className,
   classNames,
   showOutsideDays = true,
-  fetchedPendingBookingTrainsAllApartments,
   getPendingBookingTrainsOnDay,
   cutOffDateVacancies,
   ...props

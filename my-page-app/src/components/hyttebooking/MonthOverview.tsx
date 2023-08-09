@@ -311,7 +311,6 @@ export default function MonthOverview() {
         selected={date}
         onSelect={setDate}
         getPendingBookingTrainsOnDay = {getPendingBookingTrainsOnDay}
-        fetchedPendingBookingTrainsAllApartments = {fetchedPendingBookingTrainsAllApartments}
         className="rounded-md border"
         cutOffDateVacancies={cutOffDateVacancies}
       />
