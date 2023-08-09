@@ -423,6 +423,7 @@ export default function MonthOverview() {
                                       closeModal={closeModal}
                                       refreshVacancies={refreshVacancies}
                                       userIsAdmin={userIsAdmin}
+                                      cutOffDateVacancies={cutOffDateVacancies}
                                     />
                                   )}
                                 </div>

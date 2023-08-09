@@ -117,8 +117,8 @@ class BookingService(
         return filteredBookings
     }
 
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     fun createBooking(bookingRequest: CreateBookingDTO, createdBy: User): BookingDTO {
-        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val apartment = getApartment(bookingRequest.apartmentID)
 
         val checkBookingAvailable = filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
@@ -144,7 +144,7 @@ class BookingService(
     fun editBooking(editPostRequest: UpdateBookingDTO, bookingToEdit: Booking): BookingDTO {
         val checkIfBookingUpdate = filterOverlappingBookingsExcludingOwnBooking(bookingToEdit.apartment.id, editPostRequest.startDate, editPostRequest.endDate, bookingToEdit)
 
-        if (checkIfBookingUpdate.isEmpty() && (editPostRequest.startDate.isBefore(editPostRequest.endDate))) {
+        if (checkIfBookingUpdate.isEmpty() && (editPostRequest.startDate.isBefore(editPostRequest.endDate)) && (editPostRequest.endDate <= LocalDate.parse(cutOffDate, dateFormatter))) {
             return bookingMapper.toBookingDTO(
                 bookingRepository.save(
                     bookingToEdit.copy(
