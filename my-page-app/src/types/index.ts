@@ -99,3 +99,10 @@ export type EditedBooking = {
   startDate: string
   endDate: string
 }
+
+export type InfoBooking = {
+  id: number
+  startDate: string
+  endDate: string
+  description: string
+}

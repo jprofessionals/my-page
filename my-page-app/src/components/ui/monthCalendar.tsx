@@ -11,7 +11,7 @@ import {
   isWithinInterval,
   isAfter,
 } from 'date-fns'
-import { Booking } from '@/types'
+import { Booking, InfoBooking } from '@/types'
 import { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { get } from 'radash'
@@ -20,6 +20,7 @@ export type CalendarProps = ComponentProps<typeof DayPicker> & {
   bookings: Booking[] | undefined
   yourBookings: Booking[] | undefined
   getBookings: Function
+  getInfoNotices: Function
 }
 
 const cabinColors: { [key: string]: string } = {
@@ -42,6 +43,7 @@ function MonthCalendar({
   bookings,
   yourBookings,
   getBookings,
+  getInfoNotices,
   ...props
 }: CalendarProps) {
   const startDateCalendar = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
@@ -118,6 +120,9 @@ function MonthCalendar({
           const cutOffDate = new Date(cutOffDateVacancies)
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
+          const informationNoticeList = getInfoNotices(
+            format(props.date, 'yyyy-MM-dd'),
+          )
 
           const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
 
@@ -176,10 +181,28 @@ function MonthCalendar({
             )
           })
 
+          const infoNoticeElements = informationNoticeList.map(
+            (infoNotice: InfoBooking) => {
+              return (
+                <span
+                  key={infoNotice.id}
+                  className={cn(
+                    'p-2 text-white tooltip tooltip-top shadow-xl',
+                    getInfoNoticeStyle(props.date, infoNotice),
+                    'bg-blue-500',
+                    'grid grid-cols-2 gap-3 w-full h-4 md:h-8',
+                  )}
+                >
+                </span>
+              )
+            },
+          )
+
           return (
             <>
               {dateCalendar}
               {cabinBookings}
+              {infoNoticeElements}
               <span
                 className={cn(
                   'absolute top-0 left-0 w-full h-full',
@@ -227,6 +250,35 @@ const getCabinBookingStyle = (date: Date, booking: Booking) => {
 const getCutOffDateStyle = (date: Date, cutOffDate: Date) => {
   const isCutOffDay = isSameDay(date, cutOffDate)
   return isCutOffDay ? 'border-2 border-red-500 rounded-lg' : ''
+}
+
+const getInfoNoticeDateInfo = (date: Date, infoNotice: InfoBooking) => {
+  const isFirstDay = isSameDay(new Date(date), new Date(infoNotice.startDate))
+  const isLastDay = isSameDay(new Date(date), new Date(infoNotice.endDate))
+  const isInInterval =
+    isWithinInterval(new Date(date), {
+      start: new Date(infoNotice.startDate),
+      end: new Date(infoNotice.endDate),
+    }) &&
+    !isFirstDay &&
+    !isLastDay
+  return { isFirstDay, isLastDay, isInInterval }
+}
+
+const getInfoNoticeStyle = (date: Date, infoNotice: InfoBooking) => {
+  const { isFirstDay, isLastDay, isInInterval } = getInfoNoticeDateInfo(
+    date,
+    infoNotice,
+  )
+  return cn(
+    isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
+    isFirstDay && !isSunday(date) && 'md:-mr-2',
+    isLastDay && 'rounded-r-full col-start-1 row-start-1',
+    isLastDay && !isMonday(date) && 'md:-ml-2',
+    isInInterval && 'col-span-2 ',
+    isInInterval && !isMonday(date) && 'md:-ml-1',
+    isInInterval && !isSunday(date) && 'md:-mr-1',
+  )
 }
 
 MonthCalendar.displayName = 'MonthCalendar'

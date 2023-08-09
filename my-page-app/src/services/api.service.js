@@ -121,6 +121,28 @@ const adminDeleteBooking = (bookingId) => {
   })
 }
 
+const getInfoNotices = (startDate, endDate) => {
+  const params = {
+    startDate: startDate,
+    endDate: endDate,
+  }
+
+  return axios
+    .get(API_URL + 'informationNotice', {
+      headers: authHeader(),
+      params: params,
+    })
+    .then((response) => {
+      const infoNotices = response.data
+      return infoNotices.map((infoNotice) => ({
+        id: String(infoNotice.id),
+        startDate: infoNotice.startDate,
+        endDate: infoNotice.endDate,
+        description: infoNotice.description,
+      }))
+    })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -135,5 +157,6 @@ const ApiService = {
   getAllApartments,
   deleteBooking,
   adminDeleteBooking,
+  getInfoNotices,
 }
 export default ApiService

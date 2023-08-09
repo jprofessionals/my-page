@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { MonthCalendar } from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import { Apartment, Booking } from '@/types'
+import { Apartment, Booking, InfoBooking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { add, format, isAfter, isBefore, isEqual, sub } from 'date-fns'
@@ -18,6 +18,7 @@ export default function MonthOverview() {
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
   const [userIsAdmin, setUserIsAdmin] = useState<boolean>(false)
+  const [infoNotices, setInfoNotices] = useState<InfoBooking[]>([])
 
   const { data: yourBookings } = useQuery<Booking[]>(
     'yourBookingsOutline',
@@ -56,6 +57,32 @@ export default function MonthOverview() {
     const dateString = format(date, 'yyyy-MM-dd')
     const bookingsOnDay = getBookings(dateString)
     setBookingItems(bookingsOnDay)
+  }
+
+  const { data: allInfoNotices } = useQuery<InfoBooking[]>(
+    'infoNotices',
+    async () => {
+      const fetchedInfoNotices = await ApiService.getInfoNotices(
+        startDateBookings,
+        endDateBookings,
+      )
+      return fetchedInfoNotices
+    },
+  )
+
+  const getInfoNotices = (date: string) => {
+    return (
+      allInfoNotices?.filter(
+        (infoNotice) =>
+          date >= infoNotice.startDate && date <= infoNotice.endDate,
+      ) || []
+    )
+  }
+
+  const getInfoNoticesOnDay = (date: Date) => {
+    const dateString = format(date, 'yyyy-MM-dd')
+    const infoNoticesOnDay = getInfoNotices(dateString)
+    setInfoNotices(infoNoticesOnDay)
   }
 
   const getUserIsAdmin = async () => {
@@ -168,6 +195,7 @@ export default function MonthOverview() {
     getVacancyForDay(date)
     setShowModal(true)
     getBookingsOnDay(date)
+    getInfoNoticesOnDay(date)
   }
 
   const customModalStyles = {
@@ -325,6 +353,7 @@ export default function MonthOverview() {
         getBookings={getBookings}
         yourBookings={yourBookings}
         bookings={bookings}
+        getInfoNotices={getInfoNotices}
       />
       <Modal
         className=""
@@ -340,6 +369,18 @@ export default function MonthOverview() {
               {isBefore(date, new Date(cutOffDateVacancies)) ? null : (
                 <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
               )}
+              {infoNotices.length > 0 ? (
+                <div>
+                  <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
+                  {infoNotices.map((infoNotice, index) => (
+                    <p key={index} className={`mt-1 mb-1`}>
+                      <span className="information-text">
+                        {infoNotice.description}
+                      </span>
+                    </p>
+                  ))}
+                </div>
+              ) : null}
               {bookingItems.length > 0 ? (
                 <div>
                   {bookingItems
