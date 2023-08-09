@@ -1,13 +1,13 @@
 package no.jpro.mypageapi.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
-import no.jpro.mypageapi.dto.BookingDTO
-import no.jpro.mypageapi.dto.CreatePendingBookingDTO
+import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.PendingBookingService
 import no.jpro.mypageapi.service.UserService
@@ -15,10 +15,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import java.time.format.DateTimeParseException
 
 @RestController
 @RequestMapping("pendingBooking")
@@ -40,12 +38,34 @@ class PendingBookingController (
         token: JwtAuthenticationToken,
         @Valid @RequestBody bookingRequest: CreatePendingBookingDTO,
     ): ResponseEntity<String> {
-        val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val user =
+            userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         try {
             pendingBookingService.createPendingBooking(bookingRequest, user)
             return ResponseEntity.ok("A new booking has been successfully created")
         } catch (e: IllegalArgumentException) {
             return ResponseEntity.badRequest().body(e.message)
+        }
+    }
+
+    @GetMapping("/pendingBookingInformation")
+    @Transactional
+    @Operation(summary = "Get the pending booking trains and the corresponding drawing periods")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json", array = ArraySchema(
+                schema = Schema(implementation = PendingBookingTrainDTO::class)
+            )
+        )]
+    )
+    fun getPendingBookingInformation(
+        token: JwtAuthenticationToken,
+    ): List<List<PendingBookingTrainDTO>> {
+        try {
+            return pendingBookingService.getPendingBookingInformation()
+        } catch (e: DateTimeParseException) {
+            throw BookingController.InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
     }
 }
