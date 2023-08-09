@@ -120,7 +120,7 @@ const CreateBookingPost = ({
     startDate < endDate &&
     differenceInDays(new Date(endDate), new Date(startDate)) <= 7 &&
     isBefore(new Date(endDate), addDays(new Date(cutOffDateVacancies), 1)) &&
-    bookingOwnerName!== ''
+    (!userIsAdmin || bookingOwnerName !== '')
 
   const queryClient = useQueryClient()
   const { mutate } = useMutation(createBooking, {
