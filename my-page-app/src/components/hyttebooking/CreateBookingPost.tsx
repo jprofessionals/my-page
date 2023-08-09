@@ -173,7 +173,7 @@ const CreateBookingPost = ({
               <strong> Navn: </strong>
               <label>
                 <select
-                  className="w-48 input input-bordered input-sm"
+                  className="w-48 input input-bordered input-sm mr-3"
                   name="bookingOwnerName"
                   onChange={handleBookingOwnerNameChange}
                   value={bookingOwnerName}
