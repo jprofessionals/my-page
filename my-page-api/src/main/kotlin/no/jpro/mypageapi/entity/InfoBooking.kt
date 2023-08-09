@@ -7,7 +7,7 @@ import java.time.LocalDate
 data class InfoBooking(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long? = null,
     val description: String,
     val startDate: LocalDate,
     val endDate: LocalDate,

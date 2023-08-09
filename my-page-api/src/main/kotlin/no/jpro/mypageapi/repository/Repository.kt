@@ -72,3 +72,10 @@ interface  ApartmentRepository : JpaRepository<Apartment, Long> {
     fun findApartmentById(apartmentId: Long): Apartment
     fun existsApartmentById(apartmentId: Long): Boolean
 }
+@Repository
+interface  InformationNoticeRepository : JpaRepository<InfoBooking, Long> {
+    fun findInfoBookingById(infoNoticeId: Long): InfoBooking?
+    fun findInfoBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
+        date: LocalDate, anotherDate: LocalDate
+    ): List<InfoBooking>
+}
