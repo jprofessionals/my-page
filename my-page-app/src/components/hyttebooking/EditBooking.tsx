@@ -8,7 +8,7 @@ import { Booking, EditedBooking } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
 import { useMutation, useQueryClient } from 'react-query'
-import {differenceInDays, isBefore} from "date-fns";
+import { addDays, differenceInDays, isBefore } from 'date-fns'
 
 const editExistingBooking = async ({
   editedBooking,
@@ -53,18 +53,22 @@ const EditBooking = ({
   closeModal,
   refreshVacancies,
   userIsAdmin,
+  cutOffDateVacancies,
 }: {
   booking: Booking
   closeModal: () => void
   refreshVacancies: () => void
   userIsAdmin: boolean
+  cutOffDateVacancies: string
 }) => {
   const [startDate, setStartDate] = useState(booking.startDate)
   const [endDate, setEndDate] = useState(booking.endDate)
   const [isLoadingEdit, setIsLoadingEdit] = useState(false)
 
   const isValid =
-      (isBefore(new Date(startDate), new Date (endDate)) && differenceInDays(new Date (endDate), new Date(startDate)) <= 7)
+    isBefore(new Date(startDate), new Date(endDate)) &&
+    differenceInDays(new Date(endDate), new Date(startDate)) <= 7 &&
+    isBefore(new Date(endDate), addDays(new Date(cutOffDateVacancies), 1))
 
   const queryClient = useQueryClient()
   const { mutate } = useMutation(editExistingBooking, {

@@ -84,9 +84,9 @@ const CreateBookingPost = ({
     const endFns = addDays(startDateFns, 8)
 
     for (
-        let currentFns = startDateFns;
-        isBefore(currentFns, endFns);
-        currentFns = addDays(currentFns, 1)
+      let currentFns = startDateFns;
+      isBefore(currentFns, endFns);
+      currentFns = addDays(currentFns, 1)
     ) {
       const currentDate = format(currentFns, 'yyyy-MM-dd')
       const previousFns = addDays(currentFns, -1)
@@ -94,9 +94,13 @@ const CreateBookingPost = ({
       const nextFns = addDays(currentFns, 1)
       const nextDate = format(nextFns, 'yyyy-MM-dd')
       if (
-          (vacantDaysForApartmentWithoutTakeoverDates.includes(currentDate) ||
-              vacantDaysForApartmentWithoutTakeoverDates.includes(previousDate) ||
-              vacantDaysForApartmentWithoutTakeoverDates.includes(nextDate)) && isBefore(new Date(currentDate), addDays(new Date(cutOffDateVacancies), 1))
+        (vacantDaysForApartmentWithoutTakeoverDates.includes(currentDate) ||
+          vacantDaysForApartmentWithoutTakeoverDates.includes(previousDate) ||
+          vacantDaysForApartmentWithoutTakeoverDates.includes(nextDate)) &&
+        isBefore(
+          new Date(currentDate),
+          addDays(new Date(cutOffDateVacancies), 1),
+        )
       ) {
         maxAvailableDatesInBooking.push(currentDate)
       } else {
@@ -106,7 +110,7 @@ const CreateBookingPost = ({
 
     if (maxAvailableDatesInBooking.length > 0) {
       setEndDate(
-          maxAvailableDatesInBooking[maxAvailableDatesInBooking.length - 1],
+        maxAvailableDatesInBooking[maxAvailableDatesInBooking.length - 1],
       )
     } else {
       setEndDate(startDate)
