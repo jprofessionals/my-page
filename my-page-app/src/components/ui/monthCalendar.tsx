@@ -233,6 +233,9 @@ function MonthCalendar({
                     )
                   } else {
                     const pendingBookingTrain = entry as PendingBookingTrain
+                    const hasOverlapWithBooking = cabinBookings.some(
+                      (booking) => hasOverlap(booking, pendingBookingTrain),
+                    )
                     return (
                       <span
                         key={pendingBookingTrain.id}
@@ -251,6 +254,7 @@ function MonthCalendar({
                                 pendingBookingTrain.apartment.cabin_name,
                               ),
                           'normal-case',
+                          hasOverlapWithBooking && 'hidden',
                         )}
                       ></span>
                     )
@@ -357,6 +361,24 @@ const getPendingBookingCabinStyle = (
     isInInterval && 'col-span-2 ',
     isInInterval && !isMonday(date) && 'md:-ml-1',
     isInInterval && !isSunday(date) && 'md:-mr-1',
+  )
+}
+const hasOverlap = (
+  booking: Booking,
+  pendingBookingTrain: PendingBookingTrain,
+) => {
+  const bookingStartDate = new Date(booking.startDate)
+  const bookingEndDate = new Date(booking.endDate)
+  const pendingBookingStartDate = new Date(pendingBookingTrain.startDate)
+  const pendingBookingEndDate = new Date(pendingBookingTrain.endDate)
+
+  return (
+    (bookingStartDate >= pendingBookingStartDate &&
+      bookingStartDate <= pendingBookingEndDate) ||
+    (bookingEndDate >= pendingBookingStartDate &&
+      bookingEndDate <= pendingBookingEndDate) ||
+    (bookingStartDate <= pendingBookingStartDate &&
+      bookingEndDate >= pendingBookingEndDate)
   )
 }
 
