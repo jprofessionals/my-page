@@ -220,6 +220,7 @@ export default function MonthOverview() {
     setExpandedApartments([])
     setDeleteModalIsOpen(false)
     setShowCreateFormForInfoNotice(false)
+    setInfoNoticeDeleteModalIsOpen(false)
   }
 
   const handleBookClick = (apartmentId: number) => {
@@ -240,6 +241,51 @@ export default function MonthOverview() {
     if (!showCreateFormForInfoNotice) {
       setShowCreateFormForInfoNotice(true)
     } else setShowCreateFormForInfoNotice(false)
+  }
+
+  const [infoNoticeDeleteModalIsOpen, setInfoNoticeDeleteModalIsOpen] =
+    useState(false)
+  const [infoNoticeIdToDelete, setInfoNoticeIdToDelete] = useState<
+    number | null
+  >(null)
+
+  const openInfoNoticeDeleteModal = (infoNotice: number | null) => {
+    setInfoNoticeIdToDelete(infoNotice)
+    setInfoNoticeDeleteModalIsOpen(true)
+  }
+
+  const closeInfoNoticeDeleteModal = () => {
+    setInfoNoticeDeleteModalIsOpen(false)
+  }
+
+  const confirmInfoNoticeDelete = () => {
+    handleDeleteNotice(infoNoticeIdToDelete)
+    closeInfoNoticeDeleteModal()
+  }
+
+  const deleteInfoNoticeByNoticeId = async (infoNoticeId: number | null) => {
+    try {
+      await ApiService.deleteInfoNotice(infoNoticeId)
+      toast.success('Informasjonsnotisen er slettet')
+      closeModal()
+    } catch (error) {
+      toast.error(
+        `Informasjonsnotisen ble ikke slettet med følgende feil: ${error}`,
+      )
+    }
+  }
+
+  const deleteInfoNotice = useMutation(deleteInfoNoticeByNoticeId, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('infoNotices')
+    },
+    onError: (error) => {
+      console.error('Error:', error)
+    },
+  })
+
+  const handleDeleteNotice = (infoNoticeId: number | null) => {
+    deleteInfoNotice.mutate(infoNoticeId)
   }
 
   type VacancyLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
@@ -388,6 +434,40 @@ export default function MonthOverview() {
                       <span className="information-text">
                         {infoNotice.description}
                       </span>
+                      {userIsAdmin && (
+                        <button
+                          onClick={() =>
+                            openInfoNoticeDeleteModal(infoNotice.id)
+                          }
+                          className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                        >
+                          Slett
+                        </button>
+                      )}
+                      <Modal
+                        isOpen={infoNoticeDeleteModalIsOpen}
+                        onRequestClose={closeModal}
+                        contentLabel="Delete Confirmation"
+                        style={customModalStyles}
+                      >
+                        <p className="mb-3">
+                          Er du sikker på at du vil slette notisen?
+                        </p>
+                        <div className="flex justify-end">
+                          <button
+                            onClick={confirmInfoNoticeDelete}
+                            className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                          >
+                            Slett notis
+                          </button>
+                          <button
+                            onClick={closeInfoNoticeDeleteModal}
+                            className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                          >
+                            Avbryt
+                          </button>
+                        </div>
+                      </Modal>
                     </p>
                   ))}
                 </div>

@@ -143,6 +143,12 @@ const getInfoNotices = (startDate, endDate) => {
     })
 }
 
+const deleteInfoNotice = (infoNoticeId) => {
+  return axios.delete(API_URL + 'informationNotice/admin/' + infoNoticeId, {
+    headers: authHeader(),
+  })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -158,5 +164,6 @@ const ApiService = {
   deleteBooking,
   adminDeleteBooking,
   getInfoNotices,
+  deleteInfoNotice,
 }
 export default ApiService
