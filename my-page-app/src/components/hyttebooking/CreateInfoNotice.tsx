@@ -122,7 +122,7 @@ const CreateInfoNoticePost = ({ date, closeModal, userIsAdmin }: Props) => {
               name="description"
               onChange={handleDescriptionChange}
               value={description}
-              placeholder="Legg til en beskrivelse her"
+              placeholder="Legg til beskrivelse her"
             />
           </label>
           <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
