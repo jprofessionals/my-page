@@ -121,6 +121,17 @@ const adminDeleteBooking = (bookingId) => {
   })
 }
 
+const getAllPendingBookingTrainsForAllApartments = async () => {
+  const response = await axios.get(
+    API_URL + 'pendingBooking/pendingBookingInformation/',
+    {
+      headers: authHeader(),
+    },
+  )
+  const allPendingBookingTrainsAllApartments = response.data
+  return allPendingBookingTrainsAllApartments
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -135,5 +146,6 @@ const ApiService = {
   getAllApartments,
   deleteBooking,
   adminDeleteBooking,
+  getAllPendingBookingTrainsForAllApartments
 }
 export default ApiService

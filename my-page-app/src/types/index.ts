@@ -99,3 +99,27 @@ export type EditedBooking = {
   startDate: string
   endDate: string
 }
+
+export type PendingBooking = {
+  id: number
+  apartment: Apartment
+  startDate: string
+  endDate: string
+  createdDate: string
+  employeeName: string
+}
+
+export type PendingBookingTrain = {
+  id: string
+  apartment: Apartment
+  startDate: string
+  endDate: string
+  drawingPeriodList: DrawingPeriod[]
+}
+
+export type DrawingPeriod = {
+  id: string
+  startDate: string
+  endDate: string
+  pendingBookings: PendingBooking[]
+}

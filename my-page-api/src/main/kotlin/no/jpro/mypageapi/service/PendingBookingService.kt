@@ -126,8 +126,10 @@ class PendingBookingService(
                 drawingPeriod.startDate in dates
             }
 
+            val apartment = apartmentRepository.findApartmentById(apartmentId)
+
             PendingBookingTrainDTO(
-                apartmentId = apartmentId,
+                apartment = apartment,
                 startDate = startDate!!,
                 endDate = endDate!!,
                 drawingPeriodList = drawingPeriodDTO

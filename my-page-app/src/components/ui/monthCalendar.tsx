@@ -11,7 +11,7 @@ import {
   isWithinInterval,
   isAfter,
 } from 'date-fns'
-import { Booking } from '@/types'
+import {Booking, PendingBookingTrain} from '@/types'
 import { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { get } from 'radash'
@@ -20,6 +20,7 @@ export type CalendarProps = ComponentProps<typeof DayPicker> & {
   bookings: Booking[] | undefined
   yourBookings: Booking[] | undefined
   getBookings: Function
+  getPendingBookingTrainsOnDay: Function
 }
 
 const cabinColors: { [key: string]: string } = {
@@ -34,6 +35,12 @@ const cabinColorsOpacity: { [key: string]: string } = {
   'Stor leilighet': 'bg-orange-200',
 }
 
+const pendingBookingCabinColors: { [key: string]: string } = {
+  Annekset: 'bg-green-200',
+  'Liten leilighet': 'bg-purple-200',
+  'Stor leilighet': 'bg-yellow-200',
+}
+
 function MonthCalendar({
   className,
   classNames,
@@ -42,6 +49,7 @@ function MonthCalendar({
   bookings,
   yourBookings,
   getBookings,
+  getPendingBookingTrainsOnDay,
   ...props
 }: CalendarProps) {
   const startDateCalendar = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
@@ -118,6 +126,10 @@ function MonthCalendar({
           const cutOffDate = new Date(cutOffDateVacancies)
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
+          const pendingBookingsTrains =
+              getPendingBookingTrainsOnDay(
+              format(props.date, 'yyyy-MM-dd'),
+            )
 
           const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
 
@@ -129,7 +141,121 @@ function MonthCalendar({
               return result
             }, {})
 
-          const cabinBookings = cabinOrder.map((cabin) => {
+          const pendingBookingsByCabin: {
+            [key: string]: PendingBookingTrain[]
+          } = cabinOrder.reduce(
+            (result: { [key: string]: PendingBookingTrain[] }, cabin) => {
+              result[cabin] = pendingBookingsTrains.filter(
+                (pendingBookingTrain: PendingBookingTrain) =>
+                  pendingBookingTrain.apartment.cabin_name === cabin,
+              )
+              return result
+            },
+            {},
+          )
+
+          const renderBookingsAndPendingBookings = (cabin: string) => {
+            const cabinBookings = bookingsByCabin[cabin] || []
+            const cabinPendingBookingTrains =
+                pendingBookingsByCabin[cabin] || []
+            const combinedEntries: (Booking | PendingBookingTrain)[] = [
+              ...cabinBookings,
+              ...cabinPendingBookingTrains,
+            ]
+
+            if (combinedEntries.length === 0) {
+              return (
+                  <div
+                      key={cabin}
+                      className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
+                  >
+                    {cabinPendingBookingTrains.map((pendingBookingTrain) => (
+                        <span
+                            key={pendingBookingTrain.id}
+                            className={cn(
+                                getPendingBookingCabinStyle(
+                                    props.date,
+                                    pendingBookingTrain,
+                                ),
+                                isAfter(add(props.date, { days: 1 }), new Date())
+                                    ? get(
+                                        pendingBookingCabinColors,
+                                        pendingBookingTrain.apartment.cabin_name,
+                                    )
+                                    : null,
+                                'normal-case',
+                            )}
+                        ></span>
+                    ))}
+                  </div>
+              )
+            }
+
+            return (
+                <div
+                    key={cabin}
+                    className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
+                >
+                  {combinedEntries.map((entry) => {
+                    if ('employeeName' in entry) {
+                      const booking = entry as Booking
+                      const isYourBooking = yourBookings?.some(
+                          (yourBooking) => yourBooking.id === booking.id,
+                      )
+                      const { isFirstDay, isLastDay } = getBookingDateInfo(
+                          props.date,
+                          booking,
+                      )
+                      return (
+                          <span
+                              key={booking.id}
+                              className={cn(
+                                  'p-2 text-white tooltip tooltip-top shadow-xl',
+                                  getCabinBookingStyle(props.date, booking),
+                                  isYourBooking && 'shadow-y-2',
+                                  isAfter(add(props.date, { days: 1 }), new Date())
+                                      ? get(cabinColors, booking.apartment?.cabin_name)
+                                      : get(
+                                          cabinColorsOpacity,
+                                          booking.apartment?.cabin_name,
+                                      ),
+                                  'normal-case',
+                              )}
+                              {...(windowWidth > 800 && {
+                                'data-tip': `Reservert av: ${booking.employeeName}`,
+                              })}
+                          >
+                        {(isFirstDay || isLastDay) &&
+                            getInitials(booking.employeeName)}
+                      </span>
+                      )
+                    } else {
+                      const pendingBookingTrain = entry as PendingBookingTrain
+                      return (
+                          <span
+                              key={pendingBookingTrain.id}
+                              className={cn(
+                                  getPendingBookingCabinStyle(
+                                      props.date,
+                                      pendingBookingTrain,
+                                  ),
+                                  isAfter(add(props.date, { days: 1 }), new Date())
+                                      ? get(
+                                          pendingBookingCabinColors,
+                                          pendingBookingTrain.apartment.cabin_name,
+                                      )
+                                      : null,
+                                  'normal-case',
+                              )}
+                          ></span>
+                      )
+                    }
+                  })}
+                </div>
+            )
+          }
+
+          /*const cabinBookings = cabinOrder.map((cabin) => {
             const cabinBookings = bookingsByCabin[cabin] || []
             return cabinBookings.length > 0 ? (
               <div
@@ -174,12 +300,14 @@ function MonthCalendar({
                 hey
               </div>
             )
-          })
+          })*/
 
           return (
             <>
               {dateCalendar}
-              {cabinBookings}
+              {renderBookingsAndPendingBookings('Stor leilighet')}
+              {renderBookingsAndPendingBookings('Liten leilighet')}
+              {renderBookingsAndPendingBookings('Annekset')}
               <span
                 className={cn(
                   'absolute top-0 left-0 w-full h-full',
@@ -209,6 +337,28 @@ const getBookingDateInfo = (date: Date, booking: Booking) => {
   return { isFirstDay, isLastDay, isInInterval }
 }
 
+const getPendingBookingDateInfo = (
+    date: Date,
+    pendingBookingTrain: PendingBookingTrain,
+) => {
+  const isFirstDay = isSameDay(
+      new Date(date),
+      new Date(pendingBookingTrain.startDate),
+  )
+  const isLastDay = isSameDay(
+      new Date(date),
+      new Date(pendingBookingTrain.endDate),
+  )
+  const isInInterval =
+      isWithinInterval(new Date(date), {
+        start: new Date(pendingBookingTrain.startDate),
+        end: new Date(pendingBookingTrain.endDate),
+      }) &&
+      !isFirstDay &&
+      !isLastDay
+  return { isFirstDay, isLastDay, isInInterval }
+}
+
 const getCabinBookingStyle = (date: Date, booking: Booking) => {
   const { isFirstDay, isLastDay, isInInterval } = getBookingDateInfo(
     date,
@@ -227,6 +377,25 @@ const getCabinBookingStyle = (date: Date, booking: Booking) => {
 const getCutOffDateStyle = (date: Date, cutOffDate: Date) => {
   const isCutOffDay = isSameDay(date, cutOffDate)
   return isCutOffDay ? 'border-2 border-red-500 rounded-lg' : ''
+}
+
+const getPendingBookingCabinStyle = (
+    date: Date,
+    pendingBookingTrain: PendingBookingTrain,
+) => {
+  const { isFirstDay, isLastDay, isInInterval } = getPendingBookingDateInfo(
+      date,
+      pendingBookingTrain,
+  )
+  return cn(
+    isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
+    isFirstDay && !isSunday(date) && 'md:-mr-2',
+    isLastDay && 'rounded-r-full col-start-1 row-start-1',
+    isLastDay && !isMonday(date) && 'md:-ml-2',
+    isInInterval && 'col-span-2 ',
+    isInInterval && !isMonday(date) && 'md:-ml-1',
+    isInInterval && !isSunday(date) && 'md:-mr-1',
+  )
 }
 
 MonthCalendar.displayName = 'MonthCalendar'
