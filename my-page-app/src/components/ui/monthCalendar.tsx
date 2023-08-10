@@ -195,6 +195,7 @@ function MonthCalendar({
                     getInfoNoticeStyle(props.date, infoNotice),
                     'bg-blue-500',
                     'grid grid-cols-2 gap-3 w-full h-4 md:h-8',
+                    'normal-case',
                   )}
                 >
                   {isFirstDay && infoNotice.description}
