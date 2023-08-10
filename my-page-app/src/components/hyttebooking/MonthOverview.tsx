@@ -9,6 +9,7 @@ import { add, format, isAfter, isBefore, isEqual, sub } from 'date-fns'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tab'
 
 const cutOffDateVacancies = '2023-10-01'
 //TODO: Hardkodet cutoff date som styrer hva man kan booke.
@@ -334,196 +335,218 @@ export default function MonthOverview() {
         style={customModalStyles}
       >
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 prose">
-          {date ? (
-            <div>
-              <h3 className="mt-1 mb-1">{format(date, 'dd.MM.yyyy')}</h3>
-              {isBefore(date, new Date(cutOffDateVacancies)) ? null : (
-                <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
-              )}
-              {bookingItems.length > 0 ? (
+          <Tabs defaultValue="account" className="">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="account" className="text-lg">
+                Oversikt over leilighetene
+              </TabsTrigger>
+              <TabsTrigger value="password" className="text-lg">
+                Oversikt over ønsket bookinger
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="account">
+              {date ? (
                 <div>
-                  {bookingItems
-                    .sort((a, b) => {
-                      const cabinIndexA = cabinOrder.indexOf(
-                        a.apartment.cabin_name,
-                      )
-                      const cabinIndexB = cabinOrder.indexOf(
-                        b.apartment.cabin_name,
-                      )
+                  <h3 className="mt-1 mb-1">{format(date, 'dd.MM.yyyy')}</h3>
+                  {isBefore(date, new Date(cutOffDateVacancies)) ? null : (
+                    <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
+                  )}
+                  {bookingItems.length > 0 ? (
+                    <div>
+                      {bookingItems
+                        .sort((a, b) => {
+                          const cabinIndexA = cabinOrder.indexOf(
+                            a.apartment.cabin_name,
+                          )
+                          const cabinIndexB = cabinOrder.indexOf(
+                            b.apartment.cabin_name,
+                          )
 
-                      if (cabinIndexA !== cabinIndexB) {
-                        return cabinIndexA - cabinIndexB
-                      }
-                      const startDateComparison =
-                        Date.parse(a.startDate) - Date.parse(b.startDate)
-                      if (startDateComparison !== 0) {
-                        return startDateComparison
-                      }
-                      return Date.parse(a.endDate) - Date.parse(b.endDate)
-                    })
-                    .map((booking, index) => {
-                      const startDate = new Date(booking.startDate)
-                      const endDate = new Date(booking.endDate)
-                      const formattedStartDate = format(startDate, 'dd.MM.yyyy')
-                      const formattedEndDate = format(endDate, 'dd.MM.yyyy')
+                          if (cabinIndexA !== cabinIndexB) {
+                            return cabinIndexA - cabinIndexB
+                          }
+                          const startDateComparison =
+                            Date.parse(a.startDate) - Date.parse(b.startDate)
+                          if (startDateComparison !== 0) {
+                            return startDateComparison
+                          }
+                          return Date.parse(a.endDate) - Date.parse(b.endDate)
+                        })
+                        .map((booking, index) => {
+                          const startDate = new Date(booking.startDate)
+                          const endDate = new Date(booking.endDate)
+                          const formattedStartDate = format(
+                            startDate,
+                            'dd.MM.yyyy',
+                          )
+                          const formattedEndDate = format(endDate, 'dd.MM.yyyy')
 
-                      const isYourBooking = yourBookings?.some(
-                        (yourBooking) => yourBooking.id === booking.id,
-                      )
+                          const isYourBooking = yourBookings?.some(
+                            (yourBooking) => yourBooking.id === booking.id,
+                          )
 
-                      const prevCabinName =
-                        index > 0
-                          ? bookingItems[index - 1].apartment.cabin_name
-                          : null
-                      const currentCabinName = booking.apartment.cabin_name
-                      const shouldRenderDivider =
-                        prevCabinName !== currentCabinName
+                          const prevCabinName =
+                            index > 0
+                              ? bookingItems[index - 1].apartment.cabin_name
+                              : null
+                          const currentCabinName = booking.apartment.cabin_name
+                          const shouldRenderDivider =
+                            prevCabinName !== currentCabinName
 
-                      return (
-                        <div key={booking.id}>
-                          {shouldRenderDivider && (
-                            <h4
-                              className={`mt-2 mb-1 ${cabinTextColorClasses[currentCabinName]}`}
-                            >
-                              {currentCabinName}:
-                            </h4>
-                          )}
-                          <p
-                            className={`mt-2 mb-1 pl-2 flex ${cabinBorderColorClasses[currentCabinName]} border-l-2`}
-                          >
-                            {isYourBooking || userIsAdmin ? (
-                              <>
-                                <div className="flex flex-col">
-                                  <p className="flex-row justify-between items-center space-x-2">
-                                    <span>
-                                      {isYourBooking
-                                        ? `Du har hytten fra ${formattedStartDate} til ${formattedEndDate}.`
-                                        : `${booking.employeeName} har hytten fra ${formattedStartDate} til ${formattedEndDate}.`}
-                                    </span>
-                                    <button
-                                      onClick={() =>
-                                        handleEditBooking(booking.id)
-                                      }
-                                      className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
-                                    >
-                                      Rediger
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        openDeleteModal(booking.id)
-                                      }
-                                      className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
-                                    >
-                                      Slett
-                                    </button>
-                                    <Modal
-                                      isOpen={deleteModalIsOpen}
-                                      onRequestClose={closeModal}
-                                      contentLabel="Delete Confirmation"
-                                      style={customModalStyles}
-                                    >
-                                      <p className="mb-3">
-                                        Er du sikker på at du vil slette
-                                        reservasjonen?
+                          return (
+                            <div key={booking.id}>
+                              {shouldRenderDivider && (
+                                <h4
+                                  className={`mt-2 mb-1 ${cabinTextColorClasses[currentCabinName]}`}
+                                >
+                                  {currentCabinName}:
+                                </h4>
+                              )}
+                              <p
+                                className={`mt-2 mb-1 pl-2 flex ${cabinBorderColorClasses[currentCabinName]} border-l-2`}
+                              >
+                                {isYourBooking || userIsAdmin ? (
+                                  <>
+                                    <div className="flex flex-col">
+                                      <p className="flex-row justify-between items-center space-x-2">
+                                        <span>
+                                          {isYourBooking
+                                            ? `Du har hytten fra ${formattedStartDate} til ${formattedEndDate}.`
+                                            : `${booking.employeeName} har hytten fra ${formattedStartDate} til ${formattedEndDate}.`}
+                                        </span>
+                                        <button
+                                          onClick={() =>
+                                            handleEditBooking(booking.id)
+                                          }
+                                          className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                                        >
+                                          Rediger
+                                        </button>
+                                        <button
+                                          onClick={() =>
+                                            openDeleteModal(booking.id)
+                                          }
+                                          className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
+                                        >
+                                          Slett
+                                        </button>
+                                        <Modal
+                                          isOpen={deleteModalIsOpen}
+                                          onRequestClose={closeModal}
+                                          contentLabel="Delete Confirmation"
+                                          style={customModalStyles}
+                                        >
+                                          <p className="mb-3">
+                                            Er du sikker på at du vil slette
+                                            reservasjonen?
+                                          </p>
+                                          <div className="flex justify-end">
+                                            <button
+                                              onClick={confirmDelete}
+                                              className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                                            >
+                                              Slett reservasjon
+                                            </button>
+                                            <button
+                                              onClick={closeDeleteModal}
+                                              className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                                            >
+                                              Avbryt
+                                            </button>
+                                          </div>
+                                        </Modal>
                                       </p>
-                                      <div className="flex justify-end">
-                                        <button
-                                          onClick={confirmDelete}
-                                          className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
-                                        >
-                                          Slett reservasjon
-                                        </button>
-                                        <button
-                                          onClick={closeDeleteModal}
-                                          className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
-                                        >
-                                          Avbryt
-                                        </button>
-                                      </div>
-                                    </Modal>
-                                  </p>
-                                  {showEditFormForBooking === booking.id && (
-                                    <EditBooking
-                                      booking={booking}
-                                      closeModal={closeModal}
-                                      refreshVacancies={refreshVacancies}
-                                      userIsAdmin={userIsAdmin}
-                                      cutOffDateVacancies={cutOffDateVacancies}
-                                    />
-                                  )}
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <span>
-                                  {booking.employeeName} har fra{' '}
-                                  {formattedStartDate} til {formattedEndDate}.
-                                </span>
-                              </>
-                            )}
-                          </p>
-                        </div>
-                      )
-                    })}
-                </div>
-              ) : null}
-              {vacantApartmentsOnDay.length !== 0 ? (
-                <h3 className="mt-3 mb-1">Ledige hytter:</h3>
-              ) : null}
-              {vacantApartmentsOnDay
-                .sort(
-                  (a, b) =>
-                    cabinOrder.indexOf(a.cabin_name) -
-                    cabinOrder.indexOf(b.cabin_name),
-                )
-                .map((apartment, index) => (
-                  <div key={index}>
-                    <p
-                      className={`mt-1 mb-1 ${
-                        cabinBorderColorClasses[apartment.cabin_name]
-                      } pl-2 border-l-2 `}
-                    >
-                      <span className="apartment-text">
-                        {apartment.cabin_name}
-                      </span>
-                      <button
-                        onClick={() => handleBookClick(apartment.id)}
-                        className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
-                      >
-                        Reserver
-                      </button>
-                    </p>
-                    {expandedApartments.includes(apartment.id) && (
-                      <div className="expanded-content">
-                        <CreateBookingPost
-                          apartmentId={apartment.id}
-                          date={date}
-                          closeModal={closeModal}
-                          refreshVacancies={refreshVacancies}
-                          userIsAdmin={userIsAdmin}
-                          allUsersNames={allUsersNames}
-                          cutOffDateVacancies={cutOffDateVacancies}
-                          vacancies={vacancies}
-                        />
+                                      {showEditFormForBooking ===
+                                        booking.id && (
+                                        <EditBooking
+                                          booking={booking}
+                                          closeModal={closeModal}
+                                          refreshVacancies={refreshVacancies}
+                                          userIsAdmin={userIsAdmin}
+                                          cutOffDateVacancies={
+                                            cutOffDateVacancies
+                                          }
+                                        />
+                                      )}
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span>
+                                      {booking.employeeName} har fra{' '}
+                                      {formattedStartDate} til{' '}
+                                      {formattedEndDate}.
+                                    </span>
+                                  </>
+                                )}
+                              </p>
+                            </div>
+                          )
+                        })}
+                    </div>
+                  ) : null}
+                  {vacantApartmentsOnDay.length !== 0 ? (
+                    <h3 className="mt-3 mb-1">Ledige hytter:</h3>
+                  ) : null}
+                  {vacantApartmentsOnDay
+                    .sort(
+                      (a, b) =>
+                        cabinOrder.indexOf(a.cabin_name) -
+                        cabinOrder.indexOf(b.cabin_name),
+                    )
+                    .map((apartment, index) => (
+                      <div key={index}>
+                        <p
+                          className={`mt-1 mb-1 ${
+                            cabinBorderColorClasses[apartment.cabin_name]
+                          } pl-2 border-l-2 `}
+                        >
+                          <span className="apartment-text">
+                            {apartment.cabin_name}
+                          </span>
+                          <button
+                            onClick={() => handleBookClick(apartment.id)}
+                            className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
+                          >
+                            Reserver
+                          </button>
+                        </p>
+                        {expandedApartments.includes(apartment.id) && (
+                          <div className="expanded-content">
+                            <CreateBookingPost
+                              apartmentId={apartment.id}
+                              date={date}
+                              closeModal={closeModal}
+                              refreshVacancies={refreshVacancies}
+                              userIsAdmin={userIsAdmin}
+                              allUsersNames={allUsersNames}
+                              cutOffDateVacancies={cutOffDateVacancies}
+                              vacancies={vacancies}
+                            />
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                ))}
-            </div>
-          ) : (
-            <div>
-              <p>Ingen valgt dato</p>
-            </div>
-          )}
+                    ))}
+                </div>
+              ) : (
+                <div>
+                  <p>Ingen valgt dato</p>
+                </div>
+              )}
 
-          <div className="flex justify-end">
-            <button
-              onClick={closeModal}
-              className="mt-3 bg-red-not-available text-white px-2 py-1 rounded-md"
-            >
-              Lukk
-            </button>
-          </div>
+              <div className="flex justify-end">
+                <button
+                  onClick={closeModal}
+                  className="mt-3 bg-red-not-available text-white px-2 py-1 rounded-md"
+                >
+                  Lukk
+                </button>
+              </div>
+            </TabsContent>
+            <TabsContent value="password">
+              Her kommer det oversikt over ønsket reservasjoner
+            </TabsContent>
+          </Tabs>
         </div>
       </Modal>
     </div>
