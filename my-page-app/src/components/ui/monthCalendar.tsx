@@ -23,6 +23,8 @@ export type CalendarProps = ComponentProps<typeof DayPicker> & {
   getPendingBookingTrainsOnDay: Function
 }
 
+const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
+
 const cabinColors: { [key: string]: string } = {
   Annekset: 'bg-teal-annex',
   'Liten leilighet': 'bg-blue-small-appartment',
@@ -131,8 +133,6 @@ function MonthCalendar({
               format(props.date, 'yyyy-MM-dd'),
             )
 
-          const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
-
           const bookingsByCabin: { [key: string]: Booking[] } =
             cabinOrder.reduce((result: { [key: string]: Booking[] }, cabin) => {
               result[cabin] = bookingList.filter(
@@ -182,7 +182,10 @@ function MonthCalendar({
                                         pendingBookingCabinColors,
                                         pendingBookingTrain.apartment.cabin_name,
                                     )
-                                    : null,
+                                    : get(
+                                        pendingBookingCabinColors,
+                                        pendingBookingTrain.apartment.cabin_name,
+                                    ),
                                 'normal-case',
                             )}
                         ></span>
@@ -244,7 +247,10 @@ function MonthCalendar({
                                           pendingBookingCabinColors,
                                           pendingBookingTrain.apartment.cabin_name,
                                       )
-                                      : null,
+                                      : get(
+                                          pendingBookingCabinColors,
+                                          pendingBookingTrain.apartment.cabin_name,
+                                      ),
                                   'normal-case',
                               )}
                           ></span>
@@ -301,13 +307,16 @@ function MonthCalendar({
               </div>
             )
           })*/
+          const renderCabinEntries = () => {
+            return cabinOrder.map((cabin) => {
+              return renderBookingsAndPendingBookings(cabin)
+            })
+          }
 
           return (
             <>
               {dateCalendar}
-              {renderBookingsAndPendingBookings('Stor leilighet')}
-              {renderBookingsAndPendingBookings('Liten leilighet')}
-              {renderBookingsAndPendingBookings('Annekset')}
+              {renderCabinEntries()}
               <span
                 className={cn(
                   'absolute top-0 left-0 w-full h-full',
