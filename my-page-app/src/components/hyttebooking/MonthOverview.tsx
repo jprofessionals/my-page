@@ -5,11 +5,12 @@ import ApiService from '@/services/api.service'
 import { Apartment, Booking, InfoBooking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
-import { add, format, isAfter, isBefore, isEqual, sub } from 'date-fns'
+import { add, format, isAfter, isBefore, sub } from 'date-fns'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 import CreateInfoNotice from '@/components/hyttebooking/CreateInfoNotice'
+import EditInfoNotice from '@/components/hyttebooking/EditInfoNotice'
 
 const cutOffDateVacancies = '2023-10-01'
 //TODO: Hardkodet cutoff date som styrer hva man kan booke.
@@ -221,6 +222,7 @@ export default function MonthOverview() {
     setDeleteModalIsOpen(false)
     setShowCreateFormForInfoNotice(false)
     setInfoNoticeDeleteModalIsOpen(false)
+    setShowEditFormForInfoNoticeId(null)
   }
 
   const handleBookClick = (apartmentId: number) => {
@@ -286,6 +288,16 @@ export default function MonthOverview() {
 
   const handleDeleteNotice = (infoNoticeId: number | null) => {
     deleteInfoNotice.mutate(infoNoticeId)
+  }
+
+  const [showEditFormForInfoNotice, setShowEditFormForInfoNoticeId] = useState<
+    number | null
+  >(null)
+
+  const handleEditInfoNotice = (infoNoticeId: number) => {
+    if (showEditFormForInfoNotice !== infoNoticeId) {
+      setShowEditFormForInfoNoticeId(infoNoticeId)
+    } else setShowEditFormForInfoNoticeId(null)
   }
 
   type VacancyLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
@@ -430,19 +442,30 @@ export default function MonthOverview() {
                 <div>
                   <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
                   {infoNotices.map((infoNotice, index) => (
-                    <p key={index} className="mt-1 mb-1 pl-2 border-l-2 border-blue-500">
+                    <p
+                      key={index}
+                      className="mt-1 mb-1 pl-2 border-l-2 border-blue-500"
+                    >
                       <span className="information-text ">
                         {infoNotice.description}
                       </span>
                       {userIsAdmin && (
-                        <button
-                          onClick={() =>
-                            openInfoNoticeDeleteModal(infoNotice.id)
-                          }
-                          className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
-                        >
-                          Slett
-                        </button>
+                        <>
+                          <button
+                            onClick={() => handleEditInfoNotice(infoNotice.id)}
+                            className="ml-3 bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                          >
+                            Rediger
+                          </button>
+                          <button
+                            onClick={() =>
+                              openInfoNoticeDeleteModal(infoNotice.id)
+                            }
+                            className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                          >
+                            Slett
+                          </button>
+                        </>
                       )}
                       <Modal
                         isOpen={infoNoticeDeleteModalIsOpen}
@@ -468,6 +491,13 @@ export default function MonthOverview() {
                           </button>
                         </div>
                       </Modal>
+                      {showEditFormForInfoNotice === infoNotice.id && (
+                        <EditInfoNotice
+                          infoNotice={infoNotice}
+                          closeModal={closeModal}
+                          userIsAdmin={userIsAdmin}
+                        />
+                      )}
                     </p>
                   ))}
                 </div>

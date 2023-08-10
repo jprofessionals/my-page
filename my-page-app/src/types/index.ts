@@ -112,3 +112,9 @@ export type InfoBookingPost = {
   endDate: string
   description: string
 }
+
+export type EditedInfoNotice = {
+  startDate: string
+  endDate: string
+  description: string
+}
