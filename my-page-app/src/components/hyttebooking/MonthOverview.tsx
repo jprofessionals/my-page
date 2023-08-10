@@ -430,8 +430,8 @@ export default function MonthOverview() {
                 <div>
                   <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
                   {infoNotices.map((infoNotice, index) => (
-                    <p key={index} className={`mt-1 mb-1`}>
-                      <span className="information-text">
+                    <p key={index} className="mt-1 mb-1 pl-2 border-l-2 border-blue-500">
+                      <span className="information-text ">
                         {infoNotice.description}
                       </span>
                       {userIsAdmin && (
@@ -497,6 +497,7 @@ export default function MonthOverview() {
               )}
               {bookingItems.length > 0 ? (
                 <div>
+                  <h3 className="mt-3">Reservasjoner:</h3>
                   {bookingItems
                     .sort((a, b) => {
                       const cabinIndexA = cabinOrder.indexOf(
