@@ -527,7 +527,7 @@ export default function MonthOverview() {
               )}
               {bookingItems.length > 0 ? (
                 <div>
-                  <h3 className="mt-3">Reservasjoner:</h3>
+                  <h3 className="mt-3 mb-1">Reservasjoner:</h3>
                   {bookingItems
                     .sort((a, b) => {
                       const cabinIndexA = cabinOrder.indexOf(
