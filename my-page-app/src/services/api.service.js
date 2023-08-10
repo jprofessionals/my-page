@@ -146,6 +146,6 @@ const ApiService = {
   getAllApartments,
   deleteBooking,
   adminDeleteBooking,
-  getAllPendingBookingTrainsForAllApartments
+  getAllPendingBookingTrainsForAllApartments,
 }
 export default ApiService

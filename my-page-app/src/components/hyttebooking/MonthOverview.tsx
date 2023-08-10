@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { MonthCalendar } from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import {Apartment, Booking, PendingBooking} from '@/types'
+import { Apartment, Booking, PendingBooking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { add, format, isAfter, isBefore, isEqual, sub } from 'date-fns'
@@ -298,12 +298,12 @@ export default function MonthOverview() {
   }
 
   const { data: allPendingBookingTrains } = useQuery(
-      'allPendingBookingsAllApartments',
-      async () => {
-        const fetchedPendingBookingsTrains =
-            await ApiService.getAllPendingBookingTrainsForAllApartments()
-        return fetchedPendingBookingsTrains
-      },
+    'allPendingBookingsAllApartments',
+    async () => {
+      const fetchedPendingBookingsTrains =
+        await ApiService.getAllPendingBookingTrainsForAllApartments()
+      return fetchedPendingBookingsTrains
+    },
   )
   const getPendingBookingTrainsOnDay = (date: string) => {
     if (!allPendingBookingTrains) {
@@ -317,28 +317,28 @@ export default function MonthOverview() {
     }
     const currentDate = new Date(date)
     currentDate.setHours(0, 0, 0, 0)
-    const filteredPendingBookingTrainsAllApartments = allPendingBookingTrainsAllApartments.filter(
-        (pendingBookingTrain) => {
-          const startDate = new Date(pendingBookingTrain.startDate)
-          const endDate = new Date(pendingBookingTrain.endDate)
-          startDate.setHours(0, 0, 0, 0)
-          endDate.setHours(0, 0, 0, 0)
+    const filteredPendingBookingTrainsAllApartments =
+      allPendingBookingTrainsAllApartments.filter((pendingBookingTrain) => {
+        const startDate = new Date(pendingBookingTrain.startDate)
+        const endDate = new Date(pendingBookingTrain.endDate)
+        startDate.setHours(0, 0, 0, 0)
+        endDate.setHours(0, 0, 0, 0)
 
-          return currentDate >= startDate && currentDate <= endDate
-        }
-    ) || []
-    return (
-        filteredPendingBookingTrainsAllApartments
-    )
+        return currentDate >= startDate && currentDate <= endDate
+      }) || []
+    return filteredPendingBookingTrainsAllApartments
   }
 
-  const [pendingBookingsOnDay, setPendingBookingsOnDay] = useState<PendingBooking[]>([])
+  const [pendingBookingsOnDay, setPendingBookingsOnDay] = useState<
+    PendingBooking[]
+  >([])
   const getPendingBookingsOnDay = (selectedDate: Date) => {
     const pendingBookingsOnDayArrayOfArray = []
     const selectedDateString = selectedDate.toString()
-    const filteredPendingBookingTrainsAllApartments = getPendingBookingTrainsOnDay(selectedDateString)
+    const filteredPendingBookingTrainsAllApartments =
+      getPendingBookingTrainsOnDay(selectedDateString)
 
-    for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments){
+    for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments) {
       for (const drawingPeriod of pendingBookingTrain.drawingPeriodList) {
         pendingBookingsOnDayArrayOfArray.push(drawingPeriod.pendingBookings)
       }
@@ -384,7 +384,7 @@ export default function MonthOverview() {
         getBookings={getBookings}
         yourBookings={yourBookings}
         bookings={bookings}
-        getPendingBookingTrainsOnDay = {getPendingBookingTrainsOnDay}
+        getPendingBookingTrainsOnDay={getPendingBookingTrainsOnDay}
       />
       <Modal
         className=""
@@ -570,26 +570,29 @@ export default function MonthOverview() {
                   </div>
                 ))}
               <h3 className="mt-3 mb-1">Meldt interesse:</h3>
-              {pendingBookingsOnDay.sort(
+              {pendingBookingsOnDay
+                .sort(
                   (a, b) =>
-                      cabinOrder.indexOf(a.apartment.cabin_name) -
-                      cabinOrder.indexOf(b.apartment.cabin_name),
-              ).map((pendingBooking, index) => (
+                    cabinOrder.indexOf(a.apartment.cabin_name) -
+                    cabinOrder.indexOf(b.apartment.cabin_name),
+                )
+                .map((pendingBooking, index) => (
                   <div key={index}>
                     <p
-                        className={`mt-1 mb-1 ${
-                            cabinPendingBorderColorClasses[pendingBooking.apartment.cabin_name]
-                        } pl-2 border-l-2 `}
+                      className={`mt-1 mb-1 ${
+                        cabinPendingBorderColorClasses[
+                          pendingBooking.apartment.cabin_name
+                        ]
+                      } pl-2 border-l-2 `}
                     >
                       <span className="pendingBooking-text">
-                        {pendingBooking.employeeName} har meldt interesse for {pendingBooking.apartment.cabin_name}
-                        {' '} i perioden {pendingBooking.startDate} til {pendingBooking.endDate}.
+                        {pendingBooking.employeeName} har meldt interesse for{' '}
+                        {pendingBooking.apartment.cabin_name} i perioden{' '}
+                        {pendingBooking.startDate} til {pendingBooking.endDate}.
                       </span>
-
                     </p>
                   </div>
-              ))
-              }
+                ))}
             </div>
           ) : (
             <div>
