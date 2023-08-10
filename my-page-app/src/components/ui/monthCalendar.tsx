@@ -183,6 +183,10 @@ function MonthCalendar({
 
           const infoNoticeElements = informationNoticeList.map(
             (infoNotice: InfoBooking) => {
+              const { isFirstDay } = getInfoNoticeDateInfo(
+                  props.date,
+                  infoNotice,
+              )
               return (
                 <span
                   key={infoNotice.id}
@@ -193,6 +197,7 @@ function MonthCalendar({
                     'grid grid-cols-2 gap-3 w-full h-4 md:h-8',
                   )}
                 >
+                  {isFirstDay && infoNotice.description}
                 </span>
               )
             },
@@ -201,8 +206,8 @@ function MonthCalendar({
           return (
             <>
               {dateCalendar}
-              {cabinBookings}
               {infoNoticeElements}
+              {cabinBookings}
               <span
                 className={cn(
                   'absolute top-0 left-0 w-full h-full',
