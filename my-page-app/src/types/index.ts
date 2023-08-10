@@ -106,3 +106,9 @@ export type InfoBooking = {
   endDate: string
   description: string
 }
+
+export type InfoBookingPost = {
+  startDate: string
+  endDate: string
+  description: string
+}

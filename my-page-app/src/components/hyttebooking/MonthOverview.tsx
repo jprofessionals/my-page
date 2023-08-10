@@ -9,6 +9,7 @@ import { add, format, isAfter, isBefore, isEqual, sub } from 'date-fns'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
+import CreateInfoNotice from '@/components/hyttebooking/CreateInfoNotice'
 
 const cutOffDateVacancies = '2023-10-01'
 //TODO: Hardkodet cutoff date som styrer hva man kan booke.
@@ -218,6 +219,7 @@ export default function MonthOverview() {
     setShowEditFormForBookingId(null)
     setExpandedApartments([])
     setDeleteModalIsOpen(false)
+    setShowCreateFormForInfoNotice(false)
   }
 
   const handleBookClick = (apartmentId: number) => {
@@ -229,6 +231,15 @@ export default function MonthOverview() {
         return [...prevExpandedApartments, apartmentId]
       }
     })
+  }
+
+  const [showCreateFormForInfoNotice, setShowCreateFormForInfoNotice] =
+    useState<boolean>(false)
+
+  const handleAddInfoNoticeClick = () => {
+    if (!showCreateFormForInfoNotice) {
+      setShowCreateFormForInfoNotice(true)
+    } else setShowCreateFormForInfoNotice(false)
   }
 
   type VacancyLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
@@ -380,7 +391,30 @@ export default function MonthOverview() {
                     </p>
                   ))}
                 </div>
-              ) : null}
+              ) : (
+                userIsAdmin && (
+                  <div>
+                    <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
+                    <p>
+                      {' '}
+                      Legg til en informasjonsnotis
+                      <button
+                        onClick={() => handleAddInfoNoticeClick()}
+                        className="ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
+                      >
+                        +
+                      </button>
+                      {showCreateFormForInfoNotice && (
+                        <CreateInfoNotice
+                          date={date}
+                          closeModal={closeModal}
+                          userIsAdmin={userIsAdmin}
+                        />
+                      )}
+                    </p>
+                  </div>
+                )
+              )}
               {bookingItems.length > 0 ? (
                 <div>
                   {bookingItems

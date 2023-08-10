@@ -15,8 +15,12 @@ import { Booking, InfoBooking } from '@/types'
 import React, { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { get } from 'radash'
-import {faCircleInfo, faHotel, IconDefinition} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {
+  faCircleInfo,
+  faHotel,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 export type CalendarProps = ComponentProps<typeof DayPicker> & {
   cutOffDateVacancies: string
   bookings: Booking[] | undefined
@@ -206,12 +210,12 @@ function MonthCalendar({
                         'data-tip': `${infoNotice.description}`,
                       })}
                     >
-                      {isFirstDay &&
-                        windowWidth >= 800 &&
+                      {isFirstDay && windowWidth >= 800 && (
                         <FontAwesomeIcon
                           icon={infoNoticeIcon}
                           className="w-8"
-                        />}
+                        />
+                      )}
                     </span>
                   )
                 })}
