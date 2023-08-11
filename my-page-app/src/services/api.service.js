@@ -149,6 +149,22 @@ const deleteInfoNotice = (infoNoticeId) => {
   })
 }
 
+const getAllInfoNoticeVacancies = async (startDate, endDate) => {
+  const params = {
+    startdate: startDate,
+    enddate: endDate,
+  }
+  return axios
+    .get(API_URL + 'informationNotice/vacancy', {
+      headers: authHeader(),
+      params: params,
+    })
+    .then((response) => {
+      const availability = response.data
+      return availability
+    })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -165,5 +181,6 @@ const ApiService = {
   adminDeleteBooking,
   getInfoNotices,
   deleteInfoNotice,
+  getAllInfoNoticeVacancies,
 }
 export default ApiService

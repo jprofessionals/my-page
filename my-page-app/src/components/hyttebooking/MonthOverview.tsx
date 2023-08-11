@@ -198,6 +198,7 @@ export default function MonthOverview() {
     setShowModal(true)
     getBookingsOnDay(date)
     getInfoNoticesOnDay(date)
+    getInfoNoticeVacancyOnDay(date)
   }
 
   const customModalStyles = {
@@ -223,6 +224,7 @@ export default function MonthOverview() {
     setShowCreateFormForInfoNotice(false)
     setInfoNoticeDeleteModalIsOpen(false)
     setShowEditFormForInfoNoticeId(null)
+    setIsDayVacantForInfoNotice(false)
   }
 
   const handleBookClick = (apartmentId: number) => {
@@ -332,6 +334,37 @@ export default function MonthOverview() {
     }
   }, [])
 
+  type InfoNoticeVacancyLoadingStatus =
+    | 'init'
+    | 'loading'
+    | 'completed'
+    | 'failed'
+  const [infoNoticeVacancyLoadingStatus, setInfoNoticeVacancyLoadingStatus] =
+    useState<InfoNoticeVacancyLoadingStatus>('init')
+
+  const [infoNoticeVacancies, setInfoNoticeVacancies] = useState<
+    string[] | undefined
+  >([])
+
+  const refreshInfoNoticeVacancies = useCallback(async () => {
+    setInfoNoticeVacancyLoadingStatus('loading')
+
+    try {
+      const loadedInfoNoticeVacancies =
+        await ApiService.getAllInfoNoticeVacancies(
+          startDateBookings,
+          endDateBookings,
+        )
+      setInfoNoticeVacancyLoadingStatus('completed')
+      setInfoNoticeVacancies(loadedInfoNoticeVacancies)
+    } catch (e) {
+      setInfoNoticeVacancyLoadingStatus('failed')
+      toast.error(
+        'Klarte ikke laste dager ledige for informasjonsnotiser, prøv igjen senere',
+      )
+    }
+  }, [])
+
   useEffect(() => {
     if (vacancyLoadingStatus !== 'init') return
     if (userFetchStatus === 'fetched') {
@@ -342,10 +375,12 @@ export default function MonthOverview() {
   }, [userFetchStatus, vacancyLoadingStatus])
 
   useEffect(() => {
+    if (infoNoticeVacancyLoadingStatus !== 'init') return
     if (userIsAdmin) {
       fetchAllUsers()
+      refreshInfoNoticeVacancies()
     }
-  }, [userIsAdmin])
+  }, [userIsAdmin, infoNoticeVacancyLoadingStatus])
 
   const getAllApartments = async () => {
     const response = await ApiService.getAllApartments()
@@ -391,6 +426,32 @@ export default function MonthOverview() {
     }
     setVacantApartmentsOnDay(availableApartments)
     return vacantApartmentsOnDay
+  }
+
+  const [isDayVacantForInfoNotice, setIsDayVacantForInfoNotice] =
+    useState(false)
+  const getInfoNoticeVacancyOnDay = (selectedDate: Date) => {
+    let vacant: boolean = false
+    const formattedDate = format(selectedDate, 'yyyy-MM-dd')
+    const nextDate = new Date(selectedDate)
+    nextDate.setDate(selectedDate.getDate() + 1)
+    const formattedNextDate = format(nextDate, 'yyyy-MM-dd')
+    const previousDate = new Date(selectedDate)
+    previousDate.setDate(selectedDate.getDate() - 1)
+    const formattedPreviousDate = format(previousDate, 'yyyy-MM-dd')
+
+    if (isAfter(selectedDate, sub(new Date(), { days: 1 }))) {
+      const dates = infoNoticeVacancies
+      if (
+        dates?.includes(formattedDate) ||
+        dates?.includes(formattedNextDate) ||
+        dates?.includes(formattedPreviousDate)
+      ) {
+        vacant = true
+        setIsDayVacantForInfoNotice(vacant)
+      }
+    }
+    return vacant
   }
 
   type CabinColorClasses = {
@@ -451,6 +512,23 @@ export default function MonthOverview() {
                       </span>
                       {userIsAdmin && (
                         <>
+                          {isDayVacantForInfoNotice && (
+                            <>
+                              <button
+                                onClick={() => handleAddInfoNoticeClick()}
+                                className="mb-3 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
+                              >
+                                Legg til
+                              </button>
+                              {showCreateFormForInfoNotice && (
+                                <CreateInfoNotice
+                                  date={date}
+                                  closeModal={closeModal}
+                                  userIsAdmin={userIsAdmin}
+                                />
+                              )}
+                            </>
+                          )}
                           <button
                             onClick={() => handleEditInfoNotice(infoNotice.id)}
                             className="ml-3 bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
@@ -461,7 +539,7 @@ export default function MonthOverview() {
                             onClick={() =>
                               openInfoNoticeDeleteModal(infoNotice.id)
                             }
-                            className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                            className="mb-3 ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
                           >
                             Slett
                           </button>
@@ -512,7 +590,7 @@ export default function MonthOverview() {
                         onClick={() => handleAddInfoNoticeClick()}
                         className="ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
                       >
-                        +
+                        Legg til
                       </button>
                       {showCreateFormForInfoNotice && (
                         <CreateInfoNotice

@@ -11,6 +11,7 @@ import no.jpro.mypageapi.utils.mapper.InformationNoticeMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @Service
 class InformationNoticeService (
@@ -92,5 +93,18 @@ class InformationNoticeService (
 
     fun deleteInformationNotice(infoNoticeId: Long) {
         return informationNoticeRepository.deleteById(infoNoticeId)
+    }
+
+    fun getAllVacanciesInAPeriod(startDate: LocalDate, endDate: LocalDate): List<LocalDate> {
+        val datesInRange = LongRange(0, ChronoUnit.DAYS.between(startDate, endDate))
+            .map { startDate.plusDays(it) }
+        val notices = informationNoticeRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(endDate, startDate)
+        val unavailableDays = notices
+            .flatMap { infoNotice ->
+                LongRange(0, ChronoUnit.DAYS.between(infoNotice.startDate, infoNotice.endDate))
+                    .map { infoNotice.startDate.plusDays(it) }
+            }.toSet()
+        val vacancies = datesInRange.minus(unavailableDays)
+        return vacancies.toList()
     }
 }
