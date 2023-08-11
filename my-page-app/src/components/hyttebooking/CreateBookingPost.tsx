@@ -12,7 +12,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 type Props = {
   apartmentId: number
-  date: Date
+  date: Date | undefined
   closeModal: () => void
   refreshVacancies: Function
   userIsAdmin: boolean
@@ -104,7 +104,7 @@ const CreateBookingPost = ({
   cutOffDateVacancies,
   vacancies,
 }: Props) => {
-  const [startDate, setStartDate] = useState(format(date, 'yyyy-MM-dd'))
+  const [startDate, setStartDate] = useState(format(date!, 'yyyy-MM-dd'))
   const [endDate, setEndDate] = useState('')
 
   const vacantDaysForApartmentWithoutTakeoverDates =

@@ -2,7 +2,13 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { MonthCalendar } from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import { Apartment, Booking, DrawingPeriod, PendingBooking, InfoBooking } from '@/types'
+import {
+  Apartment,
+  Booking,
+  DrawingPeriod,
+  PendingBooking,
+  InfoBooking,
+} from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { add, format, isAfter, isBefore, sub } from 'date-fns'
@@ -13,7 +19,6 @@ import ConvertPendingBooking from '@/components/hyttebooking/ConvertPendingBooki
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CreateInfoNotice from '@/components/hyttebooking/CreateInfoNotice'
 import EditInfoNotice from '@/components/hyttebooking/EditInfoNotice'
-
 
 const cutOffDateVacancies = '2023-10-01'
 //TODO: Hardkodet cutoff date som styrer hva man kan booke.
@@ -343,6 +348,7 @@ export default function MonthOverview() {
   const deleteInfoNotice = useMutation(deleteInfoNoticeByNoticeId, {
     onSuccess: () => {
       queryClient.invalidateQueries('infoNotices')
+      refreshInfoNoticeVacancies()
     },
     onError: (error) => {
       console.error('Error:', error)
@@ -574,6 +580,7 @@ export default function MonthOverview() {
     }
     setPendingBookingList(pendingBookingList)
     return pendingBookingList
+  }
 
   const [isDayVacantForInfoNotice, setIsDayVacantForInfoNotice] =
     useState(false)
@@ -659,122 +666,127 @@ export default function MonthOverview() {
             <TabsContent value="oversikt">
               {date ? (
                 <div>
-                  <h3 className="mt-1 mb-1">{format(date, 'dd.MM.yyyy')}</h3>
-                  {isBefore(date, new Date(cutOffDateVacancies)) ? null : (
+                  <h3 className="mt-1 mb-1">{format(date!, 'dd.MM.yyyy')}</h3>
+                  {isBefore(date!, new Date(cutOffDateVacancies)) ? null : (
                     <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
                   )}
                   {infoNotices.length > 0 ? (
-                <div>
-                  <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
-                  {infoNotices.map((infoNotice, index) => (
-                    <p
-                      key={index}
-                      className="mt-1 mb-1 pl-2 border-l-2 border-blue-500"
-                    >
-                      <span className="information-text ">
-                        {infoNotice.description}
-                      </span>
-                      {userIsAdmin && (
-                        <>
-                          {isDayVacantForInfoNotice && (
+                    <div>
+                      <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
+                      {infoNotices.map((infoNotice, index) => (
+                        <p
+                          key={index}
+                          className="mt-1 mb-1 pl-2 border-l-2 border-blue-500"
+                        >
+                          <span className="information-text ">
+                            {infoNotice.description}
+                          </span>
+                          {userIsAdmin && (
                             <>
-                              <button
-                                onClick={() => handleAddInfoNoticeClick()}
-                                className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
-                              >
-                                Legg til
-                              </button>
-                              {showCreateFormForInfoNotice && (
-                                <CreateInfoNotice
-                                  date={date}
-                                  closeModal={closeModal}
-                                  userIsAdmin={userIsAdmin}
-                                  infoNoticeVacancies={infoNoticeVacancies}
-                                  refreshInfoNoticeVacancies={
-                                    refreshInfoNoticeVacancies
-                                  }
-                                />
+                              {isDayVacantForInfoNotice && (
+                                <>
+                                  <button
+                                    onClick={() => handleAddInfoNoticeClick()}
+                                    className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
+                                  >
+                                    Legg til
+                                  </button>
+                                  {showCreateFormForInfoNotice && (
+                                    <CreateInfoNotice
+                                      date={date}
+                                      closeModal={closeModal}
+                                      userIsAdmin={userIsAdmin}
+                                      infoNoticeVacancies={infoNoticeVacancies}
+                                      refreshInfoNoticeVacancies={
+                                        refreshInfoNoticeVacancies
+                                      }
+                                    />
+                                  )}
+                                </>
                               )}
+                              <button
+                                onClick={() =>
+                                  handleEditInfoNotice(infoNotice.id)
+                                }
+                                className="mt-3 ml-2 bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                              >
+                                Rediger
+                              </button>
+                              <button
+                                onClick={() =>
+                                  openInfoNoticeDeleteModal(infoNotice.id)
+                                }
+                                className="mb-1 ml-2 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                              >
+                                Slett
+                              </button>
                             </>
                           )}
-                          <button
-                            onClick={() => handleEditInfoNotice(infoNotice.id)}
-                            className="mt-3 ml-2 bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                          <Modal
+                            isOpen={infoNoticeDeleteModalIsOpen}
+                            onRequestClose={closeModal}
+                            contentLabel="Delete Confirmation"
+                            style={customModalStyles}
                           >
-                            Rediger
-                          </button>
-                          <button
-                            onClick={() =>
-                              openInfoNoticeDeleteModal(infoNotice.id)
-                            }
-                            className="mb-1 ml-2 bg-red-500 text-white px-2 py-0.5 rounded-md"
-                          >
-                            Slett
-                          </button>
-                        </>
-                      )}
-                      <Modal
-                        isOpen={infoNoticeDeleteModalIsOpen}
-                        onRequestClose={closeModal}
-                        contentLabel="Delete Confirmation"
-                        style={customModalStyles}
-                      >
-                        <p className="mb-3">
-                          Er du sikker på at du vil slette notisen?
+                            <p className="mb-3">
+                              Er du sikker på at du vil slette notisen?
+                            </p>
+                            <div className="flex justify-end">
+                              <button
+                                onClick={confirmInfoNoticeDelete}
+                                className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                              >
+                                Slett notis
+                              </button>
+                              <button
+                                onClick={closeInfoNoticeDeleteModal}
+                                className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                              >
+                                Avbryt
+                              </button>
+                            </div>
+                          </Modal>
+                          {showEditFormForInfoNotice === infoNotice.id && (
+                            <EditInfoNotice
+                              infoNotice={infoNotice}
+                              closeModal={closeModal}
+                              userIsAdmin={userIsAdmin}
+                              refreshInfoNoticeVacancies={
+                                refreshInfoNoticeVacancies
+                              }
+                            />
+                          )}
                         </p>
-                        <div className="flex justify-end">
+                      ))}
+                    </div>
+                  ) : (
+                    userIsAdmin && (
+                      <div>
+                        <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
+                        <p>
+                          {' '}
+                          Legg til en informasjonsnotis
                           <button
-                            onClick={confirmInfoNoticeDelete}
-                            className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                            onClick={() => handleAddInfoNoticeClick()}
+                            className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
                           >
-                            Slett notis
+                            Legg til
                           </button>
-                          <button
-                            onClick={closeInfoNoticeDeleteModal}
-                            className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
-                          >
-                            Avbryt
-                          </button>
-                        </div>
-                      </Modal>
-                      {showEditFormForInfoNotice === infoNotice.id && (
-                        <EditInfoNotice
-                          infoNotice={infoNotice}
-                          closeModal={closeModal}
-                          userIsAdmin={userIsAdmin}
-                        />
-                      )}
-                    </p>
-                  ))}
-                </div>
-              ) : (
-                userIsAdmin && (
-                  <div>
-                    <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
-                    <p>
-                      {' '}
-                      Legg til en informasjonsnotis
-                      <button
-                        onClick={() => handleAddInfoNoticeClick()}
-                        className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
-                      >
-                        Legg til
-                      </button>
-                      {showCreateFormForInfoNotice && (
-                        <CreateInfoNotice
-                          date={date}
-                          closeModal={closeModal}
-                          userIsAdmin={userIsAdmin}
-                          infoNoticeVacancies={infoNoticeVacancies}
-                          refreshInfoNoticeVacancies={
-                            refreshInfoNoticeVacancies
-                          }
-                        />
-                      )}
-                    </p>
-                  </div>
-                )
-              )}
+                          {showCreateFormForInfoNotice && (
+                            <CreateInfoNotice
+                              date={date}
+                              closeModal={closeModal}
+                              userIsAdmin={userIsAdmin}
+                              infoNoticeVacancies={infoNoticeVacancies}
+                              refreshInfoNoticeVacancies={
+                                refreshInfoNoticeVacancies
+                              }
+                            />
+                          )}
+                        </p>
+                      </div>
+                    )
+                  )}
                   {bookingItems.length > 0 ? (
                     <div>
                       {bookingItems

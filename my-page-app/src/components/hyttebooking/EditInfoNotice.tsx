@@ -45,10 +45,12 @@ const EditInfoNotice = ({
   infoNotice,
   closeModal,
   userIsAdmin,
+  refreshInfoNoticeVacancies,
 }: {
   infoNotice: InfoBooking
   closeModal: () => void
   userIsAdmin: boolean
+  refreshInfoNoticeVacancies: Function
 }) => {
   const [startDate, setStartDate] = useState(infoNotice.startDate)
   const [endDate, setEndDate] = useState(infoNotice.endDate)
@@ -65,6 +67,7 @@ const EditInfoNotice = ({
       queryClient.invalidateQueries('infoNotices')
       setIsLoadingEdit(false)
       toast.success('Redigert notisen')
+      refreshInfoNoticeVacancies()
     },
     onError: (error: string) => {
       setIsLoadingEdit(false)

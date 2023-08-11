@@ -137,6 +137,8 @@ function MonthCalendar({
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
           const pendingBookingsTrains = getPendingBookingTrainsOnDay(
+            format(props.date, 'yyyy-MM-dd'),
+          )
           const informationNoticeList = getInfoNotices(
             format(props.date, 'yyyy-MM-dd'),
           )
@@ -310,7 +312,7 @@ function MonthCalendar({
             ) : (
               <div className="invisible h-4 md:h-8">hey</div>
             )
-          
+
           const renderCabinEntries = () => {
             return cabinOrder.map((cabin) => {
               return renderBookingsAndPendingBookings(cabin)
@@ -320,8 +322,8 @@ function MonthCalendar({
           return (
             <>
               {dateCalendar}
-              {renderCabinEntries()}
               {infoNoticeElements}
+              {renderCabinEntries()}
               <span
                 className={cn(
                   'absolute top-0 left-0 w-full h-full',
@@ -400,7 +402,7 @@ const getPendingBookingCabinStyle = (
   const { isFirstDay, isLastDay, isInInterval } = getPendingBookingDateInfo(
     date,
     pendingBookingTrain,
-    )
+  )
   return cn(
     isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
     isFirstDay && !isSunday(date) && 'md:-mr-2',
@@ -429,7 +431,7 @@ const getInfoNoticeStyle = (date: Date, infoNotice: InfoBooking) => {
   const { isFirstDay, isLastDay, isInInterval } = getInfoNoticeDateInfo(
     date,
     infoNotice,
-    )
+  )
   return cn(
     isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
     isFirstDay && !isSunday(date) && 'md:-mr-2',

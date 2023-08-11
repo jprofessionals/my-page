@@ -122,6 +122,7 @@ export type DrawingPeriod = {
   startDate: string
   endDate: string
   pendingBookings: PendingBooking[]
+}
 
 export type InfoBooking = {
   id: number
