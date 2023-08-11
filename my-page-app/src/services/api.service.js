@@ -163,6 +163,49 @@ const deletePendingBooking = (pendingBookingId) => {
   return axios.delete(API_URL + 'pendingBooking/' + pendingBookingId, {
     headers: authHeader(),
   })
+
+const getInfoNotices = (startDate, endDate) => {
+  const params = {
+    startDate: startDate,
+    endDate: endDate,
+  }
+
+  return axios
+    .get(API_URL + 'informationNotice', {
+      headers: authHeader(),
+      params: params,
+    })
+    .then((response) => {
+      const infoNotices = response.data
+      return infoNotices.map((infoNotice) => ({
+        id: String(infoNotice.id),
+        startDate: infoNotice.startDate,
+        endDate: infoNotice.endDate,
+        description: infoNotice.description,
+      }))
+    })
+}
+
+const deleteInfoNotice = (infoNoticeId) => {
+  return axios.delete(API_URL + 'informationNotice/admin/' + infoNoticeId, {
+    headers: authHeader(),
+  })
+}
+
+const getAllInfoNoticeVacancies = async (startDate, endDate) => {
+  const params = {
+    startdate: startDate,
+    enddate: endDate,
+  }
+  return axios
+    .get(API_URL + 'informationNotice/vacancy', {
+      headers: authHeader(),
+      params: params,
+    })
+    .then((response) => {
+      const availability = response.data
+      return availability
+    })
 }
 
 const ApiService = {
@@ -183,5 +226,8 @@ const ApiService = {
   pickWinnerPendingBooking,
   getPendingBookingsForUser,
   deletePendingBooking,
+  getInfoNotices,
+  deleteInfoNotice,
+  getAllInfoNoticeVacancies,
 }
 export default ApiService

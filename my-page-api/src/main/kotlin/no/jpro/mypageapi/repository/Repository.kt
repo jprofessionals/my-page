@@ -82,4 +82,8 @@ interface  InformationNoticeRepository : JpaRepository<InfoBooking, Long> {
     fun findInfoBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
         date: LocalDate, anotherDate: LocalDate
     ): List<InfoBooking>
+
+    fun findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(
+        date: LocalDate, anotherDate: LocalDate
+    ): List<InfoBooking>
 }

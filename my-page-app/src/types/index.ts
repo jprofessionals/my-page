@@ -122,4 +122,22 @@ export type DrawingPeriod = {
   startDate: string
   endDate: string
   pendingBookings: PendingBooking[]
+
+export type InfoBooking = {
+  id: number
+  startDate: string
+  endDate: string
+  description: string
+}
+
+export type InfoBookingPost = {
+  startDate: string
+  endDate: string
+  description: string
+}
+
+export type EditedInfoNotice = {
+  startDate: string
+  endDate: string
+  description: string
 }
