@@ -198,6 +198,7 @@ const getAllInfoNoticeVacancies = async (startDate, endDate) => {
     startdate: startDate,
     enddate: endDate,
   }
+
   return axios
     .get(API_URL + 'informationNotice/vacancy', {
       headers: authHeader(),
