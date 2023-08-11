@@ -181,7 +181,10 @@ function MonthCalendar({
                               pendingBookingCabinColors,
                               pendingBookingTrain.apartment.cabin_name,
                             )
-                          : null,
+                          : get(
+                              pendingBookingCabinColors,
+                              pendingBookingTrain.apartment.cabin_name,
+                            ),
                         'normal-case',
                       )}
                     ></span>
@@ -247,7 +250,10 @@ function MonthCalendar({
                                 pendingBookingCabinColors,
                                 pendingBookingTrain.apartment.cabin_name,
                               )
-                            : null,
+                            : get(
+                                pendingBookingCabinColors,
+                                pendingBookingTrain.apartment.cabin_name,
+                              ),
                           'normal-case',
                           hasOverlapWithBooking && 'hidden',
                         )}

@@ -741,14 +741,15 @@ export default function MonthOverview() {
                               style={customModalStyles}
                             >
                               <p className="mb-3">
-                                Er du sikker på at du vil slette notisen?
+                                Er du sikker på at du vil slette den ønskede
+                                reservasjonen?
                               </p>
                               <div className="flex justify-end">
                                 <button
                                   onClick={confirmPendingBookingDelete}
                                   className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
                                 >
-                                  Slett notis
+                                  Slett ønsket reservasjon
                                 </button>
                                 <button
                                   onClick={closePendingBookingDeleteModal}

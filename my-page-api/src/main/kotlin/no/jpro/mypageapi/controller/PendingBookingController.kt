@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
+import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.*
-import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.PendingBooking
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
@@ -94,6 +94,7 @@ class PendingBookingController(
 
     @DeleteMapping("{pendingBookingID}")
     @Transactional
+    @RequiresAdmin
     @Operation(summary = "Delete the pending booking connected to the pending booking id")
     @ApiResponse(
         responseCode = "200",
@@ -103,18 +104,12 @@ class PendingBookingController(
         token: JwtAuthenticationToken,
         @PathVariable("pendingBookingID") pendingBookingID: Long,
     ): ResponseEntity<String> {
-
-        val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity(HttpStatus.FORBIDDEN)
-        val pendingBooking = pendingBookingService.getPendingBooking(pendingBookingID) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-
-        if (!userPermittedToDeleteBooking(pendingBooking, user) && !userIsAdmin(user)) {
-            return ResponseEntity(HttpStatus.FORBIDDEN)
+        val pendingBooking = pendingBookingService.getPendingBooking(pendingBookingID)
+        if (pendingBooking === null){
+            return ResponseEntity(HttpStatus.NOT_FOUND)
         }
-
         pendingBookingService.deletePendingBooking(pendingBookingID)
         return ResponseEntity.ok("Pending booking with ID $pendingBookingID has been deleted")
     }
-    private fun userPermittedToDeleteBooking(pendingBooking: PendingBooking, user: User) = (pendingBooking.employee?.id == user.id)
-    private fun userIsAdmin(user:User) = user.admin
 
 }
