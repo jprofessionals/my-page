@@ -17,7 +17,7 @@ function ExplorerTextArea(): JSX.Element {
   const [error, setError] = useState<Error | null>(null)
 
   const socketRef = useRef<WebSocket | null>(null)
-  const inputRef = useRef<HTMLInputElement | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const protocol = window.location.protocol
@@ -46,15 +46,15 @@ function ExplorerTextArea(): JSX.Element {
     }
     const timer = setTimeout(() => {
       if (inputRef.current !== null) {
-        inputRef.current.focus()
+        inputRef.current.focus();
       }
-    }, 0)
+    }, 0);
     // Clean up the WebSocket connection when this component unmounts
     return () => {
       if (socketRef.current) {
         socketRef.current.close()
       }
-      clearTimeout(timer)
+      clearTimeout(timer);
     }
   }, [])
 
@@ -143,8 +143,7 @@ function ExplorerTextArea(): JSX.Element {
         )}
       </div>
       <div>
-        <input
-          ref={inputRef}
+        <input ref={inputRef}
           type="text"
           placeholder="Where do you want to go?"
           value={text}
