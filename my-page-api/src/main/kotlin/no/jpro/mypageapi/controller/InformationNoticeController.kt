@@ -116,4 +116,32 @@ class InformationNoticeController (
         return ResponseEntity.ok("Information notice with ID $infoNoticeId has been deleted")
     }
 
+    @GetMapping("/vacancy")
+    @Transactional
+    @Operation(summary = "Gets information notice vacancies in a time period")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = InformationNoticeDTO::class)
+        )]
+    )
+
+    fun getVacancies(
+        token: JwtAuthenticationToken,
+        @RequestParam("startdate") startdate: String,
+        @RequestParam("enddate") enddate: String,
+
+        ): ResponseEntity<List<LocalDate>> {
+
+        try {
+            val parsedStartDate: LocalDate = LocalDate.parse(startdate)
+            val parsedEndDate: LocalDate = LocalDate.parse(enddate)
+            val availability = informationNoticeService.getAllVacanciesInAPeriod(parsedStartDate,parsedEndDate)
+            return ResponseEntity.ok(availability)
+        } catch (e: DateTimeParseException) {
+            throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
+        }
+    }
+
 }

@@ -2,13 +2,15 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { MonthCalendar } from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import { Apartment, Booking } from '@/types'
+import { Apartment, Booking, InfoBooking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
-import { add, format, isAfter, isBefore, isEqual, sub } from 'date-fns'
+import { add, format, isAfter, isBefore, sub } from 'date-fns'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
+import CreateInfoNotice from '@/components/hyttebooking/CreateInfoNotice'
+import EditInfoNotice from '@/components/hyttebooking/EditInfoNotice'
 
 const cutOffDateVacancies = '2023-10-01'
 //TODO: Hardkodet cutoff date som styrer hva man kan booke.
@@ -18,6 +20,7 @@ export default function MonthOverview() {
   const [bookingItems, setBookingItems] = useState<Booking[]>([])
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
   const [userIsAdmin, setUserIsAdmin] = useState<boolean>(false)
+  const [infoNotices, setInfoNotices] = useState<InfoBooking[]>([])
 
   const { data: yourBookings } = useQuery<Booking[]>(
     'yourBookingsOutline',
@@ -56,6 +59,32 @@ export default function MonthOverview() {
     const dateString = format(date, 'yyyy-MM-dd')
     const bookingsOnDay = getBookings(dateString)
     setBookingItems(bookingsOnDay)
+  }
+
+  const { data: allInfoNotices } = useQuery<InfoBooking[]>(
+    'infoNotices',
+    async () => {
+      const fetchedInfoNotices = await ApiService.getInfoNotices(
+        startDateBookings,
+        endDateBookings,
+      )
+      return fetchedInfoNotices
+    },
+  )
+
+  const getInfoNotices = (date: string) => {
+    return (
+      allInfoNotices?.filter(
+        (infoNotice) =>
+          date >= infoNotice.startDate && date <= infoNotice.endDate,
+      ) || []
+    )
+  }
+
+  const getInfoNoticesOnDay = (date: Date) => {
+    const dateString = format(date, 'yyyy-MM-dd')
+    const infoNoticesOnDay = getInfoNotices(dateString)
+    setInfoNotices(infoNoticesOnDay)
   }
 
   const getUserIsAdmin = async () => {
@@ -168,6 +197,8 @@ export default function MonthOverview() {
     getVacancyForDay(date)
     setShowModal(true)
     getBookingsOnDay(date)
+    getInfoNoticesOnDay(date)
+    getInfoNoticeVacancyOnDay(date)
   }
 
   const customModalStyles = {
@@ -190,6 +221,10 @@ export default function MonthOverview() {
     setShowEditFormForBookingId(null)
     setExpandedApartments([])
     setDeleteModalIsOpen(false)
+    setShowCreateFormForInfoNotice(false)
+    setInfoNoticeDeleteModalIsOpen(false)
+    setShowEditFormForInfoNoticeId(null)
+    setIsDayVacantForInfoNotice(false)
   }
 
   const handleBookClick = (apartmentId: number) => {
@@ -201,6 +236,70 @@ export default function MonthOverview() {
         return [...prevExpandedApartments, apartmentId]
       }
     })
+  }
+
+  const [showCreateFormForInfoNotice, setShowCreateFormForInfoNotice] =
+    useState<boolean>(false)
+
+  const handleAddInfoNoticeClick = () => {
+    if (!showCreateFormForInfoNotice) {
+      setShowCreateFormForInfoNotice(true)
+    } else setShowCreateFormForInfoNotice(false)
+  }
+
+  const [infoNoticeDeleteModalIsOpen, setInfoNoticeDeleteModalIsOpen] =
+    useState(false)
+  const [infoNoticeIdToDelete, setInfoNoticeIdToDelete] = useState<
+    number | null
+  >(null)
+
+  const openInfoNoticeDeleteModal = (infoNotice: number | null) => {
+    setInfoNoticeIdToDelete(infoNotice)
+    setInfoNoticeDeleteModalIsOpen(true)
+  }
+
+  const closeInfoNoticeDeleteModal = () => {
+    setInfoNoticeDeleteModalIsOpen(false)
+  }
+
+  const confirmInfoNoticeDelete = () => {
+    handleDeleteNotice(infoNoticeIdToDelete)
+    closeInfoNoticeDeleteModal()
+  }
+
+  const deleteInfoNoticeByNoticeId = async (infoNoticeId: number | null) => {
+    try {
+      await ApiService.deleteInfoNotice(infoNoticeId)
+      toast.success('Informasjonsnotisen er slettet')
+      closeModal()
+    } catch (error) {
+      toast.error(
+        `Informasjonsnotisen ble ikke slettet med følgende feil: ${error}`,
+      )
+    }
+  }
+
+  const deleteInfoNotice = useMutation(deleteInfoNoticeByNoticeId, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('infoNotices')
+    },
+    onError: (error) => {
+      console.error('Error:', error)
+    },
+  })
+
+  const handleDeleteNotice = (infoNoticeId: number | null) => {
+    deleteInfoNotice.mutate(infoNoticeId)
+  }
+
+  const [showEditFormForInfoNotice, setShowEditFormForInfoNoticeId] = useState<
+    number | null
+  >(null)
+
+  const handleEditInfoNotice = (infoNoticeId: number) => {
+    if (showEditFormForInfoNotice !== infoNoticeId) {
+      setShowEditFormForInfoNoticeId(infoNoticeId)
+    } else setShowEditFormForInfoNoticeId(null)
   }
 
   type VacancyLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
@@ -235,6 +334,37 @@ export default function MonthOverview() {
     }
   }, [])
 
+  type InfoNoticeVacancyLoadingStatus =
+    | 'init'
+    | 'loading'
+    | 'completed'
+    | 'failed'
+  const [infoNoticeVacancyLoadingStatus, setInfoNoticeVacancyLoadingStatus] =
+    useState<InfoNoticeVacancyLoadingStatus>('init')
+
+  const [infoNoticeVacancies, setInfoNoticeVacancies] = useState<
+    string[] | undefined
+  >([])
+
+  const refreshInfoNoticeVacancies = useCallback(async () => {
+    setInfoNoticeVacancyLoadingStatus('loading')
+
+    try {
+      const loadedInfoNoticeVacancies =
+        await ApiService.getAllInfoNoticeVacancies(
+          startDateBookings,
+          endDateBookings,
+        )
+      setInfoNoticeVacancyLoadingStatus('completed')
+      setInfoNoticeVacancies(loadedInfoNoticeVacancies)
+    } catch (e) {
+      setInfoNoticeVacancyLoadingStatus('failed')
+      toast.error(
+        'Klarte ikke laste dager ledige for informasjonsnotiser, prøv igjen senere',
+      )
+    }
+  }, [])
+
   useEffect(() => {
     if (vacancyLoadingStatus !== 'init') return
     if (userFetchStatus === 'fetched') {
@@ -245,10 +375,12 @@ export default function MonthOverview() {
   }, [userFetchStatus, vacancyLoadingStatus])
 
   useEffect(() => {
+    if (infoNoticeVacancyLoadingStatus !== 'init') return
     if (userIsAdmin) {
       fetchAllUsers()
+      refreshInfoNoticeVacancies()
     }
-  }, [userIsAdmin])
+  }, [userIsAdmin, infoNoticeVacancyLoadingStatus])
 
   const getAllApartments = async () => {
     const response = await ApiService.getAllApartments()
@@ -296,6 +428,32 @@ export default function MonthOverview() {
     return vacantApartmentsOnDay
   }
 
+  const [isDayVacantForInfoNotice, setIsDayVacantForInfoNotice] =
+    useState(false)
+  const getInfoNoticeVacancyOnDay = (selectedDate: Date) => {
+    let vacant: boolean = false
+    const formattedDate = format(selectedDate, 'yyyy-MM-dd')
+    const nextDate = new Date(selectedDate)
+    nextDate.setDate(selectedDate.getDate() + 1)
+    const formattedNextDate = format(nextDate, 'yyyy-MM-dd')
+    const previousDate = new Date(selectedDate)
+    previousDate.setDate(selectedDate.getDate() - 1)
+    const formattedPreviousDate = format(previousDate, 'yyyy-MM-dd')
+
+    if (isAfter(selectedDate, sub(new Date(), { days: 1 }))) {
+      const dates = infoNoticeVacancies
+      if (
+        dates?.includes(formattedDate) ||
+        dates?.includes(formattedNextDate) ||
+        dates?.includes(formattedPreviousDate)
+      ) {
+        vacant = true
+        setIsDayVacantForInfoNotice(vacant)
+      }
+    }
+    return vacant
+  }
+
   type CabinColorClasses = {
     [key: string]: string
   }
@@ -325,6 +483,7 @@ export default function MonthOverview() {
         getBookings={getBookings}
         yourBookings={yourBookings}
         bookings={bookings}
+        getInfoNotices={getInfoNotices}
       />
       <Modal
         className=""
@@ -340,8 +499,121 @@ export default function MonthOverview() {
               {isBefore(date, new Date(cutOffDateVacancies)) ? null : (
                 <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
               )}
+              {infoNotices.length > 0 ? (
+                <div>
+                  <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
+                  {infoNotices.map((infoNotice, index) => (
+                    <p
+                      key={index}
+                      className="mt-1 mb-1 pl-2 border-l-2 border-blue-500"
+                    >
+                      <span className="information-text ">
+                        {infoNotice.description}
+                      </span>
+                      {userIsAdmin && (
+                        <>
+                          {isDayVacantForInfoNotice && (
+                            <>
+                              <button
+                                onClick={() => handleAddInfoNoticeClick()}
+                                className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
+                              >
+                                Legg til
+                              </button>
+                              {showCreateFormForInfoNotice && (
+                                <CreateInfoNotice
+                                  date={date}
+                                  closeModal={closeModal}
+                                  userIsAdmin={userIsAdmin}
+                                  infoNoticeVacancies={infoNoticeVacancies}
+                                  refreshInfoNoticeVacancies={
+                                    refreshInfoNoticeVacancies
+                                  }
+                                />
+                              )}
+                            </>
+                          )}
+                          <button
+                            onClick={() => handleEditInfoNotice(infoNotice.id)}
+                            className="mt-3 ml-2 bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                          >
+                            Rediger
+                          </button>
+                          <button
+                            onClick={() =>
+                              openInfoNoticeDeleteModal(infoNotice.id)
+                            }
+                            className="mb-1 ml-2 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                          >
+                            Slett
+                          </button>
+                        </>
+                      )}
+                      <Modal
+                        isOpen={infoNoticeDeleteModalIsOpen}
+                        onRequestClose={closeModal}
+                        contentLabel="Delete Confirmation"
+                        style={customModalStyles}
+                      >
+                        <p className="mb-3">
+                          Er du sikker på at du vil slette notisen?
+                        </p>
+                        <div className="flex justify-end">
+                          <button
+                            onClick={confirmInfoNoticeDelete}
+                            className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                          >
+                            Slett notis
+                          </button>
+                          <button
+                            onClick={closeInfoNoticeDeleteModal}
+                            className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                          >
+                            Avbryt
+                          </button>
+                        </div>
+                      </Modal>
+                      {showEditFormForInfoNotice === infoNotice.id && (
+                        <EditInfoNotice
+                          infoNotice={infoNotice}
+                          closeModal={closeModal}
+                          userIsAdmin={userIsAdmin}
+                        />
+                      )}
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                userIsAdmin && (
+                  <div>
+                    <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
+                    <p>
+                      {' '}
+                      Legg til en informasjonsnotis
+                      <button
+                        onClick={() => handleAddInfoNoticeClick()}
+                        className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
+                      >
+                        Legg til
+                      </button>
+                      {showCreateFormForInfoNotice && (
+                        <CreateInfoNotice
+                          date={date}
+                          closeModal={closeModal}
+                          userIsAdmin={userIsAdmin}
+                          infoNoticeVacancies={infoNoticeVacancies}
+                          refreshInfoNoticeVacancies={
+                            refreshInfoNoticeVacancies
+                          }
+                        />
+                      )}
+                    </p>
+                  </div>
+                )
+              )}
               {bookingItems.length > 0 ? (
                 <div>
+                  <h3 className="mt-3 mb-1">Reservasjoner:</h3>
                   {bookingItems
                     .sort((a, b) => {
                       const cabinIndexA = cabinOrder.indexOf(

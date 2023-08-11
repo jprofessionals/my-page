@@ -11,15 +11,22 @@ import {
   isWithinInterval,
   isAfter,
 } from 'date-fns'
-import { Booking } from '@/types'
-import { ComponentProps, useEffect, useState } from 'react'
+import { Booking, InfoBooking } from '@/types'
+import React, { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { get } from 'radash'
+import {
+  faCircleInfo,
+  faHotel,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 export type CalendarProps = ComponentProps<typeof DayPicker> & {
   cutOffDateVacancies: string
   bookings: Booking[] | undefined
   yourBookings: Booking[] | undefined
   getBookings: Function
+  getInfoNotices: Function
 }
 
 const cabinColors: { [key: string]: string } = {
@@ -42,6 +49,7 @@ function MonthCalendar({
   bookings,
   yourBookings,
   getBookings,
+  getInfoNotices,
   ...props
 }: CalendarProps) {
   const startDateCalendar = format(sub(new Date(), { months: 6 }), 'yyyy-MM-dd')
@@ -72,6 +80,8 @@ function MonthCalendar({
     }
   }
 
+  const infoNoticeIcon = faCircleInfo
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -99,7 +109,7 @@ function MonthCalendar({
         cell: 'text-center text-sm p-0 relative flex-1 [&:has([aria-selected])]:bg-accent:has([aria-selected]) first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
         day: cn(
           buttonVariants({ variant: 'avatar' }),
-          'h-full w-full xl:h-40 xl:w-40 p-0 font-normal aria-selected:opacity-100',
+          'h-full w-full xl:h-50 xl:w-50 p-0 font-normal aria-selected:opacity-100',
           'flex flex-col items-center justify-start',
           'py-3 border-none tw-bg-opacity: 0',
         ),
@@ -118,6 +128,9 @@ function MonthCalendar({
           const cutOffDate = new Date(cutOffDateVacancies)
           const dateCalendar = format(props.date, 'dd')
           const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
+          const informationNoticeList = getInfoNotices(
+            format(props.date, 'yyyy-MM-dd'),
+          )
 
           const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
 
@@ -176,9 +189,45 @@ function MonthCalendar({
             )
           })
 
+          const infoNoticeElements =
+            informationNoticeList.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3 w-full h-4 md:h-8">
+                {informationNoticeList.map((infoNotice: InfoBooking) => {
+                  const { isFirstDay } = getInfoNoticeDateInfo(
+                    props.date,
+                    infoNotice,
+                  )
+                  return (
+                    <span
+                      key={infoNotice.id}
+                      className={cn(
+                        'p-2 text-white tooltip tooltip-top shadow-xl',
+                        getInfoNoticeStyle(props.date, infoNotice),
+                        'bg-blue-500',
+                        'normal-case',
+                      )}
+                      {...(windowWidth > 800 && {
+                        'data-tip': `${infoNotice.description}`,
+                      })}
+                    >
+                      {isFirstDay && windowWidth >= 800 && (
+                        <FontAwesomeIcon
+                          icon={infoNoticeIcon}
+                          className="w-8"
+                        />
+                      )}
+                    </span>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="invisible h-4 md:h-8">hey</div>
+            )
+
           return (
             <>
               {dateCalendar}
+              {infoNoticeElements}
               {cabinBookings}
               <span
                 className={cn(
@@ -227,6 +276,35 @@ const getCabinBookingStyle = (date: Date, booking: Booking) => {
 const getCutOffDateStyle = (date: Date, cutOffDate: Date) => {
   const isCutOffDay = isSameDay(date, cutOffDate)
   return isCutOffDay ? 'border-2 border-red-500 rounded-lg' : ''
+}
+
+const getInfoNoticeDateInfo = (date: Date, infoNotice: InfoBooking) => {
+  const isFirstDay = isSameDay(new Date(date), new Date(infoNotice.startDate))
+  const isLastDay = isSameDay(new Date(date), new Date(infoNotice.endDate))
+  const isInInterval =
+    isWithinInterval(new Date(date), {
+      start: new Date(infoNotice.startDate),
+      end: new Date(infoNotice.endDate),
+    }) &&
+    !isFirstDay &&
+    !isLastDay
+  return { isFirstDay, isLastDay, isInInterval }
+}
+
+const getInfoNoticeStyle = (date: Date, infoNotice: InfoBooking) => {
+  const { isFirstDay, isLastDay, isInInterval } = getInfoNoticeDateInfo(
+    date,
+    infoNotice,
+  )
+  return cn(
+    isFirstDay && 'rounded-l-full col-start-2 border-black-nav',
+    isFirstDay && !isSunday(date) && 'md:-mr-2',
+    isLastDay && 'rounded-r-full col-start-1 row-start-1',
+    isLastDay && !isMonday(date) && 'md:-ml-2',
+    isInInterval && 'col-span-2 ',
+    isInInterval && !isMonday(date) && 'md:-ml-1',
+    isInInterval && !isSunday(date) && 'md:-mr-1',
+  )
 }
 
 MonthCalendar.displayName = 'MonthCalendar'

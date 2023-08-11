@@ -99,3 +99,22 @@ export type EditedBooking = {
   startDate: string
   endDate: string
 }
+
+export type InfoBooking = {
+  id: number
+  startDate: string
+  endDate: string
+  description: string
+}
+
+export type InfoBookingPost = {
+  startDate: string
+  endDate: string
+  description: string
+}
+
+export type EditedInfoNotice = {
+  startDate: string
+  endDate: string
+  description: string
+}
