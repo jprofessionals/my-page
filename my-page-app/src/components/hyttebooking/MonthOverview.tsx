@@ -11,7 +11,6 @@ import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 import ConvertPendingBooking from '@/components/hyttebooking/ConvertPendingBooking'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { types } from 'sass'
 
 const cutOffDateVacancies = '2023-10-01'
 //TODO: Hardkodet cutoff date som styrer hva man kan booke.
@@ -239,7 +238,6 @@ export default function MonthOverview() {
   const [apartments, setApartments] = useState<Apartment[]>([])
 
   const startDateVacancies = format(new Date(), 'yyyy-MM-dd')
-  //const endDateVacancies = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
   const refreshVacancies = useCallback(async () => {
     setVacancyLoadingStatus('loading')
 

@@ -142,9 +142,9 @@ const pickWinnerPendingBooking = async (pendingBookingList) => {
       },
     )
 
-    return response.data // Return the response data if needed
+    return response.data
   } catch (error) {
-    throw error // Rethrow the error for handling in the component
+    throw error
   }
 }
 

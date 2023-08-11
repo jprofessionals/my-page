@@ -259,53 +259,6 @@ function MonthCalendar({
             )
           }
 
-          /*const cabinBookings = cabinOrder.map((cabin) => {
-            const cabinBookings = bookingsByCabin[cabin] || []
-            return cabinBookings.length > 0 ? (
-              <div
-                key={cabin}
-                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
-              >
-                {cabinBookings.map((booking) => {
-                  const isYourBooking = yourBookings?.some(
-                    (yourBooking: Booking) => yourBooking.id === booking.id,
-                  )
-                  const { isFirstDay, isLastDay } = getBookingDateInfo(
-                    props.date,
-                    booking,
-                  )
-                  return (
-                    <span
-                      key={booking.id}
-                      className={cn(
-                        'p-2 text-white tooltip tooltip-top shadow-xl',
-                        getCabinBookingStyle(props.date, booking),
-                        isYourBooking && 'shadow-y-2',
-                        isAfter(add(props.date, { days: 1 }), new Date())
-                          ? get(cabinColors, booking.apartment?.cabin_name)
-                          : get(
-                              cabinColorsOpacity,
-                              booking.apartment?.cabin_name,
-                            ),
-                        'normal-case',
-                      )}
-                      {...(windowWidth > 800 && {
-                        'data-tip': `Reservert av: ${booking.employeeName}`,
-                      })}
-                    >
-                      {(isFirstDay || isLastDay) &&
-                        getInitials(booking.employeeName)}
-                    </span>
-                  )
-                })}
-              </div>
-            ) : (
-              <div key={cabin} className="invisible h-4 md:h-8">
-                hey
-              </div>
-            )
-          })*/
-
           return (
             <>
               {dateCalendar}
