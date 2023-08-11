@@ -525,13 +525,17 @@ export default function MonthOverview() {
                                   date={date}
                                   closeModal={closeModal}
                                   userIsAdmin={userIsAdmin}
+                                  infoNoticeVacancies={infoNoticeVacancies}
+                                  refreshInfoNoticeVacancies={
+                                    refreshInfoNoticeVacancies
+                                  }
                                 />
                               )}
                             </>
                           )}
                           <button
                             onClick={() => handleEditInfoNotice(infoNotice.id)}
-                            className="ml-3 bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                            className="mt-3 ml-2 bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
                           >
                             Rediger
                           </button>
@@ -539,7 +543,7 @@ export default function MonthOverview() {
                             onClick={() =>
                               openInfoNoticeDeleteModal(infoNotice.id)
                             }
-                            className="mb-3 ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                            className="mb-3 ml-2 bg-red-500 text-white px-2 py-0.5 rounded-md"
                           >
                             Slett
                           </button>
@@ -597,6 +601,10 @@ export default function MonthOverview() {
                           date={date}
                           closeModal={closeModal}
                           userIsAdmin={userIsAdmin}
+                          infoNoticeVacancies={infoNoticeVacancies}
+                          refreshInfoNoticeVacancies={
+                            refreshInfoNoticeVacancies
+                          }
                         />
                       )}
                     </p>
