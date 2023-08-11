@@ -17,15 +17,15 @@ const ConvertPendingBooking = ({
   refreshVacancies,
   userIsAdmin,
 }: Props) => {
+  const queryClient = useQueryClient()
   if (userIsAdmin) {
-    const queryClient = useQueryClient()
     const handleButtonClick = async () => {
       try {
         await ApiService.pickWinnerPendingBooking(pendingBookingList)
         toast.success('Trekning fullført')
         closeModal()
-        queryClient.invalidateQueries('bookings') // Invalidate booking data
-        await queryClient.refetchQueries('yourBookingsOutline') // Refetch your bookings data
+        queryClient.invalidateQueries('bookings')
+        await queryClient.refetchQueries('yourBookingsOutline')
         refreshVacancies()
       } catch (error) {
         toast.error('Trekningen er allerede utført')

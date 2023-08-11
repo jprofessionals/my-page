@@ -29,6 +29,14 @@ export default function MonthOverview() {
     },
   )
 
+  const { data: yourPendingBookings } = useQuery<PendingBooking[]>(
+    'yourPendingBookingsOutline',
+    async () => {
+      const yourPendingBookings = await ApiService.getPendingBookingsForUser()
+      return yourPendingBookings
+    },
+  )
+
   const startDateBookings = format(
     sub(new Date(), { months: 6, days: 7 }),
     'yyyy-MM-dd',
@@ -155,6 +163,51 @@ export default function MonthOverview() {
     },
   })
 
+  const [pendingBookingDeleteModalIsOpen, setPendingBookingDeleteModalIsOpen] =
+    useState(false)
+  const [pendingBookingIdToDelete, setPendingBookingIdToDelete] = useState<
+    number | null
+  >(null)
+
+  const openPendingBookingDeleteModal = (pendingBooking: number | null) => {
+    setPendingBookingIdToDelete(pendingBooking)
+    setPendingBookingDeleteModalIsOpen(true)
+  }
+
+  const closePendingBookingDeleteModal = () => {
+    setPendingBookingDeleteModalIsOpen(false)
+  }
+
+  const confirmPendingBookingDelete = () => {
+    handleDeletePendingBooking(pendingBookingIdToDelete)
+    closePendingBookingDeleteModal()
+  }
+
+  const deletePendingBookingById = async (pendingBookingId: number | null) => {
+    try {
+      await ApiService.deletePendingBooking(pendingBookingId)
+      toast.success('Ønsket reservasjon er slettet')
+      closeModal()
+    } catch (error) {
+      toast.error(
+        `Ønsket reservasjon ble ikke slettet med følgende feil: ${error}`,
+      )
+    }
+  }
+
+  const deletePendingBooking = useMutation(deletePendingBookingById, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('allPendingBookingsAllApartments')
+    },
+    onError: (error) => {
+      console.error('Error:', error)
+    },
+  })
+
+  const handleDeletePendingBooking = (pendingBookingId: number | null) => {
+    deletePendingBooking.mutate(pendingBookingId)
+  }
+
   const [showEditFormForBooking, setShowEditFormForBookingId] = useState<
     number | null
   >(null)
@@ -190,20 +243,6 @@ export default function MonthOverview() {
     },
   }
 
-  const customTabStyles = {
-    content: {
-      width: 'auto',
-      minWidth: '300px',
-      margin: 'auto',
-      maxHeight: '80vh',
-      overflow: 'auto',
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      transform: 'translate(-50%, -50%)',
-    },
-  }
   const closeModal = () => {
     setShowModal(false)
     setDate(undefined)
@@ -363,7 +402,6 @@ export default function MonthOverview() {
     }
     const pendingBookingsOnDayList = pendingBookingsOnDayArrayOfArray.flat()
     setPendingBookingsOnDay(pendingBookingsOnDayList)
-    console.log('This', pendingBookingsOnDayList)
     return pendingBookingsOnDayList
   }
 
@@ -383,7 +421,6 @@ export default function MonthOverview() {
     }
     const drawingPeriodsOnDayList = drawingPeriodsOnDayArrayOfArray.flat()
     setDrawingPeriodListOnDay(drawingPeriodsOnDayList)
-    console.log('Drawing', drawingPeriodsOnDayList)
     return drawingPeriodsOnDayList
   }
 
@@ -687,6 +724,42 @@ export default function MonthOverview() {
                         til{' '}
                         {format(new Date(pendingBooking.endDate), 'dd.MM.yyyy')}
                         .
+                        {userIsAdmin && (
+                          <div>
+                            <button
+                              onClick={() =>
+                                openPendingBookingDeleteModal(pendingBooking.id)
+                              }
+                              className="mt-2 ml-2 bg-red-not-available text-white px-1.5 py-0.5 rounded-md"
+                            >
+                              Slett
+                            </button>
+                            <Modal
+                              isOpen={pendingBookingDeleteModalIsOpen}
+                              onRequestClose={closeModal}
+                              contentLabel="Delete Confirmation"
+                              style={customModalStyles}
+                            >
+                              <p className="mb-3">
+                                Er du sikker på at du vil slette notisen?
+                              </p>
+                              <div className="flex justify-end">
+                                <button
+                                  onClick={confirmPendingBookingDelete}
+                                  className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                                >
+                                  Slett notis
+                                </button>
+                                <button
+                                  onClick={closePendingBookingDeleteModal}
+                                  className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                                >
+                                  Avbryt
+                                </button>
+                              </div>
+                            </Modal>
+                          </div>
+                        )}
                       </span>
                     </p>
                   </div>

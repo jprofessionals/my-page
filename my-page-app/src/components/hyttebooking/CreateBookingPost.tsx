@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from 'react'
 import { API_URL } from '../../services/api.service'
-import { format, addDays, differenceInDays, isBefore, isEqual } from 'date-fns'
+import { format, addDays, differenceInDays, isBefore } from 'date-fns'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
@@ -24,10 +24,12 @@ const createBooking = async ({
   bookingPost,
   userIsAdmin,
   bookingOwnerName,
+  startDate,
 }: {
   bookingPost: BookingPost
   userIsAdmin: boolean
   bookingOwnerName: string
+  startDate: string
 }) => {
   if (userIsAdmin) {
     return axios
@@ -47,18 +49,33 @@ const createBooking = async ({
         }
       })
   } else {
-    return axios
-      .post(API_URL + 'booking/post', bookingPost, {
-        headers: authHeader(),
-      })
-      .then((response) => response.data)
-      .catch((error) => {
-        if (error.response && error.response.data) {
-          throw error.response.data
-        } else {
-          throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
-        }
-      })
+    if (differenceInDays(new Date(startDate), new Date()) <= 7) {
+      return axios
+        .post(API_URL + 'booking/post', bookingPost, {
+          headers: authHeader(),
+        })
+        .then((response) => response.data)
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            throw error.response.data
+          } else {
+            throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
+          }
+        })
+    } else {
+      return axios
+        .post(API_URL + 'pendingBooking/pendingPost', bookingPost, {
+          headers: authHeader(),
+        })
+        .then((response) => response.data)
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            throw error.response.data
+          } else {
+            throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
+          }
+        })
+    }
   }
 }
 
@@ -133,6 +150,7 @@ const CreateBookingPost = ({
       queryClient.invalidateQueries('yourBookingsOutline')
       queryClient.invalidateQueries('bookings')
       queryClient.invalidateQueries('yourBookingsButton')
+      queryClient.invalidateQueries('allPendingBookingsAllApartments')
       setIsLoadingPost(false)
       toast.success('Lagret reservasjon')
       refreshVacancies()
@@ -154,7 +172,7 @@ const CreateBookingPost = ({
         startDate: startDate,
         endDate: endDate,
       }
-      mutate({ bookingPost, userIsAdmin, bookingOwnerName })
+      mutate({ bookingPost, userIsAdmin, bookingOwnerName, startDate })
     }
   }
 

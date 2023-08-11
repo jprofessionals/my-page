@@ -1,6 +1,8 @@
 package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.dto.*
+import no.jpro.mypageapi.entity.Booking
+import no.jpro.mypageapi.entity.PendingBooking
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.PendingBookingRepository
@@ -171,4 +173,16 @@ class PendingBookingService(
 
     }
 
+    fun getUserPendingBookings(userSub: String): List<PendingBookingDTO> {
+        val pendingBookings = pendingBookingRepository.findPendingBookingByEmployeeSub(userSub)
+        return pendingBookings.map { pendingBookingMapper.toPendingBookingDTO(it) }
+    }
+
+    fun getPendingBooking(pendingBookingId: Long): PendingBooking? {
+        return pendingBookingRepository.findPendingBookingById(pendingBookingId)
+    }
+
+    fun deletePendingBooking(pendingBookingId: Long) {
+        return pendingBookingRepository.deleteById(pendingBookingId)
+    }
 }

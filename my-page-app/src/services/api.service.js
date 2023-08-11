@@ -147,6 +147,23 @@ const pickWinnerPendingBooking = async (pendingBookingList) => {
     throw error
   }
 }
+const getPendingBookingsForUser = async () => {
+  const response = await axios.get(API_URL + 'me/pendingBookings', {
+    headers: authHeader(),
+  })
+
+  const pendingBookings = response.data
+  return pendingBookings.map((pendingBooking) => ({
+    ...pendingBooking,
+    id: String(pendingBooking.id),
+  }))
+}
+
+const deletePendingBooking = (pendingBookingId) => {
+  return axios.delete(API_URL + 'pendingBooking/' + pendingBookingId, {
+    headers: authHeader(),
+  })
+}
 
 const ApiService = {
   getUsers,
@@ -164,5 +181,7 @@ const ApiService = {
   adminDeleteBooking,
   getAllPendingBookingTrainsForAllApartments,
   pickWinnerPendingBooking,
+  getPendingBookingsForUser,
+  deletePendingBooking,
 }
 export default ApiService
