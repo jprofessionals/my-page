@@ -11,10 +11,7 @@ import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.BookingService
 import no.jpro.mypageapi.service.BudgetService
-import no.jpro.mypageapi.service.PendingBookingService
 import no.jpro.mypageapi.service.UserService
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
@@ -27,8 +24,7 @@ import org.springframework.web.bind.annotation.*
 class MeController(
     private val userService: UserService,
     private val budgetService: BudgetService,
-    private val bookingService: BookingService,
-    private val pendingBookingService: PendingBookingService
+    private val bookingService: BookingService
 ) {
 
     @GetMapping
@@ -69,19 +65,5 @@ class MeController(
     )
     fun getBookings(token: JwtAuthenticationToken): List<BookingDTO> {
         return bookingService.getUserBookings(token.getSub())
-    }
-    @GetMapping("pendingBookings")
-    @Transactional
-    @Operation(summary = "Get the different cabin pending bookings that belong to logged in user.")
-    @ApiResponse(
-        responseCode = "200",
-        content = [Content(
-            mediaType = "application/json", array = ArraySchema(
-                schema = Schema(implementation = PendingBookingDTO::class)
-            )
-        )]
-    )
-    fun getPendingBookings(token: JwtAuthenticationToken): List<PendingBookingDTO> {
-        return pendingBookingService.getUserPendingBookings(token.getSub())
     }
 }

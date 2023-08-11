@@ -30,7 +30,8 @@ export function PickDate() {
           {pickDate ? format(pickDate, 'PPP') : <span>Ledige datoer</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0"></PopoverContent>
+      <PopoverContent className="w-auto p-0">
+      </PopoverContent>
     </Popover>
   )
 }

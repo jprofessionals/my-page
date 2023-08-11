@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
-import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.*
-import no.jpro.mypageapi.entity.PendingBooking
-import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.PendingBookingService
 import no.jpro.mypageapi.service.UserService
@@ -71,45 +68,4 @@ class PendingBookingController(
             throw BookingController.InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
     }
-
-    @PostMapping("/pendingBookingWin")
-    @Transactional
-    @Operation(summary = "Pending booking becomes a booking")
-    @ApiResponse(
-        responseCode = "201",
-        description = "New booking created",
-        content = [Content(schema = Schema(implementation = BookingDTO::class))]
-    )
-    fun pickWinnerPendingBooking(
-        token: JwtAuthenticationToken,
-        @Valid @RequestBody pendingBookingList: List<PendingBookingDTO>,
-    ): ResponseEntity<String> {
-        try {
-            pendingBookingService.pickWinnerPendingBooking(pendingBookingList)
-            return ResponseEntity.ok("A new booking has been successfully created")
-        } catch (e: IllegalArgumentException) {
-            return ResponseEntity.badRequest().body(e.message)
-        }
-    }
-
-    @DeleteMapping("{pendingBookingID}")
-    @Transactional
-    @RequiresAdmin
-    @Operation(summary = "Delete the pending booking connected to the pending booking id")
-    @ApiResponse(
-        responseCode = "200",
-        content = [Content(mediaType = "application/json")]
-    )
-    fun deletePendingBooking(
-        token: JwtAuthenticationToken,
-        @PathVariable("pendingBookingID") pendingBookingID: Long,
-    ): ResponseEntity<String> {
-        val pendingBooking = pendingBookingService.getPendingBooking(pendingBookingID)
-        if (pendingBooking === null){
-            return ResponseEntity(HttpStatus.NOT_FOUND)
-        }
-        pendingBookingService.deletePendingBooking(pendingBookingID)
-        return ResponseEntity.ok("Pending booking with ID $pendingBookingID has been deleted")
-    }
-
 }
