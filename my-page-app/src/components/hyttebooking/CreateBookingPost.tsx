@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from 'react'
 import { API_URL } from '../../services/api.service'
-import { format, addDays, differenceInDays, isBefore, isEqual } from 'date-fns'
+import { format, addDays, differenceInDays, isBefore } from 'date-fns'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
@@ -12,7 +12,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 type Props = {
   apartmentId: number
-  date: Date
+  date: Date | undefined
   closeModal: () => void
   refreshVacancies: Function
   userIsAdmin: boolean
@@ -24,41 +24,73 @@ const createBooking = async ({
   bookingPost,
   userIsAdmin,
   bookingOwnerName,
+  startDate,
 }: {
   bookingPost: BookingPost
   userIsAdmin: boolean
   bookingOwnerName: string
+  startDate: string
 }) => {
   if (userIsAdmin) {
-    return axios
-      .post(
-        API_URL + 'booking/admin/post?bookingOwnerName=' + bookingOwnerName,
-        bookingPost,
-        {
+    if (differenceInDays(new Date(startDate), new Date()) <= 7) {
+      return axios
+        .post(
+          API_URL + 'booking/admin/post?bookingOwnerName=' + bookingOwnerName,
+          bookingPost,
+          {
+            headers: authHeader(),
+          },
+        )
+        .then((response) => response.data)
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            throw error.response.data
+          } else {
+            throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
+          }
+        })
+    } else {
+      return axios
+        .post(API_URL + 'pendingBooking/pendingPost', bookingPost, {
           headers: authHeader(),
-        },
-      )
-      .then((response) => response.data)
-      .catch((error) => {
-        if (error.response && error.response.data) {
-          throw error.response.data
-        } else {
-          throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
-        }
-      })
+        })
+        .then((response) => response.data)
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            throw error.response.data
+          } else {
+            throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
+          }
+        })
+    }
   } else {
-    return axios
-      .post(API_URL + 'booking/post', bookingPost, {
-        headers: authHeader(),
-      })
-      .then((response) => response.data)
-      .catch((error) => {
-        if (error.response && error.response.data) {
-          throw error.response.data
-        } else {
-          throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
-        }
-      })
+    if (differenceInDays(new Date(startDate), new Date()) <= 7) {
+      return axios
+        .post(API_URL + 'booking/post', bookingPost, {
+          headers: authHeader(),
+        })
+        .then((response) => response.data)
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            throw error.response.data
+          } else {
+            throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
+          }
+        })
+    } else {
+      return axios
+        .post(API_URL + 'pendingBooking/pendingPost', bookingPost, {
+          headers: authHeader(),
+        })
+        .then((response) => response.data)
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            throw error.response.data
+          } else {
+            throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
+          }
+        })
+    }
   }
 }
 
@@ -72,7 +104,7 @@ const CreateBookingPost = ({
   cutOffDateVacancies,
   vacancies,
 }: Props) => {
-  const [startDate, setStartDate] = useState(format(date, 'yyyy-MM-dd'))
+  const [startDate, setStartDate] = useState(format(date!, 'yyyy-MM-dd'))
   const [endDate, setEndDate] = useState('')
 
   const vacantDaysForApartmentWithoutTakeoverDates =
@@ -133,6 +165,7 @@ const CreateBookingPost = ({
       queryClient.invalidateQueries('yourBookingsOutline')
       queryClient.invalidateQueries('bookings')
       queryClient.invalidateQueries('yourBookingsButton')
+      queryClient.invalidateQueries('allPendingBookingsAllApartments')
       setIsLoadingPost(false)
       toast.success('Lagret reservasjon')
       refreshVacancies()
@@ -154,7 +187,7 @@ const CreateBookingPost = ({
         startDate: startDate,
         endDate: endDate,
       }
-      mutate({ bookingPost, userIsAdmin, bookingOwnerName })
+      mutate({ bookingPost, userIsAdmin, bookingOwnerName, startDate })
     }
   }
 

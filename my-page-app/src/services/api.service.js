@@ -121,6 +121,50 @@ const adminDeleteBooking = (bookingId) => {
   })
 }
 
+const getAllPendingBookingTrainsForAllApartments = async () => {
+  const response = await axios.get(
+    API_URL + 'pendingBooking/pendingBookingInformation/',
+    {
+      headers: authHeader(),
+    },
+  )
+  const allPendingBookingTrainsAllApartments = response.data
+  return allPendingBookingTrainsAllApartments
+}
+
+const pickWinnerPendingBooking = async (pendingBookingList) => {
+  try {
+    const response = await axios.post(
+      API_URL + 'pendingBooking/pendingBookingWin',
+      pendingBookingList,
+      {
+        headers: authHeader(),
+      },
+    )
+
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+const getPendingBookingsForUser = async () => {
+  const response = await axios.get(API_URL + 'me/pendingBookings', {
+    headers: authHeader(),
+  })
+
+  const pendingBookings = response.data
+  return pendingBookings.map((pendingBooking) => ({
+    ...pendingBooking,
+    id: String(pendingBooking.id),
+  }))
+}
+
+const deletePendingBooking = (pendingBookingId) => {
+  return axios.delete(API_URL + 'pendingBooking/' + pendingBookingId, {
+    headers: authHeader(),
+  })
+}
+
 const getInfoNotices = (startDate, endDate) => {
   const params = {
     startDate: startDate,
@@ -179,6 +223,10 @@ const ApiService = {
   getAllApartments,
   deleteBooking,
   adminDeleteBooking,
+  getAllPendingBookingTrainsForAllApartments,
+  pickWinnerPendingBooking,
+  getPendingBookingsForUser,
+  deletePendingBooking,
   getInfoNotices,
   deleteInfoNotice,
   getAllInfoNoticeVacancies,

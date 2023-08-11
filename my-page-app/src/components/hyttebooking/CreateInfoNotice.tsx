@@ -11,7 +11,7 @@ import authHeader from '@/services/auth-header'
 import { useMutation, useQueryClient } from 'react-query'
 
 type Props = {
-  date: Date
+  date: Date | undefined
   closeModal: () => void
   userIsAdmin: boolean
   infoNoticeVacancies: string[] | undefined
@@ -49,8 +49,8 @@ const CreateInfoNoticePost = ({
   infoNoticeVacancies,
   refreshInfoNoticeVacancies,
 }: Props) => {
-  const [startDate, setStartDate] = useState(format(date, 'yyyy-MM-dd'))
-  const [endDate, setEndDate] = useState(format(date, 'yyyy-MM-dd'))
+  const [startDate, setStartDate] = useState(format(date!, 'yyyy-MM-dd'))
+  const [endDate, setEndDate] = useState(format(date!, 'yyyy-MM-dd'))
 
   const [isLoadingPost, setIsLoadingPost] = useState(false)
   const [description, setDescription] = useState<string>('')
