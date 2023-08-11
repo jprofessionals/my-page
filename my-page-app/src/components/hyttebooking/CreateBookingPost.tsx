@@ -32,22 +32,37 @@ const createBooking = async ({
   startDate: string
 }) => {
   if (userIsAdmin) {
-    return axios
-      .post(
-        API_URL + 'booking/admin/post?bookingOwnerName=' + bookingOwnerName,
-        bookingPost,
-        {
+    if (differenceInDays(new Date(startDate), new Date()) <= 7) {
+      return axios
+        .post(
+          API_URL + 'booking/admin/post?bookingOwnerName=' + bookingOwnerName,
+          bookingPost,
+          {
+            headers: authHeader(),
+          },
+        )
+        .then((response) => response.data)
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            throw error.response.data
+          } else {
+            throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
+          }
+        })
+    } else {
+      return axios
+        .post(API_URL + 'pendingBooking/pendingPost', bookingPost, {
           headers: authHeader(),
-        },
-      )
-      .then((response) => response.data)
-      .catch((error) => {
-        if (error.response && error.response.data) {
-          throw error.response.data
-        } else {
-          throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
-        }
-      })
+        })
+        .then((response) => response.data)
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            throw error.response.data
+          } else {
+            throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
+          }
+        })
+    }
   } else {
     if (differenceInDays(new Date(startDate), new Date()) <= 7) {
       return axios
