@@ -68,4 +68,26 @@ class PendingBookingController(
             throw BookingController.InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
     }
+
+    @PostMapping("/pendingBookingWin")
+    @Transactional
+    @Operation(summary = "Pending booking becomes a booking")
+    @ApiResponse(
+        responseCode = "201",
+        description = "New booking created",
+        content = [Content(schema = Schema(implementation = BookingDTO::class))]
+    )
+    fun pickWinnerPendingBooking(
+        token: JwtAuthenticationToken,
+        @Valid @RequestBody pendingBookingList: List<PendingBookingDTO>,
+    ): ResponseEntity<String> {
+        try {
+            pendingBookingService.pickWinnerPendingBooking(pendingBookingList)
+            return ResponseEntity.ok("A new booking has been successfully created")
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.badRequest().body(e.message)
+        }
+    }
+
+
 }

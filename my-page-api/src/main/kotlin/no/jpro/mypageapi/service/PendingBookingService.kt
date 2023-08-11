@@ -1,12 +1,10 @@
 package no.jpro.mypageapi.service
 
-import no.jpro.mypageapi.dto.CreatePendingBookingDTO
-import no.jpro.mypageapi.dto.PendingBookingDTO
-import no.jpro.mypageapi.dto.PendingBookingTrainDTO
-import no.jpro.mypageapi.dto.DrawingPeriodDTO
+import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.PendingBookingRepository
+import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.PendingBookingMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -18,7 +16,8 @@ class PendingBookingService(
     private val bookingService: BookingService,
     private val pendingBookingRepository: PendingBookingRepository,
     private val apartmentRepository: ApartmentRepository,
-    private val pendingBookingMapper: PendingBookingMapper
+    private val pendingBookingMapper: PendingBookingMapper,
+    private val userRepository: UserRepository
 ) {
 
     val todayDateMinusSevenDays: LocalDate = LocalDate.now().minusDays(7)
@@ -144,6 +143,32 @@ class PendingBookingService(
             getPendingBookingInformationForApartment(apartment.id)
         }
         return allTrainAndPendingBookings
+    }
+
+
+    fun pickWinnerPendingBooking(pendingBookingList: List<PendingBookingDTO>) {
+        if(pendingBookingList.size > 1){
+            val winner = pendingBookingList.random()
+
+            val user = winner.employeeName?.let { userRepository.findUserByName(it) }
+            winner.apartment?.let { CreateBookingDTO (it.id, winner.startDate, winner.endDate) }
+                ?.let {
+                    if (user != null) {
+                        bookingService.createBooking(it, user )
+                    }
+                }
+        } else {
+            val winner = pendingBookingList[0]
+
+            val user = winner.employeeName?.let { userRepository.findUserByName(it) }
+            winner.apartment?.let { CreateBookingDTO (it.id, winner.startDate, winner.endDate) }
+                ?.let {
+                    if (user != null) {
+                        bookingService.createBooking(it, user )
+                    }
+                }
+        }
+
     }
 
 }

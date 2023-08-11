@@ -132,6 +132,22 @@ const getAllPendingBookingTrainsForAllApartments = async () => {
   return allPendingBookingTrainsAllApartments
 }
 
+const pickWinnerPendingBooking = async (pendingBookingList) => {
+  try {
+    const response = await axios.post(
+      API_URL + 'pendingBooking/pendingBookingWin',
+      pendingBookingList,
+      {
+        headers: authHeader(),
+      },
+    )
+
+    return response.data // Return the response data if needed
+  } catch (error) {
+    throw error // Rethrow the error for handling in the component
+  }
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -146,6 +162,7 @@ const ApiService = {
   getAllApartments,
   deleteBooking,
   adminDeleteBooking,
-  getAllPendingBookingTrainsForAllApartments
+  getAllPendingBookingTrainsForAllApartments,
+  pickWinnerPendingBooking,
 }
 export default ApiService
