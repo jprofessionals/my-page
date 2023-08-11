@@ -516,7 +516,7 @@ export default function MonthOverview() {
                             <>
                               <button
                                 onClick={() => handleAddInfoNoticeClick()}
-                                className="mb-3 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
+                                className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
                               >
                                 Legg til
                               </button>
@@ -543,7 +543,7 @@ export default function MonthOverview() {
                             onClick={() =>
                               openInfoNoticeDeleteModal(infoNotice.id)
                             }
-                            className="mb-3 ml-2 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                            className="mb-1 ml-2 bg-red-500 text-white px-2 py-0.5 rounded-md"
                           >
                             Slett
                           </button>
@@ -592,7 +592,7 @@ export default function MonthOverview() {
                       Legg til en informasjonsnotis
                       <button
                         onClick={() => handleAddInfoNoticeClick()}
-                        className="ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
+                        className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
                       >
                         Legg til
                       </button>
