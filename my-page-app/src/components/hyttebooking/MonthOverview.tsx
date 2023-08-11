@@ -578,6 +578,9 @@ export default function MonthOverview() {
                           infoNotice={infoNotice}
                           closeModal={closeModal}
                           userIsAdmin={userIsAdmin}
+                          refreshInfoNoticeVacancies={
+                            refreshInfoNoticeVacancies
+                          }
                         />
                       )}
                     </p>
