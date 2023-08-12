@@ -47,5 +47,5 @@ jobs:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       - uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: my-page-jpro-test
+          project_id: my-page-jpro-test --verbosity=debug
       - run: gcloud app versions list --service=default --filter="version.createTime < $(date -Idate --date='last month')" --format="value(version.id)" | xargs --no-run-if-empty gcloud app versions delete
