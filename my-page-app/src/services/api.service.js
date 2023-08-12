@@ -123,7 +123,7 @@ const adminDeleteBooking = (bookingId) => {
 
 const getAllPendingBookingTrainsForAllApartments = async () => {
   const response = await axios.get(
-    API_URL + 'pendingBooking/pendingBookingInformation/',
+    API_URL + 'pendingBooking/pendingBookingInformation',
     {
       headers: authHeader(),
     },
