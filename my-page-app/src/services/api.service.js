@@ -165,6 +165,14 @@ const getAllInfoNoticeVacancies = async (startDate, endDate) => {
     })
 }
 
+const getBudgetSummary = async () => {
+  const response = await axios.get(API_URL + 'admin/budgetSummary', {
+    headers: authHeader(),
+  })
+  const budgetSummary = response.data
+  return budgetSummary
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -182,5 +190,6 @@ const ApiService = {
   getInfoNotices,
   deleteInfoNotice,
   getAllInfoNoticeVacancies,
+  getBudgetSummary,
 }
 export default ApiService
