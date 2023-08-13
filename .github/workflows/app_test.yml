@@ -35,7 +35,7 @@ jobs:
           PROJECT_ID: my-page-jpro-test
           APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         with:
-          args: app deploy my-page-app/app.yaml
+          args: app deploy my-page-app/app.yaml --verbosity=debug
   remove-old-versions-test:
     needs: deploy-test
     runs-on: ubuntu-latest
@@ -47,5 +47,5 @@ jobs:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       - uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: my-page-jpro-test --verbosity=debug
+          project_id: my-page-jpro-test
       - run: gcloud app versions list --service=default --filter="version.createTime < $(date -Idate --date='last month')" --format="value(version.id)" | xargs --no-run-if-empty gcloud app versions delete
