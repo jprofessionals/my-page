@@ -2,13 +2,21 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { MonthCalendar } from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import { Apartment, Booking, InfoBooking } from '@/types'
+import {
+  Apartment,
+  Booking,
+  DrawingPeriod,
+  PendingBooking,
+  InfoBooking,
+} from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { add, format, isAfter, isBefore, sub } from 'date-fns'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import EditBooking from '@/components/hyttebooking/EditBooking'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
+import ConvertPendingBooking from '@/components/hyttebooking/ConvertPendingBooking'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CreateInfoNotice from '@/components/hyttebooking/CreateInfoNotice'
 import EditInfoNotice from '@/components/hyttebooking/EditInfoNotice'
 
@@ -27,6 +35,14 @@ export default function MonthOverview() {
     async () => {
       const yourBookings = await ApiService.getBookingsForUser()
       return yourBookings
+    },
+  )
+
+  const { data: yourPendingBookings } = useQuery<PendingBooking[]>(
+    'yourPendingBookingsOutline',
+    async () => {
+      const yourPendingBookings = await ApiService.getPendingBookingsForUser()
+      return yourPendingBookings
     },
   )
 
@@ -182,6 +198,51 @@ export default function MonthOverview() {
     },
   })
 
+  const [pendingBookingDeleteModalIsOpen, setPendingBookingDeleteModalIsOpen] =
+    useState(false)
+  const [pendingBookingIdToDelete, setPendingBookingIdToDelete] = useState<
+    number | null
+  >(null)
+
+  const openPendingBookingDeleteModal = (pendingBooking: number | null) => {
+    setPendingBookingIdToDelete(pendingBooking)
+    setPendingBookingDeleteModalIsOpen(true)
+  }
+
+  const closePendingBookingDeleteModal = () => {
+    setPendingBookingDeleteModalIsOpen(false)
+  }
+
+  const confirmPendingBookingDelete = () => {
+    handleDeletePendingBooking(pendingBookingIdToDelete)
+    closePendingBookingDeleteModal()
+  }
+
+  const deletePendingBookingById = async (pendingBookingId: number | null) => {
+    try {
+      await ApiService.deletePendingBooking(pendingBookingId)
+      toast.success('Ønsket reservasjon er slettet')
+      closeModal()
+    } catch (error) {
+      toast.error(
+        `Ønsket reservasjon ble ikke slettet med følgende feil: ${error}`,
+      )
+    }
+  }
+
+  const deletePendingBooking = useMutation(deletePendingBookingById, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('allPendingBookingsAllApartments')
+    },
+    onError: (error) => {
+      console.error('Error:', error)
+    },
+  })
+
+  const handleDeletePendingBooking = (pendingBookingId: number | null) => {
+    deletePendingBooking.mutate(pendingBookingId)
+  }
+
   const [showEditFormForBooking, setShowEditFormForBookingId] = useState<
     number | null
   >(null)
@@ -197,6 +258,9 @@ export default function MonthOverview() {
     getVacancyForDay(date)
     setShowModal(true)
     getBookingsOnDay(date)
+    getPendingBookingsOnDay(date)
+    getDrawingPeriodsOnDay(date)
+    getPendBookingListFromDrawPeriod(date)
     getInfoNoticesOnDay(date)
     getInfoNoticeVacancyOnDay(date)
   }
@@ -215,6 +279,7 @@ export default function MonthOverview() {
       transform: 'translate(-50%, -50%)',
     },
   }
+
   const closeModal = () => {
     setShowModal(false)
     setDate(undefined)
@@ -225,6 +290,7 @@ export default function MonthOverview() {
     setInfoNoticeDeleteModalIsOpen(false)
     setShowEditFormForInfoNoticeId(null)
     setIsDayVacantForInfoNotice(false)
+    setPendingBookingDeleteModalIsOpen(false)
   }
 
   const handleBookClick = (apartmentId: number) => {
@@ -282,6 +348,7 @@ export default function MonthOverview() {
   const deleteInfoNotice = useMutation(deleteInfoNoticeByNoticeId, {
     onSuccess: () => {
       queryClient.invalidateQueries('infoNotices')
+      refreshInfoNoticeVacancies()
     },
     onError: (error) => {
       console.error('Error:', error)
@@ -317,7 +384,6 @@ export default function MonthOverview() {
   const [apartments, setApartments] = useState<Apartment[]>([])
 
   const startDateVacancies = format(new Date(), 'yyyy-MM-dd')
-  //const endDateVacancies = format(add(new Date(), { months: 12 }), 'yyyy-MM-dd')
   const refreshVacancies = useCallback(async () => {
     setVacancyLoadingStatus('loading')
 
@@ -428,6 +494,94 @@ export default function MonthOverview() {
     return vacantApartmentsOnDay
   }
 
+  const { data: allPendingBookingTrains } = useQuery(
+    'allPendingBookingsAllApartments',
+    async () => {
+      const fetchedPendingBookingsTrains =
+        await ApiService.getAllPendingBookingTrainsForAllApartments()
+      return fetchedPendingBookingsTrains
+    },
+  )
+  const getPendingBookingTrainsOnDay = (date: string) => {
+    if (!allPendingBookingTrains) {
+      return []
+    }
+    const allPendingBookingTrainsAllApartments = []
+    for (const apartmentPendingTrain of allPendingBookingTrains) {
+      for (const pendingTrain of apartmentPendingTrain) {
+        allPendingBookingTrainsAllApartments.push(pendingTrain)
+      }
+    }
+    const currentDate = new Date(date)
+    currentDate.setHours(0, 0, 0, 0)
+    const filteredPendingBookingTrainsAllApartments =
+      allPendingBookingTrainsAllApartments.filter((pendingBookingTrain) => {
+        const startDate = new Date(pendingBookingTrain.startDate)
+        const endDate = new Date(pendingBookingTrain.endDate)
+        startDate.setHours(0, 0, 0, 0)
+        endDate.setHours(0, 0, 0, 0)
+
+        return currentDate >= startDate && currentDate <= endDate
+      }) || []
+    return filteredPendingBookingTrainsAllApartments
+  }
+
+  const [pendingBookingsOnDay, setPendingBookingsOnDay] = useState<
+    PendingBooking[]
+  >([])
+  const getPendingBookingsOnDay = (selectedDate: Date) => {
+    const pendingBookingsOnDayArrayOfArray = []
+    const selectedDateString = selectedDate.toString()
+    const filteredPendingBookingTrainsAllApartments =
+      getPendingBookingTrainsOnDay(selectedDateString)
+
+    for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments) {
+      for (const drawingPeriod of pendingBookingTrain.drawingPeriodList) {
+        pendingBookingsOnDayArrayOfArray.push(drawingPeriod.pendingBookings)
+      }
+    }
+    const pendingBookingsOnDayList = pendingBookingsOnDayArrayOfArray.flat()
+    setPendingBookingsOnDay(pendingBookingsOnDayList)
+    return pendingBookingsOnDayList
+  }
+
+  const [drawingPeriodListOnDay, setDrawingPeriodListOnDay] = useState<
+    DrawingPeriod[]
+  >([])
+  const getDrawingPeriodsOnDay = (selectedDate: Date) => {
+    const drawingPeriodsOnDayArrayOfArray = []
+    const selectedDateString = selectedDate.toString()
+    const filteredPendingBookingTrainsAllApartments =
+      getPendingBookingTrainsOnDay(selectedDateString)
+
+    for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments) {
+      for (const drawingPeriod of pendingBookingTrain.drawingPeriodList) {
+        drawingPeriodsOnDayArrayOfArray.push(drawingPeriod)
+      }
+    }
+    const drawingPeriodsOnDayList = drawingPeriodsOnDayArrayOfArray.flat()
+    setDrawingPeriodListOnDay(drawingPeriodsOnDayList)
+    return drawingPeriodsOnDayList
+  }
+
+  const [pendingBookingList, setPendingBookingList] = useState<
+    PendingBooking[][]
+  >([])
+
+  const getPendBookingListFromDrawPeriod = (selectedDate: Date) => {
+    const drawingPeriodsOnDay = getDrawingPeriodsOnDay(selectedDate)
+    const pendingBookingList: PendingBooking[][] = []
+
+    for (const pendingBooking of drawingPeriodsOnDay) {
+      const value = pendingBooking.valueOf()
+      const pendingBookings = value.pendingBookings
+
+      pendingBookingList.push(pendingBookings)
+    }
+    setPendingBookingList(pendingBookingList)
+    return pendingBookingList
+  }
+
   const [isDayVacantForInfoNotice, setIsDayVacantForInfoNotice] =
     useState(false)
   const getInfoNoticeVacancyOnDay = (selectedDate: Date) => {
@@ -469,6 +623,12 @@ export default function MonthOverview() {
     Annekset: 'border-teal-annex',
   }
 
+  const cabinPendingBorderColorClasses: CabinColorClasses = {
+    'Stor leilighet': 'border-yellow-200',
+    'Liten leilighet': 'border-purple-200',
+    Annekset: 'border-green-200',
+  }
+
   const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
 
   return (
@@ -483,6 +643,7 @@ export default function MonthOverview() {
         getBookings={getBookings}
         yourBookings={yourBookings}
         bookings={bookings}
+        getPendingBookingTrainsOnDay={getPendingBookingTrainsOnDay}
         getInfoNotices={getInfoNotices}
       />
       <Modal
@@ -493,309 +654,457 @@ export default function MonthOverview() {
         style={customModalStyles}
       >
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 prose">
-          {date ? (
-            <div>
-              <h3 className="mt-1 mb-1">{format(date, 'dd.MM.yyyy')}</h3>
-              {isBefore(date, new Date(cutOffDateVacancies)) ? null : (
-                <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
-              )}
-              {infoNotices.length > 0 ? (
+          <Tabs defaultValue="oversikt" className="">
+            <TabsList>
+              <TabsTrigger value="oversikt" className="text-lg">
+                Oversikt
+              </TabsTrigger>
+              <TabsTrigger value="trekning" className="text-lg">
+                Trekning
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="oversikt">
+              {date ? (
                 <div>
-                  <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
-                  {infoNotices.map((infoNotice, index) => (
-                    <p
-                      key={index}
-                      className="mt-1 mb-1 pl-2 border-l-2 border-blue-500"
-                    >
-                      <span className="information-text ">
-                        {infoNotice.description}
-                      </span>
-                      {userIsAdmin && (
-                        <>
-                          {isDayVacantForInfoNotice && (
+                  <h3 className="mt-1 mb-1">{format(date!, 'dd.MM.yyyy')}</h3>
+                  {isBefore(date!, new Date(cutOffDateVacancies)) ? null : (
+                    <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
+                  )}
+                  {infoNotices.length > 0 ? (
+                    <div>
+                      <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
+                      {infoNotices.map((infoNotice, index) => (
+                        <p
+                          key={index}
+                          className="mt-1 mb-1 pl-2 border-l-2 border-blue-500"
+                        >
+                          <span className="information-text ">
+                            {infoNotice.description}
+                          </span>
+                          {userIsAdmin && (
                             <>
-                              <button
-                                onClick={() => handleAddInfoNoticeClick()}
-                                className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
-                              >
-                                Legg til
-                              </button>
-                              {showCreateFormForInfoNotice && (
-                                <CreateInfoNotice
-                                  date={date}
-                                  closeModal={closeModal}
-                                  userIsAdmin={userIsAdmin}
-                                  infoNoticeVacancies={infoNoticeVacancies}
-                                  refreshInfoNoticeVacancies={
-                                    refreshInfoNoticeVacancies
-                                  }
-                                />
-                              )}
-                            </>
-                          )}
-                          <button
-                            onClick={() => handleEditInfoNotice(infoNotice.id)}
-                            className="mt-3 ml-2 bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
-                          >
-                            Rediger
-                          </button>
-                          <button
-                            onClick={() =>
-                              openInfoNoticeDeleteModal(infoNotice.id)
-                            }
-                            className="mb-1 ml-2 bg-red-500 text-white px-2 py-0.5 rounded-md"
-                          >
-                            Slett
-                          </button>
-                        </>
-                      )}
-                      <Modal
-                        isOpen={infoNoticeDeleteModalIsOpen}
-                        onRequestClose={closeModal}
-                        contentLabel="Delete Confirmation"
-                        style={customModalStyles}
-                      >
-                        <p className="mb-3">
-                          Er du sikker på at du vil slette notisen?
-                        </p>
-                        <div className="flex justify-end">
-                          <button
-                            onClick={confirmInfoNoticeDelete}
-                            className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
-                          >
-                            Slett notis
-                          </button>
-                          <button
-                            onClick={closeInfoNoticeDeleteModal}
-                            className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
-                          >
-                            Avbryt
-                          </button>
-                        </div>
-                      </Modal>
-                      {showEditFormForInfoNotice === infoNotice.id && (
-                        <EditInfoNotice
-                          infoNotice={infoNotice}
-                          closeModal={closeModal}
-                          userIsAdmin={userIsAdmin}
-                        />
-                      )}
-                    </p>
-                  ))}
-                </div>
-              ) : (
-                userIsAdmin && (
-                  <div>
-                    <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
-                    <p>
-                      {' '}
-                      Legg til en informasjonsnotis
-                      <button
-                        onClick={() => handleAddInfoNoticeClick()}
-                        className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
-                      >
-                        Legg til
-                      </button>
-                      {showCreateFormForInfoNotice && (
-                        <CreateInfoNotice
-                          date={date}
-                          closeModal={closeModal}
-                          userIsAdmin={userIsAdmin}
-                          infoNoticeVacancies={infoNoticeVacancies}
-                          refreshInfoNoticeVacancies={
-                            refreshInfoNoticeVacancies
-                          }
-                        />
-                      )}
-                    </p>
-                  </div>
-                )
-              )}
-              {bookingItems.length > 0 ? (
-                <div>
-                  <h3 className="mt-3 mb-1">Reservasjoner:</h3>
-                  {bookingItems
-                    .sort((a, b) => {
-                      const cabinIndexA = cabinOrder.indexOf(
-                        a.apartment.cabin_name,
-                      )
-                      const cabinIndexB = cabinOrder.indexOf(
-                        b.apartment.cabin_name,
-                      )
-
-                      if (cabinIndexA !== cabinIndexB) {
-                        return cabinIndexA - cabinIndexB
-                      }
-                      const startDateComparison =
-                        Date.parse(a.startDate) - Date.parse(b.startDate)
-                      if (startDateComparison !== 0) {
-                        return startDateComparison
-                      }
-                      return Date.parse(a.endDate) - Date.parse(b.endDate)
-                    })
-                    .map((booking, index) => {
-                      const startDate = new Date(booking.startDate)
-                      const endDate = new Date(booking.endDate)
-                      const formattedStartDate = format(startDate, 'dd.MM.yyyy')
-                      const formattedEndDate = format(endDate, 'dd.MM.yyyy')
-
-                      const isYourBooking = yourBookings?.some(
-                        (yourBooking) => yourBooking.id === booking.id,
-                      )
-
-                      const prevCabinName =
-                        index > 0
-                          ? bookingItems[index - 1].apartment.cabin_name
-                          : null
-                      const currentCabinName = booking.apartment.cabin_name
-                      const shouldRenderDivider =
-                        prevCabinName !== currentCabinName
-
-                      return (
-                        <div key={booking.id}>
-                          {shouldRenderDivider && (
-                            <h4
-                              className={`mt-2 mb-1 ${cabinTextColorClasses[currentCabinName]}`}
-                            >
-                              {currentCabinName}:
-                            </h4>
-                          )}
-                          <p
-                            className={`mt-2 mb-1 pl-2 flex ${cabinBorderColorClasses[currentCabinName]} border-l-2`}
-                          >
-                            {isYourBooking || userIsAdmin ? (
-                              <>
-                                <div className="flex flex-col">
-                                  <p className="flex-row justify-between items-center space-x-2">
-                                    <span>
-                                      {isYourBooking
-                                        ? `Du har hytten fra ${formattedStartDate} til ${formattedEndDate}.`
-                                        : `${booking.employeeName} har hytten fra ${formattedStartDate} til ${formattedEndDate}.`}
-                                    </span>
-                                    <button
-                                      onClick={() =>
-                                        handleEditBooking(booking.id)
-                                      }
-                                      className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
-                                    >
-                                      Rediger
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        openDeleteModal(booking.id)
-                                      }
-                                      className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
-                                    >
-                                      Slett
-                                    </button>
-                                    <Modal
-                                      isOpen={deleteModalIsOpen}
-                                      onRequestClose={closeModal}
-                                      contentLabel="Delete Confirmation"
-                                      style={customModalStyles}
-                                    >
-                                      <p className="mb-3">
-                                        Er du sikker på at du vil slette
-                                        reservasjonen?
-                                      </p>
-                                      <div className="flex justify-end">
-                                        <button
-                                          onClick={confirmDelete}
-                                          className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
-                                        >
-                                          Slett reservasjon
-                                        </button>
-                                        <button
-                                          onClick={closeDeleteModal}
-                                          className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
-                                        >
-                                          Avbryt
-                                        </button>
-                                      </div>
-                                    </Modal>
-                                  </p>
-                                  {showEditFormForBooking === booking.id && (
-                                    <EditBooking
-                                      booking={booking}
+                              {isDayVacantForInfoNotice && (
+                                <>
+                                  <button
+                                    onClick={() => handleAddInfoNoticeClick()}
+                                    className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
+                                  >
+                                    Legg til
+                                  </button>
+                                  {showCreateFormForInfoNotice && (
+                                    <CreateInfoNotice
+                                      date={date}
                                       closeModal={closeModal}
-                                      refreshVacancies={refreshVacancies}
                                       userIsAdmin={userIsAdmin}
-                                      cutOffDateVacancies={cutOffDateVacancies}
+                                      infoNoticeVacancies={infoNoticeVacancies}
+                                      refreshInfoNoticeVacancies={
+                                        refreshInfoNoticeVacancies
+                                      }
                                     />
                                   )}
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <span>
-                                  {booking.employeeName} har fra{' '}
-                                  {formattedStartDate} til {formattedEndDate}.
-                                </span>
-                              </>
-                            )}
-                          </p>
-                        </div>
-                      )
-                    })}
+                                </>
+                              )}
+                              <button
+                                onClick={() =>
+                                  handleEditInfoNotice(infoNotice.id)
+                                }
+                                className="mt-3 ml-2 bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                              >
+                                Rediger
+                              </button>
+                              <button
+                                onClick={() =>
+                                  openInfoNoticeDeleteModal(infoNotice.id)
+                                }
+                                className="mb-1 ml-2 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                              >
+                                Slett
+                              </button>
+                            </>
+                          )}
+                          <Modal
+                            isOpen={infoNoticeDeleteModalIsOpen}
+                            onRequestClose={closeModal}
+                            contentLabel="Delete Confirmation"
+                            style={customModalStyles}
+                          >
+                            <p className="mb-3">
+                              Er du sikker på at du vil slette notisen?
+                            </p>
+                            <div className="flex justify-end">
+                              <button
+                                onClick={confirmInfoNoticeDelete}
+                                className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                              >
+                                Slett notis
+                              </button>
+                              <button
+                                onClick={closeInfoNoticeDeleteModal}
+                                className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                              >
+                                Avbryt
+                              </button>
+                            </div>
+                          </Modal>
+                          {showEditFormForInfoNotice === infoNotice.id && (
+                            <EditInfoNotice
+                              infoNotice={infoNotice}
+                              closeModal={closeModal}
+                              userIsAdmin={userIsAdmin}
+                              refreshInfoNoticeVacancies={
+                                refreshInfoNoticeVacancies
+                              }
+                            />
+                          )}
+                        </p>
+                      ))}
+                    </div>
+                  ) : (
+                    userIsAdmin && (
+                      <div>
+                        <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
+                        <p>
+                          {' '}
+                          Legg til en informasjonsnotis
+                          <button
+                            onClick={() => handleAddInfoNoticeClick()}
+                            className="mb-1 ml-3 bg-blue-500 text-white px-2 py-0.5 rounded-md"
+                          >
+                            Legg til
+                          </button>
+                          {showCreateFormForInfoNotice && (
+                            <CreateInfoNotice
+                              date={date}
+                              closeModal={closeModal}
+                              userIsAdmin={userIsAdmin}
+                              infoNoticeVacancies={infoNoticeVacancies}
+                              refreshInfoNoticeVacancies={
+                                refreshInfoNoticeVacancies
+                              }
+                            />
+                          )}
+                        </p>
+                      </div>
+                    )
+                  )}
+                  {bookingItems.length > 0 ? (
+                    <div>
+                      {bookingItems
+                        .sort((a, b) => {
+                          const cabinIndexA = cabinOrder.indexOf(
+                            a.apartment.cabin_name,
+                          )
+                          const cabinIndexB = cabinOrder.indexOf(
+                            b.apartment.cabin_name,
+                          )
+
+                          if (cabinIndexA !== cabinIndexB) {
+                            return cabinIndexA - cabinIndexB
+                          }
+                          const startDateComparison =
+                            Date.parse(a.startDate) - Date.parse(b.startDate)
+                          if (startDateComparison !== 0) {
+                            return startDateComparison
+                          }
+                          return Date.parse(a.endDate) - Date.parse(b.endDate)
+                        })
+                        .map((booking, index) => {
+                          const startDate = new Date(booking.startDate)
+                          const endDate = new Date(booking.endDate)
+                          const formattedStartDate = format(
+                            startDate,
+                            'dd.MM.yyyy',
+                          )
+                          const formattedEndDate = format(endDate, 'dd.MM.yyyy')
+
+                          const isYourBooking = yourBookings?.some(
+                            (yourBooking) => yourBooking.id === booking.id,
+                          )
+
+                          const prevCabinName =
+                            index > 0
+                              ? bookingItems[index - 1].apartment.cabin_name
+                              : null
+                          const currentCabinName = booking.apartment.cabin_name
+                          const shouldRenderDivider =
+                            prevCabinName !== currentCabinName
+
+                          return (
+                            <div key={booking.id}>
+                              {shouldRenderDivider && (
+                                <h4
+                                  className={`mt-2 mb-1 ${cabinTextColorClasses[currentCabinName]}`}
+                                >
+                                  {currentCabinName}:
+                                </h4>
+                              )}
+                              <p
+                                className={`mt-2 mb-1 pl-2 flex ${cabinBorderColorClasses[currentCabinName]} border-l-2`}
+                              >
+                                {isYourBooking || userIsAdmin ? (
+                                  <>
+                                    <div className="flex flex-col">
+                                      <p className="flex-row justify-between items-center space-x-2">
+                                        <span>
+                                          {isYourBooking
+                                            ? `Du har hytten fra ${formattedStartDate} til ${formattedEndDate}.`
+                                            : `${booking.employeeName} har hytten fra ${formattedStartDate} til ${formattedEndDate}.`}
+                                        </span>
+                                        <button
+                                          onClick={() =>
+                                            handleEditBooking(booking.id)
+                                          }
+                                          className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                                        >
+                                          Rediger
+                                        </button>
+                                        <button
+                                          onClick={() =>
+                                            openDeleteModal(booking.id)
+                                          }
+                                          className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
+                                        >
+                                          Slett
+                                        </button>
+                                        <Modal
+                                          isOpen={deleteModalIsOpen}
+                                          onRequestClose={closeModal}
+                                          contentLabel="Delete Confirmation"
+                                          style={customModalStyles}
+                                        >
+                                          <p className="mb-3">
+                                            Er du sikker på at du vil slette
+                                            reservasjonen?
+                                          </p>
+                                          <div className="flex justify-end">
+                                            <button
+                                              onClick={confirmDelete}
+                                              className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                                            >
+                                              Slett reservasjon
+                                            </button>
+                                            <button
+                                              onClick={closeDeleteModal}
+                                              className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                                            >
+                                              Avbryt
+                                            </button>
+                                          </div>
+                                        </Modal>
+                                      </p>
+                                      {showEditFormForBooking ===
+                                        booking.id && (
+                                        <EditBooking
+                                          booking={booking}
+                                          closeModal={closeModal}
+                                          refreshVacancies={refreshVacancies}
+                                          userIsAdmin={userIsAdmin}
+                                          cutOffDateVacancies={
+                                            cutOffDateVacancies
+                                          }
+                                        />
+                                      )}
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span>
+                                      {booking.employeeName} har fra{' '}
+                                      {formattedStartDate} til{' '}
+                                      {formattedEndDate}.
+                                    </span>
+                                  </>
+                                )}
+                              </p>
+                            </div>
+                          )
+                        })}
+                    </div>
+                  ) : null}
+                  {vacantApartmentsOnDay.length !== 0 ? (
+                    <h3 className="mt-3 mb-1">Ledige hytter:</h3>
+                  ) : null}
+                  {vacantApartmentsOnDay
+                    .sort(
+                      (a, b) =>
+                        cabinOrder.indexOf(a.cabin_name) -
+                        cabinOrder.indexOf(b.cabin_name),
+                    )
+                    .map((apartment, index) => (
+                      <div key={index}>
+                        <p
+                          className={`mt-1 mb-1 ${
+                            cabinBorderColorClasses[apartment.cabin_name]
+                          } pl-2 border-l-2 `}
+                        >
+                          <span className="apartment-text">
+                            {apartment.cabin_name}
+                          </span>
+                          <button
+                            onClick={() => handleBookClick(apartment.id)}
+                            className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
+                          >
+                            Reserver
+                          </button>
+                        </p>
+                        {expandedApartments.includes(apartment.id) && (
+                          <div className="expanded-content">
+                            <CreateBookingPost
+                              apartmentId={apartment.id}
+                              date={date}
+                              closeModal={closeModal}
+                              refreshVacancies={refreshVacancies}
+                              userIsAdmin={userIsAdmin}
+                              allUsersNames={allUsersNames}
+                              cutOffDateVacancies={cutOffDateVacancies}
+                              vacancies={vacancies}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
                 </div>
+              ) : (
+                <div>
+                  <p>Ingen valgt dato</p>
+                </div>
+              )}
+
+              <div className="flex justify-end">
+                <button
+                  onClick={closeModal}
+                  className="mt-3 bg-red-not-available text-white px-2 py-1 rounded-md"
+                >
+                  Lukk
+                </button>
+              </div>
+            </TabsContent>
+            <TabsContent value="trekning">
+              {pendingBookingsOnDay.length !== 0 ? (
+                <h3 className="mt-3 mb-1">Meldt interesse:</h3>
               ) : null}
-              {vacantApartmentsOnDay.length !== 0 ? (
-                <h3 className="mt-3 mb-1">Ledige hytter:</h3>
-              ) : null}
-              {vacantApartmentsOnDay
+              {pendingBookingsOnDay
                 .sort(
                   (a, b) =>
-                    cabinOrder.indexOf(a.cabin_name) -
-                    cabinOrder.indexOf(b.cabin_name),
+                    cabinOrder.indexOf(a.apartment.cabin_name) -
+                    cabinOrder.indexOf(b.apartment.cabin_name),
                 )
-                .map((apartment, index) => (
+                .map((pendingBooking, index) => (
                   <div key={index}>
                     <p
                       className={`mt-1 mb-1 ${
-                        cabinBorderColorClasses[apartment.cabin_name]
+                        cabinPendingBorderColorClasses[
+                          pendingBooking.apartment.cabin_name
+                        ]
                       } pl-2 border-l-2 `}
                     >
-                      <span className="apartment-text">
-                        {apartment.cabin_name}
+                      <span className="pendingBooking-text">
+                        {pendingBooking.employeeName} har meldt interesse for{' '}
+                        {pendingBooking.apartment.cabin_name} i perioden{' '}
+                        {format(
+                          new Date(pendingBooking.startDate),
+                          'dd.MM.yyyy',
+                        )}{' '}
+                        til{' '}
+                        {format(new Date(pendingBooking.endDate), 'dd.MM.yyyy')}
+                        .
+                        {userIsAdmin && (
+                          <div>
+                            <button
+                              onClick={() =>
+                                openPendingBookingDeleteModal(pendingBooking.id)
+                              }
+                              className="mt-2 ml-2 bg-red-not-available text-white px-1.5 py-0.5 rounded-md"
+                            >
+                              Slett
+                            </button>
+                            <Modal
+                              isOpen={pendingBookingDeleteModalIsOpen}
+                              onRequestClose={closeModal}
+                              contentLabel="Delete Confirmation"
+                              style={customModalStyles}
+                            >
+                              <p className="mb-3">
+                                Er du sikker på at du vil slette den ønskede
+                                reservasjonen?
+                              </p>
+                              <div className="flex justify-end">
+                                <button
+                                  onClick={confirmPendingBookingDelete}
+                                  className="ml-3 bg-red-500 text-white px-2 py-0.5 rounded-md"
+                                >
+                                  Slett ønsket reservasjon
+                                </button>
+                                <button
+                                  onClick={closePendingBookingDeleteModal}
+                                  className="ml-3 bg-gray-300 text-black-nav px-2 py-0.5 rounded-md"
+                                >
+                                  Avbryt
+                                </button>
+                              </div>
+                            </Modal>
+                          </div>
+                        )}
                       </span>
-                      <button
-                        onClick={() => handleBookClick(apartment.id)}
-                        className="mt-2 ml-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md"
-                      >
-                        Reserver
-                      </button>
                     </p>
-                    {expandedApartments.includes(apartment.id) && (
-                      <div className="expanded-content">
-                        <CreateBookingPost
-                          apartmentId={apartment.id}
-                          date={date}
-                          closeModal={closeModal}
-                          refreshVacancies={refreshVacancies}
-                          userIsAdmin={userIsAdmin}
-                          allUsersNames={allUsersNames}
-                          cutOffDateVacancies={cutOffDateVacancies}
-                          vacancies={vacancies}
-                        />
-                      </div>
-                    )}
                   </div>
                 ))}
-            </div>
-          ) : (
-            <div>
-              <p>Ingen valgt dato</p>
-            </div>
-          )}
+              {drawingPeriodListOnDay.length !== 0 ? (
+                <h3 className="mt-3 mb-1">Trekning:</h3>
+              ) : (
+                <p>Det er ingen som har meldt interesse for denne datoen.</p>
+              )}
+              {drawingPeriodListOnDay.map((drawingPeriod, index) => (
+                <div key={index}>
+                  <p
+                    className={`mt-1 mb-1 ${
+                      cabinPendingBorderColorClasses[
+                        drawingPeriod.pendingBookings[0].apartment.cabin_name
+                      ]
+                    } pl-2 border-l-2 `}
+                  >
+                    <span>
+                      Trekning om{' '}
+                      {drawingPeriod.pendingBookings[0].apartment.cabin_name}{' '}
+                      fra{' '}
+                      {format(new Date(drawingPeriod.startDate), 'dd.MM.yyyy')}{' '}
+                      til{' '}
+                      {format(new Date(drawingPeriod.endDate), 'dd.MM.yyyy')}.
+                      <br />
+                      Involverte er:{' '}
+                      {drawingPeriod.pendingBookings.map(
+                        (pendingBooking, bookingIndex) => (
+                          <span key={bookingIndex}>
+                            {pendingBooking.employeeName}
+                            {bookingIndex !==
+                              drawingPeriod.pendingBookings.length - 1 && ', '}
+                          </span>
+                        ),
+                      )}
+                    </span>
 
-          <div className="flex justify-end">
-            <button
-              onClick={closeModal}
-              className="mt-3 bg-red-not-available text-white px-2 py-1 rounded-md"
-            >
-              Lukk
-            </button>
-          </div>
+                    {pendingBookingList[index] && userIsAdmin && (
+                      <ConvertPendingBooking
+                        pendingBookingList={pendingBookingList[index]}
+                        closeModal={closeModal}
+                        refreshVacancies={refreshVacancies}
+                        userIsAdmin={userIsAdmin}
+                      />
+                    )}
+                  </p>
+                </div>
+              ))}
+
+              <div className="flex justify-end">
+                <button
+                  onClick={closeModal}
+                  className="mt-3 bg-red-not-available text-white px-2 py-1 rounded-md"
+                >
+                  Lukk
+                </button>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </Modal>
     </div>
