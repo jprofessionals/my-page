@@ -163,10 +163,12 @@ export default function HomePage() {
                               endDate.getMonth() + 1
                             }.${endDate.getFullYear()}`
 
+                            const old = new Date(booking.endDate) < new Date()
+
                             return (
                               <div key={booking.id} className="ml-10 mt-3 ">
-                                <p>
-                                  Du har reservert{' '}
+                                <p className={old?"old-booking":""}>
+                                  Du {old?"hadde":"har reservert"}{' '}
                                   <span
                                     className={
                                       cabinTextColorClasses[
