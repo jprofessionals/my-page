@@ -21,3 +21,4 @@ handlers:
 env_variables:
   SPRING_PROFILES_ACTIVE: "gcp"
   GOOGLE_CLIENTID: "365277685106-agts9g8tvljvdflgqottt52ujp8p989d.apps.googleusercontent.com"
+  GCP_PROJECTID: "my-page-jpro-test"
