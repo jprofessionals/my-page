@@ -973,7 +973,7 @@ export default function MonthOverview() {
               <div className="flex justify-end">
                 <button
                   onClick={closeModal}
-                  className="mt-3 bg-red-not-available text-white px-2 py-1 rounded-md"
+                  className="mt-3 bg-blue-small-appartment text-white px-2 py-1 rounded-md"
                 >
                   Lukk
                 </button>
@@ -1098,7 +1098,7 @@ export default function MonthOverview() {
               <div className="flex justify-end">
                 <button
                   onClick={closeModal}
-                  className="mt-3 bg-red-not-available text-white px-2 py-1 rounded-md"
+                  className="mt-3 bg-blue-small-appartment text-white px-2 py-1 rounded-md"
                 >
                   Lukk
                 </button>
