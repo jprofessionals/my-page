@@ -20,7 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CreateInfoNotice from '@/components/hyttebooking/CreateInfoNotice'
 import EditInfoNotice from '@/components/hyttebooking/EditInfoNotice'
 
-const cutOffDateVacancies = '2023-10-01'
+const cutOffDateVacancies = '2024-04-30'
 //TODO: Hardkodet cutoff date som styrer hva man kan booke.
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
