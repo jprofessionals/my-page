@@ -30,7 +30,7 @@
     "daisyui": "^3.6.1",
     "date-fns": "^2.30.0",
     "date-holidays": "^3.21.3",
-    "eslint": "8.47.0",
+    "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",
     "lucide-react": "^0.268.0",
     "moment": "^2.29.4",
