@@ -7,7 +7,7 @@ jobs:
   build-email-validator:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
           version: 'latest'
@@ -26,7 +26,7 @@ jobs:
   build-smtp-to-pubsub:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
           version: 'latest'
@@ -51,7 +51,7 @@ jobs:
     environment: test
     concurrency: terraform-lock-test
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download image artifact
         uses: ishworkh/docker-image-artifact-download@v1
         with:
@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download image artifact
         uses: ishworkh/docker-image-artifact-download@v1
         with:
@@ -116,7 +116,7 @@ jobs:
     environment: test
     concurrency: terraform-lock-test
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
@@ -137,7 +137,7 @@ jobs:
     environment: prod
     concurrency: terraform-lock-prod
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
@@ -157,7 +157,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download image artifact
         uses: ishworkh/docker-image-artifact-download@v1
         with:
@@ -180,7 +180,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download image artifact
         uses: ishworkh/docker-image-artifact-download@v1
         with:
@@ -206,7 +206,7 @@ jobs:
     environment: prod
     concurrency: terraform-lock-prod
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
