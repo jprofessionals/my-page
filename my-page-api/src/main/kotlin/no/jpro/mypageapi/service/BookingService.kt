@@ -18,7 +18,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-val cutOffDate = "2023-10-01" //Todo: HardCoded cutOffDate of when it is possible to book. Change later.
+val cutOffDate = "2024-04-30" //Todo: HardCoded cutOffDate of when it is possible to book. Change later.
 
 @Service
 class BookingService(
