@@ -18,7 +18,7 @@
         <java.version>17</java.version>
         <kotlin.version>1.9.10</kotlin.version>
         <testcontainers.version>1.19.0</testcontainers.version>
-        <avro.version>1.11.2</avro.version>
+        <avro.version>1.11.3</avro.version>
         <slack.version>1.32.1</slack.version>
     </properties>
 
