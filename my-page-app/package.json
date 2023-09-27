@@ -55,7 +55,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
     "@types/react-modal": "^3.16.1",
-    "@types/sockjs-client": "^1.5.1",
+    "@types/sockjs-client": "^1.5.2",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.30",
     "prettier": "^3.0.3",
