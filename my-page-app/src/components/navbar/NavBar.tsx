@@ -14,7 +14,6 @@ const navigation = [
   { href: '/admin', name: 'Admin 🛠️', requiresAdmin: true },
   { href: '/', name: 'Hjem' },
   { href: '/hyttebooking', name: 'Firmahytte' },
-  { href: '/utlysninger', name: 'Utlysninger' },
   { href: '/kalkulator', name: 'Lønnskalkulator' },
   { href: '/ai', name: 'AI' },
   { href: 'https://intranet.jpro.no', name: 'Intranett 🔗' },
