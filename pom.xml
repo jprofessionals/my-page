@@ -11,7 +11,5 @@
     <modules>
         <module>my-page-api</module>
         <module>schemas</module>
-        <module>smtp-to-pubsub</module>
-        <module>email-validator</module>
     </modules>
 </project>
