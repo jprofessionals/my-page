@@ -35,13 +35,6 @@ interface PostRepository : JpaRepository<Post, Long> {
 }
 
 @Repository
-interface JobPostingRepository : JpaRepository<JobPosting, Long> {
-    fun existsByContentDigest(contentDigest: String): Boolean
-
-    fun existsByMessageId(messageId: String): Boolean
-}
-
-@Repository
 interface BookingRepository : JpaRepository<Booking, Long> {
     fun findBookingById(bookingId: Long): Booking?
     fun findBookingByEmployeeId(employeeId: Int): List<Booking>

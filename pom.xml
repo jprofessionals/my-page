@@ -10,6 +10,5 @@
 
     <modules>
         <module>my-page-api</module>
-        <module>schemas</module>
     </modules>
 </project>
