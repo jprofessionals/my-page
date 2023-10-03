@@ -123,7 +123,7 @@ jobs:
         working-directory: infrastructure
       - run: terraform init -backend-config="bucket=terraform-state-my-page-jpro-test"
         working-directory: infrastructure
-      - run: terraform apply -auto-approve -input=false -var-file=test.tfvars
+      - run: terraform apply -auto-approve -input=false -var-file=test.tfvars -var="github_sha=${{ github.sha }}"
         working-directory: infrastructure
 
 #  run-terraform-prod-docker-repository-only:
@@ -212,5 +212,5 @@ jobs:
         working-directory: infrastructure
       - run: terraform init -backend-config="bucket=terraform-state-my-page-jpro"
         working-directory: infrastructure
-      - run: terraform apply -auto-approve -input=false -var-file=prod.tfvars
+      - run: terraform apply -auto-approve -input=false -var-file=prod.tfvars -var="github_sha=${{ github.sha }}"
         working-directory: infrastructure
