@@ -1,0 +1,216 @@
+name: email
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+#  build-email-validator:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: graalvm/setup-graalvm@v1
+#        with:
+#          version: 'latest'
+#          java-version: '17'
+#          components: 'native-image'
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          cache: 'maven'
+#      - name: Perform build
+#        run: |
+#          ./mvnw -pl email-validator -am -P docker -Dimage.tag=europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }} package
+#      - name: Attach image as artifact
+#        uses: ishworkh/docker-image-artifact-upload@v1
+#        with:
+#          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
+
+#  build-smtp-to-pubsub:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: graalvm/setup-graalvm@v1
+#        with:
+#          version: 'latest'
+#          java-version: '17'
+#          components: 'native-image'
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          cache: 'maven'
+#      - name: Perform build
+#        run: |
+#          ./mvnw -pl smtp-to-pubsub -am -P docker -Dimage.tag=europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }} package
+#      - name: Attach image as artifact
+#        uses: ishworkh/docker-image-artifact-upload@v1
+#        with:
+#          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
+
+#  run-terraform-test-docker-repository-only:
+#    if: github.ref == 'refs/heads/main'
+#    needs:
+#
+#    runs-on: ubuntu-latest
+#    environment: test
+#    concurrency: terraform-lock-test
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: google-github-actions/auth@v1
+#        with:
+#          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+#      - uses: hashicorp/setup-terraform@v2
+#        with:
+#          terraform_version: 1.4.6
+#      - run: terraform init -backend-config="bucket=terraform-state-my-page-jpro-test"
+#        working-directory: infrastructure
+#      - run: terraform apply -auto-approve -input=false -var-file=test.tfvars -var="github_sha=${{ github.sha }}" -target google_artifact_registry_repository.images
+#        working-directory: infrastructure
+#
+#  deploy-email-validator-test:
+#    if: github.ref == 'refs/heads/main'
+#    needs: run-terraform-test-docker-repository-only
+#    runs-on: ubuntu-latest
+#    environment: test
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Download image artifact
+#        uses: ishworkh/docker-image-artifact-download@v1
+#        with:
+#          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
+#      - uses: google-github-actions/auth@v1
+#        with:
+#          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+#      - uses: google-github-actions/setup-gcloud@v1
+#        with:
+#          project_id: my-page-jpro-test
+#      - run: |-
+#          gcloud auth configure-docker europe-west1-docker.pkg.dev
+#      - run: |-
+#          docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
+#
+#  deploy-smtp-to-pubsub-test:
+#    if: github.ref == 'refs/heads/main'
+#    needs: run-terraform-test-docker-repository-only
+#    runs-on: ubuntu-latest
+#    environment: test
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Download image artifact
+#        uses: ishworkh/docker-image-artifact-download@v1
+#        with:
+#          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
+#      - uses: google-github-actions/auth@v1
+#        with:
+#          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+#      - uses: google-github-actions/setup-gcloud@v1
+#        with:
+#          project_id: my-page-jpro-test
+#      - run: |-
+#          gcloud auth configure-docker europe-west1-docker.pkg.dev
+#      - run: |-
+#          docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
+
+  run-terraform-test:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: test
+    concurrency: terraform-lock-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.6
+      - run: terraform get
+        working-directory: infrastructure
+      - run: terraform init -backend-config="bucket=terraform-state-my-page-jpro-test"
+        working-directory: infrastructure
+      - run: terraform apply -auto-approve -input=false -var-file=test.tfvars -var="github_sha=${{ github.sha }}"
+        working-directory: infrastructure
+
+#  run-terraform-prod-docker-repository-only:
+#    if: github.ref == 'refs/heads/main'
+#    needs: run-terraform-test
+#    runs-on: ubuntu-latest
+#    environment: prod
+#    concurrency: terraform-lock-prod
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: google-github-actions/auth@v1
+#        with:
+#          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+#      - uses: hashicorp/setup-terraform@v2
+#        with:
+#          terraform_version: 1.4.6
+#      - run: terraform get
+#        working-directory: infrastructure
+#      - run: terraform init -backend-config="bucket=terraform-state-my-page-jpro"
+#        working-directory: infrastructure
+#      - run: terraform apply -auto-approve -input=false -var-file=prod.tfvars -var="github_sha=${{ github.sha }}" -target google_artifact_registry_repository.images
+#        working-directory: infrastructure
+#
+#  deploy-email-validator-prod:
+#    if: github.ref == 'refs/heads/main'
+#    needs: run-terraform-prod-docker-repository-only
+#    runs-on: ubuntu-latest
+#    environment: prod
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Download image artifact
+#        uses: ishworkh/docker-image-artifact-download@v1
+#        with:
+#          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }}
+#      - uses: google-github-actions/auth@v1
+#        with:
+#          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+#      - uses: google-github-actions/setup-gcloud@v1
+#        with:
+#          project_id: my-page-jpro
+#      - run: |-
+#          gcloud auth configure-docker europe-west1-docker.pkg.dev
+#      - run: |-
+#          docker tag europe-west1-docker.pkg.dev/my-page-jpro-test/images/email-validator:${{ github.sha }} europe-west1-docker.pkg.dev/my-page-jpro/images/email-validator:${{ github.sha }}
+#          docker push europe-west1-docker.pkg.dev/my-page-jpro/images/email-validator:${{ github.sha }}
+#
+#  deploy-smtp-to-pubsub-prod:
+#    if: github.ref == 'refs/heads/main'
+#    needs: run-terraform-prod-docker-repository-only
+#    runs-on: ubuntu-latest
+#    environment: prod
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Download image artifact
+#        uses: ishworkh/docker-image-artifact-download@v1
+#        with:
+#          image: europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
+#      - uses: google-github-actions/auth@v1
+#        with:
+#          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+#      - uses: google-github-actions/setup-gcloud@v1
+#        with:
+#          project_id: my-page-jpro
+#      - run: |-
+#          gcloud auth configure-docker europe-west1-docker.pkg.dev
+#      - run: |-
+#          docker tag europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }} europe-west1-docker.pkg.dev/my-page-jpro/images/smtp-to-pubsub:${{ github.sha }}
+#          docker push europe-west1-docker.pkg.dev/my-page-jpro/images/smtp-to-pubsub:${{ github.sha }}
+
+  run-terraform-prod:
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - run-terraform-test
+    runs-on: ubuntu-latest
+    environment: prod
+    concurrency: terraform-lock-prod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.6
+      - run: terraform get
+        working-directory: infrastructure
+      - run: terraform init -backend-config="bucket=terraform-state-my-page-jpro"
+        working-directory: infrastructure
+      - run: terraform apply -auto-approve -input=false -var-file=prod.tfvars -var="github_sha=${{ github.sha }}"
+        working-directory: infrastructure
