@@ -3,8 +3,8 @@ package no.jpro.mypageapi
 import com.google.api.gax.core.CredentialsProvider
 import com.google.cloud.spring.core.GcpProjectIdProvider
 import no.jpro.mypageapi.config.MockApplicationConfig
+import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.DbUtils
-import no.jpro.mypageapi.repository.JobPostingRepository
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,8 +18,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(MockApplicationConfig::class)
-class DbTests @Autowired constructor(private val jobPostingRepository: JobPostingRepository,
-									 private val dbUtils: DbUtils) {
+class DbTests @Autowired constructor(private val apartmentRepository: ApartmentRepository, private val dbUtils: DbUtils) {
 
 	@MockBean
 	lateinit var jwtDecoder: JwtDecoder
@@ -33,20 +32,20 @@ class DbTests @Autowired constructor(private val jobPostingRepository: JobPostin
 
 	@Test
 	fun testTransaction() {
-		var existingCount = jobPostingRepository.count()
+		var existingCount = apartmentRepository.count()
 		try {
-			dbUtils.failOutsideTransaction(jobPostingRepository)
+			dbUtils.failOutsideTransaction(apartmentRepository)
 		} catch(e: Exception) {
 			Assertions.assertEquals("Transaction is false", e.message)
 		}
-		Assertions.assertNotEquals(existingCount, jobPostingRepository.count()) //Transaction should not have been rolled back
+		Assertions.assertNotEquals(existingCount, apartmentRepository.count()) //Transaction should not have been rolled back
 
-		existingCount = jobPostingRepository.count()
+		existingCount = apartmentRepository.count()
 		try {
-			dbUtils.failInsideTransaction(jobPostingRepository)
+			dbUtils.failInsideTransaction(apartmentRepository)
 		} catch(e: Exception) {
 			Assertions.assertEquals("Transaction is true", e.message)
 		}
-		Assertions.assertEquals(existingCount, jobPostingRepository.count()) //Transaction should have been rolled back
+		Assertions.assertEquals(existingCount, apartmentRepository.count()) //Transaction should have been rolled back
 	}
 }

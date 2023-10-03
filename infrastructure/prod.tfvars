@@ -1,7 +1,0 @@
-google_cloud_project_id="my-page-jpro"
-google_cloud_region="europe-west1"
-google_cloud_zone="europe-west1-c"
-k8s_cluster_name="prod"
-slack_notification_channel_name="GCP - Slack alert"
-alert_policy_prefix="[PROD]"
-api_jobposting_endpoint = "https://minside.jpro.no/api/jobposting"

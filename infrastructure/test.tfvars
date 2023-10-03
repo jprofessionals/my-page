@@ -1,7 +1,0 @@
-google_cloud_project_id="my-page-jpro-test"
-google_cloud_region="europe-west1"
-google_cloud_zone="europe-west1-c"
-k8s_cluster_name="test"
-slack_notification_channel_name="Min-side-test-alerts"
-alert_policy_prefix="[TEST]"
-api_jobposting_endpoint = "https://minside-test.jpro.no/api/jobposting"

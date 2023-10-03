@@ -17,15 +17,3 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "maven"
-    directory: "/email-validator"
-    schedule:
-      interval: "weekly"
-  - package-ecosystem: "maven"
-    directory: "/schemas"
-    schedule:
-      interval: "weekly"
-  - package-ecosystem: "maven"
-    directory: "/smtp-to-pubsub"
-    schedule:
-      interval: "weekly"
