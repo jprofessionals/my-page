@@ -107,7 +107,7 @@ jobs:
 #          docker push europe-west1-docker.pkg.dev/my-page-jpro-test/images/smtp-to-pubsub:${{ github.sha }}
 
   run-terraform-test:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/bugfix/terraform-fix'
     runs-on: ubuntu-latest
     environment: test
     concurrency: terraform-lock-test
@@ -194,7 +194,7 @@ jobs:
 #          docker push europe-west1-docker.pkg.dev/my-page-jpro/images/smtp-to-pubsub:${{ github.sha }}
 
   run-terraform-prod:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/bugfix/terraform-fix'
     needs:
       - run-terraform-test
     runs-on: ubuntu-latest
