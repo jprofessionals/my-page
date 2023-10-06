@@ -112,7 +112,11 @@ function Admin() {
         maximumFractionDigits: 2,
         style: 'currency',
         currency: 'NOK',
-      })
+      }) + ' ('+budget.balance.toLocaleString('no-NO', {
+        maximumFractionDigits: 2,
+        style: 'currency',
+        currency: 'NOK',
+      })+')'
     } else {
       return '-'
     }
@@ -339,8 +343,8 @@ function Admin() {
                             budgetColumn.id +
                             '' +
                             budgetColumn.balanceIsHours
-                          }
-                        >                          
+                          }                                                    
+                        >
                           {getBudgetBalanceForSummary(
                             budgetYearSummary.yearSummary!,
                             budgetColumn,
@@ -353,6 +357,8 @@ function Admin() {
                 ))}
             </tbody>
           </table>
+
+        
         </div>
       </>
     )
