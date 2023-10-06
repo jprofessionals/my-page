@@ -152,4 +152,5 @@ export type BudgetYearSummary = {
   budgetType: BudgetType
   sum: number
   hours: number
+  balance: number
 }
