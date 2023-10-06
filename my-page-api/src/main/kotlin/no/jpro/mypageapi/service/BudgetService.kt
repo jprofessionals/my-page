@@ -113,19 +113,59 @@ class BudgetService(
         }
     }
 
+
+    class Balance(val year: Int, val budgetTypeId: Long, val balance: Double)
+
     fun getSummary(): List<BudgetSummary> {
-        return postRepository.findAll().filter { it.budget?.budgetType != null }.groupBy { post -> post.date.year }.map { postsByYear ->
-            BudgetSummary(
-                postsByYear.key,
-                postsByYear.value.groupBy { postsInYear -> postsInYear.budget?.budgetType }.map { postsByBudgetType ->
-                    BudgetYearSummary(
-                        postsByBudgetType.key?.let { budgetTypeMapper.toBudgetTypeDTO(it) },
-                        postsByBudgetType.value.sumOf { postInBudgetType -> postInBudgetType.amountExMva ?: 0.0 },
-                        0.0)
-                })
-        }
+
+
+        val hours = getHours()
+        val balances = getBalances()
+
+        return postRepository.findAll().filter { it.budget?.budgetType != null }.groupBy { post -> post.date.year }
+            .map { postsByYear ->
+                BudgetSummary(
+                    postsByYear.key,
+                    postsByYear.value.groupBy { postsInYear -> postsInYear.budget?.budgetType }
+                        .map { postsByBudgetType ->
+                            BudgetYearSummary(
+                                postsByBudgetType.key?.let { budgetTypeMapper.toBudgetTypeDTO(it) },
+                                postsByBudgetType.value.sumOf { postInBudgetType ->
+                                    postInBudgetType.amountExMva ?: 0.0
+                                },
+                                hours.firstOrNull { it.year == postsByYear.key && it.budgetTypeId == postsByBudgetType.key?.id }?.balance
+                                    ?: 0.0,
+                                balances.firstOrNull { it.year == postsByYear.key && it.budgetTypeId == postsByBudgetType.key?.id }?.balance
+                                    ?: 0.0
+                            )
+                        })
+            }
     }
 
+    private fun getBalances(): List<Balance> {
+        val budgets = budgetRepository.findAll().filter { it.budgetType != null }
 
+        return (budgets.minOf { it.startDate.year }..LocalDate.now().year).map { year ->
+            budgets
+                .groupBy { it.budgetType }.map {
+                    Balance(year, it.key.id!!, it.value.sumOf { budget ->
+                        budget.balance(LocalDate.of(year, 12, 31)).coerceAtLeast(0.0)
+                    })
+                }
+        }.flatten()
+    }
+
+    private fun getHours(): List<Balance> {
+        val budgets = budgetRepository.findAll().filter { it.budgetType != null }
+
+        return (budgets.minOf { it.startDate.year }..LocalDate.now().year).map { year ->
+            budgets
+                .groupBy { it.budgetType }.map {
+                    Balance(year, it.key.id!!, it.value.sumOf { budget ->
+                        budget.hoursInYear(year).toDouble()
+                    })
+                }
+        }.flatten()
+    }
 
 }
