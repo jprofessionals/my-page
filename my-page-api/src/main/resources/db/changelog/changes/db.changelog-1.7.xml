@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="JProfessionals" id="1.7.1">
+        <createTable tableName="settings">
+            <column name="setting_id" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="priority" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="LONGTEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="setting_value" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="JProfessionals"  id="1.7.2">
+        <insert tableName="settings">
+            <column name="setting_id" value="CUTOFF_DATE_VACANCIES"/>
+            <column name="priority" value="100"/>
+            <column name="description" value="cutOffDateVacancies"/>
+            <column name="setting_value" value="2024-04-30"/>
+        </insert>
+        <insert tableName="settings">
+            <column name="setting_id" value="CALC_GARANTILONN"/>
+            <column name="priority" value="201"/>
+            <column name="description" value="garantilonn"/>
+            <column name="setting_value" value="50000"/>
+        </insert>
+        <insert tableName="settings">
+            <column name="setting_id" value="CALC_BONUS"/>
+            <column name="priority" value="202"/>
+            <column name="description" value="bonus"/>
+            <column name="setting_value" value="0"/>
+        </insert>
+        <insert tableName="settings">
+            <column name="setting_id" value="CALC_GRUNNBELOP"/>
+            <column name="priority" value="203"/>
+            <column name="description" value="grunnbelop"/>
+            <column name="setting_value" value="118620"/>
+        </insert>
+        <insert tableName="settings">
+            <column name="setting_id" value="CALC_RESTKOMPETANSE"/>
+            <column name="priority" value="204"/>
+            <column name="description" value="restKompetanse"/>
+            <column name="setting_value" value="50"/>
+        </insert>
+        <insert tableName="settings">
+            <column name="setting_id" value="CALC_TIMEPRIS"/>
+            <column name="priority" value="205"/>
+            <column name="description" value="timepris"/>
+            <column name="setting_value" value="1650"/>
+        </insert>
+        <insert tableName="settings">
+            <column name="setting_id" value="CALC_TIMEPRIS_KOMPETANSE"/>
+            <column name="priority" value="206"/>
+            <column name="description" value="timeprisKompetanse"/>
+            <column name="setting_value" value="1259"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
