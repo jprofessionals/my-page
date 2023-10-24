@@ -8,10 +8,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import no.jpro.mypageapi.config.RequiresAdmin
-import no.jpro.mypageapi.dto.*
-import no.jpro.mypageapi.entity.PendingBooking
-import no.jpro.mypageapi.entity.User
+import no.jpro.mypageapi.dto.BookingDTO
+import no.jpro.mypageapi.dto.CreatePendingBookingDTO
+import no.jpro.mypageapi.dto.PendingBookingDTO
+import no.jpro.mypageapi.dto.PendingBookingTrainDTO
 import no.jpro.mypageapi.extensions.getSub
+import no.jpro.mypageapi.service.BookingLotteryService
 import no.jpro.mypageapi.service.PendingBookingService
 import no.jpro.mypageapi.service.UserService
 import org.springframework.http.HttpStatus
@@ -27,6 +29,7 @@ import java.time.format.DateTimeParseException
 class PendingBookingController(
     private val pendingBookingService: PendingBookingService,
     private val userService: UserService,
+    private val bookingLotteryService: BookingLotteryService
 ) {
 
     @PostMapping("/pendingPost")
@@ -73,7 +76,6 @@ class PendingBookingController(
     }
 
     @PostMapping("/pendingBookingWin")
-    @Transactional
     @Operation(summary = "Pending booking becomes a booking")
     @ApiResponse(
         responseCode = "201",
@@ -85,15 +87,16 @@ class PendingBookingController(
         @Valid @RequestBody pendingBookingList: List<PendingBookingDTO>,
     ): ResponseEntity<String> {
         try {
-            pendingBookingService.pickWinnerPendingBooking(pendingBookingList)
+            bookingLotteryService.pickWinnerPendingBooking(pendingBookingList)
             return ResponseEntity.ok("A new booking has been successfully created")
         } catch (e: IllegalArgumentException) {
             return ResponseEntity.badRequest().body(e.message)
+        } catch (e: IllegalStateException) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.message)
         }
     }
 
     @DeleteMapping("{pendingBookingID}")
-    @Transactional
     @RequiresAdmin
     @Operation(summary = "Delete the pending booking connected to the pending booking id")
     @ApiResponse(
@@ -105,11 +108,10 @@ class PendingBookingController(
         @PathVariable("pendingBookingID") pendingBookingID: Long,
     ): ResponseEntity<String> {
         val pendingBooking = pendingBookingService.getPendingBooking(pendingBookingID)
-        if (pendingBooking === null){
+        if (pendingBooking === null) {
             return ResponseEntity(HttpStatus.NOT_FOUND)
         }
         pendingBookingService.deletePendingBooking(pendingBookingID)
         return ResponseEntity.ok("Pending booking with ID $pendingBookingID has been deleted")
     }
-
 }

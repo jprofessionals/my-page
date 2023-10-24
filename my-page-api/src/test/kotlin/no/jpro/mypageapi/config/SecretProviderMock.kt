@@ -7,7 +7,11 @@ import org.springframework.stereotype.Component
 @Component
 class SecretProviderMock: SecretProvider {
 
-    override fun getApiKey(): String {
+    override fun getOpenAiApiKey(): String {
+        return "mock"
+    }
+
+    override fun getBookingLotteryKey(): String {
         return "mock"
     }
 }
