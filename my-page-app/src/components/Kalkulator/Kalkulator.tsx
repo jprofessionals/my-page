@@ -40,7 +40,7 @@ function Kalkulator() {
   const [antallTimerSyk, setAntallTimerSyk] = useState(0)
 
   const { settings } = useAuthContext()
-  const [prevSettings, setPrevSettings] = useState(settings)
+  const [prevSettings, setPrevSettings] = useState<Settings[] | undefined>(settings)
   if (settings != prevSettings) {
     setPrevSettings(settings)
     setGarantilonn(parseInt(getSetting(settings, 'CALC_GARANTILONN') ?? '0'))

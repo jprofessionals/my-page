@@ -1,9 +1,9 @@
 import { Settings } from '@/types'
 
-export default function getSetting(settings: Settings[], key: string): string {
+export default function getSetting(settings: Settings[]|undefined, key: string): string|undefined {
   if (settings == null) {
-    return null
+    return undefined
   }
-  const setting = (settings as Setting[]).find((element) => element.settingId === key)
-  return setting ? setting.settingValue : null
+  const setting = (settings as Settings[]).find((element) => element.settingId === key)
+  return setting ? setting.settingValue : undefined
 }

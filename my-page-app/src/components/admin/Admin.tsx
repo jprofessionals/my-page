@@ -150,7 +150,7 @@ function Admin() {
   }
 
   const updateSetting = (event: ChangeEvent<HTMLInputElement>) => {
-    const setting = settings.find((element) => element.settingId === event.target.id)
+    const setting = settings==null ? null : settings.find((element) => element.settingId === event.target.id)
     if (setting != null) {
       setting.settingValue = event.target.value
       apiService.patchSetting(setting.settingId, setting)
@@ -378,7 +378,7 @@ function Admin() {
               </tr>
             </thead>
             <tbody>
-            {settings
+            {settings==null ? "" : settings
             .sort((a, b) => (a.priority - b.priority) )
             .map((setting) => (
               <tr key={setting.settingId}>

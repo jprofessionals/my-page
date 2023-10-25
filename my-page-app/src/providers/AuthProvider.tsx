@@ -29,7 +29,7 @@ type AuthContext = {
   user: User | null
   logout: () => void
   setUser: (user: User | null) => void
-  settings: Settings[]
+  settings: Settings[] | undefined
 }
 
 const Context = createContext<AuthContext | null>(null)
