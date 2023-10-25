@@ -117,8 +117,6 @@ class BudgetService(
     class Balance(val year: Int, val budgetTypeId: Long, val balance: Double)
 
     fun getSummary(): List<BudgetSummary> {
-
-
         val hours = getHours()
         val balances = getBalances()
 
@@ -145,6 +143,10 @@ class BudgetService(
     private fun getBalances(): List<Balance> {
         val budgets = budgetRepository.findAll().filter { it.budgetType != null }
 
+        if (budgets.isEmpty()) {
+            return emptyList()
+        }
+
         return (budgets.minOf { it.startDate.year }..LocalDate.now().year).map { year ->
             budgets
                 .groupBy { it.budgetType }.map {
@@ -157,6 +159,10 @@ class BudgetService(
 
     private fun getHours(): List<Balance> {
         val budgets = budgetRepository.findAll().filter { it.budgetType != null }
+
+        if (budgets.isEmpty()) {
+            return emptyList()
+        }
 
         return (budgets.minOf { it.startDate.year }..LocalDate.now().year).map { year ->
             budgets
