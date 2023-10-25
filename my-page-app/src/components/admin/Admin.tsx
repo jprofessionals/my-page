@@ -151,8 +151,10 @@ function Admin() {
 
   const updateSetting = (event: ChangeEvent<HTMLInputElement>) => {
     const setting = settings.find((element) => element.settingId === event.target.id)
-    setting.settingValue = event.target.value
-    apiService.patchSetting(setting.settingId, setting)
+    if (setting != null) {
+      setting.settingValue = event.target.value
+      apiService.patchSetting(setting.settingId, setting)
+    }
   }
 
   const refreshTable = () => {
