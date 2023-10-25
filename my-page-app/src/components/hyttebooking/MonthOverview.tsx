@@ -29,7 +29,7 @@ export default function MonthOverview() {
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
   const [userIsAdmin, setUserIsAdmin] = useState<boolean>(false)
   const [infoNotices, setInfoNotices] = useState<InfoBooking[]>([])
-  const [cutOffDateVacancies, setCutOffDateVacancies] = useState(null)
+  const [cutOffDateVacancies, setCutOffDateVacancies] = useState<string | null>(null)
 
   const { data: yourBookings } = useQuery<Booking[]>(
     'yourBookingsOutline',
