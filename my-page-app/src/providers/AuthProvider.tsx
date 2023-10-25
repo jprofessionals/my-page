@@ -7,11 +7,12 @@ import {
   useState,
 } from 'react'
 import * as _ from 'radash'
-import { User } from '@/types'
+import { User, Settings } from '@/types'
 import ApiService from '@/services/api.service'
 import config from '../config/config'
 import { useSessionStorage } from 'usehooks-ts'
 import { useRouter } from 'next/router'
+import { useQuery } from 'react-query'
 
 type UserFetchStatus =
   | 'init'
@@ -28,6 +29,7 @@ type AuthContext = {
   user: User | null
   logout: () => void
   setUser: (user: User | null) => void
+  settings: Settings[]
 }
 
 const Context = createContext<AuthContext | null>(null)
@@ -103,6 +105,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
     })
   }
 
+  const { data: settings } = useQuery<Settings[]>('settingsQueryKey', async () => {return await ApiService.getSettings()} )
+
   return (
     <Context.Provider
       value={{
@@ -113,6 +117,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         authenticate,
         userFetchStatus,
         logout,
+        settings
       }}
     >
       {children}

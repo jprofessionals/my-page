@@ -25,44 +25,44 @@
         <insert tableName="settings">
             <column name="setting_id" value="CUTOFF_DATE_VACANCIES"/>
             <column name="priority" value="100"/>
-            <column name="description" value="cutOffDateVacancies"/>
+            <column name="description" value="Hyttebooking: Sist reserverbare dato (yyyy-MM-dd')"/>
             <column name="setting_value" value="2024-04-30"/>
+        </insert>
+        <insert tableName="settings">
+            <column name="setting_id" value="CALC_TIMEPRIS_KOMPETANSE"/>
+            <column name="priority" value="200"/>
+            <column name="description" value="Lønnskalkulator: Syntetisk timepris"/>
+            <column name="setting_value" value="1259"/>
         </insert>
         <insert tableName="settings">
             <column name="setting_id" value="CALC_GARANTILONN"/>
             <column name="priority" value="201"/>
-            <column name="description" value="garantilonn"/>
+            <column name="description" value="Lønnskalkulator: Garantilønn"/>
             <column name="setting_value" value="50000"/>
         </insert>
         <insert tableName="settings">
-            <column name="setting_id" value="CALC_BONUS"/>
-            <column name="priority" value="202"/>
-            <column name="description" value="bonus"/>
-            <column name="setting_value" value="0"/>
-        </insert>
-        <insert tableName="settings">
             <column name="setting_id" value="CALC_GRUNNBELOP"/>
-            <column name="priority" value="203"/>
-            <column name="description" value="grunnbelop"/>
+            <column name="priority" value="202"/>
+            <column name="description" value="Lønnskalkulator: Grunnbeløp"/>
             <column name="setting_value" value="118620"/>
         </insert>
         <insert tableName="settings">
             <column name="setting_id" value="CALC_RESTKOMPETANSE"/>
-            <column name="priority" value="204"/>
-            <column name="description" value="restKompetanse"/>
+            <column name="priority" value="203"/>
+            <column name="description" value="Lønnskalkulator: Rest kompetansetimer"/>
             <column name="setting_value" value="50"/>
         </insert>
         <insert tableName="settings">
             <column name="setting_id" value="CALC_TIMEPRIS"/>
-            <column name="priority" value="205"/>
-            <column name="description" value="timepris"/>
+            <column name="priority" value="204"/>
+            <column name="description" value="Lønnskalkulator: Timepris på prosjekt"/>
             <column name="setting_value" value="1650"/>
         </insert>
         <insert tableName="settings">
-            <column name="setting_id" value="CALC_TIMEPRIS_KOMPETANSE"/>
-            <column name="priority" value="206"/>
-            <column name="description" value="timeprisKompetanse"/>
-            <column name="setting_value" value="1259"/>
+            <column name="setting_id" value="CALC_BONUS"/>
+            <column name="priority" value="205"/>
+            <column name="description" value="Lønnskalkulator: Bonus"/>
+            <column name="setting_value" value="0"/>
         </insert>
     </changeSet>
 

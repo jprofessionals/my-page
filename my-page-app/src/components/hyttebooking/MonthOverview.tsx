@@ -8,6 +8,7 @@ import {
   DrawingPeriod,
   PendingBooking,
   InfoBooking,
+  Settings
 } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
@@ -19,9 +20,8 @@ import ConvertPendingBooking from '@/components/hyttebooking/ConvertPendingBooki
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CreateInfoNotice from '@/components/hyttebooking/CreateInfoNotice'
 import EditInfoNotice from '@/components/hyttebooking/EditInfoNotice'
+import getSetting from '@/utils/getSetting'
 
-const cutOffDateVacancies = '2024-04-30'
-//TODO: Hardkodet cutoff date som styrer hva man kan booke.
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
   const [showModal, setShowModal] = useState(false)
@@ -29,6 +29,7 @@ export default function MonthOverview() {
   const [expandedApartments, setExpandedApartments] = useState<number[]>([])
   const [userIsAdmin, setUserIsAdmin] = useState<boolean>(false)
   const [infoNotices, setInfoNotices] = useState<InfoBooking[]>([])
+  const [cutOffDateVacancies, setCutOffDateVacancies] = useState(null)
 
   const { data: yourBookings } = useQuery<Booking[]>(
     'yourBookingsOutline',
@@ -372,7 +373,14 @@ export default function MonthOverview() {
   type VacancyLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
   const [vacancyLoadingStatus, setVacancyLoadingStatus] =
     useState<VacancyLoadingStatus>('init')
-  const { userFetchStatus } = useAuthContext()
+  const { userFetchStatus, settings } = useAuthContext()
+
+  const [prevSettings, setPrevSettings] = useState(settings)
+  if (settings != prevSettings) {
+    setPrevSettings(settings)
+    setCutOffDateVacancies(getSetting(settings, 'CUTOFF_DATE_VACANCIES') ?? null)
+    refreshVacancies()
+  }
 
   const [vacancies, setVacancies] = useState<
     { [key: number]: string[] } | undefined
@@ -385,18 +393,20 @@ export default function MonthOverview() {
 
   const startDateVacancies = format(new Date(), 'yyyy-MM-dd')
   const refreshVacancies = useCallback(async () => {
-    setVacancyLoadingStatus('loading')
+    if (cutOffDateVacancies != null) {
+      setVacancyLoadingStatus('loading')
 
-    try {
-      const loadedVacancies = await ApiService.getAllVacancies(
-        startDateVacancies,
-        cutOffDateVacancies,
-      )
-      setVacancyLoadingStatus('completed')
-      setVacancies(loadedVacancies)
-    } catch (e) {
-      setVacancyLoadingStatus('failed')
-      toast.error('Klarte ikke laste ledige reservasjoner, prøv igjen senere')
+      try {
+        const loadedVacancies = await ApiService.getAllVacancies(
+          startDateVacancies,
+          cutOffDateVacancies,
+        )
+        setVacancyLoadingStatus('completed')
+        setVacancies(loadedVacancies)
+      } catch (e) {
+        setVacancyLoadingStatus('failed')
+        toast.error('Klarte ikke laste ledige reservasjoner, prøv igjen senere')
+      }
     }
   }, [])
 
@@ -465,6 +475,7 @@ export default function MonthOverview() {
     const formattedPreviousDate = format(previousDate, 'yyyy-MM-dd')
 
     if (
+      cutOffDateVacancies != null &&
       isBefore(selectedDate, new Date(cutOffDateVacancies)) &&
       isAfter(selectedDate, sub(new Date(), { days: 1 }))
     ) {

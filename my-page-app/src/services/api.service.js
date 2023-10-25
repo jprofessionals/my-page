@@ -217,6 +217,20 @@ const getBudgetSummary = async () => {
   return budgetSummary
 }
 
+const getSettings = async () => {
+  const response = await axios.get(API_URL + 'settings', {
+    headers: authHeader(),
+  })
+  const settings = response.data
+  return settings
+}
+
+const patchSetting = (settingId, updatedSetting) => {
+  return axios.patch(API_URL + 'settings/' + settingId, updatedSetting, {
+    headers: authHeader(),
+  })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -239,5 +253,7 @@ const ApiService = {
   deleteInfoNotice,
   getAllInfoNoticeVacancies,
   getBudgetSummary,
+  getSettings,
+  patchSetting,
 }
 export default ApiService

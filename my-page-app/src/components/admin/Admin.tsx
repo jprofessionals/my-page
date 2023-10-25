@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import apiService from '../../services/api.service'
 import { toast } from 'react-toastify'
-import { Budget, BudgetType, User, BudgetSummary, BudgetYearSummary } from '@/types'
+import { Budget, BudgetType, User, BudgetSummary, BudgetYearSummary, Settings } from '@/types'
 import BudgetList from '@/components/budget/BudgetList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown'
@@ -31,7 +31,7 @@ function Admin() {
   const [filterValue, setFilterValue] = useState('')
   const [activeBudget, setActiveBudget] = useState<string | null>(null)
   const [budgetSummary, setBudgetsummary] = useState<BudgetSummary[]>([])
-  const { user } = useAuthContext()
+  const { user, settings } = useAuthContext()
 
   useEffect(() => {
     refreshTable()
@@ -147,6 +147,12 @@ function Admin() {
   const handleExpandUser = (user: User) => {
     // Check if the clicked target is not a child of the expanded area
     setExpandedUser(expandedUser === user.email ? '' : user.email)
+  }
+
+  const updateSetting = (event: ChangeEvent<HTMLInputElement>) => {
+    const setting = settings.find((element) => element.settingId === event.target.id)
+    setting.settingValue = event.target.value
+    apiService.patchSetting(setting.settingId, setting)
   }
 
   const refreshTable = () => {
@@ -309,7 +315,7 @@ function Admin() {
           </table>
         </div>
         <div className="overflow-auto p-4">          
-          <h2 className="prose prose-xl">Oppsumering</h2>       
+          <h2 className="prose prose-xl">Oppsummering</h2>
           <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
             <thead>
               <tr className="text-base text-slate-900">
@@ -359,6 +365,37 @@ function Admin() {
           </table>
 
         
+        </div>
+        <div className="overflow-auto p-4">
+          <h2 className="prose prose-xl">Konfigurasjon</h2>
+          <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
+            <thead>
+              <tr className="text-base text-slate-900">
+                <th className="w-3/4 rounded-tl-lg bg-slate-300">innstilling</th>
+                <th className="w-1/4 rounded-tr-lg bg-slate-300">Verdi</th>
+              </tr>
+            </thead>
+            <tbody>
+            {settings
+            .sort((a, b) => (a.priority - b.priority) )
+            .map((setting) => (
+              <tr key={setting.settingId}>
+                <td>
+                  {setting.description}
+                </td>
+                <td>
+                  <input
+                    id={setting.settingId}
+                    type="text"
+                    className="input input-bordered"
+                    defaultValue={setting.settingValue}
+                    onChange={(e) => updateSetting(e)}
+                  />
+                </td>
+              </tr>
+            ))}
+            </tbody>
+          </table>
         </div>
       </>
     )

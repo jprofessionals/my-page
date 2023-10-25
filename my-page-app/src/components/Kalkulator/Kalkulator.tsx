@@ -5,30 +5,27 @@ import getBillableHours, { getBillabeHoursEntireYear } from './getBillableHours'
 import moment from 'moment'
 import { Button } from '../ui/button'
 import getInNok from '@/utils/getInNok'
+import getSetting from '@/utils/getSetting'
+import { Settings } from '@/types'
+import { useAuthContext } from '@/providers/AuthProvider'
 
-const defaultValues: Record<string, number> = {
-  garantilonn: 50000,
-  bonus: 0,
-  grunnbelop: 118620,
-  restKompetanse: 50,
-  timepris: 1650,
-  timeprisKompetanse: 1259,
-}
 
 function Kalkulator() {
   const [selectedMonth, setSelectedMonth] = useState(moment().format('MM'))
   const [selectedYear, setSelectedYear] = useState(moment().format('yyyy'))
-  const { garantilonn, grunnbelop, timeprisKompetanse } = defaultValues
-  const [bonus, setBonus] = useState(defaultValues.bonus)
+
+  const [garantilonn, setGarantilonn] = useState(0)
+  const [grunnbelop, setGrunnbelop] = useState(0)
+  const [timeprisKompetanse, setTimeprisKompetanse] = useState(0)
+
+  const [bonus, setBonus] = useState(0)
+  const [restKompetanseBudsjett, setRestKompetanseBudsjett] = useState(0)
+  const [timeprisProsjekt, setTimeprisProsjekt] = useState(0)
+
   const [billableHoursThisYear, setBillableHoursThisYear] = useState(
     getBillabeHoursEntireYear(selectedYear),
   )
-  const [restKompetanseBudsjett, setRestKompetanseBudsjett] = useState(
-    defaultValues.restKompetanse,
-  )
-  const [timeprisProsjekt, setTimeprisProsjekt] = useState(
-    defaultValues.timepris,
-  )
+
   const [antallTimerMnd, setAntallTimerMnd] = useState(
     getBillableHours(selectedYear, selectedMonth),
   )
@@ -41,6 +38,18 @@ function Kalkulator() {
     useState(0)
   const [antallTimerFerie, setAntallTimerFerie] = useState(0)
   const [antallTimerSyk, setAntallTimerSyk] = useState(0)
+
+  const { settings } = useAuthContext()
+  const [prevSettings, setPrevSettings] = useState(settings)
+  if (settings != prevSettings) {
+    setPrevSettings(settings)
+    setGarantilonn(getSetting(settings, 'CALC_GARANTILONN') ?? 0)
+    setGrunnbelop(getSetting(settings, 'CALC_GRUNNBELOP') ?? 0)
+    setTimeprisKompetanse(getSetting(settings, 'CALC_TIMEPRIS_KOMPETANSE') ?? 0)
+    setBonus(getSetting(settings, 'CALC_BONUS') ?? 0)
+    setRestKompetanseBudsjett(getSetting(settings, 'CALC_RESTKOMPETANSE') ?? 0)
+    setTimeprisProsjekt(getSetting(settings, 'CALC_TIMEPRIS') ?? 0)
+  }
 
   function Timelonn9G() {
     return (grunnbelop * 9) / 1880
@@ -262,7 +271,7 @@ function Kalkulator() {
             </label>
             <label className="input-group">
               <span>
-                Rest komperansetimer
+                Rest kompetansetimer
                 <ReadMoreIcon text="Antall timer du har igjen på årlig kompetansebudjett før eventuelt uttak" />
               </span>
               <input
