@@ -375,13 +375,6 @@ export default function MonthOverview() {
     useState<VacancyLoadingStatus>('init')
   const { userFetchStatus, settings } = useAuthContext()
 
-  const [prevSettings, setPrevSettings] = useState(settings)
-  if (settings != prevSettings) {
-    setPrevSettings(settings)
-    setCutOffDateVacancies(getSetting(settings, 'CUTOFF_DATE_VACANCIES') ?? null)
-    refreshVacancies()
-  }
-
   const [vacancies, setVacancies] = useState<
     { [key: number]: string[] } | undefined
   >({})
@@ -457,6 +450,13 @@ export default function MonthOverview() {
       refreshInfoNoticeVacancies()
     }
   }, [userIsAdmin, infoNoticeVacancyLoadingStatus])
+
+  const [prevSettings, setPrevSettings] = useState(settings)
+  if (settings != prevSettings) {
+    setPrevSettings(settings)
+    setCutOffDateVacancies(getSetting(settings, 'CUTOFF_DATE_VACANCIES') ?? null)
+    refreshVacancies()
+  }
 
   const getAllApartments = async () => {
     const response = await ApiService.getAllApartments()
