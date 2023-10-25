@@ -43,12 +43,12 @@ function Kalkulator() {
   const [prevSettings, setPrevSettings] = useState(settings)
   if (settings != prevSettings) {
     setPrevSettings(settings)
-    setGarantilonn(getSetting(settings, 'CALC_GARANTILONN') ?? 0)
-    setGrunnbelop(getSetting(settings, 'CALC_GRUNNBELOP') ?? 0)
-    setTimeprisKompetanse(getSetting(settings, 'CALC_TIMEPRIS_KOMPETANSE') ?? 0)
-    setBonus(getSetting(settings, 'CALC_BONUS') ?? 0)
-    setRestKompetanseBudsjett(getSetting(settings, 'CALC_RESTKOMPETANSE') ?? 0)
-    setTimeprisProsjekt(getSetting(settings, 'CALC_TIMEPRIS') ?? 0)
+    setGarantilonn(parseInt(getSetting(settings, 'CALC_GARANTILONN') ?? '0'))
+    setGrunnbelop(parseInt(getSetting(settings, 'CALC_GRUNNBELOP') ?? '0'))
+    setTimeprisKompetanse(parseInt(getSetting(settings, 'CALC_TIMEPRIS_KOMPETANSE') ?? '0'))
+    setBonus(parseInt(getSetting(settings, 'CALC_BONUS') ?? '0'))
+    setRestKompetanseBudsjett(parseInt(getSetting(settings, 'CALC_RESTKOMPETANSE') ?? '0'))
+    setTimeprisProsjekt(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0'))
   }
 
   function Timelonn9G() {
