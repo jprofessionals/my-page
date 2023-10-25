@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useState, ChangeEvent } from 'react'
 import apiService from '../../services/api.service'
 import { toast } from 'react-toastify'
 import { Budget, BudgetType, User, BudgetSummary, BudgetYearSummary, Settings } from '@/types'

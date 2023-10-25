@@ -408,7 +408,7 @@ export default function MonthOverview() {
         toast.error('Klarte ikke laste ledige reservasjoner, prøv igjen senere')
       }
     }
-  }, [])
+  }, [cutOffDateVacancies])
 
   type InfoNoticeVacancyLoadingStatus =
     | 'init'
