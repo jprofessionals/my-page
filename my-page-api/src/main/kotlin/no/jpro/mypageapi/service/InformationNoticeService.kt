@@ -10,13 +10,13 @@ import no.jpro.mypageapi.repository.InformationNoticeRepository
 import no.jpro.mypageapi.utils.mapper.InformationNoticeMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 @Service
 class InformationNoticeService (
     private val informationNoticeRepository: InformationNoticeRepository,
     private val informationNoticeMapper: InformationNoticeMapper,
+    private val bookingService: BookingService
 ){
     fun getInfoNotice(infoNoticeId: Long): InfoBooking? {
         return informationNoticeRepository.findInfoBookingById(infoNoticeId)
@@ -55,10 +55,9 @@ class InformationNoticeService (
     }
 
     fun createInfoNotice(infoNoticeRequest: CreateInformationNoticeDTO): InformationNoticeDTO {
-        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val overlappingInfoNotices = filterOverlappingInfoNotices(infoNoticeRequest.startDate, infoNoticeRequest.endDate)
 
-        if(overlappingInfoNotices.isEmpty() && infoNoticeRequest.endDate <= LocalDate.parse(cutOffDate, dateFormatter)) {
+        if(overlappingInfoNotices.isEmpty() && infoNoticeRequest.endDate <= bookingService.getCutOffDate()) {
             val infoNotice = informationNoticeMapper.toInFormationNotice(
                 infoNoticeRequest,
             )

@@ -8,6 +8,7 @@ import {
   DrawingPeriod,
   PendingBooking,
   InfoBooking,
+  Settings
 } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
@@ -19,9 +20,8 @@ import ConvertPendingBooking from '@/components/hyttebooking/ConvertPendingBooki
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CreateInfoNotice from '@/components/hyttebooking/CreateInfoNotice'
 import EditInfoNotice from '@/components/hyttebooking/EditInfoNotice'
+import getSetting from '@/utils/getSetting'
 
-const cutOffDateVacancies = '2024-04-30'
-//TODO: Hardkodet cutoff date som styrer hva man kan booke.
 export default function MonthOverview() {
   const [date, setDate] = useState<Date | undefined>()
   const [showModal, setShowModal] = useState(false)
@@ -372,7 +372,9 @@ export default function MonthOverview() {
   type VacancyLoadingStatus = 'init' | 'loading' | 'completed' | 'failed'
   const [vacancyLoadingStatus, setVacancyLoadingStatus] =
     useState<VacancyLoadingStatus>('init')
-  const { userFetchStatus } = useAuthContext()
+  const { userFetchStatus, settings } = useAuthContext()
+
+  const [cutOffDateVacancies, setCutOffDateVacancies] = useState<string | undefined>(getSetting(settings, 'CUTOFF_DATE_VACANCIES'))
 
   const [vacancies, setVacancies] = useState<
     { [key: number]: string[] } | undefined
@@ -385,20 +387,22 @@ export default function MonthOverview() {
 
   const startDateVacancies = format(new Date(), 'yyyy-MM-dd')
   const refreshVacancies = useCallback(async () => {
-    setVacancyLoadingStatus('loading')
+    if (cutOffDateVacancies != null) {
+      setVacancyLoadingStatus('loading')
 
-    try {
-      const loadedVacancies = await ApiService.getAllVacancies(
-        startDateVacancies,
-        cutOffDateVacancies,
-      )
-      setVacancyLoadingStatus('completed')
-      setVacancies(loadedVacancies)
-    } catch (e) {
-      setVacancyLoadingStatus('failed')
-      toast.error('Klarte ikke laste ledige reservasjoner, prøv igjen senere')
+      try {
+        const loadedVacancies = await ApiService.getAllVacancies(
+          startDateVacancies,
+          cutOffDateVacancies,
+        )
+        setVacancyLoadingStatus('completed')
+        setVacancies(loadedVacancies)
+      } catch (e) {
+        setVacancyLoadingStatus('failed')
+        toast.error('Klarte ikke laste ledige reservasjoner, prøv igjen senere')
+      }
     }
-  }, [])
+  }, [cutOffDateVacancies])
 
   type InfoNoticeVacancyLoadingStatus =
     | 'init'
@@ -448,6 +452,13 @@ export default function MonthOverview() {
     }
   }, [userIsAdmin, infoNoticeVacancyLoadingStatus])
 
+  const [prevSettings, setPrevSettings] = useState(settings)
+  if (settings != prevSettings) {
+    setPrevSettings(settings)
+    setCutOffDateVacancies(getSetting(settings, 'CUTOFF_DATE_VACANCIES'))
+    refreshVacancies()
+  }
+
   const getAllApartments = async () => {
     const response = await ApiService.getAllApartments()
     setApartments(response)
@@ -465,6 +476,7 @@ export default function MonthOverview() {
     const formattedPreviousDate = format(previousDate, 'yyyy-MM-dd')
 
     if (
+      cutOffDateVacancies != null &&
       isBefore(selectedDate, new Date(cutOffDateVacancies)) &&
       isAfter(selectedDate, sub(new Date(), { days: 1 }))
     ) {
@@ -633,6 +645,7 @@ export default function MonthOverview() {
 
   return (
     <div className="flex flex-col overflow-hidden gap-4 p-4">
+      {cutOffDateVacancies==null ? "Fant ikke innstilling for siste reserverbare dato" : (
       <MonthCalendar
         onDayClick={handleDateClick}
         mode="single"
@@ -645,7 +658,7 @@ export default function MonthOverview() {
         bookings={bookings}
         getPendingBookingTrainsOnDay={getPendingBookingTrainsOnDay}
         getInfoNotices={getInfoNotices}
-      />
+      /> )}
       <Modal
         className=""
         isOpen={showModal}
@@ -667,7 +680,7 @@ export default function MonthOverview() {
               {date ? (
                 <div>
                   <h3 className="mt-1 mb-1">{format(date!, 'dd.MM.yyyy')}</h3>
-                  {isBefore(date!, new Date(cutOffDateVacancies)) ? null : (
+                  {cutOffDateVacancies!=null && isBefore(date!, new Date(cutOffDateVacancies)) ? null : (
                     <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
                   )}
                   {infoNotices.length > 0 ? (
@@ -892,16 +905,13 @@ export default function MonthOverview() {
                                           </div>
                                         </Modal>
                                       </p>
-                                      {showEditFormForBooking ===
-                                        booking.id && (
+                                      {showEditFormForBooking===booking.id && cutOffDateVacancies!=null && (
                                         <EditBooking
                                           booking={booking}
                                           closeModal={closeModal}
                                           refreshVacancies={refreshVacancies}
                                           userIsAdmin={userIsAdmin}
-                                          cutOffDateVacancies={
-                                            cutOffDateVacancies
-                                          }
+                                          cutOffDateVacancies={cutOffDateVacancies}
                                         />
                                       )}
                                     </div>
@@ -947,7 +957,7 @@ export default function MonthOverview() {
                             Reserver
                           </button>
                         </p>
-                        {expandedApartments.includes(apartment.id) && (
+                        {expandedApartments.includes(apartment.id) && cutOffDateVacancies!=null && (
                           <div className="expanded-content">
                             <CreateBookingPost
                               apartmentId={apartment.id}
