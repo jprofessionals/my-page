@@ -11,14 +11,15 @@ import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.BookingRepository
+import no.jpro.mypageapi.repository.SettingsRepository
 import no.jpro.mypageapi.utils.mapper.ApartmentMapper
 import no.jpro.mypageapi.utils.mapper.BookingMapper
 import org.springframework.stereotype.Service
+import java.lang.NullPointerException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-val cutOffDate = "2024-04-30" //Todo: HardCoded cutOffDate of when it is possible to book. Change later.
 
 @Service
 class BookingService(
@@ -26,7 +27,20 @@ class BookingService(
     private val bookingMapper: BookingMapper,
     private val apartmentRepository: ApartmentRepository,
     private val apartmentMapper: ApartmentMapper,
+    private val settingsRepository: SettingsRepository
 ) {
+    private var cutOffDate: LocalDate? = null
+
+    fun getCutOffDate(): LocalDate {
+        if (cutOffDate == null) {
+            val cutOffDateSetting = settingsRepository.findSettingBySettingId("CUTOFF_DATE_VACANCIES")
+            if (cutOffDateSetting == null) {
+                throw NullPointerException("Setting 'CUTOFF_DATE_VACANCIES' not set in database")
+            }
+            cutOffDate = LocalDate.parse(cutOffDateSetting.settingValue, dateFormatter)
+        }
+        return cutOffDate!!
+    }
 
     fun getBooking(bookingId: Long): Booking? {
         return bookingRepository.findBookingById(bookingId)
@@ -123,7 +137,7 @@ class BookingService(
 
         val checkBookingAvailable = filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
 
-        if(checkBookingAvailable.isEmpty() && bookingRequest.endDate <= LocalDate.parse(cutOffDate, dateFormatter)) {
+        if(checkBookingAvailable.isEmpty() && bookingRequest.endDate <= getCutOffDate()) {
             val booking = bookingMapper.toBooking(
                 bookingRequest,
                 apartment
@@ -144,7 +158,7 @@ class BookingService(
     fun editBooking(editPostRequest: UpdateBookingDTO, bookingToEdit: Booking): BookingDTO {
         val checkIfBookingUpdate = filterOverlappingBookingsExcludingOwnBooking(bookingToEdit.apartment.id, editPostRequest.startDate, editPostRequest.endDate, bookingToEdit)
 
-        if (checkIfBookingUpdate.isEmpty() && (editPostRequest.startDate.isBefore(editPostRequest.endDate)) && (editPostRequest.endDate <= LocalDate.parse(cutOffDate, dateFormatter))) {
+        if (checkIfBookingUpdate.isEmpty() && (editPostRequest.startDate.isBefore(editPostRequest.endDate)) && (editPostRequest.endDate <= getCutOffDate())) {
             return bookingMapper.toBookingDTO(
                 bookingRepository.save(
                     bookingToEdit.copy(

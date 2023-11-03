@@ -4,6 +4,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -35,12 +36,14 @@ class ApplicationConfig {
     ): SecurityFilterChain {
         http.authorizeHttpRequests { authz ->
             authz.requestMatchers(
-                "/open/**",
-                "/v3/api-docs", "/v3/api-docs/**",
-                "/swagger-ui.html", "/swagger-ui/**",
-                "/actuator/**", "/explorationSock",
-                "/explorationSock/**"
-            ).permitAll()
+                        "/open/**",
+                        "/v3/api-docs", "/v3/api-docs/**",
+                        "/swagger-ui.html", "/swagger-ui/**",
+                        "/actuator/**", "/explorationSock",
+                        "/explorationSock/**"
+                    ).permitAll()
+                .requestMatchers(HttpMethod.GET, "/settings").permitAll() //Alle (også ikke-påloggede brukere som vil bruke
+                                                                                   //lønnskalkulatoren) skal kunne kalle "GET /settings"
                 .requestMatchers("/**").authenticated()
         }
             .csrf { csrf ->

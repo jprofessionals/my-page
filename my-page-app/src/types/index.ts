@@ -154,3 +154,10 @@ export type BudgetYearSummary = {
   hours: number
   balance: number
 }
+
+export type Settings = {
+  settingId: string
+  priority: number
+  description: string
+  settingValue: string
+}
