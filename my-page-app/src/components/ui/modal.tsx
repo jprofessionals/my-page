@@ -27,18 +27,7 @@ const Close = DialogPrimitive.Close
  *
  */
 
-const Portal = ({
-  className,
-  children,
-  ...props
-}: DialogPrimitive.DialogPortalProps) => (
-  <DialogPrimitive.Portal className={cn(className)} {...props}>
-    <div className="flex fixed inset-0 z-50 justify-center items-start sm:items-center">
-      {children}
-    </div>
-  </DialogPrimitive.Portal>
-)
-Portal.displayName = DialogPrimitive.Portal.displayName
+const Portal = DialogPrimitive.Portal
 
 const Overlay = forwardRef<
   ElementRef<typeof DialogPrimitive.Overlay>,

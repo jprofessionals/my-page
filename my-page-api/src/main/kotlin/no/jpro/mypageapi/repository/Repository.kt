@@ -7,6 +7,11 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDate
 
 @Repository
+interface SettingsRepository : JpaRepository<Setting, String> {
+    fun findSettingBySettingId(settingId: String): Setting?
+}
+
+@Repository
 interface UserRepository : JpaRepository<User, String> {
     fun existsUserBySub(userSub: String): Boolean
     fun findUserBySub(sub: String): User?
