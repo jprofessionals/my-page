@@ -1,6 +1,5 @@
 package no.jpro.mypageapi.controller
 
-import io.ktor.util.date.*
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
@@ -25,15 +24,14 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
-import java.util.*
 
 @RestController
 @RequestMapping("booking")
 @SecurityRequirement(name = "Bearer Authentication")
 class BookingController(
     private val bookingService: BookingService,
-    private val userService: UserService,
-    ) {
+    private val userService: UserService
+) {
     @GetMapping("{bookingID}")
     @Transactional
     @Operation(summary = "Get the booking connected to the booking id")

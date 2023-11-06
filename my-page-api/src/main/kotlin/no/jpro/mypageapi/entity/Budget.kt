@@ -48,4 +48,11 @@ data class Budget(
     fun hoursInYear(year: Int): Int {
         return hours.filter { it.dateOfUsage.year == year }.sumOf { it.hours }
     }
+
+    override fun toString(): String {
+        //explicit .toString() to avoid circular reference in the default implementation
+        return "Budget(id=$id, startDate=$startDate, startAmount=$startAmount, user=${user?.id}, budgetType=${budgetType.name}, hours=$hours)"
+    }
+
+
 }

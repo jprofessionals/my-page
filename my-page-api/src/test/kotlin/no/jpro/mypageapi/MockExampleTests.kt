@@ -75,12 +75,12 @@ class MockExampleTests {
 		val spy = Mockito.spy(secretProvider)
 
 		//Verify that spy acts as a real object. A mock would return, but spy should call real method (which for SecretProviderMock is hardcoded to return "mock")
-		Assertions.assertEquals("mock", spy.getApiKey())
+		Assertions.assertEquals("mock", spy.getOpenAiApiKey())
 
 		//Mock the spy to override the method and return "spy" instead of "mock"
-		Mockito.`when`(spy.getApiKey()).thenReturn("spy")
+		Mockito.`when`(spy.getOpenAiApiKey()).thenReturn("spy")
 
 		//Verify that the mocked spy method is called instead of the real one
-		Assertions.assertEquals("spy", spy.getApiKey())
+		Assertions.assertEquals("spy", spy.getOpenAiApiKey())
 	}
 }

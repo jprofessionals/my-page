@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 interface SecretProvider {
-    fun getApiKey(): String
+    fun getOpenAiApiKey(): String
+    fun getBookingLotteryKey(): String
 }
 
 @Component
@@ -17,8 +18,11 @@ class SecretProviderLocal : SecretProvider {
     @Value("\${openai.apiKey:PLACEHOLDER}")
     private var apiKey: String = "PLACEHOLDER"
 
-    override fun getApiKey(): String {
+    override fun getOpenAiApiKey(): String {
         return apiKey
+    }
+    override fun getBookingLotteryKey(): String {
+        return "DUMMY_KEY"
     }
 }
 
@@ -26,14 +30,25 @@ class SecretProviderLocal : SecretProvider {
 @Profile("gcp")
 class SecretProviderGcp : SecretProvider {
     @Value("\${sm://OpenAI_API}")
-    private val apiKey: String = "PLACEHOLDER"
+    private val openAIapiKey: String = "PLACEHOLDER"
+
+    @Value("\${sm://BookingLotteryKey}")
+    private val bookingLotteryKey: String = "NOT_SET"
+
 
     private val logger = LoggerFactory.getLogger(SecretProviderGcp::class.java.name)
 
-    override fun getApiKey(): String {
-        if(apiKey=="PLACEHOLDER") {
+    override fun getOpenAiApiKey(): String {
+        if(openAIapiKey=="PLACEHOLDER") {
             logger.error("OpenAI API key not set")
         }
-        return apiKey
+        return openAIapiKey
+    }
+
+    override fun getBookingLotteryKey(): String {
+        if (bookingLotteryKey == "NOT_SET") {
+            throw IllegalStateException("Unable to evaluate authorization key, BookingLotteryKey not set in Secret Manager")
+        }
+        return bookingLotteryKey
     }
 }

@@ -137,30 +137,9 @@ class PendingBookingService(
         return allTrainAndPendingBookings
     }
 
-
-    fun pickWinnerPendingBooking(pendingBookingList: List<PendingBookingDTO>) {
-        if(pendingBookingList.size > 1){
-            val winner = pendingBookingList.random()
-            val user = winner.employeeName?.let { userRepository.findUserByName(it) }
-
-            winner.apartment?.let { CreateBookingDTO (it.id, winner.startDate, winner.endDate) }
-                ?.let {
-                    if (user != null) {
-                        bookingService.createBooking(it, user )
-                    }
-                }
-        } else {
-            val winner = pendingBookingList[0]
-
-            val user = winner.employeeName?.let { userRepository.findUserByName(it) }
-            winner.apartment?.let { CreateBookingDTO (it.id, winner.startDate, winner.endDate) }
-                ?.let {
-                    if (user != null) {
-                        bookingService.createBooking(it, user )
-                    }
-                }
-        }
-
+    fun getPendingBookingsRegisteredBeforeDate(cutoffDate: LocalDate): List<PendingBookingDTO> {
+        val pendingBookings = pendingBookingRepository.findPendingBookingsByCreatedDateLessThanEqual(cutoffDate)
+        return pendingBookings.map { pendingBookingMapper.toPendingBookingDTO(it) }
     }
 
     fun getUserPendingBookings(userSub: String): List<PendingBookingDTO> {
