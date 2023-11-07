@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service
 
 const val GPT_3_5_TURBO = "gpt-3.5-turbo"
 const val GPT_4 = "gpt-4"
+const val GPT4_4_TURBO = "gpt-4-1106-preview"
 
 @Service
 class OpenAIConsumer(
@@ -41,6 +42,7 @@ class OpenAIConsumer(
         val deferred = GlobalScope.async {
             val prompt = "3D render, realistic, $shortDescription"
             val images = openAI.imageURL(
+
                 creation = ImageCreation(
                     prompt = prompt,
                     n = 1,

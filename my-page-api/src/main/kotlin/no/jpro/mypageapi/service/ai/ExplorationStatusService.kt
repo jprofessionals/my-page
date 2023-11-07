@@ -8,12 +8,10 @@ import org.springframework.stereotype.Component
 class ExplorationStatusService {
     private val history = mutableMapOf<String, ExplorationHistory>()
 
-    @OptIn(BetaOpenAI::class)
     fun getHistory(conversationId: String): ExplorationHistory {
         return history.getOrPut(conversationId) { ExplorationHistory() }
     }
 
-    @OptIn(BetaOpenAI::class)
     fun reset(sessionId: String) {
         history[sessionId] = ExplorationHistory()
     }
