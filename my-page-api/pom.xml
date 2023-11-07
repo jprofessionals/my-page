@@ -20,7 +20,7 @@
         <testcontainers.version>1.19.1</testcontainers.version>
         <avro.version>1.11.3</avro.version>
         <slack.version>1.35.0</slack.version>
-        <ktor.version>2.3.5</ktor.version>
+        <ktor.version>2.3.6</ktor.version>
     </properties>
 
     <dependencies>
