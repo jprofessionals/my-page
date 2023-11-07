@@ -85,8 +85,8 @@ class BookingLotteryService(
         for (i in 0..100) {
             val eldstePendingEldreEnn7DagerQuery = entityManager.createQuery(
                 "SELECT p from PendingBooking p where createdDate <= :selectionDate AND startDate >= :today AND NOT EXISTS(\n" +
-                        "    SELECT b FROM Booking b where b.apartment = p.apartment AND ( b.endDate >= p.startDate AND b.startDate <= p.endDate\n" +
-                        "                               OR b.startDate <= p.endDate AND b.endDate >= p.startDate))" +
+                        "    SELECT b FROM Booking b where b.apartment = p.apartment AND ( b.endDate > p.startDate AND b.startDate < p.endDate\n" +
+                        "                               OR p.startDate < b.endDate AND p.endDate > b.startDate))" +
                         "ORDER BY createdDate ASC LIMIT 1", PendingBooking::class.java
             )
             eldstePendingEldreEnn7DagerQuery.setParameter("selectionDate", selectionDate)
@@ -98,8 +98,8 @@ class BookingLotteryService(
             //hent ut alle pending bookings for aktuell hytte som ikke overlapper med en fastsatt booking
             val pendingSomIkkeOverlapperMedFastsattQuery = entityManager.createQuery(
                 "SELECT p from PendingBooking p where apartment= :apartment and id != :id and startDate >= :today and not exists(\n" +
-                        "    SELECT b FROM Booking b where b.apartment = p.apartment AND ( b.endDate >= p.startDate AND b.startDate <= p.endDate\n" +
-                        "                               OR b.startDate <= p.endDate AND b.endDate >= p.startDate))",
+                        "    SELECT b FROM Booking b where b.apartment = p.apartment AND ( b.endDate > p.startDate AND b.startDate < p.endDate\n" +
+                        "                               OR p.startDate < b.endDate AND p.endDate > b.startDate))",
                 PendingBooking::class.java
             )
             pendingSomIkkeOverlapperMedFastsattQuery.setParameter("today", LocalDate.now())
