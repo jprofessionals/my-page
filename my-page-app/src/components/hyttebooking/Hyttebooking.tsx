@@ -67,9 +67,9 @@ function Hyttebooking() {
           </span>{' '}
           etter trekning vil det muligens være dager hvor hytte-enhetene står
           ledig. Her er det førstemann til mølla som gjelder. Med unntak, hvis
-          en annen melder interesse innen 7 dager (foreløpig ingen
-          funksjonalitet for dette). De interesserte må da selv gjennomføre en
-          trekning, da det ikke er funksjonalitet for dette enda.
+          en annen melder interesse innen 7 dager. Da vil det gjøres en
+          automatisk trekning mellom de som har meldt interesse etter at 7 dager
+          har gått fra det første ønsket ble meldt.
         </p>
 
         <p>
