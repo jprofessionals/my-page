@@ -35,7 +35,6 @@ class SecretProviderGcp : SecretProvider {
     @Value("\${sm://BookingLotteryKey}")
     private val bookingLotteryKey: String = "NOT_SET"
 
-
     private val logger = LoggerFactory.getLogger(SecretProviderGcp::class.java.name)
 
     override fun getOpenAiApiKey(): String {
