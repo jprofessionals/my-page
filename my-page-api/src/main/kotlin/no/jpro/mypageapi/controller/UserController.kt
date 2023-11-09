@@ -12,6 +12,7 @@ import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.service.UserService
 import no.jpro.mypageapi.utils.mapper.UserMapper
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
@@ -35,6 +36,7 @@ class UserController(
     @Transactional
     @RequiresAdmin
     @Operation(summary = "Create a new employee")
+    @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(
         responseCode = "201",
         description = "Employee created",
