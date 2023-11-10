@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
@@ -152,7 +153,7 @@ class BookingController(
         try {
             val parsedStartDate: LocalDate = LocalDate.parse(startdate)
             val parsedEndDate: LocalDate = LocalDate.parse(enddate)
-            val availability = bookingService.getAllVacanciesInAPeriod(parsedStartDate,parsedEndDate)
+            val availability = bookingService.getAllVacanciesInAPeriod(parsedStartDate, parsedEndDate)
             return ResponseEntity.ok(availability)
         } catch (e: DateTimeParseException) {
             throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
@@ -199,10 +200,11 @@ class BookingController(
         bookingService.deleteBooking(bookingID)
         return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
     }
+
     private fun userPermittedToDeleteBooking(booking: Booking, user: User) = (booking.employee?.id == user.id)
 
 
-    @PostMapping ("/post")
+    @PostMapping("/post")
     @Transactional
     @Operation(summary = "Create a new booking")
     @ApiResponse(
@@ -214,12 +216,13 @@ class BookingController(
         token: JwtAuthenticationToken,
         @Valid @RequestBody bookingRequest: CreateBookingDTO,
     ): ResponseEntity<String> {
-        val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val user =
+            userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         try {
             bookingService.createBooking(bookingRequest, user)
-            return ResponseEntity.ok("A new booking has been successfully created")
+            return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
         } catch (e: IllegalArgumentException) {
-            return ResponseEntity.badRequest().body(e.message)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
         }
     }
 
@@ -232,7 +235,8 @@ class BookingController(
         @Valid @RequestBody editBookingRequest: UpdateBookingDTO,
     ): ResponseEntity<String> {
         val bookingToEdit = bookingService.getBooking(bookingId) ?: return ResponseEntity.notFound().build()
-        val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val user =
+            userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
         if (!userPermittedToEditBooking(bookingToEdit, user)) {
             return ResponseEntity(HttpStatus.FORBIDDEN)
@@ -240,12 +244,13 @@ class BookingController(
         try {
             bookingService.editBooking(editBookingRequest, bookingToEdit)
             return ResponseEntity.ok("The booking has been successfully edited")
-        } catch (e: IllegalArgumentException){
+        } catch (e: IllegalArgumentException) {
             val errorMessage = e.message ?: "An error occurred while editing the booking."
-            return ResponseEntity.badRequest().body(errorMessage)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage)
         }
 
     }
+
     private fun userPermittedToEditBooking(booking: Booking, employee: User) = (booking.employee?.id == employee.id)
 
     @PatchMapping("admin/{bookingId}")
@@ -261,11 +266,12 @@ class BookingController(
         try {
             bookingService.editBooking(editBookingRequest, bookingToEdit)
             return ResponseEntity.ok("The booking has been successfully edited")
-        } catch (e: IllegalArgumentException){
+        } catch (e: IllegalArgumentException) {
             val errorMessage = e.message ?: "An error occurred while editing the booking."
-            return ResponseEntity.badRequest().body(errorMessage)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage)
         }
     }
+
     @DeleteMapping("admin/{bookingID}")
     @Transactional
     @RequiresAdmin
@@ -279,14 +285,14 @@ class BookingController(
         @PathVariable("bookingID") bookingID: Long,
     ): ResponseEntity<String> {
         val booking = bookingService.getBooking(bookingID)
-        if (booking === null){
+        if (booking === null) {
             return ResponseEntity(HttpStatus.NOT_FOUND)
         }
         bookingService.deleteBooking(bookingID)
         return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
     }
 
-    @PostMapping ("/admin/post")
+    @PostMapping("/admin/post")
     @Transactional
     @RequiresAdmin
     @Operation(summary = "Admin creates a new booking for a user")
@@ -299,12 +305,13 @@ class BookingController(
         token: JwtAuthenticationToken,
         @Valid @RequestBody bookingRequest: CreateBookingDTO, bookingOwnerName: String,
     ): ResponseEntity<String> {
-        val bookingOwner = userService.getUserByName(bookingOwnerName)?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val bookingOwner =
+            userService.getUserByName(bookingOwnerName) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         try {
             bookingService.createBooking(bookingRequest, bookingOwner)
-            return ResponseEntity.ok("A new booking has been successfully created")
+            return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
         } catch (e: IllegalArgumentException) {
-            return ResponseEntity.badRequest().body(e.message)
+           throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
         }
     }
 }

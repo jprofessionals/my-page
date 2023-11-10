@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.time.format.DateTimeParseException
 
 @RestController
@@ -48,9 +49,9 @@ class PendingBookingController(
             userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         try {
             pendingBookingService.createPendingBooking(bookingRequest, user)
-            return ResponseEntity.ok("A new booking has been successfully created")
+            return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
         } catch (e: IllegalArgumentException) {
-            return ResponseEntity.badRequest().body(e.message)
+           throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
         }
     }
 
@@ -88,11 +89,11 @@ class PendingBookingController(
     ): ResponseEntity<String> {
         try {
             bookingLotteryService.pickWinnerPendingBooking(pendingBookingList)
-            return ResponseEntity.ok("A new booking has been successfully created")
+            return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
         } catch (e: IllegalArgumentException) {
-            return ResponseEntity.badRequest().body(e.message)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
         } catch (e: IllegalStateException) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.message)
+            throw ResponseStatusException(HttpStatus.CONFLICT, e.message)
         }
     }
 

@@ -68,7 +68,7 @@ class BudgetController(
             return ResponseEntity(HttpStatus.FORBIDDEN)
         }
 
-        return ResponseEntity.ok(budgetService.createPost(postRequest, budget, user))
+        return ResponseEntity(budgetService.createPost(postRequest, budget, user), HttpStatus.CREATED)
     }
 
     @DeleteMapping("posts/{postId}")

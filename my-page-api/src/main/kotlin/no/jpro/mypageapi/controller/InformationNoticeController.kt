@@ -8,20 +8,23 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import no.jpro.mypageapi.config.RequiresAdmin
-import no.jpro.mypageapi.dto.*
+import no.jpro.mypageapi.dto.CreateInformationNoticeDTO
+import no.jpro.mypageapi.dto.InformationNoticeDTO
+import no.jpro.mypageapi.dto.UpdateInformationNoticeDTO
 import no.jpro.mypageapi.service.InformationNoticeService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
 @RestController
 @RequestMapping("informationNotice")
 @SecurityRequirement(name = "Bearer Authentication")
-class InformationNoticeController (
+class InformationNoticeController(
     private val informationNoticeService: InformationNoticeService
 ) {
     @GetMapping
@@ -42,21 +45,24 @@ class InformationNoticeController (
         @RequestParam("endDate") endDate: LocalDate,
     ): ResponseEntity<List<InformationNoticeDTO>?> {
         try {
-            val informationNotices: List<InformationNoticeDTO> = informationNoticeService.getInformationNoticesInPeriod(startDate, endDate)
+            val informationNotices: List<InformationNoticeDTO> =
+                informationNoticeService.getInformationNoticesInPeriod(startDate, endDate)
             return ResponseEntity.ok(informationNotices)
         } catch (e: DateTimeParseException) {
             throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
     }
+
     @ExceptionHandler(InvalidDateException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleInvalidDateException(e: InvalidDateException): ErrorResponse {
         return ErrorResponse(e.message)
     }
+
     data class ErrorResponse(val message: String?)
     class InvalidDateException(message: String) : RuntimeException(message)
 
-    @PostMapping ("/post")
+    @PostMapping("/post")
     @Transactional
     @RequiresAdmin
     @Operation(summary = "An admin creates a new information notice")
@@ -71,9 +77,9 @@ class InformationNoticeController (
     ): ResponseEntity<String> {
         try {
             informationNoticeService.createInfoNotice(infoNoticeRequest)
-            return ResponseEntity.ok("A new information notice has been successfully created")
+            return ResponseEntity("A new information notice has been successfully created", HttpStatus.CREATED)
         } catch (e: IllegalArgumentException) {
-            return ResponseEntity.badRequest().body(e.message)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
         }
     }
 
@@ -86,13 +92,14 @@ class InformationNoticeController (
         @PathVariable("infoNoticeId") infoNoticeId: Long,
         @Valid @RequestBody editInfoNoticeRequest: UpdateInformationNoticeDTO,
     ): ResponseEntity<String> {
-        val infoNoticeToEdit = informationNoticeService.getInfoNotice(infoNoticeId) ?: return ResponseEntity.notFound().build()
+        val infoNoticeToEdit =
+            informationNoticeService.getInfoNotice(infoNoticeId) ?: return ResponseEntity.notFound().build()
         try {
             informationNoticeService.editInformationNotice(editInfoNoticeRequest, infoNoticeToEdit)
             return ResponseEntity.ok("The notice has been successfully edited")
-        } catch (e: IllegalArgumentException){
+        } catch (e: IllegalArgumentException) {
             val errorMessage = e.message ?: "An error occurred while editing the notice."
-            return ResponseEntity.badRequest().body(errorMessage)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage)
         }
     }
 
@@ -109,7 +116,7 @@ class InformationNoticeController (
         @PathVariable("infoNoticeId") infoNoticeId: Long,
     ): ResponseEntity<String> {
         val infoNotice = informationNoticeService.getInfoNotice(infoNoticeId)
-        if (infoNotice === null){
+        if (infoNotice === null) {
             return ResponseEntity(HttpStatus.NOT_FOUND)
         }
         informationNoticeService.deleteInformationNotice(infoNoticeId)
@@ -137,11 +144,10 @@ class InformationNoticeController (
         try {
             val parsedStartDate: LocalDate = LocalDate.parse(startdate)
             val parsedEndDate: LocalDate = LocalDate.parse(enddate)
-            val availability = informationNoticeService.getAllVacanciesInAPeriod(parsedStartDate,parsedEndDate)
+            val availability = informationNoticeService.getAllVacanciesInAPeriod(parsedStartDate, parsedEndDate)
             return ResponseEntity.ok(availability)
         } catch (e: DateTimeParseException) {
             throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
         }
     }
-
 }
