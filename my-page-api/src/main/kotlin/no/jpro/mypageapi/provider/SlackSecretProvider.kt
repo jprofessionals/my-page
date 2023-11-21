@@ -5,6 +5,7 @@ import com.google.cloud.secretmanager.v1.SecretVersionName
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
+@Deprecated("Use SecretProvider instead")
 @Component
 class SlackSecretProvider {
 

@@ -2,6 +2,7 @@ package no.jpro.mypageapi.service
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import no.jpro.mypageapi.consumer.slack.SlackConsumer
 import no.jpro.mypageapi.dto.CreateBookingDTO
 import no.jpro.mypageapi.dto.PendingBookingDTO
 import no.jpro.mypageapi.entity.Booking
@@ -13,6 +14,8 @@ import org.springframework.integration.support.locks.LockRegistry
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.*
 import kotlin.random.Random
 
 private const val LOTTERLY_LOCK_KEY = "BOOKING_LOTTERY"
@@ -22,7 +25,8 @@ class BookingLotteryService(
     private val bookingRepository: BookingRepository,
     private val userRepository: UserRepository,
     private val bookingService: BookingService,
-    private val lockRegistry: LockRegistry
+    private val lockRegistry: LockRegistry,
+    private val slackConsumer: SlackConsumer
 ) {
     @PersistenceContext
     private lateinit var entityManager: EntityManager
@@ -63,23 +67,27 @@ class BookingLotteryService(
     }
 
     fun runPendingBookingsLottery() {
-        logger.warn("Running pending bookings lottery")
+        logger.info("Running pending bookings lottery")
 
         val lock = lockRegistry.obtain(LOTTERLY_LOCK_KEY)
         if (!lock.tryLock()) {
             return
         }
         try {
-            runTheLottery(LocalDate.now().minusDays(7))
-            //todo: send melding til vinnerne. Dette må gjøres utenfor transaksjonsgrensen for å være sikker på at bookingen er fastsatt før noen varsles
-            //todo: send melding til alle tapere som overlapper med vinnerne
+            val resultMsg = runTheLottery(LocalDate.now().minusDays(7))
+            if (resultMsg != null) {
+                slackConsumer.postMessageToChannel(resultMsg)
+            }
+
         } finally {
             lock.unlock()
         }
     }
 
     @Transactional
-    internal fun runTheLottery(selectionDate: LocalDate) {
+    internal fun runTheLottery(selectionDate: LocalDate): String? {
+        val vinnere = mutableSetOf<PendingBooking>()
+        val tapere = mutableSetOf<PendingBooking>()
 
         //bruker en for-løkke for å unngå evig løkke selv om det skulle være noe galt med dataene i databasen
         for (i in 0..100) {
@@ -93,7 +101,7 @@ class BookingLotteryService(
             eldstePendingEldreEnn7DagerQuery.setParameter("today", LocalDate.now())
             val pendingEldreEnn7Dager = eldstePendingEldreEnn7DagerQuery.resultList
             if (pendingEldreEnn7Dager.isEmpty()) {
-                return
+                return formatResult(vinnere.toSet(), tapere.toSet())
             }
             //hent ut alle pending bookings for aktuell hytte som ikke overlapper med en fastsatt booking
             val pendingSomIkkeOverlapperMedFastsattQuery = entityManager.createQuery(
@@ -127,6 +135,16 @@ class BookingLotteryService(
             //trekk en tilfeldig vinner
             val vinnendePendingBooking = pendingForTrekk.toList()[Random.Default.nextInt(0, pendingForTrekk.size)]
 
+            //legg til vinneren i vinner-listen og tapere i taper-listen
+            vinnere.add(vinnendePendingBooking)
+            for (pendingBooking in pendingForTrekk) {
+                if (pendingBooking != vinnendePendingBooking &&
+                    pendingBooking.startDate <= vinnendePendingBooking.endDate && pendingBooking.endDate >= vinnendePendingBooking.startDate
+                ) {
+                    tapere.add(pendingBooking)
+                }
+            }
+
             //lag fastsatt booking for vinneren
             val vinnendeBooking = Booking(
                 startDate = vinnendePendingBooking.startDate,
@@ -136,6 +154,36 @@ class BookingLotteryService(
             )
             bookingRepository.save(vinnendeBooking)
         }
+
+        //TODO: slett taperne?
         logger.warn("Pending lottery did not terminate after 100 iterations. Something is probably wrong with the data in the database.")
+        return formatResult(vinnere.toSet(), tapere.toSet())
+    }
+
+    private fun formatResult(vinnere: Set<PendingBooking>, tapere: Set<PendingBooking>): String? {
+        if (vinnere.isEmpty()) {
+            return null
+        }
+        val dagMåned =
+            DateTimeFormatter.ofPattern("d. MMMM", Locale.Builder().setLanguage("nb").setRegion("NO").build())
+        val result = StringBuilder()
+
+        result.append("*Hyttetrekning er gjennomført og følgende vinnere er trukket ut:*\n")
+        for (vinner in vinnere) {
+            result.append(
+                vinner.employee?.name + " får " + vinner.apartment.cabin_name + " fra " + vinner.startDate.format(
+                    dagMåned
+                ) + " til " + vinner.endDate.format(dagMåned) + "\n"
+            )
+        }
+        result.append("\n*Følgende ønskede bookinger overlapper med vinnerne og er derfor tatt bort:*\n")
+        for (taper in tapere) {
+            result.append(
+                taper.employee?.name + " ønsket " + taper.apartment.cabin_name + " fra " + taper.startDate.format(
+                    dagMåned
+                ) + " til " + taper.endDate.format(dagMåned) + "\n"
+            )
+        }
+        return result.toString()
     }
 }

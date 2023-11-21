@@ -14,4 +14,8 @@ class SecretProviderMock: SecretProvider {
     override fun getBookingLotteryKey(): String {
         return "mock"
     }
+
+    override fun getSlackSecret(): String {
+        return "mock"
+    }
 }

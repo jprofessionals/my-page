@@ -2,12 +2,15 @@ package no.jpro.mypageapi.consumer.slack
 
 import com.slack.api.Slack
 import com.slack.api.methods.MethodsClient
-import no.jpro.mypageapi.provider.SlackSecretProvider
+import no.jpro.mypageapi.provider.SecretProvider
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class SlackConsumer(private val slackSecretProvider: SlackSecretProvider) {
+class SlackConsumer(private val secretProvider: SecretProvider) {
+    @Value("\${slack.hyttekanal.id}")
+    private var hytteBookingChannel: String = "NOT_SET"
 
     private val slack = Slack.getInstance()
 
@@ -22,10 +25,9 @@ class SlackConsumer(private val slackSecretProvider: SlackSecretProvider) {
     }
 
     fun postMessageToChannel(msg: String): String {
-
-        val token = slackSecretProvider.getSlackSecret()
+        val token = secretProvider.getSlackSecret()
+        val channelId = hytteBookingChannel
         val methods: MethodsClient? = slack.methods(token)
-        val channelId = "C05HJ96ACLA"
         val response = methods?.chatPostMessage {
             it
                 .channel(channelId)
