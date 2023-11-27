@@ -32,7 +32,7 @@
     "date-holidays": "^3.23.1",
     "eslint": "8.54.0",
     "eslint-config-next": "14.0.3",
-    "lucide-react": "^0.292.0",
+    "lucide-react": "^0.293.0",
     "moment": "^2.29.4",
     "next": "14.0.3",
     "radash": "^11.0.0",
