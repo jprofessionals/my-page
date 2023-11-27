@@ -27,7 +27,7 @@
     "axios": "^1.6.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "daisyui": "^3.9.4",
+    "daisyui": "^4.4.10",
     "date-fns": "^2.30.0",
     "date-holidays": "^3.23.2",
     "eslint": "8.54.0",
