@@ -22,12 +22,12 @@ jobs:
         run: |
           ./mvnw -pl my-page-api -am package
       - name: Upload jar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jar
           path: my-page-api/target/my-page-api-0.0.1-SNAPSHOT.jar
       - name: Upload app.yaml
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app.yaml
           path: my-page-api/src/main/appengine/app.yaml
