@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import {useEffect, useRef, useState} from 'react'
 import SockJS from 'sockjs-client'
-import { Button } from '../ui/button'
+import {Button} from '../ui/button'
+import Spinner from "@/components/ui/spinner";
 
 interface ExploreResponse {
   description: string
@@ -8,8 +9,23 @@ interface ExploreResponse {
   nextLocations: string[]
 }
 
+// Define a map of art style options
+const artStyleOptions: Record<string, string> = {
+  Default: 'an ultra-realistic image',
+  Cartoon: 'a cartoon style drawing',
+  Origami: 'an origami style image',
+  Watercolor: 'a watercolor style image',
+  Anime: 'an anime style image',
+  Cubist: 'a cubist style image',
+  Munch: 'a painting in the style of Edvard Munch',
+  PopArt: 'a pop-art image',
+  // Add more options here as needed
+};
+
 function ExplorerTextArea(): JSX.Element {
   const [text, setText] = useState<string>('')
+  const [artStyle, setArtStyle] = useState<string>('default'); // Default art style
+
   const textAreaRef = useRef<HTMLDivElement>(null)
   const [buttonClicked, setButtonClicked] = useState<boolean>(false)
   const [data, setData] = useState<ExploreResponse | null>(null)
@@ -18,11 +34,10 @@ function ExplorerTextArea(): JSX.Element {
 
   const socketRef = useRef<WebSocket | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const [isLoadingWebSocket, setIsLoadingWebSocket] = useState(false);
 
-  useEffect(() => {
-    const protocol = window.location.protocol
-    const sockJsURL = `${protocol}//${window.location.host}/api/explorationSock`
 
+  function openWebSocket(sockJsURL: string) {
     socketRef.current = new SockJS(sockJsURL)
 
     if (socketRef.current)
@@ -30,10 +45,10 @@ function ExplorerTextArea(): JSX.Element {
         if (socketRef.current)
           if (localStorage.getItem('user_token')) {
             socketRef.current.send(
-              (sessionStorage.getItem('user_token') as string).replace(
-                /^"|"$/g,
-                '',
-              ),
+                (sessionStorage.getItem('user_token') as string).replace(
+                    /^"|"$/g,
+                    '',
+                ),
             )
           }
       }
@@ -42,6 +57,7 @@ function ExplorerTextArea(): JSX.Element {
       socketRef.current.onmessage = function (event) {
         const data = JSON.parse(event.data)
         setData(data)
+        setIsLoadingWebSocket(false)
       }
     }
     const timer = setTimeout(() => {
@@ -56,24 +72,46 @@ function ExplorerTextArea(): JSX.Element {
       }
       clearTimeout(timer)
     }
+  }
+
+  useEffect(() => {
+    const protocol = window.location.protocol
+    const sockJsURL = `${protocol}//${window.location.host}/api/explorationSock`
+    return openWebSocket(sockJsURL);
   }, [])
 
   const sendExploreRequest = async () => {
-    setIsLoading(true)
-    setError(null)
-
+    setError(null);
     try {
       if (text.trim()) {
-        const tx = JSON.stringify(text)
-        if (socketRef.current)
-          socketRef.current.send('explore:' + JSON.stringify(text))
+          const explorationInput = {
+          location: text,
+          artStyle: artStyleOptions[artStyle],
+        };
+
+        const tx = JSON.stringify(text);
+        if(socketRef.current && socketRef.current?.readyState === 3) {
+          const protocol = window.location.protocol
+          const sockJsURL = `${protocol}//${window.location.host}/api/explorationSock`
+          openWebSocket(sockJsURL)
+        }
+        if (socketRef.current && socketRef.current?.readyState === 0) {
+          setIsLoadingWebSocket(true);
+            await new Promise((f => setTimeout(f, 1000)));
+        }
+        if (socketRef.current && socketRef.current?.readyState === 1) {
+          socketRef.current.send('explore:' + JSON.stringify(explorationInput));
+          setIsLoadingWebSocket(true);
+        } else {
+          setError(new Error('Could not connect to server, try again shortly')  );
+          setIsLoadingWebSocket(false);
+        }
       }
     } catch (err) {
-      setError(err as Error)
-    } finally {
-      setIsLoading(false)
+      setError(err as Error);
+      setIsLoadingWebSocket(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (textAreaRef.current) {
@@ -83,6 +121,10 @@ function ExplorerTextArea(): JSX.Element {
 
   const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value)
+  }
+
+  const handleArtStyleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setArtStyle(artStyleOptions[event.target.value]);
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -113,6 +155,7 @@ function ExplorerTextArea(): JSX.Element {
       setData(null)
       setText('')
       setIsLoading(false)
+      setArtStyle('Default')
     } catch (error) {
       console.error(error)
     }
@@ -126,12 +169,12 @@ function ExplorerTextArea(): JSX.Element {
   }, [text])
 
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
+    <div style={{ display: 'flex', minHeight: '80vh' }}>
       <div style={{ flexGrow: 1, fontSize: '1.5em' }}>
         {isLoading ? (
           'Loading...'
         ) : error ? (
-          'Error fetching data'
+          error.message
         ) : (
           <>
             <img src={data?.imageUrl || ''} alt="" />
@@ -158,6 +201,23 @@ function ExplorerTextArea(): JSX.Element {
           }}
           className="h-12 px-2 border-t border-black-nav shadow"
         />
+        <div style={{
+          paddingTop: '0.5rem',
+          paddingBottom: '0.5rem'
+        }}>
+          <label style={{paddingRight:'0.5rem'}}>Style:</label>
+          <select
+              value={artStyle}
+              onChange={(e) => setArtStyle(e.target.value)}
+              style={{ height: "35px" }}
+          >
+            {Object.keys(artStyleOptions).map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+            ))}
+          </select>
+        </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div>
             <Button onClick={handleResetClick}>Reset</Button>
@@ -179,6 +239,7 @@ function ExplorerTextArea(): JSX.Element {
             </button>
           ))}
         </div>
+        {isLoadingWebSocket && <Spinner />}
       </div>
     </div>
   )

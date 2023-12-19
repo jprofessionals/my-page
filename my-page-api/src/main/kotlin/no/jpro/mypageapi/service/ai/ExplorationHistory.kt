@@ -5,7 +5,7 @@ import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
 import no.jpro.explorer.ExplorationDTO
 
-class ExplorationHistory @OptIn(BetaOpenAI::class) constructor(
+class ExplorationHistory(
     val messages: MutableList<ChatMessage> = mutableListOf(),
     var latestExploration: ExplorationDTO = ExplorationDTO(
         "Welcome to the exploration game! Tell me where you want to go",
@@ -17,14 +17,14 @@ class ExplorationHistory @OptIn(BetaOpenAI::class) constructor(
         initializeMessages()
     }
 
-    @OptIn(BetaOpenAI::class)
     private fun initializeMessages() {
         messages.add(
             ChatMessage(
                 role = ChatRole.User,
-                content = "Let's play a game, where we explore a location together! I will tell you where we start, either a real world place or a fantasy location, and you will give me a description of that location and a list of 4 places we can go from there. I will then tell you where I go, and you will describe that location and 4 places to go. Try to not get too detailed with the places to go, we want to go broad rather than deep. Format the output like this JSON: \n" +
+                content = "Let's play a game, where we explore a location together! I will tell you where we start, either a real world place or a fantasy location, and you will give me a description of that location and a list of 4 places we can go from there. I will then tell you where I go, and you will describe that location and 4 places to go. Try to not get too detailed with the places to go, we want to go broad rather than deep. Also give me a DALL-E 3 prompt to generate an image of the location. The image should be photorealistic and highly detailed, reflecting the locations traits and atmosphere. Format the output like this JSON: \n" +
                         "{\n" +
                         "  \"description\": \"Description of the location\",\n" +
+                        "  \"imagePrompt\": \"DALL-E 3 prompt for the location\",\n" +
                         "  \"nextLocations\": [\n" +
                         "    \"next location 1\",\n" +
                         "    \"next location 2\",\n" +

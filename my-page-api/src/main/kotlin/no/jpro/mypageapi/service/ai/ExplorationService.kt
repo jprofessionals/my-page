@@ -1,6 +1,5 @@
 package no.jpro.mypageapi.service.ai
 
-import com.aallam.openai.api.BetaOpenAI
 import com.aallam.openai.api.chat.ChatCompletion
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
@@ -8,16 +7,17 @@ import com.google.gson.Gson
 import no.jpro.explorer.ExplorationChatDTO
 import no.jpro.explorer.ExplorationDTO
 import no.jpro.explorer.ExplorationRequest
-import no.jpro.mypageapi.consumer.ai.GPT_4
+import no.jpro.mypageapi.consumer.ai.GPT4_4_TURBO
+import no.jpro.mypageapi.consumer.ai.ImageGenerator
 import no.jpro.mypageapi.consumer.ai.OpenAIConsumer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.*
 
-@OptIn(BetaOpenAI::class)
 @Component
 class ExplorationService(
     private val openAIConsumer: OpenAIConsumer,
+    private val imageGenerator: ImageGenerator,
     private val explorationStatusService: ExplorationStatusService
 ) {
 
@@ -25,22 +25,21 @@ class ExplorationService(
 
     fun explore(exploreRequest: ExplorationRequest): ExplorationDTO {
         val sessionId =
-                exploreRequest.sessionId.ifBlank {
-                    UUID.randomUUID()
-                        .toString()
-                }
+            exploreRequest.sessionId.ifBlank {
+                UUID.randomUUID()
+                    .toString()
+            }
 
         val explorationHistory = explorationStatusService.getHistory(sessionId)
 
-        return privateExploration(exploreRequest.location, explorationHistory)
+        return privateExploration(exploreRequest.location, exploreRequest.artStyle, explorationHistory)
     }
 
     fun reset(sessionId: String) {
         explorationStatusService.reset(sessionId)
     }
 
-    @OptIn(BetaOpenAI::class)
-    private fun privateExploration(exploreRequest: String, explorationHistory: ExplorationHistory): ExplorationDTO {
+    private fun privateExploration(exploreRequest: String, artStyle: String, explorationHistory: ExplorationHistory): ExplorationDTO {
         try {
             val newMessage = ChatMessage(
                 role = ChatRole.User,
@@ -49,11 +48,11 @@ class ExplorationService(
             val requestMessages = explorationHistory.messages.toMutableList()
             requestMessages.add(newMessage)
 
-            val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_4, requestMessages)
+            val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT4_4_TURBO, requestMessages)
 
-            val responseMessage = completion.choices.first().message ?: throw Exception("No response from GPT")
+            val responseMessage = completion.choices.first().message
 
-            val explorationDTO = processResponse(responseMessage.content)
+            val explorationDTO = processResponse(responseMessage.content, artStyle)
 
             explorationHistory.latestExploration = explorationDTO
 
@@ -73,7 +72,7 @@ class ExplorationService(
     }
 
 
-    private fun processResponse(exploreResponse: String?): ExplorationDTO {
+    private fun processResponse(exploreResponse: String?, artStyle: String): ExplorationDTO {
         if (exploreResponse == null) return ExplorationDTO(
             "No response from GPT",
             "https://labs.openai.com/s/el6z7PeHbgiGbQgiOmCS5oVm",
@@ -81,9 +80,8 @@ class ExplorationService(
         )
         val chatResponse = extractJsonFromString(exploreResponse)
 
-        val shortDescription = shortify(chatResponse.description)
-
-        val imageUrl = openAIConsumer.generateImage(shortDescription)
+        val shortDescription = shortify(chatResponse.description, artStyle)
+        val imageUrl = imageGenerator.generateImage(shortDescription)
 
         return ExplorationDTO(
             chatResponse.description,
@@ -93,19 +91,16 @@ class ExplorationService(
     }
 
 
-    @OptIn(BetaOpenAI::class)
-    private fun shortify(description: String): String {
-        val prompt =
-                "Shorten the following description to at most 300 letters, and focus on the visual elements: $description"
-
+    private fun shortify(description: String, style: String = "an ultra-realistic picture"): String {
+        val prompt = "Generate a DALL-E 3 prompt for $style of this scene: $description"
         val newMessage = ChatMessage(
             role = ChatRole.User,
             content = prompt
         )
 
-        val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_4, listOf(newMessage))
+        val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT4_4_TURBO, listOf(newMessage))
 
-        return completion.choices.first().message?.content ?: throw Exception("No response from GPT")
+        return completion.choices.first().message.content ?: throw Exception("No response from GPT")
     }
 
     fun extractJsonFromString(input: String): ExplorationChatDTO {
