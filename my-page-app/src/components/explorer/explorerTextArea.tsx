@@ -24,7 +24,7 @@ const artStyleOptions: Record<string, string> = {
 
 function ExplorerTextArea(): JSX.Element {
   const [text, setText] = useState<string>('')
-  const [artStyle, setArtStyle] = useState<string>('default'); // Default art style
+  const [artStyle, setArtStyle] = useState<string>('Default'); // Default art style
 
   const textAreaRef = useRef<HTMLDivElement>(null)
   const [buttonClicked, setButtonClicked] = useState<boolean>(false)
