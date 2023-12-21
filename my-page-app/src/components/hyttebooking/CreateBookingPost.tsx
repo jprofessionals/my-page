@@ -54,7 +54,7 @@ const createBooking = async ({
         })
     } else {
       return axios
-        .post(API_URL + 'pendingBooking/pendingPost', bookingPost, {
+        .post(API_URL + 'pendingBooking/pendingPostForUser?bookingOwnerName=' + bookingOwnerName, bookingPost, {
           headers: authHeader(),
         })
         .then((response) => response.data)

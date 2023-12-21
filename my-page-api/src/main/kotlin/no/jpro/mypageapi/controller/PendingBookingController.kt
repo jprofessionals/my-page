@@ -55,6 +55,29 @@ class PendingBookingController(
         }
     }
 
+    @RequiresAdmin
+    @PostMapping("/pendingPostForUser")
+    @Transactional
+    @Operation(summary = "Create a new pending booking on behalf of a user")
+    @ApiResponse(
+        responseCode = "201",
+        description = "New booking created",
+        content = [Content(schema = Schema(implementation = BookingDTO::class))]
+    )fun createPendingBookingForUser(
+        token: JwtAuthenticationToken,
+        @Valid @RequestBody bookingRequest: CreatePendingBookingDTO,
+        bookingOwnerName: String
+    ): ResponseEntity<String> {
+        val user =
+            userService.getUserByName(bookingOwnerName) ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+        try {
+            pendingBookingService.createPendingBooking(bookingRequest, user)
+            return ResponseEntity("A new booking has been successfully created for "+user.name, HttpStatus.CREATED)
+        } catch (e: IllegalArgumentException) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
+        }
+    }
+
     @GetMapping("/pendingBookingInformation")
     @Transactional
     @Operation(summary = "Get the pending booking trains and the corresponding drawing periods")
