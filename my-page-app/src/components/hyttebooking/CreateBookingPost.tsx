@@ -25,14 +25,17 @@ const createBooking = async ({
   userIsAdmin,
   bookingOwnerName,
   startDate,
+  bookingWithoutDrawing
+
 }: {
   bookingPost: BookingPost
   userIsAdmin: boolean
   bookingOwnerName: string
   startDate: string
+  bookingWithoutDrawing: boolean
 }) => {
-  if (userIsAdmin) {
-    if (differenceInDays(new Date(startDate), new Date()) <= 7) {
+  if (userIsAdmin ) {
+    if (bookingWithoutDrawing) {
       return axios
         .post(
           API_URL + 'booking/admin/post?bookingOwnerName=' + bookingOwnerName,
@@ -51,7 +54,7 @@ const createBooking = async ({
         })
     } else {
       return axios
-        .post(API_URL + 'pendingBooking/pendingPost', bookingPost, {
+        .post(API_URL + 'pendingBooking/pendingPostForUser?bookingOwnerName=' + bookingOwnerName, bookingPost, {
           headers: authHeader(),
         })
         .then((response) => response.data)
@@ -64,20 +67,6 @@ const createBooking = async ({
         })
     }
   } else {
-    if (differenceInDays(new Date(startDate), new Date()) <= 7) {
-      return axios
-        .post(API_URL + 'booking/post', bookingPost, {
-          headers: authHeader(),
-        })
-        .then((response) => response.data)
-        .catch((error) => {
-          if (error.response && error.response.data) {
-            throw error.response.data
-          } else {
-            throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
-          }
-        })
-    } else {
       return axios
         .post(API_URL + 'pendingBooking/pendingPost', bookingPost, {
           headers: authHeader(),
@@ -91,7 +80,6 @@ const createBooking = async ({
           }
         })
     }
-  }
 }
 
 const CreateBookingPost = ({
@@ -151,6 +139,7 @@ const CreateBookingPost = ({
 
   const [isLoadingPost, setIsLoadingPost] = useState(false)
   const [bookingOwnerName, setBookingOwnerName] = useState<string>('')
+  const [bookingWithoutDrawing, setBookingWithoutDrawing] = useState<boolean>(false)
 
   const isValid =
     startDate < endDate &&
@@ -187,7 +176,7 @@ const CreateBookingPost = ({
         startDate: startDate,
         endDate: endDate,
       }
-      mutate({ bookingPost, userIsAdmin, bookingOwnerName, startDate })
+      mutate({ bookingPost, userIsAdmin, bookingOwnerName, startDate, bookingWithoutDrawing })
     }
   }
 
@@ -200,6 +189,10 @@ const CreateBookingPost = ({
   const handleBookingOwnerNameChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setBookingOwnerName(e.target.value)
   }
+  const handleBookingWithoutDrawingChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setBookingWithoutDrawing(e.target.checked)
+  }
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -247,16 +240,27 @@ const CreateBookingPost = ({
               placeholder={endDate}
             />
           </label>
-          <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
+          {userIsAdmin ? (
+              <div>
+                <input
+                    type="checkbox"
+                    onChange={handleBookingWithoutDrawingChange}
+                    id="bookingWithoutDrawing"
+                    style={{ transform: "scale(1.3)", marginRight: "10px" }}
+                />
+                <label  htmlFor="bookingWithoutDrawing">Book uten trekning</label>
+              </div>
+                ) : null}
+                <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
             <span>
               Legg til reservasjon
-              <Loading isLoading={isLoadingPost} />
+              <Loading isLoading={isLoadingPost}/>
             </span>
-          </Button>
-        </div>
-      </div>
-    </form>
-  )
-}
+                </Button>
+              </div>
+            </div>
+            </form>
+            )
+          }
 
-export default CreateBookingPost
+          export default CreateBookingPost

@@ -22,7 +22,7 @@ jobs:
           npm run build
         working-directory: ./my-page-app
   deploy-test:
-    if: github.ref == 'refs/heads/feature/hyttewishing'
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     environment: test

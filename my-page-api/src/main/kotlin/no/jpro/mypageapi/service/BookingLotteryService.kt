@@ -8,6 +8,7 @@ import no.jpro.mypageapi.dto.PendingBookingDTO
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.PendingBooking
 import no.jpro.mypageapi.repository.BookingRepository
+import no.jpro.mypageapi.repository.PendingBookingRepository
 import no.jpro.mypageapi.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.integration.support.locks.LockRegistry
@@ -26,15 +27,25 @@ class BookingLotteryService(
     private val userRepository: UserRepository,
     private val bookingService: BookingService,
     private val lockRegistry: LockRegistry,
-    private val slackConsumer: SlackConsumer
+    private val slackConsumer: SlackConsumer,
+    private val pendingBookingRepository: PendingBookingRepository
 ) {
     @PersistenceContext
     private lateinit var entityManager: EntityManager
 
     private val logger = LoggerFactory.getLogger(BookingLotteryService::class.java)
 
-    @Transactional
     fun pickWinnerPendingBooking(pendingBookingList: List<PendingBookingDTO>) {
+        val resultMsg = runManualBookingLottery(pendingBookingList)
+        if (resultMsg != null) {
+            slackConsumer.postMessageToChannel(resultMsg)
+        }
+    }
+
+    @Transactional
+    internal fun runManualBookingLottery(pendingBookingList: List<PendingBookingDTO>): String? {
+        var winningBooking: PendingBookingDTO?
+
         val lock = lockRegistry.obtain(LOTTERLY_LOCK_KEY)
         if (!lock.tryLock()) {
             throw IllegalStateException("Booking lottery is already running, please wait a moment and try again.")
@@ -50,6 +61,7 @@ class BookingLotteryService(
                             bookingService.createBooking(it, user)
                         }
                     }
+                winningBooking = winner
             } else {
                 val winner = pendingBookingList[0]
 
@@ -60,10 +72,22 @@ class BookingLotteryService(
                             bookingService.createBooking(it, user)
                         }
                     }
+                winningBooking = winner
             }
         } finally {
             lock.unlock()
         }
+        if (winningBooking == null) {
+            return null
+        }
+        val winnerToNotify = pendingBookingRepository.findPendingBookingById(winningBooking.id!!)
+        if (winnerToNotify == null) {
+            return null
+        }
+        val losersToNotify = pendingBookingList.filter { it != winningBooking }
+            .map { pendingBookingRepository.findPendingBookingById(it.id!!) }.filterNotNull().toSet()
+        val resultMsg = formatResult(setOf(winnerToNotify), losersToNotify)
+        return resultMsg
     }
 
     fun runPendingBookingsLottery() {
@@ -175,6 +199,9 @@ class BookingLotteryService(
                     dagMåned
                 ) + " til " + vinner.endDate.format(dagMåned) + "\n"
             )
+        }
+        if (tapere.isEmpty()) {
+            return result.toString()
         }
         result.append("\n*Følgende ønskede bookinger overlapper med vinnerne og er derfor tatt bort:*\n")
         for (taper in tapere) {
