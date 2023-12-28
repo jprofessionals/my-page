@@ -28,7 +28,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "daisyui": "^4.4.24",
-    "date-fns": "^2.30.0",
+    "date-fns": "^3.0.6",
     "date-holidays": "^3.23.3",
     "eslint": "8.56.0",
     "eslint-config-next": "14.0.4",
