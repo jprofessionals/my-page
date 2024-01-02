@@ -26,7 +26,7 @@
     "@types/react-dom": "18.2.18",
     "axios": "^1.6.3",
     "class-variance-authority": "^0.7.0",
-    "clsx": "^2.0.0",
+    "clsx": "^2.1.0",
     "daisyui": "^4.4.24",
     "date-fns": "^3.0.6",
     "date-holidays": "^3.23.3",
