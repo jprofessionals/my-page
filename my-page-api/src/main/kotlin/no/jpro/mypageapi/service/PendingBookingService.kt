@@ -27,24 +27,35 @@ class PendingBookingService(
         get() = LocalDate.now().plusMonths(5)
 
     fun createPendingBooking(bookingRequest: CreatePendingBookingDTO, createdBy: User): PendingBookingDTO {
+        if(createdBy.id==null){
+            throw IllegalArgumentException("Ikke mulig å opprette bookingen.")
+        }
+
         val apartment = bookingService.getApartment(bookingRequest.apartmentID)
         val checkBookingAvailable = bookingService.filterOverlappingBookings(
             bookingRequest.apartmentID,
             bookingRequest.startDate,
             bookingRequest.endDate
         )
-
-        if (checkBookingAvailable.isEmpty()) {
-            val pendingBooking = pendingBookingMapper.toPendingBooking(
-                bookingRequest,
-                apartment
-            ).copy(
-                employee = createdBy
-            )
-            return pendingBookingMapper.toPendingBookingDTO(pendingBookingRepository.save(pendingBooking))
-        } else {
-            throw IllegalArgumentException("Ikke mulig å opprette bookingen.")
+        if (checkBookingAvailable.isNotEmpty()) {
+            throw IllegalArgumentException("Ønsket leilighet er ikke ledig i dette tidsrommet.")
         }
+
+        val userAlreadyHasPendingBooking = pendingBookingRepository.findPendingBookingsByEmployeeIdAndApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
+            createdBy.id,bookingRequest.apartmentID, bookingRequest.startDate, bookingRequest.endDate)
+            .any()
+        if(userAlreadyHasPendingBooking){
+            throw IllegalArgumentException("Du har allerede en ønsket booking på denne leiligheten i dette tidsrommet.")
+        }
+
+        val pendingBooking = pendingBookingMapper.toPendingBooking(
+            bookingRequest,
+            apartment
+        ).copy(
+            employee = createdBy
+        )
+        return pendingBookingMapper.toPendingBookingDTO(pendingBookingRepository.save(pendingBooking))
+
     }
 
     fun getDateListOfPendingBookingTrains(

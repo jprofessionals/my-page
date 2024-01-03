@@ -57,7 +57,7 @@ class InformationNoticeService (
     fun createInfoNotice(infoNoticeRequest: CreateInformationNoticeDTO): InformationNoticeDTO {
         val overlappingInfoNotices = filterOverlappingInfoNotices(infoNoticeRequest.startDate, infoNoticeRequest.endDate)
 
-        if(overlappingInfoNotices.isEmpty() && infoNoticeRequest.endDate <= bookingService.getCutOffDate()) {
+        if(overlappingInfoNotices.isEmpty() && infoNoticeRequest.endDate <= bookingService.cutOffDate) {
             val infoNotice = informationNoticeMapper.toInFormationNotice(
                 infoNoticeRequest,
             )

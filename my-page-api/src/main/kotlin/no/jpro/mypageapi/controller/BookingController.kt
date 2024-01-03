@@ -203,6 +203,7 @@ class BookingController(
     private fun userPermittedToDeleteBooking(booking: Booking, user: User) = (booking.employee?.id == user.id)
 
 
+    @Deprecated("Bare admin kan opprette booking, bruk createPendingBooking i stedet")
     @PostMapping("/post")
     @Transactional
     @Operation(summary = "Create a new booking")

@@ -67,6 +67,10 @@ interface PendingBookingRepository : JpaRepository<PendingBooking, Long> {
 
     fun findPendingBookingById(pendingBookingId: Long): PendingBooking?
     fun findPendingBookingsByCreatedDateLessThanEqual(cutoffDate: LocalDate): List<PendingBooking>
+
+    fun findPendingBookingsByEmployeeIdAndApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
+        employeeId: Long, apartmentId: Long, startDate: LocalDate, endDate: LocalDate
+    ): List<PendingBooking>
 }
 
 @Repository

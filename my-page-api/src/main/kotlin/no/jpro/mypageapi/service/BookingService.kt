@@ -18,7 +18,6 @@ import no.jpro.mypageapi.utils.mapper.BookingMapper
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.NullPointerException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -35,18 +34,21 @@ class BookingService(
     private val slackConsumer: SlackConsumer,
     @Lazy private val self : BookingService? // Lazy self injection for transactional metoder. Spring oppretter ikke transaksjoner hvis en @Transactional annotert metode blir kalt fra samme objekt
 ) {
-    private var cutOffDate: LocalDate? = null
-
-    fun getCutOffDate(): LocalDate {
-        if (cutOffDate == null) {
-            val cutOffDateSetting = settingsRepository.findSettingBySettingId("CUTOFF_DATE_VACANCIES")
-            if (cutOffDateSetting == null) {
-                throw NullPointerException("Setting 'CUTOFF_DATE_VACANCIES' not set in database")
+    final var cutOffDate: LocalDate? = null
+        get() {
+            if (field == null) {
+                field = run {
+                    if (cutOffDate == null) {
+                        val cutOffDateSetting = settingsRepository.findSettingBySettingId("CUTOFF_DATE_VACANCIES")
+                            ?: throw NullPointerException("Setting 'CUTOFF_DATE_VACANCIES' not set in database")
+                        cutOffDate = LocalDate.parse(cutOffDateSetting.settingValue, dateFormatter)
+                    }
+                    cutOffDate!!
+                }
             }
-            cutOffDate = LocalDate.parse(cutOffDateSetting.settingValue, dateFormatter)
+            return field
         }
-        return cutOffDate!!
-    }
+        private set
 
     fun getBooking(bookingId: Long): Booking? {
         return bookingRepository.findBookingById(bookingId)
@@ -99,8 +101,7 @@ class BookingService(
     fun deleteBookingAndNotifySlack(bookingId: Long) {
         //kaller @Transactional metode på self for å sikre at transaksjon blir opprettet
         val deletedBooking = self?.findAndDeleteBooking(bookingId) ?: throw IllegalArgumentException("Error deleting booking with ID: $bookingId")
-        val dagMåned =
-            DateTimeFormatter.ofPattern("d. MMMM", Locale.Builder().setLanguage("nb").setRegion("NO").build())
+        val dagMåned = DateTimeFormatter.ofPattern("d. MMMM", Locale.Builder().setLanguage("nb").setRegion("NO").build())
         val cabinIsAvailableMsg =
             "${deletedBooking.apartment.cabin_name} er nå ledig fra ${deletedBooking.startDate.format(dagMåned)} til ${
                 deletedBooking.endDate.format(dagMåned)
@@ -158,21 +159,23 @@ class BookingService(
 
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     fun createBooking(bookingRequest: CreateBookingDTO, createdBy: User): BookingDTO {
+        if(bookingRequest.endDate <= cutOffDate){
+            throw IllegalArgumentException("Ikke mulig å opprette bookingen. Sluttdato må være før {${cutOffDate?.format(dateFormatter)}}")
+        }
         val apartment = getApartment(bookingRequest.apartmentID)
-
         val checkBookingAvailable = filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
 
-        if(checkBookingAvailable.isEmpty() && bookingRequest.endDate <= getCutOffDate()) {
-            val booking = bookingMapper.toBooking(
-                bookingRequest,
-                apartment
-            ).copy(
-                employee = createdBy
-            )
-            return bookingMapper.toBookingDTO(bookingRepository.save(booking))
-        } else {
+        if (checkBookingAvailable.isNotEmpty()) {
             throw IllegalArgumentException("Ikke mulig å opprette bookingen. Eksisterer en annen booking i ønsket tidsperiode.")
         }
+
+        val booking = bookingMapper.toBooking(
+            bookingRequest,
+            apartment
+        ).copy(
+            employee = createdBy
+        )
+        return bookingMapper.toBookingDTO(bookingRepository.save(booking))
     }
 
     fun filterOverlappingBookingsExcludingOwnBooking(apartmentId: Long, wishStartDate: LocalDate, wishEndDate: LocalDate, bookingToExclude: Booking?): List<Booking> {
@@ -183,7 +186,7 @@ class BookingService(
     fun editBooking(editPostRequest: UpdateBookingDTO, bookingToEdit: Booking): BookingDTO {
         val checkIfBookingUpdate = filterOverlappingBookingsExcludingOwnBooking(bookingToEdit.apartment.id, editPostRequest.startDate, editPostRequest.endDate, bookingToEdit)
 
-        if (checkIfBookingUpdate.isEmpty() && (editPostRequest.startDate.isBefore(editPostRequest.endDate)) && (editPostRequest.endDate <= getCutOffDate())) {
+        if (checkIfBookingUpdate.isEmpty() && (editPostRequest.startDate.isBefore(editPostRequest.endDate)) && (editPostRequest.endDate <= cutOffDate)) {
             return bookingMapper.toBookingDTO(
                 bookingRepository.save(
                     bookingToEdit.copy(
