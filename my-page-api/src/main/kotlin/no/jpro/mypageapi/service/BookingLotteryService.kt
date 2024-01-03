@@ -11,6 +11,7 @@ import no.jpro.mypageapi.repository.BookingRepository
 import no.jpro.mypageapi.repository.PendingBookingRepository
 import no.jpro.mypageapi.repository.UserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Lazy
 import org.springframework.integration.support.locks.LockRegistry
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,7 +29,8 @@ class BookingLotteryService(
     private val bookingService: BookingService,
     private val lockRegistry: LockRegistry,
     private val slackConsumer: SlackConsumer,
-    private val pendingBookingRepository: PendingBookingRepository
+    private val pendingBookingRepository: PendingBookingRepository,
+    @Lazy private val self: BookingLotteryService? // Lazy self injection for transactional metoder. Spring oppretter ikke transaksjoner hvis en @Transactional annotert metode blir kalt fra samme objekt
 ) {
     @PersistenceContext
     private lateinit var entityManager: EntityManager
@@ -36,7 +38,10 @@ class BookingLotteryService(
     private val logger = LoggerFactory.getLogger(BookingLotteryService::class.java)
 
     fun pickWinnerPendingBooking(pendingBookingList: List<PendingBookingDTO>) {
-        val resultMsg = runManualBookingLottery(pendingBookingList)
+        if (self == null) {
+            throw IllegalStateException("Lazy self injection failed, cannot run pickWinnerPendingBooking")
+        }
+        val resultMsg = self.runManualBookingLottery(pendingBookingList)
         if (resultMsg != null) {
             slackConsumer.postMessageToChannel(resultMsg)
         }
@@ -44,7 +49,7 @@ class BookingLotteryService(
 
     @Transactional
     internal fun runManualBookingLottery(pendingBookingList: List<PendingBookingDTO>): String? {
-        var winningBooking: PendingBookingDTO?
+        val winningBooking: PendingBookingDTO?
 
         val lock = lockRegistry.obtain(LOTTERLY_LOCK_KEY)
         if (!lock.tryLock()) {
@@ -92,13 +97,16 @@ class BookingLotteryService(
 
     fun runPendingBookingsLottery() {
         logger.info("Running pending bookings lottery")
+        if (self == null) {
+            throw IllegalStateException("Lazy self injection failed, cannot run runPendingBookingsLottery")
+        }
 
         val lock = lockRegistry.obtain(LOTTERLY_LOCK_KEY)
         if (!lock.tryLock()) {
             return
         }
         try {
-            val resultMsg = runTheLottery(LocalDate.now().minusDays(7))
+            val resultMsg = self.runTheLottery(LocalDate.now().minusDays(7))
             if (resultMsg != null) {
                 slackConsumer.postMessageToChannel(resultMsg)
             }

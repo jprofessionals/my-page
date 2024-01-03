@@ -179,7 +179,6 @@ class BookingController(
     }
 
     @DeleteMapping("{bookingID}")
-    @Transactional
     @Operation(summary = "Delete the booking connected to the booking id")
     @ApiResponse(
         responseCode = "200",
@@ -197,7 +196,7 @@ class BookingController(
             return ResponseEntity(HttpStatus.FORBIDDEN)
         }
 
-        bookingService.deleteBooking(bookingID)
+        bookingService.deleteBookingAndNotifySlack(bookingID)
         return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
     }
 

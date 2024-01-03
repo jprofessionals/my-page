@@ -2,6 +2,7 @@ package no.jpro.mypageapi.service
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import no.jpro.mypageapi.consumer.slack.SlackConsumer
 import no.jpro.mypageapi.dto.ApartmentDTO
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.dto.CreateBookingDTO
@@ -14,11 +15,14 @@ import no.jpro.mypageapi.repository.BookingRepository
 import no.jpro.mypageapi.repository.SettingsRepository
 import no.jpro.mypageapi.utils.mapper.ApartmentMapper
 import no.jpro.mypageapi.utils.mapper.BookingMapper
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.lang.NullPointerException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 
 @Service
@@ -27,7 +31,9 @@ class BookingService(
     private val bookingMapper: BookingMapper,
     private val apartmentRepository: ApartmentRepository,
     private val apartmentMapper: ApartmentMapper,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val slackConsumer: SlackConsumer,
+    @Lazy private val self : BookingService? // Lazy self injection for transactional metoder. Spring oppretter ikke transaksjoner hvis en @Transactional annotert metode blir kalt fra samme objekt
 ) {
     private var cutOffDate: LocalDate? = null
 
@@ -88,6 +94,25 @@ class BookingService(
     fun getAllApartments(): List<ApartmentDTO> {
         val apartments = apartmentRepository.findAll()
         return apartments.map { apartmentMapper.toApartmentDTO(it) }
+    }
+
+    fun deleteBookingAndNotifySlack(bookingId: Long) {
+        //kaller @Transactional metode på self for å sikre at transaksjon blir opprettet
+        val deletedBooking = self?.findAndDeleteBooking(bookingId) ?: throw IllegalArgumentException("Error deleting booking with ID: $bookingId")
+        val dagMåned =
+            DateTimeFormatter.ofPattern("d. MMMM", Locale.Builder().setLanguage("nb").setRegion("NO").build())
+        val cabinIsAvailableMsg =
+            "${deletedBooking.apartment.cabin_name} er nå ledig fra ${deletedBooking.startDate.format(dagMåned)} til ${
+                deletedBooking.endDate.format(dagMåned)
+            }"
+        slackConsumer.postMessageToChannel(cabinIsAvailableMsg)
+    }
+
+    @Transactional
+    internal fun findAndDeleteBooking(bookingId: Long): Booking {
+        val bookingToDelete = bookingRepository.findBookingById(bookingId) ?: throw IllegalArgumentException("Booking not found for ID: $bookingId")
+        bookingRepository.deleteById(bookingId)
+        return bookingToDelete
     }
 
     fun deleteBooking(bookingId: Long) {
