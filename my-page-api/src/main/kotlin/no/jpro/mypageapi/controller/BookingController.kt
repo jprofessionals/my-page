@@ -22,7 +22,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
@@ -218,12 +217,9 @@ class BookingController(
     ): ResponseEntity<String> {
         val user =
             userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
-        try {
-            bookingService.createBooking(bookingRequest, user)
-            return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
-        } catch (e: IllegalArgumentException) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
-        }
+
+        bookingService.createBooking(bookingRequest, user)
+        return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
     }
 
     @PatchMapping("{bookingId}")
@@ -246,7 +242,7 @@ class BookingController(
             return ResponseEntity.ok("The booking has been successfully edited")
         } catch (e: IllegalArgumentException) {
             val errorMessage = e.message ?: "An error occurred while editing the booking."
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage)
+            throw MyPageRestException(HttpStatus.BAD_REQUEST, errorMessage)
         }
 
     }
@@ -268,7 +264,7 @@ class BookingController(
             return ResponseEntity.ok("The booking has been successfully edited")
         } catch (e: IllegalArgumentException) {
             val errorMessage = e.message ?: "An error occurred while editing the booking."
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage)
+            throw MyPageRestException(HttpStatus.BAD_REQUEST, errorMessage)
         }
     }
 
@@ -307,12 +303,8 @@ class BookingController(
     ): ResponseEntity<String> {
         val bookingOwner =
             userService.getUserByName(bookingOwnerName) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
-        try {
-            bookingService.createBooking(bookingRequest, bookingOwner)
-            return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
-        } catch (e: IllegalArgumentException) {
-           throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
-        }
+        bookingService.createBooking(bookingRequest, bookingOwner)
+        return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
     }
 }
 

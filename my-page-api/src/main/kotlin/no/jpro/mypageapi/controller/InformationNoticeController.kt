@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
@@ -79,7 +78,7 @@ class InformationNoticeController(
             informationNoticeService.createInfoNotice(infoNoticeRequest)
             return ResponseEntity("A new information notice has been successfully created", HttpStatus.CREATED)
         } catch (e: IllegalArgumentException) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
+            throw MyPageRestException(HttpStatus.BAD_REQUEST, e.message)
         }
     }
 
@@ -99,7 +98,7 @@ class InformationNoticeController(
             return ResponseEntity.ok("The notice has been successfully edited")
         } catch (e: IllegalArgumentException) {
             val errorMessage = e.message ?: "An error occurred while editing the notice."
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage)
+            throw MyPageRestException(HttpStatus.BAD_REQUEST, errorMessage)
         }
     }
 
