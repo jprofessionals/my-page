@@ -115,16 +115,8 @@ class BookingLotteryService(
 
         //bruker en for-løkke for å unngå evig løkke selv om det skulle være noe galt med dataene i databasen
         for (i in 0..100) {
-            val eldstePendingEldreEnn7DagerQuery = entityManager.createQuery(
-                "SELECT p from PendingBooking p where createdDate <= :selectionDate AND startDate >= :today AND NOT EXISTS(\n" +
-                        "    SELECT b FROM Booking b where b.apartment = p.apartment AND ( b.endDate > p.startDate AND b.startDate < p.endDate\n" +
-                        "                               OR p.startDate < b.endDate AND p.endDate > b.startDate))" +
-                        "ORDER BY createdDate ASC LIMIT 1", PendingBooking::class.java
-            )
-            eldstePendingEldreEnn7DagerQuery.setParameter("selectionDate", selectionDate)
-            eldstePendingEldreEnn7DagerQuery.setParameter("today", LocalDate.now())
-            val pendingEldreEnn7Dager = eldstePendingEldreEnn7DagerQuery.resultList
-            if (pendingEldreEnn7Dager.isEmpty()) {
+            val pendingSomErAktuelleForTrekning = finnPendingSomErAktuelleForTrekning()
+            if (pendingSomErAktuelleForTrekning.isEmpty()) {
                 return formatResult(vinnere.toSet(), tapere.toSet())
             }
             //hent ut alle pending bookings for aktuell hytte som ikke overlapper med en fastsatt booking
@@ -135,12 +127,15 @@ class BookingLotteryService(
                 PendingBooking::class.java
             )
             pendingSomIkkeOverlapperMedFastsattQuery.setParameter("today", LocalDate.now())
-            pendingSomIkkeOverlapperMedFastsattQuery.setParameter("id", pendingEldreEnn7Dager[0].id)
-            pendingSomIkkeOverlapperMedFastsattQuery.setParameter("apartment", pendingEldreEnn7Dager[0].apartment)
+            pendingSomIkkeOverlapperMedFastsattQuery.setParameter("id", pendingSomErAktuelleForTrekning[0].id)
+            pendingSomIkkeOverlapperMedFastsattQuery.setParameter(
+                "apartment",
+                pendingSomErAktuelleForTrekning[0].apartment
+            )
             val pendingSomIkkeOverlapperMedFastsatt = pendingSomIkkeOverlapperMedFastsattQuery.resultList
 
             val pendingForTrekk = mutableSetOf<PendingBooking>()
-            pendingForTrekk.add(pendingEldreEnn7Dager[0])
+            pendingForTrekk.add(pendingSomErAktuelleForTrekning[0])
 
             val tempList = mutableListOf<PendingBooking>()
 
@@ -182,6 +177,42 @@ class BookingLotteryService(
         //TODO: slett taperne?
         logger.warn("Pending lottery did not terminate after 100 iterations. Something is probably wrong with the data in the database.")
         return formatResult(vinnere.toSet(), tapere.toSet())
+    }
+
+    private fun finnPendingSomErAktuelleForTrekning(): MutableList<PendingBooking> {
+        val eldstePendingEldreEnn7DagerQuery = entityManager.createQuery(
+            "SELECT p from PendingBooking p where createdDate <= :selectionDate AND startDate >= :today AND NOT EXISTS(\n" +
+                    "    SELECT b FROM Booking b where b.apartment = p.apartment AND ( b.endDate > p.startDate AND b.startDate < p.endDate\n" +
+                    "                               OR p.startDate < b.endDate AND p.endDate > b.startDate))" +
+                    "ORDER BY createdDate ASC LIMIT 1", PendingBooking::class.java
+        )
+        eldstePendingEldreEnn7DagerQuery.setParameter("selectionDate", LocalDate.now().minusDays(7))
+        eldstePendingEldreEnn7DagerQuery.setParameter("today", LocalDate.now())
+        val pendingEldreEnn7Dager = eldstePendingEldreEnn7DagerQuery.resultList
+        if (pendingEldreEnn7Dager.isNotEmpty()) {
+            return pendingEldreEnn7Dager
+        }
+
+        //dette er feil. det er egentlig ikke interessant når bookingen er opprettet
+        val eldstePendingEldreEnn24timerMedMindreEnn7DagerTilStartdatoQuery = entityManager.createQuery(
+            "SELECT p from PendingBooking p where createdDate <= :selectionDate AND startDate >= :today AND startDate < :todayPlus7 AND NOT EXISTS(\n" +
+                    "    SELECT b FROM Booking b where b.apartment = p.apartment AND ( b.endDate > p.startDate AND b.startDate < p.endDate\n" +
+                    "                               OR p.startDate < b.endDate AND p.endDate > b.startDate))" +
+                    "ORDER BY createdDate ASC LIMIT 1", PendingBooking::class.java
+        )
+        eldstePendingEldreEnn24timerMedMindreEnn7DagerTilStartdatoQuery.setParameter(
+            "selectionDate",
+            LocalDate.now().minusDays(1)
+        )
+        eldstePendingEldreEnn24timerMedMindreEnn7DagerTilStartdatoQuery.setParameter("today", LocalDate.now())
+        eldstePendingEldreEnn24timerMedMindreEnn7DagerTilStartdatoQuery.setParameter(
+            "todayPlus7",
+            LocalDate.now().plusDays(7)
+        )
+        val pendingEldreEnn24timerMedMindreEnn7DagerTilStartdato =
+            eldstePendingEldreEnn24timerMedMindreEnn7DagerTilStartdatoQuery.resultList
+        return pendingEldreEnn24timerMedMindreEnn7DagerTilStartdato
+        //TODO: bookinger som starter i dag
     }
 
     private fun formatResult(vinnere: Set<PendingBooking>, tapere: Set<PendingBooking>): String? {
