@@ -102,7 +102,7 @@
         <dependency> <!-- PDF to text converter -->
             <groupId>com.github.librepdf</groupId>
             <artifactId>openpdf</artifactId>
-            <version>1.3.35</version>
+            <version>1.3.36</version>
         </dependency>
         <dependency> <!-- Word to text converter -->
             <groupId>org.zwobble.mammoth</groupId>
