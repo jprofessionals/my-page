@@ -69,7 +69,9 @@ function Hyttebooking() {
           ledig. Her er det førstemann til mølla som gjelder. Med unntak, hvis
           en annen melder interesse innen 7 dager. Da vil det gjøres en
           automatisk trekning mellom de som har meldt interesse etter at 7 dager
-          har gått fra det første ønsket ble meldt.
+          har gått fra det første ønsket ble meldt. Hvis det er mindre enn 7 dager
+          fra første ønske ble meldt til oppholdet starer, kan man be admin starte
+          en trekning manuelt.
         </p>
 
         <p>

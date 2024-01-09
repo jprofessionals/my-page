@@ -643,6 +643,35 @@ export default function MonthOverview() {
 
   const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
 
+  function formatDrawing(drawingPeriod: DrawingPeriod) {
+    let autoDrawingDate: Date = drawingPeriod.pendingBookings.reduce((earliest, booking) => {
+      const bookingCreatedDate = new Date(booking.createdDate);
+      return earliest < bookingCreatedDate ? earliest : bookingCreatedDate;
+    }, new Date(drawingPeriod.pendingBookings[0].createdDate));
+    autoDrawingDate.setDate(autoDrawingDate.getDate()+7)
+
+    let earliestStartDate = drawingPeriod.pendingBookings.reduce((earliest, booking) => {
+      const bookingStartDate = new Date(booking.startDate);
+      return earliest < bookingStartDate ? earliest : bookingStartDate;
+    }, new Date(drawingPeriod.pendingBookings[0].startDate));
+
+    let manualDrawingNotice='';
+    if(autoDrawingDate >= earliestStartDate){
+      manualDrawingNotice = 'Oppholdet starter før automatisk trekningsdato. Kontakt Roger for manuell trekning'
+    }
+
+    return <>
+      {drawingPeriod.pendingBookings[0].apartment.cabin_name}{' '}
+      fra{' '}
+      {format(new Date(drawingPeriod.startDate), 'dd.MM.yyyy')}{' '}
+      til{' '}
+      {format(new Date(drawingPeriod.endDate), 'dd.MM.yyyy')}.{' '}
+      Planlagt trekning{' '}
+      {format(autoDrawingDate, 'dd.MM.yyyy')}{' '}
+      {manualDrawingNotice && <><br /><i><b>{manualDrawingNotice}</b></i></>}
+    </>;
+  }
+
   return (
     <div className="flex flex-col overflow-hidden gap-4 p-4">
       {cutOffDateVacancies==null ? "Fant ikke innstilling for siste reserverbare dato" : (
@@ -1067,39 +1096,34 @@ export default function MonthOverview() {
               {drawingPeriodListOnDay.map((drawingPeriod, index) => (
                 <div key={index}>
                   <p
-                    className={`mt-1 mb-1 ${
-                      cabinPendingBorderColorClasses[
-                        drawingPeriod.pendingBookings[0].apartment.cabin_name
-                      ]
-                    } pl-2 border-l-2 `}
+                      className={`mt-1 mb-1 ${
+                          cabinPendingBorderColorClasses[
+                              drawingPeriod.pendingBookings[0].apartment.cabin_name
+                              ]
+                      } pl-2 border-l-2 `}
                   >
                     <span>
-                      Trekning om{' '}
-                      {drawingPeriod.pendingBookings[0].apartment.cabin_name}{' '}
-                      fra{' '}
-                      {format(new Date(drawingPeriod.startDate), 'dd.MM.yyyy')}{' '}
-                      til{' '}
-                      {format(new Date(drawingPeriod.endDate), 'dd.MM.yyyy')}.
-                      <br />
+                      {formatDrawing(drawingPeriod)}
+                      <br/>
                       Involverte er:{' '}
                       {drawingPeriod.pendingBookings.map(
-                        (pendingBooking, bookingIndex) => (
-                          <span key={bookingIndex}>
+                          (pendingBooking, bookingIndex) => (
+                              <span key={bookingIndex}>
                             {pendingBooking.employeeName}
-                            {bookingIndex !==
-                              drawingPeriod.pendingBookings.length - 1 && ', '}
+                                {bookingIndex !==
+                                    drawingPeriod.pendingBookings.length - 1 && ', '}
                           </span>
-                        ),
+                          ),
                       )}
                     </span>
 
                     {pendingBookingList[index] && userIsAdmin && (
-                      <ConvertPendingBooking
-                        pendingBookingList={pendingBookingList[index]}
-                        closeModal={closeModal}
-                        refreshVacancies={refreshVacancies}
-                        userIsAdmin={userIsAdmin}
-                      />
+                        <ConvertPendingBooking
+                            pendingBookingList={pendingBookingList[index]}
+                            closeModal={closeModal}
+                            refreshVacancies={refreshVacancies}
+                            userIsAdmin={userIsAdmin}
+                        />
                     )}
                   </p>
                 </div>
