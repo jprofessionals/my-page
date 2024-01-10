@@ -1,5 +1,7 @@
 package no.jpro.mypageapi.service
 
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import no.jpro.mypageapi.dto.CreatePendingBookingDTO
 import no.jpro.mypageapi.dto.DrawingPeriodDTO
 import no.jpro.mypageapi.dto.PendingBookingDTO
@@ -20,6 +22,8 @@ class PendingBookingService(
     private val apartmentRepository: ApartmentRepository,
     private val pendingBookingMapper: PendingBookingMapper,
 ) {
+    @PersistenceContext
+    private lateinit var entityManager: EntityManager
 
     val todayDateMinusSevenDays: LocalDate
         get() = LocalDate.now().minusDays(7)
@@ -41,9 +45,16 @@ class PendingBookingService(
             throw IllegalArgumentException("Ønsket leilighet er ikke ledig i dette tidsrommet.")
         }
 
-        val userAlreadyHasPendingBooking = pendingBookingRepository.findPendingBookingsByEmployeeIdAndApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
-            createdBy.id,bookingRequest.apartmentID, bookingRequest.startDate, bookingRequest.endDate)
-            .any()
+        val eksisterendePendingBookings = entityManager.createQuery(
+            "SELECT p from PendingBooking p where p.apartment.id = :apartmentId AND p.employee = :user AND ( p.endDate > :startDate AND p.startDate < :endDate\n" +
+                    "                               OR :startDate < p.endDate AND :endDate > p.startDate)", PendingBooking::class.java
+        )
+        eksisterendePendingBookings.setParameter("apartmentId", bookingRequest.apartmentID)
+        eksisterendePendingBookings.setParameter("user", createdBy)
+        eksisterendePendingBookings.setParameter("startDate", bookingRequest.startDate)
+        eksisterendePendingBookings.setParameter("endDate", bookingRequest.endDate)
+        val userAlreadyHasPendingBooking = eksisterendePendingBookings.resultList.isNotEmpty()
+
         if(userAlreadyHasPendingBooking){
             throw IllegalArgumentException("Du har allerede en ønsket booking på denne leiligheten i dette tidsrommet.")
         }
