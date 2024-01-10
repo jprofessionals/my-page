@@ -30,7 +30,7 @@ function Hyttebooking() {
               På denne siden får du oversiskt over når de forskjellige enhetene på hytta er ledig. 
               Siden er under kontinuerlig utvikling og vi setter stor pris på alle tilbakemeldinger og bidrag :)
             </p>  
-            <p>Mer informasjon om hyttaa finnes <a
+            <p>Mer informasjon finnes <a
             href="https://sites.google.com/a/jpro.no/jpro-intranet/personalh%C3%A5ndbok/hyttereglement?authuser=1"
             className="text-warning"> her</a> og på <a href="https://jpro.slack.com/archives/C83007C8L" className="text-warning">Slack</a>.</p>          
           </div>
