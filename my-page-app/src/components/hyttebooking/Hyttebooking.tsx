@@ -27,9 +27,12 @@ function Hyttebooking() {
             <h1>Reservasjon av firmahytte</h1>
             <div className="h-1.5 bg-orange-500"></div>
             <p>
-              På denne siden får du oversiskt over når de forskjellige enhetene på hytta er ledig.
-            </p>
-            <p>disse sidene er under kontinuerlig utvikling og vi setter stor pris på alle tilbakemeldinger og birdag :)</p>
+              På denne siden får du oversiskt over når de forskjellige enhetene på hytta er ledig. 
+              Siden er under kontinuerlig utvikling og vi setter stor pris på alle tilbakemeldinger og bidrag :)
+            </p>  
+            <p>Mer informasjon om hyttaa finnes <a
+            href="https://sites.google.com/a/jpro.no/jpro-intranet/personalh%C3%A5ndbok/hyttereglement?authuser=1"
+            className="text-warning"> her</a> og på <a href="https://jpro.slack.com/archives/C83007C8L" className="text-warning">Slack</a>.</p>          
           </div>
           <Image
             className="hidden md:block mt-0 rounded"
@@ -71,7 +74,7 @@ function Hyttebooking() {
           har gått fra det første ønsket ble meldt. Er det mindre en 7 dager til 
           ønsket periode starter må trekningen gjøres manuelt, si ifra til
           Roger for få gjennomført en trekning. Når en trekning er gjennomført postes
-          det en melding til <a href="https://jpro.slack.com/archives/C83007C8L">#hytte</a> på Slack.
+          det en melding til <a href="https://jpro.slack.com/archives/C83007C8L" className="text-warning">#hytte</a> på Slack.
         </p>
 
         <p>
