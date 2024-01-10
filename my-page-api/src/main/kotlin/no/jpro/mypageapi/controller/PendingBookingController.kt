@@ -21,7 +21,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 import java.time.format.DateTimeParseException
 
 @RestController
@@ -47,12 +46,8 @@ class PendingBookingController(
     ): ResponseEntity<String> {
         val user =
             userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
-        try {
-            pendingBookingService.createPendingBooking(bookingRequest, user)
-            return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
-        } catch (e: IllegalArgumentException) {
-           throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
-        }
+        pendingBookingService.createPendingBooking(bookingRequest, user)
+        return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
     }
 
     @RequiresAdmin
@@ -63,19 +58,16 @@ class PendingBookingController(
         responseCode = "201",
         description = "New booking created",
         content = [Content(schema = Schema(implementation = BookingDTO::class))]
-    )fun createPendingBookingForUser(
+    )
+    fun createPendingBookingForUser(
         token: JwtAuthenticationToken,
         @Valid @RequestBody bookingRequest: CreatePendingBookingDTO,
         bookingOwnerName: String
     ): ResponseEntity<String> {
         val user =
             userService.getUserByName(bookingOwnerName) ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
-        try {
-            pendingBookingService.createPendingBooking(bookingRequest, user)
-            return ResponseEntity("A new booking has been successfully created for "+user.name, HttpStatus.CREATED)
-        } catch (e: IllegalArgumentException) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
-        }
+        pendingBookingService.createPendingBooking(bookingRequest, user)
+        return ResponseEntity("A new booking has been successfully created for " + user.name, HttpStatus.CREATED)
     }
 
     @GetMapping("/pendingBookingInformation")
@@ -110,14 +102,8 @@ class PendingBookingController(
         token: JwtAuthenticationToken,
         @Valid @RequestBody pendingBookingList: List<PendingBookingDTO>,
     ): ResponseEntity<String> {
-        try {
-            bookingLotteryService.pickWinnerPendingBooking(pendingBookingList)
-            return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
-        } catch (e: IllegalArgumentException) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
-        } catch (e: IllegalStateException) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, e.message)
-        }
+        bookingLotteryService.pickWinnerPendingBooking(pendingBookingList)
+        return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
     }
 
     @DeleteMapping("{pendingBookingID}")
