@@ -34,21 +34,11 @@ class BookingService(
     private val slackConsumer: SlackConsumer,
     @Lazy private val self : BookingService? // Lazy self injection for transactional metoder. Spring oppretter ikke transaksjoner hvis en @Transactional annotert metode blir kalt fra samme objekt
 ) {
-    final var cutOffDate: LocalDate? = null
-        get() {
-            if (field == null) {
-                field = run {
-                    if (cutOffDate == null) {
-                        val cutOffDateSetting = settingsRepository.findSettingBySettingId("CUTOFF_DATE_VACANCIES")
-                            ?: throw NullPointerException("Setting 'CUTOFF_DATE_VACANCIES' not set in database")
-                        cutOffDate = LocalDate.parse(cutOffDateSetting.settingValue, dateFormatter)
-                    }
-                    cutOffDate!!
-                }
-            }
-            return field
-        }
-        private set
+    val cutOffDate: LocalDate by lazy {
+        val cutOffDateSetting = settingsRepository.findSettingBySettingId("CUTOFF_DATE_VACANCIES")
+            ?: throw NullPointerException("Setting 'CUTOFF_DATE_VACANCIES' not set in database")
+        LocalDate.parse(cutOffDateSetting.settingValue, dateFormatter)
+    }
 
     fun getBooking(bookingId: Long): Booking? {
         return bookingRepository.findBookingById(bookingId)
@@ -159,7 +149,7 @@ class BookingService(
 
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     fun createBooking(bookingRequest: CreateBookingDTO, createdBy: User): BookingDTO {
-        if(bookingRequest.endDate <= cutOffDate){
+        if(bookingRequest.endDate >= cutOffDate){
             throw IllegalArgumentException("Ikke mulig å opprette bookingen. Sluttdato må være før {${cutOffDate?.format(dateFormatter)}}")
         }
         val apartment = getApartment(bookingRequest.apartmentID)
