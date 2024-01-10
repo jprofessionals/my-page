@@ -27,11 +27,9 @@ function Hyttebooking() {
             <h1>Reservasjon av firmahytte</h1>
             <div className="h-1.5 bg-orange-500"></div>
             <p>
-              Denne siden er under produksjon av årets sommerstudenter. Vi håper
-              den vil være til stor nytte i nærmeste fremtid! Med vennlig
-              hilsen, Sophie, Ulrik og Torbjørn.
+              På denne siden får du oversiskt over når de forskjellige enhetene på hytta er ledig.
             </p>
-            <p>Vi setter pris på tilbakemeldinger for forbedringer:)</p>
+            <p>disse sidene er under kontinuerlig utvikling og vi setter stor pris på alle tilbakemeldinger og birdag :)</p>
           </div>
           <Image
             className="hidden md:block mt-0 rounded"
@@ -55,33 +53,35 @@ function Hyttebooking() {
           det vil foregå to trekninger iløpet av kalenderåret, én på våren og én
           på høsten. Dato for trekning vil bli oppdatert når endelig dato er
           satt. Alle som melder interesse vil bli satt opp i en tilfeldig
-          rangert liste. Deretter velger folk etter tur, fra topp til bunn.
+          rangert liste. Deretter fordeles perioder etter tur, fra topp til bunn.
           Kommer vi til slutten av listen, snur vi trekkrekkefølgen og
-          fortsetter til toppen av listen. Det er ingen funksjonalitet for dette
-          så trekningen vil skje eksternt.
+          går gjennom listen en gang til. Det er ingen funksjonalitet for dette
+          så trekningen vil skje eksternt og resultatet legges her når trekningen er gjennomført.
         </p>
 
         <p>
           <span>
             <strong>Ledige dager:</strong>
           </span>{' '}
-          etter trekning vil det muligens være dager hvor hytte-enhetene står
-          ledig. Her er det førstemann til mølla som gjelder. Med unntak, hvis
-          en annen melder interesse innen 7 dager. Da vil det gjøres en
+          etter trekning vil det muligens være dager hvor hytte-enhetene er
+          ledig. Da kan man legge inn ønske om å få en enhet ved å trykke på en dato og velge 
+          enhet og ønsket start og slutt for periode. Merk at en periode ikke kan være 7 mer enn dager.
+          Om det er mer enn 7 dager til ønsket periode starter vil det gjøres en
           automatisk trekning mellom de som har meldt interesse etter at 7 dager
-          har gått fra det første ønsket ble meldt.
+          har gått fra det første ønsket ble meldt. Er det mindre en 7 dager til 
+          ønsket periode starter må trekningen gjøres manuelt, si ifra til
+          Roger for få gjennomført en trekning. Når en trekning er gjennomført postes
+          det en melding til <a href="https://jpro.slack.com/archives/C83007C8L">#hytte</a> på Slack. 
         </p>
 
         <p>
           <span>
             <strong>Reservering:</strong>
           </span>{' '}
-          oppretting, endring og sletting av reservasjoner vil foregå når man
-          trykker på en bestemt dato. Her planlegges det å opprette et
-          varslingssytem på slack så alle ansatte blir oppdatert på visse
-          endringer. Siste reserverbare dato markeres med en{' '}
+          oppretting, endring og sletting av reservasjoner eller ønsker vil foregå når man
+          trykker på en bestemt dato. Siste reserverbare dato markeres med en{' '}
           <span className="text-red-500">rød</span> kant i kalenderen, og det er
-          ikke mulig å reservere datoer etter denne dagen.
+          ikke mulig å reservere datoer etter denne dagen. 
         </p>
 
         <p>
