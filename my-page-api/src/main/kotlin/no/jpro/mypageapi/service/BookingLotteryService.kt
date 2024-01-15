@@ -85,13 +85,16 @@ class BookingLotteryService(
         if (winningBooking == null) {
             return null
         }
-        val winnerToNotify = pendingBookingRepository.findPendingBookingById(winningBooking.id!!)
-        if (winnerToNotify == null) {
+        val winnerPendingBooking = pendingBookingRepository.findPendingBookingById(winningBooking.id!!)
+        if (winnerPendingBooking == null) {
             return null
         }
-        val losersToNotify = pendingBookingList.filter { it != winningBooking }
+        val loserPendingBookings = pendingBookingList.filter { it != winningBooking }
             .map { pendingBookingRepository.findPendingBookingById(it.id!!) }.filterNotNull().toSet()
-        val resultMsg = formatResult(setOf(winnerToNotify), losersToNotify)
+        pendingBookingRepository.delete(winnerPendingBooking)
+        pendingBookingRepository.deleteAll(loserPendingBookings)
+
+        val resultMsg = formatResult(setOf(winnerPendingBooking), loserPendingBookings)
         return resultMsg
     }
 
@@ -185,9 +188,10 @@ class BookingLotteryService(
                 employee = vinnendePendingBooking.employee
             )
             bookingRepository.save(vinnendeBooking)
+            pendingBookingRepository.delete(vinnendePendingBooking)
+            pendingBookingRepository.deleteAll(tapere.toSet())
         }
 
-        //TODO: slett taperne?
         logger.warn("Pending lottery did not terminate after 100 iterations. Something is probably wrong with the data in the database.")
         return formatResult(vinnere.toSet(), tapere.toSet())
     }
