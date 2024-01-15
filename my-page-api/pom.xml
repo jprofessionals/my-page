@@ -165,54 +165,7 @@
         <dependency>
             <groupId>com.aallam.openai</groupId>
             <artifactId>openai-client-jvm</artifactId>
-            <version>3.6.2</version>
-            <exclusions> <!-- 3.6.2 is dependent on ktor 2.3.2, and this blocks updating ktor to 2.3.5 -->
-                <exclusion>
-                    <groupId>io.ktor</groupId>
-                    <artifactId>ktor-client-core-jvm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.ktor</groupId>
-                    <artifactId>ktor-client-logging-jvm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.ktor</groupId>
-                    <artifactId>ktor-client-auth-jvm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.ktor</groupId>
-                    <artifactId>ktor-client-content-negotiation-jvm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.ktor</groupId>
-                    <artifactId>ktor-serialization-kotlinx-json-jvm</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.ktor</groupId>
-            <artifactId>ktor-client-core-jvm</artifactId>
-            <version>${ktor.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ktor</groupId>
-            <artifactId>ktor-client-logging-jvm</artifactId>
-            <version>${ktor.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ktor</groupId>
-            <artifactId>ktor-client-auth-jvm</artifactId>
-            <version>${ktor.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ktor</groupId>
-            <artifactId>ktor-client-content-negotiation-jvm</artifactId>
-            <version>${ktor.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ktor</groupId>
-            <artifactId>ktor-serialization-kotlinx-json-jvm</artifactId>
-            <version>${ktor.version}</version>
+            <version>3.6.3</version>
         </dependency>
 
         <dependency>
