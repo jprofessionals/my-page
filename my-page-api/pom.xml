@@ -165,8 +165,8 @@
         <dependency>
             <groupId>com.aallam.openai</groupId>
             <artifactId>openai-client-jvm</artifactId>
-            <version>3.6.2</version>
-            <exclusions> <!-- 3.6.2 is dependent on ktor 2.3.2, and this blocks updating ktor to 2.3.5 -->
+            <version>3.6.3</version>
+            <exclusions> <!-- 3.6.3 is dependent on ktor 2.3.2, and this blocks updating ktor to 2.3.5 -->
                 <exclusion>
                     <groupId>io.ktor</groupId>
                     <artifactId>ktor-client-core-jvm</artifactId>
