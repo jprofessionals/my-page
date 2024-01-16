@@ -69,6 +69,7 @@ const getBookings = (startDate, endDate) => {
           cabin_name: booking.apartment.cabin_name,
         },
         employeeName: booking.employeeName,
+        isPending: false,
       }))
     })
 }
@@ -82,6 +83,7 @@ const getBookingsForUser = async () => {
   return bookings.map((booking) => ({
     ...booking,
     id: String(booking.id),
+    isPending: false,
   }))
 }
 
@@ -156,6 +158,7 @@ const getPendingBookingsForUser = async () => {
   return pendingBookings.map((pendingBooking) => ({
     ...pendingBooking,
     id: String(pendingBooking.id),
+    isPending: true,
   }))
 }
 
