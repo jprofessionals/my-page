@@ -86,7 +86,8 @@ export default function MonthOverview() {
     const endDate = new Date(booking.endDate)
     endDate.setHours(0)
 
-    return startDate<=date && endDate>=date;
+    let b = startDate<=date && endDate>=date;
+    return b;
   }
 
   const { data: allInfoNotices } = useQuery<InfoBooking[]>(
@@ -519,7 +520,8 @@ export default function MonthOverview() {
     const availableApartments: Apartment[] = []
     const vacantApartmentsInPeriod = getVacantApartments(selectedDate)
     for (const apartment of apartments) {
-      if (vacantApartmentsInPeriod.includes(apartment.id!)) {
+      if (vacantApartmentsInPeriod.includes(apartment.id!) &&
+          !yourPendingBookings?.some(pb=> pb.apartment.id == apartment.id && pendingBookingIsOnDay(selectedDate, pb) )) {
         availableApartments.push(apartment)
       }
     }
