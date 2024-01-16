@@ -70,10 +70,24 @@ export default function MonthOverview() {
     )
   }
 
+
+
   const getBookingsOnDay = (date: Date) => {
+    //duhar
     const dateString = format(date, 'yyyy-MM-dd')
     const bookingsOnDay = getBookings(dateString)
+    if(yourPendingBookings) {
+      bookingsOnDay.push(...yourPendingBookings.filter(pb => pendingBookingIsOnDay(date, pb) &&
+          !bookingsOnDay.some(book => book.apartment.id == pb.apartment.id)));
+    }
     setBookingItems(bookingsOnDay)
+  }
+
+  function pendingBookingIsOnDay(date: Date, booking: Booking){
+    const startDate = new Date(booking.startDate)
+    const endDate = new Date(booking.endDate)
+
+    return startDate<=date && endDate>=date;
   }
 
   const { data: allInfoNotices } = useQuery<InfoBooking[]>(
@@ -864,9 +878,9 @@ export default function MonthOverview() {
                           )
                           const formattedEndDate = format(endDate, 'dd.MM.yyyy')
 
-                          const isYourBooking = yourBookings?.some(
+                          const isYourBooking = !booking.isPending && yourBookings?.some(
                             (yourBooking) => yourBooking.id === booking.id,
-                          )
+                          ) || booking.isPending //only pending booking belonging to the user are in bookingItems
 
 
                           const prevCabinName =
@@ -893,10 +907,10 @@ export default function MonthOverview() {
                                   <>
                                     <div className="flex flex-col">
                                       <p className="flex-row justify-between items-center space-x-2">
-                                        <span>
-                                          DUHAR
+                                        <span style={{ fontStyle: booking.isPending ? 'italic' : 'normal' }}>
+                                          DUHAR&nbsp;
                                           {isYourBooking
-                                            ? `Du har hytten fra ${formattedStartDate} til ${formattedEndDate}.`
+                                            ? `Du ${booking.isPending ? 'ønsker' : 'har'} hytten fra ${formattedStartDate} til ${formattedEndDate}.`
                                             : `${booking.employeeName} har hytten fra ${formattedStartDate} til ${formattedEndDate}.`}
                                         </span>
                                         <button
@@ -954,11 +968,13 @@ export default function MonthOverview() {
                                   </>
                                 ) : (
                                   <>
-                                    <span>
-                                      {booking.employeeName} har fra{' '}
-                                      {formattedStartDate} til{' '}
-                                      {formattedEndDate}.
-                                    </span>
+                                    {!booking.isPending && (
+                                      <span>
+                                        {booking.employeeName} har fra{' '}
+                                        {formattedStartDate} til{' '}
+                                        {formattedEndDate}.
+                                      </span>
+                                    )}
                                   </>
                                 )}
                               </p>

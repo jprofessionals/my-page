@@ -8,10 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import no.jpro.mypageapi.config.RequiresAdmin
-import no.jpro.mypageapi.dto.BookingDTO
-import no.jpro.mypageapi.dto.CreatePendingBookingDTO
-import no.jpro.mypageapi.dto.PendingBookingDTO
-import no.jpro.mypageapi.dto.PendingBookingTrainDTO
+import no.jpro.mypageapi.dto.*
+import no.jpro.mypageapi.entity.PendingBooking
+import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.BookingLotteryService
 import no.jpro.mypageapi.service.PendingBookingService
@@ -124,4 +123,30 @@ class PendingBookingController(
         pendingBookingService.deletePendingBooking(pendingBookingID)
         return ResponseEntity.ok("Pending booking with ID $pendingBookingID has been deleted")
     }
+
+    @PatchMapping("{pendingBookingId}")
+    @Transactional
+    @Operation(summary = "Edit an existing pending booking")
+    fun editPendingBooking(
+        token: JwtAuthenticationToken,
+        @PathVariable("pendingBookingId") pendingBookingId: Long,
+        @Valid @RequestBody editBookingRequest: UpdateBookingDTO,
+    ): ResponseEntity<String> {
+        val bookingToEdit = pendingBookingService.getPendingBooking(pendingBookingId) ?: return ResponseEntity.notFound().build()
+        val user =
+            userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+
+        if (!userPermittedToEditBooking(bookingToEdit, user)) {
+            return ResponseEntity(HttpStatus.FORBIDDEN)
+        }
+        try {
+            pendingBookingService.editPendingBooking(editBookingRequest, bookingToEdit)
+            return ResponseEntity.ok("The booking has been successfully edited")
+        } catch (e: IllegalArgumentException) {
+            val errorMessage = e.message ?: "An error occurred while editing the booking."
+            throw MyPageRestException(HttpStatus.BAD_REQUEST, errorMessage)
+        }
+    }
+
+    private fun userPermittedToEditBooking(booking: PendingBooking, employee: User) = (booking.employee?.id == employee.id)
 }

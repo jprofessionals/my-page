@@ -2,10 +2,7 @@ package no.jpro.mypageapi.service
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
-import no.jpro.mypageapi.dto.CreatePendingBookingDTO
-import no.jpro.mypageapi.dto.DrawingPeriodDTO
-import no.jpro.mypageapi.dto.PendingBookingDTO
-import no.jpro.mypageapi.dto.PendingBookingTrainDTO
+import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.entity.PendingBooking
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.ApartmentRepository
@@ -31,7 +28,7 @@ class PendingBookingService(
         get() = LocalDate.now().plusMonths(5)
 
     fun createPendingBooking(bookingRequest: CreatePendingBookingDTO, createdBy: User): PendingBookingDTO {
-        if(createdBy.id==null){
+        if (createdBy.id == null) {
             throw IllegalArgumentException("Ikke mulig å opprette bookingen.")
         }
 
@@ -47,7 +44,8 @@ class PendingBookingService(
 
         val eksisterendePendingBookings = entityManager.createQuery(
             "SELECT p from PendingBooking p where p.apartment.id = :apartmentId AND p.employee = :user AND ( p.endDate > :startDate AND p.startDate < :endDate\n" +
-                    "                               OR :startDate < p.endDate AND :endDate > p.startDate)", PendingBooking::class.java
+                    "                               OR :startDate < p.endDate AND :endDate > p.startDate)",
+            PendingBooking::class.java
         )
         eksisterendePendingBookings.setParameter("apartmentId", bookingRequest.apartmentID)
         eksisterendePendingBookings.setParameter("user", createdBy)
@@ -55,7 +53,7 @@ class PendingBookingService(
         eksisterendePendingBookings.setParameter("endDate", bookingRequest.endDate)
         val userAlreadyHasPendingBooking = eksisterendePendingBookings.resultList.isNotEmpty()
 
-        if(userAlreadyHasPendingBooking){
+        if (userAlreadyHasPendingBooking) {
             throw IllegalArgumentException("Du har allerede en ønsket booking på denne leiligheten i dette tidsrommet.")
         }
 
@@ -177,5 +175,17 @@ class PendingBookingService(
 
     fun deletePendingBooking(pendingBookingId: Long) {
         return pendingBookingRepository.deleteById(pendingBookingId)
+    }
+
+    fun editPendingBooking(editBookingRequest: UpdateBookingDTO, bookingToEdit: PendingBooking) {
+        val bookingToSave = PendingBooking(
+            bookingToEdit.id,
+            editBookingRequest.startDate,
+            editBookingRequest.endDate,
+            bookingToEdit.apartment,
+            bookingToEdit.employee,
+            createdDate = bookingToEdit.createdDate
+        )
+        pendingBookingRepository.save(bookingToSave)
     }
 }

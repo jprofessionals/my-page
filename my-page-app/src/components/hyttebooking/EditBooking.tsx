@@ -14,12 +14,27 @@ const editExistingBooking = async ({
   editedBooking,
   bookingId,
   userIsAdmin,
+  bookingIsPending,
 }: {
   editedBooking: EditedBooking
   bookingId: number
   userIsAdmin: boolean
+  bookingIsPending: boolean
 }) => {
-  if (userIsAdmin) {
+  if(bookingIsPending){
+    return axios
+        .patch(API_URL + 'pendingBooking/' + bookingId, editedBooking, {
+          headers: authHeader(),
+        })
+        .then((response) => response.data)
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            throw error.response.data
+          } else {
+            throw 'En feil skjedde under redigeringen, prøv igjen.'
+          }
+        })
+  } else if (userIsAdmin) {
     return axios
       .patch(API_URL + 'booking/admin/' + bookingId, editedBooking, {
         headers: authHeader(),
@@ -96,7 +111,7 @@ const EditBooking = ({
         startDate: startDate,
         endDate: endDate,
       }
-      mutate({ editedBooking, bookingId, userIsAdmin: userIsAdmin })
+      mutate({ editedBooking, bookingId, userIsAdmin: userIsAdmin, bookingIsPending: booking.isPending })
     }
   }
 
