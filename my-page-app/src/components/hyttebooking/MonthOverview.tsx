@@ -73,7 +73,6 @@ export default function MonthOverview() {
 
 
   const getBookingsOnDay = (date: Date) => {
-    //duhar
     const dateString = format(date, 'yyyy-MM-dd')
     const bookingsOnDay = getBookings(dateString)
     if(yourPendingBookings) {
@@ -139,12 +138,12 @@ export default function MonthOverview() {
   }
 
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
-  const [bookingIdToDelete, setBookingIdToDelete] = useState<number | null>(
+  const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(
     null,
   )
 
-  const openDeleteModal = (bookingId: number | null) => {
-    setBookingIdToDelete(bookingId)
+  const openDeleteModal = (booking: Booking | null) => {
+    setBookingToDelete(booking)
     setDeleteModalIsOpen(true)
   }
 
@@ -153,10 +152,14 @@ export default function MonthOverview() {
   }
 
   const confirmDelete = () => {
-    if (userIsAdmin) {
-      handleAdminDeleteBooking(bookingIdToDelete)
+    if(bookingToDelete?.isPending){
+        handleDeletePendingBooking(bookingToDelete?.id || null)
     } else {
-      handleDeleteBooking(bookingIdToDelete)
+      if (userIsAdmin) {
+        handleAdminDeleteBooking(bookingToDelete?.id || null)
+      } else {
+        handleDeleteBooking(bookingToDelete?.id || null)
+      }
     }
     closeDeleteModal()
   }
@@ -233,12 +236,28 @@ export default function MonthOverview() {
 
   const deletePendingBookingById = async (pendingBookingId: number | null) => {
     try {
-      await ApiService.deletePendingBooking(pendingBookingId)
+      if(userIsAdmin){
+        await ApiService.adminDeletePendingBooking(pendingBookingId)
+      } else {
+        await ApiService.deletePendingBooking(pendingBookingId)
+      }
       toast.success('Ønsket reservasjon er slettet')
       closeModal()
     } catch (error) {
       toast.error(
         `Ønsket reservasjon ble ikke slettet med følgende feil: ${error}`,
+      )
+    }
+  }
+
+  const adminDeletePendingBookingById = async (pendingBookingId: number | null) => {
+    try {
+      await ApiService.deletePendingBooking(pendingBookingId)
+      toast.success('Ønsket reservasjon er slettet')
+      closeModal()
+    } catch (error) {
+      toast.error(
+          `Ønsket reservasjon ble ikke slettet med følgende feil: ${error}`,
       )
     }
   }
@@ -908,7 +927,6 @@ export default function MonthOverview() {
                                     <div className="flex flex-col">
                                       <p className="flex-row justify-between items-center space-x-2">
                                         <span style={{ fontStyle: booking.isPending ? 'italic' : 'normal' }}>
-                                          DUHAR&nbsp;
                                           {isYourBooking
                                             ? `Du ${booking.isPending ? 'ønsker' : 'har'} hytten fra ${formattedStartDate} til ${formattedEndDate}.`
                                             : `${booking.employeeName} har hytten fra ${formattedStartDate} til ${formattedEndDate}.`}
@@ -923,7 +941,7 @@ export default function MonthOverview() {
                                         </button>
                                         <button
                                           onClick={() =>
-                                            openDeleteModal(booking.id)
+                                            openDeleteModal(booking)
                                           }
                                           className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
                                         >
@@ -936,7 +954,7 @@ export default function MonthOverview() {
                                           style={customModalStyles}
                                         >
                                           <p className="mb-3">
-                                            Er du sikker på at du vil slette
+                                            Er du sikker på at du vil slette {booking.isPending ? 'den ønskede ':''}
                                             reservasjonen?
                                           </p>
                                           <div className="flex justify-end">

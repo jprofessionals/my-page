@@ -167,6 +167,11 @@ const deletePendingBooking = (pendingBookingId) => {
     headers: authHeader(),
   })
 }
+const adminDeletePendingBooking = (pendingBookingId) => {
+  return axios.delete(API_URL + 'pendingBooking/admin/' + pendingBookingId, {
+    headers: authHeader(),
+  })
+}
 
 const getInfoNotices = (startDate, endDate) => {
   const params = {
@@ -252,6 +257,7 @@ const ApiService = {
   pickWinnerPendingBooking,
   getPendingBookingsForUser,
   deletePendingBooking,
+  adminDeletePendingBooking,
   getInfoNotices,
   deleteInfoNotice,
   getAllInfoNoticeVacancies,

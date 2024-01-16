@@ -105,8 +105,26 @@ class PendingBookingController(
         return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
     }
 
-    @DeleteMapping("{pendingBookingID}")
+    @DeleteMapping("admin/{pendingBookingID}")
     @RequiresAdmin
+    @Operation(summary = "Delete the pending booking connected to the pending booking id")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json")]
+    )
+    fun adminDeletePendingBooking(
+        token: JwtAuthenticationToken,
+        @PathVariable("pendingBookingID") pendingBookingID: Long,
+    ): ResponseEntity<String> {
+        val pendingBooking = pendingBookingService.getPendingBooking(pendingBookingID)
+        if (pendingBooking === null) {
+            return ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+        pendingBookingService.deletePendingBooking(pendingBookingID)
+        return ResponseEntity.ok("Pending booking with ID $pendingBookingID has been deleted")
+    }
+
+    @DeleteMapping("{pendingBookingID}")
     @Operation(summary = "Delete the pending booking connected to the pending booking id")
     @ApiResponse(
         responseCode = "200",
@@ -120,6 +138,12 @@ class PendingBookingController(
         if (pendingBooking === null) {
             return ResponseEntity(HttpStatus.NOT_FOUND)
         }
+        val user =
+            userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        if (!userPermittedToEditBooking(pendingBooking, user)) {
+            return ResponseEntity(HttpStatus.FORBIDDEN)
+        }
+
         pendingBookingService.deletePendingBooking(pendingBookingID)
         return ResponseEntity.ok("Pending booking with ID $pendingBookingID has been deleted")
     }

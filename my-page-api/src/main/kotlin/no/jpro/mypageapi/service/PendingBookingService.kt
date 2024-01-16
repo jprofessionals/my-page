@@ -178,6 +178,7 @@ class PendingBookingService(
     }
 
     fun editPendingBooking(editBookingRequest: UpdateBookingDTO, bookingToEdit: PendingBooking) {
+        //TODO: sjekk om det finnes en overlappende fastsatt booking
         val bookingToSave = PendingBooking(
             bookingToEdit.id,
             editBookingRequest.startDate,
