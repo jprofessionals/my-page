@@ -37,7 +37,7 @@ export default function MonthOverview() {
     },
   )
 
-  const { data: yourPendingBookings } = useQuery<Booking[]>(
+  const { data: yourPendingBookings, refetch: refetchYourPendingBookings } = useQuery<Booking[]>(
     'yourPendingBookingsOutline',
     async () => {
       const yourPendingBookings = await ApiService.getPendingBookingsForUser()
@@ -70,8 +70,6 @@ export default function MonthOverview() {
     )
   }
 
-
-
   const getBookingsOnDay = (date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd')
     const bookingsOnDay = getBookings(dateString)
@@ -84,7 +82,9 @@ export default function MonthOverview() {
 
   function pendingBookingIsOnDay(date: Date, booking: Booking){
     const startDate = new Date(booking.startDate)
+    startDate.setHours(0)
     const endDate = new Date(booking.endDate)
+    endDate.setHours(0)
 
     return startDate<=date && endDate>=date;
   }
@@ -250,18 +250,6 @@ export default function MonthOverview() {
     }
   }
 
-  const adminDeletePendingBookingById = async (pendingBookingId: number | null) => {
-    try {
-      await ApiService.deletePendingBooking(pendingBookingId)
-      toast.success('Ønsket reservasjon er slettet')
-      closeModal()
-    } catch (error) {
-      toast.error(
-          `Ønsket reservasjon ble ikke slettet med følgende feil: ${error}`,
-      )
-    }
-  }
-
   const deletePendingBooking = useMutation(deletePendingBookingById, {
     onSuccess: () => {
       queryClient.invalidateQueries('allPendingBookingsAllApartments')
@@ -421,12 +409,13 @@ export default function MonthOverview() {
   const refreshVacancies = useCallback(async () => {
     if (cutOffDateVacancies != null) {
       setVacancyLoadingStatus('loading')
-
       try {
         const loadedVacancies = await ApiService.getAllVacancies(
           startDateVacancies,
           cutOffDateVacancies,
         )
+        await refetchPendingBookings()
+        await refetchYourPendingBookings()
         setVacancyLoadingStatus('completed')
         setVacancies(loadedVacancies)
       } catch (e) {
@@ -538,7 +527,7 @@ export default function MonthOverview() {
     return vacantApartmentsOnDay
   }
 
-  const { data: allPendingBookingTrains } = useQuery(
+  const { data: allPendingBookingTrains, refetch: refetchPendingBookings } = useQuery(
     'allPendingBookingsAllApartments',
     async () => {
       const fetchedPendingBookingsTrains =
