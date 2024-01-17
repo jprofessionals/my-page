@@ -58,7 +58,7 @@
     "@types/sockjs-client": "^1.5.4",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.33",
-    "prettier": "^3.1.1",
+    "prettier": "^3.2.3",
     "tailwindcss": "^3.4.1"
   },
   "engines": {
