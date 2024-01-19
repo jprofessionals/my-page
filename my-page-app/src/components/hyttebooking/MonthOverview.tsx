@@ -6,7 +6,6 @@ import {
   Apartment,
   Booking,
   DrawingPeriod,
-  PendingBooking,
   InfoBooking,
   Settings
 } from '@/types'
@@ -38,7 +37,7 @@ export default function MonthOverview() {
     },
   )
 
-  const { data: yourPendingBookings } = useQuery<PendingBooking[]>(
+  const { data: yourPendingBookings, refetch: refetchYourPendingBookings } = useQuery<Booking[]>(
     'yourPendingBookingsOutline',
     async () => {
       const yourPendingBookings = await ApiService.getPendingBookingsForUser()
@@ -74,7 +73,21 @@ export default function MonthOverview() {
   const getBookingsOnDay = (date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd')
     const bookingsOnDay = getBookings(dateString)
+    if(yourPendingBookings) {
+      bookingsOnDay.push(...yourPendingBookings.filter(pb => pendingBookingIsOnDay(date, pb) &&
+          !bookingsOnDay.some(book => book.apartment.id == pb.apartment.id)));
+    }
     setBookingItems(bookingsOnDay)
+  }
+
+  function pendingBookingIsOnDay(date: Date, booking: Booking){
+    const startDate = new Date(booking.startDate)
+    startDate.setHours(0)
+    const endDate = new Date(booking.endDate)
+    endDate.setHours(0)
+
+    let b = startDate<=date && endDate>=date;
+    return b;
   }
 
   const { data: allInfoNotices } = useQuery<InfoBooking[]>(
@@ -126,12 +139,12 @@ export default function MonthOverview() {
   }
 
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
-  const [bookingIdToDelete, setBookingIdToDelete] = useState<number | null>(
+  const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(
     null,
   )
 
-  const openDeleteModal = (bookingId: number | null) => {
-    setBookingIdToDelete(bookingId)
+  const openDeleteModal = (booking: Booking | null) => {
+    setBookingToDelete(booking)
     setDeleteModalIsOpen(true)
   }
 
@@ -140,10 +153,14 @@ export default function MonthOverview() {
   }
 
   const confirmDelete = () => {
-    if (userIsAdmin) {
-      handleAdminDeleteBooking(bookingIdToDelete)
+    if(bookingToDelete?.isPending){
+        handleDeletePendingBooking(bookingToDelete?.id || null)
     } else {
-      handleDeleteBooking(bookingIdToDelete)
+      if (userIsAdmin) {
+        handleAdminDeleteBooking(bookingToDelete?.id || null)
+      } else {
+        handleDeleteBooking(bookingToDelete?.id || null)
+      }
     }
     closeDeleteModal()
   }
@@ -220,7 +237,11 @@ export default function MonthOverview() {
 
   const deletePendingBookingById = async (pendingBookingId: number | null) => {
     try {
-      await ApiService.deletePendingBooking(pendingBookingId)
+      if(userIsAdmin){
+        await ApiService.adminDeletePendingBooking(pendingBookingId)
+      } else {
+        await ApiService.deletePendingBooking(pendingBookingId)
+      }
       toast.success('Ønsket reservasjon er slettet')
       closeModal()
     } catch (error) {
@@ -389,12 +410,13 @@ export default function MonthOverview() {
   const refreshVacancies = useCallback(async () => {
     if (cutOffDateVacancies != null) {
       setVacancyLoadingStatus('loading')
-
       try {
         const loadedVacancies = await ApiService.getAllVacancies(
           startDateVacancies,
           cutOffDateVacancies,
         )
+        await refetchPendingBookings()
+        await refetchYourPendingBookings()
         setVacancyLoadingStatus('completed')
         setVacancies(loadedVacancies)
       } catch (e) {
@@ -498,7 +520,8 @@ export default function MonthOverview() {
     const availableApartments: Apartment[] = []
     const vacantApartmentsInPeriod = getVacantApartments(selectedDate)
     for (const apartment of apartments) {
-      if (vacantApartmentsInPeriod.includes(apartment.id!)) {
+      if (vacantApartmentsInPeriod.includes(apartment.id!) &&
+          !yourPendingBookings?.some(pb=> pb.apartment.id == apartment.id && pendingBookingIsOnDay(selectedDate, pb) )) {
         availableApartments.push(apartment)
       }
     }
@@ -506,7 +529,7 @@ export default function MonthOverview() {
     return vacantApartmentsOnDay
   }
 
-  const { data: allPendingBookingTrains } = useQuery(
+  const { data: allPendingBookingTrains, refetch: refetchPendingBookings } = useQuery(
     'allPendingBookingsAllApartments',
     async () => {
       const fetchedPendingBookingsTrains =
@@ -539,7 +562,7 @@ export default function MonthOverview() {
   }
 
   const [pendingBookingsOnDay, setPendingBookingsOnDay] = useState<
-    PendingBooking[]
+    Booking[]
   >([])
   const getPendingBookingsOnDay = (selectedDate: Date) => {
     const pendingBookingsOnDayArrayOfArray = []
@@ -577,12 +600,12 @@ export default function MonthOverview() {
   }
 
   const [pendingBookingList, setPendingBookingList] = useState<
-    PendingBooking[][]
+    Booking[][]
   >([])
 
   const getPendBookingListFromDrawPeriod = (selectedDate: Date) => {
     const drawingPeriodsOnDay = getDrawingPeriodsOnDay(selectedDate)
-    const pendingBookingList: PendingBooking[][] = []
+    const pendingBookingList: Booking[][] = []
 
     for (const pendingBooking of drawingPeriodsOnDay) {
       const value = pendingBooking.valueOf()
@@ -644,10 +667,16 @@ export default function MonthOverview() {
   const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
 
   function formatDrawing(drawingPeriod: DrawingPeriod) {
+
     let autoDrawingDate: Date = drawingPeriod.pendingBookings.reduce((earliest, booking) => {
-      const bookingCreatedDate = new Date(booking.createdDate);
+      let bookingCreatedDate : Date
+      if(booking.createdDate){
+        bookingCreatedDate= new Date(booking.createdDate)
+      } else {
+        bookingCreatedDate= new Date()
+      }
       return earliest < bookingCreatedDate ? earliest : bookingCreatedDate;
-    }, new Date(drawingPeriod.pendingBookings[0].createdDate));
+    }, new Date());
     autoDrawingDate.setDate(autoDrawingDate.getDate()+7)
 
     let earliestStartDate = drawingPeriod.pendingBookings.reduce((earliest, booking) => {
@@ -859,9 +888,10 @@ export default function MonthOverview() {
                           )
                           const formattedEndDate = format(endDate, 'dd.MM.yyyy')
 
-                          const isYourBooking = yourBookings?.some(
+                          const isYourBooking = !booking.isPending && yourBookings?.some(
                             (yourBooking) => yourBooking.id === booking.id,
-                          )
+                          ) || booking.isPending //only pending booking belonging to the user are in bookingItems
+
 
                           const prevCabinName =
                             index > 0
@@ -887,9 +917,9 @@ export default function MonthOverview() {
                                   <>
                                     <div className="flex flex-col">
                                       <p className="flex-row justify-between items-center space-x-2">
-                                        <span>
+                                        <span style={{ fontStyle: booking.isPending ? 'italic' : 'normal' }}>
                                           {isYourBooking
-                                            ? `Du har hytten fra ${formattedStartDate} til ${formattedEndDate}.`
+                                            ? `Du ${booking.isPending ? 'ønsker' : 'har'} hytten fra ${formattedStartDate} til ${formattedEndDate}.`
                                             : `${booking.employeeName} har hytten fra ${formattedStartDate} til ${formattedEndDate}.`}
                                         </span>
                                         <button
@@ -902,7 +932,7 @@ export default function MonthOverview() {
                                         </button>
                                         <button
                                           onClick={() =>
-                                            openDeleteModal(booking.id)
+                                            openDeleteModal(booking)
                                           }
                                           className="bg-red-not-available text-white px-2 py-0.5 rounded-md"
                                         >
@@ -915,7 +945,7 @@ export default function MonthOverview() {
                                           style={customModalStyles}
                                         >
                                           <p className="mb-3">
-                                            Er du sikker på at du vil slette
+                                            Er du sikker på at du vil slette {booking.isPending ? 'den ønskede ':''}
                                             reservasjonen?
                                           </p>
                                           <div className="flex justify-end">
@@ -947,11 +977,13 @@ export default function MonthOverview() {
                                   </>
                                 ) : (
                                   <>
-                                    <span>
-                                      {booking.employeeName} har fra{' '}
-                                      {formattedStartDate} til{' '}
-                                      {formattedEndDate}.
-                                    </span>
+                                    {!booking.isPending && (
+                                      <span>
+                                        {booking.employeeName} har fra{' '}
+                                        {formattedStartDate} til{' '}
+                                        {formattedEndDate}.
+                                      </span>
+                                    )}
                                   </>
                                 )}
                               </p>

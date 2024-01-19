@@ -87,6 +87,8 @@ export type Booking = {
   endDate: string
   apartment: Apartment
   employeeName: string
+  isPending: boolean
+  createdDate?: string
 }
 
 export type BookingPost = {
@@ -98,15 +100,6 @@ export type BookingPost = {
 export type EditedBooking = {
   startDate: string
   endDate: string
-}
-
-export type PendingBooking = {
-  id: number
-  apartment: Apartment
-  startDate: string
-  endDate: string
-  createdDate: string
-  employeeName: string
 }
 
 export type PendingBookingTrain = {
@@ -121,7 +114,7 @@ export type DrawingPeriod = {
   id: string
   startDate: string
   endDate: string
-  pendingBookings: PendingBooking[]
+  pendingBookings: Booking[]
 }
 
 export type InfoBooking = {

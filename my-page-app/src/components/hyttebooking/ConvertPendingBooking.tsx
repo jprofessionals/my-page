@@ -1,11 +1,11 @@
 import React from 'react'
 import { useMutation, useQueryClient } from 'react-query'
 import ApiService from '@/services/api.service'
-import { PendingBooking } from '@/types'
+import { Booking } from '@/types'
 import { toast } from 'react-toastify'
 
 type Props = {
-  pendingBookingList: PendingBooking[]
+  pendingBookingList: Booking[]
   closeModal: () => void
   refreshVacancies: () => void
   userIsAdmin: boolean
