@@ -27,8 +27,12 @@ class PendingBookingService(
     val cutOffDate: LocalDate
         get() = LocalDate.now().plusMonths(5)
 
-    fun createPendingBooking(bookingRequest: CreatePendingBookingDTO, createdBy: User): PendingBookingDTO {
-        if (createdBy.id == null) {
+    fun createPendingBooking(
+        bookingRequest: CreatePendingBookingDTO,
+        createdFor: User,
+        creatorIsAdmin: Boolean
+    ): PendingBookingDTO {
+        if (createdFor.id == null) {
             throw IllegalArgumentException("Ikke mulig å opprette bookingen.")
         }
 
@@ -48,20 +52,24 @@ class PendingBookingService(
             PendingBooking::class.java
         )
         eksisterendePendingBookings.setParameter("apartmentId", bookingRequest.apartmentID)
-        eksisterendePendingBookings.setParameter("user", createdBy)
+        eksisterendePendingBookings.setParameter("user", createdFor)
         eksisterendePendingBookings.setParameter("startDate", bookingRequest.startDate)
         eksisterendePendingBookings.setParameter("endDate", bookingRequest.endDate)
         val userAlreadyHasPendingBooking = eksisterendePendingBookings.resultList.isNotEmpty()
 
         if (userAlreadyHasPendingBooking) {
-            throw IllegalArgumentException("Du har allerede en ønsket booking på denne leiligheten i dette tidsrommet.")
+            throw IllegalArgumentException(
+                if (creatorIsAdmin) createdFor.name else {
+                    "Du"
+                } + " har allerede et bookingønske på denne leiligheten i dette tidsrommet."
+            )
         }
 
         val pendingBooking = pendingBookingMapper.toPendingBooking(
             bookingRequest,
             apartment
         ).copy(
-            employee = createdBy
+            employee = createdFor
         )
         return pendingBookingMapper.toPendingBookingDTO(pendingBookingRepository.save(pendingBooking))
 

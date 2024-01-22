@@ -45,7 +45,7 @@ class PendingBookingController(
     ): ResponseEntity<String> {
         val user =
             userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
-        pendingBookingService.createPendingBooking(bookingRequest, user)
+        pendingBookingService.createPendingBooking(bookingRequest, user, false)
         return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
     }
 
@@ -65,7 +65,7 @@ class PendingBookingController(
     ): ResponseEntity<String> {
         val user =
             userService.getUserByName(bookingOwnerName) ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
-        pendingBookingService.createPendingBooking(bookingRequest, user)
+        pendingBookingService.createPendingBooking(bookingRequest, user, true)
         return ResponseEntity("A new booking has been successfully created for " + user.name, HttpStatus.CREATED)
     }
 
