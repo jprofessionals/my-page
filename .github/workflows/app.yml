@@ -57,7 +57,7 @@ jobs:
     # This job ensures that deploy-prod does not get skipped even if deploy-test is skipped
     # Add any additional setup or environment preparation steps if required
   deploy-prod:
-    if: github.ref == 'refs/heads/main'
+    if: ${{ always() && github.ref == 'refs/heads/main' && (needs.deploy-test.result == 'success' || needs.deploy-test.result == 'skipped') }}    
     needs: [always-run, deploy-test]
     runs-on: ubuntu-latest
     environment: prod
