@@ -520,8 +520,9 @@ export default function MonthOverview() {
     const availableApartments: Apartment[] = []
     const vacantApartmentsInPeriod = getVacantApartments(selectedDate)
     for (const apartment of apartments) {
-      if (vacantApartmentsInPeriod.includes(apartment.id!) &&
-          !yourPendingBookings?.some(pb=> pb.apartment.id == apartment.id && pendingBookingIsOnDay(selectedDate, pb) )) {
+      if (vacantApartmentsInPeriod.includes(apartment.id!) &&(
+          userIsAdmin ||
+          !yourPendingBookings?.some(pb=> pb.apartment.id == apartment.id && pendingBookingIsOnDay(selectedDate, pb) ))) {
         availableApartments.push(apartment)
       }
     }
