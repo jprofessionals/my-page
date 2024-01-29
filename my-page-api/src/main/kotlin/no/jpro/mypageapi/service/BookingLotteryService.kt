@@ -207,7 +207,7 @@ class BookingLotteryService(
         result.append("*Hyttetrekning er gjennomført og følgende vinnere er trukket ut:*\n")
         for (vinner in vinnere) {
             result.append(
-                vinner.employee?.name + " får " + vinner.apartment.cabin_name + " fra " + vinner.startDate.format(
+                slackConsumer.getUserToNotify(vinner.employee) + " får " + vinner.apartment.cabin_name + " fra " + vinner.startDate.format(
                     dagMåned
                 ) + " til " + vinner.endDate.format(dagMåned) + "\n"
             )
@@ -218,7 +218,7 @@ class BookingLotteryService(
         result.append("\n*Følgende ønskede bookinger overlapper med vinnerne og er derfor tatt bort:*\n")
         for (taper in tapere) {
             result.append(
-                taper.employee?.name + " ønsket " + taper.apartment.cabin_name + " fra " + taper.startDate.format(
+                slackConsumer.getUserToNotify(taper.employee) + " ønsket " + taper.apartment.cabin_name + " fra " + taper.startDate.format(
                     dagMåned
                 ) + " til " + taper.endDate.format(dagMåned) + "\n"
             )
