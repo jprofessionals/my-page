@@ -2,10 +2,11 @@ package no.jpro.mypageapi.consumer.slack
 
 import com.slack.api.Slack
 import com.slack.api.methods.MethodsClient
+import no.jpro.mypageapi.entity.User
+
 import no.jpro.mypageapi.provider.SecretProvider
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class SlackConsumer(private val secretProvider: SecretProvider) {
@@ -13,16 +14,6 @@ class SlackConsumer(private val secretProvider: SecretProvider) {
     private var hytteBookingChannel: String = "NOT_SET"
 
     private val slack = Slack.getInstance()
-
-    fun postMessageToChannel(
-        userOwner: String,
-        userRequested: String,
-        startDate: LocalDate,
-        endDate: LocalDate
-    ): String {
-
-        return postMessageToChannel("Kjære $userOwner, $userRequested ønsker også å booke i tidsrommet fra $startDate til $endDate")
-    }
 
     fun postMessageToChannel(msg: String): String {
         val token = secretProvider.getSlackSecret()
@@ -46,6 +37,23 @@ class SlackConsumer(private val secretProvider: SecretProvider) {
         }
 
         return "Response == null!"
+    }
+
+    fun getUserIdByEmail(email: String): String? {
+        val token = secretProvider.getSlackSecret()
+        val methods: MethodsClient? = slack.methods(token)
+        val response = methods?.usersLookupByEmail { it.email(email) }
+
+        if (response?.isOk == true) {
+            return response.user.id
+        }
+        return null
+    }
+
+    fun getUserToNotify(user: User?): String {
+        if (user == null) return "Ukjent bruker"
+        val slackId = user.email?.let { getUserIdByEmail(it) }
+        return if (slackId != null) "<@$slackId>" else user.name ?: "Ukjent bruker"
     }
 }
 
