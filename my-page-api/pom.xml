@@ -19,7 +19,7 @@
         <kotlin.version>1.9.22</kotlin.version>
         <testcontainers.version>1.19.3</testcontainers.version>
         <avro.version>1.11.3</avro.version>
-        <slack.version>1.37.0</slack.version>
+        <slack.version>1.38.0</slack.version>
         <ktor.version>2.3.7</ktor.version>
     </properties>
 
