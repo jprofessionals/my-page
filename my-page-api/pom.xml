@@ -165,7 +165,7 @@
         <dependency>
             <groupId>com.aallam.openai</groupId>
             <artifactId>openai-client-jvm</artifactId>
-            <version>3.6.3</version>
+            <version>3.7.0</version>
         </dependency>
 
         <dependency>
