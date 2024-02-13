@@ -25,10 +25,25 @@ class TaskController(val bookingLotteryService: BookingLotteryService, val secre
         content = [Content(mediaType = "application/json")]
     )
     fun triggerDrawPendingBookings(@RequestHeader("auth-key") authKey: String): ResponseEntity<String> {
-        if (authKey != secretProvider.getBookingLotteryKey()) {
+        if (authKey != secretProvider.getTaskSchedulerKey()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
         bookingLotteryService.runPendingBookingsLottery()
         return ResponseEntity.ok("Pending bookings have been drawn")
+    }
+
+    @GetMapping("/notifyUpcomingBookings")
+    @Operation(summary = "bob")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(mediaType = "application/json")]
+    )
+    fun notifySlackWithUpcomingBookings(@RequestHeader("auth-key") authKey: String): ResponseEntity<String> {
+        //TODO: rename secret
+        if (authKey != secretProvider.getTaskSchedulerKey()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        return ResponseEntity.ok("Notifications have been posted to slack")
     }
 }

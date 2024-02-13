@@ -11,7 +11,7 @@ class SecretProviderMock: SecretProvider {
         return "mock"
     }
 
-    override fun getBookingLotteryKey(): String {
+    override fun getTaskSchedulerKey(): String {
         return "mock"
     }
 

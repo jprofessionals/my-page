@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 
 interface SecretProvider {
     fun getOpenAiApiKey(): String
-    fun getBookingLotteryKey(): String
+    fun getTaskSchedulerKey(): String
     fun getSlackSecret(): String
 }
 
@@ -27,7 +27,7 @@ class SecretProviderLocal : SecretProvider {
     override fun getOpenAiApiKey(): String {
         return apiKey
     }
-    override fun getBookingLotteryKey(): String {
+    override fun getTaskSchedulerKey(): String {
         return "DUMMY_KEY"
     }
 
@@ -42,8 +42,8 @@ class SecretProviderGcp : SecretProvider {
     @Value("\${sm://OpenAI_API}")
     private val openAIapiKey: String = "NOT_SET"
 
-    @Value("\${sm://BookingLotteryKey}")
-    private val bookingLotteryKey: String = "NOT_SET"
+    @Value("\${sm://BookingLotteryKey}")//secret heter bookinglottery key av historiske grunner, vil endres etterhvert
+    private val taskSchedulerKey: String = "NOT_SET"
 
     @Value("\${sm://slack_bot_token}")
     private val slackBotToken : String = "NOT_SET"
@@ -57,11 +57,11 @@ class SecretProviderGcp : SecretProvider {
         return openAIapiKey
     }
 
-    override fun getBookingLotteryKey(): String {
-        if (bookingLotteryKey == "NOT_SET") {
+    override fun getTaskSchedulerKey(): String {
+        if (taskSchedulerKey == "NOT_SET") {
             throw IllegalStateException("Unable to evaluate authorization key, BookingLotteryKey not set in Secret Manager")
         }
-        return bookingLotteryKey
+        return taskSchedulerKey
     }
 
     override fun getSlackSecret(): String {
