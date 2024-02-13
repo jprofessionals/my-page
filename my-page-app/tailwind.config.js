@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: [
     // New app directory layout:
@@ -45,7 +46,9 @@ module.exports = {
           hotel: '#F6B26B',
         },
       },
-
+      backgroundImage: {
+        'pattern': "url('/images/linjert-l.png')",
+      },
     },
     keyframes: {
       'accordion-down': {

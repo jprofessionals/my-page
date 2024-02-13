@@ -110,41 +110,31 @@ function Hyttebooking() {
 
         <div className="flex flex-col gap-3 mt-7">
           <div className="flex gap-2 bg-gray-100 rounded-lg">
-            <div className="w-6 rounded-l-lg bg-orange-brand" />
+            <div className="w-6 rounded-lg bg-orange-brand" />
+            /
+            <div className="w-6 rounded-lg bg-pattern bg-yellow-200"/>
             <span>
               Stor leilighet: 13 sengeplasser (dyr <strong>ikke</strong> tilatt)
             </span>
           </div>
 
           <div className="flex gap-2 bg-gray-100 rounded-lg">
-            <div className="w-6 rounded-l-lg bg-blue-small-appartment" />
+            <div className="w-6 rounded-lg bg-blue-small-appartment"/>
+            /
+            <div className="w-6 rounded-lg bg-pattern bg-purple-200"/>
             Liten leilighet: 11 sengeplasser (dyr tilatt, men ikke på soverom)
           </div>
 
           <div className="flex gap-2 bg-gray-100 rounded-lg">
-            <div className="w-6 rounded-l-lg bg-teal-annex" />
+            <div className="w-6 rounded-lg bg-teal-annex" />
+            /
+            <div className="w-6 rounded-lg bg-pattern bg-green-200"/>
             <span>
               Annekset: 10 sengeplasser (dyr <strong>ikke</strong> tilatt)
             </span>
           </div>
         </div>
       </div>
-      {/*<div className="flex justify-end p-4">
-        <Button
-          size="sm"
-          className={`mt-4 mr-4 ${showMonthOverview ? 'bg-orange-500' : ''}`}
-          onClick={handleShowMonthOverview}
-        >
-          Måned oversikt
-        </Button>
-        <Button
-          size="sm"
-          className={`mt-4 mr-4 ${showYearOverview ? 'bg-orange-500' : ''}`}
-          onClick={handleShowYearOverview}
-        >
-          År oversikt
-        </Button>
-      </div>*/}
 
       {showMonthOverview && <MonthOverview />}
       {showYearOverview && <YearOverview />}
