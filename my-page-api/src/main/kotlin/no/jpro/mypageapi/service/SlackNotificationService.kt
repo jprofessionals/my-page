@@ -17,14 +17,16 @@ class SlackNotificationService(
 
     fun notifySlackChannelWithUpcomingBookings() {
 
+        val periodStart= findPeriodStart();
+
         val dayMonthFormat =
             DateTimeFormatter.ofPattern("d. MMMM", Locale.Builder().setLanguage("nb").setRegion("NO").build())
-        val today = LocalDate.now()
+
         val upcomingBookings =
-            bookingRepository.findBookingsByStartDateGreaterThanEqualAndStartDateLessThanEqual(today, today.plusDays(7))
+            bookingRepository.findBookingsByStartDateGreaterThanEqualAndStartDateLessThanEqual(periodStart, periodStart.plusDays(6))
 
         val notificationBuilder = StringBuilder()
-        notificationBuilder.append("*Hyttereservasjoner neste 7 dager:*\n")
+        notificationBuilder.append("*Hyttereservasjoner neste periode:*\n")
         for (booking in upcomingBookings) {
             val bookingEier = slackConsumer.getUserToNotify(booking.employee)
             notificationBuilder.append(
@@ -43,5 +45,13 @@ class SlackNotificationService(
         }
 
         slackConsumer.postMessageToChannel(notificationBuilder.toString())
+    }
+
+    private fun findPeriodStart(): LocalDate {
+      //return the date of wednesday of the current week
+        val today = LocalDate.now()
+        val dayOfWeek = today.dayOfWeek.value
+        val daysToWednesday = 3 - dayOfWeek
+        return today.plusDays(daysToWednesday.toLong())
     }
 }
