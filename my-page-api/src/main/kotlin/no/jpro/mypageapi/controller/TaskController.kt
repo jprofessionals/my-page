@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.jpro.mypageapi.provider.SecretProvider
 import no.jpro.mypageapi.service.BookingLotteryService
 import no.jpro.mypageapi.service.SlackNotificationService
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("task")
 @SecurityRequirement(name = "Bearer Authentication")
 class TaskController(val bookingLotteryService: BookingLotteryService, val slackNotificationService: SlackNotificationService, val secretProvider: SecretProvider) {
+
+    private val logger = LoggerFactory.getLogger(TaskController::class.java.name)
 
     @GetMapping("/drawPendingBookings")
     @Operation(summary = "Draws winning pending bookings that have been active for more than 7 days")
