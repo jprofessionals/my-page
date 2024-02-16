@@ -47,7 +47,7 @@ class ApplicationConfig {
                         "/swagger-ui.html", "/swagger-ui/**",
                         "/actuator/**", "/explorationSock",
                         "/explorationSock/**",
-                "/task/**","/task/drawPendingBookings","/task/auto/drawPendingBookings"
+                "/task/**","/task/drawPendingBookings","/task/auto/drawPendingBookings","/task/notifyUpcomingBookings"
             ).permitAll().requestMatchers(HttpMethod.GET, "/settings").permitAll() //Alle (også ikke-påloggede brukere som vil bruke
                                                                                    //lønnskalkulatoren) skal kunne kalle "GET /settings"
                 .requestMatchers("/**").authenticated()
