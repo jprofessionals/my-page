@@ -34,7 +34,7 @@ class SlackNotificationService(
                     booking.startDate.format(
                         dayMonthFormat
                     )
-                } til ${booking.startDate.format(dayMonthFormat)}\n"
+                } til ${booking.endDate.format(dayMonthFormat)}\n"
             )
         }
         val allApartments = apartmentRepository.findAll();
