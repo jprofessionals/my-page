@@ -35,7 +35,7 @@ jobs:
           name: app-prod.yaml
           path: my-page-api/src/main/appengine/app-prod.yaml
   deploy-test:
-    if: github.ref == 'refs/heads/bugfix/admin_dobbelbooking'
+    if: github.ref == 'refs/heads/feature/notify_upcoming'
     needs: build
     runs-on: ubuntu-latest
     environment: test
