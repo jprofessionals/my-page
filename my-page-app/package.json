@@ -43,7 +43,7 @@
     "react-modal": "^3.16.1",
     "react-query": "^3.39.3",
     "react-toastify": "^10.0.4",
-    "react-tooltip": "^5.26.0",
+    "react-tooltip": "^5.26.2",
     "sass": "^1.70.0",
     "sockjs-client": "^1.6.1",
     "tailwind-merge": "^2.2.1",
