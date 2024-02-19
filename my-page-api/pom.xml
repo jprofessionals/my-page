@@ -21,6 +21,7 @@
         <avro.version>1.11.3</avro.version>
         <slack.version>1.38.1</slack.version>
         <ktor.version>2.3.8</ktor.version>
+        <spring-cloud-gcp.version>5.0.2</spring-cloud-gcp.version>
     </properties>
 
     <dependencies>
@@ -176,7 +177,7 @@
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>spring-cloud-gcp-starter-secretmanager</artifactId>
-            <version>5.0.2</version>
+            <version>${spring-cloud-gcp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.retry</groupId>
@@ -326,7 +327,7 @@
             <dependency>
                 <groupId>com.google.cloud</groupId>
                 <artifactId>spring-cloud-gcp-dependencies</artifactId>
-                <version>5.0.2</version>
+                <version>${spring-cloud-gcp.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
