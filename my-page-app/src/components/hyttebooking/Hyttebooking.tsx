@@ -19,6 +19,9 @@ function Hyttebooking() {
     setShowMonthOverview(false)
   }
 
+  const fastsatt_tip = "Hytten er opptatt i den angitte perioden"
+  const pending_tip = "Hytten er ledig i perioden. En eller flere brukere har lagt inn et ønske om å reservere hytten, og det er fortsatt mulig å melde seg på trekningen"
+
   return (
     <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 p-4">
@@ -108,27 +111,28 @@ function Hyttebooking() {
           </a>
         </p>
 
+
         <div className="flex flex-col gap-3 mt-7">
           <div className="flex gap-2 bg-gray-100 rounded-lg">
-            <div className="w-6 rounded-lg bg-orange-brand" />
+            <div className="w-6 rounded-lg bg-orange-brand tooltip tooltip-right" data-tip={fastsatt_tip} />
             /
-            <div className="w-6 rounded-lg bg-pattern bg-yellow-200"/>
+            <div className="w-6 rounded-lg bg-pattern bg-yellow-200 tooltip tooltip-right" data-tip={pending_tip} />
             <span>
               Stor leilighet: 13 sengeplasser (dyr <strong>ikke</strong> tilatt)
             </span>
           </div>
 
-          <div className="flex gap-2 bg-gray-100 rounded-lg">
-            <div className="w-6 rounded-lg bg-blue-small-appartment"/>
+          <div className="flex gap-2 bg-gray-100 rounded-lg tooltip">
+            <div className="w-6 rounded-lg bg-blue-small-appartment tooltip tooltip-right" data-tip={fastsatt_tip}/>
             /
-            <div className="w-6 rounded-lg bg-pattern bg-purple-200"/>
+            <div className="w-6 rounded-lg bg-pattern bg-purple-200 tooltip tooltip-right" data-tip={pending_tip}/>
             Liten leilighet: 11 sengeplasser (dyr tilatt, men ikke på soverom)
           </div>
 
           <div className="flex gap-2 bg-gray-100 rounded-lg">
-            <div className="w-6 rounded-lg bg-teal-annex" />
+            <div className="w-6 rounded-lg bg-teal-annex tooltip tooltip-right" data-tip={fastsatt_tip} />
             /
-            <div className="w-6 rounded-lg bg-pattern bg-green-200"/>
+            <div className="w-6 rounded-lg bg-pattern bg-green-200 tooltip tooltip-right" data-tip={pending_tip}/>
             <span>
               Annekset: 10 sengeplasser (dyr <strong>ikke</strong> tilatt)
             </span>
