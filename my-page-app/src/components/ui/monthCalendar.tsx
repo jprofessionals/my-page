@@ -21,6 +21,7 @@ import {
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {clsx} from "clsx";
 export type CalendarProps = ComponentProps<typeof DayPicker> & {
   cutOffDateVacancies: string
   bookings: Booking[] | undefined
@@ -199,6 +200,7 @@ function MonthCalendar({
                               pendingBookingTrain.apartment.cabin_name,
                             ),
                         'normal-case',
+                          'bg-repeat',
                       )}
                     ></span>
                   ))}
@@ -207,78 +209,92 @@ function MonthCalendar({
             }
 
             return (
-              <div
-                key={cabin}
-                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
-              >
-                {combinedEntries.map((entry) => {
-                  if ('employeeName' in entry) {
-                    const booking = entry as Booking
-                    const isYourBooking = yourBookings?.some(
-                      (yourBooking) => yourBooking.id === booking.id,
-                    )
-                    const { isFirstDay, isLastDay } = getBookingDateInfo(
-                      props.date,
-                      booking,
-                    )
-                    return (
-                      <span
-                        key={booking.id}
-                        className={cn(
-                          'p-2 text-white tooltip tooltip-top shadow-xl',
-                          getCabinBookingStyle(props.date, booking),
-                          isYourBooking && 'shadow-y-2',
-                          isAfter(add(props.date, { days: 1 }), new Date())
-                            ? get(cabinColors, booking.apartment?.cabin_name)
-                            : get(
-                                cabinColorsOpacity,
-                                booking.apartment?.cabin_name,
-                              ),
-                          'normal-case',
-                        )}
-                        {...(windowWidth > 800 && {
-                          'data-tip': `Reservert av: ${booking.employeeName}`,
-                        })}
-                      >
-                        {(isFirstDay || isLastDay) &&
-                          getInitials(booking.employeeName)}
-                      </span>
-                    )
-                  } else {
-                    const pendingBookingTrain = entry as PendingBookingTrain
-                    const hasOverlapWithBooking = cabinBookings.some(
-                      (booking) => hasOverlap(booking, pendingBookingTrain),
-                    )
 
-                    return (
-                      <span
-                        key={pendingBookingTrain.id}
-                        className={cn(
-                          getPendingBookingCabinStyle(
-                            props.date,
-                            pendingBookingTrain,
-                          ),
-                          isAfter(add(props.date, { days: 1 }), new Date())
-                            ? get(
-                                pendingBookingCabinColors,
-                                pendingBookingTrain.apartment.cabin_name,
-                              )
-                            : get(
-                                pendingBookingCabinColors,
-                                pendingBookingTrain.apartment.cabin_name,
-                              ),
-                          'normal-case',
-                          hasOverlapWithBooking && 'hidden',
-                        )}
-                      ></span>
-                    )
-                  }
-                })}
-              </div>
+                <div
+                    key={cabin}
+                    className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
+                >
+                    {combinedEntries.map((entry) => {
+                        if ('employeeName' in entry) {
+                            const booking = entry as Booking
+                            const isYourBooking = yourBookings?.some(
+                                (yourBooking) => yourBooking.id === booking.id,
+                            )
+                            const {isFirstDay, isLastDay} = getBookingDateInfo(
+                                props.date,
+                                booking,
+                            )
+                            return (
+                                <span
+                                    key={booking.id}
+                                    className={cn(
+                                        'p-2 text-white tooltip tooltip-top shadow-xl',
+                                        getCabinBookingStyle(props.date, booking),
+                                        isYourBooking && 'shadow-y-2',
+                                        isAfter(add(props.date, {days: 1}), new Date())
+                                            ? get(cabinColors, booking.apartment?.cabin_name)
+                                            : get(
+                                                cabinColorsOpacity,
+                                                booking.apartment?.cabin_name,
+                                            ),
+                                        'normal-case',
+                                    )}
+                                    {...(windowWidth > 800 && {
+                                        'data-tip': `Reservert av: ${booking.employeeName}`,
+                                    })}
+                                >
+                        {(isFirstDay || isLastDay) &&
+                            getInitials(booking.employeeName)}
+                      </span>
+                            )
+                        } else {
+                            const pendingBookingTrain = entry as PendingBookingTrain
+                            const hasOverlapWithBooking = cabinBookings.some(
+                                (booking) => hasOverlap(booking, pendingBookingTrain),
+                            )
+
+
+                            return (
+                                <span
+                                    key={pendingBookingTrain.id}
+                                    className={clsx(
+                                        getPendingBookingCabinStyle(
+                                            props.date,
+                                            pendingBookingTrain,
+                                        ),
+                                        isAfter(add(props.date, {days: 1}), new Date())
+                                            ? get(
+                                                pendingBookingCabinColors,
+                                                pendingBookingTrain.apartment.cabin_name,
+                                            )
+                                            : get(
+                                                pendingBookingCabinColors,
+                                                pendingBookingTrain.apartment.cabin_name,
+                                            ),
+                                        'normal-case',
+                                        'bg-pattern',
+                                        hasOverlapWithBooking && 'hidden',
+                                    )}
+                                ></span>
+                            )
+                        }
+                    })}
+                </div>
             )
           }
 
-          const infoNoticeElements =
+          /*
+          const className = clsx(
+              getPendingBookingCabinStyle(props.date, pendingBookingTrain),
+              isAfter(add(props.date, { days: 1 }), new Date()) ? get(pendingBookingCabinColors, pendingBookingTrain.apartment.cabin_name) : get(pendingBookingCabinColors, pendingBookingTrain.apartment.cabin_name),
+              'normal-case',
+              'bg-amber-700',
+              'bg-pattern',
+              hasOverlapWithBooking && 'hidden',
+);
+           */
+
+            const infoNoticeElements =
             informationNoticeList.length > 0 ? (
               <div className="grid grid-cols-2 gap-3 w-full h-4 md:h-8">
                 {informationNoticeList.map((infoNotice: InfoBooking) => {
@@ -453,12 +469,12 @@ const hasOverlap = (
   const pendingBookingEndDate = new Date(pendingBookingTrain.endDate)
 
   return (
-    (bookingStartDate >= pendingBookingStartDate &&
-      bookingStartDate <= pendingBookingEndDate) ||
-    (bookingEndDate >= pendingBookingStartDate &&
-      bookingEndDate <= pendingBookingEndDate) ||
-    (bookingStartDate <= pendingBookingStartDate &&
-      bookingEndDate >= pendingBookingEndDate)
+    (bookingStartDate > pendingBookingStartDate &&
+      bookingStartDate < pendingBookingEndDate) ||
+    (bookingEndDate > pendingBookingStartDate &&
+      bookingEndDate < pendingBookingEndDate) ||
+    (bookingStartDate < pendingBookingStartDate &&
+      bookingEndDate > pendingBookingEndDate)
   )
 }
 

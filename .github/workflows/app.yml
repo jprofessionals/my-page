@@ -22,7 +22,7 @@ jobs:
           npm run build
         working-directory: ./my-page-app
   deploy-test:
-    if: github.ref == 'refs/heads/bugfix/admin_dobbelbooking'
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     environment: test
