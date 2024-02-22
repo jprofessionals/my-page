@@ -195,7 +195,7 @@ function Kalkulator() {
           </div>
           <div className="gap-2 p-4 form-control calculator-group">
             <li className="flex gap-4 justify-between">
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Syntetisk timepris
                 <ReadMoreIcon text="Benyttes som timepris for kompetanse (innenfor årlig budsjett). 80% av fjorårets snittpris" />
               </span>
@@ -218,7 +218,7 @@ function Kalkulator() {
         <div className="rounded-lg border border-gray-300 border-solid grow shrink-0">
           <div className="p-4 border-b border-gray-300 bg-slate-200">Dine timer</div>
           <div className="gap-2 p-4 form-control calculator-group">
-            <label className="input-group gap-4">
+            <label className="input-group gap-1">
               <span>Fakturert
                 <ReadMoreIcon text="Antall timer fakturert kunde. I snitt er det 21.67 arbeidsdager i én måned." />
               </span>
@@ -229,9 +229,9 @@ function Kalkulator() {
                 className="input input-bordered"
               />
             </label>
-            <label className="input-group gap-4">
+            <label className="input-group gap-1">
               <span>
-                Interntid m/kompensasjon
+                Interntid m/komp
                 <ReadMoreIcon text="Interntid som kompanseres som fakturert tid, se intranett for retningslinjer" />
               </span>
               <input
@@ -241,7 +241,7 @@ function Kalkulator() {
                 onChange={handleAntallTimerInterntidMedKomChange}
               />
             </label>
-            <label className="input-group gap-4">
+            <label className="input-group gap-1">
               <span>
                 Sykdom
                 <ReadMoreIcon text="Egenmelding, sykemelding, sykt barn og foreldre permisjon" />
@@ -253,10 +253,10 @@ function Kalkulator() {
                 className="input input-bordered"
               />
             </label>
-            <label className="input-group gap-4">
+            <label className="input-group gap-1">
               <span>
                 Rest kompetansetimer
-                <ReadMoreIcon text="Antall timer du har igjen på årlig kompetansebudjett før eventuelt uttak" />
+                <ReadMoreIcon text="Antall timer du har igjen på årlig kompetansebudsjett før eventuelt uttak" />
               </span>
               <input
                 type="number"
@@ -265,7 +265,7 @@ function Kalkulator() {
                 className="input input-bordered"
               />
             </label>
-            <label className="input-group gap-4">
+            <label className="input-group gap-1">
               <span>Kompetanseheving
               </span>
               <input
@@ -308,7 +308,7 @@ function Kalkulator() {
                 className="input input-bordered"
               />
             </label>
-            <label className="input-group gap-4">
+            <label className="input-group gap-1">
               <span>
                 Bonus
                 <ReadMoreIcon text="Bonus denne måneden. Eksempelvis presentasjonsbonus og rekrutteringsbonus, mer info på intranettet." />
@@ -320,7 +320,7 @@ function Kalkulator() {
                 className="input input-bordered"
               />
             </label>
-            <label className="input-group gap-4">
+            <label className="input-group gap-1">
               <span>
                 Bruttotrekk
               </span>
@@ -331,10 +331,10 @@ function Kalkulator() {
                 className="input input-bordered"
               />
             </label>
-            <label className="input-group gap-4">
+            <label className="input-group gap-1">
               <span className="flex justify-between">
                 Antall arbeidsdager
-                <ReadMoreIcon text="Antall arbeidsdager i den aktuelle måneden. I snitt er det 21.67 arbeidsdager i én måned. Dette er om man ikke tar hensyn til ferie og helligdager." />
+                <ReadMoreIcon text="Antall arbeidsdager i den aktuelle måneden. I snitt er det 21.67 arbeidsdager i én måned om man ikke tar hensyn til ferie og helligdager." />
               </span>
               <input
                 type="number"
@@ -343,7 +343,7 @@ function Kalkulator() {
                 onChange={handleAntallArbeidsdagerChange}
               />
             </label>
-            <label className="input-group gap-4">
+            <label className="input-group gap-1">
               <span className="flex justify-between">
                 Stillingsprosent
               </span>
@@ -367,7 +367,7 @@ function Kalkulator() {
           </div>
           <ul className="flex flex-col gap-2 justify-between p-4">
             <li className="flex justify-between gap-4 ml-4">
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Fakturert tid
                 <ReadMoreIcon
                   text={`Antall timer fakturert * timepris * 0.52 => ${antallTimerFakturert} * ${timeprisProsjekt} * 0.52`}
@@ -376,7 +376,7 @@ function Kalkulator() {
               <span>{getInNok(SumFakturertTid())}</span>
             </li>
             <li className="flex justify-between gap-4 ml-4">
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Interntid m/komp
                 <ReadMoreIcon
                   text={`Antall timer * timepris * 0.52 => ${antallTimerInterntidMedKomp} * ${timeprisProsjekt} * 0.52`}
@@ -385,7 +385,7 @@ function Kalkulator() {
               <span>{getInNok(SumIntertidMedKomp())}</span>
             </li>
             <li className="flex justify-between gap-4 ml-4">
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Kompetanseheving
                 <ReadMoreIcon
                   text={`Antall timer betalt kompetansheving * syntetisk timepris * 0.52 => ${AntallTimerBetaltKompetanse()} * ${timeprisKompetanse} * 0.52`}
@@ -394,7 +394,7 @@ function Kalkulator() {
               <span>{getInNok(SumBetaltKompetanse())}</span>
             </li>
             <li className="flex justify-between gap-4 ml-4">
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Sykelønn
                 <ReadMoreIcon
                   text={`Antall timer egenmelding, foreldre permisjon ol. * 9G timelønn => ${AntallTimerSyk()} * ${Timelonn9G().toFixed(2)}`}
@@ -406,7 +406,7 @@ function Kalkulator() {
               Sum betalt tid: <span>{getInNok(SumBetaltTid())}</span>
             </li>
             <li className="flex justify-between gap-4 ml-4">
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Normert tid
                 <ReadMoreIcon
                   text={`Antall arbeidsdager i gitt måned * 7.5 => ${antallArbeidsdager} * 7.5`}
@@ -415,7 +415,7 @@ function Kalkulator() {
               <span>{NormertTid().toFixed(2)}</span>
             </li>
             <li className="flex justify-between gap-4 ml-4">
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Din normerte tid
                 <ReadMoreIcon
                   text={`(Normert tid * stillingsprosent) - ferie => (${NormertTid().toFixed(2)} * ${stillingsprosent/100}) - ${antallTimerFerie}`}
@@ -424,7 +424,7 @@ function Kalkulator() {
               <span>{DinNormerteTid().toFixed(2)}</span>
             </li>
             <li className="flex justify-between gap-4 ml-4">
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Antall timer betalt tid
                 <ReadMoreIcon
                   text={`Fakturert tid + kompetanseheving (budsjett) + sykdom + interntid m/kompensasjo => (${antallTimerFakturert} + ${AntallTimerBetaltKompetanse()} + ${antallTimerSyk} + ${antallTimerInterntidMedKomp}`}
@@ -433,7 +433,7 @@ function Kalkulator() {
               <span>{AntallTimerBetaltTid().toFixed(2)}</span>
             </li>
             <li className="flex justify-between gap-4 ml-4">
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Tilgjengelig tid
                 <ReadMoreIcon
                   text={`MINIMUM(((din normerte tid - betalt tid),(interntid + kompetanseheving(over budsjett)) => (MIN((${DinNormerteTid().toFixed(2)} - ${AntallTimerBetaltTid().toFixed(2)}),(${antallTimerInterntid} + ${AntallTimerUbetaltKompetanse()}))`}
@@ -442,7 +442,7 @@ function Kalkulator() {
               <span>{TilgjengeligTid().toFixed(2)}</span>
             </li>
             <li className="flex justify-between border-b-2 border-solid border-b-black-nav font-semibold mb-2">              
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Minimumslønn
                 <ReadMoreIcon
                   text={`Tilgjengelig tid / normert tid * ${getInNok(garantilonn)} => ${TilgjengeligTid().toFixed(2)} / ${NormertTid().toFixed(2)} * ${garantilonn}`}
@@ -452,20 +452,20 @@ function Kalkulator() {
             </li>
 
             <li className="flex justify-between gap-4 ml-4">
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Bonus
               </span>
               <span>{getInNok(bonus)}</span>
             </li>
             <li className="flex justify-between gap-4 ml-4">
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
                 Bruttotrekk
               </span>
               <span className="text-red-500">{getInNok(bruttotrekk)}</span>
             </li>
 
             <li className="flex justify-between border-b-2 border-solid border-b-black-nav font-semibold mb-2">              
-              <span className="flex justify-between gap-4">
+              <span className="flex justify-between gap-1">
               Brutto månedslønn
                 <ReadMoreIcon
                   text={`Sum betalt tid + Minimumslønn + Bonus - Bruttotrekk => ${SumBetaltTid().toFixed(2)} + ${MinimumsLonn().toFixed(2)} + ${bonus} - ${bruttotrekk}`}
@@ -475,7 +475,7 @@ function Kalkulator() {
             </li>
 
             <li className="flex justify-between border-b-2 border-solid border-b-black-nav font-semibold mb-2">
-            <span className="flex justify-between gap-4">
+            <span className="flex justify-between gap-1">
                 Anslått brutto årslønn
                 <ReadMoreIcon
                   text={`Anslår årslønn ved å ta månedslønn * 12 (uttak av ferie og opptjente feriepenger går omtrent opp i opp). Alternativt kan vi bruke snitt antall arbeidstimer i året * timepris * 0,52 => ${billableHoursPerYear} * ${timeprisProsjekt} * 0,52 = ${getInNok(BruttoAarsLonnFakturert())}`}
