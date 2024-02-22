@@ -195,7 +195,7 @@ function Kalkulator() {
           </div>
           <div className="gap-2 p-4 form-control calculator-group">
             <li className="flex gap-4 justify-between">
-              <span className="flex justify-between w-full">
+              <span className="flex justify-between gap-4">
                 Syntetisk timepris
                 <ReadMoreIcon text="Benyttes som timepris for kompetanse (innenfor årlig budsjett). 80% av fjorårets snittpris" />
               </span>
@@ -363,7 +363,7 @@ function Kalkulator() {
         <div className="rounded-lg border border-gray-300 border-solid grow shrink-0 min-w-[310px]">
           <div className="flex justify-between p-4 text-white bg-green-brand">
             Lønnsberegning
-            <ReadMoreIcon text="Viser resultat av beregningen og hvilke faktorer som er med i beregnet bruttolønn" />
+            <ReadMoreIconRight text="Viser resultat av beregningen og hvilke faktorer som er med i beregnet bruttolønn" />
           </div>
           <ul className="flex flex-col gap-2 justify-between p-4">
             <li className="flex justify-between gap-4 ml-4">
@@ -395,7 +395,7 @@ function Kalkulator() {
             </li>
             <li className="flex justify-between gap-4 ml-4">
               <span className="flex justify-between gap-4">
-                Sykelønn/omsorgspenger
+                Sykelønn
                 <ReadMoreIcon
                   text={`Antall timer egenmelding, foreldre permisjon ol. * 9G timelønn => ${AntallTimerSyk()} * ${Timelonn9G().toFixed(2)}`}
                 />
@@ -491,7 +491,13 @@ function Kalkulator() {
 }
 
 const ReadMoreIcon = ({ text }: { text: string }) => (
-  <div className="tooltip tooltip-center" data-tip={text}>
+  <div className="tooltip tooltip-top" data-tip={text}>
+    <FontAwesomeIcon icon={faQuestionCircle} />
+  </div>
+)
+
+const ReadMoreIconRight = ({ text }: { text: string }) => (
+  <div className="tooltip tooltip-left" data-tip={text}>
     <FontAwesomeIcon icon={faQuestionCircle} />
   </div>
 )

@@ -21,7 +21,7 @@ code {
     grid-template-columns: 4fr 110px;
 
     & > span {
-      @apply flex justify-between gap-2;
+      @apply flex  gap-2;
     }
 
     & > .input {
