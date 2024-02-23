@@ -478,7 +478,7 @@ function Kalkulator() {
             <span className="flex justify-between gap-1">
                 Anslått brutto årslønn
                 <ReadMoreIcon
-                  text={`Anslår årslønn ved å ta månedslønn * 12 (uttak av ferie og opptjente feriepenger går omtrent opp i opp). Alternativt kan vi bruke snitt antall arbeidstimer i året * timepris * 0,52 => ${billableHoursPerYear} * ${timeprisProsjekt} * 0,52 = ${getInNok(BruttoAarsLonnFakturert())}`}
+                  text={`Anslår årslønn ved å ta månedslønn * 12 (uttak av ferie og opptjente feriepenger går omtrent opp i opp). Alternativt kan vi bruke snitt antall arbeidstimer i året (1695 timer når fem uker ferie og lovfestede helligdager er trukket fra) * timepris * 0,52 => ${billableHoursPerYear} * ${timeprisProsjekt} * 0,52 = ${getInNok(BruttoAarsLonnFakturert())}`}
                 />
               </span>
               <span>{getInNok(BruttoArsLonn())}</span>
