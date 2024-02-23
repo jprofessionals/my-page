@@ -87,22 +87,22 @@ export function AuthProvider({ children }: PropsWithChildren) {
       client_id: googleClientId,
       auto_select: true,
       prompt_parent_id: 'signInDiv',
+      use_fedcm_for_prompt: true,
       callback: (response) => setUserToken(response.credential),
     })
 
     window.google.accounts.id.prompt((notification) => {
-      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        const signInDiv = document.getElementById('signInDiv')
-        if (signInDiv)
-          window.google.accounts.id.renderButton(signInDiv, {
-            type: 'standard',
-            theme: 'outline',
-            size: 'medium',
-            text: 'continue_with',
-            shape: 'rectangular',
-          })
-      }
-    })
+      const signInDiv = document.getElementById('signInDiv')
+      if (signInDiv)
+        window.google.accounts.id.renderButton(signInDiv, {
+          type: 'standard',
+          theme: 'outline',
+          size: 'medium',
+          text: 'continue_with',
+          shape: 'rectangular',
+          logo_alignment:'left'
+        })
+     })
   }
 
   const { data: settings } = useQuery<Settings[]>('settingsQueryKey', async () => {return await ApiService.getSettings()} )
