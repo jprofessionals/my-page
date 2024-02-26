@@ -21,7 +21,7 @@
         <avro.version>1.11.3</avro.version>
         <slack.version>1.38.1</slack.version>
         <ktor.version>2.3.8</ktor.version>
-        <spring-cloud-gcp.version>5.0.3</spring-cloud-gcp.version>
+        <spring-cloud-gcp.version>5.0.4</spring-cloud-gcp.version>
     </properties>
 
     <dependencies>
