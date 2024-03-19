@@ -46,7 +46,7 @@
     "react-tooltip": "^5.26.3",
     "sass": "^1.72.0",
     "sockjs-client": "^1.6.1",
-    "tailwind-merge": "^2.2.1",
+    "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.4.2",
     "usehooks-ts": "^3.0.1",
