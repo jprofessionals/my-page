@@ -21,11 +21,11 @@ code {
     grid-template-columns: 4fr 110px;
 
     & > span {
-      @apply flex justify-between gap-2;
+      @apply flex gap-2;
     }
 
     & > .input {
-      @apply text-right pr-0 h-10;
+      @apply text-right h-10;
     }
   }
 
