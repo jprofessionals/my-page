@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
-import getBillableHours, { getBillabeHoursEntireYear } from './getBillableHours'
-import moment from 'moment'
-import { Button } from '../ui/button'
+// import moment from 'moment'
+// import { Button } from '../ui/button'
 import getInNok from '@/utils/getInNok'
 import getSetting from '@/utils/getSetting'
 import { Settings } from '@/types'
@@ -11,8 +10,8 @@ import { useAuthContext } from '@/providers/AuthProvider'
 
 
 function Kalkulator() {
-  const [selectedMonth, setSelectedMonth] = useState(moment().format('MM'))
-  const [selectedYear, setSelectedYear] = useState(moment().format('yyyy'))
+  // const [selectedMonth, setSelectedMonth] = useState(moment().format('MM'))
+  // const [selectedYear, setSelectedYear] = useState(moment().format('yyyy'))
 
   const [garantilonn, setGarantilonn] = useState(0)
   const [grunnbelop, setGrunnbelop] = useState(0)
@@ -22,12 +21,12 @@ function Kalkulator() {
   const [restKompetanseBudsjett, setRestKompetanseBudsjett] = useState(0)
   const [timeprisProsjekt, setTimeprisProsjekt] = useState(0)
 
-  const [billableHoursThisYear, setBillableHoursThisYear] = useState(
-    getBillabeHoursEntireYear(selectedYear),
+  const [billableHoursThisYear] = useState(
+    1695,
   )
 
   const [antallTimerMnd, setAntallTimerMnd] = useState(
-    getBillableHours(selectedYear, selectedMonth),
+    162.5,
   )
   const [antallTimerFakturert, setAntallTimerFakturert] =
     useState(antallTimerMnd)
@@ -110,12 +109,12 @@ function Kalkulator() {
     return billableHoursThisYear * timeprisProsjekt * 0.52 * 1.12 + +bonus
   }
 
-  const handleMonthAndYearChange = () => {
-    const billableHoursForMonth = getBillableHours(selectedYear, selectedMonth)
-    setBillableHoursThisYear(getBillabeHoursEntireYear(selectedYear))
-    setAntallTimerMnd(billableHoursForMonth)
-    setAntallTimerFakturert(billableHoursForMonth)
-  }
+  // const handleMonthAndYearChange = () => {
+  //   const billableHoursForMonth = getBillableHours(selectedYear, selectedMonth)
+  //   setBillableHoursThisYear(getBillabeHoursEntireYear(selectedYear))
+  //   setAntallTimerMnd(billableHoursForMonth)
+  //   setAntallTimerFakturert(billableHoursForMonth)
+  // }
 
   // const handleGarantilonnChange = (e: any) => {
   //   setGarantilønn(e.target.value)
@@ -185,41 +184,41 @@ function Kalkulator() {
           </a>
           .
         </p>
-        <p>Se utregning basert på år og måned:</p>
-        <div className="flex flex-wrap gap-2 p-2 -mt-4 rounded-lg border border-gray-300 border-solid calculator-group w-fit">
-          <label className="input-group">
-            <span>År</span>
-            <select
-              className="text-right input input-bordered"
-              onChange={(e) => setSelectedYear(e.target.value)}
-              value={selectedYear}
-            >
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="input-group">
-            <span>Måned</span>
+        {/*<p>Se utregning basert på år og måned:</p>*/}
+        {/*<div className="flex flex-wrap gap-2 p-2 -mt-4 rounded-lg border border-gray-300 border-solid calculator-group w-fit">*/}
+        {/*  <label className="input-group">*/}
+        {/*    <span>År</span>*/}
+        {/*    <select*/}
+        {/*      className="text-right input input-bordered"*/}
+        {/*      onChange={(e) => setSelectedYear(e.target.value)}*/}
+        {/*      value={selectedYear}*/}
+        {/*    >*/}
+        {/*      {years.map((year) => (*/}
+        {/*        <option key={year} value={year}>*/}
+        {/*          {year}*/}
+        {/*        </option>*/}
+        {/*      ))}*/}
+        {/*    </select>*/}
+        {/*  </label>*/}
+        {/*  <label className="input-group">*/}
+        {/*    <span>Måned</span>*/}
 
-            <select
-              className="text-right input input-bordered"
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              value={selectedMonth}
-            >
-              {months.map((month) => (
-                <option key={month.name} value={month.value}>
-                  {month.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <Button onClick={handleMonthAndYearChange} variant="primary">
-            Oppdater
-          </Button>
-        </div>
+        {/*    <select*/}
+        {/*      className="text-right input input-bordered"*/}
+        {/*      onChange={(e) => setSelectedMonth(e.target.value)}*/}
+        {/*      value={selectedMonth}*/}
+        {/*    >*/}
+        {/*      {months.map((month) => (*/}
+        {/*        <option key={month.name} value={month.value}>*/}
+        {/*          {month.name}*/}
+        {/*        </option>*/}
+        {/*      ))}*/}
+        {/*    </select>*/}
+        {/*  </label>*/}
+        {/*  <Button onClick={handleMonthAndYearChange} variant="primary">*/}
+        {/*    Oppdater*/}
+        {/*  </Button>*/}
+        {/*</div>*/}
       </div>
       <div className="flex flex-wrap gap-6 items-start">
         <div className="rounded-b-lg card card-bordered grow shrink-0">
@@ -414,11 +413,11 @@ function Kalkulator() {
             <li className="flex gap-4 justify-between">
               <span className="flex justify-between w-full">
                 Ca årslønn:
-                <ReadMoreIcon
-                  text={`Utregning: Antall fakturerbare timer i ${selectedYear} er ${
-                    billableHoursThisYear + 25 * 7.5
-                  }. Trekker fra 25 feriedager og legger på feriepenger (12%). Regnestykket blir: \n\n${billableHoursThisYear}t * ${timeprisProsjekt}kr/t * 0.52 * 1.12`}
-                />
+                {/*<ReadMoreIcon*/}
+                {/*  text={`Utregning: Antall fakturerbare timer i ${selectedYear} er ${*/}
+                {/*    billableHoursThisYear + 25 * 7.5*/}
+                {/*  }. Trekker fra 25 feriedager og legger på feriepenger (12%). Regnestykket blir: \n\n${billableHoursThisYear}t * ${timeprisProsjekt}kr/t * 0.52 * 1.12`}*/}
+                {/*/>*/}
               </span>
               <span>{getInNok(BruttoArsLonn())}</span>
             </li>
@@ -435,23 +434,23 @@ const ReadMoreIcon = ({ text }: { text: string }) => (
   </div>
 )
 
-const months = [
-  { name: 'Januar', value: '01' },
-  { name: 'Februar', value: '02' },
-  { name: 'Mars', value: '03' },
-  { name: 'April', value: '04' },
-  { name: 'Mai', value: '05' },
-  { name: 'Juni', value: '06' },
-  { name: 'Juli', value: '07' },
-  { name: 'August', value: '08' },
-  { name: 'September', value: '09' },
-  { name: 'Oktober', value: '10' },
-  { name: 'November', value: '11' },
-  { name: 'Desember', value: '12' },
-]
+// const months = [
+//   { name: 'Januar', value: '01' },
+//   { name: 'Februar', value: '02' },
+//   { name: 'Mars', value: '03' },
+//   { name: 'April', value: '04' },
+//   { name: 'Mai', value: '05' },
+//   { name: 'Juni', value: '06' },
+//   { name: 'Juli', value: '07' },
+//   { name: 'August', value: '08' },
+//   { name: 'September', value: '09' },
+//   { name: 'Oktober', value: '10' },
+//   { name: 'November', value: '11' },
+//   { name: 'Desember', value: '12' },
+// ]
 
-const years = Array.from({ length: 25 }).map((_x, i) =>
-  String(new Date().getFullYear() + i - 10),
-)
+// const years = Array.from({ length: 25 }).map((_x, i) =>
+//   String(new Date().getFullYear() + i - 10),
+// )
 
 export default Kalkulator
