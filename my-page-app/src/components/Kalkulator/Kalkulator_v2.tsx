@@ -130,7 +130,7 @@ function Kalkulator() {
     }
 
     function BruttoAarsLonnFakturert() {
-        return billableHoursPerYear * timeprisProsjekt * 0.52
+        return billableHoursPerYear * timeprisProsjekt * stillingsprosent / 100 * 0.52
     }
 
     const handleUtbetaltForskuddChange = (e: any) => {
@@ -195,12 +195,7 @@ function Kalkulator() {
                     bruttolønn. Mer info om timeføring og lønnsberegning finner du på{' '}
                     <a href="https://sites.google.com/a/jpro.no/jpro-intranet/personalh%C3%A5ndbok/l%C3%B8nn-og-timef%C3%B8ring">
                         intranett
-                    </a>
-                    . Forklaring av tilgjengelige timeføringskontoer finnes også på{' '}
-                    <a href="https://sites.google.com/a/jpro.no/jpro-intranet/personalh%C3%A5ndbok/l%C3%B8nn-og-timef%C3%B8ring/timef%C3%B8ring">
-                        intranett
-                    </a>
-                    .
+                    </a>.
                 </p>
             </div>
             <div className="flex flex-wrap gap-6 items-start">
@@ -472,7 +467,7 @@ function Kalkulator() {
                             <span className="flex justify-between gap-1">
                                 Tilgjengelig tid
                                 <ReadMoreIcon
-                                    text={`MINIMUM(((din normerte tid - betalt tid),(interntid + kompetanseheving(over budsjett)) => (MIN((${getAsNo(DinNormerteTid())} - ${getAsNo(AntallTimerBetaltTid())}),(${getAsNo(antallTimerInterntid)} + ${getAsNo(AntallTimerUbetaltKompetanse())}))`}
+                                    text={`MINIMUM(((din normerte tid - betalt tid),(interntid + kompetanseheving(over budsjett)) => (MINIMUM((${getAsNo(DinNormerteTid())} - ${getAsNo(AntallTimerBetaltTid())}),(${getAsNo(antallTimerInterntid)} + ${getAsNo(AntallTimerUbetaltKompetanse())}))`}
                                 />
                             </span>
                             <span>{TilgjengeligTid().toFixed(2)}</span>
@@ -491,7 +486,7 @@ function Kalkulator() {
                             <span className="flex justify-between gap-1">
                                 Lønnsgrunnlag
                                 <ReadMoreIcon
-                                    text={`Beregnet lønnsgrunnlag er summen av beregnet minimumslønn og betalt tid => ${getInNok(MinimumsLonn())} + ${getInNok(SumBetaltTid())}}`}
+                                    text={`Beregnet lønnsgrunnlag er summen av beregnet minimumslønn og betalt tid => ${getInNok(MinimumsLonn())} + ${getInNok(SumBetaltTid())}`}
                                 />
                             </span>
                             <span>{getInNok(Lonnsgrunnlag())}</span>
@@ -511,7 +506,7 @@ function Kalkulator() {
                         <li className="flex justify-between gap-4 ml-4">
                             <span className="flex justify-between gap-1">
                                 Forskudd
-                                <ReadMoreIconRight
+                                <ReadMoreIcon
                                     text={`Forskudd for inneværende måned, beregnes som Minimumslønn * Stillingsprosent => ${getInNok(garantilonn)} * ${getAsNo(stillingsprosent / 100)} `} />
                             </span>
                             <span>{getInNok(Forskudd())}</span>
@@ -519,8 +514,8 @@ function Kalkulator() {
 
                         <li className="flex justify-between gap-4 ml-4">
                             <span className="flex justify-between gap-1">
-                                Forskudd utbetalt foregående mnd
-                                <ReadMoreIconRight text="Trekk for forskudd utbetalt foregående måned" />
+                                Utbetalt forskudd
+                                <ReadMoreIcon text="Trekk for forskudd utbetalt foregående måned" />
                             </span>
                             <span className="text-red-500">{getInNok(+utbetaltForskudd)}</span>
                         </li>
@@ -528,7 +523,7 @@ function Kalkulator() {
                         <li className="flex justify-between gap-4 ml-4">
                             <span className="flex justify-between gap-1">
                                 Lønnsgrunnlag
-                                <ReadMoreIconRight text="Lønnsgrunnlag beregnet på bakgrunn av timer ført for foregående måned" />
+                                <ReadMoreIcon text="Lønnsgrunnlag beregnet på bakgrunn av timer ført for foregående måned" />
                             </span>
                             <span>{getInNok(Lonnsgrunnlag())}</span>
                         </li>
@@ -550,7 +545,7 @@ function Kalkulator() {
                             <span className="flex justify-between gap-1">
                                 Brutto månedslønn
                                 <ReadMoreIcon
-                                    text={`Forskudd - Forskudd foregående mnd + Lønnsgrunnlag + Bonus - Bruttotrekk => ${getInNok(Forskudd())} - ${getInNok(+utbetaltForskudd)} + ${getInNok(Lonnsgrunnlag())} + ${getInNok(bonus)} - ${getInNok(bruttotrekk)}`}
+                                    text={`Forskudd - Utbetalt forskudd + Lønnsgrunnlag + Bonus - Bruttotrekk => ${getInNok(Forskudd())} - ${getInNok(+utbetaltForskudd)} + ${getInNok(Lonnsgrunnlag())} + ${getInNok(bonus)} - ${getInNok(bruttotrekk)}`}
                                 />
                             </span>
                             <span>{getInNok(BruttoMaanedslonn())}</span>
@@ -560,7 +555,7 @@ function Kalkulator() {
                             <span className="flex justify-between gap-1">
                                 Anslått brutto årslønn
                                 <ReadMoreIcon
-                                    text={`Anslår årslønn ved å ta månedslønn * 12 (uttak av ferie og opptjente feriepenger går omtrent opp i opp). Alternativt kan vi bruke snitt antall arbeidstimer i året (1695 timer når fem uker ferie og lovfestede helligdager er trukket fra) * timepris * 0,52 => ${billableHoursPerYear} * ${getInNok(timeprisProsjekt)} * 0,52 = ${getInNok(BruttoAarsLonnFakturert())} (NB! her vil 12% feriepenger opptjent foregåend år komme i tillegg)`}
+                                    text={`Anslår årslønn ved å ta månedslønn * 12 (uttak av ferie og opptjente feriepenger går omtrent opp i opp). Alternativt kan vi bruke snitt antall arbeidstimer i året (1695 timer når fem uker ferie og lovfestede helligdager er trukket fra) * timepris * stillingsprosent * 0,52 => ${billableHoursPerYear} * ${getInNok(timeprisProsjekt)} * ${getAsNo(stillingsprosent/100)} * 0,52 = ${getInNok(BruttoAarsLonnFakturert())} (NB! her vil 12% feriepenger opptjent foregåend år komme i tillegg)`}
                                 />
                             </span>
                             <span>{getInNok(BruttoArsLonn())}</span>
