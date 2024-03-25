@@ -30,7 +30,7 @@ function Hyttebooking() {
             <h1>Reservasjon av firmahytte</h1>
             <div className="h-1.5 bg-orange-500"></div>
             <p>
-              På denne siden får du oversiskt over når de forskjellige enhetene på hytta er ledig. 
+              På denne siden får du oversikt over når de forskjellige enhetene på hytta er ledig.
               Siden er under kontinuerlig utvikling og vi setter stor pris på alle tilbakemeldinger og bidrag :)
             </p>  
             <p>Mer informasjon finnes <a
