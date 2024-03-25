@@ -22,7 +22,7 @@ function Kalkulator() {
     const billableHoursPerYear = 1695;
 
     const [antallArbeidsdager, setAntallArbeidsdager] = useState(21.67)
-    const [antallTimerFakturert, setAntallTimerFakturert] = useState((antallArbeidsdager * 7.5))
+    const [antallTimerFakturert, setAntallTimerFakturert] = useState(+((antallArbeidsdager * 7.5).toFixed(2)))
 
     const [antallTimerKompetanse, setAntallTimerKompetanse] = useState(0)
     const [antallTimerInterntid, setAntallTimerInterntid] = useState(0)
