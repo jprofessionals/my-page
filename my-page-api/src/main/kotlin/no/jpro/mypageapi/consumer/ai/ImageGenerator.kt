@@ -10,7 +10,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 @Service
@@ -44,18 +43,25 @@ class ImageGenerator(
             .addHeader("Authorization", "Bearer $apiKey")
             .build()
 
+        val startedGeneration = System.currentTimeMillis()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                logger.error("This request failed: ${imageRequest.prompt}")
-                logger.error("Response: ${response.body?.string()}")
-                throw IOException("Unexpected code $response")
+                logger.warn("This request failed: ${imageRequest.prompt}")
+                val errorText = response.body?.string() ?: "No error text found in response body"
+                logger.warn("Response: $errorText")
+                if (errorText.contains("content_policy_violation")) {
+                    logger.warn("Content policy violation triggered, using fallback image")
+                    return "/images/ImageBlockedTooSpicy.webp"
+                }
+                return "/images/ImageGenerationFailed.webp"
             }
             val jsonText = response.body?.string()
             val apiResponse: ApiResponse = parseJsonResponse(jsonText ?: "")
-            logger.info("Image generated: ${apiResponse.data.firstOrNull()?.url}")
-            return apiResponse.data.firstOrNull()?.url ?: throw Exception("No image generated")
-        }
+            val generationTime = String.format("%.1f", (System.currentTimeMillis() - startedGeneration) / 1000.0)
+            logger.info("Image generated in ${generationTime} seconds: ${apiResponse.data.firstOrNull()?.url}")
 
+            return apiResponse.data.firstOrNull()?.url ?: "/images/ImageGenerationFailed.webp"
+        }
     }
 }
 

@@ -4,6 +4,7 @@ package no.jpro.mypageapi.websocket.ai
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import no.jpro.explorer.ExplorationDTO
 import no.jpro.explorer.ExplorationRequest
 import no.jpro.mypageapi.service.ai.ExplorationService
 import no.jpro.mypageapi.utils.GoogleJwtValidator
@@ -31,6 +32,7 @@ class ExplorationHandler(
                 session.attributes["token"] = payload
             } else {
                 logger.warn("Invalid token received, closing connection")
+                session.sendMessage(TextMessage(Json.encodeToString(ExplorationDTO("Invalid token. Please refresh your login", "", listOf()))))
                 session.close(CloseStatus(CloseStatus.PROTOCOL_ERROR.code, "Invalid token"))
             }
         } else if (payload == "reset") {

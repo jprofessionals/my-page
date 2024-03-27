@@ -1,9 +1,9 @@
 package no.jpro.mypageapi.service.ai
 
-import com.aallam.openai.api.BetaOpenAI
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
 import no.jpro.explorer.ExplorationDTO
+val cacheError = ExplorationCacheEntry("ERROR", "ERROR", listOf(), ChatMessage(ChatRole.User, "ERROR"), ChatMessage(ChatRole.User, "ERROR"))
 
 class ExplorationHistory(
     val messages: MutableList<ChatMessage> = mutableListOf(),
@@ -13,6 +13,8 @@ class ExplorationHistory(
         listOf("New York", "Paris", "Tokyo", "Oslo")
     )
 ) {
+    val cache: MutableMap<String, ExplorationCacheEntry?> = mutableMapOf()
+
     init {
         initializeMessages()
     }
@@ -43,3 +45,11 @@ class ExplorationHistory(
         )
     }
 }
+
+data class ExplorationCacheEntry(
+    val description: String,
+    val imagePrompt: String,
+    val nextLocations: List<String>,
+    val requestMsg: ChatMessage,
+    val responseMsg: ChatMessage
+)
