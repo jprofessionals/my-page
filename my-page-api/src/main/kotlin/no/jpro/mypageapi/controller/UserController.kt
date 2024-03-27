@@ -30,7 +30,7 @@ class UserController(
     @GetMapping
     @Transactional
     @RequiresAdmin
-    fun getAllUsers(): List<UserDTO> = userService.getAllUsers()
+    fun getAllUsers(): List<UserDTO> = userService.getAllActiveUsers()
 
     @PostMapping
     @Transactional

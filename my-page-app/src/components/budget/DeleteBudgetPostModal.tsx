@@ -29,8 +29,8 @@ const DeleteBudgetPostModal = ({ refreshBudgets, post }: Props) => {
     )
   }
   return (
-    <Modal.Modal>
-      <Modal.Trigger asChild>
+    <Modal.Dialog>
+      <Modal.DialogTrigger asChild>
         <Button
           className="text-white btn btn-error btn-sm"
           type="button"
@@ -47,8 +47,8 @@ const DeleteBudgetPostModal = ({ refreshBudgets, post }: Props) => {
             'Slett'
           )}
         </Button>
-      </Modal.Trigger>
-      <Modal.Content>
+      </Modal.DialogTrigger>
+      <Modal.DialogContent className="bg-white">
         <div className="mb-6 prose">
           <h2>Slett post</h2>
           <p>
@@ -56,18 +56,18 @@ const DeleteBudgetPostModal = ({ refreshBudgets, post }: Props) => {
             <span className="text-xl">&ldquo;{post.description}&rdquo;</span>?
           </p>
         </div>
-        <Modal.Footer>
-          <Modal.Close asChild>
+        <Modal.DialogFooter>
+          <Modal.DialogClose asChild>
             <Button variant="error" onClick={handleDeletePost} size="sm">
               Slett post
             </Button>
-          </Modal.Close>
-          <Modal.Close asChild>
+          </Modal.DialogClose>
+          <Modal.DialogClose asChild>
             <Button size="sm">Avbryt</Button>
-          </Modal.Close>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal.Modal>
+          </Modal.DialogClose>
+        </Modal.DialogFooter>
+      </Modal.DialogContent>
+    </Modal.Dialog>
   )
 }
 

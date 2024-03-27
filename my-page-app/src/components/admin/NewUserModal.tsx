@@ -78,29 +78,32 @@ export default function NewUserModal() {
   }
 
   return (
-    <Modal.Modal>
-      <Modal.Trigger asChild>
+     <Modal.Dialog>
+      <Modal.DialogTrigger asChild>
         <Button variant="outline">Legg til ny ansatt</Button>
-      </Modal.Trigger>
+      </Modal.DialogTrigger>
 
-      <Modal.Content>
-        <Modal.Header>
-          <Modal.Title>Legg til ny ansatt</Modal.Title>
-        </Modal.Header>
+      <Modal.DialogContent className="bg-white">
+        <Modal.DialogHeader>
+          <Modal.DialogTitle>Legg til ny ansatt</Modal.DialogTitle>
+        </Modal.DialogHeader>
         {error && <Alert variant="error">{error}</Alert>}
         <NewEmployeeForm inputData={inputData} setInputData={setInputData} />
-        <Modal.Footer>
-          <Modal.Close asChild>
+        <Modal.DialogFooter>
+          <Modal.DialogClose asChild>
             <Button onClick={handleClose}>Lukk</Button>
-          </Modal.Close>
+          </Modal.DialogClose>
 
-          <Modal.Close asChild>
+          <Modal.DialogClose asChild>
             <Button onClick={handleSubmit} variant="primary">
               Lagre
             </Button>
-          </Modal.Close>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal.Modal>
+          </Modal.DialogClose>
+        </Modal.DialogFooter>
+      </Modal.DialogContent>
+    </Modal.Dialog>
+
+
+
   )
 }

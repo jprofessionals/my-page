@@ -7,7 +7,6 @@ import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.UserMapper
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
@@ -81,6 +80,7 @@ class UserService(
     fun getUserBySub(userSub: String) = userRepository.findUserBySub(userSub)
 
     fun getAllUsers() = userRepository.findAll().map { userMapper.toUserDTO(it) }
+    fun getAllActiveUsers() = userRepository.findByEnabled(true).map { userMapper.toUserDTO(it) }
 
     fun getUserByName(name: String) = userRepository.findUserByName(name)
 }
