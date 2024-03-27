@@ -154,7 +154,7 @@ export default function AdminBooking() {
         setBookingWithoutDrawing(e.target.checked)
     }
     const handleApartmentIdChange = (e: ChangeEvent<HTMLSelectElement>) => {
-        setApartmentId(e.target.value)
+        setApartmentId(Number(e.target.value))
     }
 
     useEffect(() => {
