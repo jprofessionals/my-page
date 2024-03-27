@@ -105,7 +105,7 @@ export default function AdminBooking() {
     const [startDate, setStartDate] = useState('') //useState(format(date!, 'yyyy-MM-dd'))
     const [endDate, setEndDate] = useState('')
     const [bookingOwnerName, setBookingOwnerName] = useState<string>('')
-    const [apartmentId, setApartmentId] = useState<string>('')
+    const [apartmentId, setApartmentId] = useState<number>(0)
     const [bookingWithoutDrawing, setBookingWithoutDrawing] = useState<boolean>(false)
     const [isLoadingPost, setIsLoadingPost] = useState(false)
 
