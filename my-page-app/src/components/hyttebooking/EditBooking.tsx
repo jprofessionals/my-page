@@ -83,7 +83,7 @@ const EditBooking = ({
   const isValid =
     isBefore(new Date(startDate), new Date(endDate)) &&
     differenceInDays(new Date(endDate), new Date(startDate)) <= 7 &&
-    isBefore(new Date(endDate), addDays(new Date(cutOffDateVacancies), 1))
+      (isBefore(new Date(endDate), addDays(new Date(cutOffDateVacancies), 1)) || userIsAdmin)
 
   const queryClient = useQueryClient()
   const { mutate } = useMutation(editExistingBooking, {

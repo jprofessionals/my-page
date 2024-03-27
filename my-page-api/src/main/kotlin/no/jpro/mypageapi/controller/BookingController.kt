@@ -238,7 +238,7 @@ class BookingController(
             return ResponseEntity(HttpStatus.FORBIDDEN)
         }
         try {
-            bookingService.editBooking(editBookingRequest, bookingToEdit)
+            bookingService.validateAndEditBooking(editBookingRequest, bookingToEdit)
             return ResponseEntity.ok("The booking has been successfully edited")
         } catch (e: IllegalArgumentException) {
             val errorMessage = e.message ?: "An error occurred while editing the booking."

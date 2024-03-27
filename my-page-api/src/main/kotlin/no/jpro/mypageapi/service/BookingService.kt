@@ -176,11 +176,20 @@ class BookingService(
         return filteredBookings.filter { it.id != bookingToExclude?.id }
     }
 
-    fun editBooking(editPostRequest: UpdateBookingDTO, bookingToEdit: Booking): BookingDTO {
+    fun validateAndEditBooking(editPostRequest: UpdateBookingDTO, bookingToEdit: Booking): BookingDTO {
         val cutOffDate = getCutoffDate()
+
+        if (editPostRequest.endDate <= cutOffDate) {
+            return editBooking(editPostRequest, bookingToEdit)
+        } else {
+            throw IllegalArgumentException("Kan ikke endre bookingen til etter cutof.")
+        }
+    }
+
+    fun editBooking(editPostRequest: UpdateBookingDTO, bookingToEdit: Booking): BookingDTO {
         val checkIfBookingUpdate = filterOverlappingBookingsExcludingOwnBooking(bookingToEdit.apartment.id, editPostRequest.startDate, editPostRequest.endDate, bookingToEdit)
 
-        if (checkIfBookingUpdate.isEmpty() && (editPostRequest.startDate.isBefore(editPostRequest.endDate)) && (editPostRequest.endDate <= cutOffDate)) {
+        if (checkIfBookingUpdate.isEmpty() && editPostRequest.startDate.isBefore(editPostRequest.endDate)) {
             return bookingMapper.toBookingDTO(
                 bookingRepository.save(
                     bookingToEdit.copy(
