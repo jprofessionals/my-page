@@ -4,6 +4,7 @@ import Image from 'next/image'
 import MonthOverview from '@/components/hyttebooking/MonthOverview'
 import YearOverview from '@/components/hyttebooking/YearOverview'
 import { Button } from '@/components/ui/button'
+import AdminBooking from "@/components/hyttebooking/AdminBooking";
 
 function Hyttebooking() {
   const [showMonthOverview, setShowMonthOverview] = useState(true)
@@ -111,6 +112,7 @@ function Hyttebooking() {
           </a>
         </p>
 
+        <AdminBooking/>
 
         <div className="flex flex-col gap-3 mt-7">
           <div className="flex gap-2 bg-gray-100 rounded-lg">

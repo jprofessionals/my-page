@@ -141,7 +141,7 @@ class BudgetService(
     }
 
     private fun getBalances(): List<Balance> {
-        val budgets = budgetRepository.findAll().filter { it.budgetType != null }
+        val budgets = budgetRepository.findBudgetsByUserEnabled(true).filter { it.budgetType != null }
 
         if (budgets.isEmpty()) {
             return emptyList()

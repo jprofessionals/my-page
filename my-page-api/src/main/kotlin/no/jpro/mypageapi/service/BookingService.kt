@@ -34,10 +34,10 @@ class BookingService(
     private val slackConsumer: SlackConsumer,
     @Lazy private val self : BookingService? // Lazy self injection for transactional metoder. Spring oppretter ikke transaksjoner hvis en @Transactional annotert metode blir kalt fra samme objekt
 ) {
-    val cutOffDate: LocalDate by lazy {
+    fun getCutoffDate(): LocalDate{
         val cutOffDateSetting = settingsRepository.findSettingBySettingId("CUTOFF_DATE_VACANCIES")
             ?: throw NullPointerException("Setting 'CUTOFF_DATE_VACANCIES' not set in database")
-        LocalDate.parse(cutOffDateSetting.settingValue, dateFormatter)
+        return LocalDate.parse(cutOffDateSetting.settingValue, dateFormatter)
     }
 
     fun getBooking(bookingId: Long): Booking? {
@@ -149,8 +149,11 @@ class BookingService(
 
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     fun createBooking(bookingRequest: CreateBookingDTO, createdBy: User): BookingDTO {
-        if(bookingRequest.endDate >= cutOffDate){
-            throw IllegalArgumentException("Ikke mulig å opprette bookingen. Sluttdato må være før {${cutOffDate?.format(dateFormatter)}}")
+        if(!createdBy.admin){
+            val cutOffDate = getCutoffDate()
+            if(bookingRequest.endDate >= cutOffDate){
+                throw IllegalArgumentException("Ikke mulig å opprette bookingen. Sluttdato må være før {${cutOffDate?.format(dateFormatter)}}")
+            }
         }
         val apartment = getApartment(bookingRequest.apartmentID)
         val checkBookingAvailable = filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
@@ -174,6 +177,7 @@ class BookingService(
     }
 
     fun editBooking(editPostRequest: UpdateBookingDTO, bookingToEdit: Booking): BookingDTO {
+        val cutOffDate = getCutoffDate()
         val checkIfBookingUpdate = filterOverlappingBookingsExcludingOwnBooking(bookingToEdit.apartment.id, editPostRequest.startDate, editPostRequest.endDate, bookingToEdit)
 
         if (checkIfBookingUpdate.isEmpty() && (editPostRequest.startDate.isBefore(editPostRequest.endDate)) && (editPostRequest.endDate <= cutOffDate)) {
