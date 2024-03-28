@@ -7,10 +7,7 @@ import com.google.gson.Gson
 import no.jpro.explorer.ExplorationChatDTO
 import no.jpro.explorer.ExplorationDTO
 import no.jpro.explorer.ExplorationRequest
-import no.jpro.mypageapi.consumer.ai.GPT4_4_TURBO
-import no.jpro.mypageapi.consumer.ai.GPT_3_5_TURBO
-import no.jpro.mypageapi.consumer.ai.ImageGenerator
-import no.jpro.mypageapi.consumer.ai.OpenAIConsumer
+import no.jpro.mypageapi.consumer.ai.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.*
@@ -181,7 +178,7 @@ class ExplorationService(
             content = prompt
         )
 
-        val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_3_5_TURBO, listOf(newMessage))
+        val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT4_4_TURBO, listOf(newMessage))
 
         return completion.choices.first().message.content ?: throw Exception("No response from GPT")
     }
