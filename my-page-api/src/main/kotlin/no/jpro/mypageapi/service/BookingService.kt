@@ -148,13 +148,15 @@ class BookingService(
     }
 
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    fun createBooking(bookingRequest: CreateBookingDTO, createdBy: User): BookingDTO {
-        if(!createdBy.admin){
-            val cutOffDate = getCutoffDate()
-            if(bookingRequest.endDate >= cutOffDate){
-                throw IllegalArgumentException("Ikke mulig å opprette bookingen. Sluttdato må være før {${cutOffDate?.format(dateFormatter)}}")
-            }
+    fun validateCutoffAndCreateBooking(bookingRequest: CreateBookingDTO, createdBy: User): BookingDTO {
+        val cutOffDate = getCutoffDate()
+        if(bookingRequest.endDate >= cutOffDate){
+            throw IllegalArgumentException("Ikke mulig å opprette bookingen. Sluttdato må være før {${cutOffDate?.format(dateFormatter)}}")
         }
+        return createBooking(bookingRequest, createdBy);
+    }
+
+    fun createBooking(bookingRequest: CreateBookingDTO, createdBy: User): BookingDTO {
         val apartment = getApartment(bookingRequest.apartmentID)
         val checkBookingAvailable = filterOverlappingBookings(bookingRequest.apartmentID,bookingRequest.startDate, bookingRequest.endDate)
 

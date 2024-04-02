@@ -218,7 +218,7 @@ class BookingController(
         val user =
             userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
-        bookingService.createBooking(bookingRequest, user)
+        bookingService.validateCutoffAndCreateBooking(bookingRequest, user)
         return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
     }
 

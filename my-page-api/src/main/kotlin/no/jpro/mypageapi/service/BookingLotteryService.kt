@@ -63,7 +63,7 @@ class BookingLotteryService(
                 winner.apartment?.let { CreateBookingDTO(it.id, winner.startDate, winner.endDate) }
                     ?.let {
                         if (user != null) {
-                            bookingService.createBooking(it, user)
+                            bookingService.validateCutoffAndCreateBooking(it, user)
                         }
                     }
                 winningBooking = winner
@@ -74,7 +74,7 @@ class BookingLotteryService(
                 winner.apartment?.let { CreateBookingDTO(it.id, winner.startDate, winner.endDate) }
                     ?.let {
                         if (user != null) {
-                            bookingService.createBooking(it, user)
+                            bookingService.validateCutoffAndCreateBooking(it, user)
                         }
                     }
                 winningBooking = winner
