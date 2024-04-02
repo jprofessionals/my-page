@@ -50,7 +50,7 @@ function Hyttebooking() {
             <strong>Overtagelse:</strong>
           </span>{' '}
           som hovedregel er overtagelse onsdag kl 16. Det betyr at man kan bli
-          til onsdag, så lenge hytta er klar til kl 16.
+          til onsdag, så lenge hytta er klar til kl 16. Hytta vaskes mellom 11 og 17 hver onsdag og vaskepersonalet trenger da tilgang til leilighetene.
         </p>
 
         <p>
