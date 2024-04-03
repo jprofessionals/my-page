@@ -1,10 +1,10 @@
-import { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import { API_URL } from '../../services/api.service'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
 import { Button } from '../ui/button'
-import { Booking, EditedBooking } from '@/types'
+import {Apartment, Booking, EditedBooking} from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
 import { useMutation, useQueryClient } from 'react-query'
@@ -69,15 +69,18 @@ const EditBooking = ({
   refreshVacancies,
   userIsAdmin,
   cutOffDateVacancies,
+  apartments,
 }: {
   booking: Booking
   closeModal: () => void
   refreshVacancies: () => void
   userIsAdmin: boolean
-  cutOffDateVacancies: string
+  cutOffDateVacancies: string,
+  apartments: Apartment[],
 }) => {
   const [startDate, setStartDate] = useState(booking.startDate)
   const [endDate, setEndDate] = useState(booking.endDate)
+  const [apartmentId, setApartmentId] = useState<number>(booking.apartment.id)
   const [isLoadingEdit, setIsLoadingEdit] = useState(false)
 
   const isValid =
@@ -110,6 +113,7 @@ const EditBooking = ({
       const editedBooking = {
         startDate: startDate,
         endDate: endDate,
+        apartmentId: apartmentId
       }
       mutate({ editedBooking, bookingId, userIsAdmin: userIsAdmin, bookingIsPending: booking.isPending })
     }
@@ -121,11 +125,34 @@ const EditBooking = ({
   const handleEndDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEndDate(e.target.value)
   }
+  const handleApartmentIdChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setApartmentId(Number(e.target.value))
+  }
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="overflow-hidden w-full rounded-xl border border-gray-500 shadow-sm">
         <div className="flex flex-col gap-2 items-start p-3">
+          {userIsAdmin ? (
+              <>
+                <strong>Enhet: </strong>
+                <label>
+                  <select
+                      className="w-48 input input-bordered input-sm mr-3"
+                      name="apartmentId"
+                      onChange={handleApartmentIdChange}
+                      value={apartmentId}
+                  >
+                    <option value="">Velg enhet</option>
+                    {apartments.map((apartment) => (
+                        <option key={apartment.id} value={apartment.id}>
+                          {apartment.cabin_name}
+                        </option>
+                    ))}
+                  </select>
+                </label>
+              </>
+          ) : null}
           <strong>Startdato:</strong>
           <label>
             <input

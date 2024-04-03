@@ -972,6 +972,7 @@ export default function MonthOverview() {
                                           refreshVacancies={refreshVacancies}
                                           userIsAdmin={userIsAdmin}
                                           cutOffDateVacancies={cutOffDateVacancies}
+                                          apartments={apartments}
                                         />
                                       )}
                                     </div>

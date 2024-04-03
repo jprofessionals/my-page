@@ -189,14 +189,17 @@ class BookingService(
     }
 
     fun editBooking(editPostRequest: UpdateBookingDTO, bookingToEdit: Booking): BookingDTO {
-        val checkIfBookingUpdate = filterOverlappingBookingsExcludingOwnBooking(bookingToEdit.apartment.id, editPostRequest.startDate, editPostRequest.endDate, bookingToEdit)
+        val checkIfBookingUpdate = filterOverlappingBookingsExcludingOwnBooking(editPostRequest.apartmentId, editPostRequest.startDate, editPostRequest.endDate, bookingToEdit)
 
+        val apartment = apartmentRepository.findApartmentById(editPostRequest.apartmentId)
         if (checkIfBookingUpdate.isEmpty() && editPostRequest.startDate.isBefore(editPostRequest.endDate)) {
+
             return bookingMapper.toBookingDTO(
                 bookingRepository.save(
                     bookingToEdit.copy(
                         startDate = editPostRequest.startDate,
-                        endDate = editPostRequest.endDate
+                        endDate = editPostRequest.endDate,
+                        apartment = apartment
                     )
                 )
             )

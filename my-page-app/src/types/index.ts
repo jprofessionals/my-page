@@ -99,7 +99,8 @@ export type BookingPost = {
 
 export type EditedBooking = {
   startDate: string
-  endDate: string
+  endDate: string,
+  apartmentId: number
 }
 
 export type PendingBookingTrain = {
