@@ -1,23 +1,32 @@
-import { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
 import getInNok from '@/utils/getInNok'
 import getAsNo from '@/utils/getAsNo'
 import getSetting from '@/utils/getSetting'
-import { Settings } from '@/types'
+// import { Settings } from '@/types'
 import { useAuthContext } from '@/providers/AuthProvider'
+import {AccordionContent, AccordionItem, Accordions, AccordionTrigger} from "@/components/ui/bookingAccordion";
+import {useSearchParams} from "next/navigation";
 
 
 function Kalkulator() {
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const [garantilonn, setGarantilonn] = useState(0)
     const [utbetaltForskudd, setUtbetaltForskudd] = useState(0)
     const [grunnbelop, setGrunnbelop] = useState(0)
     const [timeprisKompetanse, setTimeprisKompetanse] = useState(0)
     const [stillingsprosent, setStillingsprosent] = useState(100)
-    const [bonus, setBonus] = useState(0)
+    const [foredragsbonus, setForedragsbonus] = useState(0)
+    const [salgsbonus, setSalgsbonus] = useState<boolean>(false)
+    const [salgsbonusBelop] = useState(60000)
+    const [rekrutteringsbonus, setRekrutteringsbonus] = useState<boolean>(false)
+    const [rekrutteringsbonusBelop] = useState(20000)
     const [bruttotrekk, setBruttotrekk] = useState(0)
     const [restKompetanseBudsjett, setRestKompetanseBudsjett] = useState(0)
     const [timeprisProsjekt, setTimeprisProsjekt] = useState(0)
+    const [betalForskudd, setBetalforskudd] = useState<boolean>(true)
 
     const billableHoursPerYear = 1695;
 
@@ -32,16 +41,96 @@ function Kalkulator() {
     const [antallTimerSyk, setAntallTimerSyk] = useState(0)
 
     const { settings } = useAuthContext()
-    const [prevSettings, setPrevSettings] = useState<Settings[] | undefined>(settings)
-    if (settings != prevSettings) {
-        setPrevSettings(settings)
+
+    const [loading, setLoading] = useState<boolean>(true)
+
+    useEffect(() => {
+        setLoading(true)
         setGarantilonn(parseInt(getSetting(settings, 'CALC_GARANTILONN') ?? '0'))
         setUtbetaltForskudd(parseInt(getSetting(settings, 'CALC_GARANTILONN') ?? '0'))
         setGrunnbelop(parseInt(getSetting(settings, 'CALC_GRUNNBELOP') ?? '0'))
         setTimeprisKompetanse(parseInt(getSetting(settings, 'CALC_TIMEPRIS_KOMPETANSE') ?? '0'))
-        setBonus(parseInt(getSetting(settings, 'CALC_BONUS') ?? '0'))
+        // setBonus(parseInt(getSetting(settings, 'CALC_BONUS') ?? '0'))
         setRestKompetanseBudsjett(parseInt(getSetting(settings, 'CALC_RESTKOMPETANSE') ?? '0'))
         setTimeprisProsjekt(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0'))
+        setLoading(false)
+    }, [settings]);
+
+
+    // useEffect(() => {
+    //     console.log(searchParams)
+    //     if(searchParams){
+    //         switch (searchParams[0]){
+    //             case 'høy':
+    //                 loadScenarioHigh()
+    //                 break
+    //             case 'lav':
+    //                 loadScenarioLow()
+    //                 break
+    //             case 'snitt':
+    //                 loadScenarioAvg()
+    //                 break
+    //         }
+    //     }
+    //     setLoading(false)
+    // }, [settings, searchParams]);
+
+    function loadScenarioAvg(){
+        setBetalforskudd(true)
+        setTimeprisProsjekt(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0'))
+        setAntallArbeidsdager(21.67)
+        setStillingsprosent(100)
+        setUtbetaltForskudd(parseInt(getSetting(settings, 'CALC_GARANTILONN') ?? '0'))
+        setAntallTimerFakturert(+((21.67 * 7.5).toFixed(2)))
+        setAntallTimerInterntidMedKom(0)
+        setAntallTimerSyk(0)
+        setRestKompetanseBudsjett(parseInt(getSetting(settings, 'CALC_RESTKOMPETANSE') ?? '0'))
+        setAntallTimerKompetanse(0)
+        setAntallTimerInterntid(0)
+        setAntallTimerFerie(0)
+        setSalgsbonus(false)
+        setRekrutteringsbonus(false)
+        setForedragsbonus(0)
+        setBruttotrekk(0)
+    }
+
+    function loadScenarioHigh(){
+        loadScenarioAvg()
+        setTimeprisProsjekt(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0')*1.2)
+    }
+
+    function loadScenarioLow(){
+        loadScenarioAvg()
+        setTimeprisProsjekt(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0')*0.8)
+    }
+
+    function loadScenarioBench(){
+        loadScenarioAvg()
+        setAntallTimerFakturert(0)
+        setAntallTimerInterntid(+((21.67 * 7.5).toFixed(2)))
+    }
+
+    function loadScenarioFirstMonth(){
+        loadScenarioAvg()
+        setAntallTimerFakturert(0)
+        setAntallTimerInterntid(+((21.67 * 7.5).toFixed(2)))
+        setForedragsbonus(30000)
+    }
+
+    function loadScenarioLastMonthPlusOne(){
+        loadScenarioAvg()
+        setAntallTimerFakturert(+((21.67 * 7.5).toFixed(2)))
+        setBetalforskudd(false)
+    }
+
+    function loadScenario100to50(){
+        loadScenarioAvg()
+        setStillingsprosent(50)
+    }
+
+    function loadScenario50to100(){
+        loadScenarioAvg()
+        setUtbetaltForskudd(parseInt(getSetting(settings, 'CALC_GARANTILONN') ?? '0')*0.5)
     }
 
     function Timelonn9G() {
@@ -65,7 +154,7 @@ function Kalkulator() {
     }
 
     function Forskudd() {
-        return garantilonn * stillingsprosent / 100
+        return betalForskudd?(garantilonn * stillingsprosent / 100):0
     }
 
     function TilgjengeligTid() {
@@ -109,6 +198,10 @@ function Kalkulator() {
         )
     }
 
+    function SumBonus(){
+        return +foredragsbonus + (salgsbonus===true?salgsbonusBelop:0) + (rekrutteringsbonus===true?rekrutteringsbonusBelop:0)
+    }
+
     function AntallTimerBetaltKompetanse() {
         return (
             Math.min(+antallTimerKompetanse, +restKompetanseBudsjett)
@@ -122,7 +215,7 @@ function Kalkulator() {
     }
 
     function BruttoMaanedslonn() {
-        return Forskudd() - utbetaltForskudd + SumBetaltTid() + MinimumsLonn() + bonus - bruttotrekk;
+        return Forskudd() - utbetaltForskudd + SumBetaltTid() + MinimumsLonn() + SumBonus() - bruttotrekk;
     }
 
     function BruttoArsLonn() {
@@ -177,8 +270,16 @@ function Kalkulator() {
         setAntallTimerSyk(e.target.value)
     }
 
-    const handleBonusChange = (e: any) => {
-        setBonus(parseInt(e.target.value))
+    const handleForedragsbonusChange = (e: any) => {
+        setForedragsbonus(parseInt(e.target.value))
+    }
+
+    const handleSalgsbonusChange = (e: any) => {
+        setSalgsbonus(!salgsbonus)
+    }
+
+    const handleRekrutteringsbonusChange = (e: any) => {
+        setRekrutteringsbonus(!rekrutteringsbonus)
     }
 
     const handleBruttotrekkChange = (e: any) => {
@@ -186,22 +287,55 @@ function Kalkulator() {
     }
 
     return (
+        loading?<><span>loading</span></>:<>
         <div className="flex flex-col gap-4 p-4">
             <div className="prose max-w-fit">
                 <h2>Lønnskalkulator</h2>
                 <p>
-                    Her kan du se omtrentlig hvordan vi beregner lønn hver måned. Du kan
+                    Her kan du se hvordan vi beregner lønn hver måned. Du kan
                     selv leke med tallene for å se hvordan dette påvirker beregningen av
-                    bruttolønn. Mer info om timeføring og lønnsberegning finner du på{' '}
+                    bruttolønn. Du kan også klikke på de predefinerte
+                    <strong> scenariene</strong> under for å se hvordan beregningen blir i
+                    forskjellige situasjoner.
+                </p>
+                <p>
+                    Mer info om timeføring og lønnsberegning finner du på{' '}
                     <a href="https://sites.google.com/a/jpro.no/jpro-intranet/personalh%C3%A5ndbok/l%C3%B8nn-og-timef%C3%B8ring">
                         intranett
                     </a>.
                 </p>
             </div>
+            <Accordions type="multiple" className="mb-3 w-full">
+                <AccordionItem value="bookings" className="border-none">
+                    <AccordionTrigger
+                        className="text-sm rounded-lg items-center px-3 gap-2 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none bg-yellow-hotel">
+                        <div className="flex flex-1 gap-4 justify-between">
+                          <span
+                              title="Scenarier"
+                              className="flex flex-wrap gap-2 justify-center uppercase"
+                          >
+                              Scenarier
+                            </span>
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="p-2 rounded-b-lg data-open:border-2">
+                        <div className="flex flex-col gap-2">
+                            <div className="space-x-2"><button onClick={loadScenarioAvg} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">Snitt</button><span>- Gjennomsnittlig timepris I JPro</span></div>
+                            <div className="space-x-2"><button onClick={loadScenarioHigh} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">Høy</button><span>- 20% høyere timepris enn dagens gjennomsnitt i JPro</span></div>
+                            <div className="space-x-2"><button onClick={loadScenarioLow} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">Lav</button><span>- 20% lavere timepris enn dagens gjennomsnitt i JPro</span></div>
+                            <div className="space-x-2"><button onClick={loadScenarioBench} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">Ledig</button><span>- Lønn om man ikke har oppdrag</span></div>
+                            <div className="space-x-2"><button onClick={loadScenario100to50} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">100% til 50%</button><span>- Lønn om man går fra 100% til 50% stilling</span></div>
+                            <div className="space-x-2"><button onClick={loadScenario50to100} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">50% til 100%</button><span>- Lønn om man går fra 50% til 100% stilling</span></div>
+                            <div className="space-x-2"><button onClick={loadScenarioFirstMonth} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">Oppstart</button><span>- Lønn første måned som ansatt i JPro</span></div>
+                            <div className="space-x-2"><button onClick={loadScenarioLastMonthPlusOne} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">Fratredelse</button><span>- Lønn måneden etter fratredelse</span></div>
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordions>
             <div className="flex flex-wrap gap-6 items-start">
                 <div className="rounded-b-lg card card-bordered grow shrink-0">
                     <div className="p-4 rounded-t-lg border-b border-gray-300 bg-slate-200">
-                        Basis
+                        Standard verdier
                     </div>
                     <div className="gap-2 p-4 form-control calculator-group">
                         <li className="flex gap-4 justify-between">
@@ -231,119 +365,15 @@ function Kalkulator() {
                     </div>
                 </div>
                 <div className="rounded-lg border border-gray-300 border-solid grow shrink-0">
-                    <div className="p-4 border-b border-gray-300 bg-slate-200">Dine timer</div>
-                    <div className="gap-2 p-4 form-control calculator-group">
-                        <label className="input-group gap-1">
-                            <span>Fakturert
-                                <ReadMoreIcon text="Antall timer fakturert kunde. I snitt er det 21,67 arbeidsdager i én måned." />
-                            </span>
-                            <input
-                                type="number"
-                                value={antallTimerFakturert}
-                                onChange={handleAntallTimerFakturertChange}
-                                className="input input-bordered"
-                            />
-                        </label>
-                        <label className="input-group gap-1">
-                            <span>
-                                Interntid m/komp
-                                <ReadMoreIcon text="Interntid som kompanseres som fakturert tid, se intranett for retningslinjer" />
-                            </span>
-                            <input
-                                type="number"
-                                value={antallTimerInterntidMedKomp}
-                                className="input input-bordered"
-                                onChange={handleAntallTimerInterntidMedKomChange}
-                            />
-                        </label>
-                        <label className="input-group gap-1">
-                            <span>
-                                Sykdom
-                                <ReadMoreIcon text="Egenmelding, sykemelding, sykt barn og foreldre permisjon" />
-                            </span>
-                            <input
-                                type="number"
-                                value={antallTimerSyk}
-                                onChange={handleAntallTimerSykChange}
-                                className="input input-bordered"
-                            />
-                        </label>
-                        <label className="input-group gap-1">
-                            <span>
-                                Rest kompetansetimer
-                                <ReadMoreIcon text="Antall timer du har igjen på årlig kompetansebudsjett før eventuelt uttak" />
-                            </span>
-                            <input
-                                type="number"
-                                value={restKompetanseBudsjett}
-                                onChange={handleRestKompetanseBudsjettChange}
-                                className="input input-bordered"
-                            />
-                        </label>
-                        <label className="input-group gap-1">
-                            <span>Kompetanseheving
-                            </span>
-                            <input
-                                type="number"
-                                className="input input-bordered"
-                                value={antallTimerKompetanse}
-                                onChange={handleAntallTimerKompetanseChange}
-                            />
-                        </label>
-                        <label className="input-group">
-                            <span>Interntid</span>
-                            <input
-                                type="number"
-                                className="input input-bordered"
-                                value={antallTimerInterntid}
-                                onChange={handleAntallTimerInterntidChange}
-                            />
-                        </label>
-                        <label className="input-group">
-                            <span>Ferie</span>
-                            <input
-                                type="number"
-                                className="input input-bordered"
-                                value={antallTimerFerie}
-                                onChange={handleAntallTimerFerieChange}
-                            />
-                        </label>
-
-                    </div>
-                </div>
-                <div className="rounded-lg border border-gray-300 border-solid grow shrink-0">
-                    <div className="p-4 border-b border-gray-300 bg-slate-200">Annet</div>
+                    <div className="p-4 border-b border-gray-300 bg-slate-200">Basis</div>
                     <div className="gap-2 p-4 form-control calculator-group">
                         <label className="input-group">
                             <span>Timepris på prosjekt</span>
                             <input
                                 type="number"
+                                min="0"
                                 value={timeprisProsjekt}
                                 onChange={handleTimeprisProsjektChange}
-                                className="input input-bordered"
-                            />
-                        </label>
-                        <label className="input-group gap-1">
-                            <span>
-                                Bonus
-                                <ReadMoreIcon
-                                    text="Bonus denne måneden. Eksempelvis presentasjonsbonus og rekrutteringsbonus, mer info på intranett" />
-                            </span>
-                            <input
-                                type="number"
-                                value={bonus}
-                                onChange={handleBonusChange}
-                                className="input input-bordered"
-                            />
-                        </label>
-                        <label className="input-group gap-1">
-                            <span>
-                                Bruttotrekk
-                            </span>
-                            <input
-                                type="number"
-                                value={bruttotrekk}
-                                onChange={handleBruttotrekkChange}
                                 className="input input-bordered"
                             />
                         </label>
@@ -355,6 +385,7 @@ function Kalkulator() {
                             </span>
                             <input
                                 type="number"
+                                min="0"
                                 className="input input-bordered"
                                 value={antallArbeidsdager}
                                 onChange={handleAntallArbeidsdagerChange}
@@ -391,10 +422,158 @@ function Kalkulator() {
                         </label>
                     </div>
                 </div>
+                <div className="rounded-lg border border-gray-300 border-solid grow shrink-0">
+                    <div className="p-4 border-b border-gray-300 bg-slate-200">Dine timer</div>
+                    <div className="gap-2 p-4 form-control calculator-group">
+                        <label className="input-group gap-1">
+                            <span>Fakturert
+                                <ReadMoreIcon text="Antall timer fakturert kunde. I snitt er det 21,67 arbeidsdager i én måned." />
+                            </span>
+                            <input
+                                type="number"
+                                min="0"
+                                value={antallTimerFakturert}
+                                onChange={handleAntallTimerFakturertChange}
+                                className="input input-bordered"
+                            />
+                        </label>
+                        <label className="input-group gap-1">
+                            <span>
+                                Interntid m/komp
+                                <ReadMoreIcon text="Interntid som kompanseres som fakturert tid, se intranett for retningslinjer" />
+                            </span>
+                            <input
+                                type="number"
+                                min="0"
+                                value={antallTimerInterntidMedKomp}
+                                className="input input-bordered"
+                                onChange={handleAntallTimerInterntidMedKomChange}
+                            />
+                        </label>
+                        <label className="input-group gap-1">
+                            <span>
+                                Sykdom
+                                <ReadMoreIcon text="Egenmelding, sykemelding, sykt barn og foreldre permisjon" />
+                            </span>
+                            <input
+                                type="number"
+                                min="0"
+                                value={antallTimerSyk}
+                                onChange={handleAntallTimerSykChange}
+                                className="input input-bordered"
+                            />
+                        </label>
+                        <label className="input-group gap-1">
+                            <span>
+                                Rest kompetansetimer
+                                <ReadMoreIcon text="Antall timer du har igjen på årlig kompetansebudsjett før eventuelt uttak" />
+                            </span>
+                            <input
+                                type="number"
+                                min="0"
+                                value={restKompetanseBudsjett}
+                                onChange={handleRestKompetanseBudsjettChange}
+                                className="input input-bordered"
+                            />
+                        </label>
+                        <label className="input-group gap-1">
+                            <span>Kompetanseheving
+                            </span>
+                            <input
+                                type="number"
+                                min="0"
+                                className="input input-bordered"
+                                value={antallTimerKompetanse}
+                                onChange={handleAntallTimerKompetanseChange}
+                            />
+                        </label>
+                        <label className="input-group">
+                            <span>Interntid</span>
+                            <input
+                                type="number"
+                                min="0"
+                                className="input input-bordered"
+                                value={antallTimerInterntid}
+                                onChange={handleAntallTimerInterntidChange}
+                            />
+                        </label>
+                        <label className="input-group">
+                            <span>Ferie</span>
+                            <input
+                                type="number"
+                                min="0"
+                                className="input input-bordered"
+                                value={antallTimerFerie}
+                                onChange={handleAntallTimerFerieChange}
+                            />
+                        </label>
+
+                    </div>
+                </div>
+                <div className="rounded-lg border border-gray-300 border-solid grow shrink-0">
+                    <div className="p-4 rounded-t-lg border-b border-gray-300 bg-slate-200">
+                        Bonus & bruttotrekk
+                    </div>
+                    <div className="gap-2 p-4 form-control calculator-group">
+                        <label className="input-group" style={{display: "flex", justifyContent: "space-between"}}>
+                            <span>
+                                Salgsbonus
+                                <ReadMoreIcon
+                                    text={`Bonus for bidrag til at konsulent i JPro har fått oppdrag, denne er pt ${getInNok(salgsbonusBelop)}`} />
+                            </span>
+                            <input
+                                type="checkbox"
+                                checked={salgsbonus}
+                                onChange={handleSalgsbonusChange}
+                                className="checkbox checkbox-md"
+                            />
+                        </label>
+                        <label className="input-group" style={{display: "flex", justifyContent: "space-between"}}>
+                            <span>
+                                Rekrutteringsbonus
+                                <ReadMoreIcon
+                                    text={`Bonus for tips om kandidat som blir ansatt i JPro, denner er pt. ${getInNok(rekrutteringsbonusBelop)}`} />
+                            </span>
+                            <input
+                                type="checkbox"
+                                checked={rekrutteringsbonus}
+                                onChange={handleRekrutteringsbonusChange}
+                                className="checkbox checkbox-md"
+                            />
+                        </label>
+                        <label className="input-group gap-1">
+                            <span>
+                                Annen bonus
+                                <ReadMoreIcon
+                                    text="F.eks. bonus for å holde foredrag internt eller eksternt. Beløp anvhenger av flere faktorer, som lenger hvor foredraget holdes osv. se intranett for mer detaljer" />
+                            </span>
+                            <input
+                                type="number"
+                                min="0"
+                                value={foredragsbonus}
+                                onChange={handleForedragsbonusChange}
+                                className="input input-bordered"
+                            />
+                        </label>
+                        <label className="input-group gap-1">
+                            <span>
+                                Bruttotrekk
+                            </span>
+                            <input
+                                type="number"
+                                min="0"
+                                value={bruttotrekk}
+                                onChange={handleBruttotrekkChange}
+                                className="input input-bordered"
+                            />
+                        </label>
+                    </div>
+                </div>
+
                 <div className="rounded-lg border border-gray-300 border-solid grow shrink-0 min-w-[310px]">
                     <div className="flex justify-between p-4 text-white bg-green-brand">
-                        Lønnsgrunnlag
-                        <ReadMoreIconRight text="Viser beregning av lønnsgrunnlaget og hvilke faktorer som er med" />
+                        Etterskudd
+                        <ReadMoreIconRight text="Viser beregning av etterskuddslønn og hvilke faktorer som er med" />
                     </div>
                     <ul className="flex flex-col gap-2 justify-between p-4">
                         <li className="flex justify-between gap-4 ml-4">
@@ -484,9 +663,9 @@ function Kalkulator() {
 
                         <li className="flex justify-between border-b-2 border-solid border-b-black-nav font-semibold mb-2">
                             <span className="flex justify-between gap-1">
-                                Lønnsgrunnlag
+                                Etterskudd
                                 <ReadMoreIcon
-                                    text={`Beregnet lønnsgrunnlag er summen av beregnet minimumslønn og betalt tid => ${getInNok(MinimumsLonn())} + ${getInNok(SumBetaltTid())}`}
+                                    text={`Beregnet etterskudd er summen av beregnet minimumslønn og betalt tid => ${getInNok(MinimumsLonn())} + ${getInNok(SumBetaltTid())}`}
                                 />
                             </span>
                             <span>{getInNok(Lonnsgrunnlag())}</span>
@@ -522,8 +701,8 @@ function Kalkulator() {
 
                         <li className="flex justify-between gap-4 ml-4">
                             <span className="flex justify-between gap-1">
-                                Lønnsgrunnlag
-                                <ReadMoreIcon text="Lønnsgrunnlag beregnet på bakgrunn av timer ført for foregående måned" />
+                                Etterskudd
+                                <ReadMoreIcon text="Etterskuddslønn beregnet på bakgrunn av timer ført for foregående måned" />
                             </span>
                             <span>{getInNok(Lonnsgrunnlag())}</span>
                         </li>
@@ -532,7 +711,7 @@ function Kalkulator() {
                             <span className="flex justify-between gap-1">
                                 Bonus
                             </span>
-                            <span>{getInNok(bonus)}</span>
+                            <span>{getInNok(SumBonus())}</span>
                         </li>
                         <li className="flex justify-between gap-4 ml-4">
                             <span className="flex justify-between gap-1">
@@ -545,7 +724,7 @@ function Kalkulator() {
                             <span className="flex justify-between gap-1">
                                 Brutto månedslønn
                                 <ReadMoreIcon
-                                    text={`Forskudd - Utbetalt forskudd + Lønnsgrunnlag + Bonus - Bruttotrekk => ${getInNok(Forskudd())} - ${getInNok(+utbetaltForskudd)} + ${getInNok(Lonnsgrunnlag())} + ${getInNok(bonus)} - ${getInNok(bruttotrekk)}`}
+                                    text={`Forskudd - Utbetalt forskudd + Etterskudd + Bonus - Bruttotrekk => ${getInNok(Forskudd())} - ${getInNok(+utbetaltForskudd)} + ${getInNok(Lonnsgrunnlag())} + ${getInNok(SumBonus())} - ${getInNok(bruttotrekk)}`}
                                 />
                             </span>
                             <span>{getInNok(BruttoMaanedslonn())}</span>
@@ -564,6 +743,7 @@ function Kalkulator() {
                 </div>
             </div>
         </div>
+        </>
     )
 }
 
