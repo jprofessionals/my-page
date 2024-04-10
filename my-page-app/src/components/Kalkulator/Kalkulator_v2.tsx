@@ -7,11 +7,11 @@ import getSetting from '@/utils/getSetting'
 // import { Settings } from '@/types'
 import { useAuthContext } from '@/providers/AuthProvider'
 import {AccordionContent, AccordionItem, Accordions, AccordionTrigger} from "@/components/ui/bookingAccordion";
-import {useSearchParams} from "next/navigation";
+// import {useSearchParams} from "next/navigation";
 
 
 function Kalkulator() {
-    const [searchParams, setSearchParams] = useSearchParams();
+    // const [searchParams, setSearchParams] = useSearchParams();
 
     const [garantilonn, setGarantilonn] = useState(0)
     const [utbetaltForskudd, setUtbetaltForskudd] = useState(0)
@@ -295,7 +295,7 @@ function Kalkulator() {
                     Her kan du se hvordan vi beregner lønn hver måned. Du kan
                     selv leke med tallene for å se hvordan dette påvirker beregningen av
                     bruttolønn. Du kan også klikke på de predefinerte
-                    <strong> scenariene</strong> under for å se hvordan beregningen blir i
+                    <strong> eksemplene</strong> under for å se hvordan beregningen blir i
                     forskjellige situasjoner.
                 </p>
                 <p>
@@ -311,10 +311,10 @@ function Kalkulator() {
                         className="text-sm rounded-lg items-center px-3 gap-2 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none bg-yellow-hotel">
                         <div className="flex flex-1 gap-4 justify-between">
                           <span
-                              title="Scenarier"
+                              title="Eksempler"
                               className="flex flex-wrap gap-2 justify-center uppercase"
                           >
-                              Scenarier
+                              Eksempler
                             </span>
                         </div>
                     </AccordionTrigger>
