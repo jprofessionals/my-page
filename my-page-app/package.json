@@ -29,7 +29,7 @@
     "clsx": "^2.1.0",
     "daisyui": "^4.10.2",
     "date-fns": "^3.6.0",
-    "eslint": "8.57.0",
+    "eslint": "9.1.0",
     "eslint-config-next": "14.2.2",
     "lucide-react": "^0.372.0",
     "moment": "^2.30.1",
