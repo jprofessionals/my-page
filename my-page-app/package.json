@@ -52,7 +52,7 @@
     "zod": "^3.23.4"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.12",
+    "@tailwindcss/typography": "^0.5.13",
     "@types/react-modal": "^3.16.3",
     "@types/sockjs-client": "^1.5.4",
     "autoprefixer": "^10.4.19",
