@@ -7,6 +7,7 @@ import getSetting from '@/utils/getSetting'
 // import { Settings } from '@/types'
 import { useAuthContext } from '@/providers/AuthProvider'
 import {AccordionContent, AccordionItem, Accordions, AccordionTrigger} from "@/components/ui/bookingAccordion";
+import {round} from "@floating-ui/utils";
 // import {useSearchParams} from "next/navigation";
 
 
@@ -14,10 +15,10 @@ function Kalkulator() {
     // const [searchParams, setSearchParams] = useSearchParams();
 
     const [garantilonn, setGarantilonn] = useState(0)
-    const [utbetaltForskudd, setUtbetaltForskudd] = useState(0)
     const [grunnbelop, setGrunnbelop] = useState(0)
     const [timeprisKompetanse, setTimeprisKompetanse] = useState(0)
     const [stillingsprosent, setStillingsprosent] = useState(100)
+    const [forrigeStillingsprosent, setForrigeStillingsprosent] = useState(100)
     const [foredragsbonus, setForedragsbonus] = useState(0)
     const [salgsbonus, setSalgsbonus] = useState<boolean>(false)
     const [salgsbonusBelop] = useState(60000)
@@ -26,7 +27,6 @@ function Kalkulator() {
     const [bruttotrekk, setBruttotrekk] = useState(0)
     const [restKompetanseBudsjett, setRestKompetanseBudsjett] = useState(0)
     const [timeprisProsjekt, setTimeprisProsjekt] = useState(0)
-    const [betalForskudd, setBetalforskudd] = useState<boolean>(true)
 
     const billableHoursPerYear = 1695;
 
@@ -47,10 +47,8 @@ function Kalkulator() {
     useEffect(() => {
         setLoading(true)
         setGarantilonn(parseInt(getSetting(settings, 'CALC_GARANTILONN') ?? '0'))
-        setUtbetaltForskudd(parseInt(getSetting(settings, 'CALC_GARANTILONN') ?? '0'))
         setGrunnbelop(parseInt(getSetting(settings, 'CALC_GRUNNBELOP') ?? '0'))
         setTimeprisKompetanse(parseInt(getSetting(settings, 'CALC_TIMEPRIS_KOMPETANSE') ?? '0'))
-        // setBonus(parseInt(getSetting(settings, 'CALC_BONUS') ?? '0'))
         setRestKompetanseBudsjett(parseInt(getSetting(settings, 'CALC_RESTKOMPETANSE') ?? '0'))
         setTimeprisProsjekt(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0'))
         setLoading(false)
@@ -76,11 +74,10 @@ function Kalkulator() {
     // }, [settings, searchParams]);
 
     function loadScenarioAvg(){
-        setBetalforskudd(true)
         setTimeprisProsjekt(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0'))
         setAntallArbeidsdager(21.67)
         setStillingsprosent(100)
-        setUtbetaltForskudd(parseInt(getSetting(settings, 'CALC_GARANTILONN') ?? '0'))
+        setForrigeStillingsprosent(100)
         setAntallTimerFakturert(+((21.67 * 7.5).toFixed(2)))
         setAntallTimerInterntidMedKom(0)
         setAntallTimerSyk(0)
@@ -96,12 +93,12 @@ function Kalkulator() {
 
     function loadScenarioHigh(){
         loadScenarioAvg()
-        setTimeprisProsjekt(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0')*1.2)
+        setTimeprisProsjekt(round(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0')*1.2))
     }
 
     function loadScenarioLow(){
         loadScenarioAvg()
-        setTimeprisProsjekt(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0')*0.8)
+        setTimeprisProsjekt(round(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0')*0.8))
     }
 
     function loadScenarioBench(){
@@ -114,23 +111,25 @@ function Kalkulator() {
         loadScenarioAvg()
         setAntallTimerFakturert(0)
         setAntallTimerInterntid(+((21.67 * 7.5).toFixed(2)))
+        setForrigeStillingsprosent(0)
         setForedragsbonus(30000)
     }
 
     function loadScenarioLastMonthPlusOne(){
         loadScenarioAvg()
         setAntallTimerFakturert(+((21.67 * 7.5).toFixed(2)))
-        setBetalforskudd(false)
+        setStillingsprosent(0)
     }
 
     function loadScenario100to50(){
         loadScenarioAvg()
+        setForrigeStillingsprosent(100)
         setStillingsprosent(50)
     }
 
     function loadScenario50to100(){
         loadScenarioAvg()
-        setUtbetaltForskudd(parseInt(getSetting(settings, 'CALC_GARANTILONN') ?? '0')*0.5)
+        setForrigeStillingsprosent(50)
     }
 
     function Timelonn9G() {
@@ -150,15 +149,19 @@ function Kalkulator() {
     }
 
     function DinNormerteTid() {
-        return (NormertTid() * stillingsprosent / 100) - antallTimerFerie
+        return (NormertTid() * forrigeStillingsprosent / 100) - antallTimerFerie
     }
 
     function Forskudd() {
-        return betalForskudd?(garantilonn * stillingsprosent / 100):0
+        return (garantilonn * stillingsprosent / 100)
+    }
+
+    function UtbetaltForskudd() {
+        return (garantilonn * forrigeStillingsprosent / 100)
     }
 
     function TilgjengeligTid() {
-        return Math.max(Math.min((DinNormerteTid() - AntallTimerBetaltTid()), (antallTimerInterntid + AntallTimerUbetaltKompetanse())), 0)
+        return Math.max(Math.min((DinNormerteTid() - AntallTimerBetaltTid()), (+antallTimerInterntid + AntallTimerUbetaltKompetanse())), 0)
     }
 
     function SumFakturertTid() {
@@ -215,7 +218,7 @@ function Kalkulator() {
     }
 
     function BruttoMaanedslonn() {
-        return Forskudd() - utbetaltForskudd + SumBetaltTid() + MinimumsLonn() + SumBonus() - bruttotrekk;
+        return Forskudd() - UtbetaltForskudd() + SumBetaltTid() + MinimumsLonn() + SumBonus() - bruttotrekk;
     }
 
     function BruttoArsLonn() {
@@ -224,10 +227,6 @@ function Kalkulator() {
 
     function BruttoAarsLonnFakturert() {
         return billableHoursPerYear * timeprisProsjekt * stillingsprosent / 100 * 0.52
-    }
-
-    const handleUtbetaltForskuddChange = (e: any) => {
-        setUtbetaltForskudd(e.target.value)
     }
 
     const handleAntallArbeidsdagerChange = (e: any) => {
@@ -240,6 +239,10 @@ function Kalkulator() {
 
     const handleStillingsprosentChange = (e: any) => {
         setStillingsprosent(Math.min(Math.floor(e.target.value), 100))
+    }
+
+    const handleForrigeStillingsprosentChange = (e: any) => {
+        setForrigeStillingsprosent(Math.min(Math.floor(e.target.value), 100))
     }
 
     const handleTimeprisProsjektChange = (e: any) => {
@@ -381,7 +384,7 @@ function Kalkulator() {
                             <span>
                                 Antall arbeidsdager
                                 <ReadMoreIcon
-                                    text="Antall arbeidsdager i den aktuelle måneden. I snitt er det 21,67 arbeidsdager i én måned om man ikke tar hensyn til ferie og helligdager." />
+                                    text="Antall arbeidsdager i foregående måneden. I snitt er det 21,67 arbeidsdager i én måned om man ikke tar hensyn til ferie og helligdager." />
                             </span>
                             <input
                                 type="number"
@@ -392,8 +395,26 @@ function Kalkulator() {
                             />
                         </label>
                         <label className="input-group gap-1">
-                            <span className="flex justify-between">
+                            <span>
+                                Stillingsprosent foregående mnd
+                                <ReadMoreIcon
+                                    text="Stillingsprosent i foregående måned, denne påvirker beregningen av minimumslønn og estimat for utbetalt forskudd."/>
+                            </span>
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="1"
+                                className="input input-bordered"
+                                value={forrigeStillingsprosent}
+                                onChange={handleForrigeStillingsprosentChange}
+                            />
+                        </label>
+                        <label className="input-group gap-1">
+                            <span>
                                 Stillingsprosent
+                                <ReadMoreIcon
+                                    text="Stillingsprosent i inneværende måned, denne påvirker kun forskuddslønnen."/>
                             </span>
                             <input
                                 type="number"
@@ -405,27 +426,12 @@ function Kalkulator() {
                                 onChange={handleStillingsprosentChange}
                             />
                         </label>
-                        <label className="input-group gap-1">
-                            <span>
-                                Utbetalt forskudd
-                                <ReadMoreIcon
-                                    text="Forskudd utbetalt foregående måned, vil normalt være Minimumslønn * Stillingsprosent" />
-                            </span>
-                            <input
-                                type="number"
-                                min="0"
-                                step="1"
-                                className="input input-bordered"
-                                value={utbetaltForskudd}
-                                onChange={handleUtbetaltForskuddChange}
-                            />
-                        </label>
                     </div>
                 </div>
                 <div className="rounded-lg border border-gray-300 border-solid grow shrink-0">
                     <div className="p-4 border-b border-gray-300 bg-slate-200">Dine timer</div>
                     <div className="gap-2 p-4 form-control calculator-group">
-                        <label className="input-group gap-1">
+                    <label className="input-group gap-1">
                             <span>Fakturert
                                 <ReadMoreIcon text="Antall timer fakturert kunde. I snitt er det 21,67 arbeidsdager i én måned." />
                             </span>
@@ -628,7 +634,7 @@ function Kalkulator() {
                             <span className="flex justify-between gap-1">
                                 Din normerte tid
                                 <ReadMoreIcon
-                                    text={`(Normert tid * Stillingsprosent) - Ferie => (${getAsNo(NormertTid())} * ${getAsNo(stillingsprosent / 100)}) - ${getAsNo(antallTimerFerie)}`}
+                                    text={`(Normert tid * Stillingsprosent) - Ferie => (${getAsNo(NormertTid())} * ${getAsNo(forrigeStillingsprosent / 100)}) - ${getAsNo(antallTimerFerie)}`}
                                 />
                             </span>
                             <span>{DinNormerteTid().toFixed(2)}</span>
@@ -646,7 +652,7 @@ function Kalkulator() {
                             <span className="flex justify-between gap-1">
                                 Tilgjengelig tid
                                 <ReadMoreIcon
-                                    text={`MINIMUM(((din normerte tid - betalt tid),(interntid + kompetanseheving(over budsjett)) => (MINIMUM((${getAsNo(DinNormerteTid())} - ${getAsNo(AntallTimerBetaltTid())}),(${getAsNo(antallTimerInterntid)} + ${getAsNo(AntallTimerUbetaltKompetanse())}))`}
+                                    text={`Hvor mye tid som er tilgjengelig for beregning av minimumslønn, kan ikke være mer enn din normerte tid - betalt tid. => (MINIMUM((${getAsNo(DinNormerteTid())} - ${getAsNo(AntallTimerBetaltTid())}),(${getAsNo(antallTimerInterntid)} + ${getAsNo(AntallTimerUbetaltKompetanse())}))`}
                                 />
                             </span>
                             <span>{TilgjengeligTid().toFixed(2)}</span>
@@ -694,9 +700,9 @@ function Kalkulator() {
                         <li className="flex justify-between gap-4 ml-4">
                             <span className="flex justify-between gap-1">
                                 Utbetalt forskudd
-                                <ReadMoreIcon text="Trekk for forskudd utbetalt foregående måned" />
+                                <ReadMoreIcon text={`Trekk for forskudd utbetalt foregående måned, vil normalt være Minimumslønn * Stillingsprosent => ${getInNok(garantilonn)} * ${getAsNo(forrigeStillingsprosent / 100)}`} />
                             </span>
-                            <span className="text-red-500">{getInNok(+utbetaltForskudd)}</span>
+                            <span className="text-red-500">{getInNok(UtbetaltForskudd())}</span>
                         </li>
 
                         <li className="flex justify-between gap-4 ml-4">
@@ -724,7 +730,7 @@ function Kalkulator() {
                             <span className="flex justify-between gap-1">
                                 Brutto månedslønn
                                 <ReadMoreIcon
-                                    text={`Forskudd - Utbetalt forskudd + Etterskudd + Bonus - Bruttotrekk => ${getInNok(Forskudd())} - ${getInNok(+utbetaltForskudd)} + ${getInNok(Lonnsgrunnlag())} + ${getInNok(SumBonus())} - ${getInNok(bruttotrekk)}`}
+                                    text={`Forskudd - Utbetalt forskudd + Etterskudd + Bonus - Bruttotrekk => ${getInNok(Forskudd())} - ${getInNok(UtbetaltForskudd())} + ${getInNok(Lonnsgrunnlag())} + ${getInNok(SumBonus())} - ${getInNok(bruttotrekk)}`}
                                 />
                             </span>
                             <span>{getInNok(BruttoMaanedslonn())}</span>
