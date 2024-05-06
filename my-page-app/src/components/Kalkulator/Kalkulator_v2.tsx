@@ -117,7 +117,6 @@ function Kalkulator() {
 
     function loadScenarioLastMonthPlusOne(){
         loadScenarioAvg()
-        setAntallTimerFakturert(+((21.67 * 7.5).toFixed(2)))
         setStillingsprosent(0)
     }
 
@@ -127,8 +126,16 @@ function Kalkulator() {
         setStillingsprosent(50)
     }
 
+    function loadScenario50(){
+        loadScenarioAvg()
+        setForrigeStillingsprosent(50)
+        setStillingsprosent(50)
+        setAntallTimerFakturert(+((21.67 * 7.5 / 2).toFixed(2)))
+    }
+
     function loadScenario50to100(){
         loadScenarioAvg()
+        setAntallTimerFakturert(+((21.67 * 7.5 / 2).toFixed(2)))
         setForrigeStillingsprosent(50)
     }
 
@@ -328,6 +335,7 @@ function Kalkulator() {
                             <div className="space-x-2"><button onClick={loadScenarioLow} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">Lav</button><span>- 20% lavere timepris enn dagens gjennomsnitt i JPro</span></div>
                             <div className="space-x-2"><button onClick={loadScenarioBench} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">Ledig</button><span>- Lønn om man ikke har oppdrag</span></div>
                             <div className="space-x-2"><button onClick={loadScenario100to50} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">100% til 50%</button><span>- Lønn om man går fra 100% til 50% stilling</span></div>
+                            <div className="space-x-2"><button onClick={loadScenario50} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">50%</button><span>- Lønn om man har en 50% stilling</span></div>
                             <div className="space-x-2"><button onClick={loadScenario50to100} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">50% til 100%</button><span>- Lønn om man går fra 50% til 100% stilling</span></div>
                             <div className="space-x-2"><button onClick={loadScenarioFirstMonth} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">Oppstart</button><span>- Lønn første måned som ansatt i JPro</span></div>
                             <div className="space-x-2"><button onClick={loadScenarioLastMonthPlusOne} className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md">Fratredelse</button><span>- Lønn måneden etter fratredelse</span></div>
