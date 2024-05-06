@@ -118,7 +118,7 @@ function Hyttebooking() {
           <div className="flex gap-2 bg-gray-100 rounded-lg">
             <div className="w-6 rounded-lg bg-orange-brand tooltip tooltip-right" data-tip={fastsatt_tip} />
             /
-            <div className="w-6 rounded-lg bg-pattern bg-yellow-200 tooltip tooltip-right" data-tip={pending_tip} />
+            <div className="w-6 rounded-lg bg-pattern bg-yellow-200 tooltip tooltip-top" data-tip={pending_tip} />
             <span>
               Stor leilighet: 13 sengeplasser (dyr <strong>ikke</strong> tilatt)
             </span>
@@ -127,14 +127,14 @@ function Hyttebooking() {
           <div className="flex gap-2 bg-gray-100 rounded-lg tooltip">
             <div className="w-6 rounded-lg bg-blue-small-appartment tooltip tooltip-right" data-tip={fastsatt_tip}/>
             /
-            <div className="w-6 rounded-lg bg-pattern bg-purple-200 tooltip tooltip-right" data-tip={pending_tip}/>
+            <div className="w-6 rounded-lg bg-pattern bg-purple-200 tooltip tooltip-top" data-tip={pending_tip}/>
             Liten leilighet: 11 sengeplasser (dyr tilatt, men ikke på soverom)
           </div>
 
           <div className="flex gap-2 bg-gray-100 rounded-lg">
             <div className="w-6 rounded-lg bg-teal-annex tooltip tooltip-right" data-tip={fastsatt_tip} />
             /
-            <div className="w-6 rounded-lg bg-pattern bg-green-200 tooltip tooltip-right" data-tip={pending_tip}/>
+            <div className="w-6 rounded-lg bg-pattern bg-green-200 tooltip tooltip-top" data-tip={pending_tip}/>
             <span>
               Annekset: 10 sengeplasser (dyr <strong>ikke</strong> tilatt)
             </span>

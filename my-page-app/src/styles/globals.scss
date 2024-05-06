@@ -33,3 +33,19 @@ code {
     @apply h-10 min-h-6;
   }
 }
+
+.tooltip:before {
+  max-width: 300px;
+}
+
+.tooltip-top:before {
+  left: 100px;
+}
+
+.push-right:before {
+  left: 40px;
+}
+
+.push-right-more:before {
+  left: 60px;
+}

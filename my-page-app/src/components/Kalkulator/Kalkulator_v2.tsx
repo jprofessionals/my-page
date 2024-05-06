@@ -396,7 +396,7 @@ function Kalkulator() {
                         </label>
                         <label className="input-group gap-1">
                             <span>
-                                Stillingsprosent foregående mnd
+                                Stilling (% forrige)
                                 <ReadMoreIcon
                                     text="Stillingsprosent i foregående måned, denne påvirker beregningen av minimumslønn og estimat for utbetalt forskudd."/>
                             </span>
@@ -412,8 +412,8 @@ function Kalkulator() {
                         </label>
                         <label className="input-group gap-1">
                             <span>
-                                Stillingsprosent
-                                <ReadMoreIcon
+                                Stilling (% nå)
+                                <ReadMoreIconPushRight
                                     text="Stillingsprosent i inneværende måned, denne påvirker kun forskuddslønnen."/>
                             </span>
                             <input
@@ -433,7 +433,7 @@ function Kalkulator() {
                     <div className="gap-2 p-4 form-control calculator-group">
                     <label className="input-group gap-1">
                             <span>Fakturert
-                                <ReadMoreIcon text="Antall timer fakturert kunde. I snitt er det 21,67 arbeidsdager i én måned." />
+                                <ReadMoreIconPushRightMore text="Antall timer fakturert kunde. I snitt er det 21,67 arbeidsdager i én måned." />
                             </span>
                             <input
                                 type="number"
@@ -459,7 +459,7 @@ function Kalkulator() {
                         <label className="input-group gap-1">
                             <span>
                                 Sykdom
-                                <ReadMoreIcon text="Egenmelding, sykemelding, sykt barn og foreldre permisjon" />
+                                <ReadMoreIconPushRightMore text="Egenmelding, sykemelding, sykt barn og foreldre permisjon" />
                             </span>
                             <input
                                 type="number"
@@ -524,7 +524,7 @@ function Kalkulator() {
                         <label className="input-group" style={{display: "flex", justifyContent: "space-between"}}>
                             <span>
                                 Salgsbonus
-                                <ReadMoreIcon
+                                <ReadMoreIconPushRight
                                     text={`Bonus for bidrag til at konsulent i JPro har fått oppdrag, denne er pt ${getInNok(salgsbonusBelop)}`} />
                             </span>
                             <input
@@ -550,7 +550,7 @@ function Kalkulator() {
                         <label className="input-group gap-1">
                             <span>
                                 Annen bonus
-                                <ReadMoreIcon
+                                <ReadMoreIconPushRight
                                     text="F.eks. bonus for å holde foredrag internt eller eksternt. Beløp anvhenger av flere faktorer, som lenger hvor foredraget holdes osv. se intranett for mer detaljer" />
                             </span>
                             <input
@@ -585,7 +585,7 @@ function Kalkulator() {
                         <li className="flex justify-between gap-4 ml-4">
                             <span className="flex justify-between gap-1">
                                 Fakturert tid
-                                <ReadMoreIcon
+                                <ReadMoreIconPushRight
                                     text={`Antall timer fakturert * Timepris * 0,52 => ${getAsNo(antallTimerFakturert)} * ${getInNok(timeprisProsjekt)} * 0,52`}
                                 />
                             </span>
@@ -612,7 +612,7 @@ function Kalkulator() {
                         <li className="flex justify-between gap-4 ml-4">
                             <span className="flex justify-between gap-1">
                                 Sykelønn
-                                <ReadMoreIcon
+                                <ReadMoreIconPushRight
                                     text={`Antall timer Sykdom * 9G timelønn => ${getAsNo(AntallTimerSyk())} * ${getInNok(Timelonn9G())}`}
                                 />
                             </span>
@@ -633,7 +633,7 @@ function Kalkulator() {
                         <li className="flex justify-between gap-4 ml-4">
                             <span className="flex justify-between gap-1">
                                 Din normerte tid
-                                <ReadMoreIcon
+                                <ReadMoreIconPushRight
                                     text={`(Normert tid * Stillingsprosent) - Ferie => (${getAsNo(NormertTid())} * ${getAsNo(forrigeStillingsprosent / 100)}) - ${getAsNo(antallTimerFerie)}`}
                                 />
                             </span>
@@ -670,7 +670,7 @@ function Kalkulator() {
                         <li className="flex justify-between border-b-2 border-solid border-b-black-nav font-semibold mb-2">
                             <span className="flex justify-between gap-1">
                                 Etterskudd
-                                <ReadMoreIcon
+                                <ReadMoreIconPushRight
                                     text={`Beregnet etterskudd er summen av beregnet minimumslønn og betalt tid => ${getInNok(MinimumsLonn())} + ${getInNok(SumBetaltTid())}`}
                                 />
                             </span>
@@ -691,7 +691,7 @@ function Kalkulator() {
                         <li className="flex justify-between gap-4 ml-4">
                             <span className="flex justify-between gap-1">
                                 Forskudd
-                                <ReadMoreIcon
+                                <ReadMoreIconPushRight
                                     text={`Forskudd for inneværende måned, beregnes som Minimumslønn * Stillingsprosent => ${getInNok(garantilonn)} * ${getAsNo(stillingsprosent / 100)} `} />
                             </span>
                             <span>{getInNok(Forskudd())}</span>
@@ -708,7 +708,7 @@ function Kalkulator() {
                         <li className="flex justify-between gap-4 ml-4">
                             <span className="flex justify-between gap-1">
                                 Etterskudd
-                                <ReadMoreIcon text="Etterskuddslønn beregnet på bakgrunn av timer ført for foregående måned" />
+                                <ReadMoreIconPushRight text="Etterskuddslønn beregnet på bakgrunn av timer ført for foregående måned" />
                             </span>
                             <span>{getInNok(Lonnsgrunnlag())}</span>
                         </li>
@@ -753,8 +753,20 @@ function Kalkulator() {
     )
 }
 
+const ReadMoreIconPushRight = ({ text }: { text: string }) => (
+    <div className="tooltip tooltip push-right" data-tip={text}>
+        <FontAwesomeIcon icon={faQuestionCircle} />
+    </div>
+)
+
+const ReadMoreIconPushRightMore = ({ text }: { text: string }) => (
+    <div className="tooltip tooltip push-right-more" data-tip={text}>
+        <FontAwesomeIcon icon={faQuestionCircle} />
+    </div>
+)
+
 const ReadMoreIcon = ({ text }: { text: string }) => (
-    <div className="tooltip tooltip-top" data-tip={text}>
+    <div className="tooltip tooltip" data-tip={text}>
         <FontAwesomeIcon icon={faQuestionCircle} />
     </div>
 )
