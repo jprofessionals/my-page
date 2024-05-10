@@ -19,7 +19,7 @@
         <kotlin.version>1.9.24</kotlin.version>
         <testcontainers.version>1.19.8</testcontainers.version>
         <avro.version>1.11.3</avro.version>
-        <slack.version>1.39.0</slack.version>
+        <slack.version>1.39.1</slack.version>
         <ktor.version>2.3.11</ktor.version>
         <spring-cloud-gcp.version>5.2.1</spring-cloud-gcp.version>
     </properties>
