@@ -22,7 +22,7 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@types/google-one-tap": "^1.2.6",
     "@types/node": "20.12.11",
-    "@types/react": "18.3.1",
+    "@types/react": "18.3.2",
     "@types/react-dom": "18.3.0",
     "axios": "^1.6.8",
     "class-variance-authority": "^0.7.0",
