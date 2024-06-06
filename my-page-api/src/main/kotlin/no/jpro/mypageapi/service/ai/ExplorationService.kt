@@ -80,7 +80,7 @@ class ExplorationService(
             val requestMessages = explorationHistory.messages.toMutableList()
             requestMessages.add(newMessage)
 
-            val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT4_4_TURBO, requestMessages)
+            val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_4o, requestMessages)
 
             val responseMessage = completion.choices.first().message
 
@@ -142,7 +142,7 @@ class ExplorationService(
                     val requestMessages = explorationHistory.messages.toMutableList()
                     requestMessages.add(newMessage)
 
-                    val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT4_4_TURBO, requestMessages)
+                    val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_4o, requestMessages)
 
                     val responseMessage = completion.choices.first().message.content
                     if (responseMessage == null) {
@@ -178,7 +178,7 @@ class ExplorationService(
             content = prompt
         )
 
-        val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT4_4_TURBO, listOf(newMessage))
+        val completion: ChatCompletion = openAIConsumer.chatCompletion(GPT_4o, listOf(newMessage))
 
         return completion.choices.first().message.content ?: throw Exception("No response from GPT")
     }
