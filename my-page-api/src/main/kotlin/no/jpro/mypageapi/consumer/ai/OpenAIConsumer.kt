@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service
 const val GPT_3_5_TURBO = "gpt-3.5-turbo"
 const val GPT_4 = "gpt-4"
 const val GPT4_4_TURBO = "gpt-4-1106-preview"
+const val GPT_4o = "gpt-4o"
 
 @Service
 class OpenAIConsumer(
