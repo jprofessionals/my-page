@@ -20,7 +20,7 @@
         <testcontainers.version>1.19.8</testcontainers.version>
         <avro.version>1.11.3</avro.version>
         <slack.version>1.40.1</slack.version>
-        <ktor.version>2.3.11</ktor.version>
+        <ktor.version>2.3.12</ktor.version>
         <spring-cloud-gcp.version>5.4.1</spring-cloud-gcp.version>
     </properties>
 
