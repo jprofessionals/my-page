@@ -1,6 +1,5 @@
 package no.jpro.mypageapi.entity
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
 import java.time.LocalDate
 import java.time.Period
@@ -45,7 +44,7 @@ data class Budget(
 
     fun balance(toDate: LocalDate): Double = startAmount + sumDeposits(toDate) - sumPosts(toDate)
 
-    fun hoursInYear(year: Int): Int {
+    fun hoursInYear(year: Int): Double {
         return hours.filter { it.dateOfUsage.year == year }.sumOf { it.hours }
     }
 

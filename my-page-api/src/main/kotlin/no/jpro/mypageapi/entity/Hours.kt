@@ -11,7 +11,7 @@ data class Hours(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-    val hours: Int,
+    val hours: Double,
     @CreationTimestamp
     val createdDate: LocalDateTime? = null,
     @JsonIgnore

@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 data class HoursDTO (
         val id: Long?,
-        val hours: Int,
+        val hours: Double,
         val createdBy: String,
         val dateOfUsage: LocalDate
         )
