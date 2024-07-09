@@ -29,11 +29,11 @@ class BudgetDTOTests {
                         startDate = LocalDate.now(),
                         startAmount = 11.0,
                         hours = listOf(HoursDTO(id = 1,
-                                                hours = 24,
+                                                hours = 24.0,
                                                 createdBy = "createdBy",
                                                 dateOfUsage = LocalDate.now()),
                                        HoursDTO(id = 2,
-                                                hours = 23,
+                                                hours = 23.0,
                                                 createdBy = "createdBy",
                                                 dateOfUsage = LocalDate.now())))
     }
