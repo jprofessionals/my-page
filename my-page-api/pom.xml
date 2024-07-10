@@ -98,7 +98,7 @@
         <dependency> <!-- HTML to text converter -->
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.17.2</version>
+            <version>1.18.1</version>
         </dependency>
         <dependency> <!-- PDF to text converter -->
             <groupId>com.github.librepdf</groupId>
