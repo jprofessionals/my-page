@@ -26,8 +26,8 @@ export default function Document() {
           sizes="16x16"
           href="/favicon-16x16.png"
         />
-        <link rel="manifest" href="/site.webmanifest" />
-        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+        {/*<link rel="manifest" href="/app.webmanifest" />*/}
+        <link rel="manifest" href="manifest.json" />
       </Head>
       <body className="min-w-[375px]">
         <Main />
