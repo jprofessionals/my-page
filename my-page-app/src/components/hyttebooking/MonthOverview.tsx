@@ -746,7 +746,7 @@ export default function MonthOverview() {
                     <div>
                       <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
                       {infoNotices.map((infoNotice, index) => (
-                        <p
+                        <div
                           key={index}
                           className="mt-1 mb-1 pl-2 border-l-2 border-blue-500"
                         >
@@ -828,14 +828,14 @@ export default function MonthOverview() {
                               }
                             />
                           )}
-                        </p>
+                        </div>
                       ))}
                     </div>
                   ) : (
                     userIsAdmin && (
                       <div>
                         <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
-                        <p>
+                        <div>
                           {' '}
                           Legg til en informasjonsnotis
                           <button
@@ -855,7 +855,7 @@ export default function MonthOverview() {
                               }
                             />
                           )}
-                        </p>
+                        </div>
                       </div>
                     )
                   )}
@@ -911,13 +911,13 @@ export default function MonthOverview() {
                                   {currentCabinName}:
                                 </h4>
                               )}
-                              <p
+                              <div
                                 className={`mt-2 mb-1 pl-2 flex ${cabinBorderColorClasses[currentCabinName]} border-l-2`}
                               >
                                 {isYourBooking || userIsAdmin ? (
                                   <>
                                     <div className="flex flex-col">
-                                      <p className="flex-row justify-between items-center space-x-2">
+                                      <div className="flex-row justify-between items-center space-x-2">
                                         <span style={{ fontStyle: booking.isPending ? 'italic' : 'normal' }}>
                                           {isYourBooking
                                             ? `Du ${booking.isPending ? 'ønsker' : 'har'} hytten fra ${formattedStartDate} til ${formattedEndDate}.`
@@ -964,7 +964,7 @@ export default function MonthOverview() {
                                             </button>
                                           </div>
                                         </Modal>
-                                      </p>
+                                      </div>
                                       {showEditFormForBooking===booking.id && cutOffDateVacancies!=null && (
                                         <EditBooking
                                           booking={booking}
@@ -988,7 +988,7 @@ export default function MonthOverview() {
                                     )}
                                   </>
                                 )}
-                              </p>
+                              </div>
                             </div>
                           )
                         })}
@@ -1005,7 +1005,7 @@ export default function MonthOverview() {
                     )
                     .map((apartment, index) => (
                       <div key={index}>
-                        <p
+                        <div
                           className={`mt-1 mb-1 ${
                             cabinBorderColorClasses[apartment.cabin_name]
                           } pl-2 border-l-2 `}
@@ -1019,7 +1019,7 @@ export default function MonthOverview() {
                           >
                             Reserver
                           </button>
-                        </p>
+                        </div>
                         {expandedApartments.includes(apartment.id) && cutOffDateVacancies!=null && (
                           <div className="expanded-content">
                             <CreateBookingPost
@@ -1064,7 +1064,7 @@ export default function MonthOverview() {
                 )
                 .map((pendingBooking, index) => (
                   <div key={index}>
-                    <p
+                    <div
                       className={`mt-1 mb-1 ${
                         cabinPendingBorderColorClasses[
                           pendingBooking.apartment.cabin_name
@@ -1119,7 +1119,7 @@ export default function MonthOverview() {
                           </div>
                         )}
                       </span>
-                    </p>
+                    </div>
                   </div>
                 ))}
               {drawingPeriodListOnDay.length !== 0 ? (
@@ -1129,7 +1129,7 @@ export default function MonthOverview() {
               )}
               {drawingPeriodListOnDay.map((drawingPeriod, index) => (
                 <div key={index}>
-                  <p
+                  <div
                       className={`mt-1 mb-1 ${
                           cabinPendingBorderColorClasses[
                               drawingPeriod.pendingBookings[0].apartment.cabin_name
@@ -1159,7 +1159,7 @@ export default function MonthOverview() {
                             userIsAdmin={userIsAdmin}
                         />
                     )}
-                  </p>
+                  </div>
                 </div>
               ))}
 
