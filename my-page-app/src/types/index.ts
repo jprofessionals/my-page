@@ -77,10 +77,16 @@ export type JobPostingType = {
   requiredYearsOfExperience?: number
   resourcesNeeded?: number
 }
+
 export type Apartment = {
   id: number
   cabin_name: string
 }
+
+export type VacancyKeys = {
+  [key: number]: string[]
+}
+
 export type Booking = {
   id: number
   startDate: string
@@ -155,3 +161,16 @@ export type Settings = {
   description: string
   settingValue: string
 }
+
+
+/* hyttebooking */
+
+export type CabinColorClasses = { [key: string]: string }
+//export type VacancyLoadingStatus = 'init' | 'loading' | 'completed' | 'failed';
+export enum LoadingStatus {
+  init,
+  loading,
+  completed,
+  failed,
+}
+//export type InfoNoticeVacancyLoadingStatus = | 'init' | 'loading' | 'completed' | 'failed';
