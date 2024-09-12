@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react'
-import {MonthCalendar} from '@/components/ui/monthCalendar'
+import {MonthCalendar} from './components/month-calendar/monthCalendar'
 import ApiService from '@/services/api.service'
 import {Apartment, Booking, CabinColorClasses, DrawingPeriod, InfoBooking, LoadingStatus, VacancyKeys} from '@/types'
 import {toast} from 'react-toastify'
@@ -22,7 +22,9 @@ import {
     getPendingBookingTrainsOnDay,
     getPendingDrawingPeriodDaysFrom,
     getVacantApartmentsOnDay,
-    sortBookingItems
+    sortBookingItems,
+    sortPendingBookings,
+    sortVacantApartment
 } from "./monthOverviewUtils";
 import BookingItem from "@/components/hyttebooking/month-overview/components/BookingItem";
 import InfoNoticeItem from "@/components/hyttebooking/month-overview/components/InfoNoticeItem";
@@ -61,23 +63,20 @@ export default function MonthOverview() {
     const [prevSettings, setPrevSettings] = useState(settings);
     const [isDayVacantForInfoNotice, setIsDayVacantForInfoNotice] = useState(false);
     const [allUsersNames, setAllUsersNames] = useState<string[]>([]);
-
     const startDateVacancies = format(new Date(), dateFormat);
-    const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset'];
     const startDateBookings = format(sub(new Date(), {months: 6, days: 7}), dateFormat);
     const endDateBookings = format(add(new Date(), {months: 12, days: 7}), dateFormat);
 
     const cabinBorderColorClasses: CabinColorClasses = {
         'Stor leilighet': 'border-orange-brand',
         'Liten leilighet': 'border-blue-small-appartment',
-        Annekset: 'border-teal-annex',
+        'Annekset': 'border-teal-annex',
     };
-
 
     const cabinPendingBorderColorClasses: CabinColorClasses = {
         'Stor leilighet': 'border-yellow-200',
         'Liten leilighet': 'border-purple-200',
-        Annekset: 'border-green-200',
+        'Annekset': 'border-green-200',
     };
 
 
@@ -155,6 +154,13 @@ export default function MonthOverview() {
         }
     }, [userIsAdmin, infoNoticeVacancyLoadingStatus]);
 
+    useEffect(() => {
+        if (settings != prevSettings) {
+            setPrevSettings(settings);
+            setCutOffDateVacancies(getSetting(settings, 'CUTOFF_DATE_VACANCIES'));
+            refreshVacancies();
+        }
+    }, [settings]);
 
     const pendingBookingIsOnDay = (date: Date, booking: Booking): boolean => {
         const startDate = new Date(booking.startDate);
@@ -169,14 +175,6 @@ export default function MonthOverview() {
         const usersNames = response.data.map(user => user.name);
         setAllUsersNames(usersNames);
     };
-
-
-    /* todo fix as useeffect */
-    if (settings != prevSettings) {
-        setPrevSettings(settings);
-        setCutOffDateVacancies(getSetting(settings, 'CUTOFF_DATE_VACANCIES'));
-        refreshVacancies();
-    }
 
     const getUserIsAdmin = async () => {
         try {
@@ -367,8 +365,7 @@ export default function MonthOverview() {
 
     const getPendBookingListFromDrawPeriod = (selectedDate: Date) => {
         const drawingPeriodsOnDay = getDrawingPeriodsOnDay(selectedDate);
-        const pendingBookings = drawingPeriodsOnDay.map(
-            pendingBooking => ((pendingBooking.valueOf()) as DrawingPeriod).pendingBookings);
+        const pendingBookings = drawingPeriodsOnDay.map(pendingBooking => ((pendingBooking.valueOf()) as DrawingPeriod).pendingBookings);
         setPendingBookingList(pendingBookings);
         return pendingBookings;
     }
@@ -381,8 +378,8 @@ export default function MonthOverview() {
 
     const handleDateClick = (date: Date) => {
         setDate(date);
-        getVacancyForDay(date);
         setShowModal(true);
+        getVacancyForDay(date);
         getBookingsOnDay(date);
         getPendingBookingsOnDay(date);
         getDrawingPeriodsOnDay(date);
@@ -437,19 +434,11 @@ export default function MonthOverview() {
     return (
         <div className="flex flex-col overflow-hidden gap-4 p-4">
             {cutOffDateVacancies == null ? "Fant ikke innstilling for siste reserverbare dato" : (
+                <div>
                 <MonthCalendar
-                    onDayClick={handleDateClick}
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    className="rounded-md border"
-                    cutOffDateVacancies={cutOffDateVacancies}
-                    getBookings={getBookings}
-                    yourBookings={yourBookings as Booking[]}
-                    bookings={bookings as Booking[]}
-                    getPendingBookingTrainsOnDay={getPendingBookingTrainsOnDay}
-                    getInfoNotices={getInfoNotices}
+                     bookings={bookings}
                 />
+                </div>
             )}
 
             <MonthOverviewModal open={showModal} onClose={closeModal} label="Selected Date">
@@ -480,6 +469,7 @@ export default function MonthOverview() {
 
                                             {infoNotices.map((infoNotice, index) => (
                                                 <InfoNoticeItem
+                                                    key={infoBooking.id}
                                                     infoNoticeIndex={index}
                                                     infoNotice={infoNotice}
                                                     admin={userIsAdmin}
@@ -531,8 +521,9 @@ export default function MonthOverview() {
                                         </div>
                                     ) : (
                                         <div>
-                                            {sortBookingItems(bookingItems, cabinOrder).map((booking, index) => (
+                                            {sortBookingItems(bookingItems).map((booking, index) => (
                                                 <BookingItem
+                                                    key={booking.id}
                                                     booking={booking}
                                                     yourBookings={yourBookings as Booking[]}
                                                     bookingItems={bookingItems}
@@ -554,12 +545,7 @@ export default function MonthOverview() {
                                                 <h3 className="mt-3 mb-1">Ledige hytter:</h3>
                                             )}
 
-                                            {vacantApartmentsOnDay
-                                                .sort(
-                                                    (a, b) =>
-                                                        cabinOrder.indexOf(a.cabin_name) -
-                                                        cabinOrder.indexOf(b.cabin_name),
-                                                ).map((apartment, index) => (
+                                            {sortVacantApartment(vacantApartmentsOnDay).map((apartment, index) => (
                                                     <div key={index}>
                                                         <div
                                                             className={`mt-1 mb-1 ${cabinBorderColorClasses[apartment.cabin_name]} pl-2 border-l-2 `}>
@@ -609,13 +595,7 @@ export default function MonthOverview() {
                                 <h3 className="mt-3 mb-1">Meldt interesse:</h3>
                             )}
 
-                            {pendingBookingsOnDay
-                                .sort(
-                                    (a, b) =>
-                                        cabinOrder.indexOf(a.apartment.cabin_name) -
-                                        cabinOrder.indexOf(b.apartment.cabin_name),
-                                )
-                                .map((pendingBooking, index) => (
+                            {sortPendingBookings(pendingBookingsOnDay).map((pendingBooking, index) => (
                                     <div key={index}>
                                         <div
                                             className={`mt-1 mb-1 ${

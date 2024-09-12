@@ -1,25 +1,10 @@
-import jPro_Hytte from '../images/jPro_Hytte.png'
-import { useEffect, useState } from 'react'
-import Image from 'next/image'
-import MonthOverview from '@/components/hyttebooking/MonthOverview'
-import YearOverview from '@/components/hyttebooking/YearOverview'
-import { Button } from '@/components/ui/button'
+import jPro_Hytte from '../images/jPro_Hytte.png';
+import Image from 'next/image';
+import MonthOverview from '@/components/hyttebooking/MonthOverview';
+import MonthOverview2 from '@/components/hyttebooking/month-overview/MonthOverview';
 import AdminBooking from "@/components/hyttebooking/AdminBooking";
 
 function Hyttebooking() {
-  const [showMonthOverview, setShowMonthOverview] = useState(true)
-  const [showYearOverview, setShowYearOverview] = useState(false)
-
-  const handleShowMonthOverview = () => {
-    setShowMonthOverview(true)
-    setShowYearOverview(false)
-  }
-
-  const handleShowYearOverview = () => {
-    setShowYearOverview(true)
-    setShowMonthOverview(false)
-  }
-
   const fastsatt_tip = "Hytten er opptatt i den angitte perioden"
   const pending_tip = "Hytten er ledig i perioden. En eller flere brukere har lagt inn et ønske om å reservere hytten, og det er fortsatt mulig å melde seg på trekningen"
 
@@ -142,8 +127,8 @@ function Hyttebooking() {
         </div>
       </div>
 
-      {showMonthOverview && <MonthOverview />}
-      {showYearOverview && <YearOverview />}
+      <MonthOverview2 />
+      <MonthOverview />
     </div>
   )
 }

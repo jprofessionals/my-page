@@ -1,10 +1,17 @@
 import { isAfter, isBefore, sub} from 'date-fns'
 import {format, } from 'date-fns';
-import {Apartment, Booking, InfoBooking, PendingBookingTrain, VacancyKeys} from "@/types";
+import {Apartment, Booking, CabinType, InfoBooking, PendingBookingTrain, VacancyKeys} from "@/types";
+
 
 export const dateFormat = 'yyyy-MM-dd';
 
- const getVacantApartments = (selectedDate: Date, vacancies: string[], cutOffDateVacancies: string | undefined, dateFormat: string) => {
+export const cabinOrder = [
+    CabinType.stor_leilighet.valueOf(),
+    CabinType.liten_leilighet.valueOf(),
+    CabinType.annekset.valueOf()
+];
+
+ const getVacantApartments = (selectedDate: Date, vacancies: VacancyKeys, cutOffDateVacancies: string | undefined, dateFormat: string) => {
     const vacantApartments: number[] = [];
     const apartmentsInVacancies = Object.keys(vacancies!);
     const formattedDate = format(selectedDate, dateFormat);
@@ -148,7 +155,7 @@ export const getPendingDrawingPeriodDaysFrom = (selectedDate: Date, allPendingBo
     return drawingPeriodsOnDayArrayOfArray.flat();
 }
 
-export const sortBookingItems = (bookingItems, cabinOrder ) => {
+export const sortBookingItems = (bookingItems ) => {
     if (bookingItems?.length > 0) {
         return bookingItems.sort((a, b) => {
             const cabinIndexA = cabinOrder.indexOf(a.apartment.cabin_name);
@@ -169,3 +176,24 @@ export const sortBookingItems = (bookingItems, cabinOrder ) => {
 
     return [];
 };
+
+export const sortVacantApartment = (apartments: Apartment[]) => {
+    apartments
+        .sort(
+            (a, b) =>
+                cabinOrder.indexOf(a.cabin_name) -
+                cabinOrder.indexOf(b.cabin_name),
+        );
+    return apartments;
+};
+
+export const sortPendingBookings = (pendingBookings: Booking[]) => {
+    pendingBookings.sort(
+        (a, b) =>
+            cabinOrder.indexOf(a.apartment.cabin_name) -
+            cabinOrder.indexOf(b.apartment.cabin_name),
+    );
+    return pendingBookings;
+};
+
+

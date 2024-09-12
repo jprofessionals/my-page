@@ -1,3 +1,6 @@
+import {ComponentProps} from "react";
+import {DayPicker} from "react-day-picker";
+
 export type User = {
   name: string
   email: string
@@ -164,13 +167,25 @@ export type Settings = {
 
 
 /* hyttebooking */
-
 export type CabinColorClasses = { [key: string]: string }
-//export type VacancyLoadingStatus = 'init' | 'loading' | 'completed' | 'failed';
+export enum CabinType {
+  stor_leilighet = 'Stor leilighet',
+  liten_leilighet = 'Liten leilighet',
+  annekset = 'Annekset',
+}
+
 export enum LoadingStatus {
   init,
   loading,
   completed,
   failed,
 }
-//export type InfoNoticeVacancyLoadingStatus = | 'init' | 'loading' | 'completed' | 'failed';
+
+export type CalendarProps = ComponentProps<typeof DayPicker> & {
+  cutOffDateVacancies: string
+  bookings: Booking[] | undefined
+  yourBookings: Booking[] | undefined
+  getBookings: Function
+  getPendingBookingTrainsOnDay: Function
+  getInfoNotices: Function
+};
