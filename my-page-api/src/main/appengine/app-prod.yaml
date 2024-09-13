@@ -23,4 +23,5 @@ env_variables:
   SPRING_PROFILES_ACTIVE: "gcp"
   GOOGLE_CLIENTID: "742259097135-amdq1io2p7t7e4jud14o4deaokp5acl1.apps.googleusercontent.com"
   GCP_PROJECTID: "my-page-jpro"
+  GCS_BUCKET_NAME: "tavle-test-sa40ok8b"
   SLACK_HYTTEKANAL_ID: "C83007C8L"
