@@ -20,7 +20,7 @@ const CalendarBooking = ({ booking, day, user }: Props) => {
             const isPast = booking?.endDate < todayString;
 
             if (isPast) {
-                return "#e5e5e5";
+                return "#ececec";
             }
 
             if (user?.name === booking?.employeeName) {
@@ -31,6 +31,13 @@ const CalendarBooking = ({ booking, day, user }: Props) => {
         }
 
         return "#f5f7fa";
+    }
+
+    const getNameLabelColor = () => {
+        const pending = booking?.isPending;
+        const todayString = format(new Date(), dateFormat);
+        const isPast = booking?.endDate < todayString;
+        return isPast ? "" : "#ffffff";
     }
 
     const getBorderLeft = () => {
@@ -72,10 +79,11 @@ const CalendarBooking = ({ booking, day, user }: Props) => {
             borderLeft: getBorderLeft()
         }}>
             <div style={{
-                backgroundColor: "#ffffff",
+                backgroundColor: getNameLabelColor(),
                 borderRadius: "0.45rem",
                 paddingLeft: "0.5rem",
-                width: "2.3rem"
+                width: "2.3rem",
+                color: "#646464"
             }}>
                 {getEmployeeName()}
             </div>
