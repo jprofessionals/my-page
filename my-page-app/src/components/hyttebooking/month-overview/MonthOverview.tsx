@@ -1,7 +1,16 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {MonthCalendar} from './components/month-calendar/monthCalendar'
 import ApiService from '@/services/api.service'
-import {Apartment, Booking, CabinColorClasses, DrawingPeriod, InfoBooking, LoadingStatus, VacancyKeys} from '@/types'
+import {
+    Apartment,
+    Booking,
+    CabinColorClasses,
+    DrawingPeriod,
+    InfoBooking,
+    LoadingStatus,
+    User,
+    VacancyKeys
+} from '@/types'
 import {toast} from 'react-toastify'
 import {useAuthContext} from '@/providers/AuthProvider'
 import {add, format, isBefore, sub} from 'date-fns'
@@ -39,7 +48,7 @@ export default function MonthOverview() {
     const [showModal, setShowModal] = useState(false);
     const [bookingItems, setBookingItems] = useState<Booking[]>([]);
     const [expandedApartments, setExpandedApartments] = useState<number[]>([]);
-    const [userIsAdmin, setUserIsAdmin] = useState<boolean>(false);
+    const [user, setUser] = useState<User>(null);
     const [infoNotices, setInfoNotices] = useState<InfoBooking[]>([]);
     const [pendingBookingDeleteModalIsOpen, setPendingBookingDeleteModalIsOpen] = useState(false);
     const [pendingBookingIdToDelete, setPendingBookingIdToDelete] = useState<number | null>(null);
@@ -139,20 +148,23 @@ export default function MonthOverview() {
     }, [cutOffDateVacancies]);
 
     useEffect(() => {
+        getUser();
+    }, []);
+
+    useEffect(() => {
         if (vacancyLoadingStatus === LoadingStatus.init && userFetchStatus === 'fetched') {
             refreshVacancies();
             getAllApartments();
-            getUserIsAdmin();
         }
     }, [userFetchStatus, vacancyLoadingStatus]);
 
 
     useEffect(() => {
-        if (infoNoticeVacancyLoadingStatus === LoadingStatus.init && userIsAdmin) {
+        if (infoNoticeVacancyLoadingStatus === LoadingStatus.init && !!user?.admin) {
             fetchAllUsers();
             refreshInfoNoticeVacancies();
         }
-    }, [userIsAdmin, infoNoticeVacancyLoadingStatus]);
+    }, [user, infoNoticeVacancyLoadingStatus]);
 
     useEffect(() => {
         if (settings != prevSettings) {
@@ -170,20 +182,18 @@ export default function MonthOverview() {
         return startDate <= date && endDate >= date;
     };
 
+    const fetchUser = async () => {
+        const response = await ApiService.getUser();
+        const user = response.data;
+        setAllUsersNames(usersNames);
+    };
+
+
     const fetchAllUsers = async () => {
         const response = await ApiService.getUsers();
         const usersNames = response.data.map(user => user.name);
         setAllUsersNames(usersNames);
     };
-
-    const getUserIsAdmin = async () => {
-        try {
-            const response = await ApiService.getUser();
-            setUserIsAdmin(response.data.user.admin);
-        } catch (e) {
-            toast.error('Kunne ikke hente brukers admin status');
-        }
-    }
 
     const openDeleteModal = (booking: Booking | null) => {
         setBookingToDelete(booking);
@@ -195,11 +205,20 @@ export default function MonthOverview() {
         if (bookingToDelete?.isPending) {
             handleDeletePendingBooking(id || null);
         } else {
-            userIsAdmin ? adminDeleteBooking.mutate(id) : deleteBooking.mutate(id);
+            user.admin ? adminDeleteBooking.mutate(id) : deleteBooking.mutate(id);
         }
         setDeleteModalIsOpen(false);
     }
 
+    const getUser = async () => {
+        try {
+            const response = await ApiService.getUser();
+            const user = response.data;
+            setUser(user);
+        } catch (e) {
+            toast.error("Kunne ikke hente bruker");
+        }
+    }
 
     const deleteBookingByBookingId = async (bookingId: number | null) => {
         try {
@@ -223,7 +242,7 @@ export default function MonthOverview() {
 
     const deletePendingBookingById = async (pendingBookingId: number | null) => {
         try {
-            if (userIsAdmin) {
+            if (user.admin) {
                 await ApiService.adminDeletePendingBooking(pendingBookingId);
             } else {
                 await ApiService.deletePendingBooking(pendingBookingId);
@@ -344,7 +363,7 @@ export default function MonthOverview() {
             cutOffDateVacancies,
             dateFormat,
             apartments,
-            userIsAdmin,
+            !!user?.admin,
             yourPendingBookings
         );
         setVacantApartmentsOnDay(vacantApartmentsOnDay);
@@ -436,7 +455,8 @@ export default function MonthOverview() {
             {cutOffDateVacancies == null ? "Fant ikke innstilling for siste reserverbare dato" : (
                 <div>
                 <MonthCalendar
-                     bookings={bookings}
+                    bookings={(bookings || []).concat(pendingBookingList).concat(yourPendingBookings).concat(allPendingBookingTrains)}
+                    user={user}
                 />
                 </div>
             )}
@@ -472,7 +492,7 @@ export default function MonthOverview() {
                                                     key={infoBooking.id}
                                                     infoNoticeIndex={index}
                                                     infoNotice={infoNotice}
-                                                    admin={userIsAdmin}
+                                                    admin={!!user?.admin}
                                                     isDayVacantForInfoNotice={isDayVacantForInfoNotice}
                                                     onCloseModal={closeModal}
                                                     onRefreshNoticeVacancies={refreshInfoNoticeVacancies}
@@ -489,7 +509,7 @@ export default function MonthOverview() {
                                             ))}
                                         </div>
                                     ) : (
-                                        userIsAdmin && (
+                                        !!user?.admin && (
                                             <div>
                                                 <h3 className="mt-3 mb-1">Informasjon for dagen:</h3>
                                                 <div>
@@ -503,7 +523,7 @@ export default function MonthOverview() {
                                                         <CreateInfoNotice
                                                             date={date}
                                                             closeModal={closeModal}
-                                                            userIsAdmin={userIsAdmin}
+                                                            userIsAdmin={!!user?.admin}
                                                             infoNoticeVacancies={infoNoticeVacancies}
                                                             refreshInfoNoticeVacancies={
                                                                 refreshInfoNoticeVacancies
@@ -528,7 +548,7 @@ export default function MonthOverview() {
                                                     yourBookings={yourBookings as Booking[]}
                                                     bookingItems={bookingItems}
                                                     bookingItemsIndex={index}
-                                                    admin={userIsAdmin}
+                                                    admin={!!user?.admin}
                                                     onEditBooking={handleEditBooking}
                                                     onOpenDeleteModal={() => openDeleteModal(booking)}
                                                     onCloseModal={closeModal}
@@ -567,7 +587,7 @@ export default function MonthOverview() {
                                                                     date={date}
                                                                     closeModal={closeModal}
                                                                     refreshVacancies={refreshVacancies}
-                                                                    userIsAdmin={userIsAdmin}
+                                                                    userIsAdmin={!!user?.admin}
                                                                     allUsersNames={allUsersNames}
                                                                     cutOffDateVacancies={cutOffDateVacancies}
                                                                     vacancies={vacancies}
@@ -614,7 +634,7 @@ export default function MonthOverview() {
                                                   onClose={handleClosePendingBookingDeleteModal}
                                                   onOpenConfirm={() => handleOpenPendingBookingDeleteModal(pendingBooking.id)}
                                                   onConfirmDelete={handleConfirmPendingBookingDelete}
-                                                  admin={userIsAdmin}
+                                                  admin={!!user?.admin}
                                               />
                                           </span>
                                         </div>
@@ -637,12 +657,12 @@ export default function MonthOverview() {
                                             <InvolvedText drawingPeriod={drawingPeriod}/>
                                         </span>
 
-                                        {pendingBookingList[index] && userIsAdmin && (
+                                        {pendingBookingList[index] && !!user?.admin && (
                                             <ConvertPendingBooking
                                                 pendingBookingList={pendingBookingList[index]}
                                                 closeModal={closeModal}
                                                 refreshVacancies={refreshVacancies}
-                                                userIsAdmin={userIsAdmin}
+                                                userIsAdmin={!!user?.admin}
                                             />
                                         )}
                                     </div>

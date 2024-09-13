@@ -1,37 +1,52 @@
-import {Button, Chevron, DayPicker, getDefaultClassNames, WeekNumber} from 'react-day-picker'
+import {Button, CalendarDay, Chevron, DayPicker, getDefaultClassNames, WeekNumber} from 'react-day-picker'
  import {
     add,
     sub,
-    format,
-    isMonday,
-    isSameDay,
-    isSunday,
-    isWithinInterval
+    format
 } from 'date-fns'
-import {Booking, PendingBookingTrain, InfoBooking, CalendarProps} from '@/types'
+import {Booking, CalendarProps, User} from '@/types'
 import {dateFormat} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
+import CalendarBooking from "@/components/hyttebooking/month-overview/components/month-calendar/CalendarBooking";
+import CalendarWeekLabel from "@/components/hyttebooking/month-overview/components/month-calendar/CalendarWeekLabel";
+import { no } from "date-fns/locale";
+
+
+type Props = {
+    bookings: Booking[];
+    user: User;
+}
 
 function MonthCalendar({
-    bookings
+    bookings, user
 }: CalendarProps) {
     const startDateCalendar = format(sub(new Date(), { months: 6 }), dateFormat);
     const endDateCalendar = format(add(new Date(), { months: 12 }), dateFormat);
 
-    console.log("bookings:", bookings);
+    const getIsToday = (day: CalendarDay): boolean => {
+        function sameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                d1.getMonth() === d2.getMonth() &&
+                d1.getDate() === d2.getDate();
+        }
 
-    const getBooking = (date: Date, cabinName: string): Booking | undefined => {
+        return sameDay(day.date, new Date());
+     }
+
+    const getBooking = (day: CalendarDay, cabinName: string): Booking | undefined => {
         const all = bookings as Booking[] || [];
-        const dateString = format(date, dateFormat);
+        const dateString = format(day.date, dateFormat);
+
         return all.find((booking: Booking) => (
-            dateString >= booking.startDate &&
-            dateString <= booking.endDate &&
-            cabinName === booking.apartment.cabin_name
+            dateString >= booking?.startDate &&
+            dateString <= booking?.endDate &&
+            cabinName === booking?.apartment.cabin_name
         ));
     }
 
 
     return (
             <DayPicker
+                locale={no}
                 startMonth={startDateCalendar}
                 endMonth={endDateCalendar}
                 showOutsideDays={true}
@@ -40,26 +55,31 @@ function MonthCalendar({
                 weekStartsOn={1}
                 components={{
                     Day:({day}) => (
-                        <div style={{border: "1px solid pink", width: "100%", height: "9rem"}}>
-                            {day.date.getDate()}
-                            <div>
-                                Stor: {getBooking(day.date, "Stor leilighet")?.id}
+                        <div style={{width: "100%", height: "9rem"}}>
+                            <div style={{ padding: "0.2rem 0.8rem"}}>
+                                {getIsToday(day) ?
+                                    <div style={{ backgroundColor: "#dc2323",  color: "#ffffff", borderRadius: "1rem", width: "1.5rem", paddingLeft: "0.2rem"}}>
+                                        {day.date.getDate()}
+                                    </div>
+                                    :
+                                    <>
+                                        {day.date.getDate()}
+                                    </>
+                                }
                             </div>
-                            <div>
-                                Liten: {getBooking(day.date, "Liten leilighet")?.id}
-                            </div>
-                            <div>
-                                Anneks: {getBooking(day.date, "Anneks")?.id}
-                            </div>
+                            <CalendarBooking booking={ getBooking(day, "Stor leilighet")} day={day} user={user}/>
+                            <CalendarBooking booking={ getBooking(day, "Liten leilighet")} day={day} user={user}/>
+                            <CalendarBooking booking={ getBooking(day, "Annekset")} day={day} user={user}/>
                         </div>
                     ),
                     WeekNumber: ({week}) => (
                         <WeekNumber week={week}>
-                        <div style={{width: "5rem", color: "silver"}}>Uke {week.weekNumber}</div>
-                            <br/>
-                            <div style={{width: "5rem", color: "silver"}}>Stor</div>
-                            <div style={{width: "5rem", color: "silver"}}>Liten</div>
-                            <div style={{width: "5rem", color: "silver"}}>Anneks</div>
+                            <div style={{padding: "0.2rem 0.8rem", width: "5rem", color: "silver", marginTop: "-1px"}}>
+                                {week.weekNumber}
+                            </div>
+                            <CalendarWeekLabel cabinName={"Stor leilighe"} label={"Stor"} />
+                            <CalendarWeekLabel cabinName={"Liten leilighe"} label={"Liten"} />
+                            <CalendarWeekLabel cabinName={"Annekset"} label={"Anneks"}/>
                         </WeekNumber>
                     )
                 }}
