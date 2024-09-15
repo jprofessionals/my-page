@@ -61,10 +61,10 @@ export default function MonthOverview() {
     const [infoNoticeVacancyLoadingStatus, setInfoNoticeVacancyLoadingStatus] = useState<LoadingStatus>(LoadingStatus.init);
     const [infoNoticeVacancies, setInfoNoticeVacancies] = useState<string[] | undefined>([]);
     const [pendingBookingsOnDay, setPendingBookingsOnDay] = useState<Booking[]>([]);
-    const [drawingPeriodListOnDay, setDrawingPeriodListOnDay] = useState<DrawingPeriod[]>([]);
     const [pendingBookingList, setPendingBookingList] = useState<Booking[][]>([]);
-    const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
     const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
+    const [drawingPeriodListOnDay, setDrawingPeriodListOnDay] = useState<DrawingPeriod[]>([]);
+    const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
     const [showEditFormForBooking, setShowEditFormForBookingId] = useState<number | null>(null);
     const [infoNoticeDeleteModalIsOpen, setInfoNoticeDeleteModalIsOpen] = useState(false);
     const [infoNoticeIdToDelete, setInfoNoticeIdToDelete] = useState<number | null>(null);
@@ -455,7 +455,12 @@ export default function MonthOverview() {
             {cutOffDateVacancies == null ? "Fant ikke innstilling for siste reserverbare dato" : (
                 <div>
                 <MonthCalendar
-                    bookings={(bookings || []).concat(pendingBookingList).concat(yourPendingBookings).concat(allPendingBookingTrains)}
+                    bookings={
+                        (bookings as Booking[] || [])
+                        .concat(pendingBookingList)
+                        .concat(yourPendingBookings)
+                        .concat(allPendingBookingTrains)}
+                    infoNotices={infoNotices}
                     user={user}
                 />
                 </div>

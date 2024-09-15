@@ -1,14 +1,9 @@
 import {InfoBooking, PendingBookingTrain} from "@/types";
 import {
-    add,
-    sub,
-    format,
-    isMonday,
     isSameDay,
-    isSunday,
     isWithinInterval,
-    isAfter,
 } from 'date-fns';
+import {CalendarDay} from "react-day-picker";
 
 export const getInfoNoticeDateInfo = (date: Date, infoNotice: InfoBooking) => {
     const isFirstDay = isSameDay(new Date(date), new Date(infoNotice.startDate))
@@ -56,4 +51,12 @@ export const getInitials = (name: string, windowWidth: number): string => {
     } else {
         return ''
     }
+};
+
+export const getIsToday = (day: CalendarDay): boolean => {
+    const dayDate = day.date;
+    const todayDate = new Date();
+    return dayDate.getFullYear() === todayDate.getFullYear() &&
+        dayDate.getMonth() === todayDate.getMonth() &&
+        dayDate.getDate() === todayDate.getDate();
 };

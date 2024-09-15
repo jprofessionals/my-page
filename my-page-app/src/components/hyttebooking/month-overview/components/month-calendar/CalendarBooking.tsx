@@ -26,7 +26,7 @@ const CalendarBooking = ({ booking, day, user }: Props) => {
             if (user?.name === booking?.employeeName) {
                 return pending ? "#d7e6ff" : "#0e90fa";
             } else {
-                return pending ? "#fff2d7" : "#fac30e";
+                return pending ? "#e5e5e5" : "#9d9d9d";
             }
         }
 
@@ -52,8 +52,8 @@ const CalendarBooking = ({ booking, day, user }: Props) => {
     const getBorderRadius = () => {
         const dateString = format(day.date, dateFormat);
         switch (dateString) {
-            case booking?.startDate : return "0.6rem 0 0 0.6rem";
-            case booking?.endDate : return "0 0.7rem 0.7rem 0";
+            case booking?.startDate : return "0.9rem 0 0 0.9rem";
+            case booking?.endDate : return "0 0.9rem 0.9rem 0";
             default: return "0";
         }
     }
@@ -62,6 +62,7 @@ const CalendarBooking = ({ booking, day, user }: Props) => {
         const dateString = format(day.date, dateFormat);
         switch (dateString) {
             case booking?.startDate : return booking?.employeeName.split(/\s/).reduce((response,word)=> response+=word.slice(0,1),'');
+            //case booking?.startDate : return booking?.employeeName.;
             default: return "";
         }
     }
@@ -80,10 +81,11 @@ const CalendarBooking = ({ booking, day, user }: Props) => {
         }}>
             <div style={{
                 backgroundColor: getNameLabelColor(),
-                borderRadius: "0.45rem",
+                borderRadius: "0.7rem",
                 paddingLeft: "0.5rem",
                 width: "2.3rem",
-                color: "#646464"
+                color: "#646464",
+                opacity: 0.9
             }}>
                 {getEmployeeName()}
             </div>
