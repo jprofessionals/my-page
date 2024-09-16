@@ -1,0 +1,19 @@
+.container {
+    padding: 0.2rem 0.8rem;
+}
+
+.date {
+    border-radius: 1rem;
+    width: 1.8rem;
+    height: 1.5rem;
+    text-align: center;
+}
+
+.today {
+    background-color: #dc2323;
+    color: #ffffff;
+}
+
+.wednesday {
+    background-color: #ebecef;
+}

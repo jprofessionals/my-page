@@ -1,14 +1,13 @@
 import {CalendarDay, DayPicker, WeekNumber} from 'react-day-picker'
-import {add, sub, format, isBefore, isAfter} from 'date-fns';
+import {add, sub, format} from 'date-fns';
 import {Booking, InfoBooking, User} from '@/types';
-import {dateFormat} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
-import CalendarBooking from "@/components/hyttebooking/month-overview/components/month-calendar/CalendarBooking";
-import CalendarWeekLabel from "@/components/hyttebooking/month-overview/components/month-calendar/CalendarWeekLabel";
 import { no } from "date-fns/locale";
-import CalendarDate from "@/components/hyttebooking/month-overview/components/month-calendar/CalendarDate";
-import CalendarWeekNumber from "@/components/hyttebooking/month-overview/components/month-calendar/CalendarWeekNumber";
-import CalendarInfoNotices
-    from "@/components/hyttebooking/month-overview/components/month-calendar/CalendarInfoNotices";
+import {dateFormat} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
+import CalendarWeekLabel from "./calendar-week-label/CalendarWeekLabel";
+import CalendarWeekNumber from "./calendar-week-number/CalendarWeekNumber";
+import CalendarInfoNotices from "./calendar-info-notices/CalendarInfoNotices";
+import CalendarBooking from "./calendar-booking/CalendarBooking";
+import CalendarDate from "./calendar-date/CalendarDate";
 
 
 type props = {
@@ -82,7 +81,7 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                             label={"Anneks"}
                         />
                     </WeekNumber>
-                )
+                ),
             }}
             classNames={{
                 month_grid: 'w-full border-collapse',
@@ -93,11 +92,6 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
         />
     );
 }
-
-
-
-
-
 
 MonthCalendar.displayName = 'MonthCalendar'
 

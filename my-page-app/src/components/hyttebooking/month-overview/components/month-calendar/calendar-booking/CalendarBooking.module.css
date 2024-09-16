@@ -1,0 +1,53 @@
+.calendarCell {
+    height: 2rem;
+    margin-bottom: 0.2rem;
+    padding: 0.25rem 0.25rem;
+    background-color: #f5f7fa;
+    border-left: 1px solid #e1e1e1;
+    width: 100%;
+}
+
+.calendarCell:hover {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.calendarCellPast {
+    background-color: #ececec;
+}
+
+.calendarCellMine {
+    background-color: #0e90fa;
+    border-left: 1px solid #0e90fa;
+}
+
+.calendarCellMinePending {
+    background-color: #d7e6ff;
+    border-left: 1px solid #d7e6ff;
+}
+
+.calendarCellTheirs {
+    background-color: rgba(115, 99, 0, 0.37);
+    border-left: 1px solid rgba(115, 99, 0, 0.37);
+}
+
+.calendarCellTheirsPending {
+    background-color: rgba(255, 251, 244, 0.87);
+    border-left: 1px solid rgba(255, 251, 244, 0.87);
+}
+
+.calendarCellPeriodStart {
+    border-radius: 0.9rem 0 0 0.9rem;
+}
+
+.calendarCellPeriodEnd {
+    border-radius: 0 0.9rem 0.9rem 0;
+}
+
+.calendarCellNameLabel {
+    background-color: #ffffff;
+    border-radius: 0.7rem;
+    padding-left: 0.5rem;
+    width: 2.3rem;
+    color: #646464;
+}

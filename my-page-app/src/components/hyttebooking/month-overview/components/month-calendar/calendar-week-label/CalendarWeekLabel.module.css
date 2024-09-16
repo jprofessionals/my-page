@@ -1,0 +1,8 @@
+.weekLabel {
+    height: 2rem;
+    width: 5rem;
+    margin-bottom: 0.2rem;
+    padding: 0.2rem 0.8rem;
+    background-color: #f5f7fa;
+    color: #6e6e6e;
+}

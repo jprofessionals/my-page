@@ -60,3 +60,7 @@ export const getIsToday = (day: CalendarDay): boolean => {
         dayDate.getMonth() === todayDate.getMonth() &&
         dayDate.getDate() === todayDate.getDate();
 };
+
+export const getIsDayOfWeek = (day: CalendarDay): number => {
+    return day.date.getDay();
+}
