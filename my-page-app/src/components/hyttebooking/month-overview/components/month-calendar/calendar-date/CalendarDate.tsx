@@ -3,7 +3,7 @@ import {CalendarDay} from "react-day-picker";
 import {
     getIsDayOfWeek,
     getIsToday
-} from "@/components/hyttebooking/month-overview/components/month-calendar/monthCalendarUtil";
+} from "./calendarDateUtil";
 import classes from "./CalendarDate.module.css";
 
 
@@ -23,7 +23,7 @@ const CalendarDate = ({ day }: Props) => {
                 ${isToday && style.today}
                 ${isWednesday && style.wednesday}  
             `}>
-                {day.date.getDate()}
+                {day.date.getDate()}.
             </div>
         </div>
     );

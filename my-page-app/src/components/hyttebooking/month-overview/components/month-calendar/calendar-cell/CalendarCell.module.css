@@ -1,0 +1,11 @@
+.calendarCell {
+    height: 2rem;
+    margin-bottom:0.3rem;
+    background-color: #ececec;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-content: stretch;
+    box-shadow: inset 1px -1px #d3d3d3;
+    padding-bottom: 1px;
+}

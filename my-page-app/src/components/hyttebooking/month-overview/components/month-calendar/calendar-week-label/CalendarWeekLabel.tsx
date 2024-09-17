@@ -10,7 +10,7 @@ const CalendarWeekLabel = ({ cabinName, label }: Props) => {
     const style = classes;
 
     return (
-        <div className={style.weekLabel}>
+        <div className={style.weekLabel} title={cabinName}>
             {label}
         </div>
     )
