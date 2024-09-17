@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import no.jpro.mypageapi.config.RequiresAdmin
+import no.jpro.mypageapi.controller.BookingController.InvalidDateException
 import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.entity.PendingBooking
 import no.jpro.mypageapi.entity.User
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
 @RestController
@@ -30,6 +32,32 @@ class PendingBookingController(
     private val userService: UserService,
     private val bookingLotteryService: BookingLotteryService
 ) {
+
+    @GetMapping
+    @Transactional
+    @Operation(summary = "Get all pending bookings in the given date range")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json", array = ArraySchema(
+                schema = Schema(implementation = PendingBookingDTO::class)
+            )
+        )]
+    )
+    fun getPendingBookings(
+        token: JwtAuthenticationToken,
+        @RequestParam("startDate") startDate: String,
+        @RequestParam("endDate") endDate: String,
+    ): ResponseEntity<List<PendingBookingDTO>?> {
+        try {
+            val parsedStartDate: LocalDate = LocalDate.parse(startDate)
+            val parsedEndDate: LocalDate = LocalDate.parse(endDate)
+            val pendingBookings: List<PendingBookingDTO> = pendingBookingService.getPendingBookingsBetweenDates(parsedStartDate, parsedEndDate)
+            return ResponseEntity.ok(pendingBookings)
+        } catch (e: DateTimeParseException) {
+            throw InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
+        }
+    }
 
     @PostMapping("/pendingPost")
     @Transactional

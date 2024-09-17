@@ -167,6 +167,12 @@ class PendingBookingService(
         return allTrainAndPendingBookings
     }
 
+    fun getPendingBookingsBetweenDates(startDate: LocalDate, endDate: LocalDate, ): List<PendingBookingDTO> {
+        val pendingBookings =
+            pendingBookingRepository.findPendingBookingsByStartDateBetweenOrEndDateBetween(startDate, endDate, startDate, endDate)
+        return pendingBookings.map { pendingBookingMapper.toPendingBookingDTO(it) }
+    }
+
     fun getPendingBookingsRegisteredBeforeDate(cutoffDate: LocalDate): List<PendingBookingDTO> {
         val pendingBookings = pendingBookingRepository.findPendingBookingsByCreatedDateLessThanEqual(cutoffDate)
         return pendingBookings.map { pendingBookingMapper.toPendingBookingDTO(it) }

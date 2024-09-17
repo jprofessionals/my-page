@@ -54,9 +54,9 @@ class BookingService(
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 
-    fun getBookingsBetweenDates(startDate: LocalDate, endDate: LocalDate): List<BookingDTO> {
+    fun getBookingsBetweenDates(startDate: LocalDate, endDate: LocalDate, ): List<BookingDTO> {
         val bookings =
-            bookingRepository.findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(startDate, endDate)
+            bookingRepository.findBookingsByStartDateBetweenOrEndDateBetween(startDate, endDate, startDate, endDate)
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 

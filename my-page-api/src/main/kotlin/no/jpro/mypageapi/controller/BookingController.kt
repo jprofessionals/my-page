@@ -8,10 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import no.jpro.mypageapi.config.RequiresAdmin
-import no.jpro.mypageapi.dto.ApartmentDTO
-import no.jpro.mypageapi.dto.BookingDTO
-import no.jpro.mypageapi.dto.CreateBookingDTO
-import no.jpro.mypageapi.dto.UpdateBookingDTO
+import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
@@ -62,7 +59,7 @@ class BookingController(
         )]
     )
 
-    fun getBookingsPerMonth(
+    fun getBookings(
         token: JwtAuthenticationToken,
         @RequestParam("startDate") startDate: String,
         @RequestParam("endDate") endDate: String,
