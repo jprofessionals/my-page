@@ -12,9 +12,14 @@ type Props = {
 
 const CalendarCell = ({ bookings, day, user }: Props)  => {
     const style = classes;
+    const isPast = day.date < new Date();
 
     return (
-        <div className={style.calendarCell}>
+        <div className={`
+                ${style.calendarCell}
+                ${!isPast && style.calendarCellUpcoming}
+                ${isPast && style.calendarCellPast}
+            `}>
             {bookings?.map(booking =>  (
                 <BookingBar day={day} user={user} booking={booking} />
             ))}

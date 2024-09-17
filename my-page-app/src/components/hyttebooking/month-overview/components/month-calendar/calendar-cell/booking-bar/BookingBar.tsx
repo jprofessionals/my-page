@@ -21,13 +21,12 @@ const BookingBar = ({ booking, day, user }: Props)  => {
         }
     }
 
-
     const isBooking = !!booking;
     const isPending = booking?.isPending;
     const todayString = format(new Date(), dateFormat);
     const isPast = booking?.endDate < todayString;
-    const isMine = isBooking && !isPast && user?.name === booking?.employeeName;
-    const isTheirs = isBooking && !isPast && user?.name !== booking?.employeeName;
+    const isMine = isBooking  && user?.name === booking?.employeeName;
+    const isTheirs = isBooking && user?.name !== booking?.employeeName;
     const isPeriodStart = booking?.startDate === format(day.date, dateFormat);
     const isPeriodEnd = booking?.endDate === format(day.date, dateFormat);
     const showPeriodStart = booking && isPeriodStart;
@@ -38,19 +37,17 @@ const BookingBar = ({ booking, day, user }: Props)  => {
     return (
         <div className={`
                 ${style.bookingBar} 
-                ${isPast && style.calendarCellPast}
-                ${showPeriodStart && style.calendarCellPeriodStart}  
-                ${showPeriodEnd && style.calendarCellPeriodEnd}
-                ${isMine && style.calendarCellMine}
-                ${showMinePending && style.calendarCellMinePending} 
-                ${isTheirs && style.calendarCellTheirs} 
-                ${showTheirsPending && style.calendarCellTheirsPending} 
+                ${showPeriodStart && style.bookingBarPeriodStart}  
+                ${showPeriodEnd && style.bookingBarPeriodEnd}
+                ${isMine && style.bookingBarMine}
+                ${showMinePending && style.bookingBarMinePending} 
+                ${isTheirs && style.bookingBarTheirs} 
+                ${showTheirsPending && style.bookingBarTheirsPending} 
             `}>
             {showPeriodStart && (
                 <div className={`
-                    ${style.calendarCellNameLabel}
-                    ${!isPast && style.calendarCellNameLabelUpcoming}
-                    ${isPast && style.calendarCellNameLabelPast}
+                    ${style.bookingBarNameLabel}
+                    ${!isPast && style.bookingBarNameLabelUpcoming}
                 `}>
                     {getEmployeeName()}
                 </div>

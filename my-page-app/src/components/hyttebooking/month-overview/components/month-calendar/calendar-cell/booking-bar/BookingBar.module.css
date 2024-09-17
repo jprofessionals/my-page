@@ -6,42 +6,38 @@
     justify-content: flex-start;
 }
 
-.calendarCell:hover {
+.bookingBar:hover {
     cursor: pointer;
     opacity: 0.8;
 }
 
-.calendarCellPast {
-    background-color: #d0d0d0;
-}
-
-.calendarCellMine {
+.bookingBarMine {
     background-color: #0e90fa;
 }
 
-.calendarCellMinePending {
+.bookingBarMinePending {
     background-color: #c9dbff;
 }
 
-.calendarCellTheirs {
+.bookingBarTheirs {
     background-color: rgb(222, 161, 58);
 }
 
-.calendarCellTheirsPending {
+.bookingBarTheirsPending {
     background-color: rgb(217, 194, 156);
 }
 
-.calendarCellPeriodStart {
+.bookingBarPeriodStart {
     border-radius: 0.9rem 0 0 0.9rem;
     margin-left: 0.1rem;
 }
 
-.calendarCellPeriodEnd {
+.bookingBarPeriodEnd {
     border-radius: 0 0.9rem 0.9rem 0;
     margin-right: 0.1rem;
 }
 
-.calendarCellNameLabel {
+.bookingBarNameLabel {
     display: flex;
     align-items: stretch;
     justify-content: flex-start;
@@ -49,15 +45,14 @@
     margin: 0.25rem;
     text-overflow: ellipsis;
     white-space: nowrap;
+    background-color: #ffffff;
+    color: #646464;
+    border-radius: 0.7rem;
 }
 
-.calendarCellNameLabelUpcoming {
+.bookingBarNameLabelUpcoming {
     background-color: #ffffff;
     color: #646464;
     border-radius: 0.7rem;
     box-shadow: 0 0 0.25rem rgba(0, 0, 0, 0.47);
-}
-
-.calendarCellNameLabelPast {
-    color: #858585;
 }
