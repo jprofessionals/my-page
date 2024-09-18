@@ -16,15 +16,15 @@
 }
 
 .bookingBarMinePending {
-    background-color: #c9dbff;
+    background-color: #b0d9ff;
 }
 
 .bookingBarTheirs {
-    background-color: rgb(222, 161, 58);
+    background-color: rgb(164, 164, 164);
 }
 
 .bookingBarTheirsPending {
-    background-color: rgb(217, 194, 156);
+    background-color: rgb(218, 218, 218);
 }
 
 .bookingBarPeriodStart {
@@ -39,8 +39,8 @@
 
 .bookingBarNameLabel {
     display: flex;
-    align-items: stretch;
     justify-content: flex-start;
+    align-items: center;
     padding: 0 0.5rem;
     margin: 0.25rem;
     text-overflow: ellipsis;
@@ -54,5 +54,5 @@
     background-color: #ffffff;
     color: #646464;
     border-radius: 0.7rem;
-    box-shadow: 0 0 0.25rem rgba(0, 0, 0, 0.47);
+    box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.47);
 }

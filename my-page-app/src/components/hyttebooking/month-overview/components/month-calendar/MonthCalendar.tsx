@@ -1,6 +1,6 @@
-import {CalendarDay, DayPicker, WeekNumber} from 'react-day-picker'
+import { DayPicker, WeekNumber} from 'react-day-picker'
 import {add, sub, format} from 'date-fns';
-import {Booking, InfoBooking, User} from '@/types';
+import {Booking, BookingPost, CabinType, InfoBooking, User} from '@/types';
 import { no } from "date-fns/locale";
 import {dateFormat} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
 import CalendarWeekLabel from "./calendar-week-label/CalendarWeekLabel";
@@ -8,6 +8,14 @@ import CalendarWeekNumber from "./calendar-week-number/CalendarWeekNumber";
 import CalendarInfoNotices from "./calendar-info-notices/CalendarInfoNotices";
 import CalendarCell from "./calendar-cell/CalendarCell";
 import CalendarDate from "./calendar-date/CalendarDate";
+import AddBookingModal from "./add-booking-modal/AddBookingModal";
+import {useState} from "react";
+import classes from "./MonthCalendar.module.css";
+import {
+    getBookingsOnDayAndCabin,
+    getInfoNoticesOnDay
+} from "./monthCalendarUtil";
+
 
 type props = {
     bookings: Booking[];
@@ -16,22 +24,22 @@ type props = {
 }
 
 function MonthCalendar({bookings, infoNotices, user}: props) {
-    const startDateCalendar = format(sub(new Date(), { months: 6 }), dateFormat);
-    const endDateCalendar = format(add(new Date(), { months: 12 }), dateFormat);
+    const style = classes;
+    const [startMonth, setStartMonth] = useState<Date>(format(sub(new Date(), { months: 6 }), dateFormat));
+    const [endMonth, setEndMonth] = useState<Date>(format(add(new Date(), { months: 12 }), dateFormat));
+    const [addBookingPost, setAddBookingPost] = useState<BookingPost | undefined>(undefined);
 
-    const getBookingsOnDayAndCabin = (day: CalendarDay, cabinName: string): Booking[] => {
-        const dateString = format(day.date, dateFormat);
-        return bookings.filter((booking: Booking) => (
-            dateString >= booking?.startDate &&
-            dateString <= booking?.endDate &&
-            cabinName === booking?.apartment.cabin_name
-        )).sort((a, b) => Date.parse(a.startDate) - Date.parse(b.startDate));
+
+    const handleMonthChange = (month: Date) => {
+        console.log("handleMonthChange: ", month);
+        // todo setStartDate, setEndDate
+        // todo refetch
     }
 
-    const getInfoNoticesOnDay = (day: CalendarDay) => infoNotices.filter(
-        (infoNotice) => day.date >= infoNotice.startDate && day.date <= infoNotice.endDate) || [];
 
     return (
+        <>
+
         <DayPicker
             classNames={{
                 month_grid: 'w-full border-collapse',
@@ -40,33 +48,40 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                 weekdays: "flex justify-between"
             }}
             locale={no}
-            startMonth={startDateCalendar}
-            endMonth={endDateCalendar}
+            startMonth={startMonth}
+            endMonth={endMonth}
+            onMonthChange={handleMonthChange}
             showOutsideDays={true}
             fixedWeeks={true}
             showWeekNumber={true}
             weekStartsOn={1}
             components={{
                 Day:({day}) => (
-                    <div style={{width: "100%", height: "10rem"}}>
+                    <div className={style.dayContainer}>
                         <CalendarDate day={day} />
                         <CalendarCell
-                            bookings={getBookingsOnDayAndCabin(day, "Stor leilighet")}
+                            bookings={
+                                getBookingsOnDayAndCabin(day, CabinType.stor_leilighet, bookings)
+                            }
                             day={day}
                             user={user}
                         />
                         <CalendarCell
-                            bookings={getBookingsOnDayAndCabin(day, "Liten leilighet")}
+                            bookings={
+                                getBookingsOnDayAndCabin(day, CabinType.liten_leilighet, bookings)
+                            }
                             day={day}
                             user={user}
                         />
                         <CalendarCell
-                            bookings={getBookingsOnDayAndCabin(day, "Annekset")}
+                            bookings={
+                                getBookingsOnDayAndCabin(day, CabinType.annekset, bookings)
+                            }
                             day={day}
                             user={user}
                         />
                         <CalendarInfoNotices
-                            infoNotices={getInfoNoticesOnDay(day)}
+                            infoNotices={getInfoNoticesOnDay(day, infoNotices)}
                         />
                     </div>
                 ),
@@ -74,21 +89,24 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                     <WeekNumber week={week}>
                         <CalendarWeekNumber week={week} />
                         <CalendarWeekLabel
-                            cabinName={"Stor leilighe"}
+                            cabinName={CabinType.stor_leilighet}
                             label={"Stor"}
                         />
                         <CalendarWeekLabel
-                            cabinName={"Liten leilighe"}
+                            cabinName={CabinType.liten_leilighet}
                             label={"Liten"}
                         />
                         <CalendarWeekLabel
-                            cabinName={"Annekset"}
+                            cabinName={CabinType.annekset}
                             label={"Anneks"}
                         />
                     </WeekNumber>
                 ),
             }}
         />
+
+
+        </>
     );
 }
 

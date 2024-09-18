@@ -11,7 +11,7 @@ const CalendarWeekNumber = ({ week }: Props) => {
 
     return (
         <div className={style.container}>
-            {week.weekNumber}
+            Uke {week.weekNumber}
         </div>
     )
 }

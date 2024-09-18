@@ -15,10 +15,10 @@ type Props = {
     user: User;
 }
 
-const CalendarCell = ({ bookings = [], day, user }: Props)  => {
+const CalendarCell = ({ bookings, day, user }: Props)  => {
     const style = classes;
     const currentDate = new Date();
-    currentDate.setTime(currentDate.getTime() - ((24*60*60*1000) * 1));
+    currentDate.setTime(currentDate.getTime() - 86400000 /*one day*/);
     const isPast =   day.date < currentDate;
     const isWednesday = getIsDayOfWeek(day) === 3;
     const dayString = format(day.date, dateFormat);
@@ -27,10 +27,10 @@ const CalendarCell = ({ bookings = [], day, user }: Props)  => {
     const showAddButton = !isPast && isWednesday && !hasPeriodStart;
     const showAddButtonPlaceholder = !isPast && isWednesday && !hasPeriodEnd && !showAddButton;
 
+
      return (
         <div className={`
             ${style.calendarCell}
-            ${isWednesday && style.calendarCellWedDay}
             ${!isPast && style.calendarCellUpcoming}
             ${isPast && style.calendarCellPast}
         `}>
