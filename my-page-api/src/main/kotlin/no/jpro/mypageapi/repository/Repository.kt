@@ -48,6 +48,7 @@ interface BookingRepository : JpaRepository<Booking, Long> {
     fun findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
         startDate: LocalDate, endDate: LocalDate
     ): List<Booking>
+    fun findBookingsByStartDateBetweenOrEndDateBetween(startDate: LocalDate, endDate: LocalDate, startDate1: LocalDate, endDate2: LocalDate): List<Booking>
     fun findBookingsByStartDateGreaterThanEqualAndStartDateLessThanEqual(
         earliestStartDate: LocalDate, latestStartDate: LocalDate
     ): List<Booking>
@@ -63,6 +64,8 @@ interface PendingBookingRepository : JpaRepository<PendingBooking, Long> {
     fun findPendingBookingsByApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
         apartmentId: Long, startDate: LocalDate, endDate: LocalDate
     ): List<PendingBookingDTO>
+
+    fun findPendingBookingsByStartDateBetweenOrEndDateBetween(startDate: LocalDate, endDate: LocalDate, startDate1: LocalDate, endDate2: LocalDate): List<PendingBooking>
 
     fun findPendingBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
         startDate: LocalDate, endDate: LocalDate
