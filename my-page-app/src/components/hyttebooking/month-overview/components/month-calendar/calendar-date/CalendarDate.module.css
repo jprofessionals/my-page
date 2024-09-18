@@ -2,6 +2,8 @@
     padding: 0.2rem 0.8rem;
     display: flex;
     justify-content: flex-end;
+    flex-direction: column;
+    gap: 0;
 }
 
 .date {

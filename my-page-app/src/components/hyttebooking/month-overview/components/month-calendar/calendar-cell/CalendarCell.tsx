@@ -1,4 +1,4 @@
-import {Booking, User} from "@/types";
+import {Apartment, Booking, BookingPost, User} from "@/types";
 import React from "react";
 import {CalendarDay} from "react-day-picker";
 import classes from "./CalendarCell.module.css";
@@ -13,19 +13,37 @@ type Props = {
     bookings?: Booking[];
     day: CalendarDay;
     user: User;
+    apartment: Apartment;
+    onNewBookingClick: (newBooking: BookingPost) => void;
 }
 
-const CalendarCell = ({ bookings, day, user }: Props)  => {
+const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick }: Props)  => {
     const style = classes;
-    const currentDate = new Date();
-    currentDate.setTime(currentDate.getTime() - 86400000 /*one day*/);
-    const isPast =   day.date < currentDate;
+    const oneDayMS = 86400000;
     const isWednesday = getIsDayOfWeek(day) === 3;
     const dayString = format(day.date, dateFormat);
     const hasPeriodEnd = (bookings || []).find(booking => booking?.endDate === dayString);
     const hasPeriodStart = (bookings || []).find(booking => booking?.startDate === dayString);
+
+    const currentDate = new Date();
+    currentDate.setTime(currentDate.getTime() - oneDayMS);
+    const isPast = day.date < currentDate;
     const showAddButton = !isPast && isWednesday && !hasPeriodStart;
     const showAddButtonPlaceholder = !isPast && isWednesday && !hasPeriodEnd && !showAddButton;
+
+    const handleNewBooking = () => {
+        const oneDayMS = 86400000;
+        const date = day.date;
+        const startDate = format(date, dateFormat);
+        date.setTime(date.getTime() + oneDayMS*7);
+        const endDate = format(date, dateFormat);
+
+        onNewBookingClick({
+            apartmentID: apartment.id,
+            startDate: startDate,
+            endDate: endDate,
+        });
+    };
 
 
      return (
@@ -49,7 +67,10 @@ const CalendarCell = ({ bookings, day, user }: Props)  => {
 
             {showAddButton && (
                 <div className={style.addButtonContainer}>
-                    <button className={style.addButton}>+</button>
+                    <button
+                        className={style.addButton}
+                        onClick={handleNewBooking}
+                    > + </button>
                 </div>
             )}
         </div>
