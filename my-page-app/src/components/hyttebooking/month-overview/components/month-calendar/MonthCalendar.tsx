@@ -8,7 +8,7 @@ import CalendarWeekNumber from "./calendar-week-number/CalendarWeekNumber";
 import CalendarInfoNotices from "./calendar-info-notices/CalendarInfoNotices";
 import CalendarCell from "./calendar-cell/CalendarCell";
 import CalendarDate from "./calendar-date/CalendarDate";
-import AddBookingModal from "./add-booking-modal/AddBookingModal";
+import BookingAddModal from "./booking-add-modal/BookingAddModal";
 import {useEffect, useState} from "react";
 import classes from "./MonthCalendar.module.css";
 import {
@@ -16,6 +16,8 @@ import {
     getInfoNoticesOnDay
 } from "./monthCalendarUtil";
 import ApiService from "@/services/api.service";
+import BookingEditModal
+    from "@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-modal/BookingEditModal";
 
 
 type props = {
@@ -29,6 +31,7 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
     const [startMonth, setStartMonth] = useState<Date>(format(sub(new Date(), { months: 6 }), dateFormat));
     const [endMonth, setEndMonth] = useState<Date>(format(add(new Date(), { months: 12 }), dateFormat));
     const [newBookingPost, setNewBookingPost] = useState<BookingPost | undefined>(undefined);
+    const [editBooking, setEditBooking] = useState<Booking | undefined>(undefined);
     const [allApartments, setAllApartments] = useState<Apartment[]>([]);
 
     useEffect(() => {
@@ -52,13 +55,15 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
         // todo refetch all.
     }
 
-    const handleNewBookingCancelled = () => {
+    const handleEditBookingSaved = () => {
         setNewBookingPost(undefined);
+        // todo refetch all.
     }
 
-    const handleInitNewBooking = (newBooking: BookingPost) => {
-        setNewBookingPost(newBooking);
-    }
+    const handleNewBookingCancelled = () => setNewBookingPost(undefined);
+    const handleInitNewBooking = (newBooking: BookingPost) => setNewBookingPost(newBooking);
+    const handleEditBookingCancelled = () => setEditBooking(undefined);
+    const handleInitEditBooking = (booking: Booking) => setEditBooking(booking);
 
 
 
@@ -89,6 +94,7 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                                     user={user}
                                     apartment={apartment}
                                     onNewBookingClick={handleInitNewBooking}
+                                    onEditBookingClick={handleInitEditBooking}
                                     bookings={
                                         getBookingsOnDayAndCabin(
                                             day,
@@ -117,11 +123,18 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                 }}
             />
 
-            <AddBookingModal
+            <BookingAddModal
                 user={user}
                 bookingPost={newBookingPost}
                 onCancel={handleNewBookingCancelled}
                 onBookingCreated={handleNewBookingCreated}
+            />
+
+            <BookingEditModal
+                user={user}
+                booking={editBooking}
+                onCancel={handleEditBookingCancelled}
+                onBookingSaved={handleEditBookingSaved}
             />
 
         </>

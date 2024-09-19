@@ -9,8 +9,9 @@ type Props = {
     booking?: Booking;
     day: CalendarDay;
     user: User;
+    onClick: (booking: Booking) => void;
 }
-const BookingBar = ({ booking, day, user }: Props)  => {
+const BookingBar = ({ booking, day, user, onClick }: Props)  => {
     const style = classes;
 
     const getEmployeeName = () => {
@@ -34,8 +35,17 @@ const BookingBar = ({ booking, day, user }: Props)  => {
     const showMinePending = isMine && isPending;
     const showTheirsPending = isTheirs && isPending;
 
+    const handleOnClick = () => {
+        if (booking) {
+            onClick(booking);
+        }
+
+    }
+
     return (
-        <div className={`
+        <div
+            onClick={handleOnClick}
+            className={`
                 ${style.bookingBar} 
                 ${showPeriodStart && style.bookingBarPeriodStart}  
                 ${showPeriodEnd && style.bookingBarPeriodEnd}

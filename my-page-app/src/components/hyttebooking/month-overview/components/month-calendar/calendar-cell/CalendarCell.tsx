@@ -15,9 +15,10 @@ type Props = {
     user: User;
     apartment: Apartment;
     onNewBookingClick: (newBooking: BookingPost) => void;
+    onEditBookingClick: (booking: Booking) => void;
 }
 
-const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick }: Props)  => {
+const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onEditBookingClick }: Props)  => {
     const style = classes;
     const oneDayMS = 86400000;
     const isWednesday = getIsDayOfWeek(day) === 3;
@@ -62,6 +63,7 @@ const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick }: Pro
                     day={day}
                     user={user}
                     booking={booking}
+                    onClick={onEditBookingClick}
                 />
             ))}
 
