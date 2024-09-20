@@ -1,15 +1,9 @@
-import Modal from "react-modal";
 import React, {useEffect, useState} from "react";
-import {Apartment, Booking, BookingPost, User} from "@/types";
-import axios from "axios";
+import {Apartment, Booking, User} from "@/types";
 import ApiService, {API_URL} from "@/services/api.service";
-import authHeader from "@/services/auth-header";
-import {dateFormat} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
-import { format } from 'date-fns';
 import {Button} from "@/components/ui/button";
-import {Alert} from "@/components/ui/alert";
-import NewEmployeeForm from "@/components/newemployee/NewEmployeeForm";
 import SimpleModal from "@/components/ui/SimpleModal";
+import {toast} from "react-toastify";
 
 type Props = {
     booking?: Booking;
@@ -35,27 +29,42 @@ const BookingEditModal = ({ booking, user, onAbort, onBookingSaved, onCancel }: 
     }, []);
 
 
-    const createBooking = async ({ bookingPost }: {
-        bookingPost: BookingPost
-    }) => {
-        const url = asAdmin ?
-            bookingWithoutDrawing ?
-                `${API_URL}booking/admin/post?bookingOwnerName=${bookingOwnerName}` :
-                `${API_URL}pendingBooking/pendingPostForUser?bookingOwnerName=${bookingOwnerName}`
-            : `${API_URL}pendingBooking/pendingPost`;
-        return axios
-            .post(url, bookingPost, { headers: authHeader()})
-            .then((response) => response.data)
-            .catch((error) => { throw error?.response?.data || 'En feil oppstod ved lagring'});
+    const deleteBookingByBookingId = async (bookingId: number | null) => {
+        try {
+            await booking?.isPending ?
+                ApiService.deletePendingBooking(bookingId) :
+                ApiService.deleteBooking(bookingId);
+            toast.success('Reservasjonen din er slettet')
+        } catch (error) {
+            toast.error(`Det oppstod en feil ved sletting: ${error}`,
+            )
+        }
     };
 
+
+    const handleDelete = async() => {
+        if (booking) {
+            await deleteBookingByBookingId(booking.id);
+            onBookingSaved();
+        }
+    };
+
+    const handleChange = () => {
+        if (booking) {
+
+        }
+    };
 
     const handleConfirm = async () => {
         if (booking) {
           //  await createBooking({bookingPost});
             onBookingSaved();
         }
-    }
+    };
+
+    const handleCancel = () => {
+        onCancel();
+    };
 
 
     return (
@@ -69,9 +78,9 @@ const BookingEditModal = ({ booking, user, onAbort, onBookingSaved, onCancel }: 
                  Endre periode  du " " i perioden
              </>
             }
-            optionalButton={<Button onClick={onCancel} variant="error" color={"red"}>Slett</Button>}
+            optionalButton={<Button onClick={handleDelete} variant="error" color={"red"}>Slett</Button>}
             confirmButton={<Button onClick={handleConfirm} variant="primary">Bekreft</Button>}
-            cancelButton={<Button onClick={onCancel}>Avbryt</Button>}
+            cancelButton={<Button onClick={handleCancel}>Avbryt</Button>}
         />
     );
 }

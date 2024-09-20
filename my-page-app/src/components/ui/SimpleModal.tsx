@@ -6,8 +6,8 @@ type Props = {
     onRequestClose: () => void;
     header: string;
     content: ReactElement;
-    optionalButton: ReactElement;
-    confirmButton: ReactElement;
+    optionalButton?: ReactElement;
+    confirmButton?: ReactElement;
     cancelButton: ReactElement;
 }
 

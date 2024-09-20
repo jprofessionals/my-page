@@ -8,6 +8,7 @@ import {
 } from "@/components/hyttebooking/month-overview/components/month-calendar/calendar-date/calendarDateUtil";
 import {dateFormat} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
 import { format } from 'date-fns';
+import {Button} from "@/components/ui/button";
 
 type Props = {
     bookings?: Booking[];
@@ -15,10 +16,10 @@ type Props = {
     user: User;
     apartment: Apartment;
     onNewBookingClick: (newBooking: BookingPost) => void;
-    onEditBookingClick: (booking: Booking) => void;
+    onBookingClick: (booking: Booking) => void;
 }
 
-const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onEditBookingClick }: Props)  => {
+const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onBookingClick }: Props)  => {
     const style = classes;
     const oneDayMS = 86400000;
     const isWednesday = getIsDayOfWeek(day) === 3;
@@ -63,16 +64,13 @@ const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onEdi
                     day={day}
                     user={user}
                     booking={booking}
-                    onClick={onEditBookingClick}
+                    onBookingClick={onBookingClick}
                 />
             ))}
 
             {showAddButton && (
                 <div className={style.addButtonContainer}>
-                    <button
-                        className={style.addButton}
-                        onClick={handleNewBooking}
-                    > + </button>
+                    <Button size="sm" onClick={handleNewBooking}> + </Button>
                 </div>
             )}
         </div>

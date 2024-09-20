@@ -18,6 +18,8 @@ import {
 import ApiService from "@/services/api.service";
 import BookingEditModal
     from "@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-modal/BookingEditModal";
+import BookingReadOnlyInfoModal
+    from "@/components/hyttebooking/month-overview/components/month-calendar/booking-read-only-info-Modal/BookingReadOnlyInfoModal";
 
 
 type props = {
@@ -32,6 +34,7 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
     const [endMonth, setEndMonth] = useState<Date>(format(add(new Date(), { months: 12 }), dateFormat));
     const [newBookingPost, setNewBookingPost] = useState<BookingPost | undefined>(undefined);
     const [editBooking, setEditBooking] = useState<Booking | undefined>(undefined);
+    const [infoBooking, setInfoBooking] = useState<Booking | undefined>(undefined);
     const [allApartments, setAllApartments] = useState<Apartment[]>([]);
 
     useEffect(() => {
@@ -60,10 +63,31 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
         // todo refetch all.
     }
 
+    const handleInfoBookingClose = () => {
+        setInfoBooking(undefined);
+    }
+
     const handleNewBookingCancelled = () => setNewBookingPost(undefined);
     const handleInitNewBooking = (newBooking: BookingPost) => setNewBookingPost(newBooking);
     const handleEditBookingCancelled = () => setEditBooking(undefined);
-    const handleInitEditBooking = (booking: Booking) => setEditBooking(booking);
+    const handleInitEditBooking = (booking: Booking) => {
+        const isUserBookingOwner = user?.name === booking?.employeeName;
+        const isUserAdmin = false; //user.admin;
+        const oneDayMS = 86400000;
+        const currentDate = new Date();
+        currentDate.setTime(currentDate.getTime() - oneDayMS);
+        const isPast = false;
+        const canEdit = (isUserBookingOwner || isUserAdmin) && !isPast;
+
+
+        if (canEdit) {
+            console.log("edit ");
+            setEditBooking(booking);
+        } else {
+            console.log("info ");
+            setInfoBooking(booking);
+        }
+    };
 
 
 
@@ -94,7 +118,7 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                                     user={user}
                                     apartment={apartment}
                                     onNewBookingClick={handleInitNewBooking}
-                                    onEditBookingClick={handleInitEditBooking}
+                                    onBookingClick={handleInitEditBooking}
                                     bookings={
                                         getBookingsOnDayAndCabin(
                                             day,
@@ -137,6 +161,11 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                 onBookingSaved={handleEditBookingSaved}
             />
 
+            <BookingReadOnlyInfoModal
+                user={user}
+                booking={infoBooking}
+                onCancel={handleInfoBookingClose}
+            />
         </>
     );
 }

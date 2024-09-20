@@ -9,9 +9,9 @@ type Props = {
     booking?: Booking;
     day: CalendarDay;
     user: User;
-    onClick: (booking: Booking) => void;
+    onBookingClick: (booking: Booking) => void;
 }
-const BookingBar = ({ booking, day, user, onClick }: Props)  => {
+const BookingBar = ({ booking, day, user, onBookingClick }: Props)  => {
     const style = classes;
 
     const getEmployeeName = () => {
@@ -36,11 +36,10 @@ const BookingBar = ({ booking, day, user, onClick }: Props)  => {
     const showTheirsPending = isTheirs && isPending;
 
     const handleOnClick = () => {
-        if (booking) {
-            onClick(booking);
+        if (booking && onBookingClick) {
+            onBookingClick(booking);
         }
-
-    }
+    };
 
     return (
         <div
