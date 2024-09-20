@@ -1,10 +1,9 @@
 .weekLabel {
     display: flex;
-    justify-content: flex-start;
+    justify-content: flex-end;
     align-items: center;
     height: 2.3rem;
-    width: 5rem;
     padding: 0 0.8rem;
-    background-color: #ececec;
-    box-shadow: inset 1px -1px #d5d5d5;
+    font-size: small;
+
 }

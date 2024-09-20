@@ -12,11 +12,11 @@
 }
 
 .bookingBarMine {
-    background-color: #0e90fa;
+    background-color: #009ee5;
 }
 
 .bookingBarMinePending {
-    background-color: #b0d9ff;
+    background-color: #8bd8ff;
 }
 
 .bookingBarTheirs {
@@ -45,14 +45,15 @@
     margin: 0.25rem;
     text-overflow: ellipsis;
     white-space: nowrap;
-    background-color: #ffffff;
-    color: #646464;
-    border-radius: 0.7rem;
+    //background-color: #ffffff;
+    //color: #646464;
+    //border-radius: 0.7rem;
+    //color: #ffffff;
 }
 
 .bookingBarNameLabelUpcoming {
-    background-color: #ffffff;
-    color: #646464;
-    border-radius: 0.7rem;
-    box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.47);
+    //background-color: #ffffff;
+    //color: #000000;
+    //border-radius: 0.7rem;
+    //box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.47);
 }

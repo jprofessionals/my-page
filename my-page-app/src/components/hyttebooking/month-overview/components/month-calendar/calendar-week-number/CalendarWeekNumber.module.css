@@ -1,6 +1,9 @@
 .container {
-    padding: 0.2rem 0.8rem;
-    width: 5rem;
-    color: #d5d5d5;
-    margin-top: -1px;
-}
+    height: 1.5rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 0;
+    font-size: small;
+    color: #9b9b9b;
+ }
