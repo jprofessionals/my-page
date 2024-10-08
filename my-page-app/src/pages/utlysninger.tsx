@@ -4,7 +4,7 @@ const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
   ssr: false,
 })
 
-export default function tavle() {
+export default function utlysninger() {
   return (
     <RequireAuth>
       <></>
