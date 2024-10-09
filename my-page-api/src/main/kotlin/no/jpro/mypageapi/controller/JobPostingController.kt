@@ -18,6 +18,8 @@ class JobPostingController : JobPostingApiDelegate {
                 OffsetDateTime.of(2024, 10, 9, 12, 0, 0, 0, ZoneOffset.UTC),
                 "Vi søker 5 dyktige utviklere med kompetanse i Kotlin og React",
                 listOf("Kotlin", "React"),
+                emptyList(),
+                emptyList(),
                 "1"
             ),
             JobPostingResponse(
@@ -26,6 +28,8 @@ class JobPostingController : JobPostingApiDelegate {
                 OffsetDateTime.of(2024, 10, 15, 12, 0, 0, 0, ZoneOffset.UTC),
                 "Skatteetaten er på jakt etter en dyktig frontend-utvikler med kompetanse i Angular, TypeScript, og Azure",
                 listOf("Angular", "TypeScript", "Azure"),
+                emptyList(),
+                emptyList(),
                 "2"
             )
         )

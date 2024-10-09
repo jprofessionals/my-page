@@ -52,12 +52,22 @@ components:
           example: ["Java", "Kotlin", "React"]
           items:
             $ref: '#/components/schemas/Tag'
+        files:
+          type: array
+          items:
+            type: string
+        links:
+          type: array
+          items:
+            type: string
       required:
         - title
         - customer
         - deadline
         - description
         - tags
+        - files
+        - links
     JobPostingResponse:
       allOf:
         - $ref: '#/components/schemas/JobPosting'
