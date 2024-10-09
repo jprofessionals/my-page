@@ -34,7 +34,7 @@ export const AddJobPostingModal = ({
 
   // Close modal on ESC key press
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose()
       }
