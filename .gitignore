@@ -41,3 +41,4 @@ build/
 .vscode/
 /my-page-api/src/main/resources/application.yml
 /my-page-api/src/main/resources/application.yaml
+/my-page-app/src/data
