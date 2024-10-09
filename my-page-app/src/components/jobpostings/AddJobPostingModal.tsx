@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { JobPostingType } from '@/types/jobPosting'
 
 interface AddJobPostingModalProps {
@@ -18,7 +18,7 @@ export const AddJobPostingModal = ({
   const [links, setLinks] = useState('')
   const [tags, setTags] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     const newJobPosting: JobPostingType = {
       title,
@@ -55,8 +55,6 @@ export const AddJobPostingModal = ({
       <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-300">
         <h2 className="text-xl font-bold mb-4">Legg til ny utlysning</h2>
         <form onSubmit={handleSubmit}>
-          {/* Form fields */}
-          {/* Title */}
           <div className="mb-4">
             <label className="block text-gray-700">Tittel</label>
             <input
@@ -67,7 +65,6 @@ export const AddJobPostingModal = ({
               required
             />
           </div>
-          {/* Customer */}
           <div className="mb-4">
             <label className="block text-gray-700">Kunde</label>
             <input
@@ -78,7 +75,6 @@ export const AddJobPostingModal = ({
               required
             />
           </div>
-          {/* Deadline */}
           <div className="mb-4">
             <label className="block text-gray-700">Frist</label>
             <input
@@ -89,7 +85,6 @@ export const AddJobPostingModal = ({
               required
             />
           </div>
-          {/* Description */}
           <div className="mb-4">
             <label className="block text-gray-700">Beskrivelse</label>
             <textarea
@@ -99,7 +94,6 @@ export const AddJobPostingModal = ({
               required
             ></textarea>
           </div>
-          {/* Files */}
           <div className="mb-4">
             <label className="block text-gray-700">Filer (kommaseparert)</label>
             <input
@@ -109,7 +103,6 @@ export const AddJobPostingModal = ({
               className="mt-1 block w-full border border-gray-300 rounded p-2"
             />
           </div>
-          {/* Links */}
           <div className="mb-4">
             <label className="block text-gray-700">
               Lenker (kommaseparert)
@@ -121,7 +114,6 @@ export const AddJobPostingModal = ({
               className="mt-1 block w-full border border-gray-300 rounded p-2"
             />
           </div>
-          {/* Tags */}
           <div className="mb-4">
             <label className="block text-gray-700">Tags (kommaseparert)</label>
             <input
@@ -131,7 +123,6 @@ export const AddJobPostingModal = ({
               className="mt-1 block w-full border border-gray-300 rounded p-2"
             />
           </div>
-          {/* Buttons */}
           <div className="flex justify-end">
             <button
               type="button"
