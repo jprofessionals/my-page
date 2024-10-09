@@ -223,6 +223,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${project.parent.version}</version>
+                <configuration>
+                    <mainClass>no.jpro.mypageapi.MyPageApiApplicationKt</mainClass>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -246,6 +249,12 @@
                         <goals>
                             <goal>compile</goal>
                         </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/target/generated-sources/openapi/src/main/kotlin</sourceDir>
+                                <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
+                            </sourceDirs>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>test-compile</id>
@@ -281,6 +290,36 @@
                         <version>${kotlin.version}</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.9.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-api</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/api.yaml</inputSpec>
+                            <generatorName>kotlin-spring</generatorName>
+                            <configOptions>
+                                <basePackage>no.jpro.mypageapi.base</basePackage>
+                                <apiPackage>no.jpro.mypageapi.api</apiPackage>
+                                <modelPackage>no.jpro.mypageapi.model</modelPackage>
+                                <configPackage>no.jpro.mypageapi.config</configPackage>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <dateLibrary>java8</dateLibrary>
+                                <interfaceOnly>false</interfaceOnly>
+                                <delegatePattern>true</delegatePattern>
+                                <exceptionHandler>false</exceptionHandler>
+                                <enumPropertyNaming>original</enumPropertyNaming>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.liquibase</groupId>

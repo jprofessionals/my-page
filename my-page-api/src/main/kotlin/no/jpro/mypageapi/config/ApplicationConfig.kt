@@ -1,14 +1,12 @@
 package no.jpro.mypageapi.config
 
-import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.info.Info
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.integration.jdbc.lock.DefaultLockRepository
 import org.springframework.integration.jdbc.lock.JdbcLockRegistry
 import org.springframework.integration.jdbc.lock.LockRepository
 import org.springframework.integration.support.locks.LockRegistry
-import org.springframework.http.HttpMethod
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -24,16 +22,6 @@ import javax.sql.DataSource
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 class ApplicationConfig {
-
-    @Bean
-    fun springShopOpenAPI(): OpenAPI? {
-        return OpenAPI()
-            .info(
-                Info().title("My Page API")
-                    .description("API for the My Page app")
-                    .version("v0.0.1")
-            )
-    }
 
     @Bean
     fun filterChain(
