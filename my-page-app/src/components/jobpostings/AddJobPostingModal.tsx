@@ -21,10 +21,11 @@ export const AddJobPostingModal = ({
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     const newJobPosting: JobPostingType = {
-      title,
-      customer,
+      id: '1',
+      title: title,
+      customer: customer,
       deadline: new Date(deadline),
-      description,
+      description: description,
       files: files ? files.split(',').map((file) => file.trim()) : [],
       links: links ? links.split(',').map((link) => link.trim()) : [],
       tags: tags ? tags.split(',').map((tag) => tag.trim()) : [],
