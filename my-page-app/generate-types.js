@@ -7,6 +7,6 @@ fs.rmSync(outputDir, { recursive: true, force: true })
 
 await createClient({
   client: '@hey-api/client-fetch',
-  input: '../my-page-api/src/main/resources/openapi/api.yaml',
+  input: 'src/api.yaml',
   output: outputDir,
 })
