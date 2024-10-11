@@ -24,7 +24,7 @@ export default function Utlysninger() {
   }
 
   const addJobPosting = (newJobPosting: JobPostingType) => {
-    setJobPostings([...jobPostings, newJobPosting])
+    // Add job posting here
     closeModal()
   }
 
