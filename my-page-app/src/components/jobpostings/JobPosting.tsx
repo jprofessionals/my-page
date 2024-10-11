@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { JobPostingType } from "@/types/jobPosting";
+import { JobPostingResponse } from '@/data/types'
 
-type PropsType = JobPostingType
+type PropsType = JobPostingResponse
 
 export const JobPosting = ({
   title,
@@ -10,7 +10,7 @@ export const JobPosting = ({
   tags,
   description,
   files,
-  links,
+  links
 }: PropsType) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -28,7 +28,7 @@ export const JobPosting = ({
     dateStyle: 'long',
     timeStyle: 'short',
     timeZone: 'Europe/Oslo',
-  }).format(deadline)
+  }).format(new Date(deadline))
 
   return (
     <div className="border border-gray-200 rounded-lg mb-4">

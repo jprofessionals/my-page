@@ -4,6 +4,7 @@ import { useAuthContext } from '@/providers/AuthProvider'
 import { JobPosting } from '@/components/jobpostings/JobPosting'
 import { AddJobPostingModal } from '@/components/jobpostings/AddJobPostingModal'
 import { JobPostingType } from '@/types/jobPosting'
+import { useJobPostings } from '@/hooks/jobPosting'
 
 const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
   ssr: false,
@@ -12,7 +13,7 @@ const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
 export default function Utlysninger() {
   const { user } = useAuthContext()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [jobPostings, setJobPostings] = useState<JobPostingType[]>([])
+  const { data: jobPostings } = useJobPostings()
 
   const openModal = () => {
     setIsModalOpen(true)
@@ -23,7 +24,7 @@ export default function Utlysninger() {
   }
 
   const addJobPosting = (newJobPosting: JobPostingType) => {
-    setJobPostings([...jobPostings, newJobPosting])
+    // Add job posting here
     closeModal()
   }
 
@@ -41,13 +42,15 @@ export default function Utlysninger() {
           </button>
         )}
 
-        <ul className="space-y-4">
-          {jobPostings.map((jobPosting) => (
-            <li key={jobPosting.id}>
-              <JobPosting {...jobPosting} />
-            </li>
-          ))}
-        </ul>
+        {jobPostings ? (
+          <ul className="space-y-4">
+            {jobPostings.map((jobPosting) => (
+              <li key={jobPosting.id}>
+                <JobPosting {...jobPosting} />
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
 
       {isModalOpen && (
