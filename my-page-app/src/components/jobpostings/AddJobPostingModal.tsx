@@ -1,9 +1,10 @@
-import { FormEvent, useEffect, useState } from 'react'
-import { JobPostingType } from '@/types/jobPosting'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import { JobPosting } from '@/data/types'
+import { DateTime } from "luxon";
 
 interface AddJobPostingModalProps {
   onClose: () => void
-  onAddJobPosting: (newJobPosting: JobPostingType) => void
+  onAddJobPosting: (newJobPosting: JobPosting) => void
 }
 
 export const AddJobPostingModal = ({
@@ -18,13 +19,26 @@ export const AddJobPostingModal = ({
   const [links, setLinks] = useState('')
   const [tags, setTags] = useState('')
 
+  const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value
+
+    const localDateTime = DateTime.fromISO(input)
+
+    const osloDateTime = localDateTime.setZone('Europe/Oslo', {
+      keepLocalTime: true,
+    })
+
+    const isoWithOffset = osloDateTime.toISO()
+
+    setDeadline(isoWithOffset)
+  }
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    const newJobPosting: JobPostingType = {
-      id: '1',
+    const newJobPosting: JobPosting = {
       title: title,
       customer: customer,
-      deadline: new Date(deadline),
+      deadline: deadline,
       description: description,
       files: files ? files.split(',').map((file) => file.trim()) : [],
       links: links ? links.split(',').map((link) => link.trim()) : [],
@@ -80,8 +94,8 @@ export const AddJobPostingModal = ({
             <label className="block text-gray-700">Frist</label>
             <input
               type="datetime-local"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
+              value={DateTime.fromISO(deadline).toFormat("yyyy-MM-dd'T'HH:mm")}
+              onChange={handleDateChange}
               className="mt-1 block w-full border border-gray-300 rounded p-2"
               required
             />
