@@ -28,7 +28,7 @@ export const AddJobPostingModal = ({
       keepLocalTime: true,
     })
 
-    const isoWithOffset = osloDateTime.toISO()
+    const isoWithOffset = osloDateTime.toISO() || ''
 
     setDeadline(isoWithOffset)
   }
