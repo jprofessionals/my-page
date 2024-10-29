@@ -11,16 +11,20 @@ create table budget_type
     `default`                     bit          not null
 );
 
+create table customer
+(
+    id                           bigint auto_increment
+        primary key,
+    name                        varchar(255) null
+);
+
 create table job_posting
 (
     id                           bigint auto_increment
         primary key,
-    customer                     varchar(255) null,
+    customer_id                  bigint       null,
     description                  longtext     null,
-    due_date_for_application     date         null,
-    location                     varchar(255) null,
-    required_years_of_experience int          null,
-    resources_needed             int          null,
+    deadline                     datetime     null,
     title                        varchar(255) null
 );
 
