@@ -95,3 +95,11 @@ interface  InformationNoticeRepository : JpaRepository<InfoBooking, Long> {
         date: LocalDate, anotherDate: LocalDate
     ): List<InfoBooking>
 }
+
+@Repository
+interface CustomerRepository : JpaRepository<Customer, Long> {
+    fun findByName(name: String): Customer?
+}
+
+@Repository
+interface JobPostingRepository : JpaRepository<JobPosting, Long> {}
