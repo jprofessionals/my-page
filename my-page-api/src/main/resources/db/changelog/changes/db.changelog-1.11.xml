@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1.11.1" author="JProfessionals">
+        <createTable tableName="customer">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1.11.2" author="JProfessionals">
+        <!-- Rename existing customer column for clarity -->
+        <renameColumn tableName="job_posting" oldColumnName="customer" newColumnName="customer_id" columnDataType="BIGINT"/>
+
+        <!-- Drop unused columns from job_posting table -->
+        <dropColumn tableName="job_posting" columnName="location"/>
+        <dropColumn tableName="job_posting" columnName="required_years_of_experience"/>
+        <dropColumn tableName="job_posting" columnName="resources_needed"/>
+        <dropColumn tableName="job_posting" columnName="created"/>
+        <dropColumn tableName="job_posting" columnName="updated"/>
+        <dropColumn tableName="job_posting" columnName="content_digest"/>
+        <dropColumn tableName="job_posting" columnName="message_id"/>
+
+        <!-- Modify column for deadline with date-time data type -->
+        <dropColumn tableName="job_posting" columnName="due_date_for_application"/>
+        <addColumn tableName="job_posting">
+            <column name="deadline" type="DATETIME"/>
+        </addColumn>
+
+        <!-- Add foreign key constraint for customer_id -->
+        <addForeignKeyConstraint baseTableName="job_posting"
+                                 baseColumnNames="customer_id"
+                                 constraintName="FK_job_posting_customer"
+                                 referencedTableName="customer"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
