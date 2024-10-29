@@ -3,8 +3,8 @@ import dynamic from 'next/dynamic'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { JobPosting } from '@/components/jobpostings/JobPosting'
 import { AddJobPostingModal } from '@/components/jobpostings/AddJobPostingModal'
-import { JobPostingType } from '@/types/jobPosting'
-import { useJobPostings } from '@/hooks/jobPosting'
+import { JobPosting as JobPostingType } from '@/data/types'
+import { useJobPostings, usePostJobPosting } from '@/hooks/jobPosting'
 
 const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
   ssr: false,
@@ -14,6 +14,7 @@ export default function Utlysninger() {
   const { user } = useAuthContext()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { data: jobPostings } = useJobPostings()
+  const { mutate: createJobPosting } = usePostJobPosting()
 
   const openModal = () => {
     setIsModalOpen(true)
@@ -24,7 +25,7 @@ export default function Utlysninger() {
   }
 
   const addJobPosting = (newJobPosting: JobPostingType) => {
-    // Add job posting here
+    createJobPosting(newJobPosting)
     closeModal()
   }
 

@@ -5,12 +5,13 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import NavBar from '@/components/navbar/NavBar'
+import { useState } from "react";
 
 export default function App({
   Component,
   pageProps: { ...pageProps },
 }: AppProps) {
-  const queryClient = new QueryClient()
+  const [queryClient] = useState(() => new QueryClient())
 
   return (
     <>

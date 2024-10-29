@@ -22,6 +22,30 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
+    post:
+      tags:
+        - JobPosting
+      operationId: createJobPosting
+      summary: Create job postings
+      description: Returns the job posting added.
+      requestBody:
+        description: Job posting to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPosting'
+      responses:
+        '200':
+          description: The added job posting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostingResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
 components:
   schemas:
     Customer:
