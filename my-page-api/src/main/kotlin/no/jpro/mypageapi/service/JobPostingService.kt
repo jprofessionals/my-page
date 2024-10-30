@@ -34,6 +34,12 @@ class JobPostingService(
         return jobPostingRepository.save(jobPostingToPersist)
     }
 
+    fun deleteJobPosting(
+        id: Long
+    ) {
+        jobPostingRepository.deleteById(id)
+    }
+
     fun getJobPostings(): List<no.jpro.mypageapi.entity.JobPosting> {
         return jobPostingRepository.findAll()
     }

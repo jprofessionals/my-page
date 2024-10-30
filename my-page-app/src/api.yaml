@@ -47,6 +47,27 @@ paths:
         '500':
           description: Internal server error
   /job-posting/{id}:
+    delete:
+      tags:
+        - JobPosting
+      operationId: deleteJobPosting
+      summary: Delete job postings
+      description: Returns the deleted job posting
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the job posting to update
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Job posting was deleted
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
     put:
       tags:
         - JobPosting
