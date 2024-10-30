@@ -2,7 +2,6 @@ package no.jpro.mypageapi.controller
 
 import no.jpro.mypageapi.api.JobPostingApiDelegate
 import no.jpro.mypageapi.model.JobPosting
-import no.jpro.mypageapi.model.JobPostingResponse
 import no.jpro.mypageapi.service.JobPostingService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -14,37 +13,60 @@ class JobPostingController(
 
     override fun createJobPosting(
         jobPosting: JobPosting
-    ): ResponseEntity<JobPostingResponse> {
+    ): ResponseEntity<JobPosting> {
         val entity = jobPostingService.createJobPosting(jobPosting)
-        val dto = JobPostingResponse(
-            entity.title,
-            entity.customer.name,
-            entity.deadline,
-            entity.description ?: "",
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            entity.id.toString()
+        val dto = JobPosting(
+            id = entity.id,
+            title = entity.title,
+            customer = entity.customer.name,
+            deadline = entity.deadline,
+            description = entity.description ?: "",
+            tags = emptyList(),
+            files = emptyList(),
+            links = emptyList()
         )
 
         return ResponseEntity.ok(dto)
     }
 
-    override fun getJobPostings(): ResponseEntity<List<JobPostingResponse>> {
+    override fun getJobPostings(): ResponseEntity<List<JobPosting>> {
         val entities = jobPostingService.getJobPostings()
 
         val dto = entities.map {
-            JobPostingResponse(
-                it.title,
-                it.customer.name,
-                it.deadline,
-                it.description ?: "",
-                emptyList(),
-                emptyList(),
-                emptyList(),
-                it.id.toString()
+            JobPosting(
+                id = it.id,
+                title = it.title,
+                customer = it.customer.name,
+                deadline = it.deadline,
+                description = it.description ?: "",
+                tags = emptyList(),
+                files = emptyList(),
+                links = emptyList()
             )
         }
+
+        return ResponseEntity.ok(dto)
+    }
+
+    override fun updateJobPosting(
+        id: Long,
+        jobPosting: JobPosting
+    ): ResponseEntity<JobPosting> {
+        if (id != jobPosting.id) {
+            return ResponseEntity.badRequest().build<JobPosting>()
+        }
+
+        val entity = jobPostingService.updateJobPosting(jobPosting)
+        val dto = JobPosting(
+            id = entity.id,
+            title = entity.title,
+            customer = entity.customer.name,
+            deadline = entity.deadline,
+            description = entity.description ?: "",
+            tags = emptyList(),
+            files = emptyList(),
+            links = emptyList()
+        )
 
         return ResponseEntity.ok(dto)
     }

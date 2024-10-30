@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.service
 
+import jakarta.persistence.EntityNotFoundException
 import no.jpro.mypageapi.entity.Customer
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.repository.CustomerRepository
@@ -17,7 +18,7 @@ class JobPostingService(
     fun createJobPosting(
         jobPosting: JobPosting
     ): no.jpro.mypageapi.entity.JobPosting {
-        val customer = customerRepository.findByName(jobPosting.customer) ?: customerRepository.save(
+        val customerEntity = customerRepository.findByName(jobPosting.customer) ?: customerRepository.save(
             Customer(
                 name = jobPosting.customer
             )
@@ -25,7 +26,7 @@ class JobPostingService(
 
         val jobPostingToPersist = no.jpro.mypageapi.entity.JobPosting(
             title = jobPosting.title,
-            customer = customer,
+            customer = customerEntity,
             description = jobPosting.description,
             deadline = jobPosting.deadline
         )
@@ -35,5 +36,30 @@ class JobPostingService(
 
     fun getJobPostings(): List<no.jpro.mypageapi.entity.JobPosting> {
         return jobPostingRepository.findAll()
+    }
+
+    @Transactional
+    fun updateJobPosting(
+        jobPosting: JobPosting
+    ): no.jpro.mypageapi.entity.JobPosting {
+        val existingJobPosting = jobPostingRepository.findById(jobPosting.id)
+            .orElseThrow {
+                EntityNotFoundException("Job posting with id ${jobPosting.id} not found")
+            }
+
+        val customerEntity = customerRepository.findByName(jobPosting.customer) ?: customerRepository.save(
+            Customer(
+                name = jobPosting.customer
+            )
+        )
+
+        return jobPostingRepository.save(
+            existingJobPosting.apply {
+                title = jobPosting.title
+                customer = customerEntity
+                description = jobPosting.description
+                deadline = jobPosting.deadline
+            }
+        )
     }
 }
