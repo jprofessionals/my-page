@@ -14,7 +14,7 @@ class JobPostingFilesServiceImpl(
     private val storage: Storage
 ): JobPostingFilesService {
 
-    fun getJobPostingFiles(
+    override fun getJobPostingFiles(
         id: Long
     ): List<JobPostingFile> {
         return storage
