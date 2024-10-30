@@ -1,6 +1,6 @@
 import {
   createJobPosting,
-  deleteJobPosting,
+  deleteJobPosting, getJobPostingFiles,
   getJobPostings,
   JobPosting,
   updateJobPosting,
@@ -9,7 +9,8 @@ import { useMutation, useQuery, useQueryClient } from 'react-query'
 import authHeader from '@/services/auth-header'
 import { useAuthContext } from '@/providers/AuthProvider'
 
-const cacheName = 'job-postings'
+const jobPostingsCacheName = 'job-postings'
+const jobPostingFilesCacheName = 'job-posting-files'
 
 export const useDeleteJobPosting = () => {
   const queryClient = useQueryClient()
@@ -26,10 +27,29 @@ export const useDeleteJobPosting = () => {
     },
     {
       onSuccess: async () => {
-        await queryClient.invalidateQueries(cacheName)
+        await queryClient.invalidateQueries(jobPostingsCacheName)
       },
     },
   )
+}
+
+export const useJobPostingFiles = (id: number) => {
+  const { userFetchStatus } = useAuthContext()
+
+  const fetchJobPostingFiles = async () => {
+    return await getJobPostingFiles({
+      path: {
+        id: id,
+      },
+      headers: authHeader(),
+      baseUrl: '/api',
+    })
+  }
+
+  return useQuery([jobPostingFilesCacheName, id], fetchJobPostingFiles, {
+    select: (result) => result.data,
+    enabled: userFetchStatus === 'fetched',
+  })
 }
 
 export const useJobPostings = () => {
@@ -42,7 +62,7 @@ export const useJobPostings = () => {
     })
   }
 
-  return useQuery(cacheName, fetchJobPostings, {
+  return useQuery(jobPostingsCacheName, fetchJobPostings, {
     select: (result) => result.data,
     enabled: userFetchStatus === 'fetched',
   })
@@ -61,7 +81,7 @@ export const usePostJobPosting = () => {
     },
     {
       onSuccess: async () => {
-        await queryClient.invalidateQueries(cacheName)
+        await queryClient.invalidateQueries(jobPostingsCacheName)
       },
     },
   )
@@ -83,7 +103,7 @@ export const usePutJobPosting = () => {
     },
     {
       onSuccess: async () => {
-        await queryClient.invalidateQueries(cacheName)
+        await queryClient.invalidateQueries(jobPostingsCacheName)
       },
     },
   )

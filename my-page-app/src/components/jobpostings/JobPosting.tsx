@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 import { JobPosting as JobPostingType } from '@/data/types'
 import { EditJobPostingModal } from '@/components/jobpostings/EditJobPostingModal'
-import { useDeleteJobPosting, usePutJobPosting } from '@/hooks/jobPosting'
+import {
+  useDeleteJobPosting,
+  useJobPostingFiles,
+  usePutJobPosting,
+} from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
@@ -10,6 +14,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const { data: jobPostingFiles } = useJobPostingFiles(jobPosting.id)
   const { mutate: updateJobPosting } = usePutJobPosting()
   const { mutate: deleteJobPosting } = useDeleteJobPosting()
   const { user } = useAuthContext()
@@ -125,19 +130,19 @@ export const JobPosting = (jobPosting: JobPostingType) => {
             </div>
             <p className="text-gray-800">{jobPosting.description}</p>
 
-            {jobPosting.files.length > 0 && (
+            {jobPostingFiles && jobPostingFiles.length > 0 && (
               <div className="mt-2">
                 <h3 className="font-semibold text-gray-800">Filer:</h3>
                 <ul className="list-disc list-inside text-gray-800">
-                  {jobPosting.files.map((file, index) => (
-                    <li key={index}>
+                  {jobPostingFiles.map((file, index) => (
+                    <li key={file.url}>
                       <a
-                        href={file}
+                        href={file.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline"
                       >
-                        {file}
+                        {file.name}
                       </a>
                     </li>
                   ))}
@@ -170,6 +175,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
       {isModalOpen && (
         <EditJobPostingModal
           jobPosting={jobPosting}
+          jobPostingFiles={jobPostingFiles}
           onClose={closeModal}
           onEditJobPosting={editJobPosting}
         />
