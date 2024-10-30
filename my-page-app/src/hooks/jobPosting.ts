@@ -1,4 +1,9 @@
-import { createJobPosting, getJobPostings, JobPosting } from '@/data/types'
+import {
+  createJobPosting,
+  getJobPostings,
+  JobPosting,
+  updateJobPosting,
+} from '@/data/types'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import authHeader from '@/services/auth-header'
 import { useAuthContext } from '@/providers/AuthProvider'
@@ -28,6 +33,28 @@ export const usePostJobPosting = () => {
     async (newJobPosting: JobPosting) => {
       return await createJobPosting({
         body: newJobPosting,
+        headers: authHeader(),
+        baseUrl: '/api',
+      })
+    },
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(cacheName)
+      },
+    },
+  )
+}
+
+export const usePutJobPosting = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation(
+    async (updatedJobPosting: JobPosting) => {
+      return await updateJobPosting({
+        path: {
+          id: updatedJobPosting.id,
+        },
+        body: updatedJobPosting,
         headers: authHeader(),
         baseUrl: '/api',
       })
