@@ -2,17 +2,19 @@ import { useState } from 'react'
 import { JobPosting as JobPostingType } from '@/data/types'
 import { EditJobPostingModal } from '@/components/jobpostings/EditJobPostingModal'
 import { usePutJobPosting } from '@/hooks/jobPosting'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPencilAlt } from '@fortawesome/free-solid-svg-icons'
+import { useAuthContext } from '@/providers/AuthProvider'
 
 export const JobPosting = (jobPosting: JobPostingType) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { mutate: updateJobPosting } = usePutJobPosting()
+  const { user } = useAuthContext()
 
   const toggleExpansion = () => setIsExpanded(!isExpanded)
 
-  const openModal = (e: React.MouseEvent<HTMLElement>) => {
+  const openModal = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     e.stopPropagation()
     setIsModalOpen(true)
   }
@@ -57,14 +59,16 @@ export const JobPosting = (jobPosting: JobPostingType) => {
             </h2>
             <p className="text-gray-700">{jobPosting.customer}</p>
           </div>
-          <div className="absolute top-1 right-2">
-            <FontAwesomeIcon
-              icon={faPencilAlt}
-              onClick={openModal}
-              className="text-gray-600 hover:text-gray-800 cursor-pointer"
-              aria-label="Edit job posting"
-            />
-          </div>
+          {user?.admin && (
+            <div className="absolute top-1 right-2">
+              <FontAwesomeIcon
+                icon={faPencilAlt}
+                onClick={openModal}
+                className="text-gray-600 hover:text-gray-800 cursor-pointer"
+                aria-label="Edit job posting"
+              />
+            </div>
+          )}
           <div>
             <p className="text-sm font-bold text-gray-800">Frist</p>
             <p className="text-sm text-gray-700">{formattedDeadline}</p>
