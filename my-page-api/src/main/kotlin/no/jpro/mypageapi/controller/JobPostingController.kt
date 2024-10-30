@@ -3,6 +3,7 @@ package no.jpro.mypageapi.controller
 import no.jpro.mypageapi.api.JobPostingApiDelegate
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.model.JobPostingFile
+import no.jpro.mypageapi.service.JobPostingFilesService
 import no.jpro.mypageapi.service.JobPostingService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class JobPostingController(
     private val jobPostingService: JobPostingService,
+    private val jobPostingFilesService: JobPostingFilesService,
 ) : JobPostingApiDelegate {
 
     override fun createJobPosting(
@@ -40,12 +42,7 @@ class JobPostingController(
     override fun getJobPostingFiles(
         id: Long
     ): ResponseEntity<List<JobPostingFile>> {
-        val dto = listOf(
-            JobPostingFile(
-                name = "sample.pdf",
-                url = "https://pdfobject.com/pdf/sample.pdf"
-            )
-        )
+        val dto = jobPostingFilesService.getJobPostingFiles(id)
 
         return ResponseEntity.ok(dto)
     }

@@ -183,6 +183,7 @@ components:
           example: utlysning.pdf
         url:
           type: string
+          format: uri
           description: URL of file
           example: https://www.myfile.no
       required:
