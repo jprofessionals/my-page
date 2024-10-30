@@ -1,9 +1,11 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
-import { JobPosting as JobPostingType } from '@/data/types'
+import { JobPosting as JobPostingType, JobPostingFiles as JobPostingFilesType } from '@/data/types'
 import { DateTime } from 'luxon'
+import { useJobPostingFiles } from "@/hooks/jobPosting";
 
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
+  jobPostingFiles?: JobPostingFilesType
   heading: string
   submitText: string
   onClose: () => void
@@ -12,6 +14,7 @@ interface JobPostingModalProps {
 
 export const JobPostingModal = ({
   jobPosting,
+  jobPostingFiles,
   heading,
   submitText,
   onClose,
@@ -28,7 +31,7 @@ export const JobPostingModal = ({
   const [description, setDescription] = useState(
     jobPosting ? jobPosting.description : '',
   )
-  const [files, setFiles] = useState(jobPosting ? jobPosting.files : [])
+  const [files, setFiles] = useState(jobPostingFiles ? jobPostingFiles.map(file => file.name) : [])
   const [links, setLinks] = useState(jobPosting ? jobPosting.links : [])
   const [tags, setTags] = useState(jobPosting ? jobPosting.tags : [])
 
@@ -54,7 +57,6 @@ export const JobPostingModal = ({
       customer: customer,
       deadline: deadline,
       description: description,
-      files: files,
       links: links,
       tags: tags,
     }

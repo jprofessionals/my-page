@@ -100,6 +100,32 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
+  /job-posting/{id}/files:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostingFiles
+      summary: Get all the files associated with a job posting
+      description: Get all the files associated with a specific job posting
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the job posting to get files for
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A JSON array of files
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostingFiles'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
 components:
   schemas:
     Customer:
@@ -133,13 +159,9 @@ components:
         tags:
           type: array
           description: A list of tags that can be used to filter relevant job postings
-          example: ["Java", "Kotlin", "React"]
+          example: [ "Java", "Kotlin", "React" ]
           items:
             $ref: '#/components/schemas/Tag'
-        files:
-          type: array
-          items:
-            type: string
         links:
           type: array
           items:
@@ -151,8 +173,26 @@ components:
         - deadline
         - description
         - tags
-        - files
         - links
+    JobPostingFile:
+      type: object
+      properties:
+        name:
+          type: string
+          description: File name
+          example: utlysning.pdf
+        url:
+          type: string
+          description: URL of file
+          example: https://www.myfile.no
+      required:
+        - name
+        - url
+    JobPostingFiles:
+      type: array
+      description: List of files
+      items:
+        $ref: '#/components/schemas/JobPostingFile'
     JobPostings:
       type: array
       description: List of job postings

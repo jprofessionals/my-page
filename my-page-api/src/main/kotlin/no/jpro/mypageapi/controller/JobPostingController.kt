@@ -2,6 +2,7 @@ package no.jpro.mypageapi.controller
 
 import no.jpro.mypageapi.api.JobPostingApiDelegate
 import no.jpro.mypageapi.model.JobPosting
+import no.jpro.mypageapi.model.JobPostingFile
 import no.jpro.mypageapi.service.JobPostingService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -22,7 +23,6 @@ class JobPostingController(
             deadline = entity.deadline,
             description = entity.description ?: "",
             tags = emptyList(),
-            files = emptyList(),
             links = emptyList()
         )
 
@@ -37,6 +37,19 @@ class JobPostingController(
         return ResponseEntity.ok().build()
     }
 
+    override fun getJobPostingFiles(
+        id: Long
+    ): ResponseEntity<List<JobPostingFile>> {
+        val dto = listOf(
+            JobPostingFile(
+                name = "sample.pdf",
+                url = "https://pdfobject.com/pdf/sample.pdf"
+            )
+        )
+
+        return ResponseEntity.ok(dto)
+    }
+
     override fun getJobPostings(): ResponseEntity<List<JobPosting>> {
         val entities = jobPostingService.getJobPostings()
 
@@ -48,7 +61,6 @@ class JobPostingController(
                 deadline = it.deadline,
                 description = it.description ?: "",
                 tags = emptyList(),
-                files = emptyList(),
                 links = emptyList()
             )
         }
@@ -72,7 +84,6 @@ class JobPostingController(
             deadline = entity.deadline,
             description = entity.description ?: "",
             tags = emptyList(),
-            files = emptyList(),
             links = emptyList()
         )
 
