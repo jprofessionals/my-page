@@ -128,7 +128,7 @@ export const JobPostingModal = ({
             <input
               type="text"
               value={files}
-              onChange={(e) => setFiles(e.target.value)}
+              onChange={(e) => setFiles(e.target.value.split(','))}
               className="mt-1 block w-full border border-gray-300 rounded p-2"
             />
           </div>
@@ -139,7 +139,7 @@ export const JobPostingModal = ({
             <input
               type="text"
               value={links}
-              onChange={(e) => setLinks(e.target.value)}
+              onChange={(e) => setLinks(e.target.value.split(','))}
               className="mt-1 block w-full border border-gray-300 rounded p-2"
             />
           </div>
@@ -148,7 +148,7 @@ export const JobPostingModal = ({
             <input
               type="text"
               value={tags}
-              onChange={(e) => setTags(e.target.value)}
+              onChange={(e) => setTags(e.target.value.split(','))}
               className="mt-1 block w-full border border-gray-300 rounded p-2"
             />
           </div>
