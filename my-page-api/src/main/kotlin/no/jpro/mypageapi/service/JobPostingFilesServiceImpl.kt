@@ -20,13 +20,14 @@ class JobPostingFilesServiceImpl(
         return storage
             .list(
                 "utlysninger-dokumenter-test",
-                Storage.BlobListOption.prefix(id.toString())
+                Storage.BlobListOption.prefix(id.toString()),
+                Storage.BlobListOption.currentDirectory()
             )
             .iterateAll()
             .toList()
             .map {
                 JobPostingFile(
-                    name = it.name,
+                    name = it.name.split("/").last(),
                     url = it.signUrl(
                         1,
                         TimeUnit.HOURS,
