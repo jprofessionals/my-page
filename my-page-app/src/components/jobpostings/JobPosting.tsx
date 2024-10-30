@@ -175,7 +175,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
       {isModalOpen && (
         <EditJobPostingModal
           jobPosting={jobPosting}
-          jobPostingFiles={jobPostingFiles}
+          jobPostingFiles={jobPostingFiles ? jobPostingFiles : []}
           onClose={closeModal}
           onEditJobPosting={editJobPosting}
         />
