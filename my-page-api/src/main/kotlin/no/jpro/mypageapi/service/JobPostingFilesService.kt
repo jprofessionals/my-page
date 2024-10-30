@@ -4,10 +4,12 @@ import com.google.cloud.storage.HttpMethod
 import com.google.cloud.storage.Storage
 import com.google.cloud.storage.Storage.SignUrlOption
 import no.jpro.mypageapi.model.JobPostingFile
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
+@Profile("gcp")
 class JobPostingFilesService(
     private val storage: Storage
 ) {
