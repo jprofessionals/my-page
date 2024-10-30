@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { JobPosting as JobPostingType } from '@/data/types'
-import { DateTime } from "luxon";
+import { DateTime } from 'luxon'
 
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
@@ -19,12 +19,18 @@ export const JobPostingModal = ({
 }: JobPostingModalProps) => {
   const [id, setId] = useState(jobPosting ? jobPosting.id : 0)
   const [title, setTitle] = useState(jobPosting ? jobPosting.title : '')
-  const [customer, setCustomer] = useState(jobPosting ? jobPosting.customer : '')
-  const [deadline, setDeadline] = useState(jobPosting ? jobPosting.deadline : '')
-  const [description, setDescription] = useState(jobPosting ? jobPosting.description : '')
-  const [files, setFiles] = useState(jobPosting ? jobPosting.files : '')
-  const [links, setLinks] = useState(jobPosting ? jobPosting.links : '')
-  const [tags, setTags] = useState(jobPosting ? jobPosting.tags : '')
+  const [customer, setCustomer] = useState(
+    jobPosting ? jobPosting.customer : '',
+  )
+  const [deadline, setDeadline] = useState(
+    jobPosting ? jobPosting.deadline : '',
+  )
+  const [description, setDescription] = useState(
+    jobPosting ? jobPosting.description : '',
+  )
+  const [files, setFiles] = useState(jobPosting ? jobPosting.files : [])
+  const [links, setLinks] = useState(jobPosting ? jobPosting.links : [])
+  const [tags, setTags] = useState(jobPosting ? jobPosting.tags : [])
 
   const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value
@@ -48,9 +54,9 @@ export const JobPostingModal = ({
       customer: customer,
       deadline: deadline,
       description: description,
-      files: files ? files.split(',').map((file) => file.trim()) : [],
-      links: links ? links.split(',').map((link) => link.trim()) : [],
-      tags: tags ? tags.split(',').map((tag) => tag.trim()) : [],
+      files: files,
+      links: links,
+      tags: tags,
     }
     onSubmit(jobPosting)
   }
