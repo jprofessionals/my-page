@@ -1,16 +1,32 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { JobPosting as JobPostingType } from '@/data/types'
 import { EditJobPostingModal } from '@/components/jobpostings/EditJobPostingModal'
-import { usePutJobPosting } from '@/hooks/jobPosting'
+import { useDeleteJobPosting, usePutJobPosting } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPencilAlt } from '@fortawesome/free-solid-svg-icons'
+import { faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 
 export const JobPosting = (jobPosting: JobPostingType) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const { mutate: updateJobPosting } = usePutJobPosting()
+  const { mutate: deleteJobPosting } = useDeleteJobPosting()
   const { user } = useAuthContext()
+
+  // Close dialog on ESC key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeDeleteDialog()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
 
   const toggleExpansion = () => setIsExpanded(!isExpanded)
 
@@ -23,9 +39,23 @@ export const JobPosting = (jobPosting: JobPostingType) => {
     setIsModalOpen(false)
   }
 
+  const openDeleteDialog = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    e.stopPropagation()
+    setIsDeleteDialogOpen(true)
+  }
+
+  const closeDeleteDialog = () => {
+    setIsDeleteDialogOpen(false)
+  }
+
   const editJobPosting = (jobPosting: JobPostingType) => {
     updateJobPosting(jobPosting)
     closeModal()
+  }
+
+  const handleDeleteJobPosting = () => {
+    deleteJobPosting(jobPosting.id)
+    closeDeleteDialog()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -60,12 +90,18 @@ export const JobPosting = (jobPosting: JobPostingType) => {
             <p className="text-gray-700">{jobPosting.customer}</p>
           </div>
           {user?.admin && (
-            <div className="absolute top-1 right-2">
+            <div className="absolute top-1 right-2 flex space-x-2">
               <FontAwesomeIcon
                 icon={faPencilAlt}
                 onClick={openModal}
                 className="text-gray-600 hover:text-gray-800 cursor-pointer"
                 aria-label="Edit job posting"
+              />
+              <FontAwesomeIcon
+                icon={faTrashAlt}
+                onClick={openDeleteDialog}
+                className="text-red-600 hover:text-red-800 cursor-pointer"
+                aria-label="Delete job posting"
               />
             </div>
           )}
@@ -137,6 +173,32 @@ export const JobPosting = (jobPosting: JobPostingType) => {
           onClose={closeModal}
           onEditJobPosting={editJobPosting}
         />
+      )}
+      {isDeleteDialogOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-800">
+              Bekreft sletting
+            </h3>
+            <p className="text-gray-600">
+              Er du sikker på at du vil slette denne utlysningen?
+            </p>
+            <div className="flex justify-end space-x-4 mt-4">
+              <button
+                onClick={closeDeleteDialog}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Avbryt
+              </button>
+              <button
+                onClick={handleDeleteJobPosting}
+                className="px-4 py-2 text-white bg-red-600 hover:bg-red-800 rounded"
+              >
+                Slett
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   )

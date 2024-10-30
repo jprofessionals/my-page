@@ -1,5 +1,6 @@
 import {
   createJobPosting,
+  deleteJobPosting,
   getJobPostings,
   JobPosting,
   updateJobPosting,
@@ -9,6 +10,27 @@ import authHeader from '@/services/auth-header'
 import { useAuthContext } from '@/providers/AuthProvider'
 
 const cacheName = 'job-postings'
+
+export const useDeleteJobPosting = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation(
+    async (id: number) => {
+      return await deleteJobPosting({
+        path: {
+          id: id,
+        },
+        headers: authHeader(),
+        baseUrl: '/api',
+      })
+    },
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(cacheName)
+      },
+    },
+  )
+}
 
 export const useJobPostings = () => {
   const { userFetchStatus } = useAuthContext()

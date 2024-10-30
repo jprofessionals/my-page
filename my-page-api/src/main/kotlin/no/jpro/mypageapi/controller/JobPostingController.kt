@@ -29,6 +29,14 @@ class JobPostingController(
         return ResponseEntity.ok(dto)
     }
 
+    override fun deleteJobPosting(
+        id: Long
+    ): ResponseEntity<Unit> {
+        jobPostingService.deleteJobPosting(id)
+
+        return ResponseEntity.ok().build()
+    }
+
     override fun getJobPostings(): ResponseEntity<List<JobPosting>> {
         val entities = jobPostingService.getJobPostings()
 
