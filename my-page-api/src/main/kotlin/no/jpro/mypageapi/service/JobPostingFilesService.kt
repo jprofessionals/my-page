@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.service
 
+import com.google.cloud.storage.HttpMethod
 import com.google.cloud.storage.Storage
 import com.google.cloud.storage.Storage.SignUrlOption
 import no.jpro.mypageapi.model.JobPostingFile
