@@ -2,6 +2,7 @@ package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.model.JobPostingFile
 import org.springframework.context.annotation.Profile
+import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import java.net.URI
 
@@ -18,6 +19,13 @@ class JobPostingFilesServiceMock : JobPostingFilesService {
                 url = URI("https://www.jpro.no/sample.pdf")
             )
         )
+    }
+
+    override fun uploadJobPostingFile(
+        id: Long,
+        filename: String,
+        content: Resource
+    ) {
     }
 
 }

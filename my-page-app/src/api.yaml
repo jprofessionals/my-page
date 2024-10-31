@@ -4,7 +4,7 @@ info:
   description: API for JPro My Page
   version: 1.0.0
 paths:
-  /job-posting:
+  /job-postings:
     get:
       tags:
         - JobPosting
@@ -46,7 +46,7 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
-  /job-posting/{id}:
+  /job-postings/{id}:
     delete:
       tags:
         - JobPosting
@@ -100,7 +100,7 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
-  /job-posting/{id}/files:
+  /job-postings/{id}/files:
     get:
       tags:
         - JobPosting
@@ -126,12 +126,54 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
+    post:
+      tags:
+        - JobPosting
+      operationId: uploadJobPostingFile
+      summary: Upload a file associated with a job posting
+      description: Upload a file associated with a specific job posting
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the job posting
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: File to be uploaded
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+      responses:
+        '200':
+          description: File uploaded successfully
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
 components:
   schemas:
     Customer:
       type: string
       description: The name of a customer
       example: "Skatteetaten"
+    FileUpload:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: The filename
+          example: sample.pdf
+        content:
+          type: string
+          format: binary
+          description: The actual file content
+      required:
+        - filename
+        - content
     JobPosting:
       type: object
       properties:

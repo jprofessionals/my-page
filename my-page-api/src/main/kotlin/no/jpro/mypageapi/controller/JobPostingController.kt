@@ -5,6 +5,7 @@ import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.model.JobPostingFile
 import no.jpro.mypageapi.service.JobPostingFilesService
 import no.jpro.mypageapi.service.JobPostingService
+import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
@@ -85,6 +86,24 @@ class JobPostingController(
         )
 
         return ResponseEntity.ok(dto)
+    }
+
+    override fun uploadJobPostingFile(
+        id: Long,
+        filename: String,
+        content: Resource?
+    ): ResponseEntity<Unit> {
+        if (content == null) {
+            return ResponseEntity.badRequest().build()
+        }
+
+        jobPostingFilesService.uploadJobPostingFile(
+            id,
+            filename,
+            content
+        )
+
+        return ResponseEntity.ok().build()
     }
 
 }

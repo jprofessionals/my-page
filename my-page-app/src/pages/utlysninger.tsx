@@ -4,11 +4,7 @@ import { useAuthContext } from '@/providers/AuthProvider'
 import { JobPosting } from '@/components/jobpostings/JobPosting'
 import { AddJobPostingModal } from '@/components/jobpostings/AddJobPostingModal'
 import { JobPosting as JobPostingType } from '@/data/types'
-import {
-  useJobPostingFiles,
-  useJobPostings,
-  usePostJobPosting,
-} from '@/hooks/jobPosting'
+import { useJobPostings, usePostJobPosting } from '@/hooks/jobPosting'
 
 const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
   ssr: false,
@@ -20,9 +16,6 @@ export default function Utlysninger() {
   const { data: jobPostings } = useJobPostings()
   const { mutate: createJobPosting } = usePostJobPosting()
 
-  const { data: jobPostingFiles } = useJobPostingFiles(1)
-  console.log(jobPostingFiles)
-
   const openModal = () => {
     setIsModalOpen(true)
   }
@@ -31,8 +24,8 @@ export default function Utlysninger() {
     setIsModalOpen(false)
   }
 
-  const addJobPosting = (newJobPosting: JobPostingType) => {
-    createJobPosting(newJobPosting)
+  const addJobPosting = (newJobPosting: JobPostingType, newFiles: FileList) => {
+    createJobPosting({ newJobPosting: newJobPosting, newFiles: newFiles })
     closeModal()
   }
 
