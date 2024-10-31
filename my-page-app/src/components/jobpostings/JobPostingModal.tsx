@@ -1,7 +1,9 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
-import { JobPosting as JobPostingType, JobPostingFiles as JobPostingFilesType } from '@/data/types'
+import {
+  JobPosting as JobPostingType,
+  JobPostingFiles as JobPostingFilesType,
+} from '@/data/types'
 import { DateTime } from 'luxon'
-import { useJobPostingFiles } from "@/hooks/jobPosting";
 
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
@@ -9,7 +11,7 @@ interface JobPostingModalProps {
   heading: string
   submitText: string
   onClose: () => void
-  onSubmit: (jobPosting: JobPostingType) => void
+  onSubmit: (jobPosting: JobPostingType, newFiles: FileList) => void
 }
 
 export const JobPostingModal = ({
@@ -31,7 +33,10 @@ export const JobPostingModal = ({
   const [description, setDescription] = useState(
     jobPosting ? jobPosting.description : '',
   )
-  const [files, setFiles] = useState(jobPostingFiles ? jobPostingFiles.map(file => file.name) : [])
+  const [files, setFiles] = useState(
+    jobPostingFiles ? jobPostingFiles.map((file) => file.name) : [],
+  )
+  const [filesToUpload, setFilesToUpload] = useState<FileList>(new DataTransfer().files)
   const [links, setLinks] = useState(jobPosting ? jobPosting.links : [])
   const [tags, setTags] = useState(jobPosting ? jobPosting.tags : [])
 
@@ -60,7 +65,7 @@ export const JobPostingModal = ({
       links: links,
       tags: tags,
     }
-    onSubmit(jobPosting)
+    onSubmit(jobPosting, filesToUpload)
   }
 
   // Close modal on ESC key press
@@ -126,13 +131,25 @@ export const JobPostingModal = ({
             ></textarea>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Filer (kommaseparert)</label>
+            <label className="block text-gray-700">Filer</label>
             <input
-              type="text"
-              value={files}
-              onChange={(e) => setFiles(e.target.value.split(','))}
+              type="file"
+              multiple
+              onChange={(e) => {
+                if (e.target.files) {
+                  setFilesToUpload(e.target.files)
+                }
+              }}
               className="mt-1 block w-full border border-gray-300 rounded p-2"
             />
+            <ul className="mt-2">
+              {[
+                ...files,
+                ...Array.from(filesToUpload).map((file) => file.name),
+              ].map((filename) => (
+                <li key={filename}>{filename}</li>
+              ))}
+            </ul>
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">

@@ -1,9 +1,12 @@
 import {
   createJobPosting,
-  deleteJobPosting, getJobPostingFiles,
+  deleteJobPosting,
+  FileUpload,
+  getJobPostingFiles,
   getJobPostings,
   JobPosting,
   updateJobPosting,
+  uploadJobPostingFile,
 } from '@/data/types'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import authHeader from '@/services/auth-header'
@@ -52,6 +55,37 @@ export const useJobPostingFiles = (id: number) => {
   })
 }
 
+export const usePostJobPostingFiles = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation(
+    async ({
+      jobPostingId,
+      newJobPostingFile,
+    }: {
+      jobPostingId: number
+      newJobPostingFile: FileUpload
+    }) => {
+      return await uploadJobPostingFile({
+        path: {
+          id: jobPostingId,
+        },
+        body: newJobPostingFile,
+        headers: authHeader(),
+        baseUrl: '/api',
+      })
+    },
+    {
+      onSuccess: async (_data, variables) => {
+        await queryClient.invalidateQueries([
+          jobPostingFilesCacheName,
+          variables.jobPostingId,
+        ])
+      },
+    },
+  )
+}
+
 export const useJobPostings = () => {
   const { userFetchStatus } = useAuthContext()
 
@@ -70,9 +104,16 @@ export const useJobPostings = () => {
 
 export const usePostJobPosting = () => {
   const queryClient = useQueryClient()
+  const { mutate: uploadFile } = usePostJobPostingFiles()
 
   return useMutation(
-    async (newJobPosting: JobPosting) => {
+    async ({
+      newJobPosting,
+      newFiles,
+    }: {
+      newJobPosting: JobPosting
+      newFiles?: FileList
+    }) => {
       return await createJobPosting({
         body: newJobPosting,
         headers: authHeader(),
@@ -80,8 +121,20 @@ export const usePostJobPosting = () => {
       })
     },
     {
-      onSuccess: async () => {
+      onSuccess: async (data, variables) => {
         await queryClient.invalidateQueries(jobPostingsCacheName)
+
+        if (variables.newFiles && variables.newFiles.length > 0) {
+          Array.from(variables.newFiles).forEach((file) => {
+            uploadFile({
+              jobPostingId: data.data ? data.data.id : 0,
+              newJobPostingFile: {
+                filename: file.name,
+                content: file,
+              },
+            })
+          })
+        }
       },
     },
   )

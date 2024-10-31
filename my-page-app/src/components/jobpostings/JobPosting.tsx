@@ -4,6 +4,7 @@ import { EditJobPostingModal } from '@/components/jobpostings/EditJobPostingModa
 import {
   useDeleteJobPosting,
   useJobPostingFiles,
+  usePostJobPostingFiles,
   usePutJobPosting,
 } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -14,7 +15,9 @@ export const JobPosting = (jobPosting: JobPostingType) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const { data: jobPostingFiles } = useJobPostingFiles(jobPosting.id)
+  const { data: existingJobPostingFiles } = useJobPostingFiles(jobPosting.id)
+  const [filesToUpload, setFilesToUpload] = useState<FileList | null>(null)
+  const { mutate: uploadFile } = usePostJobPostingFiles()
   const { mutate: updateJobPosting } = usePutJobPosting()
   const { mutate: deleteJobPosting } = useDeleteJobPosting()
   const { user } = useAuthContext()
@@ -53,8 +56,20 @@ export const JobPosting = (jobPosting: JobPostingType) => {
     setIsDeleteDialogOpen(false)
   }
 
-  const editJobPosting = (jobPosting: JobPostingType) => {
+  const editJobPosting = (
+    jobPosting: JobPostingType,
+    filesToUpload: FileList,
+  ) => {
     updateJobPosting(jobPosting)
+    Array.from(filesToUpload).forEach((file) => {
+      uploadFile({
+        jobPostingId: jobPosting.id,
+        newJobPostingFile: {
+          filename: file.name,
+          content: file,
+        },
+      })
+    })
     closeModal()
   }
 
@@ -62,6 +77,8 @@ export const JobPosting = (jobPosting: JobPostingType) => {
     deleteJobPosting(jobPosting.id)
     closeDeleteDialog()
   }
+
+  const handleFileUpload = (file: File) => {}
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -130,11 +147,11 @@ export const JobPosting = (jobPosting: JobPostingType) => {
             </div>
             <p className="text-gray-800">{jobPosting.description}</p>
 
-            {jobPostingFiles && jobPostingFiles.length > 0 && (
+            {existingJobPostingFiles && existingJobPostingFiles.length > 0 && (
               <div className="mt-2">
                 <h3 className="font-semibold text-gray-800">Filer:</h3>
                 <ul className="list-disc list-inside text-gray-800">
-                  {jobPostingFiles.map((file, index) => (
+                  {existingJobPostingFiles.map((file, index) => (
                     <li key={file.url}>
                       <a
                         href={file.url}
@@ -175,7 +192,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
       {isModalOpen && (
         <EditJobPostingModal
           jobPosting={jobPosting}
-          jobPostingFiles={jobPostingFiles ? jobPostingFiles : []}
+          jobPostingFiles={existingJobPostingFiles ? existingJobPostingFiles : []}
           onClose={closeModal}
           onEditJobPosting={editJobPosting}
         />

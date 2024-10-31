@@ -3,7 +3,7 @@ import { JobPostingModal } from '@/components/jobpostings/JobPostingModal'
 
 interface AddJobPostingModalProps {
   onClose: () => void
-  onAddJobPosting: (newJobPosting: JobPostingType) => void
+  onAddJobPosting: (newJobPosting: JobPostingType, newFiles: FileList) => void
 }
 
 export const AddJobPostingModal = ({

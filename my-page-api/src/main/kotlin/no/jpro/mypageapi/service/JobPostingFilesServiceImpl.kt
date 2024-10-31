@@ -1,10 +1,12 @@
 package no.jpro.mypageapi.service
 
+import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.HttpMethod
 import com.google.cloud.storage.Storage
 import com.google.cloud.storage.Storage.SignUrlOption
 import no.jpro.mypageapi.model.JobPostingFile
 import org.springframework.context.annotation.Profile
+import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
@@ -20,11 +22,13 @@ class JobPostingFilesServiceImpl(
         return storage
             .list(
                 "utlysninger-dokumenter-test",
-                Storage.BlobListOption.prefix(id.toString()),
-                Storage.BlobListOption.currentDirectory()
+                Storage.BlobListOption.prefix(id.toString())
             )
             .iterateAll()
             .toList()
+            .filterNot {
+                it.name.endsWith("/")
+            }
             .map {
                 JobPostingFile(
                     name = it.name.split("/").last(),
@@ -37,6 +41,20 @@ class JobPostingFilesServiceImpl(
                 )
             }
 
+    }
+
+    override fun uploadJobPostingFile(
+        id: Long,
+        filename: String,
+        content: Resource
+    ) {
+        val blobInfo = BlobInfo.newBuilder(
+            "utlysninger-dokumenter-test",
+            "$id/$filename"
+        ).build()
+        content.inputStream.use { inputStream ->
+            storage.createFrom(blobInfo, inputStream)
+        }
     }
 
 }
