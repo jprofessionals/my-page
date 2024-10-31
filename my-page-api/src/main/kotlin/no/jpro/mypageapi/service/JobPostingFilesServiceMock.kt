@@ -15,6 +15,7 @@ class JobPostingFilesServiceMock : JobPostingFilesService {
     ): List<JobPostingFile> {
         return listOf(
             JobPostingFile(
+                blobId = "1",
                 name = "sample.pdf",
                 url = URI("https://www.jpro.no/sample.pdf")
             )

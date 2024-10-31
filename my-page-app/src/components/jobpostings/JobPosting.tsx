@@ -150,8 +150,8 @@ export const JobPosting = (jobPosting: JobPostingType) => {
               <div className="mt-2">
                 <h3 className="font-semibold text-gray-800">Filer:</h3>
                 <ul className="list-disc list-inside text-gray-800">
-                  {existingJobPostingFiles.map((file, index) => (
-                    <li key={file.url}>
+                  {existingJobPostingFiles.map((file) => (
+                    <li key={file.blobId}>
                       <a
                         href={file.url}
                         target="_blank"

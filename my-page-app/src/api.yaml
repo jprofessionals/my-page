@@ -219,6 +219,9 @@ components:
     JobPostingFile:
       type: object
       properties:
+        blobId:
+          type: string
+          description: The unique ID of the blob
         name:
           type: string
           description: File name
@@ -229,6 +232,7 @@ components:
           description: URL of file
           example: https://www.myfile.no
       required:
+        - blobId
         - name
         - url
     JobPostingFiles:

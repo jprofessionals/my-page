@@ -33,6 +33,7 @@ class JobPostingFilesServiceImpl(
             }
             .map {
                 JobPostingFile(
+                    blobId = it.blobId.toString(),
                     name = it.name.split("/").last(),
                     url = it.signUrl(
                         1,
