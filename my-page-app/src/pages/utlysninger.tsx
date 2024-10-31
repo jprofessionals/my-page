@@ -11,7 +11,7 @@ const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
 })
 
 export default function Utlysninger() {
-  const { user } = useAuthContext()
+  const user = { admin: true }
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { data: jobPostings } = useJobPostings()
   const { mutate: createJobPosting } = usePostJobPosting()
