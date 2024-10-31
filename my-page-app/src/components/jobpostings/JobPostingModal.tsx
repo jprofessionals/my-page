@@ -4,6 +4,8 @@ import {
   JobPostingFiles as JobPostingFilesType,
 } from '@/data/types'
 import { DateTime } from 'luxon'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
@@ -37,6 +39,9 @@ export const JobPostingModal = ({
     jobPostingFiles ? jobPostingFiles.map((file) => file.name) : [],
   )
   const [filesToUpload, setFilesToUpload] = useState<FileList>(
+    new DataTransfer().files,
+  )
+  const [filesToDelete, setFilesToDelete] = useState<FileList>(
     new DataTransfer().files,
   )
   const [links, setLinks] = useState(jobPosting ? jobPosting.links : [])
@@ -146,7 +151,15 @@ export const JobPostingModal = ({
             />
             <ul className="mt-2">
               {files.map((filename) => (
-                <li key={filename}>{filename}</li>
+                <li className="flex justify-between items-center w-full" key={filename}>
+                  <span className="flex-grow">{filename}</span>
+                  <FontAwesomeIcon
+                    icon={faTrashAlt}
+                    onClick={(e) => {}}
+                    className="text-red-600 hover:text-red-800 cursor-pointer"
+                    aria-label="Delete file"
+                  />
+                </li>
               ))}
             </ul>
           </div>
