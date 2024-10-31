@@ -5,6 +5,7 @@ import com.google.cloud.storage.HttpMethod
 import com.google.cloud.storage.Storage
 import com.google.cloud.storage.Storage.SignUrlOption
 import no.jpro.mypageapi.model.JobPostingFile
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
@@ -13,15 +14,16 @@ import java.util.concurrent.TimeUnit
 @Service
 @Profile("gcp")
 class JobPostingFilesServiceImpl(
+    @Value("\${gcs.jobpostings.bucket.name}") private val bucketName: String,
     private val storage: Storage
-): JobPostingFilesService {
+) : JobPostingFilesService {
 
     override fun getJobPostingFiles(
         id: Long
     ): List<JobPostingFile> {
         return storage
             .list(
-                "utlysninger-dokumenter-test",
+                bucketName,
                 Storage.BlobListOption.prefix(id.toString())
             )
             .iterateAll()
@@ -49,7 +51,7 @@ class JobPostingFilesServiceImpl(
         content: Resource
     ) {
         val blobInfo = BlobInfo.newBuilder(
-            "utlysninger-dokumenter-test",
+            bucketName,
             "$id/$filename"
         ).build()
         content.inputStream.use { inputStream ->
