@@ -36,7 +36,9 @@ export const JobPostingModal = ({
   const [files, setFiles] = useState(
     jobPostingFiles ? jobPostingFiles.map((file) => file.name) : [],
   )
-  const [filesToUpload, setFilesToUpload] = useState<FileList>(new DataTransfer().files)
+  const [filesToUpload, setFilesToUpload] = useState<FileList>(
+    new DataTransfer().files,
+  )
   const [links, setLinks] = useState(jobPosting ? jobPosting.links : [])
   const [tags, setTags] = useState(jobPosting ? jobPosting.tags : [])
 
@@ -143,33 +145,10 @@ export const JobPostingModal = ({
               className="mt-1 block w-full border border-gray-300 rounded p-2"
             />
             <ul className="mt-2">
-              {[
-                ...files,
-                ...Array.from(filesToUpload).map((file) => file.name),
-              ].map((filename) => (
+              {files.map((filename) => (
                 <li key={filename}>{filename}</li>
               ))}
             </ul>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">
-              Lenker (kommaseparert)
-            </label>
-            <input
-              type="text"
-              value={links}
-              onChange={(e) => setLinks(e.target.value.split(','))}
-              className="mt-1 block w-full border border-gray-300 rounded p-2"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Tags (kommaseparert)</label>
-            <input
-              type="text"
-              value={tags}
-              onChange={(e) => setTags(e.target.value.split(','))}
-              className="mt-1 block w-full border border-gray-300 rounded p-2"
-            />
           </div>
           <div className="flex justify-end">
             <button
