@@ -144,7 +144,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                 </span>
               ))}
             </div>
-            <p className="text-gray-800">{jobPosting.description}</p>
+            <p className="text-gray-800 whitespace-pre-line">{jobPosting.description}</p>
 
             {existingJobPostingFiles && existingJobPostingFiles.length > 0 && (
               <div className="mt-2">
