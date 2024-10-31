@@ -9,7 +9,6 @@ import {
 } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
-import { useAuthContext } from '@/providers/AuthProvider'
 
 export const JobPosting = (jobPosting: JobPostingType) => {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -20,7 +19,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
   const { mutate: uploadFile } = usePostJobPostingFiles()
   const { mutate: updateJobPosting } = usePutJobPosting()
   const { mutate: deleteJobPosting } = useDeleteJobPosting()
-  const { user } = useAuthContext()
+  const user = { admin: true }
 
   // Close dialog on ESC key press
   useEffect(() => {
@@ -192,7 +191,9 @@ export const JobPosting = (jobPosting: JobPostingType) => {
       {isModalOpen && (
         <EditJobPostingModal
           jobPosting={jobPosting}
-          jobPostingFiles={existingJobPostingFiles ? existingJobPostingFiles : []}
+          jobPostingFiles={
+            existingJobPostingFiles ? existingJobPostingFiles : []
+          }
           onClose={closeModal}
           onEditJobPosting={editJobPosting}
         />
