@@ -8,6 +8,7 @@ import no.jpro.mypageapi.service.JobPostingService
 import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @Service
 class JobPostingController(
@@ -29,7 +30,15 @@ class JobPostingController(
             links = emptyList()
         )
 
-        return ResponseEntity.ok(dto)
+        return ResponseEntity
+            .created(
+                ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(dto.id)
+                    .toUri()
+            )
+            .body(dto)
     }
 
     override fun deleteJobPosting(
@@ -37,13 +46,20 @@ class JobPostingController(
     ): ResponseEntity<Unit> {
         jobPostingService.deleteJobPosting(id)
 
-        return ResponseEntity.ok().build()
+        return ResponseEntity.noContent().build()
+    }
+
+    override fun deleteJobPostingFile(
+        jobPostingId: Long,
+        fileName: String
+    ): ResponseEntity<Unit> {
+        return ResponseEntity.noContent().build()
     }
 
     override fun getJobPostingFiles(
-        id: Long
+        jobPostingId: Long
     ): ResponseEntity<List<JobPostingFile>> {
-        val dto = jobPostingFilesService.getJobPostingFiles(id)
+        val dto = jobPostingFilesService.getJobPostingFiles(jobPostingId)
 
         return ResponseEntity.ok(dto)
     }
@@ -69,27 +85,18 @@ class JobPostingController(
     override fun updateJobPosting(
         id: Long,
         jobPosting: JobPosting
-    ): ResponseEntity<JobPosting> {
+    ): ResponseEntity<Unit> {
         if (id != jobPosting.id) {
-            return ResponseEntity.badRequest().build<JobPosting>()
+            return ResponseEntity.badRequest().build()
         }
 
-        val entity = jobPostingService.updateJobPosting(jobPosting)
-        val dto = JobPosting(
-            id = entity.id,
-            title = entity.title,
-            customer = entity.customer.name,
-            deadline = entity.deadline,
-            description = entity.description ?: "",
-            tags = emptyList(),
-            links = emptyList()
-        )
+        jobPostingService.updateJobPosting(jobPosting)
 
-        return ResponseEntity.ok(dto)
+        return ResponseEntity.noContent().build()
     }
 
     override fun uploadJobPostingFile(
-        id: Long,
+        jobPostingId: Long,
         filename: String,
         content: Resource?
     ): ResponseEntity<Unit> {
@@ -98,12 +105,20 @@ class JobPostingController(
         }
 
         jobPostingFilesService.uploadJobPostingFile(
-            id,
+            jobPostingId,
             filename,
             content
         )
 
-        return ResponseEntity.ok().build()
+        return ResponseEntity
+            .created(
+                ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{name}")
+                    .buildAndExpand(filename)
+                    .toUri()
+            )
+            .build()
     }
 
 }

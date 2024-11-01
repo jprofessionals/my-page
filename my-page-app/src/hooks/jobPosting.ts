@@ -42,7 +42,7 @@ export const useJobPostingFiles = (id: number) => {
   const fetchJobPostingFiles = async () => {
     return await getJobPostingFiles({
       path: {
-        id: id,
+        jobPostingId: id,
       },
       headers: authHeader(),
       baseUrl: '/api',
@@ -68,7 +68,7 @@ export const usePostJobPostingFiles = () => {
     }) => {
       return await uploadJobPostingFile({
         path: {
-          id: jobPostingId,
+          jobPostingId: jobPostingId,
         },
         body: newJobPostingFile,
         headers: authHeader(),

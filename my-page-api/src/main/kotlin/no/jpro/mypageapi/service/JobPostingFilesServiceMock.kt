@@ -11,7 +11,7 @@ import java.net.URI
 class JobPostingFilesServiceMock : JobPostingFilesService {
 
     override fun getJobPostingFiles(
-        id: Long
+        jobPostingId: Long
     ): List<JobPostingFile> {
         return listOf(
             JobPostingFile(
@@ -23,7 +23,7 @@ class JobPostingFilesServiceMock : JobPostingFilesService {
     }
 
     override fun uploadJobPostingFile(
-        id: Long,
+        jobPostingId: Long,
         filename: String,
         content: Resource
     ) {

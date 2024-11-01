@@ -19,12 +19,12 @@ class JobPostingFilesServiceImpl(
 ) : JobPostingFilesService {
 
     override fun getJobPostingFiles(
-        id: Long
+        jobPostingId: Long
     ): List<JobPostingFile> {
         return storage
             .list(
                 bucketName,
-                Storage.BlobListOption.prefix(id.toString())
+                Storage.BlobListOption.prefix(jobPostingId.toString())
             )
             .iterateAll()
             .toList()
@@ -33,13 +33,16 @@ class JobPostingFilesServiceImpl(
             }
             .map {
                 JobPostingFile(
-                    blobId = it.blobId.toString(),
+                    blobId = "$jobPostingId/${it.name}",
                     name = it.name.split("/").last(),
                     url = it.signUrl(
                         1,
                         TimeUnit.HOURS,
                         SignUrlOption.httpMethod(HttpMethod.GET),
-                        SignUrlOption.withV4Signature()
+                        SignUrlOption.withV4Signature(),
+                        SignUrlOption.withQueryParams(
+                            mapOf("response-content-disposition" to "inline")
+                        )
                     ).toURI()
                 )
             }
@@ -47,13 +50,13 @@ class JobPostingFilesServiceImpl(
     }
 
     override fun uploadJobPostingFile(
-        id: Long,
+        jobPostingId: Long,
         filename: String,
         content: Resource
     ) {
         val blobInfo = BlobInfo.newBuilder(
             bucketName,
-            "$id/$filename"
+            "$jobPostingId/$filename"
         ).build()
         content.inputStream.use { inputStream ->
             storage.createFrom(blobInfo, inputStream)

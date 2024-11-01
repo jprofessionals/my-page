@@ -47,7 +47,7 @@ class JobPostingService(
     @Transactional
     fun updateJobPosting(
         jobPosting: JobPosting
-    ): no.jpro.mypageapi.entity.JobPosting {
+    ) {
         val existingJobPosting = jobPostingRepository.findById(jobPosting.id)
             .orElseThrow {
                 EntityNotFoundException("Job posting with id ${jobPosting.id} not found")
@@ -59,7 +59,7 @@ class JobPostingService(
             )
         )
 
-        return jobPostingRepository.save(
+        jobPostingRepository.save(
             existingJobPosting.apply {
                 title = jobPosting.title
                 customer = customerEntity
