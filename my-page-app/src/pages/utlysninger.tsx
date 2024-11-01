@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { JobPosting } from '@/components/jobpostings/JobPosting'
 import { AddJobPostingModal } from '@/components/jobpostings/AddJobPostingModal'
 import {
   JobPosting as JobPostingType,
   JobPostingFiles as JobPostingFilesType,
 } from '@/data/types'
 import { useJobPostings, usePostJobPosting } from '@/hooks/jobPosting'
+import { JobPostingList } from '@/components/jobpostings/JobPostingList'
 
 const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
   ssr: false,
@@ -18,13 +18,27 @@ export default function Utlysninger() {
   const { data: jobPostings } = useJobPostings()
   const { mutate: createJobPosting } = usePostJobPosting()
 
-  const activeJobPostings = jobPostings?.filter((jobPosting) => {
-    return new Date(jobPosting.deadline) >= new Date()
-  })
+  const activeJobPostings = useMemo(() => {
+    return (
+      jobPostings
+        ?.filter((jobPosting) => new Date(jobPosting.deadline) >= new Date())
+        .sort(
+          (a, b) =>
+            new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
+        ) || []
+    )
+  }, [jobPostings])
 
-  const pastJobPostings = jobPostings?.filter((jobPosting) => {
-    return new Date(jobPosting.deadline) < new Date()
-  })
+  const pastJobPostings = useMemo(() => {
+    return (
+      jobPostings
+        ?.filter((jobPosting) => new Date(jobPosting.deadline) < new Date())
+        .sort(
+          (a, b) =>
+            new Date(b.deadline).getTime() - new Date(a.deadline).getTime(),
+        ) || []
+    )
+  }, [jobPostings])
 
   const openModal = () => {
     setIsModalOpen(true)
@@ -61,31 +75,15 @@ export default function Utlysninger() {
           </button>
         )}
 
-        <h2 className="text-2xl font-bold mb-3">Aktive utlysninger</h2>
-        {activeJobPostings && activeJobPostings.length > 0 ? (
-          <ul className="space-y-4">
-            {activeJobPostings.map((jobPosting) => (
-              <li key={jobPosting.id}>
-                <JobPosting {...jobPosting} />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mb-3">Ingen utlysninger</p>
-        )}
+        <JobPostingList
+          title="Aktive utlysninger"
+          jobPostings={activeJobPostings}
+        />
 
-        <h2 className="text-2xl font-bold mb-3">Tidligere utlysninger</h2>
-        {pastJobPostings && pastJobPostings.length > 0 ? (
-          <ul className="space-y-4">
-            {pastJobPostings.map((jobPosting) => (
-              <li key={jobPosting.id}>
-                <JobPosting {...jobPosting} />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mb-3">Ingen utlysninger</p>
-        )}
+        <JobPostingList
+          title="Tidligere utlysninger"
+          jobPostings={pastJobPostings}
+        />
       </div>
 
       {isModalOpen && (
