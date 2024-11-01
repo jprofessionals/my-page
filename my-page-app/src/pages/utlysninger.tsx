@@ -18,6 +18,14 @@ export default function Utlysninger() {
   const { data: jobPostings } = useJobPostings()
   const { mutate: createJobPosting } = usePostJobPosting()
 
+  const activeJobPostings = jobPostings?.filter((jobPosting) => {
+    return new Date(jobPosting.deadline) >= new Date()
+  })
+
+  const pastJobPostings = jobPostings?.filter((jobPosting) => {
+    return new Date(jobPosting.deadline) < new Date()
+  })
+
   const openModal = () => {
     setIsModalOpen(true)
   }
@@ -53,15 +61,31 @@ export default function Utlysninger() {
           </button>
         )}
 
-        {jobPostings ? (
+        <h2 className="text-2xl font-bold mb-3">Aktive utlysninger</h2>
+        {activeJobPostings && activeJobPostings.length > 0 ? (
           <ul className="space-y-4">
-            {jobPostings.map((jobPosting) => (
+            {activeJobPostings.map((jobPosting) => (
               <li key={jobPosting.id}>
                 <JobPosting {...jobPosting} />
               </li>
             ))}
           </ul>
-        ) : null}
+        ) : (
+          <p className="mb-3">Ingen utlysninger</p>
+        )}
+
+        <h2 className="text-2xl font-bold mb-3">Tidligere utlysninger</h2>
+        {pastJobPostings && pastJobPostings.length > 0 ? (
+          <ul className="space-y-4">
+            {pastJobPostings.map((jobPosting) => (
+              <li key={jobPosting.id}>
+                <JobPosting {...jobPosting} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mb-3">Ingen utlysninger</p>
+        )}
       </div>
 
       {isModalOpen && (
