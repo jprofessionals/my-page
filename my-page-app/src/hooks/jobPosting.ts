@@ -1,10 +1,12 @@
 import {
   createJobPosting,
   deleteJobPosting,
+  deleteJobPostingFile,
   FileUpload,
   getJobPostingFiles,
   getJobPostings,
   JobPosting,
+  JobPostingFiles,
   updateJobPosting,
   uploadJobPostingFile,
 } from '@/data/types'
@@ -31,6 +33,37 @@ export const useDeleteJobPosting = () => {
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(jobPostingsCacheName)
+      },
+    },
+  )
+}
+
+export const useDeleteJobPostingFiles = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation(
+    async ({
+      jobPostingId,
+      fileName,
+    }: {
+      jobPostingId: number
+      fileName: string
+    }) => {
+      return await deleteJobPostingFile({
+        path: {
+          jobPostingId: jobPostingId,
+          fileName: fileName,
+        },
+        headers: authHeader(),
+        baseUrl: '/api',
+      })
+    },
+    {
+      onSuccess: async (_data, variables) => {
+        await queryClient.invalidateQueries([
+          jobPostingFilesCacheName,
+          variables.jobPostingId,
+        ])
       },
     },
   )
@@ -105,14 +138,17 @@ export const useJobPostings = () => {
 export const usePostJobPosting = () => {
   const queryClient = useQueryClient()
   const { mutate: uploadFile } = usePostJobPostingFiles()
+  const { mutate: deleteFile } = useDeleteJobPostingFiles()
 
   return useMutation(
     async ({
       newJobPosting,
-      newFiles,
+      filesToUpload,
+      filesToDelete,
     }: {
       newJobPosting: JobPosting
-      newFiles?: FileList
+      filesToUpload?: FileList
+      filesToDelete?: JobPostingFiles
     }) => {
       return await createJobPosting({
         body: newJobPosting,
@@ -124,14 +160,23 @@ export const usePostJobPosting = () => {
       onSuccess: async (data, variables) => {
         await queryClient.invalidateQueries(jobPostingsCacheName)
 
-        if (variables.newFiles && variables.newFiles.length > 0) {
-          Array.from(variables.newFiles).forEach((file) => {
+        if (variables.filesToUpload && variables.filesToUpload.length > 0) {
+          Array.from(variables.filesToUpload).forEach((file) => {
             uploadFile({
               jobPostingId: data.data ? data.data.id : 0,
               newJobPostingFile: {
                 filename: file.name,
                 content: file,
               },
+            })
+          })
+        }
+
+        if (variables.filesToDelete && variables.filesToDelete.length > 0) {
+          variables.filesToDelete.forEach((file) => {
+            deleteFile({
+              jobPostingId: data.data ? data.data.id : 0,
+              fileName: file.name,
             })
           })
         }
@@ -143,8 +188,19 @@ export const usePostJobPosting = () => {
 export const usePutJobPosting = () => {
   const queryClient = useQueryClient()
 
+  const { mutate: uploadFile } = usePostJobPostingFiles()
+  const { mutate: deleteFile } = useDeleteJobPostingFiles()
+
   return useMutation(
-    async (updatedJobPosting: JobPosting) => {
+    async ({
+      updatedJobPosting,
+      filesToUpload,
+      filesToDelete,
+    }: {
+      updatedJobPosting: JobPosting
+      filesToUpload?: FileList
+      filesToDelete?: JobPostingFiles
+    }) => {
       return await updateJobPosting({
         path: {
           id: updatedJobPosting.id,
@@ -155,8 +211,29 @@ export const usePutJobPosting = () => {
       })
     },
     {
-      onSuccess: async () => {
+      onSuccess: async (_data, variables) => {
         await queryClient.invalidateQueries(jobPostingsCacheName)
+
+        if (variables.filesToUpload && variables.filesToUpload.length > 0) {
+          Array.from(variables.filesToUpload).forEach((file) => {
+            uploadFile({
+              jobPostingId: variables.updatedJobPosting.id,
+              newJobPostingFile: {
+                filename: file.name,
+                content: file,
+              },
+            })
+          })
+        }
+
+        if (variables.filesToDelete && variables.filesToDelete.length > 0) {
+          variables.filesToDelete.forEach((file) => {
+            deleteFile({
+              jobPostingId: variables.updatedJobPosting.id,
+              fileName: file.name,
+            })
+          })
+        }
       },
     },
   )

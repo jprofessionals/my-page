@@ -53,6 +53,11 @@ class JobPostingController(
         jobPostingId: Long,
         fileName: String
     ): ResponseEntity<Unit> {
+        jobPostingFilesService.deleteJobPostingFile(
+            jobPostingId,
+            fileName
+        )
+
         return ResponseEntity.noContent().build()
     }
 

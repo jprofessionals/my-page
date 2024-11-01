@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { useAuthContext } from '@/providers/AuthProvider'
 import { JobPosting } from '@/components/jobpostings/JobPosting'
 import { AddJobPostingModal } from '@/components/jobpostings/AddJobPostingModal'
-import { JobPosting as JobPostingType } from '@/data/types'
+import {
+  JobPosting as JobPostingType,
+  JobPostingFiles as JobPostingFilesType,
+} from '@/data/types'
 import { useJobPostings, usePostJobPosting } from '@/hooks/jobPosting'
 
 const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
@@ -24,8 +26,16 @@ export default function Utlysninger() {
     setIsModalOpen(false)
   }
 
-  const addJobPosting = (newJobPosting: JobPostingType, newFiles: FileList) => {
-    createJobPosting({ newJobPosting: newJobPosting, newFiles: newFiles })
+  const addJobPosting = (
+    newJobPosting: JobPostingType,
+    filesToUpload: FileList,
+    filesToDelete: JobPostingFilesType,
+  ) => {
+    createJobPosting({
+      newJobPosting: newJobPosting,
+      filesToUpload: filesToUpload,
+      filesToDelete: filesToDelete,
+    })
     closeModal()
   }
 
