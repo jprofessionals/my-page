@@ -6,11 +6,11 @@ import org.springframework.core.io.Resource
 interface JobPostingFilesService {
 
     fun getJobPostingFiles(
-        id: Long
+        jobPostingId: Long
     ): List<JobPostingFile>
 
     fun uploadJobPostingFile(
-        id: Long,
+        jobPostingId: Long,
         filename: String,
         content: Resource
     )
