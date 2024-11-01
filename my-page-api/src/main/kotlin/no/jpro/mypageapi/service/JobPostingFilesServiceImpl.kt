@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.service
 
+import com.google.cloud.storage.BlobId
 import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.HttpMethod
 import com.google.cloud.storage.Storage
@@ -18,6 +19,18 @@ class JobPostingFilesServiceImpl(
     @Value("\${gcs.jobpostings.bucket.name}") private val bucketName: String,
     private val storage: Storage
 ) : JobPostingFilesService {
+
+    override fun deleteJobPostingFile(
+        jobPostingId: Long,
+        fileName: String
+    ) {
+        storage.delete(
+            BlobId.of(
+                bucketName,
+                "$jobPostingId/$fileName"
+            )
+        )
+    }
 
     override fun getJobPostingFiles(
         jobPostingId: Long

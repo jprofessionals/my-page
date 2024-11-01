@@ -8,7 +8,7 @@ interface EditJobPostingModalProps {
   jobPosting: JobPostingType
   jobPostingFiles: JobPostingFilesType
   onClose: () => void
-  onEditJobPosting: (updatedJobPosting: JobPostingType, newFiles: FileList) => void
+  onEditJobPosting: (updatedJobPosting: JobPostingType, newFiles: FileList, filesToDelete: JobPostingFilesType) => void
 }
 
 export const EditJobPostingModal = ({

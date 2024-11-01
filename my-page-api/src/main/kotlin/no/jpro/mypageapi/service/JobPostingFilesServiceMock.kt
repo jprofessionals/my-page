@@ -10,6 +10,12 @@ import java.net.URI
 @Profile("!gcp")
 class JobPostingFilesServiceMock : JobPostingFilesService {
 
+    override fun deleteJobPostingFile(
+        jobPostingId: Long,
+        fileName: String
+    ) {
+    }
+
     override fun getJobPostingFiles(
         jobPostingId: Long
     ): List<JobPostingFile> {

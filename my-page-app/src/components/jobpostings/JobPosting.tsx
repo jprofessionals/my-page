@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
-import { JobPosting as JobPostingType } from '@/data/types'
+import {
+  JobPosting as JobPostingType,
+  JobPostingFiles as JobPostingFilesType,
+} from '@/data/types'
 import { EditJobPostingModal } from '@/components/jobpostings/EditJobPostingModal'
 import {
   useDeleteJobPosting,
   useJobPostingFiles,
-  usePostJobPostingFiles,
   usePutJobPosting,
 } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -15,8 +17,6 @@ export const JobPosting = (jobPosting: JobPostingType) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const { data: existingJobPostingFiles } = useJobPostingFiles(jobPosting.id)
-  const [filesToUpload, setFilesToUpload] = useState<FileList | null>(null)
-  const { mutate: uploadFile } = usePostJobPostingFiles()
   const { mutate: updateJobPosting } = usePutJobPosting()
   const { mutate: deleteJobPosting } = useDeleteJobPosting()
   const user = { admin: true }
@@ -58,16 +58,12 @@ export const JobPosting = (jobPosting: JobPostingType) => {
   const editJobPosting = (
     jobPosting: JobPostingType,
     filesToUpload: FileList,
+    filesToDelete: JobPostingFilesType,
   ) => {
-    updateJobPosting(jobPosting)
-    Array.from(filesToUpload).forEach((file) => {
-      uploadFile({
-        jobPostingId: jobPosting.id,
-        newJobPostingFile: {
-          filename: file.name,
-          content: file,
-        },
-      })
+    updateJobPosting({
+      updatedJobPosting: jobPosting,
+      filesToUpload: filesToUpload,
+      filesToDelete: filesToDelete,
     })
     closeModal()
   }
@@ -76,8 +72,6 @@ export const JobPosting = (jobPosting: JobPostingType) => {
     deleteJobPosting(jobPosting.id)
     closeDeleteDialog()
   }
-
-  const handleFileUpload = (file: File) => {}
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -144,7 +138,9 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                 </span>
               ))}
             </div>
-            <p className="text-gray-800 whitespace-pre-line">{jobPosting.description}</p>
+            <p className="text-gray-800 whitespace-pre-line">
+              {jobPosting.description}
+            </p>
 
             {existingJobPostingFiles && existingJobPostingFiles.length > 0 && (
               <div className="mt-2">

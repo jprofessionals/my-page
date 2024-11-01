@@ -4,8 +4,8 @@ import {
   JobPostingFiles as JobPostingFilesType,
 } from '@/data/types'
 import { DateTime } from 'luxon'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
@@ -13,7 +13,7 @@ interface JobPostingModalProps {
   heading: string
   submitText: string
   onClose: () => void
-  onSubmit: (jobPosting: JobPostingType, newFiles: FileList) => void
+  onSubmit: (jobPosting: JobPostingType, newFiles: FileList, filesToDelete: JobPostingFilesType) => void
 }
 
 export const JobPostingModal = ({
@@ -35,15 +35,11 @@ export const JobPostingModal = ({
   const [description, setDescription] = useState(
     jobPosting ? jobPosting.description : '',
   )
-  const [files, setFiles] = useState(
-    jobPostingFiles ? jobPostingFiles.map((file) => file.name) : [],
-  )
+  const [files, setFiles] = useState(jobPostingFiles ? jobPostingFiles : [])
   const [filesToUpload, setFilesToUpload] = useState<FileList>(
     new DataTransfer().files,
   )
-  const [filesToDelete, setFilesToDelete] = useState<FileList>(
-    new DataTransfer().files,
-  )
+  const [filesToDelete, setFilesToDelete] = useState<JobPostingFilesType>([])
   const [links, setLinks] = useState(jobPosting ? jobPosting.links : [])
   const [tags, setTags] = useState(jobPosting ? jobPosting.tags : [])
 
@@ -72,7 +68,7 @@ export const JobPostingModal = ({
       links: links,
       tags: tags,
     }
-    onSubmit(jobPosting, filesToUpload)
+    onSubmit(jobPosting, filesToUpload, filesToDelete)
   }
 
   // Close modal on ESC key press
@@ -150,12 +146,27 @@ export const JobPostingModal = ({
               className="mt-1 block w-full border border-gray-300 rounded p-2"
             />
             <ul className="mt-2">
-              {files.map((filename) => (
-                <li className="flex justify-between items-center w-full" key={filename}>
-                  <span className="flex-grow">{filename}</span>
+              {files.map((file) => (
+                <li
+                  className="flex justify-between items-center w-full"
+                  key={file.blobId}
+                >
+                  <a
+                    href={file.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-grow text-blue-600 hover:underline"
+                  >
+                    {file.name}
+                  </a>
                   <FontAwesomeIcon
                     icon={faTrashAlt}
-                    onClick={(e) => {}}
+                    onClick={() => {
+                      setFilesToDelete((prevFiles) => [...prevFiles, file])
+                      setFiles((prevFiles) =>
+                        prevFiles.filter((f) => f.blobId !== file.blobId),
+                      )
+                    }}
                     className="text-red-600 hover:text-red-800 cursor-pointer"
                     aria-label="Delete file"
                   />

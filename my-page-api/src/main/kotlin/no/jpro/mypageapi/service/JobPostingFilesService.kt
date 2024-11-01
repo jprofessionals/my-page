@@ -5,6 +5,11 @@ import org.springframework.core.io.Resource
 
 interface JobPostingFilesService {
 
+    fun deleteJobPostingFile(
+        jobPostingId: Long,
+        fileName: String
+    )
+
     fun getJobPostingFiles(
         jobPostingId: Long
     ): List<JobPostingFile>
