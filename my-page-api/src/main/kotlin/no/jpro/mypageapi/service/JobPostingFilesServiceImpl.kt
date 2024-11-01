@@ -32,17 +32,28 @@ class JobPostingFilesServiceImpl(
                 it.name.endsWith("/")
             }
             .map {
+                val isPdf = it.name.endsWith(".pdf", ignoreCase = true)
+                val signUrlOptions = mutableListOf(
+                    SignUrlOption.httpMethod(HttpMethod.GET),
+                    SignUrlOption.withV4Signature()
+                )
+                if (isPdf) {
+                    signUrlOptions.add(
+                        SignUrlOption.withQueryParams(
+                            mapOf(
+                                "response-content-disposition" to "inline",
+                                "response-content-type" to "application/pdf"
+                            )
+                        )
+                    )
+                }
                 JobPostingFile(
                     blobId = "$jobPostingId/${it.name}",
                     name = it.name.split("/").last(),
                     url = it.signUrl(
                         1,
                         TimeUnit.HOURS,
-                        SignUrlOption.httpMethod(HttpMethod.GET),
-                        SignUrlOption.withV4Signature(),
-                        SignUrlOption.withQueryParams(
-                            mapOf("response-content-disposition" to "inline")
-                        )
+                        *signUrlOptions.toTypedArray()
                     ).toURI()
                 )
             }
