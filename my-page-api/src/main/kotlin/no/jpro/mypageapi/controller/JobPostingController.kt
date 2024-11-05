@@ -1,6 +1,7 @@
 package no.jpro.mypageapi.controller
 
 import no.jpro.mypageapi.api.JobPostingApiDelegate
+import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.model.JobPostingFile
 import no.jpro.mypageapi.service.JobPostingFilesService
@@ -16,6 +17,7 @@ class JobPostingController(
     private val jobPostingFilesService: JobPostingFilesService,
 ) : JobPostingApiDelegate {
 
+    @RequiresAdmin
     override fun createJobPosting(
         jobPosting: JobPosting
     ): ResponseEntity<JobPosting> {
@@ -41,6 +43,7 @@ class JobPostingController(
             .body(dto)
     }
 
+    @RequiresAdmin
     override fun deleteJobPosting(
         id: Long
     ): ResponseEntity<Unit> {
@@ -49,6 +52,7 @@ class JobPostingController(
         return ResponseEntity.noContent().build()
     }
 
+    @RequiresAdmin
     override fun deleteJobPostingFile(
         jobPostingId: Long,
         fileName: String
@@ -87,6 +91,7 @@ class JobPostingController(
         return ResponseEntity.ok(dto)
     }
 
+    @RequiresAdmin
     override fun updateJobPosting(
         id: Long,
         jobPosting: JobPosting
@@ -100,6 +105,7 @@ class JobPostingController(
         return ResponseEntity.noContent().build()
     }
 
+    @RequiresAdmin
     override fun uploadJobPostingFile(
         jobPostingId: Long,
         filename: String,

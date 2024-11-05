@@ -7,13 +7,14 @@ import {
 } from '@/data/types'
 import { useJobPostings, usePostJobPosting } from '@/hooks/jobPosting'
 import { JobPostingList } from '@/components/jobpostings/JobPostingList'
+import { useAuthContext } from "@/providers/AuthProvider";
 
 const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
   ssr: false,
 })
 
 export default function Utlysninger() {
-  const user = { admin: true }
+  const { user } = useAuthContext()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { data: jobPostings } = useJobPostings()
   const { mutate: createJobPosting } = usePostJobPosting()
