@@ -11,6 +11,7 @@ import {
 } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { useAuthContext } from "@/providers/AuthProvider";
 
 export const JobPosting = (jobPosting: JobPostingType) => {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -19,7 +20,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
   const { data: existingJobPostingFiles } = useJobPostingFiles(jobPosting.id)
   const { mutate: updateJobPosting } = usePutJobPosting()
   const { mutate: deleteJobPosting } = useDeleteJobPosting()
-  const user = { admin: true }
+  const { user } = useAuthContext()
 
   // Close dialog on ESC key press
   useEffect(() => {

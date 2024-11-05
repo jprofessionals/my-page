@@ -6,6 +6,7 @@ import {
 import { DateTime } from 'luxon'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { useAuthContext } from '@/providers/AuthProvider'
 
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
@@ -13,7 +14,11 @@ interface JobPostingModalProps {
   heading: string
   submitText: string
   onClose: () => void
-  onSubmit: (jobPosting: JobPostingType, newFiles: FileList, filesToDelete: JobPostingFilesType) => void
+  onSubmit: (
+    jobPosting: JobPostingType,
+    newFiles: FileList,
+    filesToDelete: JobPostingFilesType,
+  ) => void
 }
 
 export const JobPostingModal = ({
@@ -24,6 +29,7 @@ export const JobPostingModal = ({
   onClose,
   onSubmit,
 }: JobPostingModalProps) => {
+  const { user } = useAuthContext()
   const [id, setId] = useState(jobPosting ? jobPosting.id : 0)
   const [title, setTitle] = useState(jobPosting ? jobPosting.title : '')
   const [customer, setCustomer] = useState(
@@ -159,17 +165,21 @@ export const JobPostingModal = ({
                   >
                     {file.name}
                   </a>
-                  <FontAwesomeIcon
-                    icon={faTrashAlt}
-                    onClick={() => {
-                      setFilesToDelete((prevFiles) => [...prevFiles, file])
-                      setFiles((prevFiles) =>
-                        prevFiles.filter((f) => f.blobId !== file.blobId),
-                      )
-                    }}
-                    className="text-red-600 hover:text-red-800 cursor-pointer"
-                    aria-label="Delete file"
-                  />
+                  {user?.admin ? (
+                    <FontAwesomeIcon
+                      icon={faTrashAlt}
+                      onClick={() => {
+                        setFilesToDelete((prevFiles) => [...prevFiles, file])
+                        setFiles((prevFiles) =>
+                          prevFiles.filter((f) => f.blobId !== file.blobId),
+                        )
+                      }}
+                      className="text-red-600 hover:text-red-800 cursor-pointer"
+                      aria-label="Delete file"
+                    />
+                  ) : (
+                    <span />
+                  )}
                 </li>
               ))}
             </ul>
