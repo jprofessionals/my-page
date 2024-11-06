@@ -2,7 +2,6 @@ package no.jpro.mypageapi.service
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
-import no.jpro.mypageapi.consumer.slack.SlackConsumer
 import no.jpro.mypageapi.dto.CreateBookingDTO
 import no.jpro.mypageapi.dto.PendingBookingDTO
 import no.jpro.mypageapi.entity.Booking
@@ -10,6 +9,7 @@ import no.jpro.mypageapi.entity.PendingBooking
 import no.jpro.mypageapi.repository.BookingRepository
 import no.jpro.mypageapi.repository.PendingBookingRepository
 import no.jpro.mypageapi.repository.UserRepository
+import no.jpro.mypageapi.service.slack.SlackService
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Lazy
 import org.springframework.integration.support.locks.LockRegistry
@@ -28,7 +28,7 @@ class BookingLotteryService(
     private val userRepository: UserRepository,
     private val bookingService: BookingService,
     private val lockRegistry: LockRegistry,
-    private val slackConsumer: SlackConsumer,
+    private val slackService: SlackService,
     private val pendingBookingRepository: PendingBookingRepository,
     @Lazy private val self: BookingLotteryService? // Lazy self injection for transactional metoder. Spring oppretter ikke transaksjoner hvis en @Transactional annotert metode blir kalt fra samme objekt
 ) {
@@ -43,7 +43,7 @@ class BookingLotteryService(
         }
         val resultMsg = self.runManualBookingLottery(pendingBookingList)
         if (resultMsg != null) {
-            slackConsumer.postMessageToChannel(resultMsg)
+            slackService.postMessageToChannel(resultMsg)
         }
     }
 
@@ -111,7 +111,7 @@ class BookingLotteryService(
         try {
             val resultMsg = self.runTheLottery(LocalDate.now().minusDays(7))
             if (resultMsg != null) {
-                slackConsumer.postMessageToChannel(resultMsg)
+                slackService.postMessageToChannel(resultMsg)
             }
 
         } finally {
@@ -207,7 +207,7 @@ class BookingLotteryService(
         result.append("*Hyttetrekning er gjennomført og følgende vinnere er trukket ut:*\n")
         for (vinner in vinnere) {
             result.append(
-                slackConsumer.getUserToNotify(vinner.employee) + " får " + vinner.apartment.cabin_name + " fra " + vinner.startDate.format(
+                slackService.getUserToNotify(vinner.employee) + " får " + vinner.apartment.cabin_name + " fra " + vinner.startDate.format(
                     dagMåned
                 ) + " til " + vinner.endDate.format(dagMåned) + "\n"
             )
@@ -218,7 +218,7 @@ class BookingLotteryService(
         result.append("\n*Følgende ønskede bookinger overlapper med vinnerne og er derfor tatt bort:*\n")
         for (taper in tapere) {
             result.append(
-                slackConsumer.getUserToNotify(taper.employee) + " ønsket " + taper.apartment.cabin_name + " fra " + taper.startDate.format(
+                slackService.getUserToNotify(taper.employee) + " ønsket " + taper.apartment.cabin_name + " fra " + taper.startDate.format(
                     dagMåned
                 ) + " til " + taper.endDate.format(dagMåned) + "\n"
             )

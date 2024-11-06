@@ -1,8 +1,8 @@
 package no.jpro.mypageapi.service
 
-import no.jpro.mypageapi.consumer.slack.SlackConsumer
 import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.BookingRepository
+import no.jpro.mypageapi.service.slack.SlackService
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -10,7 +10,7 @@ import java.util.*
 
 @Component
 class SlackNotificationService(
-    val slackConsumer: SlackConsumer,
+    val slackService: SlackService,
     val bookingRepository: BookingRepository,
     val apartmentRepository: ApartmentRepository
 ) {
@@ -28,7 +28,7 @@ class SlackNotificationService(
         val notificationBuilder = StringBuilder()
         notificationBuilder.append("*Hyttereservasjoner neste periode:*\n")
         for (booking in upcomingBookings) {
-            val bookingEier = slackConsumer.getUserToNotify(booking.employee)
+            val bookingEier = slackService.getUserToNotify(booking.employee)
             notificationBuilder.append(
                 "$bookingEier har ${booking.apartment.cabin_name} fra ${
                     booking.startDate.format(
@@ -44,7 +44,7 @@ class SlackNotificationService(
             }
         }
 
-        slackConsumer.postMessageToChannel(notificationBuilder.toString())
+        slackService.postMessageToChannel(notificationBuilder.toString())
     }
 
     private fun findPeriodStart(): LocalDate {
