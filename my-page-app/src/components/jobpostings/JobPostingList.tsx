@@ -1,5 +1,6 @@
 import { JobPostings as JobPostingsType } from '@/data/types'
 import { JobPosting } from '@/components/jobpostings/JobPosting'
+import * as Accordion from '@radix-ui/react-accordion'
 
 type PropsType = {
   title: string
@@ -11,13 +12,16 @@ export const JobPostingList = ({ title, jobPostings }: PropsType) => {
     <>
       <h2 className="text-2xl font-bold mb-3">{title}</h2>
       {jobPostings.length > 0 ? (
-        <ul className="space-y-4">
+        <Accordion.Root type="multiple" className="space-y-4">
           {jobPostings.map((jobPosting) => (
-            <li key={jobPosting.id}>
+            <Accordion.Item
+              key={jobPosting.id}
+              value={jobPosting.id.toString()}
+            >
               <JobPosting {...jobPosting} />
-            </li>
+            </Accordion.Item>
           ))}
-        </ul>
+        </Accordion.Root>
       ) : (
         <p className="mb-3">Ingen utlysninger</p>
       )}
