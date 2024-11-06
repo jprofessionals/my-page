@@ -5,13 +5,15 @@ import no.jpro.mypageapi.entity.Customer
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.repository.CustomerRepository
 import no.jpro.mypageapi.repository.JobPostingRepository
+import no.jpro.mypageapi.service.slack.SlackService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class JobPostingService(
     private val customerRepository: CustomerRepository,
-    private val jobPostingRepository: JobPostingRepository
+    private val jobPostingRepository: JobPostingRepository,
+    private val slackService: SlackService,
 ) {
 
     @Transactional
@@ -31,7 +33,14 @@ class JobPostingService(
             deadline = jobPosting.deadline
         )
 
-        return jobPostingRepository.save(jobPostingToPersist)
+        val newJobPosting = jobPostingRepository.save(jobPostingToPersist)
+
+        slackService.postJobPosting(
+            "utlysninger",
+            newJobPosting,
+        )
+
+        return newJobPosting
     }
 
     fun deleteJobPosting(
