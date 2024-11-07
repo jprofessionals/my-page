@@ -26,7 +26,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.1",
     "@types/google-one-tap": "^1.2.6",
-    "@types/node": "^22.8.2",
+    "@types/node": "^22.8.7",
     "@types/react": "^18.3.12",
     "@types/react-dom": "18.3.1",
     "axios": "^1.7.7",
@@ -49,7 +49,7 @@
     "react-query": "^3.39.3",
     "react-toastify": "^10.0.6",
     "react-tooltip": "^5.27.0",
-    "sass": "^1.80.4",
+    "sass": "^1.80.6",
     "sockjs-client": "^1.6.1",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
@@ -58,7 +58,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "0.54.0",
+    "@hey-api/openapi-ts": "0.54.2",
     "@tailwindcss/typography": "^0.5.15",
     "@types/luxon": "3.4.2",
     "@types/react-modal": "^3.16.3",
