@@ -30,6 +30,7 @@ class JobPostingService(
             title = jobPosting.title,
             customer = customerEntity,
             description = jobPosting.description,
+            urgent = jobPosting.urgent,
             deadline = jobPosting.deadline
         )
 
@@ -73,6 +74,7 @@ class JobPostingService(
                 title = jobPosting.title
                 customer = customerEntity
                 description = jobPosting.description
+                urgent = jobPosting.urgent
                 deadline = jobPosting.deadline
             }
         )
