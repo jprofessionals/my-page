@@ -217,6 +217,11 @@ components:
           example: "Software Engineer"
         customer:
           $ref: '#/components/schemas/Customer'
+        urgent:
+          type: boolean
+          description: Indicates if the job posting is urgent. If true, no deadline is required.
+          default: false
+          example: true
         deadline:
           type: string
           format: date-time
@@ -248,7 +253,6 @@ components:
         - id
         - title
         - customer
-        - deadline
         - description
         - tags
         - links

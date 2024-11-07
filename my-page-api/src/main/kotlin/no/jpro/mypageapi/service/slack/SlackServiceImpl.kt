@@ -49,16 +49,7 @@ class SlackServiceImpl(
                             listOf(
                                 markdownText("*Kunde:* ${jobPosting.customer.name}"),
                                 markdownText(
-                                    "*Frist:* ${
-                                        jobPosting.deadline
-                                            .atZoneSameInstant(ZoneId.of("Europe/Oslo"))
-                                            .format(
-                                                DateTimeFormatter.ofPattern(
-                                                    "dd. MMMM yyyy HH:mm",
-                                                    Locale.forLanguageTag("no-NO")
-                                                )
-                                            )
-                                    }"
+                                    "*Frist:* ${getDeadlineText(jobPosting)}"
                                 ),
                             )
                         ).build(),
@@ -104,6 +95,23 @@ class SlackServiceImpl(
             return response.user.id
         }
         return null
+    }
+
+    private fun getDeadlineText(
+        jobPosting: JobPosting
+    ): String {
+        if (jobPosting.urgent) {
+            return "ASAP"
+        } else {
+            return jobPosting.deadline
+                ?.atZoneSameInstant(ZoneId.of("Europe/Oslo"))
+                ?.format(
+                    DateTimeFormatter.ofPattern(
+                        "dd. MMMM yyyy HH:mm",
+                        Locale.forLanguageTag("no-NO")
+                    )
+                ) ?: "Ingen frist"
+        }
     }
 
 }

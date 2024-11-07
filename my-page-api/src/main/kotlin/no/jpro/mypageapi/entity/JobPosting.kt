@@ -1,6 +1,8 @@
 package no.jpro.mypageapi.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.JdbcTypeCode
+import java.sql.Types
 import java.time.OffsetDateTime
 
 @Entity
@@ -17,8 +19,12 @@ class JobPosting(
     @Column(columnDefinition = "LONGTEXT")
     var description: String? = null,
 
-    @Column(nullable = false)
-    var deadline: OffsetDateTime,
+    @Column
+    var deadline: OffsetDateTime? = null,
+
+    @Column(nullable = true)
+    @JdbcTypeCode(Types.TINYINT)
+    var urgent: Boolean = false,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
