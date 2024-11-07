@@ -254,6 +254,7 @@ components:
         - title
         - customer
         - description
+        - urgent
         - tags
         - links
     JobPostingFile:
