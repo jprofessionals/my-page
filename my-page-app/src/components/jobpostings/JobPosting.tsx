@@ -60,11 +60,15 @@ export const JobPosting = (jobPosting: JobPostingType) => {
   }
 
   // Format the deadline to Norwegian format
-  const formattedDeadline = new Intl.DateTimeFormat('no-NO', {
-    dateStyle: 'long',
-    timeStyle: 'short',
-    timeZone: 'Europe/Oslo',
-  }).format(new Date(jobPosting.deadline))
+  const formattedDeadline = jobPosting.urgent
+    ? 'ASAP'
+    : jobPosting.deadline
+      ? new Intl.DateTimeFormat('no-NO', {
+          dateStyle: 'long',
+          timeStyle: 'short',
+          timeZone: 'Europe/Oslo',
+        }).format(new Date(jobPosting.deadline))
+      : 'Ukjent'
 
   return (
     <>
