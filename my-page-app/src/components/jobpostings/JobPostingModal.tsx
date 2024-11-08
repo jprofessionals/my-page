@@ -92,6 +92,10 @@ export const JobPostingModal = ({
     onSubmit(jobPosting, filesToUpload, filesToDelete)
   }
 
+  if (!customers) {
+    return
+  }
+
   return (
     <Dialog.Root open={true} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
