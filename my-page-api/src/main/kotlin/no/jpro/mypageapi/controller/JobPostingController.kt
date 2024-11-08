@@ -2,6 +2,7 @@ package no.jpro.mypageapi.controller
 
 import no.jpro.mypageapi.api.JobPostingApiDelegate
 import no.jpro.mypageapi.config.RequiresAdmin
+import no.jpro.mypageapi.model.Customer
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.model.JobPostingFile
 import no.jpro.mypageapi.service.JobPostingFilesService
@@ -25,7 +26,10 @@ class JobPostingController(
         val dto = JobPosting(
             id = entity.id,
             title = entity.title,
-            customer = entity.customer.name,
+            customer = Customer(
+                id = entity.customer.id,
+                name = entity.customer.name
+            ),
             urgent = entity.urgent,
             deadline = entity.deadline,
             description = entity.description ?: "",
@@ -66,6 +70,20 @@ class JobPostingController(
         return ResponseEntity.noContent().build()
     }
 
+    override fun getJobPostingCustomers(): ResponseEntity<List<Customer>> {
+        val entities = jobPostingService.getJobPostingCustomers()
+
+        val dto = entities
+            .map {
+                Customer(
+                    id = it.id,
+                    name = it.name
+                )
+            }
+
+        return ResponseEntity.ok(dto)
+    }
+
     override fun getJobPostingFiles(
         jobPostingId: Long
     ): ResponseEntity<List<JobPostingFile>> {
@@ -81,7 +99,10 @@ class JobPostingController(
             JobPosting(
                 id = it.id,
                 title = it.title,
-                customer = it.customer.name,
+                customer = Customer(
+                    id = it.customer.id,
+                    name = it.customer.name
+                ),
                 urgent = it.urgent,
                 deadline = it.deadline,
                 description = it.description ?: "",

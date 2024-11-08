@@ -1,11 +1,17 @@
-import { JobPosting as JobPostingType, JobPostingFiles as JobPostingFilesType, } from '@/data/types'
+import {
+  Customer,
+  JobPosting as JobPostingType,
+  JobPostingFiles as JobPostingFilesType,
+} from '@/data/types'
 import { DateTime } from 'luxon'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Switch from '@radix-ui/react-switch'
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from 'react'
+import { Autocomplete, TextField } from '@mui/material'
+import { useJobPostingCustomers } from '@/hooks/jobPosting'
 
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
@@ -29,10 +35,11 @@ export const JobPostingModal = ({
   onSubmit,
 }: JobPostingModalProps) => {
   const { user } = useAuthContext()
+  const { data: customers } = useJobPostingCustomers()
   const [id, setId] = useState(jobPosting ? jobPosting.id : 0)
   const [title, setTitle] = useState(jobPosting ? jobPosting.title : '')
-  const [customer, setCustomer] = useState(
-    jobPosting ? jobPosting.customer : '',
+  const [customer, setCustomer] = useState<Customer | null>(
+    jobPosting ? jobPosting.customer : null,
   )
   const [isUrgent, setIsUrgent] = useState(
     jobPosting ? jobPosting.urgent : false,
@@ -67,6 +74,11 @@ export const JobPostingModal = ({
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
+
+    if (!customer) {
+      return
+    }
+
     const jobPosting: JobPostingType = {
       id: id,
       title: title,
@@ -80,44 +92,69 @@ export const JobPostingModal = ({
     onSubmit(jobPosting, filesToUpload, filesToDelete)
   }
 
+  if (!customers) {
+    return
+  }
+
   return (
     <Dialog.Root open={true} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50"/>
+        <Dialog.Overlay className="fixed inset-0 bg-black/50" />
         <Dialog.Content
           className="fixed inset-0 flex justify-center items-center z-50"
           aria-modal="true"
         >
-          <div
-            className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-300">
+          <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-300">
             <Dialog.Title className="text-xl font-bold mb-4">
               {heading}
             </Dialog.Title>
             <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-gray-700">Tittel</label>
-                <input
-                  type="text"
+              <div className="mt-5 mb-4">
+                <TextField
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="mt-1 block w-full border border-gray-300 rounded p-2"
+                  label="Tittel"
+                  variant="outlined"
                   required
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Kunde</label>
-                <input
-                  type="text"
+                <Autocomplete
+                  options={customers}
+                  getOptionLabel={(option) => option.name}
                   value={customer}
-                  onChange={(e) => setCustomer(e.target.value)}
-                  className="mt-1 block w-full border border-gray-300 rounded p-2"
-                  required
+                  onChange={(event: any, newValue: Customer | null) => {
+                    setCustomer(newValue)
+                  }}
+                  onInputChange={(event, newInputValue, reason) => {
+                    if (reason === 'input') {
+                      const matchingCustomer = customers.find(
+                        (elem) => elem.name === newInputValue,
+                      )
+
+                      if (!matchingCustomer) {
+                        const newCustomer: Customer = {
+                          id: 0,
+                          name: newInputValue,
+                        }
+
+                        setCustomer(newCustomer)
+                      }
+                    }
+                  }}
+                  disablePortal
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Kunde"
+                      variant="outlined"
+                      required
+                    />
+                  )}
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 mb-1">
-                  Levere ASAP?
-                </label>
+                <label className="block text-gray-700 mb-1">Levere ASAP?</label>
                 <Switch.Root
                   className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
                     isUrgent
@@ -131,7 +168,9 @@ export const JobPostingModal = ({
                   <Switch.Thumb
                     className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
                     style={{
-                      transform: isUrgent ? 'translateX(18px)' : 'translateX(0)',
+                      transform: isUrgent
+                        ? 'translateX(18px)'
+                        : 'translateX(0)',
                     }}
                   />
                 </Switch.Root>
@@ -151,13 +190,16 @@ export const JobPostingModal = ({
                 </div>
               )}
               <div className="mb-4">
-                <label className="block text-gray-700">Beskrivelse</label>
-                <textarea
+                <TextField
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="mt-1 block w-full border border-gray-300 rounded p-2"
-                  required
-                ></textarea>
+                  label="Beskrivelse"
+                  variant="outlined"
+                  multiline
+                  fullWidth
+                  minRows={2}
+                  maxRows={8}
+                />
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700">Filer</label>
@@ -189,7 +231,10 @@ export const JobPostingModal = ({
                         <FontAwesomeIcon
                           icon={faTrashAlt}
                           onClick={() => {
-                            setFilesToDelete((prevFiles) => [...prevFiles, file])
+                            setFilesToDelete((prevFiles) => [
+                              ...prevFiles,
+                              file,
+                            ])
                             setFiles((prevFiles) =>
                               prevFiles.filter((f) => f.blobId !== file.blobId),
                             )
@@ -198,7 +243,7 @@ export const JobPostingModal = ({
                           aria-label="Delete file"
                         />
                       ) : (
-                        <span/>
+                        <span />
                       )}
                     </li>
                   ))}

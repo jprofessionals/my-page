@@ -20,9 +20,9 @@ class JobPostingService(
     fun createJobPosting(
         jobPosting: JobPosting
     ): no.jpro.mypageapi.entity.JobPosting {
-        val customerEntity = customerRepository.findByName(jobPosting.customer) ?: customerRepository.save(
+        val customerEntity = customerRepository.findByName(jobPosting.customer.name) ?: customerRepository.save(
             Customer(
-                name = jobPosting.customer
+                name = jobPosting.customer.name
             )
         )
 
@@ -54,6 +54,10 @@ class JobPostingService(
         return jobPostingRepository.findAll()
     }
 
+    fun getJobPostingCustomers(): List<Customer> {
+        return customerRepository.findAll()
+    }
+
     @Transactional
     fun updateJobPosting(
         jobPosting: JobPosting
@@ -63,9 +67,9 @@ class JobPostingService(
                 EntityNotFoundException("Job posting with id ${jobPosting.id} not found")
             }
 
-        val customerEntity = customerRepository.findByName(jobPosting.customer) ?: customerRepository.save(
+        val customerEntity = customerRepository.findByName(jobPosting.customer.name) ?: customerRepository.save(
             Customer(
-                name = jobPosting.customer
+                name = jobPosting.customer.name
             )
         )
 
