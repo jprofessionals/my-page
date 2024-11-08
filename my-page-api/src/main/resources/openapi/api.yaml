@@ -44,6 +44,22 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
+  /job-postings/customers:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostingCustomers
+      summary: Get job posting customers
+      description: Returns all the customers for job postings
+      responses:
+        '200':
+          description: A JSON array of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customers'
+        '500':
+          description: Internal server error
   /job-postings/{id}:
     delete:
       tags:
@@ -185,9 +201,26 @@ paths:
 components:
   schemas:
     Customer:
-      type: string
-      description: The name of a customer
-      example: "Skatteetaten"
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          default: 0
+          description: The ID of the customer
+          example: 1
+        name:
+          type: string
+          description: The name of a customer
+          example: "Skatteetaten"
+      required:
+        - id
+        - name
+    Customers:
+      type: array
+      description: A list of customers
+      items:
+        $ref: '#/components/schemas/Customer'
     FileUpload:
       type: object
       properties:

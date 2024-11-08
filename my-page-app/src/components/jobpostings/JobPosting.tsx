@@ -79,7 +79,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
               <h2 className="text-xl font-bold text-gray-800">
                 {jobPosting.title}
               </h2>
-              <p className="text-gray-700">{jobPosting.customer}</p>
+              <p className="text-gray-700">{jobPosting.customer.name}</p>
             </div>
 
             <div className="flex flex-col items-start w-[200px]">
