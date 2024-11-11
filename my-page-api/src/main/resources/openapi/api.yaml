@@ -11,6 +11,17 @@ paths:
       operationId: getJobPostings
       summary: Get job postings
       description: Returns the job postings added by admins. Allows filtering by different criteria.
+      parameters:
+        - in: query
+          name: tags
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          description: List of tags to filter
       responses:
         '200':
           description: A JSON array of job postings

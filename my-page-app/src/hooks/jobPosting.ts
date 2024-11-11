@@ -137,17 +137,20 @@ export const usePostJobPostingFiles = () => {
   )
 }
 
-export const useJobPostings = () => {
+export const useJobPostings = (tags: string[] | null) => {
   const { userFetchStatus } = useAuthContext()
 
   const fetchJobPostings = async () => {
     return await getJobPostings({
+      query: {
+        tags: tags ? tags : undefined,
+      },
       headers: authHeader(),
       baseUrl: '/api',
     })
   }
 
-  return useQuery(jobPostingsCacheName, fetchJobPostings, {
+  return useQuery([jobPostingsCacheName, tags], fetchJobPostings, {
     select: (result) => result.data,
     enabled: userFetchStatus === 'fetched',
   })

@@ -50,8 +50,11 @@ class JobPostingService(
         jobPostingRepository.deleteById(id)
     }
 
-    fun getJobPostings(): List<no.jpro.mypageapi.entity.JobPosting> {
-        return jobPostingRepository.findAll()
+    fun getJobPostings(
+        tags: List<String>?
+    ): List<no.jpro.mypageapi.entity.JobPosting> {
+        System.out.println("Tags $tags")
+        return jobPostingRepository.findAllWithFilters(tags)
     }
 
     fun getJobPostingCustomers(): List<Customer> {

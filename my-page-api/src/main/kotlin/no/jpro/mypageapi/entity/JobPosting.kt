@@ -28,7 +28,16 @@ class JobPosting(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
-    var customer: Customer
+    var customer: Customer,
+
+    @ManyToMany
+    @JoinTable(
+        name = "job_posting_tags",
+        joinColumns = [JoinColumn(name = "job_posting_id")],
+        inverseJoinColumns = [JoinColumn(name = "tag_id")]
+    )
+    var tags: Set<Tag> = HashSet()
+
 ) {
 
     override fun equals(other: Any?): Boolean {
