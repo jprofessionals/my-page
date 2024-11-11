@@ -16,7 +16,8 @@ const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
 export default function Utlysninger() {
   const { user } = useAuthContext()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const { data: jobPostings } = useJobPostings()
+  const [tags, setTags] = useState<string[]>([])
+  const { data: jobPostings } = useJobPostings(tags)
   const { mutate: createJobPosting } = usePostJobPosting()
 
   const activeJobPostings = useMemo(() => {

@@ -92,8 +92,10 @@ class JobPostingController(
         return ResponseEntity.ok(dto)
     }
 
-    override fun getJobPostings(): ResponseEntity<List<JobPosting>> {
-        val entities = jobPostingService.getJobPostings()
+    override fun getJobPostings(
+        tags: List<String>?
+    ): ResponseEntity<List<JobPosting>> {
+        val entities = jobPostingService.getJobPostings(tags)
 
         val dto = entities.map {
             JobPosting(
@@ -106,7 +108,10 @@ class JobPostingController(
                 urgent = it.urgent,
                 deadline = it.deadline,
                 description = it.description ?: "",
-                tags = emptyList(),
+                tags = it.tags
+                    .map {
+                        it.name
+                    },
                 links = emptyList()
             )
         }
