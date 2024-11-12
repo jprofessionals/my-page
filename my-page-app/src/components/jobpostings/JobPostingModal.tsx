@@ -276,11 +276,19 @@ export const JobPostingModal = ({
                   }}
                   freeSolo
                   value={selectedTag}
-                  onChange={(event: any, newValue: Tag | null) => {
+                  onChange={(event: any, newValue: Tag | string | null) => {
                     if (newValue) {
-                      setTags((prev) => [...prev, newValue])
+                      if (typeof newValue !== 'string') {
+                        setTags((prev) => [...prev, newValue])
+                        setSelectedTag(newValue)
+                      } else {
+                        const newTag = { id: 0, name: newValue }
+                        setTags((prev) => [...prev, newTag])
+                        setSelectedTag(newTag)
+                      }
+                    } else {
+                      setSelectedTag(null)
                     }
-                    setSelectedTag(newValue)
                   }}
                   onInputChange={(event, newInputValue, reason) => {
                     if (reason === 'input') {
