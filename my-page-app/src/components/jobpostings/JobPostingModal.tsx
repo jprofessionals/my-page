@@ -248,7 +248,12 @@ export const JobPostingModal = ({
                 )}
                 <Autocomplete
                   options={tagOptions}
-                  getOptionLabel={(option) => option.name}
+                  getOptionLabel={(option) => {
+                    if (typeof option === 'string') {
+                      return option
+                    }
+                    return option.name
+                  }}
                   filterOptions={(options, params) => {
                     const filter = createFilterOptions<Tag>()
                     const filtered = filter(options, params)
