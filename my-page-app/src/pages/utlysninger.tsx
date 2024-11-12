@@ -112,6 +112,8 @@ export default function Utlysninger() {
           jobPostings={activeJobPostings}
         />
 
+        <div className="mb-12"/>
+
         <JobPostingList
           title="Tidligere utlysninger"
           jobPostings={pastJobPostings}
