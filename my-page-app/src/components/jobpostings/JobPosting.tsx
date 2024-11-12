@@ -74,17 +74,17 @@ export const JobPosting = (jobPosting: JobPostingType) => {
     <>
       <Accordion.Header className="border border-gray-200 rounded-lg">
         <Accordion.Trigger className="relative p-4 bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
-          <div className="flex justify-between">
+          <div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
             <div className="flex flex-col items-start">
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-xl text-left font-bold text-gray-800">
                 {jobPosting.title}
               </h2>
-              <p className="text-gray-700">{jobPosting.customer.name}</p>
+              <p className="text-gray-700 text-left">{jobPosting.customer.name}</p>
             </div>
 
             <div className="flex flex-col items-start w-[200px]">
-              <p className="text-sm font-bold text-gray-800">Frist</p>
-              <p className="text-sm text-gray-700">{formattedDeadline}</p>
+              <p className="text-sm text-left font-bold text-gray-800">Frist</p>
+              <p className="text-sm text-gray-700 text-left">{formattedDeadline}</p>
             </div>
           </div>
           {user?.admin && (

@@ -41,7 +41,7 @@ export const JobPostingList = ({ title, jobPostings }: PropsType) => {
 
   return (
     <>
-      <h2 className="text-2xl font-bold mb-3">{title}</h2>
+      <h2 className="text-2xl font-bold mb-5">{title}</h2>
       {jobPostings.length > 0 ? (
         <Accordion.Root
           type="multiple"
