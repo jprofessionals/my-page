@@ -255,7 +255,7 @@ export const JobPostingModal = ({
                     return option.name
                   }}
                   filterOptions={(options, params) => {
-                    const filter = createFilterOptions<Tag>()
+                    const filter = createFilterOptions<Tag | string>()
                     const filtered = filter(options, params)
 
                     const { inputValue } = params
@@ -265,7 +265,7 @@ export const JobPostingModal = ({
                     }
 
                     const isExisting = options.some(
-                      (option) => inputTag.name === option.name,
+                      (option) => typeof option !== 'string' && inputTag.name === option.name,
                     )
 
                     if (inputValue !== '' && !isExisting) {
