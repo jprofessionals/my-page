@@ -2,9 +2,11 @@ package no.jpro.mypageapi.service
 
 import jakarta.persistence.EntityNotFoundException
 import no.jpro.mypageapi.entity.Customer
+import no.jpro.mypageapi.entity.Tag
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.repository.CustomerRepository
 import no.jpro.mypageapi.repository.JobPostingRepository
+import no.jpro.mypageapi.repository.TagRepository
 import no.jpro.mypageapi.service.slack.SlackService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class JobPostingService(
     private val customerRepository: CustomerRepository,
+    private val tagRepository: TagRepository,
     private val jobPostingRepository: JobPostingRepository,
     private val slackService: SlackService,
 ) {
@@ -26,12 +29,23 @@ class JobPostingService(
             )
         )
 
+        val tagEntities = jobPosting
+            .tags
+            .map {
+                tagRepository.findByName(it.name) ?: tagRepository.save(
+                    Tag(
+                        name = it.name
+                    )
+                )
+            }
+
         val jobPostingToPersist = no.jpro.mypageapi.entity.JobPosting(
             title = jobPosting.title,
             customer = customerEntity,
             description = jobPosting.description,
             urgent = jobPosting.urgent,
-            deadline = jobPosting.deadline
+            deadline = jobPosting.deadline,
+            tags = tagEntities,
         )
 
         val newJobPosting = jobPostingRepository.save(jobPostingToPersist)
@@ -50,10 +64,13 @@ class JobPostingService(
         jobPostingRepository.deleteById(id)
     }
 
+    fun getJobPostingTags(): List<no.jpro.mypageapi.entity.Tag> {
+        return tagRepository.findAll()
+    }
+
     fun getJobPostings(
         tags: List<String>?
     ): List<no.jpro.mypageapi.entity.JobPosting> {
-        System.out.println("Tags $tags")
         return jobPostingRepository.findAllWithFilters(tags)
     }
 
@@ -76,6 +93,16 @@ class JobPostingService(
             )
         )
 
+        val tagEntities = jobPosting
+            .tags
+            .map {
+                tagRepository.findByName(it.name) ?: tagRepository.save(
+                    Tag(
+                        name = it.name
+                    )
+                )
+            }
+
         jobPostingRepository.save(
             existingJobPosting.apply {
                 title = jobPosting.title
@@ -83,6 +110,7 @@ class JobPostingService(
                 description = jobPosting.description
                 urgent = jobPosting.urgent
                 deadline = jobPosting.deadline
+                tags = tagEntities
             }
         )
     }

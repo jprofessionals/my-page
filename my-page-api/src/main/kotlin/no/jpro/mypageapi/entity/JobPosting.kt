@@ -36,7 +36,7 @@ class JobPosting(
         joinColumns = [JoinColumn(name = "job_posting_id")],
         inverseJoinColumns = [JoinColumn(name = "tag_id")]
     )
-    var tags: Set<Tag> = HashSet()
+    var tags: List<Tag> = mutableListOf()
 
 ) {
 

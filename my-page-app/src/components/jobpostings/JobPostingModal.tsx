@@ -2,16 +2,23 @@ import {
   Customer,
   JobPosting as JobPostingType,
   JobPostingFiles as JobPostingFilesType,
+  Tag,
 } from '@/data/types'
 import { DateTime } from 'luxon'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Switch from '@radix-ui/react-switch'
 import { ChangeEvent, FormEvent, useState } from 'react'
-import { Autocomplete, TextField } from '@mui/material'
-import { useJobPostingCustomers } from '@/hooks/jobPosting'
+import {
+  Autocomplete,
+  Chip,
+  createFilterOptions,
+  Stack,
+  TextField,
+} from '@mui/material'
+import { useJobPostingCustomers, useJobPostingTags } from '@/hooks/jobPosting'
 
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
@@ -36,6 +43,7 @@ export const JobPostingModal = ({
 }: JobPostingModalProps) => {
   const { user } = useAuthContext()
   const { data: customers } = useJobPostingCustomers()
+  const { data: tagOptions } = useJobPostingTags()
   const [id, setId] = useState(jobPosting ? jobPosting.id : 0)
   const [title, setTitle] = useState(jobPosting ? jobPosting.title : '')
   const [customer, setCustomer] = useState<Customer | null>(
@@ -57,6 +65,7 @@ export const JobPostingModal = ({
   const [filesToDelete, setFilesToDelete] = useState<JobPostingFilesType>([])
   const [links, setLinks] = useState(jobPosting ? jobPosting.links : [])
   const [tags, setTags] = useState(jobPosting ? jobPosting.tags : [])
+  const [selectedTag, setSelectedTag] = useState<Tag | null>(null)
 
   const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value
@@ -93,6 +102,10 @@ export const JobPostingModal = ({
   }
 
   if (!customers) {
+    return
+  }
+
+  if (!tagOptions) {
     return
   }
 
@@ -199,6 +212,95 @@ export const JobPostingModal = ({
                   fullWidth
                   minRows={2}
                   maxRows={8}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700">Emneknagger</label>
+                {tags.length > 0 ? (
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{ flexWrap: 'wrap' }}
+                    className="mb-4"
+                  >
+                    {tags.map((tag) => (
+                      <Chip
+                        key={tag.id + tag.name}
+                        label={tag.name}
+                        onDelete={() =>
+                          setTags((prevTags) =>
+                            prevTags.filter((elem) => elem.name !== tag.name),
+                          )
+                        }
+                        deleteIcon={
+                          <FontAwesomeIcon
+                            icon={faTimes}
+                            style={{ fontSize: '0.8em' }}
+                          />
+                        }
+                        color="primary"
+                        variant="outlined"
+                      />
+                    ))}
+                  </Stack>
+                ) : (
+                  <p className="mb-3">Ingen emneknagger er valgt</p>
+                )}
+                <Autocomplete
+                  options={tagOptions}
+                  getOptionLabel={(option) => option.name}
+                  filterOptions={(options, params) => {
+                    const filter = createFilterOptions<Tag>()
+                    const filtered = filter(options, params)
+
+                    const { inputValue } = params
+                    const inputTag = {
+                      id: 0,
+                      name: inputValue,
+                    }
+
+                    const isExisting = options.some(
+                      (option) => inputTag.name === option.name,
+                    )
+
+                    if (inputValue !== '' && !isExisting) {
+                      filtered.push(inputTag)
+                    }
+
+                    return filtered
+                  }}
+                  freeSolo
+                  value={selectedTag}
+                  onChange={(event: any, newValue: Tag | null) => {
+                    if (newValue) {
+                      setTags((prev) => [...prev, newValue])
+                    }
+                    setSelectedTag(newValue)
+                  }}
+                  onInputChange={(event, newInputValue, reason) => {
+                    if (reason === 'input') {
+                      const matchingTag = tags.find(
+                        (elem) => elem.name === newInputValue,
+                      )
+
+                      if (!matchingTag) {
+                        const newTag: Tag = {
+                          id: 0,
+                          name: newInputValue,
+                        }
+
+                        setSelectedTag(newTag)
+                      }
+                    }
+                  }}
+                  disablePortal
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Velg emneknagger"
+                      variant="outlined"
+                    />
+                  )}
                 />
               </div>
               <div className="mb-4">

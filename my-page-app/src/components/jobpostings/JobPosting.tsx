@@ -72,7 +72,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
 
   return (
     <>
-      <Accordion.Header className="border border-gray-200 rounded-lg mb-4">
+      <Accordion.Header className="border border-gray-200 rounded-lg">
         <Accordion.Trigger className="relative p-4 bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
           <div className="flex justify-between">
             <div className="flex flex-col items-start">
@@ -116,12 +116,12 @@ export const JobPosting = (jobPosting: JobPostingType) => {
 
       <Accordion.Content className="p-4 bg-white">
         <div className="flex flex-wrap gap-2 mb-2">
-          {jobPosting.tags.map((tag, index) => (
+          {jobPosting.tags.map((tag) => (
             <span
-              key={index}
+              key={tag.id}
               className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded"
             >
-              {tag}
+              {tag.name}
             </span>
           ))}
         </div>
