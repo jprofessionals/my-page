@@ -5,6 +5,7 @@ import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.model.Customer
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.model.JobPostingFile
+import no.jpro.mypageapi.model.Tag
 import no.jpro.mypageapi.service.JobPostingFilesService
 import no.jpro.mypageapi.service.JobPostingService
 import org.springframework.core.io.Resource
@@ -92,6 +93,20 @@ class JobPostingController(
         return ResponseEntity.ok(dto)
     }
 
+    override fun getJobPostingTags(): ResponseEntity<List<Tag>> {
+        val entities = jobPostingService.getJobPostingTags()
+
+        val dto = entities
+            .map {
+                Tag(
+                    id = it.id,
+                    name = it.name
+                )
+            }
+
+        return ResponseEntity.ok(dto)
+    }
+
     override fun getJobPostings(
         tags: List<String>?
     ): ResponseEntity<List<JobPosting>> {
@@ -110,7 +125,10 @@ class JobPostingController(
                 description = it.description ?: "",
                 tags = it.tags
                     .map {
-                        it.name
+                        Tag(
+                            id = it.id,
+                            name = it.name
+                        )
                     },
                 links = emptyList()
             )

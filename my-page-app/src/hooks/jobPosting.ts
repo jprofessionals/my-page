@@ -5,7 +5,7 @@ import {
   FileUpload,
   getJobPostingCustomers,
   getJobPostingFiles,
-  getJobPostings,
+  getJobPostings, getJobPostingTags,
   JobPosting,
   JobPostingFiles,
   updateJobPosting,
@@ -18,6 +18,7 @@ import { useAuthContext } from '@/providers/AuthProvider'
 const jobPostingsCacheName = 'job-postings'
 const jobPostingFilesCacheName = 'job-posting-files'
 const jobPostingCustomersCacheName = 'job-posting-customers'
+const jobPostingTagsCacheName = 'job-posting-tags'
 
 export const useDeleteJobPosting = () => {
   const queryClient = useQueryClient()
@@ -135,6 +136,22 @@ export const usePostJobPostingFiles = () => {
       },
     },
   )
+}
+
+export const useJobPostingTags = () => {
+  const { userFetchStatus } = useAuthContext()
+
+  const fetchJobPostingTags = async () => {
+    return await getJobPostingTags({
+      headers: authHeader(),
+      baseUrl: '/api',
+    })
+  }
+
+  return useQuery(jobPostingTagsCacheName, fetchJobPostingTags, {
+    select: (result) => result.data,
+    enabled: userFetchStatus === 'fetched',
+  })
 }
 
 export const useJobPostings = (tags: string[] | null) => {

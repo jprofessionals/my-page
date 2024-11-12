@@ -106,6 +106,11 @@ interface CustomerRepository : JpaRepository<Customer, Long> {
 }
 
 @Repository
+interface TagRepository : JpaRepository<Tag, Long> {
+    fun findByName(name: String): Tag?
+}
+
+@Repository
 interface JobPostingRepository : JpaRepository<JobPosting, Long> {
 
     @Query("""
