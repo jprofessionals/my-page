@@ -81,6 +81,9 @@ class JobPostingController(
                     name = it.name
                 )
             }
+            .sortedBy {
+                it.name
+            }
 
         return ResponseEntity.ok(dto)
     }
@@ -102,6 +105,9 @@ class JobPostingController(
                     id = it.id,
                     name = it.name
                 )
+            }
+            .sortedBy {
+                it.name
             }
 
         return ResponseEntity.ok(dto)
