@@ -280,9 +280,12 @@ export const JobPostingModal = ({
                   }}
                   disablePortal
                   renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip label={option.name} {...getTagProps({ index })} />
-                    ))
+                    value.map((option, index) => {
+                      const { key, ...tagProps } = getTagProps({ index })
+                      return (
+                        <Chip key={key} label={option.name} {...tagProps} />
+                      )
+                    })
                   }
                   renderInput={(params) => (
                     <TextField
