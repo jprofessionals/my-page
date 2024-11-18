@@ -1,27 +1,24 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { DayPicker } from 'react-day-picker'
+import { Chevron, DayPicker } from 'react-day-picker'
 import cn from '@/utils/cn'
 import {
   add,
-  sub,
   format,
+  isAfter,
   isMonday,
   isSameDay,
   isSunday,
   isWithinInterval,
-  isAfter,
+  sub,
 } from 'date-fns'
-import { Booking, PendingBookingTrain, InfoBooking } from '@/types'
+import { Booking, InfoBooking, PendingBookingTrain } from '@/types'
 import { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { get } from 'radash'
-import {
-  faCircleInfo,
-  faHotel,
-  IconDefinition,
-} from '@fortawesome/free-solid-svg-icons'
+import { faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {clsx} from "clsx";
+import { clsx } from 'clsx'
+
 export type CalendarProps = ComponentProps<typeof DayPicker> & {
   cutOffDateVacancies: string
   bookings: Booking[] | undefined
@@ -96,52 +93,67 @@ function MonthCalendar({
       showOutsideDays={showOutsideDays}
       className={cn('p-3 border-none', className)}
       weekStartsOn={1}
-      fromDate={new Date(startDateCalendar)}
-      toDate={new Date(endDateCalendar)}
+      startMonth={new Date(startDateCalendar)}
+      endMonth={new Date(endDateCalendar)}
+      hidden={[
+        { before: new Date(startDateCalendar) },
+        { after: new Date(endDateCalendar) },
+      ]}
       classNames={{
         months:
           'flex flex-col sm:flex-row space-y-10 sm:space-x-10 sm:space-y-0',
         month: 'space-y-4 w-full',
-        caption: 'flex justify-center pt-1 relative items-center',
+        month_caption: 'flex justify-center pt-1 relative items-center',
         caption_label: 'text-sm font-medium font-size: xx-large',
         nav: 'space-x-1 flex items-center',
-        nav_button: cn(
+        button_previous: cn(
           buttonVariants({ variant: 'outline' }),
-          'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
+          'absolute left-1 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
         ),
-        nav_button_previous: 'absolute left-1',
-        nav_button_next: 'absolute right-1',
-        table: 'w-full border-collapse space-y-1',
-        head_row: 'flex justify-between',
-        head_cell: 'text-muted-foreground rounded-md font-normal text-[0.8rem]',
-        row: 'flex justify-between mt-2',
-        cell: 'text-center text-sm p-0 relative flex-1 [&:has([aria-selected])]:bg-accent:has([aria-selected]) first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
-        day: cn(
+        button_next: cn(
+          buttonVariants({ variant: 'outline' }),
+          'absolute right-1 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
+        ),
+        month_grid: 'w-full border-collapse space-y-1',
+        weekdays: 'flex justify-between',
+        weekday: 'text-muted-foreground rounded-md font-normal text-[0.8rem]',
+        week: 'flex justify-between mt-2',
+        day: 'text-center text-sm p-0 relative flex-1 [&:has([aria-selected])]:bg-accent:has([aria-selected]) first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+        day_button: cn(
           buttonVariants({ variant: 'avatar' }),
           'h-full w-full xl:h-50 xl:w-50 p-0 font-normal aria-selected:opacity-100',
           'flex flex-col items-center justify-start',
           'py-3 border-none tw-bg-opacity: 0',
         ),
-        day_selected: 'tw-bg-opacity: 0',
-        day_today: cn('text-accent-foreground', 'bg-gray-400'),
-        day_disabled: 'text-muted-foreground opacity-50',
-        day_range_middle:
+        selected: 'tw-bg-opacity: 0',
+        today: cn('text-accent-foreground', 'bg-gray-400'),
+        disabled: 'text-muted-foreground opacity-50',
+        range_middle:
           'aria-selected:bg-accent aria-selected:text-accent-foreground',
-        day_hidden: 'invisible',
+        hidden: 'invisible',
         ...classNames,
       }}
       components={{
-        IconLeft: () => <ChevronLeft className="w-4 h-4" />,
-        IconRight: () => <ChevronRight className="w-4 h-4" />,
-        DayContent: (props) => {
+        Chevron: (props) => {
+          if (props.orientation === 'left') {
+            return <ChevronLeft className="w-4 h-4" />
+          }
+
+          if (props.orientation === 'right') {
+            return <ChevronRight className="w-4 h-4" />
+          }
+
+          return <Chevron {...props} />
+        },
+        Day: (props) => {
           const cutOffDate = new Date(cutOffDateVacancies)
-          const dateCalendar = format(props.date, 'dd')
-          const bookingList = getBookings(format(props.date, 'yyyy-MM-dd'))
+          const dateCalendar = format(props.day.date, 'dd')
+          const bookingList = getBookings(format(props.day.date, 'yyyy-MM-dd'))
           const pendingBookingsTrains = getPendingBookingTrainsOnDay(
-            format(props.date, 'yyyy-MM-dd'),
+            format(props.day.date, 'yyyy-MM-dd'),
           )
           const informationNoticeList = getInfoNotices(
-            format(props.date, 'yyyy-MM-dd'),
+            format(props.day.date, 'yyyy-MM-dd'),
           )
 
           const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
@@ -187,10 +199,10 @@ function MonthCalendar({
                       key={pendingBookingTrain.id}
                       className={cn(
                         getPendingBookingCabinStyle(
-                          props.date,
+                          props.day.date,
                           pendingBookingTrain,
                         ),
-                        isAfter(add(props.date, { days: 1 }), new Date())
+                        isAfter(add(props.day.date, { days: 1 }), new Date())
                           ? get(
                               pendingBookingCabinColors,
                               pendingBookingTrain.apartment.cabin_name,
@@ -200,7 +212,7 @@ function MonthCalendar({
                               pendingBookingTrain.apartment.cabin_name,
                             ),
                         'normal-case',
-                          'bg-repeat',
+                        'bg-repeat',
                       )}
                     ></span>
                   ))}
@@ -209,77 +221,75 @@ function MonthCalendar({
             }
 
             return (
-
-                <div
-                    key={cabin}
-                    className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
-                >
-                    {combinedEntries.map((entry) => {
-                        if ('employeeName' in entry) {
-                            const booking = entry as Booking
-                            const isYourBooking = yourBookings?.some(
-                                (yourBooking) => yourBooking.id === booking.id,
-                            )
-                            const {isFirstDay, isLastDay} = getBookingDateInfo(
-                                props.date,
-                                booking,
-                            )
-                            return (
-                                <span
-                                    key={booking.id}
-                                    className={cn(
-                                        'p-2 text-white tooltip tooltip-top shadow-xl',
-                                        getCabinBookingStyle(props.date, booking),
-                                        isYourBooking && 'shadow-y-2',
-                                        isAfter(add(props.date, {days: 1}), new Date())
-                                            ? get(cabinColors, booking.apartment?.cabin_name)
-                                            : get(
-                                                cabinColorsOpacity,
-                                                booking.apartment?.cabin_name,
-                                            ),
-                                        'normal-case',
-                                    )}
-                                    {...(windowWidth > 800 && {
-                                        'data-tip': `Reservert av: ${booking.employeeName}`,
-                                    })}
-                                >
+              <div
+                key={cabin}
+                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
+              >
+                {combinedEntries.map((entry) => {
+                  if ('employeeName' in entry) {
+                    const booking = entry as Booking
+                    const isYourBooking = yourBookings?.some(
+                      (yourBooking) => yourBooking.id === booking.id,
+                    )
+                    const { isFirstDay, isLastDay } = getBookingDateInfo(
+                      props.day.date,
+                      booking,
+                    )
+                    return (
+                      <span
+                        key={booking.id}
+                        className={cn(
+                          'p-2 text-white tooltip tooltip-top shadow-xl',
+                          getCabinBookingStyle(props.day.date, booking),
+                          isYourBooking && 'shadow-y-2',
+                          isAfter(add(props.day.date, { days: 1 }), new Date())
+                            ? get(cabinColors, booking.apartment?.cabin_name)
+                            : get(
+                                cabinColorsOpacity,
+                                booking.apartment?.cabin_name,
+                              ),
+                          'normal-case',
+                        )}
+                        {...(windowWidth > 800 && {
+                          'data-tip': `Reservert av: ${booking.employeeName}`,
+                        })}
+                      >
                         {(isFirstDay || isLastDay) &&
-                            getInitials(booking.employeeName)}
+                          getInitials(booking.employeeName)}
                       </span>
-                            )
-                        } else {
-                            const pendingBookingTrain = entry as PendingBookingTrain
-                            const hasOverlapWithBooking = cabinBookings.some(
-                                (booking) => hasOverlap(booking, pendingBookingTrain),
-                            )
+                    )
+                  } else {
+                    const pendingBookingTrain = entry as PendingBookingTrain
+                    const hasOverlapWithBooking = cabinBookings.some(
+                      (booking) => hasOverlap(booking, pendingBookingTrain),
+                    )
 
-
-                            return (
-                                <span
-                                    key={pendingBookingTrain.id}
-                                    className={clsx(
-                                        getPendingBookingCabinStyle(
-                                            props.date,
-                                            pendingBookingTrain,
-                                        ),
-                                        isAfter(add(props.date, {days: 1}), new Date())
-                                            ? get(
-                                                pendingBookingCabinColors,
-                                                pendingBookingTrain.apartment.cabin_name,
-                                            )
-                                            : get(
-                                                pendingBookingCabinColors,
-                                                pendingBookingTrain.apartment.cabin_name,
-                                            ),
-                                        'normal-case',
-                                        'bg-pattern',
-                                        hasOverlapWithBooking && 'hidden',
-                                    )}
-                                ></span>
-                            )
-                        }
-                    })}
-                </div>
+                    return (
+                      <span
+                        key={pendingBookingTrain.id}
+                        className={clsx(
+                          getPendingBookingCabinStyle(
+                            props.day.date,
+                            pendingBookingTrain,
+                          ),
+                          isAfter(add(props.day.date, { days: 1 }), new Date())
+                            ? get(
+                                pendingBookingCabinColors,
+                                pendingBookingTrain.apartment.cabin_name,
+                              )
+                            : get(
+                                pendingBookingCabinColors,
+                                pendingBookingTrain.apartment.cabin_name,
+                              ),
+                          'normal-case',
+                          'bg-pattern',
+                          hasOverlapWithBooking && 'hidden',
+                        )}
+                      ></span>
+                    )
+                  }
+                })}
+              </div>
             )
           }
 
@@ -294,12 +304,12 @@ function MonthCalendar({
 );
            */
 
-            const infoNoticeElements =
+          const infoNoticeElements =
             informationNoticeList.length > 0 ? (
               <div className="grid grid-cols-2 gap-3 w-full h-4 md:h-8">
                 {informationNoticeList.map((infoNotice: InfoBooking) => {
                   const { isFirstDay } = getInfoNoticeDateInfo(
-                    props.date,
+                    props.day.date,
                     infoNotice,
                   )
                   return (
@@ -307,7 +317,7 @@ function MonthCalendar({
                       key={infoNotice.id}
                       className={cn(
                         'p-2 text-white tooltip tooltip-top shadow-xl',
-                        getInfoNoticeStyle(props.date, infoNotice),
+                        getInfoNoticeStyle(props.day.date, infoNotice),
                         'bg-blue-500',
                         'normal-case',
                       )}
@@ -343,7 +353,7 @@ function MonthCalendar({
               <span
                 className={cn(
                   'absolute top-0 left-0 w-full h-full',
-                  getCutOffDateStyle(props.date, cutOffDate),
+                  getCutOffDateStyle(props.day.date, cutOffDate),
                 )}
                 aria-hidden="true"
               />

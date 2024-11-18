@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { DayPicker } from 'react-day-picker'
+import { Chevron, DayPicker } from 'react-day-picker'
 
 import cn from '@/utils/cn'
 import { buttonVariants } from '@/components/ui/button'
@@ -21,42 +21,54 @@ function YearCalendar({
       classNames={{
         months: 'flex flex-col sm:flex-row flex-wrap justify-between',
         month: 'space-y-4',
-        caption: 'flex justify-center pt-1 relative items-center',
+        month_caption: 'flex justify-center pt-1 relative items-center',
         caption_label: 'text-sm font-medium',
         nav: 'space-x-1 flex items-center',
-        nav_button: cn(
+        button_previous: cn(
           buttonVariants({ variant: 'outline' }),
-          'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
+          'absolute left-1 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
         ),
-        nav_button_previous: 'absolute left-1',
-        nav_button_next: 'absolute right-1',
-        table: 'w-full border-collapse space-y-1',
-        head_row: 'flex justify-between',
-        head_cell: 'text-muted-foreground rounded-md font-normal text-[0.8rem]',
-        row: 'flex justify-between mt-2',
-        cell: 'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
-        day: cn(
+        button_next: cn(
+          buttonVariants({ variant: 'outline' }),
+          'absolute right-1 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
+        ),
+        month_grid: 'w-full border-collapse space-y-1',
+        weekdays: 'flex justify-between',
+        weekday: 'text-muted-foreground rounded-md font-normal text-[0.8rem]',
+        week: 'flex justify-between mt-2',
+        day: 'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+        day_button: cn(
           buttonVariants({ variant: 'ghost' }),
           'h-9 w-9 p-0 font-normal aria-selected:opacity-100',
         ),
-        day_selected:
+        selected:
           'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
-        day_today: 'bg-accent text-accent-foreground',
-        day_outside: 'text-muted-foreground opacity-50',
-        day_disabled: 'text-muted-foreground opacity-50',
-        day_range_middle:
+        today: 'bg-accent text-accent-foreground',
+        outside: 'text-muted-foreground opacity-50',
+        disabled: 'text-muted-foreground opacity-50',
+        range_middle:
           'aria-selected:bg-accent aria-selected:text-accent-foreground',
-        day_hidden: 'invisible',
+        hidden: 'invisible',
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        Chevron: (props) => {
+          if (props.orientation === 'left') {
+            return <ChevronLeft className="h-4 w-4" />
+          }
+
+          if (props.orientation === 'right') {
+            return <ChevronRight className="h-4 w-4" />
+          }
+
+          return <Chevron {...props} />
+        },
       }}
       {...props}
     />
   )
 }
+
 YearCalendar.displayName = 'Calendar'
 
 export { YearCalendar }
