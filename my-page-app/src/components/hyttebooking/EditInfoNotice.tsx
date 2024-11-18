@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import { API_URL } from '../../services/api.service'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -50,7 +50,7 @@ const EditInfoNotice = ({
   infoNotice: InfoBooking
   closeModal: () => void
   userIsAdmin: boolean
-  refreshInfoNoticeVacancies: Function
+  refreshInfoNoticeVacancies: () => void
 }) => {
   const [startDate, setStartDate] = useState(infoNotice.startDate)
   const [endDate, setEndDate] = useState(infoNotice.endDate)
@@ -75,7 +75,7 @@ const EditInfoNotice = ({
     },
   })
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!isValid) {
       toast.error('Noen av verdiene var ikke gyldig, prøv igjen')

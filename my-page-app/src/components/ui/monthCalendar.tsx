@@ -3,32 +3,31 @@ import { DayPicker } from 'react-day-picker'
 import cn from '@/utils/cn'
 import {
   add,
-  sub,
   format,
+  isAfter,
   isMonday,
   isSameDay,
   isSunday,
   isWithinInterval,
-  isAfter,
+  sub,
 } from 'date-fns'
-import { Booking, PendingBookingTrain, InfoBooking } from '@/types'
+import { Booking, InfoBooking, PendingBookingTrain } from '@/types'
 import { ComponentProps, useEffect, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { get } from 'radash'
-import {
-  faCircleInfo,
-  faHotel,
-  IconDefinition,
-} from '@fortawesome/free-solid-svg-icons'
+import { faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {clsx} from "clsx";
+import { clsx } from 'clsx'
+
 export type CalendarProps = ComponentProps<typeof DayPicker> & {
   cutOffDateVacancies: string
   bookings: Booking[] | undefined
   yourBookings: Booking[] | undefined
-  getBookings: Function
-  getPendingBookingTrainsOnDay: Function
-  getInfoNotices: Function
+  getBookings: (date: string) => Booking[] | undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getPendingBookingTrainsOnDay: (date: string) => any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getInfoNotices: (date: string) => any
 }
 
 const cabinColors: { [key: string]: string } = {
@@ -54,7 +53,6 @@ function MonthCalendar({
   classNames,
   showOutsideDays = true,
   cutOffDateVacancies,
-  bookings,
   yourBookings,
   getBookings,
   getPendingBookingTrainsOnDay,
@@ -148,9 +146,9 @@ function MonthCalendar({
 
           const bookingsByCabin: { [key: string]: Booking[] } =
             cabinOrder.reduce((result: { [key: string]: Booking[] }, cabin) => {
-              result[cabin] = bookingList.filter(
+              result[cabin] = bookingList?.filter(
                 (booking: Booking) => booking.apartment?.cabin_name === cabin,
-              )
+              ) ?? []
               return result
             }, {})
 
@@ -200,7 +198,7 @@ function MonthCalendar({
                               pendingBookingTrain.apartment.cabin_name,
                             ),
                         'normal-case',
-                          'bg-repeat',
+                        'bg-repeat',
                       )}
                     ></span>
                   ))}
@@ -209,77 +207,75 @@ function MonthCalendar({
             }
 
             return (
-
-                <div
-                    key={cabin}
-                    className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
-                >
-                    {combinedEntries.map((entry) => {
-                        if ('employeeName' in entry) {
-                            const booking = entry as Booking
-                            const isYourBooking = yourBookings?.some(
-                                (yourBooking) => yourBooking.id === booking.id,
-                            )
-                            const {isFirstDay, isLastDay} = getBookingDateInfo(
-                                props.date,
-                                booking,
-                            )
-                            return (
-                                <span
-                                    key={booking.id}
-                                    className={cn(
-                                        'p-2 text-white tooltip tooltip-top shadow-xl',
-                                        getCabinBookingStyle(props.date, booking),
-                                        isYourBooking && 'shadow-y-2',
-                                        isAfter(add(props.date, {days: 1}), new Date())
-                                            ? get(cabinColors, booking.apartment?.cabin_name)
-                                            : get(
-                                                cabinColorsOpacity,
-                                                booking.apartment?.cabin_name,
-                                            ),
-                                        'normal-case',
-                                    )}
-                                    {...(windowWidth > 800 && {
-                                        'data-tip': `Reservert av: ${booking.employeeName}`,
-                                    })}
-                                >
+              <div
+                key={cabin}
+                className="grid grid-cols-2 gap-3 w-full h-4 md:h-8"
+              >
+                {combinedEntries.map((entry) => {
+                  if ('employeeName' in entry) {
+                    const booking = entry as Booking
+                    const isYourBooking = yourBookings?.some(
+                      (yourBooking) => yourBooking.id === booking.id,
+                    )
+                    const { isFirstDay, isLastDay } = getBookingDateInfo(
+                      props.date,
+                      booking,
+                    )
+                    return (
+                      <span
+                        key={booking.id}
+                        className={cn(
+                          'p-2 text-white tooltip tooltip-top shadow-xl',
+                          getCabinBookingStyle(props.date, booking),
+                          isYourBooking && 'shadow-y-2',
+                          isAfter(add(props.date, { days: 1 }), new Date())
+                            ? get(cabinColors, booking.apartment?.cabin_name)
+                            : get(
+                                cabinColorsOpacity,
+                                booking.apartment?.cabin_name,
+                              ),
+                          'normal-case',
+                        )}
+                        {...(windowWidth > 800 && {
+                          'data-tip': `Reservert av: ${booking.employeeName}`,
+                        })}
+                      >
                         {(isFirstDay || isLastDay) &&
-                            getInitials(booking.employeeName)}
+                          getInitials(booking.employeeName)}
                       </span>
-                            )
-                        } else {
-                            const pendingBookingTrain = entry as PendingBookingTrain
-                            const hasOverlapWithBooking = cabinBookings.some(
-                                (booking) => hasOverlap(booking, pendingBookingTrain),
-                            )
+                    )
+                  } else {
+                    const pendingBookingTrain = entry as PendingBookingTrain
+                    const hasOverlapWithBooking = cabinBookings.some(
+                      (booking) => hasOverlap(booking, pendingBookingTrain),
+                    )
 
-
-                            return (
-                                <span
-                                    key={pendingBookingTrain.id}
-                                    className={clsx(
-                                        getPendingBookingCabinStyle(
-                                            props.date,
-                                            pendingBookingTrain,
-                                        ),
-                                        isAfter(add(props.date, {days: 1}), new Date())
-                                            ? get(
-                                                pendingBookingCabinColors,
-                                                pendingBookingTrain.apartment.cabin_name,
-                                            )
-                                            : get(
-                                                pendingBookingCabinColors,
-                                                pendingBookingTrain.apartment.cabin_name,
-                                            ),
-                                        'normal-case',
-                                        'bg-pattern',
-                                        hasOverlapWithBooking && 'hidden',
-                                    )}
-                                ></span>
-                            )
-                        }
-                    })}
-                </div>
+                    return (
+                      <span
+                        key={pendingBookingTrain.id}
+                        className={clsx(
+                          getPendingBookingCabinStyle(
+                            props.date,
+                            pendingBookingTrain,
+                          ),
+                          isAfter(add(props.date, { days: 1 }), new Date())
+                            ? get(
+                                pendingBookingCabinColors,
+                                pendingBookingTrain.apartment.cabin_name,
+                              )
+                            : get(
+                                pendingBookingCabinColors,
+                                pendingBookingTrain.apartment.cabin_name,
+                              ),
+                          'normal-case',
+                          'bg-pattern',
+                          hasOverlapWithBooking && 'hidden',
+                        )}
+                      ></span>
+                    )
+                  }
+                })}
+              </div>
             )
           }
 
@@ -294,7 +290,7 @@ function MonthCalendar({
 );
            */
 
-            const infoNoticeElements =
+          const infoNoticeElements =
             informationNoticeList.length > 0 ? (
               <div className="grid grid-cols-2 gap-3 w-full h-4 md:h-8">
                 {informationNoticeList.map((infoNotice: InfoBooking) => {

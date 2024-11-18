@@ -72,7 +72,7 @@ export type JobPostingType = {
   description?: string
   tags?: string[]
   customer: string
-  location?: String
+  location?: string
   dueDateForApplication?: string
   requiredYearsOfExperience?: number
   resourcesNeeded?: number

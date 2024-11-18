@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import ApiService from '../../services/api.service'
 import moment from 'moment'
 import { toast } from 'react-toastify'
@@ -9,8 +9,8 @@ import { Button } from '../ui/button'
 
 type Props = {
   budget: Budget
-  refreshBudgets: Function
-  toggle: Function
+  refreshBudgets: () => void
+  toggle: () => void
 }
 
 const CreateBudgetPost = ({ budget, refreshBudgets, toggle }: Props) => {
@@ -21,7 +21,7 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }: Props) => {
 
   const isValid = amountExMva > 0 && description && description !== ''
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!isValid) {
       toast.error('Noen av verdiene var ikke gyldig, prøv igjen')
@@ -48,15 +48,15 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }: Props) => {
     }
   }
 
-  const handleDescriptionChange = (e: any) => {
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(e.target.value)
   }
 
-  const handleAmountChange = (e: any) => {
-    setAmountExMva(e.target.value)
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmountExMva(Number(e.target.value))
   }
 
-  const handleDateChange = (e: any) => {
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDate(e.target.value)
   }
 

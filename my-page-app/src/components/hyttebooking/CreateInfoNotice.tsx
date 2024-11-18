@@ -1,6 +1,6 @@
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { API_URL } from '../../services/api.service'
-import { addDays, format, isBefore } from 'date-fns'
+import { addDays, format } from 'date-fns'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
@@ -15,7 +15,7 @@ type Props = {
   closeModal: () => void
   userIsAdmin: boolean
   infoNoticeVacancies: string[] | undefined
-  refreshInfoNoticeVacancies: Function
+  refreshInfoNoticeVacancies: () => void
 }
 const createInfoNotice = async ({
   userIsAdmin,
@@ -57,7 +57,7 @@ const CreateInfoNoticePost = ({
 
   const vacantDaysForInfoNoticesWithoutTakeoverDates = infoNoticeVacancies!
   const [isEndDateValid, setIsEndDateValid] = useState(false)
-  const evaluateEndDateValidity = (newEndDate: string) => {
+  const evaluateEndDateValidity = useCallback((newEndDate: string) => {
     const endDateDate = new Date(newEndDate)
     const previousFns = addDays(endDateDate, -1)
     const previousDate = format(previousFns, 'yyyy-MM-dd')
@@ -69,11 +69,11 @@ const CreateInfoNoticePost = ({
       vacantDaysForInfoNoticesWithoutTakeoverDates?.includes(previousDate) ||
       vacantDaysForInfoNoticesWithoutTakeoverDates?.includes(nextDate)
     setIsEndDateValid(isValid)
-  }
+  }, [vacantDaysForInfoNoticesWithoutTakeoverDates])
 
   useEffect(() => {
     evaluateEndDateValidity(endDate)
-  }, [infoNoticeVacancies, endDate])
+  }, [infoNoticeVacancies, endDate, evaluateEndDateValidity])
 
   const isValid = startDate < endDate && description !== '' && isEndDateValid
   const queryClient = useQueryClient()
@@ -91,7 +91,7 @@ const CreateInfoNoticePost = ({
     },
   })
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!isValid) {
       toast.error('Noen av verdiene var ikke gyldig, prøv igjen')
