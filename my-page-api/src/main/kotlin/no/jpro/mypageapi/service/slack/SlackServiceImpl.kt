@@ -53,6 +53,9 @@ class SlackServiceImpl(
                                 ),
                             )
                         ).build(),
+                        SectionBlock.builder().text(
+                            markdownText("*Tagger:* ${jobPosting.tags.map { tag -> tag.name }.joinToString(", ")}")
+                        ).build(),
                     )
                 )
             }
