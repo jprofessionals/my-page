@@ -91,7 +91,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       callback: (response) => setUserToken(response.credential),
     })
 
-    window.google.accounts.id.prompt((notification) => {
+    window.google.accounts.id.prompt(() => {
       const signInDiv = document.getElementById('signInDiv')
       if (signInDiv)
         window.google.accounts.id.renderButton(signInDiv, {

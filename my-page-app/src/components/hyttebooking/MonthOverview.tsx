@@ -2,13 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { MonthCalendar } from '@/components/ui/monthCalendar'
 import ApiService from '@/services/api.service'
-import {
-  Apartment,
-  Booking,
-  DrawingPeriod,
-  InfoBooking,
-  Settings
-} from '@/types'
+import { Apartment, Booking, DrawingPeriod, InfoBooking } from '@/types'
 import { toast } from 'react-toastify'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { add, format, isAfter, isBefore, sub } from 'date-fns'
@@ -37,13 +31,18 @@ export default function MonthOverview() {
     },
   )
 
-  const { data: yourPendingBookings, refetch: refetchYourPendingBookings } = useQuery<Booking[]>(
-    'yourPendingBookingsOutline',
-    async () => {
+  const { data: yourPendingBookings, refetch: refetchYourPendingBookings } =
+    useQuery<Booking[]>('yourPendingBookingsOutline', async () => {
       const yourPendingBookings = await ApiService.getPendingBookingsForUser()
       return yourPendingBookings
-    },
-  )
+    })
+
+  const { data: allPendingBookingTrains, refetch: refetchPendingBookings } =
+    useQuery('allPendingBookingsAllApartments', async () => {
+      const fetchedPendingBookingsTrains =
+        await ApiService.getAllPendingBookingTrainsForAllApartments()
+      return fetchedPendingBookingsTrains
+    })
 
   const startDateBookings = format(
     sub(new Date(), { months: 6, days: 7 }),
@@ -73,21 +72,26 @@ export default function MonthOverview() {
   const getBookingsOnDay = (date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd')
     const bookingsOnDay = getBookings(dateString)
-    if(yourPendingBookings) {
-      bookingsOnDay.push(...yourPendingBookings.filter(pb => pendingBookingIsOnDay(date, pb) &&
-          !bookingsOnDay.some(book => book.apartment.id == pb.apartment.id)));
+    if (yourPendingBookings) {
+      bookingsOnDay.push(
+        ...yourPendingBookings.filter(
+          (pb) =>
+            pendingBookingIsOnDay(date, pb) &&
+            !bookingsOnDay.some((book) => book.apartment.id == pb.apartment.id),
+        ),
+      )
     }
     setBookingItems(bookingsOnDay)
   }
 
-  function pendingBookingIsOnDay(date: Date, booking: Booking){
+  function pendingBookingIsOnDay(date: Date, booking: Booking) {
     const startDate = new Date(booking.startDate)
     startDate.setHours(0)
     const endDate = new Date(booking.endDate)
     endDate.setHours(0)
 
-    let b = startDate<=date && endDate>=date;
-    return b;
+    const b = startDate <= date && endDate >= date
+    return b
   }
 
   const { data: allInfoNotices } = useQuery<InfoBooking[]>(
@@ -122,7 +126,7 @@ export default function MonthOverview() {
       const user = response.data
       const adminStatus = user.admin
       setUserIsAdmin(adminStatus)
-    } catch (e) {
+    } catch {
       toast.error('Kunne ikke hente brukers admin status')
     }
   }
@@ -139,9 +143,7 @@ export default function MonthOverview() {
   }
 
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
-  const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(
-    null,
-  )
+  const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null)
 
   const openDeleteModal = (booking: Booking | null) => {
     setBookingToDelete(booking)
@@ -153,8 +155,8 @@ export default function MonthOverview() {
   }
 
   const confirmDelete = () => {
-    if(bookingToDelete?.isPending){
-        handleDeletePendingBooking(bookingToDelete?.id || null)
+    if (bookingToDelete?.isPending) {
+      handleDeletePendingBooking(bookingToDelete?.id || null)
     } else {
       if (userIsAdmin) {
         handleAdminDeleteBooking(bookingToDelete?.id || null)
@@ -237,7 +239,7 @@ export default function MonthOverview() {
 
   const deletePendingBookingById = async (pendingBookingId: number | null) => {
     try {
-      if(userIsAdmin){
+      if (userIsAdmin) {
         await ApiService.adminDeletePendingBooking(pendingBookingId)
       } else {
         await ApiService.deletePendingBooking(pendingBookingId)
@@ -395,7 +397,9 @@ export default function MonthOverview() {
     useState<VacancyLoadingStatus>('init')
   const { userFetchStatus, settings } = useAuthContext()
 
-  const [cutOffDateVacancies, setCutOffDateVacancies] = useState<string | undefined>(getSetting(settings, 'CUTOFF_DATE_VACANCIES'))
+  const [cutOffDateVacancies, setCutOffDateVacancies] = useState<
+    string | undefined
+  >(getSetting(settings, 'CUTOFF_DATE_VACANCIES'))
 
   const [vacancies, setVacancies] = useState<
     { [key: number]: string[] } | undefined
@@ -419,12 +423,12 @@ export default function MonthOverview() {
         await refetchYourPendingBookings()
         setVacancyLoadingStatus('completed')
         setVacancies(loadedVacancies)
-      } catch (e) {
+      } catch {
         setVacancyLoadingStatus('failed')
         toast.error('Klarte ikke laste ledige reservasjoner, prøv igjen senere')
       }
     }
-  }, [cutOffDateVacancies])
+  }, [cutOffDateVacancies, refetchPendingBookings, refetchYourPendingBookings, startDateVacancies])
 
   type InfoNoticeVacancyLoadingStatus =
     | 'init'
@@ -449,13 +453,13 @@ export default function MonthOverview() {
         )
       setInfoNoticeVacancyLoadingStatus('completed')
       setInfoNoticeVacancies(loadedInfoNoticeVacancies)
-    } catch (e) {
+    } catch {
       setInfoNoticeVacancyLoadingStatus('failed')
       toast.error(
         'Klarte ikke laste dager ledige for informasjonsnotiser, prøv igjen senere',
       )
     }
-  }, [])
+  }, [startDateBookings, endDateBookings])
 
   useEffect(() => {
     if (vacancyLoadingStatus !== 'init') return
@@ -464,7 +468,7 @@ export default function MonthOverview() {
       getAllApartments()
       getUserIsAdmin()
     }
-  }, [userFetchStatus, vacancyLoadingStatus])
+  }, [userFetchStatus, vacancyLoadingStatus, refreshVacancies])
 
   useEffect(() => {
     if (infoNoticeVacancyLoadingStatus !== 'init') return
@@ -472,7 +476,7 @@ export default function MonthOverview() {
       fetchAllUsers()
       refreshInfoNoticeVacancies()
     }
-  }, [userIsAdmin, infoNoticeVacancyLoadingStatus])
+  }, [userIsAdmin, infoNoticeVacancyLoadingStatus, refreshInfoNoticeVacancies])
 
   const [prevSettings, setPrevSettings] = useState(settings)
   if (settings != prevSettings) {
@@ -520,9 +524,15 @@ export default function MonthOverview() {
     const availableApartments: Apartment[] = []
     const vacantApartmentsInPeriod = getVacantApartments(selectedDate)
     for (const apartment of apartments) {
-      if (vacantApartmentsInPeriod.includes(apartment.id!) &&(
-          userIsAdmin ||
-          !yourPendingBookings?.some(pb=> pb.apartment.id == apartment.id && pendingBookingIsOnDay(selectedDate, pb) ))) {
+      if (
+        vacantApartmentsInPeriod.includes(apartment.id!) &&
+        (userIsAdmin ||
+          !yourPendingBookings?.some(
+            (pb) =>
+              pb.apartment.id == apartment.id &&
+              pendingBookingIsOnDay(selectedDate, pb),
+          ))
+      ) {
         availableApartments.push(apartment)
       }
     }
@@ -530,14 +540,6 @@ export default function MonthOverview() {
     return vacantApartmentsOnDay
   }
 
-  const { data: allPendingBookingTrains, refetch: refetchPendingBookings } = useQuery(
-    'allPendingBookingsAllApartments',
-    async () => {
-      const fetchedPendingBookingsTrains =
-        await ApiService.getAllPendingBookingTrainsForAllApartments()
-      return fetchedPendingBookingsTrains
-    },
-  )
   const getPendingBookingTrainsOnDay = (date: string) => {
     if (!allPendingBookingTrains) {
       return []
@@ -562,9 +564,9 @@ export default function MonthOverview() {
     return filteredPendingBookingTrainsAllApartments
   }
 
-  const [pendingBookingsOnDay, setPendingBookingsOnDay] = useState<
-    Booking[]
-  >([])
+  const [pendingBookingsOnDay, setPendingBookingsOnDay] = useState<Booking[]>(
+    [],
+  )
   const getPendingBookingsOnDay = (selectedDate: Date) => {
     const pendingBookingsOnDayArrayOfArray = []
     const selectedDateString = selectedDate.toString()
@@ -600,9 +602,7 @@ export default function MonthOverview() {
     return drawingPeriodsOnDayList
   }
 
-  const [pendingBookingList, setPendingBookingList] = useState<
-    Booking[][]
-  >([])
+  const [pendingBookingList, setPendingBookingList] = useState<Booking[][]>([])
 
   const getPendBookingListFromDrawPeriod = (selectedDate: Date) => {
     const drawingPeriodsOnDay = getDrawingPeriodsOnDay(selectedDate)
@@ -668,56 +668,71 @@ export default function MonthOverview() {
   const cabinOrder = ['Stor leilighet', 'Liten leilighet', 'Annekset']
 
   function formatDrawing(drawingPeriod: DrawingPeriod) {
+    const autoDrawingDate: Date = drawingPeriod.pendingBookings.reduce(
+      (earliest, booking) => {
+        let bookingCreatedDate: Date
+        if (booking.createdDate) {
+          bookingCreatedDate = new Date(booking.createdDate)
+        } else {
+          bookingCreatedDate = new Date()
+        }
+        return earliest < bookingCreatedDate ? earliest : bookingCreatedDate
+      },
+      new Date(),
+    )
+    autoDrawingDate.setDate(autoDrawingDate.getDate() + 7)
 
-    let autoDrawingDate: Date = drawingPeriod.pendingBookings.reduce((earliest, booking) => {
-      let bookingCreatedDate : Date
-      if(booking.createdDate){
-        bookingCreatedDate= new Date(booking.createdDate)
-      } else {
-        bookingCreatedDate= new Date()
-      }
-      return earliest < bookingCreatedDate ? earliest : bookingCreatedDate;
-    }, new Date());
-    autoDrawingDate.setDate(autoDrawingDate.getDate()+7)
+    const earliestStartDate = drawingPeriod.pendingBookings.reduce(
+      (earliest, booking) => {
+        const bookingStartDate = new Date(booking.startDate)
+        return earliest < bookingStartDate ? earliest : bookingStartDate
+      },
+      new Date(drawingPeriod.pendingBookings[0].startDate),
+    )
 
-    let earliestStartDate = drawingPeriod.pendingBookings.reduce((earliest, booking) => {
-      const bookingStartDate = new Date(booking.startDate);
-      return earliest < bookingStartDate ? earliest : bookingStartDate;
-    }, new Date(drawingPeriod.pendingBookings[0].startDate));
-
-    let manualDrawingNotice='';
-    if(autoDrawingDate >= earliestStartDate){
-      manualDrawingNotice = 'Oppholdet starter før automatisk trekningsdato. Kontakt Roger for manuell trekning'
+    let manualDrawingNotice = ''
+    if (autoDrawingDate >= earliestStartDate) {
+      manualDrawingNotice =
+        'Oppholdet starter før automatisk trekningsdato. Kontakt Roger for manuell trekning'
     }
 
-    return <>
-      {drawingPeriod.pendingBookings[0].apartment.cabin_name}{' '}
-      fra{' '}
-      {format(new Date(drawingPeriod.startDate), 'dd.MM.yyyy')}{' '}
-      til{' '}
-      {format(new Date(drawingPeriod.endDate), 'dd.MM.yyyy')}.{' '}
-      Planlagt trekning{' '}
-      {format(autoDrawingDate, 'dd.MM.yyyy')}{' '}
-      {manualDrawingNotice && <><br /><i><b>{manualDrawingNotice}</b></i></>}
-    </>;
+    return (
+      <>
+        {drawingPeriod.pendingBookings[0].apartment.cabin_name} fra{' '}
+        {format(new Date(drawingPeriod.startDate), 'dd.MM.yyyy')} til{' '}
+        {format(new Date(drawingPeriod.endDate), 'dd.MM.yyyy')}. Planlagt
+        trekning {format(autoDrawingDate, 'dd.MM.yyyy')}{' '}
+        {manualDrawingNotice && (
+          <>
+            <br />
+            <i>
+              <b>{manualDrawingNotice}</b>
+            </i>
+          </>
+        )}
+      </>
+    )
   }
 
   return (
     <div className="flex flex-col overflow-hidden gap-4 p-4">
-      {cutOffDateVacancies==null ? "Fant ikke innstilling for siste reserverbare dato" : (
-      <MonthCalendar
-        onDayClick={handleDateClick}
-        mode="single"
-        selected={date}
-        onSelect={setDate}
-        className="rounded-md border"
-        cutOffDateVacancies={cutOffDateVacancies}
-        getBookings={getBookings}
-        yourBookings={yourBookings}
-        bookings={bookings}
-        getPendingBookingTrainsOnDay={getPendingBookingTrainsOnDay}
-        getInfoNotices={getInfoNotices}
-      /> )}
+      {cutOffDateVacancies == null ? (
+        'Fant ikke innstilling for siste reserverbare dato'
+      ) : (
+        <MonthCalendar
+          onDayClick={handleDateClick}
+          mode="single"
+          selected={date}
+          onSelect={setDate}
+          className="rounded-md border"
+          cutOffDateVacancies={cutOffDateVacancies}
+          getBookings={getBookings}
+          yourBookings={yourBookings}
+          bookings={bookings}
+          getPendingBookingTrainsOnDay={getPendingBookingTrainsOnDay}
+          getInfoNotices={getInfoNotices}
+        />
+      )}
       <Modal
         className=""
         isOpen={showModal}
@@ -739,7 +754,8 @@ export default function MonthOverview() {
               {date ? (
                 <div>
                   <h3 className="mt-1 mb-1">{format(date!, 'dd.MM.yyyy')}</h3>
-                  {cutOffDateVacancies!=null && isBefore(date!, new Date(cutOffDateVacancies)) ? null : (
+                  {cutOffDateVacancies != null &&
+                  isBefore(date!, new Date(cutOffDateVacancies)) ? null : (
                     <p> Denne dagen er ikke åpnet for reservasjon enda.</p>
                   )}
                   {infoNotices.length > 0 ? (
@@ -889,10 +905,12 @@ export default function MonthOverview() {
                           )
                           const formattedEndDate = format(endDate, 'dd.MM.yyyy')
 
-                          const isYourBooking = !booking.isPending && yourBookings?.some(
-                            (yourBooking) => yourBooking.id === booking.id,
-                          ) || booking.isPending //only pending booking belonging to the user are in bookingItems
-
+                          const isYourBooking =
+                            (!booking.isPending &&
+                              yourBookings?.some(
+                                (yourBooking) => yourBooking.id === booking.id,
+                              )) ||
+                            booking.isPending //only pending booking belonging to the user are in bookingItems
 
                           const prevCabinName =
                             index > 0
@@ -918,7 +936,13 @@ export default function MonthOverview() {
                                   <>
                                     <div className="flex flex-col">
                                       <div className="flex-row justify-between items-center space-x-2">
-                                        <span style={{ fontStyle: booking.isPending ? 'italic' : 'normal' }}>
+                                        <span
+                                          style={{
+                                            fontStyle: booking.isPending
+                                              ? 'italic'
+                                              : 'normal',
+                                          }}
+                                        >
                                           {isYourBooking
                                             ? `Du ${booking.isPending ? 'ønsker' : 'har'} hytten fra ${formattedStartDate} til ${formattedEndDate}.`
                                             : `${booking.employeeName} har hytten fra ${formattedStartDate} til ${formattedEndDate}.`}
@@ -946,7 +970,10 @@ export default function MonthOverview() {
                                           style={customModalStyles}
                                         >
                                           <p className="mb-3">
-                                            Er du sikker på at du vil slette {booking.isPending ? 'den ønskede ':''}
+                                            Er du sikker på at du vil slette{' '}
+                                            {booking.isPending
+                                              ? 'den ønskede '
+                                              : ''}
                                             reservasjonen?
                                           </p>
                                           <div className="flex justify-end">
@@ -965,16 +992,19 @@ export default function MonthOverview() {
                                           </div>
                                         </Modal>
                                       </div>
-                                      {showEditFormForBooking===booking.id && cutOffDateVacancies!=null && (
-                                        <EditBooking
-                                          booking={booking}
-                                          closeModal={closeModal}
-                                          refreshVacancies={refreshVacancies}
-                                          userIsAdmin={userIsAdmin}
-                                          cutOffDateVacancies={cutOffDateVacancies}
-                                          apartments={apartments}
-                                        />
-                                      )}
+                                      {showEditFormForBooking === booking.id &&
+                                        cutOffDateVacancies != null && (
+                                          <EditBooking
+                                            booking={booking}
+                                            closeModal={closeModal}
+                                            refreshVacancies={refreshVacancies}
+                                            userIsAdmin={userIsAdmin}
+                                            cutOffDateVacancies={
+                                              cutOffDateVacancies
+                                            }
+                                            apartments={apartments}
+                                          />
+                                        )}
                                     </div>
                                   </>
                                 ) : (
@@ -1020,20 +1050,21 @@ export default function MonthOverview() {
                             Reserver
                           </button>
                         </div>
-                        {expandedApartments.includes(apartment.id) && cutOffDateVacancies!=null && (
-                          <div className="expanded-content">
-                            <CreateBookingPost
-                              apartmentId={apartment.id}
-                              date={date}
-                              closeModal={closeModal}
-                              refreshVacancies={refreshVacancies}
-                              userIsAdmin={userIsAdmin}
-                              allUsersNames={allUsersNames}
-                              cutOffDateVacancies={cutOffDateVacancies}
-                              vacancies={vacancies}
-                            />
-                          </div>
-                        )}
+                        {expandedApartments.includes(apartment.id) &&
+                          cutOffDateVacancies != null && (
+                            <div className="expanded-content">
+                              <CreateBookingPost
+                                apartmentId={apartment.id}
+                                date={date}
+                                closeModal={closeModal}
+                                refreshVacancies={refreshVacancies}
+                                userIsAdmin={userIsAdmin}
+                                allUsersNames={allUsersNames}
+                                cutOffDateVacancies={cutOffDateVacancies}
+                                vacancies={vacancies}
+                              />
+                            </div>
+                          )}
                       </div>
                     ))}
                 </div>
@@ -1130,34 +1161,34 @@ export default function MonthOverview() {
               {drawingPeriodListOnDay.map((drawingPeriod, index) => (
                 <div key={index}>
                   <div
-                      className={`mt-1 mb-1 ${
-                          cabinPendingBorderColorClasses[
-                              drawingPeriod.pendingBookings[0].apartment.cabin_name
-                              ]
-                      } pl-2 border-l-2 `}
+                    className={`mt-1 mb-1 ${
+                      cabinPendingBorderColorClasses[
+                        drawingPeriod.pendingBookings[0].apartment.cabin_name
+                      ]
+                    } pl-2 border-l-2 `}
                   >
                     <span>
                       {formatDrawing(drawingPeriod)}
-                      <br/>
+                      <br />
                       Involverte er:{' '}
                       {drawingPeriod.pendingBookings.map(
-                          (pendingBooking, bookingIndex) => (
-                              <span key={bookingIndex}>
+                        (pendingBooking, bookingIndex) => (
+                          <span key={bookingIndex}>
                             {pendingBooking.employeeName}
-                                {bookingIndex !==
-                                    drawingPeriod.pendingBookings.length - 1 && ', '}
+                            {bookingIndex !==
+                              drawingPeriod.pendingBookings.length - 1 && ', '}
                           </span>
-                          ),
+                        ),
                       )}
                     </span>
 
                     {pendingBookingList[index] && userIsAdmin && (
-                        <ConvertPendingBooking
-                            pendingBookingList={pendingBookingList[index]}
-                            closeModal={closeModal}
-                            refreshVacancies={refreshVacancies}
-                            userIsAdmin={userIsAdmin}
-                        />
+                      <ConvertPendingBooking
+                        pendingBookingList={pendingBookingList[index]}
+                        closeModal={closeModal}
+                        refreshVacancies={refreshVacancies}
+                        userIsAdmin={userIsAdmin}
+                      />
                     )}
                   </div>
                 </div>

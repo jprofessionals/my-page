@@ -13,8 +13,9 @@ import {
 
 type Props = {
   budget: Budget
-  refreshBudgets: Function
+  refreshBudgets: () => void
   showActions: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   post: any
 }
 const Post = ({ refreshBudgets, post, budget, showActions }: Props) => {

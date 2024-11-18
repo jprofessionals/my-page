@@ -1,5 +1,5 @@
 import React from 'react'
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 import ApiService from '@/services/api.service'
 import { Booking } from '@/types'
 import { toast } from 'react-toastify'
@@ -27,7 +27,7 @@ const ConvertPendingBooking = ({
         queryClient.invalidateQueries('bookings')
         await queryClient.refetchQueries('yourBookingsOutline')
         refreshVacancies()
-      } catch (error) {
+      } catch {
         toast.error('Trekningen er allerede utført')
       }
     }

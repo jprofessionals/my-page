@@ -2,13 +2,13 @@ import Post from './Post'
 import CreateBudgetPost from './CreateBudgetPost'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  IconDefinition,
   faGraduationCap,
   faHome,
   faLaptop,
   faMoneyBill,
   faPhone,
   faPlus,
+  IconDefinition,
 } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 import RequireAdmin from '../../utils/RequireAdmin'
@@ -23,7 +23,7 @@ type Props = {
   budget: Budget
   isActive: boolean
   setActiveId: (id: string) => void
-  refreshBudgets: any
+  refreshBudgets: () => void
   type: 'list' | 'tiles'
 }
 
@@ -69,20 +69,10 @@ const budgetConfigs: Record<
 
 const BudgetItem = ({ budget, refreshBudgets, type }: Props) => {
   const { posts } = budget
-  const [cardItem, setCardItem] = useState<any>()
+  const [showCreateBudgetPost, setShowCreateBudgetPost] = useState(false)
 
   const handleAddBudgetItem = () => {
-    if (!cardItem) {
-      setCardItem(
-        <CreateBudgetPost
-          budget={budget}
-          refreshBudgets={refreshBudgets}
-          toggle={setCardItem}
-        />,
-      )
-    } else {
-      setCardItem(null)
-    }
+    setShowCreateBudgetPost(true)
   }
 
   const budgetConfig = get(
@@ -128,14 +118,23 @@ const BudgetItem = ({ budget, refreshBudgets, type }: Props) => {
                 className="text-xl rounded-full btn btn-info btn-sm"
               >
                 <FontAwesomeIcon
-                  className={cn(cardItem ? 'rotate-45' : '', 'transition-all')}
+                  className={cn(
+                    showCreateBudgetPost ? 'rotate-45' : '',
+                    'transition-all',
+                  )}
                   icon={faPlus}
-                  title={cardItem ? 'Avbryt' : 'Legg til ny post'}
+                  title={showCreateBudgetPost ? 'Avbryt' : 'Legg til ny post'}
                 />
               </button>
             </RequireAdmin>
           </div>
-          {cardItem}
+          {showCreateBudgetPost ? (
+            <CreateBudgetPost
+              budget={budget}
+              refreshBudgets={refreshBudgets}
+              toggle={() => setShowCreateBudgetPost(false)}
+            />
+          ) : null}
           {posts.length > 0 ? (
             posts
               .sort((a, b) => (a.date < b.date ? 1 : -1))

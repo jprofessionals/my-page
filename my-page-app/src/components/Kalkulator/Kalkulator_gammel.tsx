@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
 // import moment from 'moment'
@@ -127,44 +127,44 @@ function Kalkulator_gammel() {
   //   setTimeprisKompetanse(e.target.value)
   // }
 
-  const handleAntallTimerMndChange = (e: any) => {
-    setAntallTimerMnd(e.target.value)
+  const handleAntallTimerMndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAntallTimerMnd(Number(e.target.value))
   }
 
-  const handleRestKompetanseBudsjettChange = (e: any) => {
-    setRestKompetanseBudsjett(e.target.value)
+  const handleRestKompetanseBudsjettChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRestKompetanseBudsjett(Number(e.target.value))
   }
 
-  const handleTimeprisProsjektChange = (e: any) => {
-    setTimeprisProsjekt(e.target.value)
+  const handleTimeprisProsjektChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTimeprisProsjekt(Number(e.target.value))
   }
 
-  const handleAntallTimerFakturertChange = (e: any) => {
-    setAntallTimerFakturert(e.target.value)
+  const handleAntallTimerFakturertChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAntallTimerFakturert(Number(e.target.value))
   }
 
-  const handleAntallTimerKompetanseChange = (e: any) => {
-    setAntallTimerKompetanse(e.target.value)
+  const handleAntallTimerKompetanseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAntallTimerKompetanse(Number(e.target.value))
   }
 
-  const handleAntallTimerInterntidChange = (e: any) => {
-    setAntallTimerInterntid(e.target.value)
+  const handleAntallTimerInterntidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAntallTimerInterntid(Number(e.target.value))
   }
 
-  const handleAntallTimerInterntidMedKomChange = (e: any) => {
-    setAntallTimerInterntidMedKom(e.target.value)
+  const handleAntallTimerInterntidMedKomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAntallTimerInterntidMedKom(Number(e.target.value))
   }
 
-  const handleAntallTimerFerieChange = (e: any) => {
-    setAntallTimerFerie(e.target.value)
+  const handleAntallTimerFerieChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAntallTimerFerie(Number(e.target.value))
   }
 
-  const handleAntallTimerSykChange = (e: any) => {
-    setAntallTimerSyk(e.target.value)
+  const handleAntallTimerSykChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAntallTimerSyk(Number(e.target.value))
   }
 
-  const handleBonusChange = (e: any) => {
-    setBonus(e.target.value)
+  const handleBonusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBonus(Number(e.target.value))
   }
 
   return (

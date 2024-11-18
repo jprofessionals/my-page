@@ -43,7 +43,7 @@ export const JobPostingModal = ({
   const { user } = useAuthContext()
   const { data: customers } = useJobPostingCustomers()
   const { data: tagOptions } = useJobPostingTags()
-  const [id, setId] = useState(jobPosting ? jobPosting.id : 0)
+  const [id] = useState(jobPosting ? jobPosting.id : 0)
   const [title, setTitle] = useState(jobPosting ? jobPosting.title : '')
   const [customer, setCustomer] = useState<Customer | null>(
     jobPosting ? jobPosting.customer : null,
@@ -62,7 +62,7 @@ export const JobPostingModal = ({
     new DataTransfer().files,
   )
   const [filesToDelete, setFilesToDelete] = useState<JobPostingFilesType>([])
-  const [links, setLinks] = useState(jobPosting ? jobPosting.links : [])
+  const [links] = useState(jobPosting ? jobPosting.links : [])
   const [tags, setTags] = useState(jobPosting ? jobPosting.tags : [])
   const [tagInputValue, setTagInputValue] = useState('')
 
@@ -135,7 +135,7 @@ export const JobPostingModal = ({
                   options={customers}
                   getOptionLabel={(option) => option.name}
                   value={customer}
-                  onChange={(event: any, newValue: Customer | null) => {
+                  onChange={(event, newValue: Customer | null) => {
                     setCustomer(newValue)
                   }}
                   onInputChange={(event, newInputValue, reason) => {
@@ -233,7 +233,7 @@ export const JobPostingModal = ({
                     })
 
                     const filter = createFilterOptions<Tag>()
-                    let filtered = filter(filteredOptions, params)
+                    const filtered = filter(filteredOptions, params)
 
                     const isExistingOption = options.some((option) => {
                       const optionName =

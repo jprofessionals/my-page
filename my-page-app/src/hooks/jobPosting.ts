@@ -181,8 +181,6 @@ export const usePostJobPosting = () => {
   return useMutation(
     async ({
       newJobPosting,
-      filesToUpload,
-      filesToDelete,
     }: {
       newJobPosting: JobPosting
       filesToUpload?: FileList
@@ -232,8 +230,6 @@ export const usePutJobPosting = () => {
   return useMutation(
     async ({
       updatedJobPosting,
-      filesToUpload,
-      filesToDelete,
     }: {
       updatedJobPosting: JobPosting
       filesToUpload?: FileList
