@@ -81,7 +81,16 @@ export const JobPosting = (jobPosting: JobPostingType) => {
               </h2>
               <p className="text-gray-700 text-left">{jobPosting.customer.name}</p>
             </div>
-
+            <div className="flex flex-wrap gap-2 mb-2 items-center">
+              {jobPosting.tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded"
+                >
+              {tag.name}
+            </span>
+              ))}
+            </div>
             <div className="flex flex-col items-start w-[200px]">
               <p className="text-sm text-left font-bold text-gray-800">Frist</p>
               <p className="text-sm text-gray-700 text-left">{formattedDeadline}</p>
@@ -115,16 +124,6 @@ export const JobPosting = (jobPosting: JobPostingType) => {
       </Accordion.Header>
 
       <Accordion.Content className="p-4 bg-white">
-        <div className="flex flex-wrap gap-2 mb-2">
-          {jobPosting.tags.map((tag) => (
-            <span
-              key={tag.id}
-              className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded"
-            >
-              {tag.name}
-            </span>
-          ))}
-        </div>
         <p className="text-gray-800 whitespace-pre-line">
           {jobPosting.description}
         </p>
