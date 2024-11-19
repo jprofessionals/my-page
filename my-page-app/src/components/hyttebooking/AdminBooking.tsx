@@ -3,7 +3,7 @@ import ApiService, { API_URL } from '@/services/api.service'
 import { toast } from 'react-toastify'
 import { Button } from '@/components/ui/button'
 import { differenceInDays } from 'date-fns'
-import { useMutation } from 'react-query'
+import { useMutation } from '@tanstack/react-query'
 import { Apartment, BookingPost } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
@@ -121,15 +121,18 @@ export default function AdminBooking() {
     apartmentId > 0 &&
     differenceInDays(new Date(endDate), new Date(startDate)) <= 7
 
-  const { mutate } = useMutation(createBooking, {
+  const { mutate } = useMutation({
+    mutationFn: createBooking,
+
     onSuccess: () => {
       setIsLoadingPost(false)
       toast.success('Lagret reservasjon')
     },
+
     onError: (error: string) => {
       setIsLoadingPost(false)
       toast.error(error)
-    },
+    }
   })
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

@@ -5,13 +5,14 @@ import {
   FileUpload,
   getJobPostingCustomers,
   getJobPostingFiles,
-  getJobPostings, getJobPostingTags,
+  getJobPostings,
+  getJobPostingTags,
   JobPosting,
   JobPostingFiles,
   updateJobPosting,
   uploadJobPostingFile,
 } from '@/data/types'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import authHeader from '@/services/auth-header'
 import { useAuthContext } from '@/providers/AuthProvider'
 
@@ -23,8 +24,8 @@ const jobPostingTagsCacheName = 'job-posting-tags'
 export const useDeleteJobPosting = () => {
   const queryClient = useQueryClient()
 
-  return useMutation(
-    async (id: number) => {
+  return useMutation({
+    mutationFn: async (id: number) => {
       return await deleteJobPosting({
         path: {
           id: id,
@@ -33,19 +34,18 @@ export const useDeleteJobPosting = () => {
         baseUrl: '/api',
       })
     },
-    {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries(jobPostingsCacheName)
-      },
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [jobPostingsCacheName] })
     },
-  )
+  })
 }
 
 export const useDeleteJobPostingFiles = () => {
   const queryClient = useQueryClient()
 
-  return useMutation(
-    async ({
+  return useMutation({
+    mutationFn: async ({
       jobPostingId,
       fileName,
     }: {
@@ -61,15 +61,13 @@ export const useDeleteJobPostingFiles = () => {
         baseUrl: '/api',
       })
     },
-    {
-      onSuccess: async (_data, variables) => {
-        await queryClient.invalidateQueries([
-          jobPostingFilesCacheName,
-          variables.jobPostingId,
-        ])
-      },
+
+    onSuccess: async (_data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: [jobPostingFilesCacheName, variables.jobPostingId],
+      })
     },
-  )
+  })
 }
 
 export const useJobPostingCustomers = () => {
@@ -82,7 +80,9 @@ export const useJobPostingCustomers = () => {
     })
   }
 
-  return useQuery(jobPostingCustomersCacheName, fetchJobPostingCustomers, {
+  return useQuery({
+    queryKey: [jobPostingCustomersCacheName],
+    queryFn: fetchJobPostingCustomers,
     select: (result) => result.data,
     enabled: userFetchStatus === 'fetched',
   })
@@ -101,7 +101,9 @@ export const useJobPostingFiles = (id: number) => {
     })
   }
 
-  return useQuery([jobPostingFilesCacheName, id], fetchJobPostingFiles, {
+  return useQuery({
+    queryKey: [jobPostingFilesCacheName, id],
+    queryFn: fetchJobPostingFiles,
     select: (result) => result.data,
     enabled: userFetchStatus === 'fetched',
   })
@@ -110,8 +112,8 @@ export const useJobPostingFiles = (id: number) => {
 export const usePostJobPostingFiles = () => {
   const queryClient = useQueryClient()
 
-  return useMutation(
-    async ({
+  return useMutation({
+    mutationFn: async ({
       jobPostingId,
       newJobPostingFile,
     }: {
@@ -127,15 +129,13 @@ export const usePostJobPostingFiles = () => {
         baseUrl: '/api',
       })
     },
-    {
-      onSuccess: async (_data, variables) => {
-        await queryClient.invalidateQueries([
-          jobPostingFilesCacheName,
-          variables.jobPostingId,
-        ])
-      },
+
+    onSuccess: async (_data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: [jobPostingFilesCacheName, variables.jobPostingId],
+      })
     },
-  )
+  })
 }
 
 export const useJobPostingTags = () => {
@@ -148,7 +148,9 @@ export const useJobPostingTags = () => {
     })
   }
 
-  return useQuery(jobPostingTagsCacheName, fetchJobPostingTags, {
+  return useQuery({
+    queryKey: [jobPostingTagsCacheName],
+    queryFn: fetchJobPostingTags,
     select: (result) => result.data,
     enabled: userFetchStatus === 'fetched',
   })
@@ -167,7 +169,9 @@ export const useJobPostings = (tags: string[] | null) => {
     })
   }
 
-  return useQuery([jobPostingsCacheName, tags], fetchJobPostings, {
+  return useQuery({
+    queryKey: [jobPostingsCacheName, tags],
+    queryFn: fetchJobPostings,
     select: (result) => result.data,
     enabled: userFetchStatus === 'fetched',
   })
@@ -178,8 +182,8 @@ export const usePostJobPosting = () => {
   const { mutate: uploadFile } = usePostJobPostingFiles()
   const { mutate: deleteFile } = useDeleteJobPostingFiles()
 
-  return useMutation(
-    async ({
+  return useMutation({
+    mutationFn: async ({
       newJobPosting,
     }: {
       newJobPosting: JobPosting
@@ -192,33 +196,32 @@ export const usePostJobPosting = () => {
         baseUrl: '/api',
       })
     },
-    {
-      onSuccess: async (data, variables) => {
-        await queryClient.invalidateQueries(jobPostingsCacheName)
 
-        if (variables.filesToUpload && variables.filesToUpload.length > 0) {
-          Array.from(variables.filesToUpload).forEach((file) => {
-            uploadFile({
-              jobPostingId: data.data ? data.data.id : 0,
-              newJobPostingFile: {
-                filename: file.name,
-                content: file,
-              },
-            })
-          })
-        }
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({ queryKey: [jobPostingsCacheName] })
 
-        if (variables.filesToDelete && variables.filesToDelete.length > 0) {
-          variables.filesToDelete.forEach((file) => {
-            deleteFile({
-              jobPostingId: data.data ? data.data.id : 0,
-              fileName: file.name,
-            })
+      if (variables.filesToUpload && variables.filesToUpload.length > 0) {
+        Array.from(variables.filesToUpload).forEach((file) => {
+          uploadFile({
+            jobPostingId: data.data ? data.data.id : 0,
+            newJobPostingFile: {
+              filename: file.name,
+              content: file,
+            },
           })
-        }
-      },
+        })
+      }
+
+      if (variables.filesToDelete && variables.filesToDelete.length > 0) {
+        variables.filesToDelete.forEach((file) => {
+          deleteFile({
+            jobPostingId: data.data ? data.data.id : 0,
+            fileName: file.name,
+          })
+        })
+      }
     },
-  )
+  })
 }
 
 export const usePutJobPosting = () => {
@@ -227,8 +230,8 @@ export const usePutJobPosting = () => {
   const { mutate: uploadFile } = usePostJobPostingFiles()
   const { mutate: deleteFile } = useDeleteJobPostingFiles()
 
-  return useMutation(
-    async ({
+  return useMutation({
+    mutationFn: async ({
       updatedJobPosting,
     }: {
       updatedJobPosting: JobPosting
@@ -244,31 +247,30 @@ export const usePutJobPosting = () => {
         baseUrl: '/api',
       })
     },
-    {
-      onSuccess: async (_data, variables) => {
-        await queryClient.invalidateQueries(jobPostingsCacheName)
 
-        if (variables.filesToUpload && variables.filesToUpload.length > 0) {
-          Array.from(variables.filesToUpload).forEach((file) => {
-            uploadFile({
-              jobPostingId: variables.updatedJobPosting.id,
-              newJobPostingFile: {
-                filename: file.name,
-                content: file,
-              },
-            })
-          })
-        }
+    onSuccess: async (_data, variables) => {
+      await queryClient.invalidateQueries({ queryKey: [jobPostingsCacheName] })
 
-        if (variables.filesToDelete && variables.filesToDelete.length > 0) {
-          variables.filesToDelete.forEach((file) => {
-            deleteFile({
-              jobPostingId: variables.updatedJobPosting.id,
-              fileName: file.name,
-            })
+      if (variables.filesToUpload && variables.filesToUpload.length > 0) {
+        Array.from(variables.filesToUpload).forEach((file) => {
+          uploadFile({
+            jobPostingId: variables.updatedJobPosting.id,
+            newJobPostingFile: {
+              filename: file.name,
+              content: file,
+            },
           })
-        }
-      },
+        })
+      }
+
+      if (variables.filesToDelete && variables.filesToDelete.length > 0) {
+        variables.filesToDelete.forEach((file) => {
+          deleteFile({
+            jobPostingId: variables.updatedJobPosting.id,
+            fileName: file.name,
+          })
+        })
+      }
     },
-  )
+  })
 }
