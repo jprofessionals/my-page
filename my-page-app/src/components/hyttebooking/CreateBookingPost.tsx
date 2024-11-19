@@ -8,7 +8,7 @@ import { Button } from '../ui/button'
 import { BookingPost } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
-import { useMutation, useQueryClient } from 'react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 type Props = {
   apartmentId: number
@@ -139,7 +139,11 @@ const CreateBookingPost = ({
     } else {
       setEndDate(startDate)
     }
-  }, [vacantDaysForApartmentWithoutTakeoverDates, startDate, cutOffDateVacancies])
+  }, [
+    vacantDaysForApartmentWithoutTakeoverDates,
+    startDate,
+    cutOffDateVacancies,
+  ])
 
   const [isLoadingPost, setIsLoadingPost] = useState(false)
   const [bookingOwnerName, setBookingOwnerName] = useState<string>('')
@@ -153,17 +157,22 @@ const CreateBookingPost = ({
     (!userIsAdmin || bookingOwnerName !== '')
 
   const queryClient = useQueryClient()
-  const { mutate } = useMutation(createBooking, {
+  const { mutate } = useMutation({
+    mutationFn: createBooking,
+
     onSuccess: () => {
       closeModal()
-      queryClient.invalidateQueries('yourBookingsOutline')
-      queryClient.invalidateQueries('bookings')
-      queryClient.invalidateQueries('yourBookingsButton')
-      queryClient.invalidateQueries('allPendingBookingsAllApartments')
+      queryClient.invalidateQueries({ queryKey: ['yourBookingsOutline'] })
+      queryClient.invalidateQueries({ queryKey: ['bookings'] })
+      queryClient.invalidateQueries({ queryKey: ['yourBookingsButton'] })
+      queryClient.invalidateQueries({
+        queryKey: ['allPendingBookingsAllApartments'],
+      })
       setIsLoadingPost(false)
       toast.success('Lagret reservasjon')
       refreshVacancies()
     },
+
     onError: (error: string) => {
       setIsLoadingPost(false)
       toast.error(error)
