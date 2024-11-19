@@ -1,5 +1,5 @@
 import React from 'react'
-import { useQueryClient } from 'react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import ApiService from '@/services/api.service'
 import { Booking } from '@/types'
 import { toast } from 'react-toastify'
@@ -24,8 +24,8 @@ const ConvertPendingBooking = ({
         await ApiService.pickWinnerPendingBooking(pendingBookingList)
         toast.success('Trekning fullført')
         closeModal()
-        queryClient.invalidateQueries('bookings')
-        await queryClient.refetchQueries('yourBookingsOutline')
+        queryClient.invalidateQueries({ queryKey: ['bookings'] })
+        await queryClient.refetchQueries({ queryKey: ['yourBookingsOutline'] })
         refreshVacancies()
       } catch {
         toast.error('Trekningen er allerede utført')

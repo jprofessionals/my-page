@@ -7,7 +7,7 @@ import { Button } from '../ui/button'
 import { EditedInfoNotice, InfoBooking } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
-import { useMutation, useQueryClient } from 'react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { isBefore } from 'date-fns'
 
 const editExistingInfoNotice = async ({
@@ -61,14 +61,17 @@ const EditInfoNotice = ({
     isBefore(new Date(startDate), new Date(endDate)) && description !== ''
 
   const queryClient = useQueryClient()
-  const { mutate } = useMutation(editExistingInfoNotice, {
+  const { mutate } = useMutation({
+    mutationFn: editExistingInfoNotice,
+
     onSuccess: () => {
       closeModal()
-      queryClient.invalidateQueries('infoNotices')
+      queryClient.invalidateQueries({ queryKey: ['infoNotices'] })
       setIsLoadingEdit(false)
       toast.success('Redigert notisen')
       refreshInfoNoticeVacancies()
     },
+
     onError: (error: string) => {
       setIsLoadingEdit(false)
       toast.error(error)
