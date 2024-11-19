@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react'
 import NewEmployeeForm from '@/components/newemployee/NewEmployeeForm'
 import { NewEmployee } from '@/types'
-import { useMutation } from 'react-query'
+import { useMutation } from '@tanstack/react-query'
 import axios, { AxiosError } from 'axios'
 import { API_URL } from '@/services/api.service'
 import authHeader from '@/services/auth-header'
@@ -42,15 +42,18 @@ export default function NewUserModal() {
   const [error, setError] = useState<string | null>(null)
   const [inputData, setInputData] = useState<NewEmployee>(initialInputData)
 
-  const { mutate } = useMutation(createNewEmployee, {
+  const { mutate } = useMutation({
+    mutationFn: createNewEmployee,
+
     onSuccess: () => {
       toast.info('Opprettet bruker')
       resetInputData()
       setError(null)
     },
+
     onError: (error: AxiosError) => {
       toast.error(`Klarte ikke opprette ny bruker: ${error.response?.data}`)
-    },
+    }
   })
 
   const handleClose = () => {
@@ -78,7 +81,7 @@ export default function NewUserModal() {
   }
 
   return (
-     <Modal.Dialog>
+    <Modal.Dialog>
       <Modal.DialogTrigger asChild>
         <Button variant="outline">Legg til ny ansatt</Button>
       </Modal.DialogTrigger>
@@ -102,8 +105,5 @@ export default function NewUserModal() {
         </Modal.DialogFooter>
       </Modal.DialogContent>
     </Modal.Dialog>
-
-
-
   )
 }

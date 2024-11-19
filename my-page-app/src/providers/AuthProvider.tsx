@@ -7,12 +7,12 @@ import {
   useState,
 } from 'react'
 import * as _ from 'radash'
-import { User, Settings } from '@/types'
+import { Settings, User } from '@/types'
 import ApiService from '@/services/api.service'
 import config from '../config/config'
 import { useSessionStorage } from 'usehooks-ts'
 import { useRouter } from 'next/router'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 
 type UserFetchStatus =
   | 'init'
@@ -100,12 +100,18 @@ export function AuthProvider({ children }: PropsWithChildren) {
           size: 'medium',
           text: 'continue_with',
           shape: 'rectangular',
-          logo_alignment:'left'
+          logo_alignment: 'left',
         })
-     })
+    })
   }
 
-  const { data: settings } = useQuery<Settings[]>('settingsQueryKey', async () => {return await ApiService.getSettings()} )
+  const { data: settings } = useQuery({
+    queryKey: ['settingsQueryKey'],
+
+    queryFn: async () => {
+      return await ApiService.getSettings()
+    },
+  })
 
   return (
     <Context.Provider
@@ -117,7 +123,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         authenticate,
         userFetchStatus,
         logout,
-        settings
+        settings,
       }}
     >
       {children}
