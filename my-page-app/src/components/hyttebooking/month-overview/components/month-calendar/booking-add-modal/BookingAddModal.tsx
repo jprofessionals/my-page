@@ -1,5 +1,5 @@
 import Modal from "react-modal";
-import React, {useEffect, useState} from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import {Apartment, BookingPost, User} from "@/types";
 import axios from "axios";
 import ApiService, {API_URL} from "@/services/api.service";
@@ -18,10 +18,12 @@ type Props = {
 
 const BookingAddModal = ({ bookingPost, user, onAbort, onBookingCreated, onCancel }: Props) => {
     const [allApartments, setAllApartments] = useState<Apartment[]>([]);
-    const [asAdmin, setAsAdmin] = useState<boolean>(false); //user.admin
+    const [asAdmin, setAsAdmin] = useState<boolean>(!!user?.admin || false);
     const selectedApartment = allApartments.find(apartment => apartment.id === bookingPost?.apartmentID);
     const bookingOwnerName = ""; //todo useState
     const bookingWithoutDrawing = false; //todo useState
+    const [startDate, setStartDate] = useState<string | undefined>();
+    const [endDate, setEndDate] = useState<string | undefined>();
 
 
     useEffect(() => {
@@ -32,17 +34,23 @@ const BookingAddModal = ({ bookingPost, user, onAbort, onBookingCreated, onCance
         fetchAllApartments();
     }, []);
 
+    useEffect(() => {
+        setStartDate(bookingPost?.startDate)
+        setEndDate(bookingPost?.endDate)
+    }, [bookingPost])
+
 
     const createBooking = async ({ bookingPost }: {
         bookingPost: BookingPost
     }) => {
+        const data = { ...bookingPost, startDate, endDate}
         const url = asAdmin ?
             bookingWithoutDrawing ?
                 `${API_URL}booking/admin/post?bookingOwnerName=${bookingOwnerName}` :
                 `${API_URL}pendingBooking/pendingPostForUser?bookingOwnerName=${bookingOwnerName}`
             : `${API_URL}pendingBooking/pendingPost`;
         return axios
-            .post(url, bookingPost, { headers: authHeader()})
+            .post(url, data, { headers: authHeader()})
             .then((response) => response.data)
             .catch((error) => { throw error?.response?.data || 'En feil oppstod ved lagring'});
     };
@@ -55,6 +63,13 @@ const BookingAddModal = ({ bookingPost, user, onAbort, onBookingCreated, onCance
         }
     }
 
+    const handleStartDateChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setStartDate(e.target.value)
+    }
+
+    const handleEndDateChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setEndDate(e.target.value)
+    }
 
     return (
         <SimpleModal
@@ -63,9 +78,25 @@ const BookingAddModal = ({ bookingPost, user, onAbort, onBookingCreated, onCance
             onRequestClose={onAbort}
             content={
             <>
-                {user?.name}, ønsker du "{selectedApartment?.cabin_name}" i perioden
+                {user?.name}, ønsker du &quot;{selectedApartment?.cabin_name}&quot; i perioden
                 <br/>
-                {bookingPost?.startDate && format(bookingPost.startDate, dateFormat)} til {bookingPost?.endDate && format(bookingPost.endDate, dateFormat)} ?
+                <strong>Startdato:</strong>
+                <input
+                    type="date"
+                    name="startDate"
+                    onChange={handleStartDateChange}
+                    value={startDate}
+                    placeholder={startDate}
+                />
+                <br/>
+                <strong>Sluttdato:</strong>
+                <input
+                    type="date"
+                    name="endDate"
+                    onChange={handleEndDateChange}
+                    value={endDate}
+                    placeholder={endDate}
+                />
             </>
             }
             cancelButton={<Button onClick={onCancel}>Avbryt</Button>}
