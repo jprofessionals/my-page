@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.scss'
 import { ToastContainer } from 'react-toastify'
+import Providers from '@/app/providers'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -38,7 +39,9 @@ export default function RootLayout({
           draggable={true}
           theme="colored"
         />
-        <main data-theme="jpro">{children}</main>
+        <main data-theme="jpro">
+          <Providers>{children}</Providers>
+        </main>
       </body>
     </html>
   )
