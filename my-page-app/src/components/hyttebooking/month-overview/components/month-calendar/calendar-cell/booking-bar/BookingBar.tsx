@@ -6,7 +6,7 @@ import { format } from 'date-fns'
 import classes from "./BookingBar.module.css";
 
 type Props = {
-    booking?: Booking;
+    booking: Booking;
     day: CalendarDay;
     user: User;
     onBookingClick: (booking: Booking) => void;

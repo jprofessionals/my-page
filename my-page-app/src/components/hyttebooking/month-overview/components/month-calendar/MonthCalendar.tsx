@@ -114,6 +114,7 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                             <CalendarDate day={day} />
                             {allApartments.map(apartment => (
                                 <CalendarCell
+                                    key={apartment.id}
                                     day={day}
                                     user={user}
                                     apartment={apartment}
@@ -138,6 +139,7 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                             <CalendarWeekNumber week={week} />
                             {allApartments.map(apartment => (
                                 <CalendarWeekLabel
+                                    key={apartment.id}
                                     cabinName={apartment.cabin_name}
                                     label={apartment.cabin_name.split(" ")[0]}
                                 />

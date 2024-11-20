@@ -61,6 +61,7 @@ const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onBoo
 
             {bookings?.map(booking => (
                 <BookingBar
+                    key={booking.id}
                     day={day}
                     user={user}
                     booking={booking}
