@@ -11,7 +11,7 @@ import { Settings, User } from '@/types'
 import ApiService from '@/services/api.service'
 import config from '../config/config'
 import { useSessionStorage } from 'usehooks-ts'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 
 type UserFetchStatus =
