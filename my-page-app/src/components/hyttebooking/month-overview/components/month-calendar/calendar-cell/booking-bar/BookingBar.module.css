@@ -16,15 +16,15 @@
 }
 
 .bookingBarMinePending {
-    background-color: #8bd8ff;
+    background: repeating-linear-gradient(0deg, #8bd8ff, #8bd8ff 10px, #dadada 10px, #dadada 20px);
 }
 
 .bookingBarTheirs {
-    background-color: rgb(164, 164, 164);
+    background-color: #ff8b8b;
 }
 
 .bookingBarTheirsPending {
-    background-color: rgb(218, 218, 218);
+    background: repeating-linear-gradient(0deg, #ff8b8b, #ff8b8b 10px, #dadada 10px, #dadada 20px);
 }
 
 .bookingBarPeriodStart {
