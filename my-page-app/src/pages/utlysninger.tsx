@@ -19,6 +19,8 @@ export default function Utlysninger() {
   const [tags] = useState<string[]>([])
   const { data: jobPostings } = useJobPostings(tags)
   const { mutate: createJobPosting } = usePostJobPosting()
+    // Definer en konstant for dagens dato
+    const now = new Date()
 
   const activeJobPostings = useMemo(() => {
     return (
@@ -28,7 +30,7 @@ export default function Utlysninger() {
             return true
           } else {
             return (
-              jobPosting.deadline && new Date(jobPosting.deadline) >= new Date()
+              jobPosting.deadline && new Date(jobPosting.deadline) >= now
             )
           }
         })
@@ -46,7 +48,7 @@ export default function Utlysninger() {
           return aVal - bVal
         }) || []
     )
-  }, [jobPostings])
+  }, [jobPostings, now])
 
   const pastJobPostings = useMemo(() => {
     return (
@@ -56,7 +58,7 @@ export default function Utlysninger() {
             return false
           }
           if (jobPosting.deadline) {
-            return new Date(jobPosting.deadline) < new Date()
+            return new Date(jobPosting.deadline) < now
           }
           return true
         })
@@ -70,7 +72,7 @@ export default function Utlysninger() {
           return bVal - aVal
         }) || []
     )
-  }, [jobPostings])
+  }, [jobPostings, now])
 
   const openModal = () => {
     setIsModalOpen(true)
