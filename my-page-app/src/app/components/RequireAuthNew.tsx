@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { CredentialResponse } from 'google-one-tap'
 import Script from 'next/script'
 import config from '@/config/config'
+import { useSessionStorage } from 'usehooks-ts'
 
 export default function RequireAuthNew({
   children,
@@ -11,11 +12,15 @@ export default function RequireAuthNew({
   children: React.ReactNode
 }) {
   const signInDivRef = useRef(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [userToken, setUserToken] = useSessionStorage<string | null>(
+    'user_token',
+    null,
+    { initializeWithValue: false },
+  )
+  const isAuthenticated = useMemo(() => !!userToken, [userToken])
 
   const handleCallbackResponse = (response: CredentialResponse) => {
-    setIsAuthenticated(true)
-    console.log(response.credential)
+    setUserToken(response.credential)
   }
 
   if (isAuthenticated) {

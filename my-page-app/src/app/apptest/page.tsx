@@ -1,13 +1,18 @@
 'use client'
 
-import RequireAuthNew from '@/app/components/requireauthnew'
+import RequireAuth from '@/components/auth/RequireAuth'
+import { useAuthContext } from "@/providers/AuthProvider";
 
 export default function AppTest() {
+
+  const {user} = useAuthContext()
+
   return (
     <>
-      <RequireAuthNew>
+      <RequireAuth>
         <h1>App test</h1>
-      </RequireAuthNew>
+        <p>{user?.name}</p>
+      </RequireAuth>
     </>
   )
 }

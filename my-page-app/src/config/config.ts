@@ -3,7 +3,6 @@ interface Config {
 }
 
 export default function config(): Config {
-  console.log(window.location)
   if (window.location.hostname === 'minside.jpro.no') {
     return {
       googleClientId:
