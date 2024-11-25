@@ -202,7 +202,6 @@ function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: prop
             />
 
             <BookingReadOnlyInfoModal
-                user={user}
                 booking={infoBooking}
                 onCancel={handleInfoBookingClose}
             />
