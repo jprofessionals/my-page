@@ -26,12 +26,14 @@ interface JobPostingModalProps {
   jobPostingFiles?: JobPostingFilesType
   heading: string
   submitText: string
-  onClose: () => void
-  onSubmit: (
+
+  onClose(): void
+
+  onSubmit(
     jobPosting: JobPostingType,
     newFiles: FileList,
     filesToDelete: JobPostingFilesType,
-  ) => void
+  ): void
 }
 
 export const JobPostingModal = ({
