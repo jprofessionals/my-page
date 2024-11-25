@@ -1,6 +1,6 @@
 'use client'
 
-import React, { PropsWithChildren, useEffect, useRef } from 'react'
+import React, { PropsWithChildren, useRef } from 'react'
 import Script from 'next/script'
 import { useAuthContext } from '@/providers/AuthProvider'
 import ErrorPage from '@/components/ErrorPage'
@@ -8,12 +8,6 @@ import ErrorPage from '@/components/ErrorPage'
 function RequireAuth({ children }: PropsWithChildren) {
   const { isAuthenticated, authenticate, userFetchStatus } = useAuthContext()
   const signInDivRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    if (isAuthenticated && window.google?.accounts?.id) {
-      window.google.accounts.id.cancel();
-    }
-  }, [isAuthenticated]);
 
   if (!isAuthenticated || userFetchStatus === 'signedOut') {
     return (
