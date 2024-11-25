@@ -1,7 +1,7 @@
 import {CalendarDay} from "react-day-picker";
 import {Booking, CabinType, InfoBooking} from "@/types";
 import {dateFormat} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
-import {format} from 'date-fns';
+import {format, isAfter, isBefore} from 'date-fns';
 
 
 
@@ -15,4 +15,6 @@ export const getBookingsOnDayAndCabin = (day: CalendarDay, cabinName: CabinType,
 };
 
 export const getInfoNoticesOnDay = (day: CalendarDay, infoNotices: InfoBooking[]) => infoNotices.filter(
-    (infoNotice) => day.date >= infoNotice.startDate && day.date <= infoNotice.endDate) || [];
+    (infoNotice) => {
+        return !isBefore(day.date, infoNotice.startDate) && !isAfter(day.date, infoNotice.endDate);
+    }) || [];

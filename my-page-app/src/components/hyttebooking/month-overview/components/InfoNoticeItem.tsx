@@ -65,22 +65,24 @@ const InfoNoticeItem = ({ infoNoticeIndex, infoNotice, admin,isDayVacantForInfoN
         )}
 
         <MonthOverviewModal open={infoNoticeDeleteModalIsOpen} onClose={onCloseModal} label="Delete Confirmation">
-            <p className="mb-3">
-                Er du sikker på at du vil slette notisen?
-            </p>
+            <div>
+                <p className="mb-3">
+                    Er du sikker på at du vil slette notisen?
+                </p>
 
-            <div className="flex justify-end">
-                <MonthOverviewButton
-                    onClick={onConfirmInfoNoticeDelete}
-                    variant={"red"}
-                    title={"Slett notis"}
-                />
+                <div className="flex justify-end">
+                    <MonthOverviewButton
+                        onClick={onConfirmInfoNoticeDelete}
+                        variant={"red"}
+                        title={"Slett notis"}
+                    />
 
-                <MonthOverviewButton
-                    onClick={onCloseInfoNoticeDeleteModal}
-                    variant={"gray"}
-                    title={"Avbryt"}
-                />
+                    <MonthOverviewButton
+                        onClick={onCloseInfoNoticeDeleteModal}
+                        variant={"gray"}
+                        title={"Avbryt"}
+                    />
+                </div>
             </div>
         </MonthOverviewModal>
 

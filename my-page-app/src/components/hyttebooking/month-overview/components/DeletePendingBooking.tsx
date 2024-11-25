@@ -21,21 +21,23 @@ const DeletePendingBooking = ({ admin, open, onOpenConfirm, onConfirmDelete, onC
                 />
 
                 <MonthOverviewModal open={open} onClose={onClose} label="Delete Confirmation">
-                    <p className="mb-3">
-                        Er du sikker på at du vil slette den ønskede
-                        reservasjonen?
-                    </p>
-                    <div className="flex justify-end">
-                        <MonthOverviewButton
-                            onClick={onConfirmDelete}
-                            variant={"red"}
-                            title={"Slett ønsket reservasjon"}
-                        />
-                        <MonthOverviewButton
-                            onClick={onClose}
-                            variant={"gray"}
-                            title={"Avbryt"}
-                        />
+                    <div>
+                        <p className="mb-3">
+                            Er du sikker på at du vil slette den ønskede
+                            reservasjonen?
+                        </p>
+                        <div className="flex justify-end">
+                            <MonthOverviewButton
+                                onClick={onConfirmDelete}
+                                variant={"red"}
+                                title={"Slett ønsket reservasjon"}
+                            />
+                            <MonthOverviewButton
+                                onClick={onClose}
+                                variant={"gray"}
+                                title={"Avbryt"}
+                            />
+                        </div>
                     </div>
                 </MonthOverviewModal>
             </div>

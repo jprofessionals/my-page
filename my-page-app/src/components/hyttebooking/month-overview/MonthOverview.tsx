@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react'
-import {MonthCalendar} from './components/month-calendar/monthCalendar'
+import {MonthCalendar} from './components/month-calendar/MonthCalendar'
 import ApiService from '@/services/api.service'
 import {
     Apartment,
@@ -13,7 +13,7 @@ import {
 } from '@/types'
 import {toast} from 'react-toastify'
 import {useAuthContext} from '@/providers/AuthProvider'
-import {add, format, isBefore, sub} from 'date-fns'
+import {add, format, isAfter, isBefore, sub} from 'date-fns'
 import {useMutation, useQuery, useQueryClient} from 'react-query'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 import ConvertPendingBooking from '@/components/hyttebooking/ConvertPendingBooking'
@@ -40,6 +40,9 @@ import InfoNoticeItem from "@/components/hyttebooking/month-overview/components/
 import PendingBookingText from "@/components/hyttebooking/month-overview/components/PendingBookingText";
 import InvolvedText from "@/components/hyttebooking/month-overview/components/InvolvedText";
 import MonthOverviewButton from "@/components/hyttebooking/month-overview/components/MonthOverviewButton";
+import {
+    getInfoNoticesOnDay
+} from "@/components/hyttebooking/month-overview/components/month-calendar/monthCalendarUtil";
 
 export default function MonthOverview() {
     const queryClient = useQueryClient();
@@ -48,7 +51,7 @@ export default function MonthOverview() {
     const [showModal, setShowModal] = useState(false);
     const [bookingItems, setBookingItems] = useState<Booking[]>([]);
     const [expandedApartments, setExpandedApartments] = useState<number[]>([]);
-    const [user, setUser] = useState<User>(null);
+    const [user, setUser] = useState<User | undefined>();
     const [infoNotices, setInfoNotices] = useState<InfoBooking[]>([]);
     const [pendingBookingDeleteModalIsOpen, setPendingBookingDeleteModalIsOpen] = useState(false);
     const [pendingBookingIdToDelete, setPendingBookingIdToDelete] = useState<number | null>(null);
@@ -182,16 +185,10 @@ export default function MonthOverview() {
         return startDate <= date && endDate >= date;
     };
 
-    const fetchUser = async () => {
-        const response = await ApiService.getUser();
-        const user = response.data;
-        setAllUsersNames(usersNames);
-    };
-
-
     const fetchAllUsers = async () => {
         const response = await ApiService.getUsers();
-        const usersNames = response.data.map(user => user.name);
+        const users = response.data as User[] || []
+        const usersNames = users.map(user => user.name);
         setAllUsersNames(usersNames);
     };
 
@@ -201,11 +198,13 @@ export default function MonthOverview() {
     }
 
     const confirmDelete = () => {
-        const id = bookingToDelete?.id;
+        const id = bookingToDelete?.id || null;
         if (bookingToDelete?.isPending) {
-            handleDeletePendingBooking(id || null);
+            handleDeletePendingBooking(id);
+        } else if (user?.admin) {
+            adminDeleteBooking.mutate(id);
         } else {
-            user.admin ? adminDeleteBooking.mutate(id) : deleteBooking.mutate(id);
+            deleteBooking.mutate(id);
         }
         setDeleteModalIsOpen(false);
     }
@@ -242,7 +241,7 @@ export default function MonthOverview() {
 
     const deletePendingBookingById = async (pendingBookingId: number | null) => {
         try {
-            if (user.admin) {
+            if (user?.admin) {
                 await ApiService.adminDeletePendingBooking(pendingBookingId);
             } else {
                 await ApiService.deletePendingBooking(pendingBookingId);
@@ -314,7 +313,9 @@ export default function MonthOverview() {
 
     const getInfoNoticesOnDay = (date: Date) => {
         const all = allInfoNotices as InfoBooking[] || [];
-        const infoNoticesOnDay = all.filter((infoNotice) => date >= infoNotice.startDate && date <= infoNotice.endDate) || [];
+        const infoNoticesOnDay = all.filter(infoNotice =>
+            !isBefore(date, infoNotice.startDate) && !isAfter(date, infoNotice.endDate)
+        );
         setInfoNotices(infoNoticesOnDay);
     };
 
@@ -364,7 +365,7 @@ export default function MonthOverview() {
             dateFormat,
             apartments,
             !!user?.admin,
-            yourPendingBookings
+            yourPendingBookings || []
         );
         setVacantApartmentsOnDay(vacantApartmentsOnDay);
         return vacantApartmentsOnDay;
@@ -457,9 +458,11 @@ export default function MonthOverview() {
                 <MonthCalendar
                     bookings={
                         (bookings as Booking[] || [])
-                        .concat(pendingBookingList)
-                        .concat(yourPendingBookings)
-                        .concat(allPendingBookingTrains)}
+                        // TODO: See which lists are necessary
+                        // .concat(pendingBookingList)
+                        // .concat(yourPendingBookings)
+                        // .concat(allPendingBookingTrains)
+                    }
                     infoNotices={infoNotices}
                     user={user}
                 />
@@ -494,7 +497,7 @@ export default function MonthOverview() {
 
                                             {infoNotices.map((infoNotice, index) => (
                                                 <InfoNoticeItem
-                                                    key={infoBooking.id}
+                                                    key={infoNotice.id}
                                                     infoNoticeIndex={index}
                                                     infoNotice={infoNotice}
                                                     admin={!!user?.admin}

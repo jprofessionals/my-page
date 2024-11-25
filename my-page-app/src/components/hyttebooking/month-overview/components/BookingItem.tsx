@@ -83,20 +83,22 @@ const BookingItem = ({bookingItemsIndex, booking, yourBookings, bookingItems, ad
                             />
 
                             <MonthOverviewModal open={deleteModalIsOpen} onClose={onCloseModal} label="Delete Confirmation">
-                                <p className="mb-3">
-                                    Er du sikker på at du vil slette {booking.isPending ? 'den ønskede ' : ''}reservasjonen?
-                                </p>
-                                <div className="flex justify-end">
-                                    <MonthOverviewButton
-                                        onClick={onConfirmDelete}
-                                        variant={"red"}
-                                        title={"Slett reservasjon"}
-                                    />
-                                    <MonthOverviewButton
-                                        onClick={onCloseModal}
-                                        variant={"gray"}
-                                        title={"Avbryt"}
-                                    />
+                                <div>
+                                    <p className="mb-3">
+                                        Er du sikker på at du vil slette {booking.isPending ? 'den ønskede ' : ''}reservasjonen?
+                                    </p>
+                                    <div className="flex justify-end">
+                                        <MonthOverviewButton
+                                            onClick={onConfirmDelete}
+                                            variant={"red"}
+                                            title={"Slett reservasjon"}
+                                        />
+                                        <MonthOverviewButton
+                                            onClick={onCloseModal}
+                                            variant={"gray"}
+                                            title={"Avbryt"}
+                                        />
+                                    </div>
                                 </div>
                             </MonthOverviewModal>
                         </div>

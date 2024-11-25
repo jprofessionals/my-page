@@ -13,7 +13,7 @@ import {Button} from "@/components/ui/button";
 type Props = {
     bookings?: Booking[];
     day: CalendarDay;
-    user: User;
+    user?: User;
     apartment: Apartment;
     onNewBookingClick: (newBooking: BookingPost) => void;
     onBookingClick: (booking: Booking) => void;

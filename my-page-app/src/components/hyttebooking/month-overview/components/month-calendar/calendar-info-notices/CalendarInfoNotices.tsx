@@ -14,8 +14,8 @@ const CalendarInfoNotices = ({ infoNotices }: Props) => {
         <div
             title={`${infoNotices.map(infoBooking => `${infoBooking.description} `)}`}
             className={style.container}>
-            { infoNotices.map(InfoBooking => (
-                <div className={style.notice} />
+            { infoNotices.map(infoNotice => (
+                <div key={infoNotice.id} className={style.notice} />
             ))}
         </div>
     );

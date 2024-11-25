@@ -11,12 +11,12 @@ import SimpleModal from "@/components/ui/SimpleModal";
 
 type Props = {
     bookingPost?: BookingPost;
-    user: User;
+    user?: User;
     onBookingCreated: () => void;
     onCancel: () => void;
 }
 
-const BookingAddModal = ({ bookingPost, user, onAbort, onBookingCreated, onCancel }: Props) => {
+const BookingAddModal = ({ bookingPost, user, onBookingCreated, onCancel }: Props) => {
     const [allApartments, setAllApartments] = useState<Apartment[]>([]);
     const [asAdmin, setAsAdmin] = useState<boolean>(!!user?.admin || false);
     const selectedApartment = allApartments.find(apartment => apartment.id === bookingPost?.apartmentID);
@@ -75,7 +75,7 @@ const BookingAddModal = ({ bookingPost, user, onAbort, onBookingCreated, onCance
         <SimpleModal
             header={"Ny booking"}
             open={!!bookingPost}
-            onRequestClose={onAbort}
+            onRequestClose={onCancel}
             content={
             <>
                 {user?.name}, ønsker du &quot;{selectedApartment?.cabin_name}&quot; i perioden

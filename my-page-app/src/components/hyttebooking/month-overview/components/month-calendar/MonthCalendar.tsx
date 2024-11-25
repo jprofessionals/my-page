@@ -1,7 +1,7 @@
 import { DayPicker, WeekNumber} from 'react-day-picker'
 import {add, sub, format} from 'date-fns';
 import {Apartment, Booking, BookingPost, CabinType, InfoBooking, User} from '@/types';
-import { no } from "date-fns/locale";
+import {nb} from "date-fns/locale";
 import {dateFormat} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
 import CalendarWeekLabel from "./calendar-week-label/CalendarWeekLabel";
 import CalendarWeekNumber from "./calendar-week-number/CalendarWeekNumber";
@@ -25,13 +25,13 @@ import BookingReadOnlyInfoModal
 type props = {
     bookings: Booking[];
     infoNotices: InfoBooking[];
-    user: User;
+    user?: User;
 }
 
 function MonthCalendar({bookings, infoNotices, user}: props) {
     const style = classes;
-    const [startMonth, setStartMonth] = useState<Date>(format(sub(new Date(), { months: 6 }), dateFormat));
-    const [endMonth, setEndMonth] = useState<Date>(format(add(new Date(), { months: 12 }), dateFormat));
+    const [startMonth, setStartMonth] = useState<Date>(sub(new Date(), { months: 6 }));
+    const [endMonth, setEndMonth] = useState<Date>(add(new Date(), { months: 12 }));
     const [newBookingPost, setNewBookingPost] = useState<BookingPost | undefined>(undefined);
     const [editBooking, setEditBooking] = useState<Booking | undefined>(undefined);
     const [infoBooking, setInfoBooking] = useState<Booking | undefined>(undefined);
@@ -100,7 +100,7 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                     weekday: 'text-muted-foreground rounded-md',
                     weekdays: "flex justify-between"
                 }}
-                locale={no}
+                locale={nb}
                 startMonth={startMonth}
                 endMonth={endMonth}
                 onMonthChange={handleMonthChange}

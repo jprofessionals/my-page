@@ -8,7 +8,7 @@ import classes from "./BookingBar.module.css";
 type Props = {
     booking: Booking;
     day: CalendarDay;
-    user: User;
+    user?: User;
     onBookingClick: (booking: Booking) => void;
 }
 const BookingBar = ({ booking, day, user, onBookingClick }: Props)  => {

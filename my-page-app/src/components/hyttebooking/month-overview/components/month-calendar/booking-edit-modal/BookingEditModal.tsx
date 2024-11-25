@@ -7,12 +7,12 @@ import {toast} from "react-toastify";
 
 type Props = {
     booking?: Booking;
-    user: User;
+    user?: User;
     onBookingSaved: () => void;
     onCancel: () => void;
 }
 
-const BookingEditModal = ({ booking, user, onAbort, onBookingSaved, onCancel }: Props) => {
+const BookingEditModal = ({ booking, user, onBookingSaved, onCancel }: Props) => {
     const [allApartments, setAllApartments] = useState<Apartment[]>([]);
     const [asAdmin, setAsAdmin] = useState<boolean>(!!user?.admin || false);
 //    const selectedApartment = allApartments.find(apartment => apartment.id === bookingPost?.apartmentID);
@@ -38,9 +38,11 @@ const BookingEditModal = ({ booking, user, onAbort, onBookingSaved, onCancel }: 
 
     const deleteBookingByBookingId = async (bookingId: number | null) => {
         try {
-            await booking?.isPending ?
-                ApiService.deletePendingBooking(bookingId) :
-                ApiService.deleteBooking(bookingId);
+            if (booking?.isPending) {
+                await ApiService.deletePendingBooking(bookingId);
+            } else {
+                await ApiService.deleteBooking(bookingId);
+            }
             toast.success('Reservasjonen din er slettet')
         } catch (error) {
             toast.error(`Det oppstod en feil ved sletting: ${error}`,
@@ -50,9 +52,11 @@ const BookingEditModal = ({ booking, user, onAbort, onBookingSaved, onCancel }: 
 
     const patchBookingByBookingId = async (bookingId: number | null, updatedBooking: Booking) => {
         try {
-            await booking?.isPending ?
-                ApiService.patchPendingBooking(bookingId, updatedBooking) :
-                ApiService.patchBooking(bookingId, updatedBooking);
+            if (booking?.isPending) {
+                await ApiService.patchPendingBooking(bookingId, updatedBooking);
+            } else {
+                await ApiService.patchBooking(bookingId, updatedBooking);
+            }
             toast.success('Reservasjonen din er oppdatert')
         } catch (error) {
             toast.error(`Det oppstod en feil ved oppdatering: ${error}`,

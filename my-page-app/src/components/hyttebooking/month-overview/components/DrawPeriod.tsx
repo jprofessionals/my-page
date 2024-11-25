@@ -9,7 +9,7 @@ type Props = {
 
 const DrawPeriod = ({ drawingPeriod, dateFormat }: Props) => {
 
-    let autoDrawingDate: Date = drawingPeriod.pendingBookings.reduce((earliest, booking) => {
+    const autoDrawingDate: Date = drawingPeriod.pendingBookings.reduce((earliest, booking) => {
         let bookingCreatedDate: Date;
         if (booking.createdDate) {
             bookingCreatedDate = new Date(booking.createdDate)
@@ -21,7 +21,7 @@ const DrawPeriod = ({ drawingPeriod, dateFormat }: Props) => {
 
     autoDrawingDate.setDate(autoDrawingDate.getDate() + 7);
 
-    let earliestStartDate = drawingPeriod.pendingBookings.reduce((earliest, booking) => {
+    const earliestStartDate = drawingPeriod.pendingBookings.reduce((earliest, booking) => {
         const bookingStartDate = new Date(booking.startDate);
         return earliest < bookingStartDate ? earliest : bookingStartDate;
     }, new Date(drawingPeriod.pendingBookings[0].startDate));

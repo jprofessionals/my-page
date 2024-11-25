@@ -6,7 +6,7 @@ import {Button} from "@/components/ui/button";
 import SimpleModal from "@/components/ui/SimpleModal";
 
 type Props = {
-    user: User;
+    user?: User;
     booking?: Booking;
     onCancel: () => void;
 }
@@ -19,7 +19,7 @@ const BookingReadOnlyInfoModal = ({ booking, user, onCancel }: Props) => {
             onRequestClose={onCancel}
             content={
                 <>
-                    {user?.name} Har booket "{booking?.apartment.cabin_name}" for perioden
+                    {user?.name} Har booket &quot;{booking?.apartment?.cabin_name}&quot; for perioden
                     {booking?.startDate && format(booking?.startDate, dateFormat)} til {booking?.endDate && format(booking?.endDate, dateFormat)} ?
                 </>
             }

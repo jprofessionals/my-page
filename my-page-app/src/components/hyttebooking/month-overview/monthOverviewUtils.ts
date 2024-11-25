@@ -74,7 +74,6 @@ export const getVacantApartmentsOnDay = (
     return availableApartments;
 };
 
-
 export const getPendingBookingTrainsOnDay = (date: string, allPendingBookingTrains: Booking[]): PendingBookingTrain[] => {
     if (!allPendingBookingTrains) {
         return []
@@ -155,7 +154,7 @@ export const getPendingDrawingPeriodDaysFrom = (selectedDate: Date, allPendingBo
     return drawingPeriodsOnDayArrayOfArray.flat();
 }
 
-export const sortBookingItems = (bookingItems ) => {
+export const sortBookingItems = (bookingItems: Booking[] ) => {
     if (bookingItems?.length > 0) {
         return bookingItems.sort((a, b) => {
             const cabinIndexA = cabinOrder.indexOf(a.apartment.cabin_name);
