@@ -158,10 +158,10 @@ class PendingBookingService(
         }
     }
 
-    fun getPendingBookingInformation(): List<List<PendingBookingTrainDTO>> {
+    fun getPendingBookingInformation(): List<PendingBookingTrainDTO> {
         val apartments = apartmentRepository.findAll()
 
-        val allTrainAndPendingBookings = apartments.map { apartment ->
+        val allTrainAndPendingBookings = apartments.flatMap { apartment ->
             getPendingBookingInformationForApartment(apartment.id)
         }
         return allTrainAndPendingBookings

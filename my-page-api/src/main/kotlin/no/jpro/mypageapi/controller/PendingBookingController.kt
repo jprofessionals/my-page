@@ -110,7 +110,7 @@ class PendingBookingController(
     )
     fun getPendingBookingInformation(
         token: JwtAuthenticationToken,
-    ): List<List<PendingBookingTrainDTO>> {
+    ): List<PendingBookingTrainDTO> {
         try {
             return pendingBookingService.getPendingBookingInformation()
         } catch (e: DateTimeParseException) {

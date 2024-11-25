@@ -1,8 +1,17 @@
 import { DayPicker, WeekNumber} from 'react-day-picker'
 import {add, sub, format} from 'date-fns';
-import {Apartment, Booking, BookingPost, CabinType, InfoBooking, User} from '@/types';
+import {
+    Apartment,
+    Booking,
+    BookingPost,
+    CabinType,
+    DrawingPeriod,
+    InfoBooking,
+    PendingBookingTrain,
+    User
+} from '@/types';
 import {nb} from "date-fns/locale";
-import {dateFormat} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
+import {dateFormat, getPendingBookingTrainsOnDay} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
 import CalendarWeekLabel from "./calendar-week-label/CalendarWeekLabel";
 import CalendarWeekNumber from "./calendar-week-number/CalendarWeekNumber";
 import CalendarInfoNotices from "./calendar-info-notices/CalendarInfoNotices";
@@ -13,28 +22,33 @@ import {useEffect, useState} from "react";
 import classes from "./MonthCalendar.module.css";
 import {
     getBookingsOnDayAndCabin,
-    getInfoNoticesOnDay
+    getInfoNoticesOnDay,
+    getDrawingPeriodsOnDayAndCabin,
 } from "./monthCalendarUtil";
 import ApiService from "@/services/api.service";
 import BookingEditModal
     from "@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-modal/BookingEditModal";
 import BookingReadOnlyInfoModal
     from "@/components/hyttebooking/month-overview/components/month-calendar/booking-read-only-info-Modal/BookingReadOnlyInfoModal";
+import DrawingPeriodModal from "./drawing-modal/DrawingPeriodModal";
+import {toast} from "react-toastify";
 
 
 type props = {
     bookings: Booking[];
     infoNotices: InfoBooking[];
+    pendingBookingTrains: PendingBookingTrain[];
     user?: User;
 }
 
-function MonthCalendar({bookings, infoNotices, user}: props) {
+function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: props) {
     const style = classes;
     const [startMonth, setStartMonth] = useState<Date>(sub(new Date(), { months: 6 }));
     const [endMonth, setEndMonth] = useState<Date>(add(new Date(), { months: 12 }));
     const [newBookingPost, setNewBookingPost] = useState<BookingPost | undefined>(undefined);
     const [editBooking, setEditBooking] = useState<Booking | undefined>(undefined);
     const [infoBooking, setInfoBooking] = useState<Booking | undefined>(undefined);
+    const [drawingPeriod, setDrawingPeriod] = useState<DrawingPeriod | undefined>(undefined);
     const [allApartments, setAllApartments] = useState<Apartment[]>([]);
 
     useEffect(() => {
@@ -67,6 +81,20 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
         setInfoBooking(undefined);
     }
 
+    const handleDrawingPeriodClose = () => {
+        setDrawingPeriod(undefined);
+    }
+
+    const handlePerformDrawing = async (drawingPeriod: DrawingPeriod) => {
+        try {
+            await ApiService.pickWinnerPendingBooking(drawingPeriod.pendingBookings);
+            toast("Trekning fullført");
+        } catch {
+            toast.error("Trekning feilet");
+        }
+        setDrawingPeriod(undefined);
+    }
+
     const handleNewBookingCancelled = () => setNewBookingPost(undefined);
     const handleInitNewBooking = (newBooking: BookingPost) => setNewBookingPost(newBooking);
     const handleEditBookingCancelled = () => setEditBooking(undefined);
@@ -89,7 +117,9 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
         }
     };
 
-
+    const handleShowDrawingPeriod = (drawingPeriod: DrawingPeriod) => {
+        setDrawingPeriod(drawingPeriod);
+    };
 
     return (
         <>
@@ -127,6 +157,14 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                                             bookings
                                         )
                                     }
+                                    drawingPeriods={
+                                        getDrawingPeriodsOnDayAndCabin(
+                                            day,
+                                            apartment.cabin_name as CabinType,
+                                            pendingBookingTrains
+                                        )
+                                    }
+                                    onDrawingPeriodClick={handleShowDrawingPeriod}
                                 />
                             ))}
                             <CalendarInfoNotices
@@ -167,6 +205,13 @@ function MonthCalendar({bookings, infoNotices, user}: props) {
                 user={user}
                 booking={infoBooking}
                 onCancel={handleInfoBookingClose}
+            />
+
+            <DrawingPeriodModal
+                user={user}
+                drawingPeriod={drawingPeriod}
+                onCancel={handleDrawingPeriodClose}
+                onPerformDrawing={handlePerformDrawing}
             />
         </>
     );

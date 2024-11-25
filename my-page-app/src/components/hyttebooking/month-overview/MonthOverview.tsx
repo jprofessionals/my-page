@@ -7,7 +7,7 @@ import {
     CabinColorClasses,
     DrawingPeriod,
     InfoBooking,
-    LoadingStatus,
+    LoadingStatus, PendingBookingTrain,
     User,
     VacancyKeys
 } from '@/types'
@@ -132,7 +132,8 @@ export default function MonthOverview() {
     } = useQuery({
         queryKey: ['allPendingBookingsAllApartments'],
         queryFn: async () => {
-            return await ApiService.getAllPendingBookingTrainsForAllApartments();
+            const allPendingBookingTrainsForAllApartments: PendingBookingTrain[] = await ApiService.getAllPendingBookingTrainsForAllApartments();
+            return await allPendingBookingTrainsForAllApartments;
         }
     });
 
@@ -395,24 +396,24 @@ export default function MonthOverview() {
         return vacantApartmentsOnDay;
     };
 
-    const getPendingBookingsOnDay = (selectedDate: Date) => {
-        const pendingBookingsOnDayList = getPendingBookingDaysFrom(selectedDate, allPendingBookingTrains);
-        setPendingBookingsOnDay(pendingBookingsOnDayList);
-        return pendingBookingsOnDayList;
-    };
-
-    const getDrawingPeriodsOnDay = (selectedDate: Date) => {
-        const drawingPeriodsOnDayList = getPendingDrawingPeriodDaysFrom(selectedDate, allPendingBookingTrains);
-        setDrawingPeriodListOnDay(drawingPeriodsOnDayList);
-        return drawingPeriodsOnDayList;
-    };
-
-    const getPendBookingListFromDrawPeriod = (selectedDate: Date) => {
-        const drawingPeriodsOnDay = getDrawingPeriodsOnDay(selectedDate);
-        const pendingBookings = drawingPeriodsOnDay.map(pendingBooking => ((pendingBooking.valueOf()) as DrawingPeriod).pendingBookings);
-        setPendingBookingList(pendingBookings);
-        return pendingBookings;
-    }
+    // const getPendingBookingsOnDay = (selectedDate: Date) => {
+    //     const pendingBookingsOnDayList = getPendingBookingDaysFrom(selectedDate, allPendingBookingTrains);
+    //     setPendingBookingsOnDay(pendingBookingsOnDayList);
+    //     return pendingBookingsOnDayList;
+    // };
+    //
+    // const getDrawingPeriodsOnDay = (selectedDate: Date) => {
+    //     const drawingPeriodsOnDayList = getPendingDrawingPeriodDaysFrom(selectedDate, allPendingBookingTrains);
+    //     setDrawingPeriodListOnDay(drawingPeriodsOnDayList);
+    //     return drawingPeriodsOnDayList;
+    // };
+    //
+    // const getPendBookingListFromDrawPeriod = (selectedDate: Date) => {
+    //     const drawingPeriodsOnDay = getDrawingPeriodsOnDay(selectedDate);
+    //     const pendingBookings = drawingPeriodsOnDay.map(pendingBooking => ((pendingBooking.valueOf()) as DrawingPeriod).pendingBookings);
+    //     setPendingBookingList(pendingBookings);
+    //     return pendingBookings;
+    // }
 
     const getInfoNoticeVacancyOnDay = (selectedDate: Date) => {
         const vacant = getInfoNoticeVacancyOnGivenDay(selectedDate, infoNoticeVacancies);
@@ -425,9 +426,9 @@ export default function MonthOverview() {
         setShowModal(true);
         getVacancyForDay(date);
         getBookingsOnDay(date);
-        getPendingBookingsOnDay(date);
-        getDrawingPeriodsOnDay(date);
-        getPendBookingListFromDrawPeriod(date);
+        // getPendingBookingsOnDay(date);
+        // getDrawingPeriodsOnDay(date);
+        // getPendBookingListFromDrawPeriod(date);
         getInfoNoticesOnDay(date);
         getInfoNoticeVacancyOnDay(date);
     }
@@ -484,9 +485,10 @@ export default function MonthOverview() {
                         (bookings as Booking[] || [])
                         // TODO: See which lists are necessary
                         // .concat(pendingBookingList)
-                        // .concat(yourPendingBookings)
+                        // .concat(yourPendingBookings || [])
                         // .concat(allPendingBookingTrains)
                     }
+                    pendingBookingTrains={allPendingBookingTrains || []}
                     infoNotices={infoNotices}
                     user={user}
                 />

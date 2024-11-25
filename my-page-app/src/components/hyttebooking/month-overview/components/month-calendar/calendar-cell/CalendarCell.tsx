@@ -1,4 +1,4 @@
-import {Apartment, Booking, BookingPost, User} from "@/types";
+import {Apartment, Booking, BookingPost, DrawingPeriod, PendingBookingTrain, User} from "@/types";
 import React from "react";
 import {CalendarDay} from "react-day-picker";
 import classes from "./CalendarCell.module.css";
@@ -17,9 +17,11 @@ type Props = {
     apartment: Apartment;
     onNewBookingClick: (newBooking: BookingPost) => void;
     onBookingClick: (booking: Booking) => void;
+    drawingPeriods: DrawingPeriod[];
+    onDrawingPeriodClick: (drawingPeriod: DrawingPeriod) => void;
 }
 
-const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onBookingClick }: Props)  => {
+const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onBookingClick, drawingPeriods, onDrawingPeriodClick}: Props)  => {
     const style = classes;
     const oneDayMS = 86400000;
     const isWednesday = getIsDayOfWeek(day) === 3;
@@ -47,7 +49,6 @@ const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onBoo
         });
     };
 
-
      return (
         <div className={`
             ${style.calendarCell}
@@ -66,6 +67,23 @@ const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onBoo
                     user={user}
                     booking={booking}
                     onBookingClick={onBookingClick}
+                />
+            ))}
+
+            {drawingPeriods?.map(drawingPeriod => (
+                <BookingBar
+                    key={drawingPeriod.id}
+                    day={day}
+                    user={user}
+                    booking={{
+                        id: 1,
+                        apartment,
+                        startDate: drawingPeriod.startDate,
+                        endDate: drawingPeriod.endDate,
+                        employeeName: '',
+                        isPending: true
+                    }}
+                    onBookingClick={() => onDrawingPeriodClick(drawingPeriod)}
                 />
             ))}
 
