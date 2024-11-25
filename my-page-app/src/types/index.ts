@@ -1,6 +1,3 @@
-import {ComponentProps} from "react";
-import {DayPicker} from "react-day-picker";
-
 export type User = {
   name: string
   email: string
@@ -75,7 +72,7 @@ export type JobPostingType = {
   description?: string
   tags?: string[]
   customer: string
-  location?: String
+  location?: string
   dueDateForApplication?: string
   requiredYearsOfExperience?: number
   resourcesNeeded?: number
@@ -180,12 +177,3 @@ export enum LoadingStatus {
   completed,
   failed,
 }
-
-export type CalendarProps = ComponentProps<typeof DayPicker> & {
-  cutOffDateVacancies: string
-  bookings: Booking[] | undefined
-  yourBookings: Booking[] | undefined
-  getBookings: Function
-  getPendingBookingTrainsOnDay: Function
-  getInfoNotices: Function
-};

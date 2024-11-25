@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import no.jpro.mypageapi.consumer.slack.SlackConsumer
+import no.jpro.mypageapi.service.slack.SlackService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("slack")
 @SecurityRequirement(name = "Bearer Authentication")
-class SlackController(private val slackConsumer: SlackConsumer) {
+class SlackController(
+    private val slackService: SlackService
+) {
 
     @Operation(summary = "Send en melding til en Slack-kanal")
     @ApiResponses(value = [
@@ -24,7 +26,7 @@ class SlackController(private val slackConsumer: SlackConsumer) {
     ])
     @PostMapping("/message")
     fun postMessage(@RequestParam message: String): ResponseEntity<String> {
-        val responseMessage = slackConsumer.postMessageToChannel(message)
+        val responseMessage = slackService.postMessageToChannel(message)
         return when {
             responseMessage.startsWith("Melding sendt til kanal med ID") -> ResponseEntity.ok(responseMessage)
             responseMessage == "Response == null!" -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage)

@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from 'react'
 import { API_URL } from '../../services/api.service'
-import { format, addDays, differenceInDays, isBefore } from 'date-fns'
+import { addDays, differenceInDays, format, isBefore } from 'date-fns'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
@@ -8,13 +8,13 @@ import { Button } from '../ui/button'
 import { BookingPost } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
-import { useMutation, useQueryClient } from 'react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 type Props = {
   apartmentId: number
   date: Date | undefined
   closeModal: () => void
-  refreshVacancies: Function
+  refreshVacancies: () => void
   userIsAdmin: boolean
   allUsersNames: string[]
   cutOffDateVacancies: string
@@ -24,9 +24,7 @@ const createBooking = async ({
   bookingPost,
   userIsAdmin,
   bookingOwnerName,
-  startDate,
-  bookingWithoutDrawing
-
+  bookingWithoutDrawing,
 }: {
   bookingPost: BookingPost
   userIsAdmin: boolean
@@ -34,7 +32,7 @@ const createBooking = async ({
   startDate: string
   bookingWithoutDrawing: boolean
 }) => {
-  if (userIsAdmin ) {
+  if (userIsAdmin) {
     if (bookingWithoutDrawing) {
       return axios
         .post(
@@ -54,9 +52,15 @@ const createBooking = async ({
         })
     } else {
       return axios
-        .post(API_URL + 'pendingBooking/pendingPostForUser?bookingOwnerName=' + bookingOwnerName, bookingPost, {
-          headers: authHeader(),
-        })
+        .post(
+          API_URL +
+            'pendingBooking/pendingPostForUser?bookingOwnerName=' +
+            bookingOwnerName,
+          bookingPost,
+          {
+            headers: authHeader(),
+          },
+        )
         .then((response) => response.data)
         .catch((error) => {
           if (error.response && error.response.data) {
@@ -67,19 +71,19 @@ const createBooking = async ({
         })
     }
   } else {
-      return axios
-        .post(API_URL + 'pendingBooking/pendingPost', bookingPost, {
-          headers: authHeader(),
-        })
-        .then((response) => response.data)
-        .catch((error) => {
-          if (error.response && error.response.data) {
-            throw error.response.data
-          } else {
-            throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
-          }
-        })
-    }
+    return axios
+      .post(API_URL + 'pendingBooking/pendingPost', bookingPost, {
+        headers: authHeader(),
+      })
+      .then((response) => response.data)
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          throw error.response.data
+        } else {
+          throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
+        }
+      })
+  }
 }
 
 const CreateBookingPost = ({
@@ -135,11 +139,16 @@ const CreateBookingPost = ({
     } else {
       setEndDate(startDate)
     }
-  }, [vacantDaysForApartmentWithoutTakeoverDates])
+  }, [
+    vacantDaysForApartmentWithoutTakeoverDates,
+    startDate,
+    cutOffDateVacancies,
+  ])
 
   const [isLoadingPost, setIsLoadingPost] = useState(false)
   const [bookingOwnerName, setBookingOwnerName] = useState<string>('')
-  const [bookingWithoutDrawing, setBookingWithoutDrawing] = useState<boolean>(false)
+  const [bookingWithoutDrawing, setBookingWithoutDrawing] =
+    useState<boolean>(false)
 
   const isValid =
     startDate < endDate &&
@@ -148,24 +157,29 @@ const CreateBookingPost = ({
     (!userIsAdmin || bookingOwnerName !== '')
 
   const queryClient = useQueryClient()
-  const { mutate } = useMutation(createBooking, {
+  const { mutate } = useMutation({
+    mutationFn: createBooking,
+
     onSuccess: () => {
       closeModal()
-      queryClient.invalidateQueries('yourBookingsOutline')
-      queryClient.invalidateQueries('bookings')
-      queryClient.invalidateQueries('yourBookingsButton')
-      queryClient.invalidateQueries('allPendingBookingsAllApartments')
+      queryClient.invalidateQueries({ queryKey: ['yourBookingsOutline'] })
+      queryClient.invalidateQueries({ queryKey: ['bookings'] })
+      queryClient.invalidateQueries({ queryKey: ['yourBookingsButton'] })
+      queryClient.invalidateQueries({
+        queryKey: ['allPendingBookingsAllApartments'],
+      })
       setIsLoadingPost(false)
       toast.success('Lagret reservasjon')
       refreshVacancies()
     },
+
     onError: (error: string) => {
       setIsLoadingPost(false)
       toast.error(error)
     },
   })
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!isValid) {
       toast.error('Noen av verdiene var ikke gyldig, prøv igjen')
@@ -176,7 +190,13 @@ const CreateBookingPost = ({
         startDate: startDate,
         endDate: endDate,
       }
-      mutate({ bookingPost, userIsAdmin, bookingOwnerName, startDate, bookingWithoutDrawing })
+      mutate({
+        bookingPost,
+        userIsAdmin,
+        bookingOwnerName,
+        startDate,
+        bookingWithoutDrawing,
+      })
     }
   }
 
@@ -189,10 +209,11 @@ const CreateBookingPost = ({
   const handleBookingOwnerNameChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setBookingOwnerName(e.target.value)
   }
-  const handleBookingWithoutDrawingChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleBookingWithoutDrawingChange = (
+    e: ChangeEvent<HTMLInputElement>,
+  ) => {
     setBookingWithoutDrawing(e.target.checked)
   }
-
 
   return (
     <form onSubmit={handleSubmit}>
@@ -241,26 +262,26 @@ const CreateBookingPost = ({
             />
           </label>
           {userIsAdmin ? (
-              <div>
-                <input
-                    type="checkbox"
-                    onChange={handleBookingWithoutDrawingChange}
-                    id="bookingWithoutDrawing"
-                    style={{ transform: "scale(1.3)", marginRight: "10px" }}
-                />
-                <label  htmlFor="bookingWithoutDrawing">Book uten trekning</label>
-              </div>
-                ) : null}
-                <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
+            <div>
+              <input
+                type="checkbox"
+                onChange={handleBookingWithoutDrawingChange}
+                id="bookingWithoutDrawing"
+                style={{ transform: 'scale(1.3)', marginRight: '10px' }}
+              />
+              <label htmlFor="bookingWithoutDrawing">Book uten trekning</label>
+            </div>
+          ) : null}
+          <Button type="submit" disabled={!isValid} size="sm" className="mt-4">
             <span>
               Legg til reservasjon
-              <Loading isLoading={isLoadingPost}/>
+              <Loading isLoading={isLoadingPost} />
             </span>
-                </Button>
-              </div>
-            </div>
-            </form>
-            )
-          }
+          </Button>
+        </div>
+      </div>
+    </form>
+  )
+}
 
-          export default CreateBookingPost
+export default CreateBookingPost

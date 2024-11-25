@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import { API_URL } from '../../services/api.service'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -7,7 +7,7 @@ import { Button } from '../ui/button'
 import { EditedInfoNotice, InfoBooking } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
-import { useMutation, useQueryClient } from 'react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { isBefore } from 'date-fns'
 
 const editExistingInfoNotice = async ({
@@ -50,7 +50,7 @@ const EditInfoNotice = ({
   infoNotice: InfoBooking
   closeModal: () => void
   userIsAdmin: boolean
-  refreshInfoNoticeVacancies: Function
+  refreshInfoNoticeVacancies: () => void
 }) => {
   const [startDate, setStartDate] = useState(infoNotice.startDate)
   const [endDate, setEndDate] = useState(infoNotice.endDate)
@@ -61,21 +61,24 @@ const EditInfoNotice = ({
     isBefore(new Date(startDate), new Date(endDate)) && description !== ''
 
   const queryClient = useQueryClient()
-  const { mutate } = useMutation(editExistingInfoNotice, {
+  const { mutate } = useMutation({
+    mutationFn: editExistingInfoNotice,
+
     onSuccess: () => {
       closeModal()
-      queryClient.invalidateQueries('infoNotices')
+      queryClient.invalidateQueries({ queryKey: ['infoNotices'] })
       setIsLoadingEdit(false)
       toast.success('Redigert notisen')
       refreshInfoNoticeVacancies()
     },
+
     onError: (error: string) => {
       setIsLoadingEdit(false)
       toast.error(error)
     },
   })
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!isValid) {
       toast.error('Noen av verdiene var ikke gyldig, prøv igjen')

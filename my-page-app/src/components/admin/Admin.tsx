@@ -1,7 +1,13 @@
-import { Fragment, useEffect, useState, ChangeEvent } from 'react'
+import { ChangeEvent, Fragment, useEffect, useState } from 'react'
 import apiService from '../../services/api.service'
 import { toast } from 'react-toastify'
-import { Budget, BudgetType, User, BudgetSummary, BudgetYearSummary, Settings } from '@/types'
+import {
+  Budget,
+  BudgetSummary,
+  BudgetType,
+  BudgetYearSummary,
+  User,
+} from '@/types'
 import BudgetList from '@/components/budget/BudgetList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown'
@@ -9,7 +15,6 @@ import NewUserModal from '@/components/admin/NewUserModal'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 import cn from '@/utils/cn'
-import { it } from 'node:test'
 
 function compareUsers(a: User, b: User): number {
   if (a.name === null && b.name === null) {
@@ -41,21 +46,20 @@ function Admin() {
   const extractListOfBudgets = (users: User[]) => {
     if (users.length > 0) {
       const extractedBudgetTypes: BudgetType[] = []
-      users.map(
-        (user) =>
-          user?.budgets?.forEach((budget) => {
-            if (!budgetTypeListContains(extractedBudgetTypes, budget)) {
-              extractedBudgetTypes.push(budget.budgetType)
-              if (budget.budgetType.allowTimeBalance) {
-                const budgetType = {
-                  ...budget.budgetType,
-                  balanceIsHours: true,
-                  name: budget.budgetType.name + '(timer)',
-                }
-                extractedBudgetTypes.push(budgetType)
+      users.map((user) =>
+        user?.budgets?.forEach((budget) => {
+          if (!budgetTypeListContains(extractedBudgetTypes, budget)) {
+            extractedBudgetTypes.push(budget.budgetType)
+            if (budget.budgetType.allowTimeBalance) {
+              const budgetType = {
+                ...budget.budgetType,
+                balanceIsHours: true,
+                name: budget.budgetType.name + '(timer)',
               }
+              extractedBudgetTypes.push(budgetType)
             }
-          }),
+          }
+        }),
       )
       setBudgetTypes(extractedBudgetTypes)
     }
@@ -82,7 +86,10 @@ function Admin() {
     }
   }
 
-  const getBudgetBalanceForSummary = (budgets: BudgetYearSummary[], type: BudgetType) => {
+  const getBudgetBalanceForSummary = (
+    budgets: BudgetYearSummary[],
+    type: BudgetType,
+  ) => {
     const foundBudget = budgets.find(
       (budget) => budget.budgetType.id === type.id,
     )
@@ -108,15 +115,20 @@ function Admin() {
 
   const budgetBalanceForSummary = (budget: BudgetYearSummary) => {
     if (budget) {
-      return budget.sum.toLocaleString('no-NO', {
-        maximumFractionDigits: 2,
-        style: 'currency',
-        currency: 'NOK',
-      }) + ' ('+budget.balance.toLocaleString('no-NO', {
-        maximumFractionDigits: 2,
-        style: 'currency',
-        currency: 'NOK',
-      })+')'
+      return (
+        budget.sum.toLocaleString('no-NO', {
+          maximumFractionDigits: 2,
+          style: 'currency',
+          currency: 'NOK',
+        }) +
+        ' (' +
+        budget.balance.toLocaleString('no-NO', {
+          maximumFractionDigits: 2,
+          style: 'currency',
+          currency: 'NOK',
+        }) +
+        ')'
+      )
     } else {
       return '-'
     }
@@ -133,12 +145,11 @@ function Admin() {
     }
   }
 
-  const budgetBalanceHoursCurrentYearForSummary = (budget: BudgetYearSummary) => {
+  const budgetBalanceHoursCurrentYearForSummary = (
+    budget: BudgetYearSummary,
+  ) => {
     if (budget) {
-      return (
-        budget.hours +
-        (budget.hours === 1 ? ' time' : ' timer')
-      )
+      return budget.hours + (budget.hours === 1 ? ' time' : ' timer')
     } else {
       return '-'
     }
@@ -150,7 +161,10 @@ function Admin() {
   }
 
   const updateSetting = (event: ChangeEvent<HTMLInputElement>) => {
-    const setting = settings==null ? null : settings.find((element) => element.settingId === event.target.id)
+    const setting =
+      settings == null
+        ? null
+        : settings.find((element) => element.settingId === event.target.id)
     if (setting != null) {
       setting.settingValue = event.target.value
       apiService.patchSetting(setting.settingId, setting)
@@ -165,14 +179,16 @@ function Admin() {
         setUsers(responseSummary.data)
         extractListOfBudgets(responseSummary.data)
 
-        apiService.getBudgetSummary()
-        .then((budgetSummary) => {
-          setBudgetsummary(budgetSummary)
-          setIsLoading(false)
-        }).catch(() => {
-          setIsLoading(false)
-          toast.error('Klarte ikke laste oppsumeringen, prøv igjen senere')
-        })
+        apiService
+          .getBudgetSummary()
+          .then((budgetSummary) => {
+            setBudgetsummary(budgetSummary)
+            setIsLoading(false)
+          })
+          .catch(() => {
+            setIsLoading(false)
+            toast.error('Klarte ikke laste oppsumeringen, prøv igjen senere')
+          })
       })
       .catch(() => {
         setIsLoading(false)
@@ -194,7 +210,7 @@ function Admin() {
   } else {
     return (
       <>
-        <div className="overflow-auto p-4">          
+        <div className="overflow-auto p-4">
           <h2 className="prose prose-xl">Våre ansatte</h2>
 
           {/* Add text input field */}
@@ -316,7 +332,7 @@ function Admin() {
             </tbody>
           </table>
         </div>
-        <div className="overflow-auto p-4">          
+        <div className="overflow-auto p-4">
           <h2 className="prose prose-xl">Oppsummering</h2>
           <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
             <thead>
@@ -334,24 +350,22 @@ function Admin() {
               </tr>
             </thead>
             <tbody>
-            {budgetSummary
-            .sort((a, b) => (a.year - b.year) )
-            .map((budgetYearSummary) => (
-              <Fragment key={budgetYearSummary.year}>
-                <tr
-                  key={budgetYearSummary.year}
-                >
-                  <td key={budgetYearSummary.year}>
-                    {budgetYearSummary.year}
-                  </td>
-                  {budgetTypes.map((budgetColumn) => (
+              {budgetSummary
+                .sort((a, b) => a.year - b.year)
+                .map((budgetYearSummary) => (
+                  <Fragment key={budgetYearSummary.year}>
+                    <tr key={budgetYearSummary.year}>
+                      <td key={budgetYearSummary.year}>
+                        {budgetYearSummary.year}
+                      </td>
+                      {budgetTypes.map((budgetColumn) => (
                         <td
                           key={
                             budgetYearSummary.year +
                             budgetColumn.id +
                             '' +
                             budgetColumn.balanceIsHours
-                          }                                                    
+                          }
                         >
                           {getBudgetBalanceForSummary(
                             budgetYearSummary.yearSummary!,
@@ -359,43 +373,42 @@ function Admin() {
                           )}
                         </td>
                       ))}
-                </tr>
-                    
-                </Fragment>
+                    </tr>
+                  </Fragment>
                 ))}
             </tbody>
           </table>
-
-        
         </div>
         <div className="overflow-auto p-4">
           <h2 className="prose prose-xl">Konfigurasjon</h2>
           <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
             <thead>
               <tr className="text-base text-slate-900">
-                <th className="w-3/4 rounded-tl-lg bg-slate-300">innstilling</th>
+                <th className="w-3/4 rounded-tl-lg bg-slate-300">
+                  innstilling
+                </th>
                 <th className="w-1/4 rounded-tr-lg bg-slate-300">Verdi</th>
               </tr>
             </thead>
             <tbody>
-            {settings==null ? "" : settings
-            .sort((a, b) => (a.priority - b.priority) )
-            .map((setting) => (
-              <tr key={setting.settingId}>
-                <td>
-                  {setting.description}
-                </td>
-                <td>
-                  <input
-                    id={setting.settingId}
-                    type="text"
-                    className="input input-bordered"
-                    defaultValue={setting.settingValue}
-                    onChange={(e) => updateSetting(e)}
-                  />
-                </td>
-              </tr>
-            ))}
+              {settings == null
+                ? ''
+                : settings
+                    .sort((a, b) => a.priority - b.priority)
+                    .map((setting) => (
+                      <tr key={setting.settingId}>
+                        <td>{setting.description}</td>
+                        <td>
+                          <input
+                            id={setting.settingId}
+                            type="text"
+                            className="input input-bordered"
+                            defaultValue={setting.settingValue}
+                            onChange={(e) => updateSetting(e)}
+                          />
+                        </td>
+                      </tr>
+                    ))}
             </tbody>
           </table>
         </div>

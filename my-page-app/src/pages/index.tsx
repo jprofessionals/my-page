@@ -47,7 +47,7 @@ export default function HomePage() {
       const loadedBookings = await ApiService.getBookingsForUser()
       setBookingLoadingStatus('completed')
       setBookings(loadedBookings)
-    } catch (e) {
+    } catch {
       setBookingLoadingStatus('failed')
       toast.error('Klarte ikke laste reservasjoner, prøv igjen senere')
     }
@@ -56,7 +56,7 @@ export default function HomePage() {
   useEffect(() => {
     if (bookingLoadingStatus !== 'init') return
     if (userFetchStatus === 'fetched') refreshBookings()
-  }, [userFetchStatus, bookingLoadingStatus])
+  }, [userFetchStatus, bookingLoadingStatus, refreshBookings])
 
   const refreshBudgets = useCallback(async () => {
     setBudgetLoadingStatus('loading')
@@ -65,7 +65,7 @@ export default function HomePage() {
       const loadedBudgets = await ApiService.getBudgets()
       setBudgetLoadingStatus('completed')
       setBudgets(loadedBudgets)
-    } catch (e) {
+    } catch {
       setBudgetLoadingStatus('failed')
       toast.error('Klarte ikke laste budsjettene, prøv igjen senere')
     }

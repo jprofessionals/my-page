@@ -24,4 +24,6 @@ env_variables:
   SPRING_LIQUIBASE_CHANGE_LOG: "classpath:/db/changelog/db.changelog-root.yaml"
   GOOGLE_CLIENTID: "365277685106-agts9g8tvljvdflgqottt52ujp8p989d.apps.googleusercontent.com"
   GCP_PROJECTID: "my-page-jpro-test"
+  GCS_BUCKET_NAME: "tavle-cropped-test"
+  GCS_JOBPOSTINGS_BUCKET_NAME: "utlysninger-dokumenter-test"
   SLACK_HYTTEKANAL_ID: "C05HJ96ACLA"

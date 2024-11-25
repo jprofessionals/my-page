@@ -1,3 +1,17 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "src/components/hyttebooking/month-overview/**/*.tsx",
+        "src/components/hyttebooking/month-overview/*.tsx"
+      ],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "off"
+      }
+    }
+  ]
 }

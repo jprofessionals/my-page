@@ -1,0 +1,25 @@
+name: infrastructure
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  run-terraform-test:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: test
+    concurrency: terraform-lock-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.6
+      - run: terraform get
+        working-directory: infrastructure
+      - run: terraform init -backend-config="bucket=terraform-state-my-page-jpro-test"
+        working-directory: infrastructure
+      - run: terraform apply -auto-approve -input=false -var-file=test.tfvars
+        working-directory: infrastructure

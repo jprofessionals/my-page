@@ -1,5 +1,5 @@
 import ApiService from '../../services/api.service'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import * as Modal from '../ui/modal'
@@ -7,13 +7,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '../ui/button'
 type Props = {
-  refreshBudgets: Function
+  refreshBudgets: () => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   post: any
 }
 
 const DeleteBudgetPostModal = ({ refreshBudgets, post }: Props) => {
   const [isLoading, setIsLoading] = useState(false)
-  const handleDeletePost = (e: any) => {
+  const handleDeletePost = (e: React.MouseEvent<HTMLButtonElement>) => {
     setIsLoading(true)
     e.preventDefault()
     ApiService.deleteBudgetPost(post.id).then(

@@ -4,10 +4,10 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
 import { Button } from '../ui/button'
-import {Apartment, Booking, EditedBooking} from '@/types'
+import { Apartment, Booking, EditedBooking } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
-import { useMutation, useQueryClient } from 'react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { addDays, differenceInDays, isBefore } from 'date-fns'
 
 const editExistingBooking = async ({
@@ -21,19 +21,19 @@ const editExistingBooking = async ({
   userIsAdmin: boolean
   bookingIsPending: boolean
 }) => {
-  if(bookingIsPending){
+  if (bookingIsPending) {
     return axios
-        .patch(API_URL + 'pendingBooking/' + bookingId, editedBooking, {
-          headers: authHeader(),
-        })
-        .then((response) => response.data)
-        .catch((error) => {
-          if (error.response && error.response.data) {
-            throw error.response.data
-          } else {
-            throw 'En feil skjedde under redigeringen, prøv igjen.'
-          }
-        })
+      .patch(API_URL + 'pendingBooking/' + bookingId, editedBooking, {
+        headers: authHeader(),
+      })
+      .then((response) => response.data)
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          throw error.response.data
+        } else {
+          throw 'En feil skjedde under redigeringen, prøv igjen.'
+        }
+      })
   } else if (userIsAdmin) {
     return axios
       .patch(API_URL + 'booking/admin/' + bookingId, editedBooking, {
@@ -75,8 +75,8 @@ const EditBooking = ({
   closeModal: () => void
   refreshVacancies: () => void
   userIsAdmin: boolean
-  cutOffDateVacancies: string,
-  apartments: Apartment[],
+  cutOffDateVacancies: string
+  apartments: Apartment[]
 }) => {
   const [startDate, setStartDate] = useState(booking.startDate)
   const [endDate, setEndDate] = useState(booking.endDate)
@@ -86,24 +86,28 @@ const EditBooking = ({
   const isValid =
     isBefore(new Date(startDate), new Date(endDate)) &&
     differenceInDays(new Date(endDate), new Date(startDate)) <= 7 &&
-      (isBefore(new Date(endDate), addDays(new Date(cutOffDateVacancies), 1)) || userIsAdmin)
+    (isBefore(new Date(endDate), addDays(new Date(cutOffDateVacancies), 1)) ||
+      userIsAdmin)
 
   const queryClient = useQueryClient()
-  const { mutate } = useMutation(editExistingBooking, {
+  const { mutate } = useMutation({
+    mutationFn: editExistingBooking,
+
     onSuccess: () => {
       closeModal()
-      queryClient.invalidateQueries('bookings')
+      queryClient.invalidateQueries({ queryKey: ['bookings'] })
       setIsLoadingEdit(false)
       toast.success('Redigert reservasjon')
       refreshVacancies()
     },
+
     onError: (error: string) => {
       setIsLoadingEdit(false)
       toast.error(error)
     },
   })
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!isValid) {
       toast.error('Noen av verdiene var ikke gyldig, prøv igjen')
@@ -113,9 +117,14 @@ const EditBooking = ({
       const editedBooking = {
         startDate: startDate,
         endDate: endDate,
-        apartmentId: apartmentId
+        apartmentId: apartmentId,
       }
-      mutate({ editedBooking, bookingId, userIsAdmin: userIsAdmin, bookingIsPending: booking.isPending })
+      mutate({
+        editedBooking,
+        bookingId,
+        userIsAdmin: userIsAdmin,
+        bookingIsPending: booking.isPending,
+      })
     }
   }
 
@@ -134,24 +143,24 @@ const EditBooking = ({
       <div className="overflow-hidden w-full rounded-xl border border-gray-500 shadow-sm">
         <div className="flex flex-col gap-2 items-start p-3">
           {userIsAdmin ? (
-              <>
-                <strong>Enhet: </strong>
-                <label>
-                  <select
-                      className="w-48 input input-bordered input-sm mr-3"
-                      name="apartmentId"
-                      onChange={handleApartmentIdChange}
-                      value={apartmentId}
-                  >
-                    <option value="">Velg enhet</option>
-                    {apartments.map((apartment) => (
-                        <option key={apartment.id} value={apartment.id}>
-                          {apartment.cabin_name}
-                        </option>
-                    ))}
-                  </select>
-                </label>
-              </>
+            <>
+              <strong>Enhet: </strong>
+              <label>
+                <select
+                  className="w-48 input input-bordered input-sm mr-3"
+                  name="apartmentId"
+                  onChange={handleApartmentIdChange}
+                  value={apartmentId}
+                >
+                  <option value="">Velg enhet</option>
+                  {apartments.map((apartment) => (
+                    <option key={apartment.id} value={apartment.id}>
+                      {apartment.cabin_name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </>
           ) : null}
           <strong>Startdato:</strong>
           <label>

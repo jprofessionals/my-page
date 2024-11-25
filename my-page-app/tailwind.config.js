@@ -27,6 +27,7 @@ module.exports = {
           dark: '#d16512',
         },
         black: {
+          DEFAULT: '#000000',
           nav: '#2c2c2c',
         },
         green: {

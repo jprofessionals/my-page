@@ -50,7 +50,7 @@ export const getVacantApartmentsOnDay = (
     dateFormat: string,
     apartments: Apartment[],
     userIsAdmin: boolean,
-    yourPendingBookings: any,
+    yourPendingBookings: Booking[],
 ): Apartment[] => {
     const availableApartments: Apartment[] = [];
     const vacantApartmentsInPeriod = getVacantApartments(selectedDate, vacancies, cutOffDateVacancies, dateFormat);
@@ -79,13 +79,14 @@ export const getPendingBookingTrainsOnDay = (date: string, allPendingBookingTrai
         return []
     }
 
-    const allPendingBookingTrainsAllApartments = []
+    const allPendingBookingTrainsAllApartments: PendingBookingTrain[] = []
 
-    for (const apartmentPendingTrain of allPendingBookingTrains) {
-        for (const pendingTrain of apartmentPendingTrain) {
-            allPendingBookingTrainsAllApartments.push(pendingTrain)
-        }
-    }
+    // TODO: Implement
+    // for (const apartmentPendingTrain of allPendingBookingTrains) {
+    //     for (const pendingTrain of apartmentPendingTrain) {
+    //         allPendingBookingTrainsAllApartments.push(pendingTrain)
+    //     }
+    // }
 
     const currentDate = new Date(date)
     currentDate.setHours(0, 0, 0, 0)

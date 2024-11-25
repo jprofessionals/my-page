@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import SockJS from 'sockjs-client'
 import {Button} from '../ui/button'
 import Spinner from "@/components/ui/spinner";
@@ -41,7 +41,7 @@ function ExplorerTextArea(): JSX.Element {
     socketRef.current = new SockJS(sockJsURL)
 
     if (socketRef.current)
-      socketRef.current.onopen = function (e) {
+      socketRef.current.onopen = function () {
         if (socketRef.current)
           if (localStorage.getItem('user_token')) {
             socketRef.current.send(
@@ -80,7 +80,7 @@ function ExplorerTextArea(): JSX.Element {
     return openWebSocket(sockJsURL);
   }, [])
 
-  const sendExploreRequest = async () => {
+  const sendExploreRequest = useCallback(async () => {
     setError(null);
     try {
       if (text.trim()) {
@@ -89,7 +89,6 @@ function ExplorerTextArea(): JSX.Element {
           artStyle: artStyleOptions[artStyle],
         };
 
-        const tx = JSON.stringify(text);
         if(socketRef.current && socketRef.current?.readyState === 3) {
           const protocol = window.location.protocol
           const sockJsURL = `${protocol}//${window.location.host}/api/explorationSock`
@@ -111,7 +110,7 @@ function ExplorerTextArea(): JSX.Element {
       setError(err as Error);
       setIsLoadingWebSocket(false);
     }
-  };
+  }, [text, artStyle]);
 
   useEffect(() => {
     if (textAreaRef.current) {
@@ -121,10 +120,6 @@ function ExplorerTextArea(): JSX.Element {
 
   const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value)
-  }
-
-  const handleArtStyleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setArtStyle(artStyleOptions[event.target.value]);
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -166,7 +161,7 @@ function ExplorerTextArea(): JSX.Element {
       setButtonClicked(false)
       sendExploreRequest()
     }
-  }, [text])
+  }, [text, buttonClicked, sendExploreRequest])
 
   return (
     <div style={{ display: 'flex', minHeight: '80vh' }}>

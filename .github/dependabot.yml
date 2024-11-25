@@ -8,11 +8,25 @@ updates:
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/my-page-app" # Location of package manifests
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    groups:
+      non-major:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/my-page-api" # Location of package manifests
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    groups:
+      non-major:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

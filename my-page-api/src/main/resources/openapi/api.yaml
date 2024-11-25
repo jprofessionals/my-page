@@ -1,0 +1,364 @@
+openapi: 3.0.3
+info:
+  title: JPro My Page API
+  description: API for JPro My Page
+  version: 1.0.0
+paths:
+  /job-postings:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostings
+      summary: Get job postings
+      description: Returns the job postings added by admins. Allows filtering by different criteria.
+      parameters:
+        - in: query
+          name: tags
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          description: List of tags to filter
+      responses:
+        '200':
+          description: A JSON array of job postings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostings'
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - JobPosting
+      operationId: createJobPosting
+      summary: Create job postings
+      description: Returns the job posting added.
+      requestBody:
+        description: Job posting to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPosting'
+      responses:
+        '201':
+          description: The added job posting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /job-postings/customers:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostingCustomers
+      summary: Get job posting customers
+      description: Returns all the customers for job postings
+      responses:
+        '200':
+          description: A JSON array of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customers'
+        '500':
+          description: Internal server error
+  /job-postings/tags:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostingTags
+      summary: Get job posting tags
+      description: Returns all tags for job postings
+      responses:
+        '200':
+          description: A JSON array of tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tags'
+        '500':
+          description: Internal server error
+  /job-postings/{id}:
+    delete:
+      tags:
+        - JobPosting
+      operationId: deleteJobPosting
+      summary: Delete a job posting
+      description: Deletes a specific job posting by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the job posting to delete
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Job posting was deleted
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - JobPosting
+      operationId: updateJobPosting
+      summary: Update a job posting
+      description: Updates a specific job posting by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the job posting to update
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Job posting data to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPosting'
+      responses:
+        '204':
+          description: Job posting was updated
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /job-postings/{jobPostingId}/files:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostingFiles
+      summary: Get files for a job posting
+      description: Retrieves all files associated with a specific job posting.
+      parameters:
+        - name: jobPostingId
+          in: path
+          required: true
+          description: The ID of the job posting to get files for
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A JSON array of files
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostingFiles'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - JobPosting
+      operationId: uploadJobPostingFile
+      summary: Upload a file to a job posting
+      description: Uploads a file and associates it with a specific job posting.
+      parameters:
+        - name: jobPostingId
+          in: path
+          required: true
+          description: The ID of the job posting
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: File to be uploaded
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+      responses:
+        '201':
+          description: File uploaded successfully
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /job-postings/{jobPostingId}/files/{fileName}:
+    delete:
+      tags:
+        - JobPosting
+      operationId: deleteJobPostingFile
+      summary: Delete a job posting file
+      description: Deletes a specific job posting file by job posting ID and file name.
+      parameters:
+        - name: jobPostingId
+          in: path
+          required: true
+          description: The ID of the job posting
+          schema:
+            type: integer
+            format: int64
+        - name: fileName
+          in: path
+          required: true
+          description: The name of the file to be deleted
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Job posting file was deleted
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          default: 0
+          description: The ID of the customer
+          example: 1
+        name:
+          type: string
+          description: The name of a customer
+          example: "Skatteetaten"
+      required:
+        - id
+        - name
+    Customers:
+      type: array
+      description: A list of customers
+      items:
+        $ref: '#/components/schemas/Customer'
+    FileUpload:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: The filename
+          example: sample.pdf
+        content:
+          type: string
+          format: binary
+          description: The actual file content
+      required:
+        - filename
+        - content
+    JobPosting:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          default: 0
+          description: The ID of the job posting
+          example: 40
+        title:
+          type: string
+          description: The title of a job posting
+          example: "Software Engineer"
+        customer:
+          $ref: '#/components/schemas/Customer'
+        urgent:
+          type: boolean
+          description: Indicates if the job posting is urgent. If true, no deadline is required.
+          default: false
+          example: true
+        deadline:
+          type: string
+          format: date-time
+          description: The deadline for submitting applications
+          example: "2024-10-09T12:00:00+02:00"
+        description:
+          type: string
+          description: The description of the job posting
+          example: "Skatteetaten leter etter en dyktig Kotlin-utvikler"
+        tags:
+          $ref: '#/components/schemas/Tags'
+        links:
+          type: array
+          description: A list of related links
+          items:
+            type: string
+            format: uri
+          example:
+            - "https://example.com/link1"
+            - "https://example.com/link2"
+      required:
+        - id
+        - title
+        - customer
+        - description
+        - urgent
+        - tags
+        - links
+    JobPostingFile:
+      type: object
+      properties:
+        blobId:
+          type: string
+          description: The unique ID of the blob
+          example: "abc123"
+        name:
+          type: string
+          description: File name
+          example: "utlysning.pdf"
+        url:
+          type: string
+          format: uri
+          description: URL of the file
+          example: "https://www.myfile.no/utlysning.pdf"
+      required:
+        - blobId
+        - name
+        - url
+    JobPostingFiles:
+      type: array
+      description: List of files
+      items:
+        $ref: '#/components/schemas/JobPostingFile'
+    JobPostings:
+      type: array
+      description: List of job postings
+      items:
+        $ref: '#/components/schemas/JobPosting'
+    Tag:
+      type: object
+      description: A tag that describes e.g. a technology or method used in the project
+      properties:
+        id:
+          type: integer
+          format: int64
+          default: 0
+          description: The ID of the tag
+          example: 101
+        name:
+          type: string
+          description: The name of the tag
+          example: "Kotlin"
+      required:
+        - id
+        - name
+    Tags:
+      type: array
+      description: List of tags
+      items:
+        $ref: '#/components/schemas/Tag'

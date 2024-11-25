@@ -2,7 +2,6 @@ package no.jpro.mypageapi.service
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
-import no.jpro.mypageapi.consumer.slack.SlackConsumer
 import no.jpro.mypageapi.dto.ApartmentDTO
 import no.jpro.mypageapi.dto.BookingDTO
 import no.jpro.mypageapi.dto.CreateBookingDTO
@@ -13,6 +12,7 @@ import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.BookingRepository
 import no.jpro.mypageapi.repository.SettingsRepository
+import no.jpro.mypageapi.service.slack.SlackService
 import no.jpro.mypageapi.utils.mapper.ApartmentMapper
 import no.jpro.mypageapi.utils.mapper.BookingMapper
 import org.springframework.context.annotation.Lazy
@@ -31,7 +31,7 @@ class BookingService(
     private val apartmentRepository: ApartmentRepository,
     private val apartmentMapper: ApartmentMapper,
     private val settingsRepository: SettingsRepository,
-    private val slackConsumer: SlackConsumer,
+    private val slackService: SlackService,
     @Lazy private val self : BookingService? // Lazy self injection for transactional metoder. Spring oppretter ikke transaksjoner hvis en @Transactional annotert metode blir kalt fra samme objekt
 ) {
     fun getCutoffDate(): LocalDate{
@@ -96,7 +96,7 @@ class BookingService(
             "${deletedBooking.apartment.cabin_name} er nå ledig fra ${deletedBooking.startDate.format(dagMåned)} til ${
                 deletedBooking.endDate.format(dagMåned)
             }"
-        slackConsumer.postMessageToChannel(cabinIsAvailableMsg)
+        slackService.postMessageToChannel(cabinIsAvailableMsg)
     }
 
     @Transactional

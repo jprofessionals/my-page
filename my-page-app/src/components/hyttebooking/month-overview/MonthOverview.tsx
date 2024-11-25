@@ -14,7 +14,7 @@ import {
 import {toast} from 'react-toastify'
 import {useAuthContext} from '@/providers/AuthProvider'
 import {add, format, isAfter, isBefore, sub} from 'date-fns'
-import {useMutation, useQuery, useQueryClient} from 'react-query'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import CreateBookingPost from '@/components/hyttebooking/CreateBookingPost'
 import ConvertPendingBooking from '@/components/hyttebooking/ConvertPendingBooking'
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs'
@@ -91,35 +91,49 @@ export default function MonthOverview() {
         'Annekset': 'border-green-200',
     };
 
-
-    const {data: yourBookings} = useQuery<Booking[]>('yourBookingsOutline', async () => {
-        const yourBookings: Booking[] = await ApiService.getBookingsForUser();
-        return yourBookings;
-    })
+    const {data: yourBookings} = useQuery<Booking[]>({
+        queryKey: ['yourBookingsOutline'],
+        queryFn: async () => {
+            const yourBookings: Booking[] = await ApiService.getBookingsForUser();
+            return yourBookings;
+        }
+    });
 
     const {
         data: yourPendingBookings,
         refetch: refetchYourPendingBookings
-    } = useQuery<Booking[]>('yourPendingBookingsOutline', async () => {
-        const yourPendingBookings: Booking[] = await ApiService.getPendingBookingsForUser();
-        return yourPendingBookings;
-    })
+    } = useQuery<Booking[]>({
+        queryKey: ['yourPendingBookingsOutline'],
+        queryFn: async () => {
+            const yourPendingBookings: Booking[] = await ApiService.getPendingBookingsForUser();
+            return yourPendingBookings;
+        }
+    });
 
-    const {data: bookings} = useQuery<Booking[]>('bookings', async () => {
-        const fetchedBookings: Booking[] = await ApiService.getBookings(startDateBookings, endDateBookings);
-        return fetchedBookings;
-    })
+    const {data: bookings} = useQuery<Booking[]>({
+        queryKey: ['bookings'],
+        queryFn: async () => {
+            const fetchedBookings: Booking[] = await ApiService.getBookings(startDateBookings, endDateBookings);
+            return fetchedBookings;
+        }
+    });
 
-    const {data: allInfoNotices} = useQuery<InfoBooking[]>('infoNotices', async () => {
-        const fetchedInfoNotices: InfoBooking[] = await ApiService.getInfoNotices(startDateBookings, endDateBookings);
-        return fetchedInfoNotices;
+    const {data: allInfoNotices} = useQuery<InfoBooking[]>({
+        queryKey: ['infoNotices'],
+        queryFn: async () => {
+            const fetchedInfoNotices: InfoBooking[] = await ApiService.getInfoNotices(startDateBookings, endDateBookings);
+            return fetchedInfoNotices;
+        }
     });
 
     const {
         data: allPendingBookingTrains,
         refetch: refetchPendingBookings
-    } = useQuery('allPendingBookingsAllApartments', async () => {
-        return await ApiService.getAllPendingBookingTrainsForAllApartments()
+    } = useQuery({
+        queryKey: ['allPendingBookingsAllApartments'],
+        queryFn: async () => {
+            return await ApiService.getAllPendingBookingTrainsForAllApartments();
+        }
     });
 
     const refreshInfoNoticeVacancies = useCallback(async () => {
@@ -132,7 +146,7 @@ export default function MonthOverview() {
             setInfoNoticeVacancyLoadingStatus(LoadingStatus.failed);
             toast.error('Klarte ikke laste dager ledige for informasjonsnotiser, prøv igjen senere');
         }
-    }, []);
+    }, [startDateBookings, endDateBookings]);
 
     const refreshVacancies = useCallback(async () => {
         try {
@@ -148,7 +162,7 @@ export default function MonthOverview() {
             setVacancyLoadingStatus(LoadingStatus.failed);
             toast.error('Klarte ikke laste ledige reservasjoner, prøv igjen senere');
         }
-    }, [cutOffDateVacancies]);
+    }, [startDateVacancies, cutOffDateVacancies, refetchPendingBookings, refetchYourPendingBookings]);
 
     useEffect(() => {
         getUser();
@@ -159,7 +173,7 @@ export default function MonthOverview() {
             refreshVacancies();
             getAllApartments();
         }
-    }, [userFetchStatus, vacancyLoadingStatus]);
+    }, [userFetchStatus, vacancyLoadingStatus, refreshVacancies]);
 
 
     useEffect(() => {
@@ -198,8 +212,12 @@ export default function MonthOverview() {
     }
 
     const confirmDelete = () => {
-        const id = bookingToDelete?.id || null;
-        if (bookingToDelete?.isPending) {
+        if (!bookingToDelete) {
+            toast("Fant ikke id til booking som skal slettes");
+            return;
+        }
+        const id = bookingToDelete.id;
+        if (bookingToDelete.isPending) {
             handleDeletePendingBooking(id);
         } else if (user?.admin) {
             adminDeleteBooking.mutate(id);
@@ -253,9 +271,10 @@ export default function MonthOverview() {
         }
     };
 
-    const deleteBooking = useMutation(deleteBookingByBookingId, {
+    const deleteBooking = useMutation({
+        mutationFn: deleteBookingByBookingId,
         onSuccess: () => {
-            queryClient.invalidateQueries('bookings');
+            queryClient.invalidateQueries({ queryKey: ['bookings']});
             refreshVacancies();
         },
         onError: (error) => {
@@ -263,9 +282,10 @@ export default function MonthOverview() {
         },
     });
 
-    const adminDeleteBooking = useMutation(adminDeleteBookingByBookingId, {
+    const adminDeleteBooking = useMutation({
+        mutationFn: adminDeleteBookingByBookingId,
         onSuccess: () => {
-            queryClient.invalidateQueries('bookings');
+            queryClient.invalidateQueries({ queryKey: ['bookings']});
             refreshVacancies();
         },
         onError: (error) => {
@@ -273,9 +293,10 @@ export default function MonthOverview() {
         },
     });
 
-    const deletePendingBooking = useMutation(deletePendingBookingById, {
+    const deletePendingBooking = useMutation({
+        mutationFn: deletePendingBookingById,
         onSuccess: () => {
-            queryClient.invalidateQueries('allPendingBookingsAllApartments');
+            queryClient.invalidateQueries({ queryKey: ['allPendingBookingsAllApartments']});
         },
         onError: (error) => {
             console.error('Error:', error);
@@ -292,7 +313,9 @@ export default function MonthOverview() {
     }
 
     const handleConfirmPendingBookingDelete = () => {
-        handleDeletePendingBooking(pendingBookingIdToDelete);
+        if (!!pendingBookingIdToDelete) {
+            handleDeletePendingBooking(pendingBookingIdToDelete);
+        }
         handleClosePendingBookingDeleteModal();
     }
 
@@ -342,9 +365,10 @@ export default function MonthOverview() {
         }
     };
 
-    const deleteInfoNotice = useMutation(deleteInfoNoticeByNoticeId, {
+    const deleteInfoNotice = useMutation({
+        mutationFn: deleteInfoNoticeByNoticeId,
         onSuccess: () => {
-            queryClient.invalidateQueries('infoNotices');
+            queryClient.invalidateQueries({ queryKey: ['infoNotices']});
             refreshInfoNoticeVacancies();
         },
         onError: (error) => {
@@ -408,7 +432,7 @@ export default function MonthOverview() {
         getInfoNoticeVacancyOnDay(date);
     }
 
-    const handleDeletePendingBooking = (pendingBookingId: number | null) => {
+    const handleDeletePendingBooking = (pendingBookingId: number) => {
         deletePendingBooking.mutate(pendingBookingId);
     };
 

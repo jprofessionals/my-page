@@ -10,6 +10,7 @@ interface SecretProvider {
     fun getOpenAiApiKey(): String
     fun getTaskSchedulerKey(): String
     fun getSlackSecret(): String
+    fun getSlackAppUtlysningerToken(): String
 }
 
 @Component
@@ -24,6 +25,9 @@ class SecretProviderLocal : SecretProvider {
     @Value("\${slack.bot.token:NOT_SET}")
     private val slackBotToken : String = "NOT_SET"
 
+    @Value("\${slack.app.utlysninger.token:NOT_SET}")
+    private lateinit var slackAppUtlysningerToken: String
+
     override fun getOpenAiApiKey(): String {
         return apiKey
     }
@@ -33,6 +37,10 @@ class SecretProviderLocal : SecretProvider {
 
     override fun getSlackSecret(): String {
         return slackBotToken
+    }
+
+    override fun getSlackAppUtlysningerToken(): String {
+        return slackAppUtlysningerToken
     }
 }
 
@@ -47,6 +55,9 @@ class SecretProviderGcp : SecretProvider {
 
     @Value("\${sm://slack_bot_token}")
     private val slackBotToken : String = "NOT_SET"
+
+    @Value("\${sm://slack_app_utlysninger_token}")
+    private lateinit var slackAppUtlysningerToken: String
 
     private val logger = LoggerFactory.getLogger(SecretProviderGcp::class.java.name)
 
@@ -66,5 +77,9 @@ class SecretProviderGcp : SecretProvider {
 
     override fun getSlackSecret(): String {
         return slackBotToken
+    }
+
+    override fun getSlackAppUtlysningerToken(): String {
+        return slackAppUtlysningerToken
     }
 }

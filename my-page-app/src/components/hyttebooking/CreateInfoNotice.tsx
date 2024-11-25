@@ -1,6 +1,6 @@
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { API_URL } from '../../services/api.service'
-import { addDays, format, isBefore } from 'date-fns'
+import { addDays, format } from 'date-fns'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loading from '@/components/Loading'
@@ -8,14 +8,14 @@ import { Button } from '../ui/button'
 import { InfoBookingPost } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
-import { useMutation, useQueryClient } from 'react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 type Props = {
   date: Date | undefined
   closeModal: () => void
   userIsAdmin: boolean
   infoNoticeVacancies: string[] | undefined
-  refreshInfoNoticeVacancies: Function
+  refreshInfoNoticeVacancies: () => void
 }
 const createInfoNotice = async ({
   userIsAdmin,
@@ -57,41 +57,47 @@ const CreateInfoNoticePost = ({
 
   const vacantDaysForInfoNoticesWithoutTakeoverDates = infoNoticeVacancies!
   const [isEndDateValid, setIsEndDateValid] = useState(false)
-  const evaluateEndDateValidity = (newEndDate: string) => {
-    const endDateDate = new Date(newEndDate)
-    const previousFns = addDays(endDateDate, -1)
-    const previousDate = format(previousFns, 'yyyy-MM-dd')
-    const nextFns = addDays(endDateDate, 1)
-    const nextDate = format(nextFns, 'yyyy-MM-dd')
+  const evaluateEndDateValidity = useCallback(
+    (newEndDate: string) => {
+      const endDateDate = new Date(newEndDate)
+      const previousFns = addDays(endDateDate, -1)
+      const previousDate = format(previousFns, 'yyyy-MM-dd')
+      const nextFns = addDays(endDateDate, 1)
+      const nextDate = format(nextFns, 'yyyy-MM-dd')
 
-    const isValid =
-      vacantDaysForInfoNoticesWithoutTakeoverDates?.includes(newEndDate) ||
-      vacantDaysForInfoNoticesWithoutTakeoverDates?.includes(previousDate) ||
-      vacantDaysForInfoNoticesWithoutTakeoverDates?.includes(nextDate)
-    setIsEndDateValid(isValid)
-  }
+      const isValid =
+        vacantDaysForInfoNoticesWithoutTakeoverDates?.includes(newEndDate) ||
+        vacantDaysForInfoNoticesWithoutTakeoverDates?.includes(previousDate) ||
+        vacantDaysForInfoNoticesWithoutTakeoverDates?.includes(nextDate)
+      setIsEndDateValid(isValid)
+    },
+    [vacantDaysForInfoNoticesWithoutTakeoverDates],
+  )
 
   useEffect(() => {
     evaluateEndDateValidity(endDate)
-  }, [infoNoticeVacancies, endDate])
+  }, [infoNoticeVacancies, endDate, evaluateEndDateValidity])
 
   const isValid = startDate < endDate && description !== '' && isEndDateValid
   const queryClient = useQueryClient()
-  const { mutate } = useMutation(createInfoNotice, {
+  const { mutate } = useMutation({
+    mutationFn: createInfoNotice,
+
     onSuccess: () => {
       closeModal()
-      queryClient.invalidateQueries('infoNotices')
+      queryClient.invalidateQueries({ queryKey: ['infoNotices'] })
       setIsLoadingPost(false)
       toast.success('Lagret notisen')
       refreshInfoNoticeVacancies()
     },
+
     onError: (error: string) => {
       setIsLoadingPost(false)
       toast.error(error)
     },
   })
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!isValid) {
       toast.error('Noen av verdiene var ikke gyldig, prøv igjen')
