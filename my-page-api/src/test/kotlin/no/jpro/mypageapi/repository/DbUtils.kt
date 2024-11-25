@@ -10,14 +10,14 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 class DbUtils {
 
     fun failOutsideTransaction(apartmentRepository: ApartmentRepository) {
-        apartmentRepository.saveAll(listOf(Apartment(cabin_name="cabin_name", id=999)))
+        apartmentRepository.saveAll(listOf(Apartment(cabin_name="cabin_name", id=0)))
         val active = TransactionSynchronizationManager.isActualTransactionActive()
         throw RuntimeException("Transaction is $active")
     }
 
     @Transactional
     fun failInsideTransaction(apartmentRepository: ApartmentRepository) {
-        apartmentRepository.saveAll(listOf(Apartment(cabin_name="cabin_name", id=999)))
+        apartmentRepository.saveAll(listOf(Apartment(cabin_name="cabin_name", id=0)))
         val active = TransactionSynchronizationManager.isActualTransactionActive()
         throw RuntimeException("Transaction is $active")
     }
