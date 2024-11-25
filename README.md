@@ -22,6 +22,18 @@ The api will run on localhost:8080 - See http://localhost:8080/api/swagger-ui/in
 
 ## Running the app
 
+The project relies on auto-generated code based on an OpenAPI specification, so for everything to work, you must first run:
+
+```bash
+npm run build:openapi
+```
+
+and
+
+```bash
+mvn clean compile
+```
+
 Build the app with `npm install` and run it with `npm run dev`. The app will run on http://localhost:3000 (with a proxy to the api running on localhost:8080).
 
 ### Local MySQl

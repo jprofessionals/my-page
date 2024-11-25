@@ -12,6 +12,19 @@ This app is a NextJS project built with:
 The components under ./src/components/ui are from
 [shadcn/ui](https://ui.shadcn.com/), with slight modifications.
 
+
+The project relies on auto-generated code based on an OpenAPI specification, so for everything to work, you must first run:
+
+```bash
+npm run build:openapi
+```
+
+and
+
+```bash
+mvn clean compile
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
