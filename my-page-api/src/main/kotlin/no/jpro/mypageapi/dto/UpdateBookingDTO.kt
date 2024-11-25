@@ -5,5 +5,5 @@ import java.time.LocalDate
 data class UpdateBookingDTO (
     val startDate: LocalDate,
     val endDate: LocalDate,
-    val apartmentId: Long
+    val apartmentID: Long
 )

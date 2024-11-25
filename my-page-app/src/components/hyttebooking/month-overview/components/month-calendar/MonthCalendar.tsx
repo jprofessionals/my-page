@@ -88,7 +88,7 @@ function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: prop
     const handlePerformDrawing = async (drawingPeriod: DrawingPeriod) => {
         try {
             await ApiService.pickWinnerPendingBooking(drawingPeriod.pendingBookings);
-            toast("Trekning fullført");
+            toast.success("Trekning fullført");
         } catch {
             toast.error("Trekning feilet");
         }
@@ -140,7 +140,7 @@ function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: prop
                 weekStartsOn={1}
                 components={{
                     Day:({day}) => (
-                        <div className={style.dayContainer}>
+                        <td className={style.dayContainer}>
                             <CalendarDate day={day} />
                             {allApartments.map(apartment => (
                                 <CalendarCell
@@ -170,7 +170,7 @@ function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: prop
                             <CalendarInfoNotices
                                 infoNotices={getInfoNoticesOnDay(day, infoNotices)}
                             />
-                        </div>
+                        </td>
                     ),
                     WeekNumber: ({week}) => (
                         <WeekNumber week={week}>

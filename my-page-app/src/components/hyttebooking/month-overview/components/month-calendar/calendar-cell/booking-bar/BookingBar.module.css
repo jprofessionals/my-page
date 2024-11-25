@@ -12,7 +12,7 @@
 }
 
 .bookingBarMine {
-    background-color: #009ee5;
+    background-color: #5bceae;
 }
 
 .bookingBarMinePending {
@@ -20,11 +20,11 @@
 }
 
 .bookingBarTheirs {
-    background-color: #ff8b8b;
+    background-color: #2b809b;
 }
 
 .bookingBarTheirsPending {
-    background: repeating-linear-gradient(0deg, #ff8b8b, #ff8b8b 10px, #dadada 10px, #dadada 20px);
+    background: repeating-linear-gradient(0deg, #ff7a0c, #ff7a0c 10px, #dadada 10px, #dadada 20px);
 }
 
 .bookingBarPeriodStart {

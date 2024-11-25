@@ -1,5 +1,5 @@
 import React, {ChangeEvent, useEffect, useState} from "react";
-import {Apartment, Booking, User} from "@/types";
+import {Apartment, Booking, BookingPost, User} from "@/types";
 import ApiService, {API_URL} from "@/services/api.service";
 import {Button} from "@/components/ui/button";
 import SimpleModal from "@/components/ui/SimpleModal";
@@ -50,7 +50,7 @@ const BookingEditModal = ({ booking, user, onBookingSaved, onCancel }: Props) =>
         }
     };
 
-    const patchBookingByBookingId = async (bookingId: number | null, updatedBooking: Booking) => {
+    const patchBookingByBookingId = async (bookingId: number | null, updatedBooking: BookingPost) => {
         try {
             if (booking?.isPending) {
                 await ApiService.patchPendingBooking(bookingId, updatedBooking);
@@ -74,7 +74,7 @@ const BookingEditModal = ({ booking, user, onBookingSaved, onCancel }: Props) =>
 
     const handleConfirm = async () => {
         if (booking && startDate && endDate) {
-            const updatedBooking: Booking = {...booking, startDate, endDate}
+            const updatedBooking: BookingPost = {apartmentID: booking.apartment.id, startDate, endDate}
             await patchBookingByBookingId(booking.id, updatedBooking);
             onBookingSaved();
         }
