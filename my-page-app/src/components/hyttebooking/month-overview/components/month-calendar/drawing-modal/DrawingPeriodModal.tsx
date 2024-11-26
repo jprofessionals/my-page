@@ -27,9 +27,9 @@ const DrawingPeriodModal = ({bookingTrain, user, onCancel, onPerformDrawing}: Pr
                     {bookingTrain?.drawingPeriodList
                         .flatMap(drawingPeriod => drawingPeriod.pendingBookings)
                         .map(pendingBooking => {
-                                return <>
+                                return <div key={pendingBooking.id}>
                                     <span>{pendingBooking.employeeName} ønsker {pendingBooking.apartment.cabin_name} fra {pendingBooking.startDate} til {pendingBooking.endDate}</span><br />
-                                </>
+                                </div>
                         })
                     }
                 </>

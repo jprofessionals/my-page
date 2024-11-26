@@ -141,7 +141,7 @@ function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: prop
                 components={{
                     Day:({day}) => (
                         <td className={style.dayContainer}>
-                            <CalendarDate day={day} />
+                            <CalendarDate day={day} infoNotices={getInfoNoticesOnDay(day, infoNotices)} />
                             {allApartments.map(apartment => (
                                 <CalendarCell
                                     key={apartment.id}
@@ -167,9 +167,6 @@ function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: prop
                                     onBookingTrainClick={handleShowBookingTrain}
                                 />
                             ))}
-                            <CalendarInfoNotices
-                                infoNotices={getInfoNoticesOnDay(day, infoNotices)}
-                            />
                         </td>
                     ),
                     WeekNumber: ({week}) => (

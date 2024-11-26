@@ -1,5 +1,5 @@
 .container {
-    padding: 0 0.6rem;
+    padding: 0 0.6rem 4px;
     display: flex;
     justify-content: flex-end;
     gap: 0;
@@ -12,6 +12,19 @@
     display: flex;
     justify-content: center;
     align-items: center
+}
+
+.info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 0.5em;
+    width: 2em;
+    background-color: #2e51ef;
+    color: #ffffff;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 2rem;
 }
 
 .today {
