@@ -11,7 +11,6 @@ import {
     User
 } from '@/types';
 import {nb} from "date-fns/locale";
-import {dateFormat, getPendingBookingTrainsOnDay} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
 import CalendarWeekLabel from "./calendar-week-label/CalendarWeekLabel";
 import CalendarWeekNumber from "./calendar-week-number/CalendarWeekNumber";
 import CalendarInfoNotices from "./calendar-info-notices/CalendarInfoNotices";
@@ -23,7 +22,7 @@ import classes from "./MonthCalendar.module.css";
 import {
     getBookingsOnDayAndCabin,
     getInfoNoticesOnDay,
-    getDrawingPeriodsOnDayAndCabin,
+    getFirstBookingTrainOnDayAndCabin,
 } from "./monthCalendarUtil";
 import ApiService from "@/services/api.service";
 import BookingEditModal
@@ -48,7 +47,7 @@ function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: prop
     const [newBookingPost, setNewBookingPost] = useState<BookingPost | undefined>(undefined);
     const [editBooking, setEditBooking] = useState<Booking | undefined>(undefined);
     const [infoBooking, setInfoBooking] = useState<Booking | undefined>(undefined);
-    const [drawingPeriod, setDrawingPeriod] = useState<DrawingPeriod | undefined>(undefined);
+    const [bookingTrain, setBookingTrain] = useState<PendingBookingTrain | undefined>(undefined);
     const [allApartments, setAllApartments] = useState<Apartment[]>([]);
 
     useEffect(() => {
@@ -82,17 +81,18 @@ function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: prop
     }
 
     const handleDrawingPeriodClose = () => {
-        setDrawingPeriod(undefined);
+        setBookingTrain(undefined);
     }
 
-    const handlePerformDrawing = async (drawingPeriod: DrawingPeriod) => {
+    const handlePerformDrawing = async (bookingTrain: PendingBookingTrain) => {
         try {
-            await ApiService.pickWinnerPendingBooking(drawingPeriod.pendingBookings);
+            const pendingBookings = bookingTrain.drawingPeriodList.flatMap(drawingPeriod => drawingPeriod.pendingBookings)
+            await ApiService.pickWinnerPendingBooking(pendingBookings);
             toast.success("Trekning fullført");
         } catch {
             toast.error("Trekning feilet");
         }
-        setDrawingPeriod(undefined);
+        setBookingTrain(undefined);
     }
 
     const handleNewBookingCancelled = () => setNewBookingPost(undefined);
@@ -117,8 +117,8 @@ function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: prop
         }
     };
 
-    const handleShowDrawingPeriod = (drawingPeriod: DrawingPeriod) => {
-        setDrawingPeriod(drawingPeriod);
+    const handleShowBookingTrain = (bookingTrain: PendingBookingTrain) => {
+        setBookingTrain(bookingTrain);
     };
 
     return (
@@ -157,14 +157,14 @@ function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: prop
                                             bookings
                                         )
                                     }
-                                    drawingPeriods={
-                                        getDrawingPeriodsOnDayAndCabin(
+                                    bookingTrain={
+                                        getFirstBookingTrainOnDayAndCabin(
                                             day,
                                             apartment.cabin_name as CabinType,
                                             pendingBookingTrains
                                         )
                                     }
-                                    onDrawingPeriodClick={handleShowDrawingPeriod}
+                                    onBookingTrainClick={handleShowBookingTrain}
                                 />
                             ))}
                             <CalendarInfoNotices
@@ -208,7 +208,7 @@ function MonthCalendar({bookings, infoNotices, pendingBookingTrains, user}: prop
 
             <DrawingPeriodModal
                 user={user}
-                drawingPeriod={drawingPeriod}
+                bookingTrain={bookingTrain}
                 onCancel={handleDrawingPeriodClose}
                 onPerformDrawing={handlePerformDrawing}
             />

@@ -29,12 +29,14 @@
 
 .bookingBarPeriodStart {
     border-radius: 0.9rem 0 0 0.9rem;
-    margin-left: 0.1rem;
+    margin-left: auto;
+    width: 50%;
 }
 
 .bookingBarPeriodEnd {
     border-radius: 0 0.9rem 0.9rem 0;
-    margin-right: 0.1rem;
+    margin-right: auto;
+    width: 50%;
 }
 
 .bookingBarNameLabel {

@@ -17,11 +17,11 @@ type Props = {
     apartment: Apartment;
     onNewBookingClick: (newBooking: BookingPost) => void;
     onBookingClick: (booking: Booking) => void;
-    drawingPeriods: DrawingPeriod[];
-    onDrawingPeriodClick: (drawingPeriod: DrawingPeriod) => void;
+    bookingTrain?: PendingBookingTrain;
+    onBookingTrainClick: (bookingTrain: PendingBookingTrain) => void;
 }
 
-const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onBookingClick, drawingPeriods, onDrawingPeriodClick}: Props)  => {
+const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onBookingClick, bookingTrain, onBookingTrainClick}: Props)  => {
     const style = classes;
     const oneDayMS = 86400000;
     const isWednesday = getIsDayOfWeek(day) === 3;
@@ -49,7 +49,7 @@ const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onBoo
         });
     };
 
-     return (
+    return (
         <div className={`
             ${style.calendarCell}
             ${!isPast && style.calendarCellUpcoming}
@@ -70,22 +70,22 @@ const CalendarCell = ({ bookings, day, user, apartment, onNewBookingClick, onBoo
                 />
             ))}
 
-            {drawingPeriods?.map(drawingPeriod => (
+            {bookingTrain &&
                 <BookingBar
-                    key={drawingPeriod.id}
+                    key={bookingTrain.id}
                     day={day}
                     user={user}
                     booking={{
-                        id: 1,
+                        id: -1,
                         apartment,
-                        startDate: drawingPeriod.startDate,
-                        endDate: drawingPeriod.endDate,
+                        startDate: bookingTrain.startDate,
+                        endDate: bookingTrain.endDate,
                         employeeName: '',
                         isPending: true
                     }}
-                    onBookingClick={() => onDrawingPeriodClick(drawingPeriod)}
+                    onBookingClick={() => onBookingTrainClick(bookingTrain)}
                 />
-            ))}
+            }
 
             {showAddButton && (
                 <div className={style.addButtonContainer}>
