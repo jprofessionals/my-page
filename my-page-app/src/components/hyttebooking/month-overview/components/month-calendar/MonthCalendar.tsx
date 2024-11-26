@@ -108,7 +108,8 @@ function MonthCalendar({
       toast.error('Trekning feilet')
     }
     setBookingTrain(undefined)
-    await queryClient.invalidateQueries({ queryKey: ['bookings', 'allPendingBookingsAllApartments'] })
+    await queryClient.invalidateQueries({ queryKey: ['bookings'] })
+    await queryClient.invalidateQueries({ queryKey: ['allPendingBookingsAllApartments'] })
   }
 
   const handleNewBookingCancelled = () => setNewBookingPost(undefined)
