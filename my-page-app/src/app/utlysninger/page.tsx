@@ -1,5 +1,6 @@
+'use client'
+
 import { useMemo, useState } from 'react'
-import dynamic from 'next/dynamic'
 import { AddJobPostingModal } from '@/components/jobpostings/AddJobPostingModal'
 import {
   JobPosting as JobPostingType,
@@ -8,10 +9,7 @@ import {
 import { useJobPostings, usePostJobPosting } from '@/hooks/jobPosting'
 import { JobPostingList } from '@/components/jobpostings/JobPostingList'
 import { useAuthContext } from '@/providers/AuthProvider'
-
-const RequireAuth = dynamic(() => import('@/components/auth/RequireAuth'), {
-  ssr: false,
-})
+import RequireAuth from '@/components/auth/RequireAuth'
 
 export default function Utlysninger() {
   const { user } = useAuthContext()
@@ -19,6 +17,8 @@ export default function Utlysninger() {
   const [tags] = useState<string[]>([])
   const { data: jobPostings } = useJobPostings(tags)
   const { mutate: createJobPosting } = usePostJobPosting()
+  // Definer en konstant for dagens dato
+  const now = new Date()
 
   const activeJobPostings = useMemo(() => {
     return (
@@ -27,9 +27,7 @@ export default function Utlysninger() {
           if (jobPosting.urgent) {
             return true
           } else {
-            return (
-              jobPosting.deadline && new Date(jobPosting.deadline) >= new Date()
-            )
+            return jobPosting.deadline && new Date(jobPosting.deadline) >= now
           }
         })
         .sort((a, b) => {
@@ -46,7 +44,7 @@ export default function Utlysninger() {
           return aVal - bVal
         }) || []
     )
-  }, [jobPostings])
+  }, [jobPostings, now])
 
   const pastJobPostings = useMemo(() => {
     return (
@@ -56,7 +54,7 @@ export default function Utlysninger() {
             return false
           }
           if (jobPosting.deadline) {
-            return new Date(jobPosting.deadline) < new Date()
+            return new Date(jobPosting.deadline) < now
           }
           return true
         })
@@ -70,7 +68,7 @@ export default function Utlysninger() {
           return bVal - aVal
         }) || []
     )
-  }, [jobPostings])
+  }, [jobPostings, now])
 
   const openModal = () => {
     setIsModalOpen(true)
@@ -112,7 +110,7 @@ export default function Utlysninger() {
           jobPostings={activeJobPostings}
         />
 
-        <div className="mb-12"/>
+        <div className="mb-12" />
 
         <JobPostingList
           title="Tidligere utlysninger"

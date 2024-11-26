@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Customer,
   JobPosting as JobPostingType,
@@ -24,12 +26,14 @@ interface JobPostingModalProps {
   jobPostingFiles?: JobPostingFilesType
   heading: string
   submitText: string
-  onClose: () => void
-  onSubmit: (
+
+  onClose(): void
+
+  onSubmit(
     jobPosting: JobPostingType,
     newFiles: FileList,
     filesToDelete: JobPostingFilesType,
-  ) => void
+  ): void
 }
 
 export const JobPostingModal = ({
@@ -120,6 +124,9 @@ export const JobPostingModal = ({
             <Dialog.Title className="text-xl font-bold mb-4">
               {heading}
             </Dialog.Title>
+            <Dialog.Description hidden={true}>
+              Legg til eller endre utlysninger
+            </Dialog.Description>
             <form onSubmit={handleSubmit}>
               <div className="mt-5 mb-4">
                 <TextField

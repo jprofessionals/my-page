@@ -1,18 +1,19 @@
+'use client'
+
 import {
   createContext,
+  MutableRefObject,
   PropsWithChildren,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from 'react'
-import * as _ from 'radash'
 import { Settings, User } from '@/types'
 import ApiService from '@/services/api.service'
 import config from '../config/config'
-import { useSessionStorage } from 'usehooks-ts'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
 
 type UserFetchStatus =
   | 'init'
@@ -21,10 +22,10 @@ type UserFetchStatus =
   | 'fetchFailed'
   | 'signedOut'
 
-type AuthContext = {
+type AuthContextType = {
   isAuthenticated: boolean
   userToken: string | null
-  authenticate: () => void
+  authenticate: (divElement: MutableRefObject<HTMLDivElement | null>) => void
   userFetchStatus: UserFetchStatus
   user: User | null
   logout: () => void
@@ -32,18 +33,23 @@ type AuthContext = {
   settings: Settings[] | undefined
 }
 
-const Context = createContext<AuthContext | null>(null)
+const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null)
-  const [userToken, setUserToken] = useSessionStorage<string | null>(
-    'user_token',
-    null,
-  )
+  const [userToken, setUserToken] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   const [userFetchStatus, setUserFetchStatus] =
     useState<UserFetchStatus>('init')
-  const isAuthenticated = useMemo(() => !!userToken, [userToken])
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('user_token')
+    setUserToken(token)
+    setIsLoading(false)
+  }, [])
+
+  const isAuthenticated = !!userToken
 
   useEffect(() => {
     const getUser = async () => {
@@ -56,13 +62,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
         })
         setUserFetchStatus('fetched')
       } catch (e) {
-        const headerAuthToken = _.get(
-          e,
-          'response.headers.[www-authenticate]',
-          '',
-        ) // Then the token was either expired or otherwise invalid
-        if (headerAuthToken?.includes('invalid_token')) {
-          setUserToken(null)
+        if (axios.isAxiosError(e) && e.response) {
+          const headerAuthToken = e.response.headers['www-authenticate'] || ''
+          if (
+            typeof headerAuthToken === 'string' &&
+            headerAuthToken.includes('invalid_token')
+          ) {
+            sessionStorage.removeItem('user_token')
+            setUserToken(null)
+          }
         }
         setUserFetchStatus('fetchFailed')
       }
@@ -70,51 +78,61 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (isAuthenticated && !user) {
       getUser()
     }
-  }, [isAuthenticated, setUserToken, user])
+  }, [isAuthenticated, user])
 
   const router = useRouter()
   const logout = () => {
+    sessionStorage.removeItem('user_token')
     setUserFetchStatus('signedOut')
     setUserToken(null)
     setUser(null)
     router.push('/loggut')
   }
 
-  const authenticate = async () => {
-    const { googleClientId } = config()
+  const authenticate = (
+    divElement: MutableRefObject<HTMLDivElement | null>,
+  ) => {
+    if (isAuthenticated) return
 
-    window.google.accounts.id.initialize({
-      client_id: googleClientId,
-      auto_select: true,
-      prompt_parent_id: 'signInDiv',
-      use_fedcm_for_prompt: true,
-      callback: (response) => setUserToken(response.credential),
-    })
+    if (typeof window !== 'undefined' && window.google) {
+      const { googleClientId } = config()
 
-    window.google.accounts.id.prompt(() => {
-      const signInDiv = document.getElementById('signInDiv')
-      if (signInDiv)
-        window.google.accounts.id.renderButton(signInDiv, {
-          type: 'standard',
-          theme: 'outline',
-          size: 'medium',
-          text: 'continue_with',
-          shape: 'rectangular',
-          logo_alignment: 'left',
-        })
-    })
+      window.google.accounts.id.initialize({
+        client_id: googleClientId,
+        auto_select: true,
+        prompt_parent_id: 'signInDiv',
+        use_fedcm_for_prompt: true,
+        callback: (response) => {
+          sessionStorage.setItem('user_token', response.credential)
+          setUserToken(response.credential)
+        },
+      })
+
+      window.google.accounts.id.prompt(() => {
+        const signInDiv = divElement.current
+        if (signInDiv)
+          window.google.accounts.id.renderButton(signInDiv, {
+            type: 'standard',
+            theme: 'outline',
+            size: 'medium',
+            text: 'continue_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+          })
+      })
+    }
   }
 
   const { data: settings } = useQuery({
     queryKey: ['settingsQueryKey'],
 
-    queryFn: async () => {
-      return await ApiService.getSettings()
+    queryFn: () => {
+      return ApiService.getSettings()
     },
   })
 
   return (
-    <Context.Provider
+    <AuthContext.Provider
       value={{
         userToken,
         isAuthenticated,
@@ -126,15 +144,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
         settings,
       }}
     >
-      {children}
-    </Context.Provider>
+      {!isLoading && children}
+    </AuthContext.Provider>
   )
 }
 
 export function useAuthContext() {
-  const auth = useContext(Context)
+  const auth = useContext(AuthContext)
   if (!auth) {
-    throw new Error("Can't use useContext outside of AuthProvider.")
+    throw new Error("Can't use useAuthContext outside of AuthProvider.")
   }
   return auth
 }
