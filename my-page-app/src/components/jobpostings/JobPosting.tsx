@@ -1,3 +1,5 @@
+'use client'
+
 import { MouseEventHandler, useState } from 'react'
 import {
   JobPosting as JobPostingType,
@@ -72,14 +74,40 @@ export const JobPosting = (jobPosting: JobPostingType) => {
 
   return (
     <>
-      <Accordion.Header className="border border-gray-200 rounded-lg">
-        <Accordion.Trigger className="relative p-4 bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
-          <div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
+      <Accordion.Header className="relative border border-gray-200 rounded-lg">
+        {user?.admin && (
+          <div className="absolute top-1 right-2 flex space-x-2">
+            <button
+              onClick={openModal}
+              aria-label="Edit job posting"
+              className="focus:outline-none"
+            >
+              <FontAwesomeIcon
+                icon={faPencilAlt}
+                className="text-gray-600 hover:text-gray-800"
+              />
+            </button>
+            <button
+              onClick={openDeleteDialog}
+              aria-label="Delete job posting"
+              className="focus:outline-none"
+            >
+              <FontAwesomeIcon
+                icon={faTrashAlt}
+                className="text-red-600 hover:text-red-800"
+              />
+            </button>
+          </div>
+        )}
+        <Accordion.Trigger className="p-4 bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+          < div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
             <div className="flex flex-col items-start">
               <h2 className="text-xl text-left font-bold text-gray-800">
                 {jobPosting.title}
               </h2>
-              <p className="text-gray-700 text-left">{jobPosting.customer.name}</p>
+              <p className="text-gray-700 text-left">
+                {jobPosting.customer.name}
+              </p>
             </div>
             <div className="flex flex-wrap gap-2 mb-2 items-center">
               {jobPosting.tags.map((tag) => (
@@ -87,39 +115,17 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                   key={tag.id}
                   className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded"
                 >
-              {tag.name}
-            </span>
+                  {tag.name}
+                </span>
               ))}
             </div>
             <div className="flex flex-col items-start w-[200px]">
               <p className="text-sm text-left font-bold text-gray-800">Frist</p>
-              <p className="text-sm text-gray-700 text-left">{formattedDeadline}</p>
+              <p className="text-sm text-gray-700 text-left">
+                {formattedDeadline}
+              </p>
             </div>
           </div>
-          {user?.admin && (
-            <div className="absolute top-1 right-2 flex space-x-2">
-              <button
-                onClick={openModal}
-                aria-label="Edit job posting"
-                className="focus:outline-none"
-              >
-                <FontAwesomeIcon
-                  icon={faPencilAlt}
-                  className="text-gray-600 hover:text-gray-800"
-                />
-              </button>
-              <button
-                onClick={openDeleteDialog}
-                aria-label="Delete job posting"
-                className="focus:outline-none"
-              >
-                <FontAwesomeIcon
-                  icon={faTrashAlt}
-                  className="text-red-600 hover:text-red-800"
-                />
-              </button>
-            </div>
-          )}
         </Accordion.Trigger>
       </Accordion.Header>
 

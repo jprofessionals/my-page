@@ -1,8 +1,8 @@
 import { JobPostings as JobPostingsType } from '@/data/types'
 import * as Accordion from '@radix-ui/react-accordion'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { JobPosting } from '@/components/jobpostings/JobPosting'
+import { useSearchParams } from 'next/navigation'
 
 type PropsType = {
   title: string
@@ -10,16 +10,15 @@ type PropsType = {
 }
 
 export const JobPostingList = ({ title, jobPostings }: PropsType) => {
-  const router = useRouter()
+  const searchParams = useSearchParams()
   const [openItems, setOpenItems] = useState<string[]>([])
   const hasScrolledRef = useRef(false)
 
-  const { id } = router.query
+  const id = searchParams?.get('id')
 
   useEffect(() => {
     if (id) {
-      const idStr = Array.isArray(id) ? id[0] : id
-      setOpenItems((prev) => [...prev, idStr])
+      setOpenItems((prev) => [...prev, id])
     }
   }, [id])
 
