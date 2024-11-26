@@ -117,13 +117,23 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long> {
         SELECT jp
         FROM JobPosting jp
         LEFT JOIN jp.tags t
+        LEFT JOIN jp.customer c
         GROUP BY jp
-        HAVING 
-            :#{#tagNames == null || #tagNames.isEmpty()} = true
-            OR 
-            COUNT(CASE WHEN t.name IN :tagNames THEN 1 END) = :#{#tagNames != null ? #tagNames.size() : 0}
+        HAVING
+            (
+                :#{#tagNames == null || #tagNames.isEmpty()} = true
+                OR 
+                COUNT(CASE WHEN t.name IN :tagNames THEN 1 END) = :#{#tagNames != null ? #tagNames.size() : 0}
+            )
+            AND
+            (
+                :#{#customerNames == null || #customerNames.isEmpty()} = true
+                OR 
+                COUNT(CASE WHEN c.name IN :customerNames THEN 1 END) = :#{#customerNames != null ? #customerNames.size() : 0}
+            )
     """)
     fun findAllWithFilters(
+        @Param("customerNames") customerNames: List<String>?,
         @Param("tagNames") tagNames: List<String>?,
     ): List<JobPosting>
 

@@ -3,19 +3,27 @@
 import { useMemo, useState } from 'react'
 import { AddJobPostingModal } from '@/components/jobpostings/AddJobPostingModal'
 import {
+  Customer,
   JobPosting as JobPostingType,
   JobPostingFiles as JobPostingFilesType,
+  Tags,
 } from '@/data/types'
 import { useJobPostings, usePostJobPosting } from '@/hooks/jobPosting'
 import { JobPostingList } from '@/components/jobpostings/JobPostingList'
 import { useAuthContext } from '@/providers/AuthProvider'
 import RequireAuth from '@/components/auth/RequireAuth'
+import TagFilter from '@/components/jobpostings/TagFilter'
+import CustomerFilter from '@/components/jobpostings/CustomerFilter'
 
 export default function Utlysninger() {
   const { user } = useAuthContext()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [tags] = useState<string[]>([])
-  const { data: jobPostings } = useJobPostings(tags)
+  const [tags, setTags] = useState<Tags>([])
+  const [customer, setCustomer] = useState<Customer | null>(null)
+  const { data: jobPostings } = useJobPostings(
+    customer ? [customer.name] : null,
+    tags.map((tag) => tag.name),
+  )
   const { mutate: createJobPosting } = usePostJobPosting()
   // Definer en konstant for dagens dato
   const now = new Date()
@@ -104,6 +112,13 @@ export default function Utlysninger() {
             Legg til ny utlysning
           </button>
         )}
+
+        <h2 className="text-2xl font-bold mb-6">Filtrer utlysninger</h2>
+        <TagFilter tags={tags} setTags={setTags} />
+        <div className="mb-4" />
+        <CustomerFilter customer={customer} setCustomer={setCustomer} />
+
+        <div className="mb-12" />
 
         <JobPostingList
           title="Aktive utlysninger"

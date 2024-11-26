@@ -69,9 +69,10 @@ class JobPostingService(
     }
 
     fun getJobPostings(
+        customers: List<String>?,
         tags: List<String>?
     ): List<no.jpro.mypageapi.entity.JobPosting> {
-        return jobPostingRepository.findAllWithFilters(tags)
+        return jobPostingRepository.findAllWithFilters(customers, tags)
     }
 
     fun getJobPostingCustomers(): List<Customer> {
