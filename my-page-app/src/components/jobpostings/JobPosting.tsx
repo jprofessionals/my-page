@@ -99,9 +99,9 @@ export const JobPosting = (jobPosting: JobPostingType) => {
             </button>
           </div>
         )}
-        <Accordion.Trigger className="p-4 bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
-          < div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
-            <div className="flex flex-col items-start">
+        <Accordion.Trigger className="pt-4 group bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+          <div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
+            <div className="flex flex-col items-start px-4 pb-4">
               <h2 className="text-xl text-left font-bold text-gray-800">
                 {jobPosting.title}
               </h2>
@@ -109,7 +109,15 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                 {jobPosting.customer.name}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 mb-2 items-center">
+            <div className="flex flex-col items-start justify-center w-[230px] pr-4 pl-4 pb-4 mb:pl-0 mb:pb-0">
+              <p className="text-sm text-left font-bold text-gray-800">Frist</p>
+              <p className="text-sm text-gray-700 text-left">
+                {formattedDeadline}
+              </p>
+            </div>
+          </div>
+          {jobPosting.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 pl-6 pr-4 pb-2 pt-2 items-center border-t border-orange-300">
               {jobPosting.tags.map((tag) => (
                 <span
                   key={tag.id}
@@ -119,13 +127,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                 </span>
               ))}
             </div>
-            <div className="flex flex-col items-start w-[200px]">
-              <p className="text-sm text-left font-bold text-gray-800">Frist</p>
-              <p className="text-sm text-gray-700 text-left">
-                {formattedDeadline}
-              </p>
-            </div>
-          </div>
+          )}
         </Accordion.Trigger>
       </Accordion.Header>
 
