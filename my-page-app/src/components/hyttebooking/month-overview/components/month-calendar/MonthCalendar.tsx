@@ -22,14 +22,14 @@ import classes from './MonthCalendar.module.css'
 import {
   getBookingsOnDayAndCabin,
   getInfoNoticesOnDay,
-  getFirstBookingTrainOnDayAndCabin,
+  getBookingTrainsOnDayAndCabin,
 } from './monthCalendarUtil'
 import ApiService from '@/services/api.service'
 import BookingEditModal from '@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-modal/BookingEditModal'
 import BookingReadOnlyInfoModal from '@/components/hyttebooking/month-overview/components/month-calendar/booking-read-only-info-Modal/BookingReadOnlyInfoModal'
 import DrawingPeriodModal from './drawing-modal/DrawingPeriodModal'
 import { toast } from 'react-toastify'
-import {useQueryClient} from "@tanstack/react-query";
+import { useQueryClient } from '@tanstack/react-query'
 
 type props = {
   bookings: Booking[]
@@ -80,13 +80,17 @@ function MonthCalendar({
   const handleNewBookingCreated = async () => {
     setNewBookingPost(undefined)
     await queryClient.invalidateQueries({ queryKey: ['bookings'] })
-    await queryClient.invalidateQueries({ queryKey: ['allPendingBookingsAllApartments'] })
+    await queryClient.invalidateQueries({
+      queryKey: ['allPendingBookingsAllApartments'],
+    })
   }
 
   const handleEditBookingSaved = async () => {
     setEditBooking(undefined)
     await queryClient.invalidateQueries({ queryKey: ['bookings'] })
-    await queryClient.invalidateQueries({ queryKey: ['allPendingBookingsAllApartments'] })
+    await queryClient.invalidateQueries({
+      queryKey: ['allPendingBookingsAllApartments'],
+    })
   }
 
   const handleInfoBookingClose = () => {
@@ -109,7 +113,9 @@ function MonthCalendar({
     }
     setBookingTrain(undefined)
     await queryClient.invalidateQueries({ queryKey: ['bookings'] })
-    await queryClient.invalidateQueries({ queryKey: ['allPendingBookingsAllApartments'] })
+    await queryClient.invalidateQueries({
+      queryKey: ['allPendingBookingsAllApartments'],
+    })
   }
 
   const handleNewBookingCancelled = () => setNewBookingPost(undefined)
@@ -175,7 +181,7 @@ function MonthCalendar({
                     apartment.cabin_name as CabinType,
                     bookings,
                   )}
-                  bookingTrain={getFirstBookingTrainOnDayAndCabin(
+                  bookingTrains={getBookingTrainsOnDayAndCabin(
                     day,
                     apartment.cabin_name as CabinType,
                     pendingBookingTrains,

@@ -4,7 +4,7 @@ import ApiService, { API_URL } from '@/services/api.service'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
 import { toast } from 'react-toastify'
-import {useQueryClient} from "@tanstack/react-query";
+import { useQueryClient } from '@tanstack/react-query'
 
 type Props = {
   booking?: Booking

@@ -3,6 +3,11 @@ import { Booking, CabinType, InfoBooking, PendingBookingTrain } from '@/types'
 import { dateFormat } from '@/components/hyttebooking/month-overview/monthOverviewUtils'
 import { format } from 'date-fns'
 
+export const byStartDate = (
+  a: Booking | PendingBookingTrain,
+  b: Booking | PendingBookingTrain,
+) => Date.parse(a.startDate) - Date.parse(b.startDate)
+
 export const getBookingsOnDayAndCabin = (
   day: CalendarDay,
   cabinName: CabinType,
@@ -16,23 +21,21 @@ export const getBookingsOnDayAndCabin = (
         dateString <= booking?.endDate &&
         cabinName === booking?.apartment.cabin_name,
     )
-    .sort((a, b) => Date.parse(a.startDate) - Date.parse(b.startDate))
+    .sort(byStartDate)
 }
 
-export const getFirstBookingTrainOnDayAndCabin = (
+export const getBookingTrainsOnDayAndCabin = (
   day: CalendarDay,
   cabinName: CabinType,
   trains: PendingBookingTrain[],
-): PendingBookingTrain | undefined => {
+): PendingBookingTrain[] | undefined => {
   const dateString = format(day.date, dateFormat)
-  const trainsOnDay = trains.filter((train: PendingBookingTrain) => {
-    return (
+  return trains.filter(
+    (train: PendingBookingTrain) =>
       dateString >= train.startDate &&
       dateString <= train.endDate &&
-      cabinName === train?.apartment.cabin_name
-    )
-  })
-  return trainsOnDay.length > 0 ? trainsOnDay[0] : undefined
+      cabinName === train?.apartment.cabin_name,
+  )
 }
 
 export const getInfoNoticesOnDay = (

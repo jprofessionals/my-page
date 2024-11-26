@@ -22,7 +22,7 @@ type Props = {
   apartment: Apartment
   onNewBookingClick: (newBooking: BookingPost) => void
   onBookingClick: (booking: Booking) => void
-  bookingTrain?: PendingBookingTrain
+  bookingTrains?: PendingBookingTrain[]
   onBookingTrainClick: (bookingTrain: PendingBookingTrain) => void
 }
 
@@ -33,7 +33,7 @@ const CalendarCell = ({
   apartment,
   onNewBookingClick,
   onBookingClick,
-  bookingTrain,
+  bookingTrains,
   onBookingTrainClick,
 }: Props) => {
   const style = classes
@@ -55,7 +55,6 @@ const CalendarCell = ({
     !isPast && isWednesday && !hasPeriodEnd && !showAddButton
 
   const handleNewBooking = () => {
-    const oneDayMS = 86400000
     const date = day.date
     const startDate = format(date, dateFormat)
     date.setTime(date.getTime() + oneDayMS * 7)
@@ -88,7 +87,7 @@ const CalendarCell = ({
         />
       ))}
 
-      {bookingTrain && (
+      {bookingTrains?.map((bookingTrain) => (
         <BookingBar
           key={bookingTrain.id}
           day={day}
@@ -103,7 +102,7 @@ const CalendarCell = ({
           }}
           onBookingClick={() => onBookingTrainClick(bookingTrain)}
         />
-      )}
+      ))}
 
       {showAddButton && (
         <div className={style.addButtonContainer}>
