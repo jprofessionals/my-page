@@ -27,9 +27,6 @@ import {
     dateFormat,
     getInfoNotices,
     getInfoNoticeVacancyOnGivenDay,
-    getPendingBookingDaysFrom,
-    getPendingBookingTrainsOnDay,
-    getPendingDrawingPeriodDaysFrom,
     getVacantApartmentsOnDay,
     sortBookingItems,
     sortPendingBookings,
@@ -481,13 +478,7 @@ export default function MonthOverview() {
             {cutOffDateVacancies == null ? "Fant ikke innstilling for siste reserverbare dato" : (
                 <div>
                 <MonthCalendar
-                    bookings={
-                        (bookings as Booking[] || [])
-                        // TODO: See which lists are necessary
-                        // .concat(pendingBookingList)
-                        // .concat(yourPendingBookings || [])
-                        // .concat(allPendingBookingTrains)
-                    }
+                    bookings={(bookings as Booking[] || [])}
                     pendingBookingTrains={allPendingBookingTrains || []}
                     infoNotices={allInfoNotices || []}
                     user={user}

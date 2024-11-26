@@ -1,11 +1,8 @@
-import Modal from "react-modal";
 import React, {ChangeEvent, useEffect, useState} from "react";
 import {Apartment, BookingPost, User} from "@/types";
 import axios from "axios";
 import ApiService, {API_URL} from "@/services/api.service";
 import authHeader from "@/services/auth-header";
-import {dateFormat} from "@/components/hyttebooking/month-overview/monthOverviewUtils";
-import { format } from 'date-fns';
 import {Button} from "@/components/ui/button";
 import SimpleModal from "@/components/ui/SimpleModal";
 
@@ -18,10 +15,7 @@ type Props = {
 
 const BookingAddModal = ({ bookingPost, user, onBookingCreated, onCancel }: Props) => {
     const [allApartments, setAllApartments] = useState<Apartment[]>([]);
-    const [asAdmin, setAsAdmin] = useState<boolean>(!!user?.admin || false);
     const selectedApartment = allApartments.find(apartment => apartment.id === bookingPost?.apartmentID);
-    const bookingOwnerName = ""; //todo useState
-    const bookingWithoutDrawing = false; //todo useState
     const [startDate, setStartDate] = useState<string | undefined>();
     const [endDate, setEndDate] = useState<string | undefined>();
 
@@ -44,11 +38,7 @@ const BookingAddModal = ({ bookingPost, user, onBookingCreated, onCancel }: Prop
         bookingPost: BookingPost
     }) => {
         const data = { ...bookingPost, startDate, endDate}
-        const url = asAdmin ?
-            bookingWithoutDrawing ?
-                `${API_URL}booking/admin/post?bookingOwnerName=${bookingOwnerName}` :
-                `${API_URL}pendingBooking/pendingPostForUser?bookingOwnerName=${bookingOwnerName}`
-            : `${API_URL}pendingBooking/pendingPost`;
+        const url = `${API_URL}pendingBooking/pendingPost`;
         return axios
             .post(url, data, { headers: authHeader()})
             .then((response) => response.data)

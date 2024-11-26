@@ -1,6 +1,6 @@
 import { isAfter, isBefore, sub} from 'date-fns'
 import {format, } from 'date-fns';
-import {Apartment, Booking, CabinType, InfoBooking, PendingBookingTrain, VacancyKeys} from "@/types";
+import {Apartment, Booking, CabinType, InfoBooking, VacancyKeys} from "@/types";
 
 
 export const dateFormat = 'yyyy-MM-dd';
@@ -74,33 +74,6 @@ export const getVacantApartmentsOnDay = (
     return availableApartments;
 };
 
-export const getPendingBookingTrainsOnDay = (date: string, allPendingBookingTrains: Booking[]): PendingBookingTrain[] => {
-    if (!allPendingBookingTrains) {
-        return []
-    }
-
-    const allPendingBookingTrainsAllApartments: PendingBookingTrain[] = []
-
-    // TODO: Implement
-    // for (const apartmentPendingTrain of allPendingBookingTrains) {
-    //     for (const pendingTrain of apartmentPendingTrain) {
-    //         allPendingBookingTrainsAllApartments.push(pendingTrain)
-    //     }
-    // }
-
-    const currentDate = new Date(date)
-    currentDate.setHours(0, 0, 0, 0)
-
-    return allPendingBookingTrainsAllApartments.filter((pendingBookingTrain) => {
-            const startDate = new Date(pendingBookingTrain.startDate)
-            const endDate = new Date(pendingBookingTrain.endDate)
-            startDate.setHours(0, 0, 0, 0)
-            endDate.setHours(0, 0, 0, 0)
-            return currentDate >= startDate && currentDate <= endDate
-        }) || [];
-};
-
-
 export const getInfoNotices = (date: string, allInfoNotices: InfoBooking[]):InfoBooking[] => {
     return (
         allInfoNotices?.filter(
@@ -125,35 +98,6 @@ export const getInfoNoticeVacancyOnGivenDay = (selectedDate: Date, infoNoticeVac
     }
     return false;
 };
-
-
-export const getPendingBookingDaysFrom = (selectedDate: Date, allPendingBookingTrains: Booking[]) => {
-    const pendingBookingsOnDayArrayOfArray = [];
-    const selectedDateString = selectedDate.toString();
-    const filteredPendingBookingTrainsAllApartments = getPendingBookingTrainsOnDay(selectedDateString, allPendingBookingTrains);
-
-    for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments) {
-        for (const drawingPeriod of pendingBookingTrain.drawingPeriodList) {
-            pendingBookingsOnDayArrayOfArray.push(drawingPeriod.pendingBookings);
-        }
-    }
-
-    return pendingBookingsOnDayArrayOfArray.flat();
-};
-
-export const getPendingDrawingPeriodDaysFrom = (selectedDate: Date, allPendingBookingTrains: Booking[]) => {
-    const drawingPeriodsOnDayArrayOfArray = [];
-    const selectedDateString = selectedDate.toString();
-    const filteredPendingBookingTrainsAllApartments = getPendingBookingTrainsOnDay(selectedDateString, allPendingBookingTrains);
-
-    for (const pendingBookingTrain of filteredPendingBookingTrainsAllApartments) {
-        for (const drawingPeriod of pendingBookingTrain.drawingPeriodList) {
-            drawingPeriodsOnDayArrayOfArray.push(drawingPeriod);
-        }
-    }
-
-    return drawingPeriodsOnDayArrayOfArray.flat();
-}
 
 export const sortBookingItems = (bookingItems: Booking[] ) => {
     if (bookingItems?.length > 0) {
