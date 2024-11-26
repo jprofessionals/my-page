@@ -29,6 +29,7 @@ import BookingEditModal from '@/components/hyttebooking/month-overview/component
 import BookingReadOnlyInfoModal from '@/components/hyttebooking/month-overview/components/month-calendar/booking-read-only-info-Modal/BookingReadOnlyInfoModal'
 import DrawingPeriodModal from './drawing-modal/DrawingPeriodModal'
 import { toast } from 'react-toastify'
+import {useQueryClient} from "@tanstack/react-query";
 
 type props = {
   bookings: Booking[]
@@ -43,6 +44,8 @@ function MonthCalendar({
   pendingBookingTrains,
   user,
 }: props) {
+  const queryClient = useQueryClient()
+
   const style = classes
   const [startMonth, setStartMonth] = useState<Date>(
     sub(new Date(), { months: 6 }),
@@ -74,21 +77,23 @@ function MonthCalendar({
     // todo refetch
   }
 
-  const handleNewBookingCreated = () => {
+  const handleNewBookingCreated = async () => {
     setNewBookingPost(undefined)
-    // todo refetch all.
+    await queryClient.invalidateQueries({ queryKey: ['bookings'] })
+    await queryClient.invalidateQueries({ queryKey: ['allPendingBookingsAllApartments'] })
   }
 
-  const handleEditBookingSaved = () => {
-    setNewBookingPost(undefined)
-    // todo refetch all.
+  const handleEditBookingSaved = async () => {
+    setEditBooking(undefined)
+    await queryClient.invalidateQueries({ queryKey: ['bookings'] })
+    await queryClient.invalidateQueries({ queryKey: ['allPendingBookingsAllApartments'] })
   }
 
   const handleInfoBookingClose = () => {
     setInfoBooking(undefined)
   }
 
-  const handleDrawingPeriodClose = () => {
+  const handleDrawingPeriodClose = async () => {
     setBookingTrain(undefined)
   }
 
@@ -103,6 +108,7 @@ function MonthCalendar({
       toast.error('Trekning feilet')
     }
     setBookingTrain(undefined)
+    await queryClient.invalidateQueries({ queryKey: ['bookings', 'allPendingBookingsAllApartments'] })
   }
 
   const handleNewBookingCancelled = () => setNewBookingPost(undefined)

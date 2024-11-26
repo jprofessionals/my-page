@@ -4,6 +4,7 @@ import ApiService, { API_URL } from '@/services/api.service'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
 import { toast } from 'react-toastify'
+import {useQueryClient} from "@tanstack/react-query";
 
 type Props = {
   booking?: Booking
@@ -18,21 +19,10 @@ const BookingEditModal = ({
   onBookingSaved,
   onCancel,
 }: Props) => {
-  const [allApartments, setAllApartments] = useState<Apartment[]>([])
-  const [asAdmin, setAsAdmin] = useState<boolean>(!!user?.admin || false)
-  //    const selectedApartment = allApartments.find(apartment => apartment.id === bookingPost?.apartmentID);
-  const bookingOwnerName = '' //todo useState
-  const bookingWithoutDrawing = false //todo useState
   const [startDate, setStartDate] = useState<string | undefined>()
   const [endDate, setEndDate] = useState<string | undefined>()
 
-  useEffect(() => {
-    const fetchAllApartments = async () => {
-      const response = await ApiService.getAllApartments()
-      setAllApartments(response)
-    }
-    fetchAllApartments()
-  }, [])
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     setStartDate(booking?.startDate)
