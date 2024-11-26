@@ -489,7 +489,7 @@ export default function MonthOverview() {
                         // .concat(allPendingBookingTrains)
                     }
                     pendingBookingTrains={allPendingBookingTrains || []}
-                    infoNotices={infoNotices}
+                    infoNotices={allInfoNotices || []}
                     user={user}
                 />
                 </div>
