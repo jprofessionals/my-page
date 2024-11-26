@@ -24,6 +24,7 @@ const SimpleModal = ({
     isOpen={open}
     onRequestClose={onRequestClose}
     contentLabel={'Book'}
+    ariaHideApp={false} // TODO: Pass in appElement instead so screen readers don't see main content when modal is opened
     style={{
       content: {
         width: 'auto',
