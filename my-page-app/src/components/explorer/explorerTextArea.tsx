@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import SockJS from 'sockjs-client'
-import {Button} from '../ui/button'
-import Spinner from "@/components/ui/spinner";
+import { Button } from '../ui/button'
+import Spinner from '@/components/ui/spinner'
 
 interface ExploreResponse {
   description: string
@@ -20,11 +20,11 @@ const artStyleOptions: Record<string, string> = {
   Munch: 'a painting in the style of Edvard Munch',
   PopArt: 'a pop-art image',
   // Add more options here as needed
-};
+}
 
 function ExplorerTextArea(): JSX.Element {
   const [text, setText] = useState<string>('')
-  const [artStyle, setArtStyle] = useState<string>('Default'); // Default art style
+  const [artStyle, setArtStyle] = useState<string>('Default') // Default art style
 
   const textAreaRef = useRef<HTMLDivElement>(null)
   const [buttonClicked, setButtonClicked] = useState<boolean>(false)
@@ -34,8 +34,7 @@ function ExplorerTextArea(): JSX.Element {
 
   const socketRef = useRef<WebSocket | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
-  const [isLoadingWebSocket, setIsLoadingWebSocket] = useState(false);
-
+  const [isLoadingWebSocket, setIsLoadingWebSocket] = useState(false)
 
   function openWebSocket(sockJsURL: string) {
     socketRef.current = new SockJS(sockJsURL)
@@ -45,10 +44,10 @@ function ExplorerTextArea(): JSX.Element {
         if (socketRef.current)
           if (localStorage.getItem('user_token')) {
             socketRef.current.send(
-                (sessionStorage.getItem('user_token') as string).replace(
-                    /^"|"$/g,
-                    '',
-                ),
+              (sessionStorage.getItem('user_token') as string).replace(
+                /^"|"$/g,
+                '',
+              ),
             )
           }
       }
@@ -77,40 +76,40 @@ function ExplorerTextArea(): JSX.Element {
   useEffect(() => {
     const protocol = window.location.protocol
     const sockJsURL = `${protocol}//${window.location.host}/api/explorationSock`
-    return openWebSocket(sockJsURL);
+    return openWebSocket(sockJsURL)
   }, [])
 
   const sendExploreRequest = useCallback(async () => {
-    setError(null);
+    setError(null)
     try {
       if (text.trim()) {
-          const explorationInput = {
+        const explorationInput = {
           location: text,
           artStyle: artStyleOptions[artStyle],
-        };
+        }
 
-        if(socketRef.current && socketRef.current?.readyState === 3) {
+        if (socketRef.current && socketRef.current?.readyState === 3) {
           const protocol = window.location.protocol
           const sockJsURL = `${protocol}//${window.location.host}/api/explorationSock`
           openWebSocket(sockJsURL)
         }
         if (socketRef.current && socketRef.current?.readyState === 0) {
-          setIsLoadingWebSocket(true);
-            await new Promise((f => setTimeout(f, 1000)));
+          setIsLoadingWebSocket(true)
+          await new Promise((f) => setTimeout(f, 1000))
         }
         if (socketRef.current && socketRef.current?.readyState === 1) {
-          socketRef.current.send('explore:' + JSON.stringify(explorationInput));
-          setIsLoadingWebSocket(true);
+          socketRef.current.send('explore:' + JSON.stringify(explorationInput))
+          setIsLoadingWebSocket(true)
         } else {
-          setError(new Error('Could not connect to server, try again shortly')  );
-          setIsLoadingWebSocket(false);
+          setError(new Error('Could not connect to server, try again shortly'))
+          setIsLoadingWebSocket(false)
         }
       }
     } catch (err) {
-      setError(err as Error);
-      setIsLoadingWebSocket(false);
+      setError(err as Error)
+      setIsLoadingWebSocket(false)
     }
-  }, [text, artStyle]);
+  }, [text, artStyle])
 
   useEffect(() => {
     if (textAreaRef.current) {
@@ -196,20 +195,22 @@ function ExplorerTextArea(): JSX.Element {
           }}
           className="h-12 px-2 border-t border-black-nav shadow"
         />
-        <div style={{
-          paddingTop: '0.5rem',
-          paddingBottom: '0.5rem'
-        }}>
-          <label style={{paddingRight:'0.5rem'}}>Style:</label>
+        <div
+          style={{
+            paddingTop: '0.5rem',
+            paddingBottom: '0.5rem',
+          }}
+        >
+          <label style={{ paddingRight: '0.5rem' }}>Style:</label>
           <select
-              value={artStyle}
-              onChange={(e) => setArtStyle(e.target.value)}
-              style={{ height: "35px" }}
+            value={artStyle}
+            onChange={(e) => setArtStyle(e.target.value)}
+            style={{ height: '35px' }}
           >
             {Object.keys(artStyleOptions).map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
+              <option key={option} value={option}>
+                {option}
+              </option>
             ))}
           </select>
         </div>

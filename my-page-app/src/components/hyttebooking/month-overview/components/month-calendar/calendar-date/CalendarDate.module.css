@@ -1,37 +1,37 @@
 .container {
-    padding: 0 0.6rem 4px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 0;
-    font-size: small;
+  padding: 0 0.6rem 4px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0;
+  font-size: small;
 }
 
 .date {
-    border-radius: 2rem;
-    padding: 0.2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center
+  border-radius: 2rem;
+  padding: 0.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .info {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 0.5em;
-    width: 2em;
-    background-color: #2e51ef;
-    color: #ffffff;
-    font-size: 1em;
-    font-weight: bold;
-    border-radius: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0.5em;
+  width: 2em;
+  background-color: #2e51ef;
+  color: #ffffff;
+  font-size: 1em;
+  font-weight: bold;
+  border-radius: 2rem;
 }
 
 .today {
-    background-color: #dc2323;
-    color: #ffffff;
+  background-color: #dc2323;
+  color: #ffffff;
 }
 
 .wednesday {
-    font-weight: bold;
+  font-weight: bold;
 }

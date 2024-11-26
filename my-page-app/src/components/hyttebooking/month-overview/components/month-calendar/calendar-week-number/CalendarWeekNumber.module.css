@@ -1,9 +1,9 @@
 .container {
-    height: 1.5rem;
-    display: flex;
-    justify-content: flex-start;
-    align-items: baseline;
-    gap: 0;
-    font-size: small;
-    color: #9b9b9b;
- }
+  height: 1.5rem;
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: 0;
+  font-size: small;
+  color: #9b9b9b;
+}

@@ -72,7 +72,7 @@ const EditBudgetPost = ({
   }
 
   return (
-    (<div className="overflow-hidden w-full rounded-xl border-2 border-gray-500 border-solid shadow-sm">
+    <div className="overflow-hidden w-full rounded-xl border-2 border-gray-500 border-solid shadow-sm">
       <div className="flex justify-between items-center px-3 pt-3 pb-2 w-full text-sm bg-gray-200">
         <input
           className="input input-sm"
@@ -98,7 +98,7 @@ const EditBudgetPost = ({
               />
             ) : (
               //<FontAwesomeIcon icon={faCheck} />
-              ('Lagre')
+              'Lagre'
             )}
           </button>
           <button
@@ -144,8 +144,8 @@ const EditBudgetPost = ({
           />
         </label>
       </div>
-    </div>)
-  );
+    </div>
+  )
 }
 
 export default EditBudgetPost

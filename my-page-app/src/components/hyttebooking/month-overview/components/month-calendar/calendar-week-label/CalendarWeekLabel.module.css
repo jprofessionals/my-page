@@ -1,9 +1,8 @@
 .weekLabel {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    height: 2.3rem;
-    padding: 0 0.8rem;
-    font-size: small;
-
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 2.3rem;
+  padding: 0 0.8rem;
+  font-size: small;
 }

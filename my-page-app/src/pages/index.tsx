@@ -167,8 +167,8 @@ export default function HomePage() {
 
                             return (
                               <div key={booking.id} className="ml-10 mt-3 ">
-                                <p className={old?"old-booking":""}>
-                                  Du {old?"hadde":"har reservert"}{' '}
+                                <p className={old ? 'old-booking' : ''}>
+                                  Du {old ? 'hadde' : 'har reservert'}{' '}
                                   <span
                                     className={
                                       cabinTextColorClasses[

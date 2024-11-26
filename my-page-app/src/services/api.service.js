@@ -254,8 +254,8 @@ const patchPendingBooking = (bookingId, updatedBooking) => {
 const getImage = async (fileName) => {
   const response = await axios.get(API_URL + 'image/' + fileName, {
     headers: authHeader(),
-    responseType: "blob",
-  });
+    responseType: 'blob',
+  })
   return response.data
 }
 

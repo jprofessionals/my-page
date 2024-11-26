@@ -1,12 +1,12 @@
 .container {
-    height: 2rem;
-    margin-bottom: 0.2rem;
-    width: 100%;
+  height: 2rem;
+  margin-bottom: 0.2rem;
+  width: 100%;
 }
 
 .notice {
-    width: 100%;
-    border-bottom: 3px solid;
-    border-color: #ffcf38;
-    margin-bottom: 0.1rem;
+  width: 100%;
+  border-bottom: 3px solid;
+  border-color: #ffcf38;
+  margin-bottom: 0.1rem;
 }
