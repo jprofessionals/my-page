@@ -54,7 +54,7 @@ class SecretProviderGcp : SecretProvider {
     @Value("\${sm://BookingLotteryKey}")//secret heter bookinglottery key av historiske grunner, vil endres etterhvert
     private val taskSchedulerKey: String = "NOT_SET"
 
-    @Value("\${sm://slack_bot_token}")
+    @Value("\${sm\\://slack_bot_token}")
     private val slackBotToken : String = "NOT_SET"
 
     @Value("\${sm://slack_app_utlysninger_token}")
@@ -80,7 +80,7 @@ class SecretProviderGcp : SecretProvider {
         if (slackBotToken == null) {
             logger.error("Token is null")
         }
-        
+
         logger.error(slackBotToken.substring(0, 5))
 
         if (slackBotToken == "NOT_SET") {
