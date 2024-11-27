@@ -55,6 +55,9 @@ export const JobPostingModal = ({
   const [isUrgent, setIsUrgent] = useState(
     jobPosting ? jobPosting.urgent : false,
   )
+  const [doNotify, setDoNotify] = useState(
+    jobPosting ? jobPosting.notify : true,
+  )
   const [deadline, setDeadline] = useState(
     jobPosting ? (jobPosting.deadline ? jobPosting.deadline : '') : '',
   )
@@ -96,6 +99,7 @@ export const JobPostingModal = ({
       title: title,
       customer: customer,
       urgent: isUrgent,
+      notify: doNotify,
       deadline: deadline,
       description: description,
       links: links,
@@ -172,7 +176,8 @@ export const JobPostingModal = ({
                   )}
                 />
               </div>
-              <div className="mb-4">
+              <div className="mb-4 flex gap-4">
+                <div className="flex gap-2">
                 <label className="block text-gray-700 mb-1">Levere ASAP?</label>
                 <Switch.Root
                   className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
@@ -193,6 +198,29 @@ export const JobPostingModal = ({
                     }}
                   />
                 </Switch.Root>
+                </div>
+                <div className="flex gap-2">
+                  <label className="block text-gray-700 mb-1">Varsel?</label>
+                  <Switch.Root
+                    className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
+                      doNotify
+                        ? 'bg-blue-600 border-blue-600'
+                        : 'bg-gray-400 border-gray-400'
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                    id="notify"
+                    checked={doNotify}
+                    onCheckedChange={(checked) => setDoNotify(checked)}
+                  >
+                    <Switch.Thumb
+                      className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
+                      style={{
+                        transform: doNotify
+                          ? 'translateX(18px)'
+                          : 'translateX(0)',
+                      }}
+                    />
+                  </Switch.Root>
+                </div>
               </div>
               {isUrgent ? null : (
                 <div className="mb-4">

@@ -302,6 +302,11 @@ components:
           example:
             - "https://example.com/link1"
             - "https://example.com/link2"
+        notify:
+          type: boolean
+          description: Indicates if the job posting should cause a notification
+          default: true
+          example: true
       required:
         - id
         - title
@@ -310,6 +315,7 @@ components:
         - urgent
         - tags
         - links
+        - notify
     JobPostingFile:
       type: object
       properties:
