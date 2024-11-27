@@ -57,7 +57,7 @@ class SecretProviderGcp : SecretProvider {
     private val slackBotToken : String = "NOT_SET"
 
     @Value("\${sm://slack_app_utlysninger_token}")
-    private lateinit var slackAppUtlysningerToken: String
+    private val slackAppUtlysningerToken: String = "NOT_SET"
 
     private val logger = LoggerFactory.getLogger(SecretProviderGcp::class.java.name)
 
@@ -76,10 +76,16 @@ class SecretProviderGcp : SecretProvider {
     }
 
     override fun getSlackSecret(): String {
+        if (slackBotToken == "NOT_SET") {
+            throw IllegalStateException("Unable to evaluate authorization key, slack_bot_token not set in Secret Manager")
+        }
         return slackBotToken
     }
 
     override fun getSlackAppUtlysningerToken(): String {
+        if (slackAppUtlysningerToken == "NOT_SET") {
+            throw IllegalStateException("Unable to evaluate authorization key, slack_app_utlysninger_token not set in Secret Manager")
+        }
         return slackAppUtlysningerToken
     }
 }
