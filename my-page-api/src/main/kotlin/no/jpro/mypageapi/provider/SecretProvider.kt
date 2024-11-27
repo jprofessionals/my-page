@@ -47,17 +47,18 @@ class SecretProviderLocal : SecretProvider {
 @Component
 @Profile("gcp")
 class SecretProviderGcp : SecretProvider {
-    @Value("\${sm://OpenAI_API}")
+
+    @Value("\${sm\\://OpenAI_API}")
     private val openAIapiKey: String = "NOT_SET"
 
-    @Value("\${sm://BookingLotteryKey}")//secret heter bookinglottery key av historiske grunner, vil endres etterhvert
+    @Value("\${sm\\://BookingLotteryKey}")//secret heter bookinglottery key av historiske grunner, vil endres etterhvert
     private val taskSchedulerKey: String = "NOT_SET"
 
-    @Value("\${sm://slack_bot_token}")
+    @Value("\${sm\\://slack_bot_token}")
     private val slackBotToken : String = "NOT_SET"
 
-    @Value("\${sm://slack_app_utlysninger_token}")
-    private lateinit var slackAppUtlysningerToken: String
+    @Value("\${sm\\://slack_app_utlysninger_token}")
+    private val slackAppUtlysningerToken: String = "NOT_SET"
 
     private val logger = LoggerFactory.getLogger(SecretProviderGcp::class.java.name)
 
@@ -76,10 +77,16 @@ class SecretProviderGcp : SecretProvider {
     }
 
     override fun getSlackSecret(): String {
+        if (slackBotToken == "NOT_SET") {
+            throw IllegalStateException("Unable to evaluate authorization key, slack_bot_token not set in Secret Manager")
+        }
         return slackBotToken
     }
 
     override fun getSlackAppUtlysningerToken(): String {
+        if (slackAppUtlysningerToken == "NOT_SET") {
+            throw IllegalStateException("Unable to evaluate authorization key, slack_app_utlysninger_token not set in Secret Manager")
+        }
         return slackAppUtlysningerToken
     }
 }
