@@ -50,10 +50,12 @@ class JobPostingService(
 
         val newJobPosting = jobPostingRepository.save(jobPostingToPersist)
 
-        slackService.postJobPosting(
-            "utlysninger",
-            newJobPosting,
-        )
+        if(jobPosting.notify) {
+            slackService.postJobPosting(
+                "utlysninger",
+                newJobPosting,
+            )
+        }
 
         return newJobPosting
     }
