@@ -47,6 +47,7 @@ class SecretProviderLocal : SecretProvider {
 @Component
 @Profile("gcp")
 class SecretProviderGcp : SecretProvider {
+
     @Value("\${sm://OpenAI_API}")
     private val openAIapiKey: String = "NOT_SET"
 
@@ -76,6 +77,12 @@ class SecretProviderGcp : SecretProvider {
     }
 
     override fun getSlackSecret(): String {
+        if (slackBotToken == null) {
+            logger.error("Token is null")
+        }
+        
+        logger.error(slackBotToken.substring(0, 5))
+
         if (slackBotToken == "NOT_SET") {
             throw IllegalStateException("Unable to evaluate authorization key, slack_bot_token not set in Secret Manager")
         }
