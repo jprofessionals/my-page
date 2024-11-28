@@ -5,6 +5,7 @@
   align-items: center;
   margin-right: 0.5em;
   width: 2em;
+  cursor: pointer;
 }
 
 .icon {
