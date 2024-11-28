@@ -24,25 +24,9 @@ export default function CustomerFilter({ customer, setCustomer }: PropsType) {
       onChange={(event, newValue: Customer | null) => {
         setCustomer(newValue)
       }}
-      onInputChange={(event, newInputValue, reason) => {
-        if (reason === 'input') {
-          const matchingCustomer = customerOptions.find(
-            (elem) => elem.name === newInputValue,
-          )
-
-          if (!matchingCustomer) {
-            const newCustomer: Customer = {
-              id: 0,
-              name: newInputValue,
-            }
-
-            setCustomer(newCustomer)
-          }
-        }
-      }}
       disablePortal
       renderInput={(params) => (
-        <TextField {...params} label="Kunde" variant="outlined" required />
+        <TextField {...params} label="Kunde" variant="outlined" />
       )}
     />
   )
