@@ -121,7 +121,7 @@ export default function Utlysninger() {
         <div className="mb-12" />
 
         <JobPostingList
-          title="Aktive utlysninger"
+          title={`Aktive utlysninger${activeJobPostings.length > 0 ? ` (${activeJobPostings.length})` : ''}`}
           jobPostings={activeJobPostings}
         />
 
