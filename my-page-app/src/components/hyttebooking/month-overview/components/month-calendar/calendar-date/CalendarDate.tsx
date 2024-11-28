@@ -19,16 +19,17 @@ const CalendarDate = ({ day, infoNotices }: Props) => {
   return (
     <div className={style.container}>
       {infoNotices.map((infoNotice) => (
-        <div key={infoNotice.id} style={{display: 'flex'}}>
           <div
+            key={infoNotice.id}
             className={style.info}
             onClick={() => setShowNoticeDescription(!showNoticeDescription)}
-          >!</div>
-          {showNoticeDescription && (
-            <div id="dialog" className={style.dialog}>
-              {infoNotice.description}
-            </div>
-          )}
+          >
+            !
+            {showNoticeDescription && (
+              <div id="dialog" className={style.dialog}>
+                {infoNotice.description}
+              </div>
+            )}
         </div>
       ))}
       <div
