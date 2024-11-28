@@ -23,6 +23,15 @@ paths:
           explode: false
           description: List of customers to filter
         - in: query
+          name: from-date-time
+          required: false
+          schema:
+            type: string
+            format: date-time
+          style: form
+          explode: false
+          description: From which date-time to filter job postings
+        - in: query
           name: tags
           required: false
           schema:

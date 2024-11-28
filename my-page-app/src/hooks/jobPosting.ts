@@ -15,6 +15,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import authHeader from '@/services/auth-header'
 import { useAuthContext } from '@/providers/AuthProvider'
+import { DateTime } from "luxon";
 
 const jobPostingsCacheName = 'job-postings'
 const jobPostingFilesCacheName = 'job-posting-files'
@@ -158,6 +159,7 @@ export const useJobPostingTags = () => {
 
 export const useJobPostings = (
   customers: string[] | null,
+  fromDateTime: string | null,
   tags: string[] | null,
 ) => {
   const { userFetchStatus } = useAuthContext()
@@ -166,6 +168,7 @@ export const useJobPostings = (
     return await getJobPostings({
       query: {
         customers: customers ? customers : undefined,
+        'from-date-time': fromDateTime ? fromDateTime : DateTime.now().minus({month: 3}).toString(),
         tags: tags ? tags : undefined,
       },
       headers: authHeader(),
@@ -174,7 +177,7 @@ export const useJobPostings = (
   }
 
   return useQuery({
-    queryKey: [jobPostingsCacheName, customers, tags],
+    queryKey: [jobPostingsCacheName, customers, fromDateTime, tags],
     queryFn: fetchJobPostings,
     select: (result) => result.data,
     enabled: userFetchStatus === 'fetched',

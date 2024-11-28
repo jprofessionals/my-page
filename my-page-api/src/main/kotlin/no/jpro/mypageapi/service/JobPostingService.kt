@@ -10,6 +10,7 @@ import no.jpro.mypageapi.repository.TagRepository
 import no.jpro.mypageapi.service.slack.SlackService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.OffsetDateTime
 
 @Service
 class JobPostingService(
@@ -72,9 +73,10 @@ class JobPostingService(
 
     fun getJobPostings(
         customers: List<String>?,
+        fromDateTime: OffsetDateTime?,
         tags: List<String>?
     ): List<no.jpro.mypageapi.entity.JobPosting> {
-        return jobPostingRepository.findAllWithFilters(customers, tags)
+        return jobPostingRepository.findAllWithFilters(customers, fromDateTime, tags)
     }
 
     fun getJobPostingCustomers(): List<Customer> {
