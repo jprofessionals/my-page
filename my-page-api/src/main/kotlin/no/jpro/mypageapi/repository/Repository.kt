@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
+import java.time.OffsetDateTime
 
 @Repository
 interface SettingsRepository : JpaRepository<Setting, String> {
@@ -124,6 +125,14 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long> {
                 OR
                 c.name IN :customerNames
             )
+            AND
+            (
+                :fromDateTime IS NULL
+                OR
+                jp.urgent = true
+                OR
+                jp.deadline >= :fromDateTime
+            )
         GROUP BY jp
         HAVING
             (
@@ -134,6 +143,7 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long> {
     """)
     fun findAllWithFilters(
         @Param("customerNames") customerNames: List<String>?,
+        @Param("fromDateTime") fromDateTime: OffsetDateTime?,
         @Param("tagNames") tagNames: List<String>?,
     ): List<JobPosting>
 

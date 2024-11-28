@@ -14,14 +14,18 @@ import { useAuthContext } from '@/providers/AuthProvider'
 import RequireAuth from '@/components/auth/RequireAuth'
 import TagFilter from '@/components/jobpostings/TagFilter'
 import CustomerFilter from '@/components/jobpostings/CustomerFilter'
+import DateFilter from '@/components/jobpostings/DateFilter'
+import { Dayjs } from 'dayjs'
 
 export default function Utlysninger() {
   const { user } = useAuthContext()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [tags, setTags] = useState<Tags>([])
   const [customer, setCustomer] = useState<Customer | null>(null)
+  const [selectedFromDate, setSelectedFromDate] = useState<Dayjs | null>(null)
   const { data: jobPostings } = useJobPostings(
     customer ? [customer.name] : null,
+    selectedFromDate ? selectedFromDate.toISOString() : null,
     tags.map((tag) => tag.name),
   )
   const { mutate: createJobPosting } = usePostJobPosting()
@@ -117,6 +121,8 @@ export default function Utlysninger() {
         <TagFilter tags={tags} setTags={setTags} />
         <div className="mb-4" />
         <CustomerFilter customer={customer} setCustomer={setCustomer} />
+        <div className="mb-4" />
+        <DateFilter value={selectedFromDate} onChange={setSelectedFromDate} />
 
         <div className="mb-12" />
 

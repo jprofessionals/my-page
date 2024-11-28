@@ -12,6 +12,7 @@ import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import java.time.OffsetDateTime
 
 @Service
 class JobPostingController(
@@ -115,9 +116,10 @@ class JobPostingController(
 
     override fun getJobPostings(
         customers: List<String>?,
+        fromDateTime: OffsetDateTime?,
         tags: List<String>?
     ): ResponseEntity<List<JobPosting>> {
-        val entities = jobPostingService.getJobPostings(customers, tags)
+        val entities = jobPostingService.getJobPostings(customers, fromDateTime, tags)
 
         val dto = entities.map {
             JobPosting(
