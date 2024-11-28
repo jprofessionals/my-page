@@ -22,11 +22,6 @@
   align-items: center;
   margin-right: 0.5em;
   width: 2em;
-  background-color: #2e51ef;
-  color: #ffffff;
-  font-size: 1em;
-  font-weight: bold;
-  border-radius: 2rem;
 }
 
 .today {
@@ -38,13 +33,19 @@
   font-weight: bold;
 }
 
+.icon {
+  height: 100%;
+  width: 100%;
+  color: #2e51ef;
+  background-color: #ffffff;
+}
+
 .dialog {
   position: absolute;
   height: 100%;
   padding: 0 0.5em;
   right: 2em;
   font-size: 16px;
-  font-weight: normal;
   color: #161616;
   background: #fff;
   border: 1px solid #ccc;
