@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { CalendarDay } from 'react-day-picker'
 import { getIsDayOfWeek, getIsToday } from './calendarDateUtil'
 import classes from './CalendarDate.module.css'
@@ -13,16 +13,22 @@ const CalendarDate = ({ day, infoNotices }: Props) => {
   const style = classes
   const isToday = getIsToday(day)
   const isWednesday = getIsDayOfWeek(day) === 3
+  const [showNoticeDescription, setShowNoticeDescription] =
+    useState<boolean>(!false)
 
   return (
     <div className={style.container}>
       {infoNotices.map((infoNotice) => (
-        <div
-          key={infoNotice.id}
-          className={style.info}
-          title={infoNotice.description}
-        >
-          !
+        <div key={infoNotice.id} style={{display: 'flex'}}>
+          <div
+            className={style.info}
+            onClick={() => setShowNoticeDescription(!showNoticeDescription)}
+          >!</div>
+          {showNoticeDescription && (
+            <div id="dialog" className={style.dialog}>
+              {infoNotice.description}
+            </div>
+          )}
         </div>
       ))}
       <div

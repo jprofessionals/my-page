@@ -4,6 +4,7 @@
   justify-content: flex-end;
   gap: 0;
   font-size: small;
+  position: relative;
 }
 
 .date {
@@ -34,4 +35,17 @@
 
 .wednesday {
   font-weight: bold;
+}
+
+.dialog {
+  position: absolute;
+  height: 100%;
+  padding: 0 0.5em;
+  transform: translateX(-100%);
+  font-size: 16px;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  z-index: 1;
 }
