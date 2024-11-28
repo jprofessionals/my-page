@@ -156,12 +156,16 @@ export const useJobPostingTags = () => {
   })
 }
 
-export const useJobPostings = (tags: string[] | null) => {
+export const useJobPostings = (
+  customers: string[] | null,
+  tags: string[] | null,
+) => {
   const { userFetchStatus } = useAuthContext()
 
   const fetchJobPostings = async () => {
     return await getJobPostings({
       query: {
+        customers: customers ? customers : undefined,
         tags: tags ? tags : undefined,
       },
       headers: authHeader(),
@@ -170,7 +174,7 @@ export const useJobPostings = (tags: string[] | null) => {
   }
 
   return useQuery({
-    queryKey: [jobPostingsCacheName, tags],
+    queryKey: [jobPostingsCacheName, customers, tags],
     queryFn: fetchJobPostings,
     select: (result) => result.data,
     enabled: userFetchStatus === 'fetched',

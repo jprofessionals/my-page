@@ -13,6 +13,16 @@ paths:
       description: Returns the job postings added by admins. Allows filtering by different criteria.
       parameters:
         - in: query
+          name: customers
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          description: List of customers to filter
+        - in: query
           name: tags
           required: false
           schema:
