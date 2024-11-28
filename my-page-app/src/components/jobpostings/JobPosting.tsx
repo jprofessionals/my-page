@@ -12,10 +12,11 @@ import {
   usePutJobPosting,
 } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { faPaperclip, faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as AlertDialog from '@radix-ui/react-alert-dialog'
+import Link from 'next/link'
 
 export const JobPosting = (jobPosting: JobPostingType) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -75,31 +76,44 @@ export const JobPosting = (jobPosting: JobPostingType) => {
   return (
     <>
       <Accordion.Header className="relative border border-gray-200 rounded-lg">
-        {user?.admin && (
-          <div className="absolute top-1 right-2 flex space-x-2">
-            <button
-              onClick={openModal}
-              aria-label="Edit job posting"
-              className="focus:outline-none"
-            >
-              <FontAwesomeIcon
-                icon={faPencilAlt}
-                className="text-gray-600 hover:text-gray-800"
-              />
-            </button>
-            <button
-              onClick={openDeleteDialog}
-              aria-label="Delete job posting"
-              className="focus:outline-none"
-            >
-              <FontAwesomeIcon
-                icon={faTrashAlt}
-                className="text-red-600 hover:text-red-800"
-              />
-            </button>
-          </div>
-        )}
-        <Accordion.Trigger className="pt-4 group bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+
+        <div className="absolute top-1 right-2 flex space-x-2">
+          <Link  href={`?id=${jobPosting.id}`}
+            aria-label="Lenke til denne ultysningen"
+            title="Lenke til denne ultysningen"
+            className="focus:outline-none"
+          >
+            <FontAwesomeIcon
+              icon={faPaperclip}
+              className="text-gray-600 hover:text-gray-800"
+            />
+          </Link>
+          {user?.admin && (
+            <>
+              <button
+                onClick={openModal}
+                aria-label="Edit job posting"
+                className="focus:outline-none"
+              >
+                <FontAwesomeIcon
+                  icon={faPencilAlt}
+                  className="text-gray-600 hover:text-gray-800" />
+              </button>
+              <button
+                onClick={openDeleteDialog}
+                aria-label="Delete job posting"
+                className="focus:outline-none"
+              >
+                <FontAwesomeIcon
+                  icon={faTrashAlt}
+                  className="text-red-600 hover:text-red-800" />
+              </button>
+            </>
+          )}
+        </div>
+
+        <Accordion.Trigger
+          className="pt-4 group bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
           <div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
             <div className="flex flex-col items-start px-4 pb-4">
               <h2 className="text-xl text-left font-bold text-gray-800">
