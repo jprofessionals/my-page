@@ -1,0 +1,30 @@
+.info {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0.5em;
+  width: 2em;
+}
+
+.icon {
+  height: 100%;
+  width: 100%;
+  color: #2e51ef;
+  background-color: #ffffff;
+}
+
+.dialog {
+  position: absolute;
+  height: 100%;
+  padding: 0 0.5em;
+  right: 2em;
+  font-size: 16px;
+  white-space: nowrap;
+  color: #161616;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  z-index: 1;
+}

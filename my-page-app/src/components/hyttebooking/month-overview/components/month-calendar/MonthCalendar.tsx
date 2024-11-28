@@ -13,7 +13,6 @@ import {
 import { nb } from 'date-fns/locale'
 import CalendarWeekLabel from './calendar-week-label/CalendarWeekLabel'
 import CalendarWeekNumber from './calendar-week-number/CalendarWeekNumber'
-import CalendarInfoNotices from './calendar-info-notices/CalendarInfoNotices'
 import CalendarCell from './calendar-cell/CalendarCell'
 import CalendarDate from './calendar-date/CalendarDate'
 import BookingAddModal from './booking-add-modal/BookingAddModal'
