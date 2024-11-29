@@ -176,7 +176,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
       </Accordion.Header>
 
       <Accordion.Content className="p-4 bg-white">
-        <div className="prose">
+        <div className="prose max-w-none">
           <RichTextReadOnly
             content={jobPosting.description}
             extensions={[StarterKit]}
