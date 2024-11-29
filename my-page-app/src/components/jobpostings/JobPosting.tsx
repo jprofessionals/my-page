@@ -12,11 +12,17 @@ import {
   usePutJobPosting,
 } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperclip, faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import {
+  faPaperclip,
+  faPencilAlt,
+  faTrashAlt,
+} from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as AlertDialog from '@radix-ui/react-alert-dialog'
 import Link from 'next/link'
+import { RichTextReadOnly } from 'mui-tiptap'
+import { StarterKit } from '@tiptap/starter-kit'
 
 export const JobPosting = (jobPosting: JobPostingType) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -76,9 +82,9 @@ export const JobPosting = (jobPosting: JobPostingType) => {
   return (
     <>
       <Accordion.Header className="relative border border-gray-200 rounded-lg">
-
         <div className="absolute top-1 right-2 flex space-x-2">
-          <Link  href={`?id=${jobPosting.id}`}
+          <Link
+            href={`?id=${jobPosting.id}`}
             aria-label="Lenke til denne ultysningen"
             title="Lenke til denne ultysningen"
             className="focus:outline-none"
@@ -97,7 +103,8 @@ export const JobPosting = (jobPosting: JobPostingType) => {
               >
                 <FontAwesomeIcon
                   icon={faPencilAlt}
-                  className="text-gray-600 hover:text-gray-800" />
+                  className="text-gray-600 hover:text-gray-800"
+                />
               </button>
               <button
                 onClick={openDeleteDialog}
@@ -106,14 +113,14 @@ export const JobPosting = (jobPosting: JobPostingType) => {
               >
                 <FontAwesomeIcon
                   icon={faTrashAlt}
-                  className="text-red-600 hover:text-red-800" />
+                  className="text-red-600 hover:text-red-800"
+                />
               </button>
             </>
           )}
         </div>
 
-        <Accordion.Trigger
-          className="pt-4 group bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+        <Accordion.Trigger className="pt-4 group bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
           <div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
             <div className="flex flex-col items-start px-4 pb-4">
               <h2 className="text-xl text-left font-bold text-gray-800">
@@ -146,9 +153,12 @@ export const JobPosting = (jobPosting: JobPostingType) => {
       </Accordion.Header>
 
       <Accordion.Content className="p-4 bg-white">
-        <p className="text-gray-800 whitespace-pre-line">
-          {jobPosting.description}
-        </p>
+        <div className="prose">
+          <RichTextReadOnly
+            content={jobPosting.description}
+            extensions={[StarterKit]}
+          />
+        </div>
 
         {existingJobPostingFiles && existingJobPostingFiles?.length > 0 && (
           <div className="mt-2">

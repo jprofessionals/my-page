@@ -12,7 +12,7 @@ import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Switch from '@radix-ui/react-switch'
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useRef, useState } from 'react'
 import {
   Autocomplete,
   Chip,
@@ -20,6 +20,16 @@ import {
   TextField,
 } from '@mui/material'
 import { useJobPostingCustomers, useJobPostingTags } from '@/hooks/jobPosting'
+import {
+  MenuButtonBold,
+  MenuButtonItalic,
+  MenuControlsContainer,
+  MenuDivider,
+  MenuSelectHeading,
+  RichTextEditor,
+  type RichTextEditorRef,
+} from 'mui-tiptap'
+import { StarterKit } from '@tiptap/starter-kit'
 
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
@@ -72,6 +82,7 @@ export const JobPostingModal = ({
   const [links] = useState(jobPosting ? jobPosting.links : [])
   const [tags, setTags] = useState(jobPosting ? jobPosting.tags : [])
   const [tagInputValue, setTagInputValue] = useState('')
+  const rteRef = useRef<RichTextEditorRef>(null)
 
   const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value
@@ -178,26 +189,28 @@ export const JobPostingModal = ({
               </div>
               <div className="mb-4 flex gap-4">
                 <div className="flex gap-2">
-                <label className="block text-gray-700 mb-1">Levere ASAP?</label>
-                <Switch.Root
-                  className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
-                    isUrgent
-                      ? 'bg-blue-600 border-blue-600'
-                      : 'bg-gray-400 border-gray-400'
-                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                  id="urgent"
-                  checked={isUrgent}
-                  onCheckedChange={(checked) => setIsUrgent(checked)}
-                >
-                  <Switch.Thumb
-                    className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
-                    style={{
-                      transform: isUrgent
-                        ? 'translateX(18px)'
-                        : 'translateX(0)',
-                    }}
-                  />
-                </Switch.Root>
+                  <label className="block text-gray-700 mb-1">
+                    Levere ASAP?
+                  </label>
+                  <Switch.Root
+                    className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
+                      isUrgent
+                        ? 'bg-blue-600 border-blue-600'
+                        : 'bg-gray-400 border-gray-400'
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                    id="urgent"
+                    checked={isUrgent}
+                    onCheckedChange={(checked) => setIsUrgent(checked)}
+                  >
+                    <Switch.Thumb
+                      className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
+                      style={{
+                        transform: isUrgent
+                          ? 'translateX(18px)'
+                          : 'translateX(0)',
+                      }}
+                    />
+                  </Switch.Root>
                 </div>
                 <div className="flex gap-2">
                   <label className="block text-gray-700 mb-1">Varsel?</label>
@@ -237,16 +250,28 @@ export const JobPostingModal = ({
                 </div>
               )}
               <div className="mb-4">
-                <TextField
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  label="Beskrivelse"
-                  variant="outlined"
-                  multiline
-                  fullWidth
-                  minRows={2}
-                  maxRows={8}
-                />
+                <div className="prose">
+                  <RichTextEditor
+                    ref={rteRef}
+                    extensions={[StarterKit]}
+                    content={description}
+                    onUpdate={(e) => {
+                      setDescription(e.editor.getHTML())
+                    }}
+                    renderControls={() => (
+                      <MenuControlsContainer>
+                        <MenuSelectHeading
+                          MenuProps={{
+                            disablePortal: true,
+                          }}
+                        />
+                        <MenuDivider />
+                        <MenuButtonBold />
+                        <MenuButtonItalic />
+                      </MenuControlsContainer>
+                    )}
+                  />
+                </div>
               </div>
               <div className="mb-4">
                 <Autocomplete
