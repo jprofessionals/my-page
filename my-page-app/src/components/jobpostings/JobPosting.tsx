@@ -13,6 +13,7 @@ import {
 } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
+  faLock,
   faPaperclip,
   faPencilAlt,
   faTrashAlt,
@@ -20,6 +21,7 @@ import {
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as AlertDialog from '@radix-ui/react-alert-dialog'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 
 export const JobPosting = (jobPosting: JobPostingType) => {
@@ -126,6 +128,27 @@ export const JobPosting = (jobPosting: JobPostingType) => {
               </h2>
               <p className="text-gray-700 text-left">
                 {jobPosting.customer.name}
+                {jobPosting.customer.exclusive && (
+                  <Tooltip.Provider>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger asChild>
+                        <FontAwesomeIcon
+                          icon={faLock}
+                          aria-label="Krever eksklusivitet"
+                          className="text-gray-600 hover:text-gray-800 ml-1 cursor-pointer"
+                        />
+                      </Tooltip.Trigger>
+                      <Tooltip.Content
+                        className="bg-black text-white text-xs px-2 py-1 rounded-md shadow-md"
+                        side="top"
+                        align="center"
+                      >
+                        Krever eksklusivitet
+                        <Tooltip.Arrow className="fill-black" />
+                      </Tooltip.Content>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
+                )}
               </p>
             </div>
             <div className="flex flex-col items-start justify-center w-[230px] pr-4 pl-4 pb-4 mb:pl-0 mb:pb-0">
@@ -151,17 +174,12 @@ export const JobPosting = (jobPosting: JobPostingType) => {
       </Accordion.Header>
 
       <Accordion.Content className="p-4 bg-white">
-        <p className="text-base mb-4">
-          <span className="font-bold">Krever eksklusivitet: </span>
-          <span>{jobPosting.customer.exclusive ? 'Ja' : 'Nei'}</span>
-        </p>
-
         <p className="text-gray-800 whitespace-pre-line">
           {jobPosting.description}
         </p>
 
         {existingJobPostingFiles && existingJobPostingFiles?.length > 0 && (
-          <div className="mt-2">
+          <div className="mt-4">
             <h3 className="font-semibold text-gray-800">Filer:</h3>
             <ul className="list-disc list-inside text-gray-800">
               {existingJobPostingFiles.map((file) => (
