@@ -30,7 +30,8 @@ class JobPostingController(
             title = entity.title,
             customer = Customer(
                 id = entity.customer.id,
-                name = entity.customer.name
+                name = entity.customer.name,
+                exclusive = entity.customer.exclusive,
             ),
             urgent = entity.urgent,
             deadline = entity.deadline,
@@ -79,7 +80,8 @@ class JobPostingController(
             .map {
                 Customer(
                     id = it.id,
-                    name = it.name
+                    name = it.name,
+                    exclusive = it.exclusive
                 )
             }
             .sortedBy {
@@ -127,7 +129,8 @@ class JobPostingController(
                 title = it.title,
                 customer = Customer(
                     id = it.customer.id,
-                    name = it.customer.name
+                    name = it.customer.name,
+                    exclusive = it.customer.exclusive
                 ),
                 urgent = it.urgent,
                 deadline = it.deadline,

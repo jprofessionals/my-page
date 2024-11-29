@@ -170,6 +170,7 @@ export const JobPostingModal = ({
                         const newCustomer: Customer = {
                           id: 0,
                           name: newInputValue,
+                          exclusive: false,
                         }
 
                         setCustomer(newCustomer)

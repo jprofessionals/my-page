@@ -82,6 +82,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
   return (
     <>
       <Accordion.Header className="relative border border-gray-200 rounded-lg">
+
         <div className="absolute top-1 right-2 flex space-x-2">
           <Link
             href={`?id=${jobPosting.id}`}
@@ -153,6 +154,11 @@ export const JobPosting = (jobPosting: JobPostingType) => {
       </Accordion.Header>
 
       <Accordion.Content className="p-4 bg-white">
+        <p className="text-base mb-4">
+          <span className="font-bold">Krever eksklusivitet: </span>
+          <span>{jobPosting.customer.exclusive ? 'Ja' : 'Nei'}</span>
+        </p>
+
         <div className="prose">
           <RichTextReadOnly
             content={jobPosting.description}
