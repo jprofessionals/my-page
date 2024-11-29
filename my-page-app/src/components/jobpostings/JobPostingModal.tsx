@@ -159,6 +159,7 @@ export const JobPostingModal = ({
                         const newCustomer: Customer = {
                           id: 0,
                           name: newInputValue,
+                          exclusive: false,
                         }
 
                         setCustomer(newCustomer)
@@ -178,26 +179,28 @@ export const JobPostingModal = ({
               </div>
               <div className="mb-4 flex gap-4">
                 <div className="flex gap-2">
-                <label className="block text-gray-700 mb-1">Levere ASAP?</label>
-                <Switch.Root
-                  className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
-                    isUrgent
-                      ? 'bg-blue-600 border-blue-600'
-                      : 'bg-gray-400 border-gray-400'
-                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                  id="urgent"
-                  checked={isUrgent}
-                  onCheckedChange={(checked) => setIsUrgent(checked)}
-                >
-                  <Switch.Thumb
-                    className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
-                    style={{
-                      transform: isUrgent
-                        ? 'translateX(18px)'
-                        : 'translateX(0)',
-                    }}
-                  />
-                </Switch.Root>
+                  <label className="block text-gray-700 mb-1">
+                    Levere ASAP?
+                  </label>
+                  <Switch.Root
+                    className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
+                      isUrgent
+                        ? 'bg-blue-600 border-blue-600'
+                        : 'bg-gray-400 border-gray-400'
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                    id="urgent"
+                    checked={isUrgent}
+                    onCheckedChange={(checked) => setIsUrgent(checked)}
+                  >
+                    <Switch.Thumb
+                      className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
+                      style={{
+                        transform: isUrgent
+                          ? 'translateX(18px)'
+                          : 'translateX(0)',
+                      }}
+                    />
+                  </Switch.Root>
                 </div>
                 <div className="flex gap-2">
                   <label className="block text-gray-700 mb-1">Varsel?</label>

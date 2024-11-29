@@ -259,9 +259,15 @@ components:
           type: string
           description: The name of a customer
           example: "Skatteetaten"
+        exclusive:
+          type: boolean
+          description: Whether the customer demands exclusive applications
+          default: false
+          example: true
       required:
         - id
         - name
+        - exclusive
     Customers:
       type: array
       description: A list of customers
