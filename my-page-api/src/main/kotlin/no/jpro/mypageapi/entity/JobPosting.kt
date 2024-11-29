@@ -16,7 +16,7 @@ class JobPosting(
     @Column(nullable = false)
     var title: String,
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(name = "description_migrated", columnDefinition = "LONGTEXT")
     var description: String? = null,
 
     @Column

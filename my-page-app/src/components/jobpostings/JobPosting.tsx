@@ -23,6 +23,8 @@ import * as Accordion from '@radix-ui/react-accordion'
 import * as AlertDialog from '@radix-ui/react-alert-dialog'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
+import { RichTextReadOnly } from 'mui-tiptap'
+import { StarterKit } from '@tiptap/starter-kit'
 
 export const JobPosting = (jobPosting: JobPostingType) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -174,9 +176,12 @@ export const JobPosting = (jobPosting: JobPostingType) => {
       </Accordion.Header>
 
       <Accordion.Content className="p-4 bg-white">
-        <p className="text-gray-800 whitespace-pre-line">
-          {jobPosting.description}
-        </p>
+        <div className="prose">
+          <RichTextReadOnly
+            content={jobPosting.description}
+            extensions={[StarterKit]}
+          />
+        </div>
 
         {existingJobPostingFiles && existingJobPostingFiles?.length > 0 && (
           <div className="mt-4">

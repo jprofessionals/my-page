@@ -12,7 +12,7 @@ import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Switch from '@radix-ui/react-switch'
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useRef, useState } from 'react'
 import {
   Autocomplete,
   Chip,
@@ -20,6 +20,16 @@ import {
   TextField,
 } from '@mui/material'
 import { useJobPostingCustomers, useJobPostingTags } from '@/hooks/jobPosting'
+import {
+  MenuButtonBold,
+  MenuButtonItalic,
+  MenuControlsContainer,
+  MenuDivider,
+  MenuSelectHeading,
+  RichTextEditor,
+  type RichTextEditorRef,
+} from 'mui-tiptap'
+import { StarterKit } from '@tiptap/starter-kit'
 
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
@@ -72,6 +82,7 @@ export const JobPostingModal = ({
   const [links] = useState(jobPosting ? jobPosting.links : [])
   const [tags, setTags] = useState(jobPosting ? jobPosting.tags : [])
   const [tagInputValue, setTagInputValue] = useState('')
+  const rteRef = useRef<RichTextEditorRef>(null)
 
   const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value
@@ -240,16 +251,28 @@ export const JobPostingModal = ({
                 </div>
               )}
               <div className="mb-4">
-                <TextField
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  label="Beskrivelse"
-                  variant="outlined"
-                  multiline
-                  fullWidth
-                  minRows={2}
-                  maxRows={8}
-                />
+                <div className="prose">
+                  <RichTextEditor
+                    ref={rteRef}
+                    extensions={[StarterKit]}
+                    content={description}
+                    onUpdate={(e) => {
+                      setDescription(e.editor.getHTML())
+                    }}
+                    renderControls={() => (
+                      <MenuControlsContainer>
+                        <MenuSelectHeading
+                          MenuProps={{
+                            disablePortal: true,
+                          }}
+                        />
+                        <MenuDivider />
+                        <MenuButtonBold />
+                        <MenuButtonItalic />
+                      </MenuControlsContainer>
+                    )}
+                  />
+                </div>
               </div>
               <div className="mb-4">
                 <Autocomplete
