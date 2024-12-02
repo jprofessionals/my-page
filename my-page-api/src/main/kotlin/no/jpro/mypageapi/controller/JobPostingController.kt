@@ -22,9 +22,10 @@ class JobPostingController(
 
     @RequiresAdmin
     override fun createJobPosting(
+        notify: Boolean,
         jobPosting: JobPosting
     ): ResponseEntity<JobPosting> {
-        val entity = jobPostingService.createJobPosting(jobPosting)
+        val entity = jobPostingService.createJobPosting(notify, jobPosting)
         val dto = JobPosting(
             id = entity.id,
             title = entity.title,

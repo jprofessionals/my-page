@@ -31,6 +31,18 @@ import {
 } from 'mui-tiptap'
 import { StarterKit } from '@tiptap/starter-kit'
 
+type OnCreateJobPostingType = (
+  jobPosting: JobPostingType,
+  newFiles: FileList,
+  notify: boolean,
+) => void
+
+type OnEditJobPostingType = (
+  jobPosting: JobPostingType,
+  newFiles: FileList,
+  filesToDelete: JobPostingFilesType,
+) => void
+
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
   jobPostingFiles?: JobPostingFilesType
@@ -39,11 +51,7 @@ interface JobPostingModalProps {
 
   onClose(): void
 
-  onSubmit(
-    jobPosting: JobPostingType,
-    newFiles: FileList,
-    filesToDelete: JobPostingFilesType,
-  ): void
+  onSubmit: OnCreateJobPostingType | OnEditJobPostingType
 }
 
 export const JobPostingModal = ({
@@ -65,9 +73,7 @@ export const JobPostingModal = ({
   const [isUrgent, setIsUrgent] = useState(
     jobPosting ? jobPosting.urgent : false,
   )
-  const [doNotify, setDoNotify] = useState(
-    jobPosting ? jobPosting.notify : true,
-  )
+  const [doNotify, setDoNotify] = useState(true)
   const [deadline, setDeadline] = useState(
     jobPosting ? (jobPosting.deadline ? jobPosting.deadline : '') : '',
   )
@@ -105,18 +111,30 @@ export const JobPostingModal = ({
       return
     }
 
-    const jobPosting: JobPostingType = {
+    const newOrUpdatedJobPosting: JobPostingType = {
       id: id,
       title: title,
       customer: customer,
       urgent: isUrgent,
-      notify: doNotify,
       deadline: deadline,
       description: description,
       links: links,
       tags: tags,
     }
-    onSubmit(jobPosting, filesToUpload, filesToDelete)
+
+    if (jobPosting) {
+      ;(onSubmit as OnEditJobPostingType)(
+        newOrUpdatedJobPosting,
+        filesToUpload,
+        filesToDelete,
+      )
+    } else {
+      ;(onSubmit as OnCreateJobPostingType)(
+        newOrUpdatedJobPosting,
+        filesToUpload,
+        doNotify,
+      )
+    }
   }
 
   if (!customers) {
