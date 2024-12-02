@@ -121,30 +121,41 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long> {
         LEFT JOIN jp.tags t
         WHERE
             (
-                :#{#customerNames == null || #customerNames.isEmpty()} = true
-                OR
-                c.name IN :customerNames
+                jp.id IN :includeIds
             )
-            AND
+            OR
             (
-                :fromDateTime IS NULL
-                OR
-                jp.urgent = true
-                OR
-                jp.deadline >= :fromDateTime
+                (
+                    :#{#customerNames.isEmpty()} = true
+                    OR
+                    c.name IN :customerNames
+                )
+                AND
+                (
+                    :fromDateTime IS NULL
+                    OR
+                    jp.urgent = true
+                    OR
+                    jp.deadline >= :fromDateTime
+                )
             )
         GROUP BY jp
         HAVING
             (
-                :#{#tagNames == null || #tagNames.isEmpty()} = true
+                jp.id IN :includeIds
+            )
+            OR
+            (
+                :#{#tagNames.isEmpty()} = true
                 OR 
-                COUNT(CASE WHEN t.name IN :tagNames THEN 1 END) = :#{#tagNames != null ? #tagNames.size() : 0}
+                COUNT(CASE WHEN t.name IN :tagNames THEN 1 END) = :#{#tagNames.size()}
             )
     """)
     fun findAllWithFilters(
-        @Param("customerNames") customerNames: List<String>?,
+        @Param("customerNames") customerNames: List<String>,
         @Param("fromDateTime") fromDateTime: OffsetDateTime?,
-        @Param("tagNames") tagNames: List<String>?,
+        @Param("includeIds") includeIds: List<String>,
+        @Param("tagNames") tagNames: List<String>,
     ): List<JobPosting>
 
 }

@@ -51,7 +51,7 @@ class JobPostingService(
 
         val newJobPosting = jobPostingRepository.save(jobPostingToPersist)
 
-        if(jobPosting.notify) {
+        if (jobPosting.notify) {
             slackService.postJobPosting(
                 "utlysninger",
                 newJobPosting,
@@ -72,11 +72,12 @@ class JobPostingService(
     }
 
     fun getJobPostings(
-        customers: List<String>?,
+        customers: List<String>,
         fromDateTime: OffsetDateTime?,
-        tags: List<String>?
+        includeIds: List<String>,
+        tags: List<String>
     ): List<no.jpro.mypageapi.entity.JobPosting> {
-        return jobPostingRepository.findAllWithFilters(customers, fromDateTime, tags)
+        return jobPostingRepository.findAllWithFilters(customers, fromDateTime, includeIds, tags)
     }
 
     fun getJobPostingCustomers(): List<Customer> {

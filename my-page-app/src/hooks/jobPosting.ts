@@ -160,6 +160,7 @@ export const useJobPostingTags = () => {
 export const useJobPostings = (
   customers: string[] | null,
   fromDateTime: string | null,
+  includeIds: string[] | null,
   tags: string[] | null,
 ) => {
   const { userFetchStatus } = useAuthContext()
@@ -169,6 +170,7 @@ export const useJobPostings = (
       query: {
         customers: customers ? customers : undefined,
         'from-date-time': fromDateTime ? fromDateTime : DateTime.now().minus({month: 3}).toString(),
+        'include-ids': includeIds ? includeIds : undefined,
         tags: tags ? tags : undefined,
       },
       headers: authHeader(),
