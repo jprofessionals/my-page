@@ -17,7 +17,6 @@ paths:
           required: false
           schema:
             type: array
-            default: []
             items:
               type: string
           style: form
@@ -37,7 +36,6 @@ paths:
           required: false
           schema:
             type: array
-            default: []
             items:
               type: string
           style: form
@@ -48,7 +46,6 @@ paths:
           required: false
           schema:
             type: array
-            default: []
             items:
               type: string
           style: form

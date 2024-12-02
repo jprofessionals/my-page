@@ -119,9 +119,15 @@ class JobPostingController(
     override fun getJobPostings(
         customers: List<String>?,
         fromDateTime: OffsetDateTime?,
+        includeIds: List<String>?,
         tags: List<String>?
     ): ResponseEntity<List<JobPosting>> {
-        val entities = jobPostingService.getJobPostings(customers, fromDateTime, tags)
+        val entities = jobPostingService.getJobPostings(
+            customers ?: emptyList(),
+            fromDateTime,
+            includeIds ?: emptyList(),
+            tags ?: emptyList()
+        )
 
         val dto = entities.map {
             JobPosting(
