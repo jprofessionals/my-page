@@ -66,6 +66,14 @@ paths:
       operationId: createJobPosting
       summary: Create job postings
       description: Returns the job posting added.
+      parameters:
+        - in: query
+          name: notify
+          required: true
+          schema:
+            type: boolean
+            default: true
+          description: Indicates if the job posting should cause a notification
       requestBody:
         description: Job posting to be created
         required: true
@@ -337,11 +345,6 @@ components:
           example:
             - "https://example.com/link1"
             - "https://example.com/link2"
-        notify:
-          type: boolean
-          description: Indicates if the job posting should cause a notification
-          default: true
-          example: true
       required:
         - id
         - title
@@ -350,7 +353,6 @@ components:
         - urgent
         - tags
         - links
-        - notify
     JobPostingFile:
       type: object
       properties:

@@ -22,6 +22,7 @@ class JobPostingService(
 
     @Transactional
     fun createJobPosting(
+        notify: Boolean,
         jobPosting: JobPosting
     ): no.jpro.mypageapi.entity.JobPosting {
         val customerEntity = customerRepository.findByName(jobPosting.customer.name) ?: customerRepository.save(
@@ -51,7 +52,7 @@ class JobPostingService(
 
         val newJobPosting = jobPostingRepository.save(jobPostingToPersist)
 
-        if (jobPosting.notify) {
+        if (notify) {
             slackService.postJobPosting(
                 "utlysninger",
                 newJobPosting,

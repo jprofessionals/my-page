@@ -1,7 +1,4 @@
-import {
-  JobPosting as JobPostingType,
-  JobPostingFiles as JobPostingFilesType,
-} from '@/data/types'
+import { JobPosting as JobPostingType } from '@/data/types'
 import { JobPostingModal } from '@/components/jobpostings/JobPostingModal'
 
 interface AddJobPostingModalProps {
@@ -9,7 +6,7 @@ interface AddJobPostingModalProps {
   onAddJobPosting: (
     newJobPosting: JobPostingType,
     newFiles: FileList,
-    filesToDelete: JobPostingFilesType,
+    notify: boolean,
   ) => void
 }
 

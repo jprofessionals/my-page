@@ -2,12 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { AddJobPostingModal } from '@/components/jobpostings/AddJobPostingModal'
-import {
-  Customer,
-  JobPosting as JobPostingType,
-  JobPostingFiles as JobPostingFilesType,
-  Tags,
-} from '@/data/types'
+import { Customer, JobPosting as JobPostingType, Tags } from '@/data/types'
 import { useJobPostings, usePostJobPosting } from '@/hooks/jobPosting'
 import { JobPostingList } from '@/components/jobpostings/JobPostingList'
 import { useAuthContext } from '@/providers/AuthProvider'
@@ -16,7 +11,7 @@ import TagFilter from '@/components/jobpostings/TagFilter'
 import CustomerFilter from '@/components/jobpostings/CustomerFilter'
 import DateFilter from '@/components/jobpostings/DateFilter'
 import { Dayjs } from 'dayjs'
-import { useSearchParams } from "next/navigation";
+import { useSearchParams } from 'next/navigation'
 
 export default function Utlysninger() {
   const { user } = useAuthContext()
@@ -98,12 +93,12 @@ export default function Utlysninger() {
   const addJobPosting = (
     newJobPosting: JobPostingType,
     filesToUpload: FileList,
-    filesToDelete: JobPostingFilesType,
+    notify: boolean,
   ) => {
     createJobPosting({
       newJobPosting: newJobPosting,
       filesToUpload: filesToUpload,
-      filesToDelete: filesToDelete,
+      notify: notify,
     })
     closeModal()
   }

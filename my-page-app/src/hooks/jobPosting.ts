@@ -15,7 +15,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import authHeader from '@/services/auth-header'
 import { useAuthContext } from '@/providers/AuthProvider'
-import { DateTime } from "luxon";
+import { DateTime } from 'luxon'
 
 const jobPostingsCacheName = 'job-postings'
 const jobPostingFilesCacheName = 'job-posting-files'
@@ -169,7 +169,9 @@ export const useJobPostings = (
     return await getJobPostings({
       query: {
         customers: customers ? customers : undefined,
-        'from-date-time': fromDateTime ? fromDateTime : DateTime.now().minus({month: 3}).toString(),
+        'from-date-time': fromDateTime
+          ? fromDateTime
+          : DateTime.now().minus({ month: 3 }).toString(),
         'include-ids': includeIds ? includeIds : undefined,
         tags: tags ? tags : undefined,
       },
@@ -189,17 +191,20 @@ export const useJobPostings = (
 export const usePostJobPosting = () => {
   const queryClient = useQueryClient()
   const { mutate: uploadFile } = usePostJobPostingFiles()
-  const { mutate: deleteFile } = useDeleteJobPostingFiles()
 
   return useMutation({
     mutationFn: async ({
       newJobPosting,
+      notify,
     }: {
       newJobPosting: JobPosting
       filesToUpload?: FileList
-      filesToDelete?: JobPostingFiles
+      notify: boolean
     }) => {
       return await createJobPosting({
+        query: {
+          notify: notify,
+        },
         body: newJobPosting,
         headers: authHeader(),
         baseUrl: '/api',
@@ -217,15 +222,6 @@ export const usePostJobPosting = () => {
               filename: file.name,
               content: file,
             },
-          })
-        })
-      }
-
-      if (variables.filesToDelete && variables.filesToDelete.length > 0) {
-        variables.filesToDelete.forEach((file) => {
-          deleteFile({
-            jobPostingId: data.data ? data.data.id : 0,
-            fileName: file.name,
           })
         })
       }
