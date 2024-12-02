@@ -16,16 +16,21 @@ import TagFilter from '@/components/jobpostings/TagFilter'
 import CustomerFilter from '@/components/jobpostings/CustomerFilter'
 import DateFilter from '@/components/jobpostings/DateFilter'
 import { Dayjs } from 'dayjs'
+import { useSearchParams } from "next/navigation";
 
 export default function Utlysninger() {
   const { user } = useAuthContext()
+  const searchParams = useSearchParams()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [tags, setTags] = useState<Tags>([])
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [selectedFromDate, setSelectedFromDate] = useState<Dayjs | null>(null)
+
+  const id = searchParams?.get('id')
   const { data: jobPostings } = useJobPostings(
     customer ? [customer.name] : null,
     selectedFromDate ? selectedFromDate.toISOString() : null,
+    id ? [id] : [],
     tags.map((tag) => tag.name),
   )
   const { mutate: createJobPosting } = usePostJobPosting()

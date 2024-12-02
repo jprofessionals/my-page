@@ -17,6 +17,7 @@ paths:
           required: false
           schema:
             type: array
+            default: []
             items:
               type: string
           style: form
@@ -32,10 +33,22 @@ paths:
           explode: false
           description: From which date-time to filter job postings
         - in: query
+          name: include-ids
+          required: false
+          schema:
+            type: array
+            default: []
+            items:
+              type: string
+          style: form
+          explode: false
+          description: IDs of job postings that will be retrieved regardless of other filters
+        - in: query
           name: tags
           required: false
           schema:
             type: array
+            default: []
             items:
               type: string
           style: form
