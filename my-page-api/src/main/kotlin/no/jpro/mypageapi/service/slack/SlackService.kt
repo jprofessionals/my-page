@@ -12,6 +12,13 @@ interface SlackService {
     fun postJobPosting(
         channel: String,
         jobPosting: JobPosting,
+        updateMessage: String? = null
+    )
+
+    fun postJobPostingUpdate(
+        channel: String,
+        jobPosting: JobPosting,
+        updateMessage: String
     )
 
     fun postMessageToChannel(

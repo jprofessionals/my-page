@@ -162,6 +162,12 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: update-message
+          in: query
+          required: false
+          description: An optional update text which be used in notifications
+          schema:
+            type: string
       requestBody:
         description: Job posting data to be updated
         required: true

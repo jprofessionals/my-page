@@ -17,7 +17,15 @@ class SlackServiceMock : SlackService {
 
     override fun postJobPosting(
         channel: String,
-        jobPosting: JobPosting
+        jobPosting: JobPosting,
+        updateMessage: String?
+    ) {
+    }
+
+    override fun postJobPostingUpdate(
+        channel: String,
+        jobPosting: JobPosting,
+        updateMessage: String,
     ) {
     }
 
