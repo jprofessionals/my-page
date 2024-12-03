@@ -1,14 +1,14 @@
 import React from 'react'
-import {Booking, DrawingPeriod, PendingBookingTrain, User} from '@/types'
-import { Button } from '@/components/ui/button'
+import {PendingBookingTrain, User} from '@/types'
+import {Button} from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
+import DrawingPeriodPendingBooking from "./DrawingPeriodPendingBooking";
 
 type Props = {
   user?: User
   bookingTrain?: PendingBookingTrain
   onCancel: () => void
   onPerformDrawing: (bookingTrain: PendingBookingTrain) => void
-  onEdit: (pendingBooking: Booking) => void
 }
 
 const DrawingPeriodModal = ({
@@ -16,7 +16,6 @@ const DrawingPeriodModal = ({
   user,
   onCancel,
   onPerformDrawing,
-  onEdit,
 }: Props) => {
   function handlePerformDrawing() {
     if (bookingTrain) {
@@ -30,29 +29,16 @@ const DrawingPeriodModal = ({
       open={!!bookingTrain}
       onRequestClose={onCancel}
       content={
-        <>
+        <div style={{display: "grid", rowGap: "1em"}}>
           {bookingTrain?.drawingPeriodList
             .flatMap((drawingPeriod) => drawingPeriod.pendingBookings)
-            .map((pendingBooking) => {
-              return (
-                <div key={pendingBooking.id}>
-                  <span>
-                    {pendingBooking.employeeName} ønsker{' '}
-                    {pendingBooking.apartment.cabin_name} fra{' '}
-                    {pendingBooking.startDate} til {pendingBooking.endDate}
-                  </span>
-                  <Button
-                    variant="error"
-                    style={{marginLeft: '8px', height: '1rem'}}
-                    onClick={() => onEdit(pendingBooking)}
-                  >
-                    Endre
-                  </Button>
-                  <br />
-                </div>
-              )
-            })}
-        </>
+            .map((pendingBooking) => (
+              <DrawingPeriodPendingBooking
+                key={pendingBooking.id}
+                pendingBooking={{...pendingBooking, isPending: true}}
+                user={user}
+              />))}
+        </div>
       }
       confirmButton={
         (!!user?.admin || undefined) && (

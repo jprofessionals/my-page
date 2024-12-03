@@ -40,11 +40,19 @@ const BookingEditForm = ({
   const deleteBookingByBookingId = async (bookingId: number | null) => {
     try {
       if (booking?.isPending) {
-        await ApiService.deletePendingBooking(bookingId)
+        if (user?.admin) {
+          await ApiService.adminDeletePendingBooking(bookingId)
+        } else {
+          await ApiService.deletePendingBooking(bookingId)
+        }
       } else {
-        await ApiService.deleteBooking(bookingId)
+        if (user?.admin) {
+          await ApiService.adminDeleteBooking(bookingId)
+        } else {
+          await ApiService.deleteBooking(bookingId)
+        }
       }
-      toast.success('Reservasjonen din er slettet')
+      toast.success('Reservasjonen er slettet')
     } catch (error) {
       toast.error(`Det oppstod en feil ved sletting: ${error}`)
     }
@@ -56,11 +64,24 @@ const BookingEditForm = ({
   ) => {
     try {
       if (booking?.isPending) {
-        await ApiService.patchPendingBooking(bookingId, updatedBooking)
+        if (user?.name === booking?.employeeName) {
+          await ApiService.patchPendingBooking(bookingId, updatedBooking)
+          toast.success('Reservasjonen er oppdatert')
+        } else if (user?.admin) {
+          // TODO: Implement backend
+          toast.warning('Ikke implementert')
+        } else {
+          toast.warning('Du er ikke eier av reservasjonen eller admin')
+        }
       } else {
-        await ApiService.patchBooking(bookingId, updatedBooking)
+        if (user?.admin) {
+          await ApiService.adminPatchBooking(bookingId, updatedBooking)
+          toast.success('Reservasjonen er oppdatert')
+        } else {
+          await ApiService.patchBooking(bookingId, updatedBooking)
+          toast.success('Reservasjonen er oppdatert')
+        }
       }
-      toast.success('Reservasjonen din er oppdatert')
     } catch (error) {
       toast.error(`Det oppstod en feil ved oppdatering: ${error}`)
     }
@@ -92,16 +113,16 @@ const BookingEditForm = ({
   const handleStartDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setStartDate(e.target.value)
   }
+
   const handleEndDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEndDate(e.target.value)
   }
+
   const handleApartmentChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setApartmentId(Number(e.target.value))
   }
 
-  return <div style={{display: "grid", rowGap: "8px"}}>
-    <div>Hei {user?.name}!</div>
-    <div>Endre reservasjon for &quot;{booking?.apartment?.cabin_name}&quot;</div>
+  return <div style={{display: "grid", rowGap: "8px", marginTop: "8px"}}>
     <label>
       <b>Startdato:</b>
       <input
@@ -139,7 +160,7 @@ const BookingEditForm = ({
       </select>
     </label>}
 
-    <div style={{display: "flex", justifyContent: "right", marginTop: "2em"}}>
+    <div style={{display: "flex", justifyContent: "right", marginTop: "2em", marginBottom: "2em"}}>
       <Button onClick={handleDelete} variant="error" style={{marginRight: "auto"}}>Slett</Button>
       <Button onClick={handleCancel} style={{marginLeft: "0.5em"}}>Avbryt</Button>
       <Button onClick={handleConfirm} variant="primary" style={{marginLeft: "0.5em"}}>Bekreft</Button>

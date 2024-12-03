@@ -192,12 +192,13 @@ class PendingBookingService(
     }
 
     fun editPendingBooking(editBookingRequest: UpdateBookingDTO, bookingToEdit: PendingBooking) {
+        val apartment = apartmentRepository.findApartmentById(editBookingRequest.apartmentID)
         //TODO: sjekk om det finnes en overlappende fastsatt booking
         val bookingToSave = PendingBooking(
             bookingToEdit.id,
             editBookingRequest.startDate,
             editBookingRequest.endDate,
-            bookingToEdit.apartment,
+            apartment,
             bookingToEdit.employee,
             createdDate = bookingToEdit.createdDate
         )

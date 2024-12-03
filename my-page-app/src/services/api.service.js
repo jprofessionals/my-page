@@ -245,6 +245,12 @@ const patchBooking = (bookingId, updatedBooking) => {
   })
 }
 
+const adminPatchBooking = (bookingId, updatedBooking) => {
+  return axios.patch(API_URL + 'booking/admin/' + bookingId, updatedBooking, {
+    headers: authHeader(),
+  })
+}
+
 const patchPendingBooking = (bookingId, updatedBooking) => {
   return axios.patch(API_URL + 'pendingBooking/' + bookingId, updatedBooking, {
     headers: authHeader(),
@@ -286,6 +292,8 @@ const ApiService = {
   patchSetting,
   patchBooking,
   patchPendingBooking,
+  adminPatchBooking,
   getImage,
 }
+
 export default ApiService
