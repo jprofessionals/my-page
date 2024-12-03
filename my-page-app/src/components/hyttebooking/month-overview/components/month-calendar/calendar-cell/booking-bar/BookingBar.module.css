@@ -19,9 +19,9 @@
   background: repeating-linear-gradient(
     0deg,
     #8bd8ff,
-    #8bd8ff 10px,
-    #dadada 10px,
-    #dadada 20px
+    #8bd8ff 10%,
+    #dadada 10%,
+    #dadada 20%
   );
 }
 
@@ -33,9 +33,9 @@
   background: repeating-linear-gradient(
     0deg,
     #ff7a0c,
-    #ff7a0c 10px,
-    #dadada 10px,
-    #dadada 20px
+    #ff7a0c 10%,
+    #dadada 10%,
+    #dadada 20%
   );
 }
 

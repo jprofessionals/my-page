@@ -4,14 +4,11 @@ import MonthOverview2 from '@/components/hyttebooking/month-overview/MonthOvervi
 import AdminBooking from '@/components/hyttebooking/AdminBooking'
 
 function Hyttebooking() {
-  const fastsatt_tip = 'Hytten er opptatt i den angitte perioden'
-  const pending_tip =
-    'Hytten er ledig i perioden. En eller flere brukere har lagt inn et ønske om å reservere hytten, og det er fortsatt mulig å melde seg på trekningen'
-
   return (
     <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 p-4">
-        <div className="flex overflow-hidden gap-2 items-center p-2 max-w-7xl rounded-lg border prose bgColor: bg-slate-200">
+        <div
+          className="flex overflow-hidden gap-2 items-center p-2 max-w-7xl rounded-lg border prose bgColor: bg-slate-200">
           <div className="relative flex-1">
             <h1>Reservasjon av firmahytte</h1>
             <div className="h-1.5 bg-orange-500"></div>
@@ -114,6 +111,17 @@ function Hyttebooking() {
         </p>
 
         <p>
+          <span>
+            <strong>Enheter:</strong>
+          </span>{' '}
+          <ul>
+            <li>Stor leilighet: 13 sengeplasser (dyr <strong>ikke</strong> tilatt)</li>
+            <li>Liten leilighet: 11 sengeplasser (dyr tilatt, men ikke på soverom)</li>
+            <li>Annekset: 10 sengeplasser (dyr <strong>ikke</strong> tilatt)</li>
+          </ul>
+        </p>
+
+        <p>
           For mer informasjon se{' '}
           <a
             href="https://sites.google.com/a/jpro.no/jpro-intranet/personalh%C3%A5ndbok/hyttereglement?authuser=1"
@@ -123,55 +131,36 @@ function Hyttebooking() {
           </a>
         </p>
 
-        <AdminBooking />
+        <AdminBooking/>
 
         <div className="flex flex-col gap-3 mt-7">
           <div className="flex gap-2 bg-gray-100 rounded-lg">
             <div
-              className="w-6 rounded-lg bg-orange-brand tooltip tooltip-right"
-              data-tip={fastsatt_tip}
+              className="w-6 rounded-lg bg-teal-annex tooltip tooltip-right"
             />
-            /
-            <div
-              className="w-6 rounded-lg bg-pattern bg-yellow-200 tooltip tooltip-top"
-              data-tip={pending_tip}
-            />
-            <span>
-              Stor leilighet: 13 sengeplasser (dyr <strong>ikke</strong> tilatt)
-            </span>
+            Dine reservasjoner
           </div>
 
           <div className="flex gap-2 bg-gray-100 rounded-lg tooltip">
             <div
               className="w-6 rounded-lg bg-blue-small-appartment tooltip tooltip-right"
-              data-tip={fastsatt_tip}
             />
-            /
-            <div
-              className="w-6 rounded-lg bg-pattern bg-purple-200 tooltip tooltip-top"
-              data-tip={pending_tip}
-            />
-            Liten leilighet: 11 sengeplasser (dyr tilatt, men ikke på soverom)
+            Andres reservasjoner
           </div>
 
           <div className="flex gap-2 bg-gray-100 rounded-lg">
             <div
-              className="w-6 rounded-lg bg-teal-annex tooltip tooltip-right"
-              data-tip={fastsatt_tip}
+              className="w-6 rounded-lg tooltip tooltip-right"
+              style={{
+                background: "repeating-linear-gradient(0deg, #ff7a0c, #ff7a0c 10%, #dadada 10%, #dadada 20%)"
+              }}
             />
-            /
-            <div
-              className="w-6 rounded-lg bg-pattern bg-green-200 tooltip tooltip-top"
-              data-tip={pending_tip}
-            />
-            <span>
-              Annekset: 10 sengeplasser (dyr <strong>ikke</strong> tilatt)
-            </span>
+            Trekninger
           </div>
         </div>
       </div>
 
-      <MonthOverview2 />
+      <MonthOverview2/>
     </div>
   )
 }
