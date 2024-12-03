@@ -35,6 +35,7 @@ class JobPostingController(
                 exclusive = entity.customer.exclusive,
             ),
             urgent = entity.urgent,
+            hidden = entity.hidden,
             deadline = entity.deadline,
             description = entity.description ?: "",
             tags = emptyList(),
@@ -120,12 +121,14 @@ class JobPostingController(
     override fun getJobPostings(
         customers: List<String>?,
         fromDateTime: OffsetDateTime?,
+        hidden: Boolean?,
         includeIds: List<String>?,
         tags: List<String>?
     ): ResponseEntity<List<JobPosting>> {
         val entities = jobPostingService.getJobPostings(
             customers ?: emptyList(),
             fromDateTime,
+            hidden,
             includeIds ?: emptyList(),
             tags ?: emptyList()
         )
@@ -140,6 +143,7 @@ class JobPostingController(
                     exclusive = it.customer.exclusive
                 ),
                 urgent = it.urgent,
+                hidden = it.hidden,
                 deadline = it.deadline,
                 description = it.description ?: "",
                 tags = it.tags

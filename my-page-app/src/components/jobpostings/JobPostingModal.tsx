@@ -74,6 +74,9 @@ export const JobPostingModal = ({
   const [isUrgent, setIsUrgent] = useState(
     jobPosting ? jobPosting.urgent : false,
   )
+  const [isHidden, setIsHidden] = useState(
+    jobPosting ? jobPosting.hidden : false,
+  )
   const [doNotify, setDoNotify] = useState(true)
   const [doSendUpdate, setDoSendUpdate] = useState(false)
   const [updateMessage, setUpdateMessage] = useState<string | null>(null)
@@ -119,6 +122,7 @@ export const JobPostingModal = ({
       title: title,
       customer: customer,
       urgent: isUrgent,
+      hidden: isHidden,
       deadline: deadline,
       description: description,
       links: links,
@@ -236,7 +240,36 @@ export const JobPostingModal = ({
                     />
                   </Switch.Root>
                 </div>
-                {jobPosting ? (
+                <div className="flex gap-2">
+                  <label className="block text-gray-700 mb-1">
+                    Skjule for ansatte?
+                  </label>
+                  <Switch.Root
+                    className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
+                      isHidden
+                        ? 'bg-blue-600 border-blue-600'
+                        : 'bg-gray-400 border-gray-400'
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                    id="urgent"
+                    checked={isHidden}
+                    onCheckedChange={(checked) => {
+                      setIsHidden(checked)
+                      setDoNotify(false)
+                      setDoSendUpdate(false)
+                      setUpdateMessage(null)
+                    }}
+                  >
+                    <Switch.Thumb
+                      className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
+                      style={{
+                        transform: isHidden
+                          ? 'translateX(18px)'
+                          : 'translateX(0)',
+                      }}
+                    />
+                  </Switch.Root>
+                </div>
+                {isHidden ? null : jobPosting ? (
                   <div className="flex gap-2">
                     <label className="block text-gray-700 mb-1">
                       Send oppdatering?

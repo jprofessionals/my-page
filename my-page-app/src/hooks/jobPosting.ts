@@ -160,6 +160,7 @@ export const useJobPostingTags = () => {
 export const useJobPostings = (
   customers: string[] | null,
   fromDateTime: string | null,
+  hidden: boolean | null,
   includeIds: string[] | null,
   tags: string[] | null,
 ) => {
@@ -172,6 +173,7 @@ export const useJobPostings = (
         'from-date-time': fromDateTime
           ? fromDateTime
           : DateTime.now().minus({ month: 3 }).toString(),
+        hidden: hidden === null ? undefined : hidden,
         'include-ids': includeIds ? includeIds : undefined,
         tags: tags ? tags : undefined,
       },
@@ -181,7 +183,7 @@ export const useJobPostings = (
   }
 
   return useQuery({
-    queryKey: [jobPostingsCacheName, customers, fromDateTime, tags],
+    queryKey: [jobPostingsCacheName, customers, fromDateTime, hidden, tags],
     queryFn: fetchJobPostings,
     select: (result) => result.data,
     enabled: userFetchStatus === 'fetched',

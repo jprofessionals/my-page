@@ -13,7 +13,6 @@ import {
 } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faLock,
   faPaperclip,
   faPencilAlt,
   faTrashAlt,
@@ -21,7 +20,6 @@ import {
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as AlertDialog from '@radix-ui/react-alert-dialog'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 import { RichTextReadOnly } from 'mui-tiptap'
 import { StarterKit } from '@tiptap/starter-kit'
@@ -127,10 +125,18 @@ export const JobPosting = (jobPosting: JobPostingType) => {
         <Accordion.Trigger className="pt-4 group bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
           <div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
             <div className="flex flex-col items-start px-4 pb-4">
-              <h2 className="text-xl text-left font-bold text-gray-800">
+              <h2
+                className={`text-xl text-left font-bold ${
+                  jobPosting.hidden ? 'text-gray-500' : 'text-gray-800'
+                }`}
+              >
                 {jobPosting.title}
               </h2>
-              <p className="text-gray-700 text-left">
+              <p
+                className={`text-left ${
+                  jobPosting.hidden ? 'text-gray-500' : 'text-gray-700'
+                }`}
+              >
                 {jobPosting.customer.name}
                 {jobPosting.customer.exclusive && (
                   <Tooltip.Provider>
@@ -138,24 +144,24 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                       <Tooltip.Trigger asChild>
                         <FontAwesomeIcon
                           icon={faLock}
-                          aria-label="Krever eksklusivitet"
-                          className="text-gray-600 hover:text-gray-800 ml-1 cursor-pointer"
+                          aria-label=" Krever eksklusivitet"
+                          className=" text-gray-600 hover:text-gray-800 ml-1 cursor-pointer"
                         />
                       </Tooltip.Trigger>
                       <Tooltip.Content
-                        className="bg-black text-white text-xs px-2 py-1 rounded-md shadow-md"
-                        side="top"
-                        align="center"
+                        className=" bg-black text-white text-xs px-2 py-1 rounded-md shadow-md"
+                        side=" top"
+                        align=" center"
                       >
                         Krever eksklusivitet
-                        <Tooltip.Arrow className="fill-black" />
+                        <Tooltip.Arrow className=" fill-black" />
                       </Tooltip.Content>
                     </Tooltip.Root>
                   </Tooltip.Provider>
                 )}
               </p>
             </div>
-            <div className="flex flex-col items-start justify-center w-[230px] pr-4 pl-4 pb-4 mb:pl-0 mb:pb-0">
+            <div className=" flex flex-col items-start justify-center w-[230px] pr-4 pl-4 pb-4 mb:pl-0 mb:pb-0">
               <p className="text-sm text-left font-bold text-gray-800">Frist</p>
               <p className="text-sm text-gray-700 text-left">
                 {formattedDeadline}

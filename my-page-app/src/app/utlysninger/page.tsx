@@ -25,6 +25,7 @@ export default function Utlysninger() {
   const { data: jobPostings } = useJobPostings(
     customer ? [customer.name] : null,
     selectedFromDate ? selectedFromDate.toISOString() : null,
+    user?.admin ? null : false,
     id ? [id] : [],
     tags.map((tag) => tag.name),
   )
