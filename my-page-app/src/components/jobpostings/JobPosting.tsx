@@ -13,6 +13,7 @@ import {
 } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
+  faLock,
   faPaperclip,
   faPencilAlt,
   faTrashAlt,
@@ -20,6 +21,7 @@ import {
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as AlertDialog from '@radix-ui/react-alert-dialog'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 import { RichTextReadOnly } from 'mui-tiptap'
 import { StarterKit } from '@tiptap/starter-kit'
