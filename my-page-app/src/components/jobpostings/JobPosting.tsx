@@ -146,24 +146,24 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                       <Tooltip.Trigger asChild>
                         <FontAwesomeIcon
                           icon={faLock}
-                          aria-label=" Krever eksklusivitet"
-                          className=" text-gray-600 hover:text-gray-800 ml-1 cursor-pointer"
+                          aria-label="Krever eksklusivitet"
+                          className="text-gray-600 hover:text-gray-800 ml-1 cursor-pointer"
                         />
                       </Tooltip.Trigger>
                       <Tooltip.Content
-                        className=" bg-black text-white text-xs px-2 py-1 rounded-md shadow-md"
-                        side=" top"
-                        align=" center"
+                        className="bg-black text-white text-xs px-2 py-1 rounded-md shadow-md"
+                        side="top"
+                        align="center"
                       >
                         Krever eksklusivitet
-                        <Tooltip.Arrow className=" fill-black" />
+                        <Tooltip.Arrow className="fill-black" />
                       </Tooltip.Content>
                     </Tooltip.Root>
                   </Tooltip.Provider>
                 )}
               </p>
             </div>
-            <div className=" flex flex-col items-start justify-center w-[230px] pr-4 pl-4 pb-4 mb:pl-0 mb:pb-0">
+            <div className="flex flex-col items-start justify-center w-[230px] pr-4 pl-4 pb-4 mb:pl-0 mb:pb-0">
               <p className="text-sm text-left font-bold text-gray-800">Frist</p>
               <p className="text-sm text-gray-700 text-left">
                 {formattedDeadline}
