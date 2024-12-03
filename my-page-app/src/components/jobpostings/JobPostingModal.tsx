@@ -75,7 +75,7 @@ export const JobPostingModal = ({
     jobPosting ? jobPosting.urgent : false,
   )
   const [doNotify, setDoNotify] = useState(true)
-  const [doSendUpdate, setDoSendUpdate] = useState(true)
+  const [doSendUpdate, setDoSendUpdate] = useState(false)
   const [updateMessage, setUpdateMessage] = useState<string | null>(null)
   const [deadline, setDeadline] = useState(
     jobPosting ? (jobPosting.deadline ? jobPosting.deadline : '') : '',
@@ -157,7 +157,7 @@ export const JobPostingModal = ({
           className="fixed inset-0 flex justify-center items-center z-50"
           aria-modal="true"
         >
-          <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-300">
+          <div className="bg-white rounded-lg p-6 w-full max-w-5xl max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-300">
             <Dialog.Title className="text-xl font-bold mb-4">
               {heading}
             </Dialog.Title>
@@ -316,7 +316,7 @@ export const JobPostingModal = ({
                 </div>
               )}
               <div className="mb-4">
-                <div className="prose">
+                <div className="prose max-w-none">
                   <RichTextEditor
                     ref={rteRef}
                     extensions={[StarterKit]}
