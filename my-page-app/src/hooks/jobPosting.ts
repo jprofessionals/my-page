@@ -238,14 +238,19 @@ export const usePutJobPosting = () => {
   return useMutation({
     mutationFn: async ({
       updatedJobPosting,
+      updateMessage,
     }: {
       updatedJobPosting: JobPosting
       filesToUpload?: FileList
       filesToDelete?: JobPostingFiles
+      updateMessage: string | null
     }) => {
       return await updateJobPosting({
         path: {
           id: updatedJobPosting.id,
+        },
+        query: {
+          'update-message': updateMessage ? updateMessage : undefined,
         },
         body: updatedJobPosting,
         headers: authHeader(),
