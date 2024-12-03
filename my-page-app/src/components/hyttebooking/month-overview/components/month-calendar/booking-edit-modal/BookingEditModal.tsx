@@ -1,10 +1,6 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
-import { Apartment, Booking, BookingPost, User } from '@/types'
-import ApiService, { API_URL } from '@/services/api.service'
-import { Button } from '@/components/ui/button'
+import { Booking, User } from '@/types'
 import SimpleModal from '@/components/ui/SimpleModal'
-import { toast } from 'react-toastify'
-import { useQueryClient } from '@tanstack/react-query'
+import BookingEditForm from "@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-form/BookingEditForm";
 
 type Props = {
   booking?: Booking
@@ -19,116 +15,22 @@ const BookingEditModal = ({
   onBookingSaved,
   onCancel,
 }: Props) => {
-  const [startDate, setStartDate] = useState<string | undefined>()
-  const [endDate, setEndDate] = useState<string | undefined>()
-
-  const queryClient = useQueryClient()
-
-  useEffect(() => {
-    setStartDate(booking?.startDate)
-    setEndDate(booking?.endDate)
-  }, [booking])
-
-  const deleteBookingByBookingId = async (bookingId: number | null) => {
-    try {
-      if (booking?.isPending) {
-        await ApiService.deletePendingBooking(bookingId)
-      } else {
-        await ApiService.deleteBooking(bookingId)
-      }
-      toast.success('Reservasjonen din er slettet')
-    } catch (error) {
-      toast.error(`Det oppstod en feil ved sletting: ${error}`)
-    }
-  }
-
-  const patchBookingByBookingId = async (
-    bookingId: number | null,
-    updatedBooking: BookingPost,
-  ) => {
-    try {
-      if (booking?.isPending) {
-        await ApiService.patchPendingBooking(bookingId, updatedBooking)
-      } else {
-        await ApiService.patchBooking(bookingId, updatedBooking)
-      }
-      toast.success('Reservasjonen din er oppdatert')
-    } catch (error) {
-      toast.error(`Det oppstod en feil ved oppdatering: ${error}`)
-    }
-  }
-
-  const handleDelete = async () => {
-    if (booking) {
-      await deleteBookingByBookingId(booking.id)
-      onBookingSaved()
-    }
-  }
-
-  const handleConfirm = async () => {
-    if (booking && startDate && endDate) {
-      const updatedBooking: BookingPost = {
-        apartmentID: booking.apartment.id,
-        startDate,
-        endDate,
-      }
-      await patchBookingByBookingId(booking.id, updatedBooking)
-      onBookingSaved()
-    }
-  }
-
-  const handleCancel = () => {
-    onCancel()
-  }
-
-  const handleStartDateChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setStartDate(e.target.value)
-  }
-  const handleEndDateChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEndDate(e.target.value)
-  }
-
   return (
     <SimpleModal
       open={!!booking}
       onRequestClose={onCancel}
       header={'Endre booking'}
       content={
-        <>
-          Hei {user?.name}! <br />
-          Endre periode for &quot;{booking?.apartment?.cabin_name}&quot; i
-          perioden
-          <br />
-          <strong>Startdato:</strong>
-          <input
-            type="date"
-            name="startDate"
-            onChange={handleStartDateChange}
-            value={startDate}
-            placeholder={startDate}
-          />
-          <br />
-          <strong>Sluttdato:</strong>
-          <input
-            type="date"
-            name="endDate"
-            onChange={handleEndDateChange}
-            value={endDate}
-            placeholder={endDate}
-          />
-        </>
+        <BookingEditForm
+          user={user}
+          booking={booking}
+          onCancel={onCancel}
+          onBookingSaved={onBookingSaved}
+        />
       }
-      optionalButton={
-        <Button onClick={handleDelete} variant="error" color={'red'}>
-          Slett
-        </Button>
-      }
-      confirmButton={
-        <Button onClick={handleConfirm} variant="primary">
-          Bekreft
-        </Button>
-      }
-      cancelButton={<Button onClick={handleCancel}>Avbryt</Button>}
+      optionalButton={<></>}
+      confirmButton={<></>}
+      cancelButton={<></>}
     />
   )
 }

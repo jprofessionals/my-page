@@ -1,5 +1,5 @@
 import React from 'react'
-import { DrawingPeriod, PendingBookingTrain, User } from '@/types'
+import {Booking, DrawingPeriod, PendingBookingTrain, User} from '@/types'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
 
@@ -8,6 +8,7 @@ type Props = {
   bookingTrain?: PendingBookingTrain
   onCancel: () => void
   onPerformDrawing: (bookingTrain: PendingBookingTrain) => void
+  onEdit: (pendingBooking: Booking) => void
 }
 
 const DrawingPeriodModal = ({
@@ -15,6 +16,7 @@ const DrawingPeriodModal = ({
   user,
   onCancel,
   onPerformDrawing,
+  onEdit,
 }: Props) => {
   function handlePerformDrawing() {
     if (bookingTrain) {
@@ -39,6 +41,13 @@ const DrawingPeriodModal = ({
                     {pendingBooking.apartment.cabin_name} fra{' '}
                     {pendingBooking.startDate} til {pendingBooking.endDate}
                   </span>
+                  <Button
+                    variant="error"
+                    style={{marginLeft: '8px', height: '1rem'}}
+                    onClick={() => onEdit(pendingBooking)}
+                  >
+                    Endre
+                  </Button>
                   <br />
                 </div>
               )
@@ -47,7 +56,7 @@ const DrawingPeriodModal = ({
       }
       confirmButton={
         (!!user?.admin || undefined) && (
-          <Button className="primary" onClick={handlePerformDrawing}>
+          <Button variant="primary" onClick={handlePerformDrawing}>
             Trekk
           </Button>
         )

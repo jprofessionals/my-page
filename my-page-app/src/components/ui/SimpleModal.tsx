@@ -8,7 +8,7 @@ type Props = {
   content: ReactElement
   optionalButton?: ReactElement
   confirmButton?: ReactElement
-  cancelButton: ReactElement
+  cancelButton?: ReactElement
 }
 
 const SimpleModal = ({
