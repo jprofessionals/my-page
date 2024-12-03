@@ -1,9 +1,9 @@
 import React, {ChangeEvent, useEffect, useState} from 'react'
-import {Booking, BookingPost, User} from '@/types'
+import {Apartment, Booking, BookingPost, User} from '@/types'
 import ApiService from '@/services/api.service'
 import {Button} from '@/components/ui/button'
 import {toast} from 'react-toastify'
-import {useQueryClient} from '@tanstack/react-query'
+import {useQuery} from '@tanstack/react-query'
 
 type Props = {
   booking?: Booking
@@ -18,15 +18,24 @@ const BookingEditForm = ({
                            onBookingSaved,
                            onCancel,
                          }: Props) => {
-  const [startDate, setStartDate] = useState<string | undefined>()
-  const [endDate, setEndDate] = useState<string | undefined>()
-
-  const queryClient = useQueryClient()
+  const [startDate, setStartDate] = useState<string>('')
+  const [endDate, setEndDate] = useState<string>('')
+  const [apartmentId, setApartmentId] = useState<number>(0)
 
   useEffect(() => {
-    setStartDate(booking?.startDate)
-    setEndDate(booking?.endDate)
+    setStartDate(booking?.startDate || '')
+    setEndDate(booking?.endDate || '')
+    setApartmentId(booking?.apartment.id || 0)
   }, [booking])
+
+  const { data: apartments } = useQuery({
+    queryKey: ['apartments'],
+    queryFn: () => {
+      const allApartments = ApiService.getAllApartments();
+      console.log('apartments=' + JSON.stringify(allApartments))
+      return allApartments
+    },
+  })
 
   const deleteBookingByBookingId = async (bookingId: number | null) => {
     try {
@@ -67,7 +76,7 @@ const BookingEditForm = ({
   const handleConfirm = async () => {
     if (booking && startDate && endDate) {
       const updatedBooking: BookingPost = {
-        apartmentID: booking.apartment.id,
+        apartmentID: apartmentId,
         startDate,
         endDate,
       }
@@ -86,35 +95,56 @@ const BookingEditForm = ({
   const handleEndDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEndDate(e.target.value)
   }
+  const handleApartmentChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setApartmentId(Number(e.target.value))
+  }
 
-  return <>
-    Hei {user?.name}! <br/>
-    Endre reservasjon for &quot;{booking?.apartment?.cabin_name}&quot;
-    <br/>
-    <strong>Startdato:</strong>
-    <input
-      type="date"
-      name="startDate"
-      onChange={handleStartDateChange}
-      value={startDate}
-      placeholder={startDate}
-    />
-    <br/>
-    <strong>Sluttdato:</strong>
-    <input
-      type="date"
-      name="endDate"
-      onChange={handleEndDateChange}
-      value={endDate}
-      placeholder={endDate}
-    />
+  return <div style={{display: "grid", rowGap: "8px"}}>
+    <div>Hei {user?.name}!</div>
+    <div>Endre reservasjon for &quot;{booking?.apartment?.cabin_name}&quot;</div>
+    <label>
+      <b>Startdato:</b>
+      <input
+        type="date"
+        name="startDate"
+        onChange={handleStartDateChange}
+        value={startDate}
+        className="w-48 input input-bordered input-sm ml-3 float-end"
+      />
+    </label>
+    <label>
+      <b>Sluttdato:</b>
+      <input
+        type="date"
+        name="endDate"
+        onChange={handleEndDateChange}
+        value={endDate}
+        className="w-48 input input-bordered input-sm ml-3 float-end"
+      />
+    </label>
+    {user?.admin && <label>
+      <b>Enhet:</b>
+      <select
+        name="apartment"
+        onChange={handleApartmentChange}
+        value={apartmentId}
+        className="w-48 input input-bordered input-sm ml-3 float-end"
+      >
+        <option value="">Velg enhet</option>
+        {(apartments || []).map((apartment: Apartment) => (
+          <option key={apartment.id} value={apartment.id}>
+            {apartment.cabin_name}
+          </option>
+        ))}
+      </select>
+    </label>}
 
     <div style={{display: "flex", justifyContent: "right", marginTop: "2em"}}>
       <Button onClick={handleDelete} variant="error" style={{marginRight: "auto"}}>Slett</Button>
       <Button onClick={handleCancel} style={{marginLeft: "0.5em"}}>Avbryt</Button>
       <Button onClick={handleConfirm} variant="primary" style={{marginLeft: "0.5em"}}>Bekreft</Button>
     </div>
-  </>
+  </div>
 }
 
 export default BookingEditForm

@@ -5,7 +5,7 @@ export type User = {
   familyName: string
   icon: string
   startDate: string
-  admin: string
+  admin: boolean
   employeeNumber: string
   budgets?: Budget[]
   loaded: boolean
