@@ -159,13 +159,14 @@ class JobPostingController(
     @RequiresAdmin
     override fun updateJobPosting(
         id: Long,
-        jobPosting: JobPosting
+        jobPosting: JobPosting,
+        updateMessage: String?
     ): ResponseEntity<Unit> {
         if (id != jobPosting.id) {
             return ResponseEntity.badRequest().build()
         }
 
-        jobPostingService.updateJobPosting(jobPosting)
+        jobPostingService.updateJobPosting(jobPosting, updateMessage)
 
         return ResponseEntity.noContent().build()
     }

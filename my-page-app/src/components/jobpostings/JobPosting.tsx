@@ -56,11 +56,13 @@ export const JobPosting = (jobPosting: JobPostingType) => {
     jobPosting: JobPostingType,
     filesToUpload: FileList,
     filesToDelete: JobPostingFilesType,
+    updateMessage: string | null,
   ) => {
     updateJobPosting({
       updatedJobPosting: jobPosting,
       filesToUpload: filesToUpload,
       filesToDelete: filesToDelete,
+      updateMessage: updateMessage,
     })
     closeModal()
   }

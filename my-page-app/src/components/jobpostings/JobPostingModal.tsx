@@ -41,6 +41,7 @@ type OnEditJobPostingType = (
   jobPosting: JobPostingType,
   newFiles: FileList,
   filesToDelete: JobPostingFilesType,
+  updateMessage: string | null,
 ) => void
 
 interface JobPostingModalProps {
@@ -74,6 +75,8 @@ export const JobPostingModal = ({
     jobPosting ? jobPosting.urgent : false,
   )
   const [doNotify, setDoNotify] = useState(true)
+  const [doSendUpdate, setDoSendUpdate] = useState(true)
+  const [updateMessage, setUpdateMessage] = useState<string | null>(null)
   const [deadline, setDeadline] = useState(
     jobPosting ? (jobPosting.deadline ? jobPosting.deadline : '') : '',
   )
@@ -127,6 +130,7 @@ export const JobPostingModal = ({
         newOrUpdatedJobPosting,
         filesToUpload,
         filesToDelete,
+        updateMessage,
       )
     } else {
       ;(onSubmit as OnCreateJobPostingType)(
@@ -167,6 +171,7 @@ export const JobPostingModal = ({
                   onChange={(e) => setTitle(e.target.value)}
                   label="Tittel"
                   variant="outlined"
+                  fullWidth
                   required
                 />
               </div>
@@ -231,29 +236,71 @@ export const JobPostingModal = ({
                     />
                   </Switch.Root>
                 </div>
-                <div className="flex gap-2">
-                  <label className="block text-gray-700 mb-1">Varsel?</label>
-                  <Switch.Root
-                    className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
-                      doNotify
-                        ? 'bg-blue-600 border-blue-600'
-                        : 'bg-gray-400 border-gray-400'
-                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                    id="notify"
-                    checked={doNotify}
-                    onCheckedChange={(checked) => setDoNotify(checked)}
-                  >
-                    <Switch.Thumb
-                      className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
-                      style={{
-                        transform: doNotify
-                          ? 'translateX(18px)'
-                          : 'translateX(0)',
+                {jobPosting ? (
+                  <div className="flex gap-2">
+                    <label className="block text-gray-700 mb-1">
+                      Send oppdatering?
+                    </label>
+                    <Switch.Root
+                      className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
+                        doSendUpdate
+                          ? 'bg-blue-600 border-blue-600'
+                          : 'bg-gray-400 border-gray-400'
+                      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                      id="notify"
+                      checked={doSendUpdate}
+                      onCheckedChange={(checked) => {
+                        setDoSendUpdate(checked)
+                        setUpdateMessage(null)
                       }}
-                    />
-                  </Switch.Root>
-                </div>
+                    >
+                      <Switch.Thumb
+                        className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
+                        style={{
+                          transform: doSendUpdate
+                            ? 'translateX(18px)'
+                            : 'translateX(0)',
+                        }}
+                      />
+                    </Switch.Root>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <label className="block text-gray-700 mb-1">Varsel?</label>
+                    <Switch.Root
+                      className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
+                        doNotify
+                          ? 'bg-blue-600 border-blue-600'
+                          : 'bg-gray-400 border-gray-400'
+                      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                      id="notify"
+                      checked={doNotify}
+                      onCheckedChange={(checked) => setDoNotify(checked)}
+                    >
+                      <Switch.Thumb
+                        className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
+                        style={{
+                          transform: doNotify
+                            ? 'translateX(18px)'
+                            : 'translateX(0)',
+                        }}
+                      />
+                    </Switch.Root>
+                  </div>
+                )}
               </div>
+              {doSendUpdate && (
+                <div className="mb-4">
+                  <TextField
+                    value={updateMessage}
+                    onChange={(e) => setUpdateMessage(e.target.value)}
+                    label="Oppdatering"
+                    variant="outlined"
+                    fullWidth
+                    required
+                  />
+                </div>
+              )}
               {isUrgent ? null : (
                 <div className="mb-4">
                   <label className="block text-gray-700">Frist</label>

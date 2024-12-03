@@ -87,7 +87,8 @@ class JobPostingService(
 
     @Transactional
     fun updateJobPosting(
-        jobPosting: JobPosting
+        jobPosting: JobPosting,
+        updateMessage: String?
     ) {
         val existingJobPosting = jobPostingRepository.findById(jobPosting.id)
             .orElseThrow {
@@ -110,7 +111,7 @@ class JobPostingService(
                 )
             }
 
-        jobPostingRepository.save(
+        val updatedJobPosting = jobPostingRepository.save(
             existingJobPosting.apply {
                 title = jobPosting.title
                 customer = customerEntity
@@ -120,5 +121,13 @@ class JobPostingService(
                 tags = tagEntities
             }
         )
+
+        if (updateMessage != null) {
+            slackService.postJobPostingUpdate(
+                "utlysninger",
+                updatedJobPosting,
+                updateMessage
+            )
+        }
     }
 }

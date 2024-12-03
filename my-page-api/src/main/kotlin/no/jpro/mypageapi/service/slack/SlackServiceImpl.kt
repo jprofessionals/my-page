@@ -4,6 +4,7 @@ import com.slack.api.Slack
 import com.slack.api.methods.MethodsClient
 import com.slack.api.model.block.SectionBlock
 import com.slack.api.model.block.composition.BlockCompositions.markdownText
+import com.slack.api.model.block.composition.BlockCompositions.plainText
 import no.jpro.mypageapi.entity.JobPosting
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.provider.SecretProvider
@@ -35,34 +36,64 @@ class SlackServiceImpl(
     override fun postJobPosting(
         channel: String,
         jobPosting: JobPosting,
+        updateMessage: String?,
     ) {
+        val title = if (updateMessage == null) {
+            jobPosting.title
+        } else {
+            "OPPDATERING - ${jobPosting.title}"
+        }
+
+        val blocks = mutableListOf(
+            SectionBlock.builder().text(
+                markdownText("<https://minside.jpro.no/utlysninger?id=${jobPosting.id}|*${title}*>")
+
+            ).build(),
+            SectionBlock.builder().fields(
+                listOf(
+                    markdownText("*Kunde:* ${jobPosting.customer.name}"),
+                    markdownText(
+                        "*Frist:* ${getDeadlineText(jobPosting)}"
+                    ),
+                )
+            ).build(),
+            SectionBlock.builder().text(
+                markdownText("*Tagger:* ${jobPosting.tags.map { tag -> tag.name }.joinToString(", ")}")
+            ).build(),
+        )
+
+        if (updateMessage != null) {
+            blocks.add(
+                1,
+                SectionBlock.builder().text(
+                    plainText(updateMessage)
+                ).build(),
+            )
+        }
+
         val response = slack
             .methods(secretProvider.getSlackAppUtlysningerToken())
             .chatPostMessage {
                 it.channel(channel).blocks(
-                    listOf(
-                        SectionBlock.builder().text(
-                            markdownText("<https://minside.jpro.no/utlysninger?id=${jobPosting.id}|*${jobPosting.title}*>")
-
-                        ).build(),
-                        SectionBlock.builder().fields(
-                            listOf(
-                                markdownText("*Kunde:* ${jobPosting.customer.name}"),
-                                markdownText(
-                                    "*Frist:* ${getDeadlineText(jobPosting)}"
-                                ),
-                            )
-                        ).build(),
-                        SectionBlock.builder().text(
-                            markdownText("*Tagger:* ${jobPosting.tags.map { tag -> tag.name }.joinToString(", ")}")
-                        ).build(),
-                    )
+                    blocks.toList()
                 )
             }
 
         if (!response.isOk) {
             throw RuntimeException("Failed to post message to Slack: ${response.error}")
         }
+    }
+
+    override fun postJobPostingUpdate(
+        channel: String,
+        jobPosting: JobPosting,
+        updateMessage: String
+    ) {
+        postJobPosting(
+            channel,
+            jobPosting,
+            updateMessage
+        )
     }
 
     override fun postMessageToChannel(
