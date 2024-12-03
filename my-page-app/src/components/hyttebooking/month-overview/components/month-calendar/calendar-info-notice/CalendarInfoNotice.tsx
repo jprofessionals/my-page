@@ -5,22 +5,25 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircleExclamation} from "@fortawesome/free-solid-svg-icons";
 
 type Props = {
-  infoNotice: InfoBooking
+  infoNotices: InfoBooking[]
 }
 
-const CalendarInfoNotice = ({ infoNotice }: Props) => {
-  const [showNoticeDescription, setShowNoticeDescription] =
+const CalendarInfoNotice = ({ infoNotices }: Props) => {
+  const [showNotices, setShowNotices] =
     useState<boolean>(false)
 
   return (
     <div
       className={style.info}
-      onClick={() => setShowNoticeDescription(!showNoticeDescription)}
+      onClick={() => setShowNotices(!showNotices)}
     >
       <FontAwesomeIcon icon={faCircleExclamation} className={style.icon}/>
-      {showNoticeDescription && (
+      {showNotices && (
         <div id="dialog" className={style.dialog}>
-          {infoNotice.description}
+          <ul>
+            {infoNotices.map((infoNotice) => (
+              <li key={infoNotice.id}>{infoNotice.description}</li>))}
+          </ul>
         </div>
       )}
     </div>

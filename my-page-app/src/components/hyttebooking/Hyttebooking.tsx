@@ -110,7 +110,7 @@ function Hyttebooking() {
           den i kalenderen. Dine egne reservasjoner markeres med en svart kant.
         </p>
 
-        <p>
+        <div>
           <span>
             <strong>Enheter:</strong>
           </span>{' '}
@@ -119,7 +119,7 @@ function Hyttebooking() {
             <li>Liten leilighet: 11 sengeplasser (dyr tilatt, men ikke på soverom)</li>
             <li>Annekset: 10 sengeplasser (dyr <strong>ikke</strong> tilatt)</li>
           </ul>
-        </p>
+        </div>
 
         <p>
           For mer informasjon se{' '}

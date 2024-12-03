@@ -17,9 +17,7 @@ const CalendarDate = ({ day, infoNotices }: Props) => {
 
   return (
     <div className={style.container}>
-      {infoNotices.map((infoNotice) => (
-          <CalendarInfoNotice key={infoNotice.id} infoNotice={infoNotice} />
-      ))}
+      {infoNotices && infoNotices.length > 0 && <CalendarInfoNotice infoNotices={infoNotices} />}
       <div
         className={`
                 ${style.date}

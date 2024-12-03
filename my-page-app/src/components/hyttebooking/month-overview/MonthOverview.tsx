@@ -552,7 +552,7 @@ export default function MonthOverview() {
   }
 
   return (
-    <div className="flex flex-col overflow-hidden gap-4 p-4">
+    <div className="flex flex-col overflow-scroll gap-4 p-4">
       {cutOffDateVacancies == null ? (
         'Fant ikke innstilling for siste reserverbare dato'
       ) : (
