@@ -25,7 +25,7 @@ const BookingReadOnlyInfoModal = ({ booking, onCancel }: Props) => {
           {booking?.endDate && format(booking?.endDate, dateFormat)} ?
         </>
       }
-      cancelButton={<Button onClick={onCancel}>Avbryt</Button>}
+      cancelButton={<Button onClick={onCancel}>Lukk</Button>}
     />
   )
 }
