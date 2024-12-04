@@ -1,75 +1,40 @@
-import { Booking, User } from '@/types'
 import React from 'react'
-import { CalendarDay } from 'react-day-picker'
-import { dateFormat } from '@/components/hyttebooking/month-overview/monthOverviewUtils'
-import { format } from 'date-fns'
 import classes from './BookingBar.module.css'
 
-type Props = {
-  booking: Booking
-  day: CalendarDay
-  user?: User
-  onBookingClick: (booking: Booking) => void
+export enum BarType {
+  mine,
+  theirs,
+  train,
 }
-const BookingBar = ({ booking, day, user, onBookingClick }: Props) => {
-  const style = classes
 
-  const getEmployeeName = () => {
-    const dateString = format(day.date, dateFormat)
-    switch (dateString) {
-      case booking?.startDate:
-        return booking?.employeeName
-          .split(/\s/)
-          .reduce((response, word) => (response += word.slice(0, 1)), '')
-      default:
-        return ''
-    }
-  }
+type Props = {
+  isStart: boolean
+  isEnd: boolean
+  label?: string
+  barType: BarType
+  onClick: () => void
+}
 
-  const isBooking = !!booking
-  const isPending = booking?.isPending
-  const todayString = format(new Date(), dateFormat)
-  const isPast = booking?.endDate < todayString
-  const isMine = isBooking && user?.name === booking?.employeeName
-  const isTheirs = isBooking && user?.name !== booking?.employeeName
-  const isPeriodStart = booking?.startDate === format(day.date, dateFormat)
-  const isPeriodEnd = booking?.endDate === format(day.date, dateFormat)
-  const showPeriodStart = booking && isPeriodStart
-  const showPeriodEnd = booking && isPeriodEnd
-  const showMinePending = isMine && isPending
-  const showTheirsPending = isTheirs && isPending
-
-  const handleOnClick = () => {
-    if (booking && onBookingClick) {
-      onBookingClick(booking)
-    }
-  }
-
-  return (
-    <div
-      onClick={handleOnClick}
-      className={`
-                ${style.bookingBar} 
-                ${showPeriodStart && style.bookingBarPeriodStart}  
-                ${showPeriodEnd && style.bookingBarPeriodEnd}
-                ${isMine && style.bookingBarMine}
-                ${showMinePending && style.bookingBarMinePending} 
-                ${isTheirs && style.bookingBarTheirs} 
-                ${showTheirsPending && style.bookingBarTheirsPending} 
-            `}
-    >
-      {showPeriodStart && (
-        <div
-          className={`
-                    ${style.bookingBarNameLabel}
-                    ${!isPast && style.bookingBarNameLabelUpcoming}
-                `}
-        >
-          {getEmployeeName()}
-        </div>
-      )}
-    </div>
-  )
+const BookingBar = ({ isStart, isEnd, label, barType, onClick }: Props) => {
+  return <div
+    onClick={onClick}
+    className={`
+              ${classes.bookingBar} 
+              ${isStart && classes.bookingBarPeriodStart}  
+              ${isEnd && classes.bookingBarPeriodEnd}
+              ${barType === BarType.mine && classes.bookingBarMine}
+              ${barType === BarType.theirs && classes.bookingBarTheirs} 
+              ${barType === BarType.train && classes.bookingBarTrain} 
+          `}
+  >
+    {isStart && <div
+        className={`
+                  ${classes.bookingBarNameLabel}
+              `}
+      >
+        {label}
+      </div>}
+  </div>
 }
 
 export default BookingBar

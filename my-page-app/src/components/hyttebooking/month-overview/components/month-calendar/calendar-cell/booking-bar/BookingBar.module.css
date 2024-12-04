@@ -29,7 +29,7 @@
   background-color: #2b809b;
 }
 
-.bookingBarTheirsPending {
+.bookingBarTrain {
   background: repeating-linear-gradient(
     0deg,
     #ff7a0c,
@@ -59,15 +59,4 @@
   margin: 0.25rem;
   text-overflow: ellipsis;
   white-space: nowrap;
-  //background-color: #ffffff;
-  //color: #646464;
-  //border-radius: 0.7rem;
-  //color: #ffffff;
-}
-
-.bookingBarNameLabelUpcoming {
-  //background-color: #ffffff;
-  //color: #000000;
-  //border-radius: 0.7rem;
-  //box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.47);
 }
