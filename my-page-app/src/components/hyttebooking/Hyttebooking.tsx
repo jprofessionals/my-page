@@ -7,8 +7,7 @@ function Hyttebooking() {
   return (
     <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 p-4">
-        <div
-          className="flex overflow-hidden gap-2 items-center p-2 max-w-7xl rounded-lg border prose bgColor: bg-slate-200">
+        <div className="flex overflow-hidden gap-2 items-center p-2 max-w-7xl rounded-lg border prose bgColor: bg-slate-200">
           <div className="relative flex-1">
             <h1>Reservasjon av firmahytte</h1>
             <div className="h-1.5 bg-orange-500"></div>
@@ -115,9 +114,15 @@ function Hyttebooking() {
             <strong>Enheter:</strong>
           </span>{' '}
           <ul>
-            <li>Stor leilighet: 13 sengeplasser (dyr <strong>ikke</strong> tilatt)</li>
-            <li>Liten leilighet: 11 sengeplasser (dyr tilatt, men ikke på soverom)</li>
-            <li>Annekset: 10 sengeplasser (dyr <strong>ikke</strong> tilatt)</li>
+            <li>
+              Stor leilighet: 13 sengeplasser (dyr <strong>ikke</strong> tilatt)
+            </li>
+            <li>
+              Liten leilighet: 11 sengeplasser (dyr tilatt, men ikke på soverom)
+            </li>
+            <li>
+              Annekset: 10 sengeplasser (dyr <strong>ikke</strong> tilatt)
+            </li>
           </ul>
         </div>
 
@@ -131,20 +136,16 @@ function Hyttebooking() {
           </a>
         </p>
 
-        <AdminBooking/>
+        <AdminBooking />
 
         <div className="flex flex-col gap-3 mt-7">
           <div className="flex gap-2 bg-gray-100 rounded-lg">
-            <div
-              className="w-6 rounded-lg bg-teal-annex tooltip tooltip-right"
-            />
+            <div className="w-6 rounded-lg bg-teal-annex tooltip tooltip-right" />
             Dine reservasjoner
           </div>
 
           <div className="flex gap-2 bg-gray-100 rounded-lg tooltip">
-            <div
-              className="w-6 rounded-lg bg-blue-small-appartment tooltip tooltip-right"
-            />
+            <div className="w-6 rounded-lg bg-blue-small-appartment tooltip tooltip-right" />
             Andres reservasjoner
           </div>
 
@@ -152,7 +153,8 @@ function Hyttebooking() {
             <div
               className="w-6 rounded-lg tooltip tooltip-right"
               style={{
-                background: "repeating-linear-gradient(0deg, #ff7a0c, #ff7a0c 10%, #dadada 10%, #dadada 20%)"
+                background:
+                  'repeating-linear-gradient(0deg, #ff7a0c, #ff7a0c 10%, #dadada 10%, #dadada 20%)',
               }}
             />
             Trekninger
@@ -160,7 +162,7 @@ function Hyttebooking() {
         </div>
       </div>
 
-      <MonthOverview2/>
+      <MonthOverview2 />
     </div>
   )
 }

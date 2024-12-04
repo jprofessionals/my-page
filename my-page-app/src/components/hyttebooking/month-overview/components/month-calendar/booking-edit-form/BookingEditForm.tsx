@@ -1,9 +1,9 @@
-import React, {ChangeEvent, useEffect, useState} from 'react'
-import {Apartment, Booking, BookingPost, User} from '@/types'
+import React, { ChangeEvent, useEffect, useState } from 'react'
+import { Apartment, Booking, BookingPost, User } from '@/types'
 import ApiService from '@/services/api.service'
-import {Button} from '@/components/ui/button'
-import {toast} from 'react-toastify'
-import {useQuery} from '@tanstack/react-query'
+import { Button } from '@/components/ui/button'
+import { toast } from 'react-toastify'
+import { useQuery } from '@tanstack/react-query'
 
 type Props = {
   booking?: Booking
@@ -13,11 +13,11 @@ type Props = {
 }
 
 const BookingEditForm = ({
-                           booking,
-                           user,
-                           onBookingSaved,
-                           onCancel,
-                         }: Props) => {
+  booking,
+  user,
+  onBookingSaved,
+  onCancel,
+}: Props) => {
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
   const [apartmentId, setApartmentId] = useState<number>(0)
@@ -31,7 +31,7 @@ const BookingEditForm = ({
   const { data: apartments } = useQuery({
     queryKey: ['apartments'],
     queryFn: () => {
-      const allApartments = ApiService.getAllApartments();
+      const allApartments = ApiService.getAllApartments()
       console.log('apartments=' + JSON.stringify(allApartments))
       return allApartments
     },
@@ -122,50 +122,75 @@ const BookingEditForm = ({
     setApartmentId(Number(e.target.value))
   }
 
-  return <div style={{display: "grid", rowGap: "8px", marginTop: "8px"}}>
-    <label>
-      <b>Startdato:</b>
-      <input
-        type="date"
-        name="startDate"
-        onChange={handleStartDateChange}
-        value={startDate}
-        className="w-48 input input-bordered input-sm ml-3 float-end"
-      />
-    </label>
-    <label>
-      <b>Sluttdato:</b>
-      <input
-        type="date"
-        name="endDate"
-        onChange={handleEndDateChange}
-        value={endDate}
-        className="w-48 input input-bordered input-sm ml-3 float-end"
-      />
-    </label>
-    {user?.admin && <label>
-      <b>Enhet:</b>
-      <select
-        name="apartment"
-        onChange={handleApartmentChange}
-        value={apartmentId}
-        className="w-48 input input-bordered input-sm ml-3 float-end"
-      >
-        <option value="">Velg enhet</option>
-        {(apartments || []).map((apartment: Apartment) => (
-          <option key={apartment.id} value={apartment.id}>
-            {apartment.cabin_name}
-          </option>
-        ))}
-      </select>
-    </label>}
+  return (
+    <div style={{ display: 'grid', rowGap: '8px', marginTop: '8px' }}>
+      <label>
+        <b>Startdato:</b>
+        <input
+          type="date"
+          name="startDate"
+          onChange={handleStartDateChange}
+          value={startDate}
+          className="w-48 input input-bordered input-sm ml-3 float-end"
+        />
+      </label>
+      <label>
+        <b>Sluttdato:</b>
+        <input
+          type="date"
+          name="endDate"
+          onChange={handleEndDateChange}
+          value={endDate}
+          className="w-48 input input-bordered input-sm ml-3 float-end"
+        />
+      </label>
+      {user?.admin && (
+        <label>
+          <b>Enhet:</b>
+          <select
+            name="apartment"
+            onChange={handleApartmentChange}
+            value={apartmentId}
+            className="w-48 input input-bordered input-sm ml-3 float-end"
+          >
+            <option value="">Velg enhet</option>
+            {(apartments || []).map((apartment: Apartment) => (
+              <option key={apartment.id} value={apartment.id}>
+                {apartment.cabin_name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
-    <div style={{display: "flex", justifyContent: "right", marginTop: "2em", marginBottom: "2em"}}>
-      <Button onClick={handleDelete} variant="error" style={{marginRight: "auto"}}>Slett</Button>
-      <Button onClick={handleCancel} style={{marginLeft: "0.5em"}}>Avbryt</Button>
-      <Button onClick={handleConfirm} variant="primary" style={{marginLeft: "0.5em"}}>Bekreft</Button>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'right',
+          marginTop: '2em',
+          marginBottom: '2em',
+        }}
+      >
+        <Button
+          onClick={handleDelete}
+          variant="error"
+          style={{ marginRight: 'auto' }}
+        >
+          Slett
+        </Button>
+        <Button onClick={handleCancel} style={{ marginLeft: '0.5em' }}>
+          Avbryt
+        </Button>
+        <Button
+          onClick={handleConfirm}
+          variant="primary"
+          style={{ marginLeft: '0.5em' }}
+        >
+          Bekreft
+        </Button>
+      </div>
     </div>
-  </div>
+  )
 }
 
 export default BookingEditForm

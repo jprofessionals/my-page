@@ -16,9 +16,10 @@ type Props = {
 }
 
 const BookingBar = ({ isStart, isEnd, label, barType, onClick }: Props) => {
-  return <div
-    onClick={onClick}
-    className={`
+  return (
+    <div
+      onClick={onClick}
+      className={`
               ${classes.bookingBar} 
               ${isStart && classes.bookingBarPeriodStart}  
               ${isEnd && classes.bookingBarPeriodEnd}
@@ -26,15 +27,18 @@ const BookingBar = ({ isStart, isEnd, label, barType, onClick }: Props) => {
               ${barType === BarType.theirs && classes.bookingBarTheirs} 
               ${barType === BarType.train && classes.bookingBarTrain} 
           `}
-  >
-    {isStart && <div
-        className={`
+    >
+      {isStart && (
+        <div
+          className={`
                   ${classes.bookingBarNameLabel}
               `}
-      >
-        {label}
-      </div>}
-  </div>
+        >
+          {label}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default BookingBar

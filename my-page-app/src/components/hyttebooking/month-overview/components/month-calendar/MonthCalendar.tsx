@@ -123,7 +123,7 @@ function MonthCalendar({
   const handleEditBookingCancelled = () => setEditBooking(undefined)
   const handleInitEditBooking = (booking: Booking) => {
     const isUserBookingOwner = user?.name === booking?.employeeName
-    const isUserAdmin = user?.admin || false;
+    const isUserAdmin = user?.admin || false
     const oneDayMS = 86400000
     const currentDate = new Date()
     currentDate.setTime(currentDate.getTime() - oneDayMS)

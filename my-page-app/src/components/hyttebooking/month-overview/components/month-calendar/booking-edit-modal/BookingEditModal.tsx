@@ -1,6 +1,6 @@
 import { Booking, User } from '@/types'
 import SimpleModal from '@/components/ui/SimpleModal'
-import BookingEditForm from "@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-form/BookingEditForm";
+import BookingEditForm from '@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-form/BookingEditForm'
 
 type Props = {
   booking?: Booking
