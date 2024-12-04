@@ -126,6 +126,12 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long> {
             OR
             (
                 (
+                    :hidden IS NULL
+                    OR
+                    jp.hidden = :hidden
+                )
+                AND
+                (
                     :#{#customerNames.isEmpty()} = true
                     OR
                     c.name IN :customerNames
@@ -154,6 +160,7 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long> {
     fun findAllWithFilters(
         @Param("customerNames") customerNames: List<String>,
         @Param("fromDateTime") fromDateTime: OffsetDateTime?,
+        @Param("hidden") hidden: Boolean?,
         @Param("includeIds") includeIds: List<String>,
         @Param("tagNames") tagNames: List<String>,
     ): List<JobPosting>

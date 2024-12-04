@@ -127,10 +127,18 @@ export const JobPosting = (jobPosting: JobPostingType) => {
         <Accordion.Trigger className="pt-4 group bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
           <div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
             <div className="flex flex-col items-start px-4 pb-4">
-              <h2 className="text-xl text-left font-bold text-gray-800">
+              <h2
+                className={`text-xl text-left font-bold ${
+                  jobPosting.hidden ? 'text-gray-500' : 'text-gray-800'
+                }`}
+              >
                 {jobPosting.title}
               </h2>
-              <p className="text-gray-700 text-left">
+              <p
+                className={`text-left ${
+                  jobPosting.hidden ? 'text-gray-500' : 'text-gray-700'
+                }`}
+              >
                 {jobPosting.customer.name}
                 {jobPosting.customer.exclusive && (
                   <Tooltip.Provider>

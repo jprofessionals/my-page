@@ -32,6 +32,12 @@ paths:
           explode: false
           description: From which date-time to filter job postings
         - in: query
+          name: hidden
+          required: false
+          schema:
+            type: boolean
+          description: Whether to get hidden job postings or not
+        - in: query
           name: include-ids
           required: false
           schema:
@@ -331,6 +337,11 @@ components:
           description: Indicates if the job posting is urgent. If true, no deadline is required.
           default: false
           example: true
+        hidden:
+          type: boolean
+          description: Indicates if the job posting is hidden for employees but available to admins
+          default: false
+          example: false
         deadline:
           type: string
           format: date-time
@@ -357,6 +368,7 @@ components:
         - customer
         - description
         - urgent
+        - hidden
         - tags
         - links
     JobPostingFile:

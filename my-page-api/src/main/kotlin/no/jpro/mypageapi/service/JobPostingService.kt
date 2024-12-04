@@ -46,6 +46,7 @@ class JobPostingService(
             customer = customerEntity,
             description = jobPosting.description,
             urgent = jobPosting.urgent,
+            hidden = jobPosting.hidden,
             deadline = jobPosting.deadline,
             tags = tagEntities,
         )
@@ -75,10 +76,17 @@ class JobPostingService(
     fun getJobPostings(
         customers: List<String>,
         fromDateTime: OffsetDateTime?,
+        hidden: Boolean?,
         includeIds: List<String>,
         tags: List<String>
     ): List<no.jpro.mypageapi.entity.JobPosting> {
-        return jobPostingRepository.findAllWithFilters(customers, fromDateTime, includeIds, tags)
+        return jobPostingRepository.findAllWithFilters(
+            customers,
+            fromDateTime,
+            hidden,
+            includeIds,
+            tags
+        )
     }
 
     fun getJobPostingCustomers(): List<Customer> {
@@ -117,6 +125,7 @@ class JobPostingService(
                 customer = customerEntity
                 description = jobPosting.description
                 urgent = jobPosting.urgent
+                hidden = jobPosting.hidden
                 deadline = jobPosting.deadline
                 tags = tagEntities
             }
