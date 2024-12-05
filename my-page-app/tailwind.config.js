@@ -48,7 +48,7 @@ module.exports = {
         },
       },
       backgroundImage: {
-        'pattern': "url('/images/linjert-l.png')",
+        pattern: "url('/images/linjert-l.png')",
       },
     },
     keyframes: {
@@ -60,13 +60,13 @@ module.exports = {
         from: { height: 'var(--radix-accordion-content-height)' },
         to: { height: 0 },
       },
-      'spin': {
+      spin: {
         from: { transform: 'rotate(0deg)' },
         to: { transform: 'rotate(360deg)' },
       },
     },
     animation: {
-      'spin': 'spin 1s linear infinite',
+      spin: 'spin 1s linear infinite',
       'accordion-down': 'accordion-down 0.2s ease-out',
       'accordion-up': 'accordion-up 0.2s ease-out',
     },

@@ -146,9 +146,10 @@ function MonthCalendar({
 
           const bookingsByCabin: { [key: string]: Booking[] } =
             cabinOrder.reduce((result: { [key: string]: Booking[] }, cabin) => {
-              result[cabin] = bookingList?.filter(
-                (booking: Booking) => booking.apartment?.cabin_name === cabin,
-              ) ?? []
+              result[cabin] =
+                bookingList?.filter(
+                  (booking: Booking) => booking.apartment?.cabin_name === cabin,
+                ) ?? []
               return result
             }, {})
 

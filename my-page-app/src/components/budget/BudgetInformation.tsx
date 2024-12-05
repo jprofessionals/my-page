@@ -28,15 +28,16 @@ const BudgetInformation = ({ budget }: Props) => (
             <strong title="Startbeløp">Startbeløp: </strong>
             {getInNok(budget.startAmount)} (
             {moment(budget.startDate).format('DD.MM.YYYY')})
-          </div>          
+          </div>
         </>
-      ) : <>
-        <div className="flex flex-col">
+      ) : (
+        <>
+          <div className="flex flex-col">
             <strong title="Årlig budsjett">Årlig budsjett: </strong>
             {getInNok(budget.budgetType.startAmount)}
-        </div>
-      </>
-      }
+          </div>
+        </>
+      )}
       {budget.posts.length > 0 ? (
         <div className="flex flex-col">
           <strong title="Dato for siste kjøp">Dato for siste kjøp: </strong>

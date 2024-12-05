@@ -53,7 +53,7 @@ export default function NewUserModal() {
 
     onError: (error: AxiosError) => {
       toast.error(`Klarte ikke opprette ny bruker: ${error.response?.data}`)
-    }
+    },
   })
 
   const handleClose = () => {

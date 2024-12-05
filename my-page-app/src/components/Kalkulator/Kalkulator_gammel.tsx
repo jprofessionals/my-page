@@ -8,7 +8,6 @@ import getSetting from '@/utils/getSetting'
 import { Settings } from '@/types'
 import { useAuthContext } from '@/providers/AuthProvider'
 
-
 function Kalkulator_gammel() {
   // const [selectedMonth, setSelectedMonth] = useState(moment().format('MM'))
   // const [selectedYear, setSelectedYear] = useState(moment().format('yyyy'))
@@ -21,13 +20,9 @@ function Kalkulator_gammel() {
   const [restKompetanseBudsjett, setRestKompetanseBudsjett] = useState(0)
   const [timeprisProsjekt, setTimeprisProsjekt] = useState(0)
 
-  const [billableHoursThisYear] = useState(
-    1695,
-  )
+  const [billableHoursThisYear] = useState(1695)
 
-  const [antallTimerMnd, setAntallTimerMnd] = useState(
-    162.5,
-  )
+  const [antallTimerMnd, setAntallTimerMnd] = useState(162.5)
   const [antallTimerFakturert, setAntallTimerFakturert] =
     useState(antallTimerMnd)
 
@@ -39,14 +34,20 @@ function Kalkulator_gammel() {
   const [antallTimerSyk, setAntallTimerSyk] = useState(0)
 
   const { settings } = useAuthContext()
-  const [prevSettings, setPrevSettings] = useState<Settings[] | undefined>(settings)
+  const [prevSettings, setPrevSettings] = useState<Settings[] | undefined>(
+    settings,
+  )
   if (settings != prevSettings) {
     setPrevSettings(settings)
     setGarantilonn(parseInt(getSetting(settings, 'CALC_GARANTILONN') ?? '0'))
     setGrunnbelop(parseInt(getSetting(settings, 'CALC_GRUNNBELOP') ?? '0'))
-    setTimeprisKompetanse(parseInt(getSetting(settings, 'CALC_TIMEPRIS_KOMPETANSE') ?? '0'))
+    setTimeprisKompetanse(
+      parseInt(getSetting(settings, 'CALC_TIMEPRIS_KOMPETANSE') ?? '0'),
+    )
     setBonus(parseInt(getSetting(settings, 'CALC_BONUS') ?? '0'))
-    setRestKompetanseBudsjett(parseInt(getSetting(settings, 'CALC_RESTKOMPETANSE') ?? '0'))
+    setRestKompetanseBudsjett(
+      parseInt(getSetting(settings, 'CALC_RESTKOMPETANSE') ?? '0'),
+    )
     setTimeprisProsjekt(parseInt(getSetting(settings, 'CALC_TIMEPRIS') ?? '0'))
   }
 
@@ -127,39 +128,57 @@ function Kalkulator_gammel() {
   //   setTimeprisKompetanse(e.target.value)
   // }
 
-  const handleAntallTimerMndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAntallTimerMndChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setAntallTimerMnd(Number(e.target.value))
   }
 
-  const handleRestKompetanseBudsjettChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRestKompetanseBudsjettChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setRestKompetanseBudsjett(Number(e.target.value))
   }
 
-  const handleTimeprisProsjektChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTimeprisProsjektChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setTimeprisProsjekt(Number(e.target.value))
   }
 
-  const handleAntallTimerFakturertChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAntallTimerFakturertChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setAntallTimerFakturert(Number(e.target.value))
   }
 
-  const handleAntallTimerKompetanseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAntallTimerKompetanseChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setAntallTimerKompetanse(Number(e.target.value))
   }
 
-  const handleAntallTimerInterntidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAntallTimerInterntidChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setAntallTimerInterntid(Number(e.target.value))
   }
 
-  const handleAntallTimerInterntidMedKomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAntallTimerInterntidMedKomChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setAntallTimerInterntidMedKom(Number(e.target.value))
   }
 
-  const handleAntallTimerFerieChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAntallTimerFerieChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setAntallTimerFerie(Number(e.target.value))
   }
 
-  const handleAntallTimerSykChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAntallTimerSykChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setAntallTimerSyk(Number(e.target.value))
   }
 

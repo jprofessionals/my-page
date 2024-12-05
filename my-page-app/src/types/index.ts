@@ -99,7 +99,7 @@ export type BookingPost = {
 
 export type EditedBooking = {
   startDate: string
-  endDate: string,
+  endDate: string
   apartmentId: number
 }
 
@@ -138,7 +138,7 @@ export type EditedInfoNotice = {
 }
 
 export type BudgetSummary = {
-  year: number  
+  year: number
   yearSummary?: BudgetYearSummary[]
 }
 

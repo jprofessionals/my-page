@@ -132,7 +132,7 @@ export default function AdminBooking() {
     onError: (error: string) => {
       setIsLoadingPost(false)
       toast.error(error)
-    }
+    },
   })
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
