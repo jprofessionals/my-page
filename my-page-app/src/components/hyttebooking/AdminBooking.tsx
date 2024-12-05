@@ -190,7 +190,9 @@ export default function AdminBooking() {
       {userIsAdmin && (
         <Modal.Dialog>
           <Modal.DialogTrigger asChild>
-            <Button variant="outline">Admin booking</Button>
+            <Button variant="outline" style={{ width: '40%' }}>
+              Admin booking
+            </Button>
           </Modal.DialogTrigger>
 
           <Modal.DialogContent className="bg-white">

@@ -2,6 +2,7 @@ import jPro_Hytte from '../images/jPro_Hytte.png'
 import Image from 'next/image'
 import MonthOverview2 from '@/components/hyttebooking/month-overview/MonthOverview'
 import AdminBooking from '@/components/hyttebooking/AdminBooking'
+import InfoNotices from './InfoNotices'
 
 function Hyttebooking() {
   return (
@@ -136,8 +137,16 @@ function Hyttebooking() {
           </a>
         </p>
 
-        <AdminBooking />
-
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexGrow: '1',
+          }}
+        >
+          <AdminBooking />
+          <InfoNotices />
+        </div>
         <div className="flex flex-col gap-3 mt-7">
           <div className="flex gap-2 bg-gray-100 rounded-lg">
             <div className="w-6 rounded-lg bg-teal-annex tooltip tooltip-right" />

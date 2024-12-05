@@ -201,6 +201,12 @@ const deleteInfoNotice = (infoNoticeId) => {
   })
 }
 
+const createInfoNotice = (infoNotice) => {
+  return axios.post(API_URL + 'informationNotice/post', infoNotice, {
+    headers: authHeader(),
+  })
+}
+
 const getAllInfoNoticeVacancies = async (startDate, endDate) => {
   const params = {
     startdate: startDate,
@@ -285,6 +291,7 @@ const ApiService = {
   deletePendingBooking,
   adminDeletePendingBooking,
   getInfoNotices,
+  createInfoNotice,
   deleteInfoNotice,
   getAllInfoNoticeVacancies,
   getBudgetSummary,
