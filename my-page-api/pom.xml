@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <kotlin.version>2.0.21</kotlin.version>
+        <kotlin.version>2.1.0</kotlin.version>
         <testcontainers.version>1.20.4</testcontainers.version>
         <avro.version>1.12.0</avro.version>
         <slack.version>1.44.2</slack.version>
@@ -102,7 +102,7 @@
         <dependency> <!-- HTML to text converter -->
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.18.1</version>
+            <version>1.18.3</version>
         </dependency>
         <dependency> <!-- PDF to text converter -->
             <groupId>com.github.librepdf</groupId>

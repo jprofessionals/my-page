@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
+import java.time.OffsetDateTime
 
 @Repository
 interface SettingsRepository : JpaRepository<Setting, String> {
@@ -120,15 +121,52 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long> {
     @Query("""
         SELECT jp
         FROM JobPosting jp
+        JOIN jp.customer c
         LEFT JOIN jp.tags t
+        WHERE
+            (
+                jp.id IN :includeIds
+            )
+            OR
+            (
+                (
+                    :hidden IS NULL
+                    OR
+                    jp.hidden = :hidden
+                )
+                AND
+                (
+                    :#{#customerNames.isEmpty()} = true
+                    OR
+                    c.name IN :customerNames
+                )
+                AND
+                (
+                    :fromDateTime IS NULL
+                    OR
+                    jp.urgent = true
+                    OR
+                    jp.deadline >= :fromDateTime
+                )
+            )
         GROUP BY jp
-        HAVING 
-            :#{#tagNames == null || #tagNames.isEmpty()} = true
-            OR 
-            COUNT(CASE WHEN t.name IN :tagNames THEN 1 END) = :#{#tagNames != null ? #tagNames.size() : 0}
+        HAVING
+            (
+                jp.id IN :includeIds
+            )
+            OR
+            (
+                :#{#tagNames.isEmpty()} = true
+                OR 
+                COUNT(CASE WHEN t.name IN :tagNames THEN 1 END) = :#{#tagNames.size()}
+            )
     """)
     fun findAllWithFilters(
-        @Param("tagNames") tagNames: List<String>?,
+        @Param("customerNames") customerNames: List<String>,
+        @Param("fromDateTime") fromDateTime: OffsetDateTime?,
+        @Param("hidden") hidden: Boolean?,
+        @Param("includeIds") includeIds: List<String>,
+        @Param("tagNames") tagNames: List<String>,
     ): List<JobPosting>
 
 }

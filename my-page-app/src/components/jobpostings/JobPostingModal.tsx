@@ -12,7 +12,7 @@ import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Switch from '@radix-ui/react-switch'
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useRef, useState } from 'react'
 import {
   Autocomplete,
   Chip,
@@ -20,6 +20,29 @@ import {
   TextField,
 } from '@mui/material'
 import { useJobPostingCustomers, useJobPostingTags } from '@/hooks/jobPosting'
+import {
+  MenuButtonBold,
+  MenuButtonItalic,
+  MenuControlsContainer,
+  MenuDivider,
+  MenuSelectHeading,
+  RichTextEditor,
+  type RichTextEditorRef,
+} from 'mui-tiptap'
+import { StarterKit } from '@tiptap/starter-kit'
+
+type OnCreateJobPostingType = (
+  jobPosting: JobPostingType,
+  newFiles: FileList,
+  notify: boolean,
+) => void
+
+type OnEditJobPostingType = (
+  jobPosting: JobPostingType,
+  newFiles: FileList,
+  filesToDelete: JobPostingFilesType,
+  updateMessage: string | null,
+) => void
 
 interface JobPostingModalProps {
   jobPosting?: JobPostingType
@@ -29,11 +52,7 @@ interface JobPostingModalProps {
 
   onClose(): void
 
-  onSubmit(
-    jobPosting: JobPostingType,
-    newFiles: FileList,
-    filesToDelete: JobPostingFilesType,
-  ): void
+  onSubmit: OnCreateJobPostingType | OnEditJobPostingType
 }
 
 export const JobPostingModal = ({
@@ -55,6 +74,12 @@ export const JobPostingModal = ({
   const [isUrgent, setIsUrgent] = useState(
     jobPosting ? jobPosting.urgent : false,
   )
+  const [isHidden, setIsHidden] = useState(
+    jobPosting ? jobPosting.hidden : false,
+  )
+  const [doNotify, setDoNotify] = useState(true)
+  const [doSendUpdate, setDoSendUpdate] = useState(false)
+  const [updateMessage, setUpdateMessage] = useState<string | null>(null)
   const [deadline, setDeadline] = useState(
     jobPosting ? (jobPosting.deadline ? jobPosting.deadline : '') : '',
   )
@@ -69,6 +94,7 @@ export const JobPostingModal = ({
   const [links] = useState(jobPosting ? jobPosting.links : [])
   const [tags, setTags] = useState(jobPosting ? jobPosting.tags : [])
   const [tagInputValue, setTagInputValue] = useState('')
+  const rteRef = useRef<RichTextEditorRef>(null)
 
   const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value
@@ -91,17 +117,32 @@ export const JobPostingModal = ({
       return
     }
 
-    const jobPosting: JobPostingType = {
+    const newOrUpdatedJobPosting: JobPostingType = {
       id: id,
       title: title,
       customer: customer,
       urgent: isUrgent,
+      hidden: isHidden,
       deadline: deadline,
       description: description,
       links: links,
       tags: tags,
     }
-    onSubmit(jobPosting, filesToUpload, filesToDelete)
+
+    if (jobPosting) {
+      ;(onSubmit as OnEditJobPostingType)(
+        newOrUpdatedJobPosting,
+        filesToUpload,
+        filesToDelete,
+        updateMessage,
+      )
+    } else {
+      ;(onSubmit as OnCreateJobPostingType)(
+        newOrUpdatedJobPosting,
+        filesToUpload,
+        doNotify,
+      )
+    }
   }
 
   if (!customers) {
@@ -120,7 +161,7 @@ export const JobPostingModal = ({
           className="fixed inset-0 flex justify-center items-center z-50"
           aria-modal="true"
         >
-          <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-300">
+          <div className="bg-white rounded-lg p-6 w-full max-w-5xl max-h-[calc(100vh-4rem)] overflow-y-auto shadow-xl border border-gray-300">
             <Dialog.Title className="text-xl font-bold mb-4">
               {heading}
             </Dialog.Title>
@@ -134,6 +175,7 @@ export const JobPostingModal = ({
                   onChange={(e) => setTitle(e.target.value)}
                   label="Tittel"
                   variant="outlined"
+                  fullWidth
                   required
                 />
               </div>
@@ -155,6 +197,7 @@ export const JobPostingModal = ({
                         const newCustomer: Customer = {
                           id: 0,
                           name: newInputValue,
+                          exclusive: false,
                         }
 
                         setCustomer(newCustomer)
@@ -172,28 +215,125 @@ export const JobPostingModal = ({
                   )}
                 />
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-1">Levere ASAP?</label>
-                <Switch.Root
-                  className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
-                    isUrgent
-                      ? 'bg-blue-600 border-blue-600'
-                      : 'bg-gray-400 border-gray-400'
-                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                  id="urgent"
-                  checked={isUrgent}
-                  onCheckedChange={(checked) => setIsUrgent(checked)}
-                >
-                  <Switch.Thumb
-                    className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
-                    style={{
-                      transform: isUrgent
-                        ? 'translateX(18px)'
-                        : 'translateX(0)',
+              <div className="mb-4 flex gap-4">
+                <div className="flex gap-2">
+                  <label className="block text-gray-700 mb-1">
+                    Levere ASAP?
+                  </label>
+                  <Switch.Root
+                    className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
+                      isUrgent
+                        ? 'bg-blue-600 border-blue-600'
+                        : 'bg-gray-400 border-gray-400'
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                    id="urgent"
+                    checked={isUrgent}
+                    onCheckedChange={(checked) => setIsUrgent(checked)}
+                  >
+                    <Switch.Thumb
+                      className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
+                      style={{
+                        transform: isUrgent
+                          ? 'translateX(18px)'
+                          : 'translateX(0)',
+                      }}
+                    />
+                  </Switch.Root>
+                </div>
+                <div className="flex gap-2">
+                  <label className="block text-gray-700 mb-1">
+                    Skjule for ansatte?
+                  </label>
+                  <Switch.Root
+                    className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
+                      isHidden
+                        ? 'bg-blue-600 border-blue-600'
+                        : 'bg-gray-400 border-gray-400'
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                    id="urgent"
+                    checked={isHidden}
+                    onCheckedChange={(checked) => {
+                      setIsHidden(checked)
+                      setDoNotify(false)
+                      setDoSendUpdate(false)
+                      setUpdateMessage(null)
                     }}
-                  />
-                </Switch.Root>
+                  >
+                    <Switch.Thumb
+                      className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
+                      style={{
+                        transform: isHidden
+                          ? 'translateX(18px)'
+                          : 'translateX(0)',
+                      }}
+                    />
+                  </Switch.Root>
+                </div>
+                {isHidden ? null : jobPosting ? (
+                  <div className="flex gap-2">
+                    <label className="block text-gray-700 mb-1">
+                      Send oppdatering?
+                    </label>
+                    <Switch.Root
+                      className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
+                        doSendUpdate
+                          ? 'bg-blue-600 border-blue-600'
+                          : 'bg-gray-400 border-gray-400'
+                      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                      id="notify"
+                      checked={doSendUpdate}
+                      onCheckedChange={(checked) => {
+                        setDoSendUpdate(checked)
+                        setUpdateMessage(null)
+                      }}
+                    >
+                      <Switch.Thumb
+                        className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
+                        style={{
+                          transform: doSendUpdate
+                            ? 'translateX(18px)'
+                            : 'translateX(0)',
+                        }}
+                      />
+                    </Switch.Root>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <label className="block text-gray-700 mb-1">Varsel?</label>
+                    <Switch.Root
+                      className={`relative inline-flex items-center h-6 rounded-full w-11 border ${
+                        doNotify
+                          ? 'bg-blue-600 border-blue-600'
+                          : 'bg-gray-400 border-gray-400'
+                      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                      id="notify"
+                      checked={doNotify}
+                      onCheckedChange={(checked) => setDoNotify(checked)}
+                    >
+                      <Switch.Thumb
+                        className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200"
+                        style={{
+                          transform: doNotify
+                            ? 'translateX(18px)'
+                            : 'translateX(0)',
+                        }}
+                      />
+                    </Switch.Root>
+                  </div>
+                )}
               </div>
+              {doSendUpdate && (
+                <div className="mb-4">
+                  <TextField
+                    value={updateMessage}
+                    onChange={(e) => setUpdateMessage(e.target.value)}
+                    label="Oppdatering"
+                    variant="outlined"
+                    fullWidth
+                    required
+                  />
+                </div>
+              )}
               {isUrgent ? null : (
                 <div className="mb-4">
                   <label className="block text-gray-700">Frist</label>
@@ -209,16 +349,28 @@ export const JobPostingModal = ({
                 </div>
               )}
               <div className="mb-4">
-                <TextField
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  label="Beskrivelse"
-                  variant="outlined"
-                  multiline
-                  fullWidth
-                  minRows={2}
-                  maxRows={8}
-                />
+                <div className="prose max-w-none">
+                  <RichTextEditor
+                    ref={rteRef}
+                    extensions={[StarterKit]}
+                    content={description}
+                    onUpdate={(e) => {
+                      setDescription(e.editor.getHTML())
+                    }}
+                    renderControls={() => (
+                      <MenuControlsContainer>
+                        <MenuSelectHeading
+                          MenuProps={{
+                            disablePortal: true,
+                          }}
+                        />
+                        <MenuDivider />
+                        <MenuButtonBold />
+                        <MenuButtonItalic />
+                      </MenuControlsContainer>
+                    )}
+                  />
+                </div>
               </div>
               <div className="mb-4">
                 <Autocomplete

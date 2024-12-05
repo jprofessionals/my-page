@@ -1,6 +1,8 @@
 package no.jpro.mypageapi.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.JdbcTypeCode
+import java.sql.Types
 
 @Entity
 @Table(
@@ -15,6 +17,10 @@ class Customer(
 
     @Column(nullable = false)
     var name: String,
+
+    @Column(nullable = true)
+    @JdbcTypeCode(Types.TINYINT)
+    var exclusive: Boolean = false,
 
     @OneToMany(mappedBy = "customer", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var jobPostings: Set<JobPosting> = HashSet()

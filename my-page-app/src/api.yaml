@@ -13,6 +13,41 @@ paths:
       description: Returns the job postings added by admins. Allows filtering by different criteria.
       parameters:
         - in: query
+          name: customers
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          description: List of customers to filter
+        - in: query
+          name: from-date-time
+          required: false
+          schema:
+            type: string
+            format: date-time
+          style: form
+          explode: false
+          description: From which date-time to filter job postings
+        - in: query
+          name: hidden
+          required: false
+          schema:
+            type: boolean
+          description: Whether to get hidden job postings or not
+        - in: query
+          name: include-ids
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          description: IDs of job postings that will be retrieved regardless of other filters
+        - in: query
           name: tags
           required: false
           schema:
@@ -37,6 +72,14 @@ paths:
       operationId: createJobPosting
       summary: Create job postings
       description: Returns the job posting added.
+      parameters:
+        - in: query
+          name: notify
+          required: true
+          schema:
+            type: boolean
+            default: true
+          description: Indicates if the job posting should cause a notification
       requestBody:
         description: Job posting to be created
         required: true
@@ -125,6 +168,12 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: update-message
+          in: query
+          required: false
+          description: An optional update text which be used in notifications
+          schema:
+            type: string
       requestBody:
         description: Job posting data to be updated
         required: true
@@ -240,9 +289,15 @@ components:
           type: string
           description: The name of a customer
           example: 'Skatteetaten'
+        exclusive:
+          type: boolean
+          description: Whether the customer demands exclusive applications
+          default: false
+          example: true
       required:
         - id
         - name
+        - exclusive
     Customers:
       type: array
       description: A list of customers
@@ -282,6 +337,11 @@ components:
           description: Indicates if the job posting is urgent. If true, no deadline is required.
           default: false
           example: true
+        hidden:
+          type: boolean
+          description: Indicates if the job posting is hidden for employees but available to admins
+          default: false
+          example: false
         deadline:
           type: string
           format: date-time
@@ -308,6 +368,7 @@ components:
         - customer
         - description
         - urgent
+        - hidden
         - tags
         - links
     JobPostingFile:

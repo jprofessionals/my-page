@@ -15,6 +15,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import authHeader from '@/services/auth-header'
 import { useAuthContext } from '@/providers/AuthProvider'
+import { DateTime } from 'luxon'
 
 const jobPostingsCacheName = 'job-postings'
 const jobPostingFilesCacheName = 'job-posting-files'
@@ -156,12 +157,24 @@ export const useJobPostingTags = () => {
   })
 }
 
-export const useJobPostings = (tags: string[] | null) => {
+export const useJobPostings = (
+  customers: string[] | null,
+  fromDateTime: string | null,
+  hidden: boolean | null,
+  includeIds: string[] | null,
+  tags: string[] | null,
+) => {
   const { userFetchStatus } = useAuthContext()
 
   const fetchJobPostings = async () => {
     return await getJobPostings({
       query: {
+        customers: customers ? customers : undefined,
+        'from-date-time': fromDateTime
+          ? fromDateTime
+          : DateTime.now().minus({ month: 3 }).toString(),
+        hidden: hidden === null ? undefined : hidden,
+        'include-ids': includeIds ? includeIds : undefined,
         tags: tags ? tags : undefined,
       },
       headers: authHeader(),
@@ -170,7 +183,7 @@ export const useJobPostings = (tags: string[] | null) => {
   }
 
   return useQuery({
-    queryKey: [jobPostingsCacheName, tags],
+    queryKey: [jobPostingsCacheName, customers, fromDateTime, hidden, tags],
     queryFn: fetchJobPostings,
     select: (result) => result.data,
     enabled: userFetchStatus === 'fetched',
@@ -180,17 +193,20 @@ export const useJobPostings = (tags: string[] | null) => {
 export const usePostJobPosting = () => {
   const queryClient = useQueryClient()
   const { mutate: uploadFile } = usePostJobPostingFiles()
-  const { mutate: deleteFile } = useDeleteJobPostingFiles()
 
   return useMutation({
     mutationFn: async ({
       newJobPosting,
+      notify,
     }: {
       newJobPosting: JobPosting
       filesToUpload?: FileList
-      filesToDelete?: JobPostingFiles
+      notify: boolean
     }) => {
       return await createJobPosting({
+        query: {
+          notify: notify,
+        },
         body: newJobPosting,
         headers: authHeader(),
         baseUrl: '/api',
@@ -211,15 +227,6 @@ export const usePostJobPosting = () => {
           })
         })
       }
-
-      if (variables.filesToDelete && variables.filesToDelete.length > 0) {
-        variables.filesToDelete.forEach((file) => {
-          deleteFile({
-            jobPostingId: data.data ? data.data.id : 0,
-            fileName: file.name,
-          })
-        })
-      }
     },
   })
 }
@@ -233,14 +240,19 @@ export const usePutJobPosting = () => {
   return useMutation({
     mutationFn: async ({
       updatedJobPosting,
+      updateMessage,
     }: {
       updatedJobPosting: JobPosting
       filesToUpload?: FileList
       filesToDelete?: JobPostingFiles
+      updateMessage: string | null
     }) => {
       return await updateJobPosting({
         path: {
           id: updatedJobPosting.id,
+        },
+        query: {
+          'update-message': updateMessage ? updateMessage : undefined,
         },
         body: updatedJobPosting,
         headers: authHeader(),

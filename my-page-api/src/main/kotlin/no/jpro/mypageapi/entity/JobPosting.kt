@@ -26,6 +26,10 @@ class JobPosting(
     @JdbcTypeCode(Types.TINYINT)
     var urgent: Boolean = false,
 
+    @Column(nullable = true)
+    @JdbcTypeCode(Types.TINYINT)
+    var hidden: Boolean = false,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     var customer: Customer,

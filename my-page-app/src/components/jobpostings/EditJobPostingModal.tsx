@@ -12,6 +12,7 @@ interface EditJobPostingModalProps {
     updatedJobPosting: JobPostingType,
     newFiles: FileList,
     filesToDelete: JobPostingFilesType,
+    updateMessage: string | null,
   ) => void
 }
 

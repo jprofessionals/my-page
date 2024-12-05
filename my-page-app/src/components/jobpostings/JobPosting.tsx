@@ -12,10 +12,19 @@ import {
   usePutJobPosting,
 } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import {
+  faLock,
+  faPaperclip,
+  faPencilAlt,
+  faTrashAlt,
+} from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as AlertDialog from '@radix-ui/react-alert-dialog'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import Link from 'next/link'
+import { RichTextReadOnly } from 'mui-tiptap'
+import { StarterKit } from '@tiptap/starter-kit'
 
 export const JobPosting = (jobPosting: JobPostingType) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -47,11 +56,13 @@ export const JobPosting = (jobPosting: JobPostingType) => {
     jobPosting: JobPostingType,
     filesToUpload: FileList,
     filesToDelete: JobPostingFilesType,
+    updateMessage: string | null,
   ) => {
     updateJobPosting({
       updatedJobPosting: jobPosting,
       filesToUpload: filesToUpload,
       filesToDelete: filesToDelete,
+      updateMessage: updateMessage,
     })
     closeModal()
   }
@@ -75,41 +86,92 @@ export const JobPosting = (jobPosting: JobPostingType) => {
   return (
     <>
       <Accordion.Header className="relative border border-gray-200 rounded-lg">
-        {user?.admin && (
-          <div className="absolute top-1 right-2 flex space-x-2">
-            <button
-              onClick={openModal}
-              aria-label="Edit job posting"
-              className="focus:outline-none"
-            >
-              <FontAwesomeIcon
-                icon={faPencilAlt}
-                className="text-gray-600 hover:text-gray-800"
-              />
-            </button>
-            <button
-              onClick={openDeleteDialog}
-              aria-label="Delete job posting"
-              className="focus:outline-none"
-            >
-              <FontAwesomeIcon
-                icon={faTrashAlt}
-                className="text-red-600 hover:text-red-800"
-              />
-            </button>
-          </div>
-        )}
-        <Accordion.Trigger className="p-4 bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+        <div className="absolute top-1 right-2 flex space-x-2">
+          <Link
+            href={`?id=${jobPosting.id}`}
+            aria-label="Lenke til denne ultysningen"
+            title="Lenke til denne ultysningen"
+            className="focus:outline-none"
+          >
+            <FontAwesomeIcon
+              icon={faPaperclip}
+              className="text-gray-600 hover:text-gray-800"
+            />
+          </Link>
+          {user?.admin && (
+            <>
+              <button
+                onClick={openModal}
+                aria-label="Edit job posting"
+                className="focus:outline-none"
+              >
+                <FontAwesomeIcon
+                  icon={faPencilAlt}
+                  className="text-gray-600 hover:text-gray-800"
+                />
+              </button>
+              <button
+                onClick={openDeleteDialog}
+                aria-label="Delete job posting"
+                className="focus:outline-none"
+              >
+                <FontAwesomeIcon
+                  icon={faTrashAlt}
+                  className="text-red-600 hover:text-red-800"
+                />
+              </button>
+            </>
+          )}
+        </div>
+
+        <Accordion.Trigger className="pt-4 group bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
           <div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
-            <div className="flex flex-col items-start">
-              <h2 className="text-xl text-left font-bold text-gray-800">
+            <div className="flex flex-col items-start px-4 pb-4">
+              <h2
+                className={`text-xl text-left font-bold ${
+                  jobPosting.hidden ? 'text-gray-500' : 'text-gray-800'
+                }`}
+              >
                 {jobPosting.title}
               </h2>
-              <p className="text-gray-700 text-left">
+              <p
+                className={`text-left ${
+                  jobPosting.hidden ? 'text-gray-500' : 'text-gray-700'
+                }`}
+              >
                 {jobPosting.customer.name}
+                {jobPosting.customer.exclusive && (
+                  <Tooltip.Provider>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger asChild>
+                        <FontAwesomeIcon
+                          icon={faLock}
+                          aria-label="Krever eksklusivitet"
+                          className="text-gray-600 hover:text-gray-800 ml-1 cursor-pointer"
+                        />
+                      </Tooltip.Trigger>
+                      <Tooltip.Content
+                        className="bg-black text-white text-xs px-2 py-1 rounded-md shadow-md"
+                        side="top"
+                        align="center"
+                      >
+                        Krever eksklusivitet
+                        <Tooltip.Arrow className="fill-black" />
+                      </Tooltip.Content>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
+                )}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 mb-2 items-center">
+            <div className="flex flex-col items-start justify-center w-[230px] pr-4 pl-4 pb-4 mb:pl-0 mb:pb-0">
+              <p className="text-sm text-left font-bold text-gray-800">Frist</p>
+              <p className="text-sm text-gray-700 text-left">
+                {formattedDeadline}
+              </p>
+            </div>
+          </div>
+          {jobPosting.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 pl-6 pr-4 pb-2 pt-2 items-center border-t border-orange-300">
               {jobPosting.tags.map((tag) => (
                 <span
                   key={tag.id}
@@ -119,23 +181,20 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                 </span>
               ))}
             </div>
-            <div className="flex flex-col items-start w-[200px]">
-              <p className="text-sm text-left font-bold text-gray-800">Frist</p>
-              <p className="text-sm text-gray-700 text-left">
-                {formattedDeadline}
-              </p>
-            </div>
-          </div>
+          )}
         </Accordion.Trigger>
       </Accordion.Header>
 
       <Accordion.Content className="p-4 bg-white">
-        <p className="text-gray-800 whitespace-pre-line">
-          {jobPosting.description}
-        </p>
+        <div className="prose max-w-none">
+          <RichTextReadOnly
+            content={jobPosting.description}
+            extensions={[StarterKit]}
+          />
+        </div>
 
         {existingJobPostingFiles && existingJobPostingFiles?.length > 0 && (
-          <div className="mt-2">
+          <div className="mt-4">
             <h3 className="font-semibold text-gray-800">Filer:</h3>
             <ul className="list-disc list-inside text-gray-800">
               {existingJobPostingFiles.map((file) => (

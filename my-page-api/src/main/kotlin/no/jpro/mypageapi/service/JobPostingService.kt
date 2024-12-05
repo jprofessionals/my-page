@@ -10,6 +10,7 @@ import no.jpro.mypageapi.repository.TagRepository
 import no.jpro.mypageapi.service.slack.SlackService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.OffsetDateTime
 
 @Service
 class JobPostingService(
@@ -21,6 +22,7 @@ class JobPostingService(
 
     @Transactional
     fun createJobPosting(
+        notify: Boolean,
         jobPosting: JobPosting
     ): no.jpro.mypageapi.entity.JobPosting {
         val customerEntity = customerRepository.findByName(jobPosting.customer.name) ?: customerRepository.save(
@@ -44,16 +46,19 @@ class JobPostingService(
             customer = customerEntity,
             description = jobPosting.description,
             urgent = jobPosting.urgent,
+            hidden = jobPosting.hidden,
             deadline = jobPosting.deadline,
             tags = tagEntities,
         )
 
         val newJobPosting = jobPostingRepository.save(jobPostingToPersist)
 
-        slackService.postJobPosting(
-            "utlysninger",
-            newJobPosting,
-        )
+        if (notify) {
+            slackService.postJobPosting(
+                "utlysninger",
+                newJobPosting,
+            )
+        }
 
         return newJobPosting
     }
@@ -69,9 +74,19 @@ class JobPostingService(
     }
 
     fun getJobPostings(
-        tags: List<String>?
+        customers: List<String>,
+        fromDateTime: OffsetDateTime?,
+        hidden: Boolean?,
+        includeIds: List<String>,
+        tags: List<String>
     ): List<no.jpro.mypageapi.entity.JobPosting> {
-        return jobPostingRepository.findAllWithFilters(tags)
+        return jobPostingRepository.findAllWithFilters(
+            customers,
+            fromDateTime,
+            hidden,
+            includeIds,
+            tags
+        )
     }
 
     fun getJobPostingCustomers(): List<Customer> {
@@ -80,7 +95,8 @@ class JobPostingService(
 
     @Transactional
     fun updateJobPosting(
-        jobPosting: JobPosting
+        jobPosting: JobPosting,
+        updateMessage: String?
     ) {
         val existingJobPosting = jobPostingRepository.findById(jobPosting.id)
             .orElseThrow {
@@ -103,15 +119,24 @@ class JobPostingService(
                 )
             }
 
-        jobPostingRepository.save(
+        val updatedJobPosting = jobPostingRepository.save(
             existingJobPosting.apply {
                 title = jobPosting.title
                 customer = customerEntity
                 description = jobPosting.description
                 urgent = jobPosting.urgent
+                hidden = jobPosting.hidden
                 deadline = jobPosting.deadline
                 tags = tagEntities
             }
         )
+
+        if (updateMessage != null) {
+            slackService.postJobPostingUpdate(
+                "utlysninger",
+                updatedJobPosting,
+                updateMessage
+            )
+        }
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import java.time.OffsetDateTime
 
 @Service
 class JobPostingController(
@@ -21,17 +22,20 @@ class JobPostingController(
 
     @RequiresAdmin
     override fun createJobPosting(
+        notify: Boolean,
         jobPosting: JobPosting
     ): ResponseEntity<JobPosting> {
-        val entity = jobPostingService.createJobPosting(jobPosting)
+        val entity = jobPostingService.createJobPosting(notify, jobPosting)
         val dto = JobPosting(
             id = entity.id,
             title = entity.title,
             customer = Customer(
                 id = entity.customer.id,
-                name = entity.customer.name
+                name = entity.customer.name,
+                exclusive = entity.customer.exclusive,
             ),
             urgent = entity.urgent,
+            hidden = entity.hidden,
             deadline = entity.deadline,
             description = entity.description ?: "",
             tags = emptyList(),
@@ -78,7 +82,8 @@ class JobPostingController(
             .map {
                 Customer(
                     id = it.id,
-                    name = it.name
+                    name = it.name,
+                    exclusive = it.exclusive
                 )
             }
             .sortedBy {
@@ -114,9 +119,19 @@ class JobPostingController(
     }
 
     override fun getJobPostings(
+        customers: List<String>?,
+        fromDateTime: OffsetDateTime?,
+        hidden: Boolean?,
+        includeIds: List<String>?,
         tags: List<String>?
     ): ResponseEntity<List<JobPosting>> {
-        val entities = jobPostingService.getJobPostings(tags)
+        val entities = jobPostingService.getJobPostings(
+            customers ?: emptyList(),
+            fromDateTime,
+            hidden,
+            includeIds ?: emptyList(),
+            tags ?: emptyList()
+        )
 
         val dto = entities.map {
             JobPosting(
@@ -124,9 +139,11 @@ class JobPostingController(
                 title = it.title,
                 customer = Customer(
                     id = it.customer.id,
-                    name = it.customer.name
+                    name = it.customer.name,
+                    exclusive = it.customer.exclusive
                 ),
                 urgent = it.urgent,
+                hidden = it.hidden,
                 deadline = it.deadline,
                 description = it.description ?: "",
                 tags = it.tags
@@ -146,13 +163,14 @@ class JobPostingController(
     @RequiresAdmin
     override fun updateJobPosting(
         id: Long,
-        jobPosting: JobPosting
+        jobPosting: JobPosting,
+        updateMessage: String?
     ): ResponseEntity<Unit> {
         if (id != jobPosting.id) {
             return ResponseEntity.badRequest().build()
         }
 
-        jobPostingService.updateJobPosting(jobPosting)
+        jobPostingService.updateJobPosting(jobPosting, updateMessage)
 
         return ResponseEntity.noContent().build()
     }

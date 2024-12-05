@@ -2,20 +2,33 @@
 
 import { useMemo, useState } from 'react'
 import { AddJobPostingModal } from '@/components/jobpostings/AddJobPostingModal'
-import {
-  JobPosting as JobPostingType,
-  JobPostingFiles as JobPostingFilesType,
-} from '@/data/types'
+import { Customer, JobPosting as JobPostingType, Tags } from '@/data/types'
 import { useJobPostings, usePostJobPosting } from '@/hooks/jobPosting'
 import { JobPostingList } from '@/components/jobpostings/JobPostingList'
 import { useAuthContext } from '@/providers/AuthProvider'
 import RequireAuth from '@/components/auth/RequireAuth'
+import TagFilter from '@/components/jobpostings/TagFilter'
+import CustomerFilter from '@/components/jobpostings/CustomerFilter'
+import DateFilter from '@/components/jobpostings/DateFilter'
+import { Dayjs } from 'dayjs'
+import { useSearchParams } from 'next/navigation'
 
 export default function Utlysninger() {
   const { user } = useAuthContext()
+  const searchParams = useSearchParams()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [tags] = useState<string[]>([])
-  const { data: jobPostings } = useJobPostings(tags)
+  const [tags, setTags] = useState<Tags>([])
+  const [customer, setCustomer] = useState<Customer | null>(null)
+  const [selectedFromDate, setSelectedFromDate] = useState<Dayjs | null>(null)
+
+  const id = searchParams?.get('id')
+  const { data: jobPostings } = useJobPostings(
+    customer ? [customer.name] : null,
+    selectedFromDate ? selectedFromDate.toISOString() : null,
+    user?.admin ? null : false,
+    id ? [id] : [],
+    tags.map((tag) => tag.name),
+  )
   const { mutate: createJobPosting } = usePostJobPosting()
   // Definer en konstant for dagens dato
   const now = new Date()
@@ -81,12 +94,12 @@ export default function Utlysninger() {
   const addJobPosting = (
     newJobPosting: JobPostingType,
     filesToUpload: FileList,
-    filesToDelete: JobPostingFilesType,
+    notify: boolean,
   ) => {
     createJobPosting({
       newJobPosting: newJobPosting,
       filesToUpload: filesToUpload,
-      filesToDelete: filesToDelete,
+      notify: notify,
     })
     closeModal()
   }
@@ -105,8 +118,17 @@ export default function Utlysninger() {
           </button>
         )}
 
+        <h2 className="text-2xl font-bold mb-6">Filtrer utlysninger</h2>
+        <TagFilter tags={tags} setTags={setTags} />
+        <div className="mb-4" />
+        <CustomerFilter customer={customer} setCustomer={setCustomer} />
+        <div className="mb-4" />
+        <DateFilter value={selectedFromDate} onChange={setSelectedFromDate} />
+
+        <div className="mb-12" />
+
         <JobPostingList
-          title="Aktive utlysninger"
+          title={`Aktive utlysninger${activeJobPostings.length > 0 ? ` (${activeJobPostings.length})` : ''}`}
           jobPostings={activeJobPostings}
         />
 
