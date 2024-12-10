@@ -41,6 +41,7 @@ function Hyttebooking() {
             className="hidden md:block mt-0 rounded"
             src={jPro_Hytte}
             alt="jPro"
+            priority={true}
           />
         </div>
 
