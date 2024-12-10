@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { Booking, DrawingPeriod, PendingBookingTrain, User } from '@/types'
+import { Booking, User } from '@/types'
 import { Button } from '@/components/ui/button'
-import SimpleModal from '@/components/ui/SimpleModal'
 import BookingEditForm from '../booking-edit-form/BookingEditForm'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -14,6 +13,13 @@ const DrawingPeriodPendingBooking = ({ pendingBooking, user }: Props) => {
   const [showForm, setShowForm] = useState<boolean>(false)
 
   const queryClient = useQueryClient()
+
+  const onBookingSaved = () => {
+    queryClient.invalidateQueries({ queryKey: ['bookings'] })
+    queryClient.invalidateQueries({
+      queryKey: ['allPendingBookingsAllApartments'],
+    })
+  }
 
   return (
     <div>
@@ -33,12 +39,7 @@ const DrawingPeriodPendingBooking = ({ pendingBooking, user }: Props) => {
         <BookingEditForm
           booking={pendingBooking}
           user={user}
-          onBookingSaved={() => {
-            queryClient.invalidateQueries({ queryKey: ['bookings'] })
-            queryClient.invalidateQueries({
-              queryKey: ['allPendingBookingsAllApartments'],
-            })
-          }}
+          onBookingSaved={onBookingSaved}
           onCancel={() => {}}
         />
       )}

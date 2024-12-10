@@ -2,7 +2,7 @@ import React from 'react'
 import { PendingBookingTrain, User } from '@/types'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
-import DrawingPeriodPendingBooking from './DrawingPeriodPendingBooking'
+import DrawingPeriodItem from './DrawingPeriodItem'
 
 type Props = {
   user?: User
@@ -29,24 +29,16 @@ const DrawingPeriodModal = ({
       open={!!bookingTrain}
       onRequestClose={onCancel}
       content={
-        <div style={{ display: 'grid', rowGap: '1em' }}>
-          {bookingTrain?.drawingPeriodList
-            .flatMap((drawingPeriod) => drawingPeriod.pendingBookings)
-            .map((pendingBooking) => (
-              <DrawingPeriodPendingBooking
-                key={pendingBooking.id}
-                pendingBooking={{ ...pendingBooking, isPending: true }}
-                user={user}
-              />
-            ))}
+        <div>
+          {bookingTrain?.drawingPeriodList.map((drawingPeriod) => (
+            <DrawingPeriodItem
+              key={drawingPeriod.id}
+              drawingPeriod={drawingPeriod}
+              onPerformDrawing={handlePerformDrawing}
+              user={user}
+            />
+          ))}
         </div>
-      }
-      confirmButton={
-        (!!user?.admin || undefined) && (
-          <Button variant="primary" onClick={handlePerformDrawing}>
-            Trekk
-          </Button>
-        )
       }
       cancelButton={<Button onClick={onCancel}>Lukk</Button>}
     />
