@@ -15,38 +15,27 @@
   background-color: #5bceae;
 }
 
-.bookingBarMinePending {
-  background: repeating-linear-gradient(
-    0deg,
-    #8bd8ff,
-    #8bd8ff 10%,
-    #dadada 10%,
-    #dadada 20%
-  );
-}
-
 .bookingBarTheirs {
   background-color: #2b809b;
 }
 
 .bookingBarTrain {
-  background: repeating-linear-gradient(
-    0deg,
-    #ff7a0c,
-    #ff7a0c 10%,
-    #dadada 10%,
-    #dadada 20%
-  );
+  border-style: solid;
+  border-color: #ff7a0c;
+  border-width: 6px 0;
+  background-color: #ff7a0c66;
 }
 
 .bookingBarPeriodStart {
   border-radius: 0.9rem 0 0 0.9rem;
+  border-left-width: 6px;
   margin-left: auto;
   width: 50%;
 }
 
 .bookingBarPeriodEnd {
   border-radius: 0 0.9rem 0.9rem 0;
+  border-right-width: 6px;
   margin-right: auto;
   width: 50%;
 }
