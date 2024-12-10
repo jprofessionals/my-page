@@ -62,14 +62,14 @@ function InfoNotices() {
     e.preventDefault()
     if (isValid()) {
       try {
-        setSubmitInProgress(true);
-        await ApiService.createInfoNotice({ startDate, endDate, description });
-        toast.success('Infonotis opprettet');
-        queryClient.invalidateQueries({ queryKey: ['infoNotices'] });
+        setSubmitInProgress(true)
+        await ApiService.createInfoNotice({ startDate, endDate, description })
+        toast.success('Infonotis opprettet')
+        queryClient.invalidateQueries({ queryKey: ['infoNotices'] })
       } catch {
-        toast.error('Oppretting av infonotis feilet');
+        toast.error('Oppretting av infonotis feilet')
       }
-      setSubmitInProgress(false);
+      setSubmitInProgress(false)
     }
   }
 
