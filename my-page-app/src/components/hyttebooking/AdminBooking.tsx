@@ -3,7 +3,7 @@ import ApiService, { API_URL } from '@/services/api.service'
 import { toast } from 'react-toastify'
 import { Button } from '@/components/ui/button'
 import { differenceInDays } from 'date-fns'
-import { useMutation } from '@tanstack/react-query'
+import {useMutation, useQueryClient} from '@tanstack/react-query'
 import { Apartment, BookingPost } from '@/types'
 import axios from 'axios'
 import authHeader from '@/services/auth-header'
@@ -14,6 +14,8 @@ export default function AdminBooking() {
   const [userIsAdmin, setUserIsAdmin] = useState<boolean>(false)
   const [allUsersNames, setAllUsersNames] = useState<string[]>([])
   const [apartments, setApartments] = useState<Apartment[]>([])
+
+  const queryClient = useQueryClient();
 
   const getAllApartments = async () => {
     const response = await ApiService.getAllApartments()
@@ -126,7 +128,11 @@ export default function AdminBooking() {
 
     onSuccess: () => {
       setIsLoadingPost(false)
-      toast.success('Lagret reservasjon')
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      queryClient.invalidateQueries({
+        queryKey: ['allPendingBookingsAllApartments'],
+      });
+      toast.success('Lagret reservasjon');
     },
 
     onError: (error: string) => {
