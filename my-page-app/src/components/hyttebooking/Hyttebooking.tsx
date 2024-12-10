@@ -3,6 +3,7 @@ import Image from 'next/image'
 import MonthOverview2 from '@/components/hyttebooking/month-overview/MonthOverview'
 import AdminBooking from '@/components/hyttebooking/AdminBooking'
 import InfoNotices from './InfoNotices'
+import bookingBarStyles from '@/components/hyttebooking/month-overview/components/month-calendar/calendar-cell/booking-bar/BookingBar.module.css'
 
 function Hyttebooking() {
   return (
@@ -149,22 +150,19 @@ function Hyttebooking() {
         </div>
         <div className="flex flex-col gap-3 mt-7">
           <div className="flex gap-2 bg-gray-100 rounded-lg">
-            <div className="w-6 rounded-lg bg-teal-annex tooltip tooltip-right" />
+            <div className={`w-6 rounded-lg tooltip tooltip-right ${bookingBarStyles.bookingBarMine}`} />
             Dine reservasjoner
           </div>
 
           <div className="flex gap-2 bg-gray-100 rounded-lg tooltip">
-            <div className="w-6 rounded-lg bg-blue-small-appartment tooltip tooltip-right" />
+            <div className={`w-6 rounded-lg tooltip tooltip-right ${bookingBarStyles.bookingBarTheirs}`} />
             Andres reservasjoner
           </div>
 
           <div className="flex gap-2 bg-gray-100 rounded-lg">
             <div
-              className="w-6 rounded-lg tooltip tooltip-right"
-              style={{
-                background:
-                  'repeating-linear-gradient(0deg, #ff7a0c, #ff7a0c 10%, #dadada 10%, #dadada 20%)',
-              }}
+              className={`w-6 rounded-lg tooltip tooltip-right ${bookingBarStyles.bookingBarTrain}`}
+              style={{borderLeftWidth: '6px', borderRightWidth: '6px'}}
             />
             Trekninger
           </div>
