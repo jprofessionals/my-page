@@ -3,3 +3,7 @@
   height: 10rem;
   padding: 0px;
 }
+
+.cutoffDate {
+  border-right: 2px solid #dc2323;
+}

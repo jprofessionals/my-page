@@ -1,4 +1,4 @@
-import { DayPicker, WeekNumber } from 'react-day-picker'
+import {CalendarDay, DayPicker, WeekNumber} from 'react-day-picker'
 import { add, sub, format } from 'date-fns'
 import {
   Apartment,
@@ -7,7 +7,7 @@ import {
   CabinType,
   DrawingPeriod,
   InfoBooking,
-  PendingBookingTrain,
+  PendingBookingTrain, Settings,
   User,
 } from '@/types'
 import { nb } from 'date-fns/locale'
@@ -16,7 +16,7 @@ import CalendarWeekNumber from './calendar-week-number/CalendarWeekNumber'
 import CalendarCell from './calendar-cell/CalendarCell'
 import CalendarDate from './calendar-date/CalendarDate'
 import BookingAddModal from './booking-add-modal/BookingAddModal'
-import { useEffect, useState } from 'react'
+import {useEffect, useMemo, useState} from 'react'
 import classes from './MonthCalendar.module.css'
 import {
   getBookingsOnDayAndCabin,
@@ -28,7 +28,8 @@ import BookingEditModal from '@/components/hyttebooking/month-overview/component
 import BookingReadOnlyInfoModal from '@/components/hyttebooking/month-overview/components/month-calendar/booking-read-only-info-Modal/BookingReadOnlyInfoModal'
 import DrawingPeriodModal from './drawing-modal/DrawingPeriodModal'
 import { toast } from 'react-toastify'
-import { useQueryClient } from '@tanstack/react-query'
+import {useQuery, useQueryClient} from '@tanstack/react-query'
+import {dateFormat} from "../../monthOverviewUtils";
 
 type props = {
   bookings: Booking[]
@@ -69,6 +70,22 @@ function MonthCalendar({
     }
     fetchAllApartments()
   }, [])
+
+  const { data: cutoffDate } = useQuery<string>({
+    queryKey: ['cutoffDate'],
+    queryFn: async () => {
+      const settings: Settings[] = await ApiService.getSettings();
+      const setting = settings.find((setting) => setting.settingId === 'CUTOFF_DATE_VACANCIES');
+
+      return setting?.settingValue || '2000-01-01';
+    },
+  });
+
+  function isCutoffDate(day: CalendarDay) {
+    const dateString = format(day.date, dateFormat);
+    console.log(dateString + ' ' + cutoffDate);
+    return dateString === cutoffDate;
+  }
 
   const handleMonthChange = (month: Date) => {
     console.log('handleMonthChange: ', month)
@@ -162,7 +179,7 @@ function MonthCalendar({
         weekStartsOn={1}
         components={{
           Day: ({ day }) => (
-            <td className={style.dayContainer}>
+            <td className={`${style.dayContainer} ${isCutoffDate(day) && style.cutoffDate}`}>
               <CalendarDate
                 day={day}
                 infoNotices={getInfoNoticesOnDay(day, infoNotices)}
