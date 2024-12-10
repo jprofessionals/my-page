@@ -169,9 +169,8 @@ function MonthCalendar({
       <DayPicker
         classNames={{
           month_grid: 'w-full border-collapse',
-          week: 'flex justify-between',
-          weekday: 'text-muted-foreground rounded-md',
-          weekdays: 'flex justify-between',
+          week: 'pt-4',
+          weekday: 'text-right pr-3',
         }}
         locale={nb}
         startMonth={startMonth}
@@ -215,7 +214,7 @@ function MonthCalendar({
             </td>
           ),
           WeekNumber: ({ week }) => (
-            <WeekNumber week={week}>
+            <td className={`${style.dayContainer}`}>
               <CalendarWeekNumber week={week} />
               {allApartments.map((apartment) => (
                 <CalendarWeekLabel
@@ -224,7 +223,7 @@ function MonthCalendar({
                   label={apartment.cabin_name.split(' ')[0]}
                 />
               ))}
-            </WeekNumber>
+            </td>
           ),
         }}
       />
