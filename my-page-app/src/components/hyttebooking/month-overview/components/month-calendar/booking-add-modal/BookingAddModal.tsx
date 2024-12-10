@@ -5,7 +5,7 @@ import ApiService, { API_URL } from '@/services/api.service'
 import authHeader from '@/services/auth-header'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
-import {toast} from "react-toastify";
+import { toast } from 'react-toastify'
 
 type Props = {
   bookingPost?: BookingPost
@@ -60,9 +60,9 @@ const BookingAddModal = ({
       try {
         await createBooking({ bookingPost })
         onBookingCreated()
-        toast.success('Booking opprettet');
+        toast.success('Booking opprettet')
       } catch (e) {
-        toast.error(`Booking feilet: ${e}`);
+        toast.error(`Booking feilet: ${e}`)
       }
     }
   }
