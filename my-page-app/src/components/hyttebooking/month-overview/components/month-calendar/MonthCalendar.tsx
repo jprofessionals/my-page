@@ -72,21 +72,22 @@ function MonthCalendar({
     fetchAllApartments()
   }, [])
 
+  const DEFAULT_CUTOFF_DATE = '2000-01-01';
   const { data: cutoffDate } = useQuery<string>({
     queryKey: ['cutoffDate'],
+    initialData: DEFAULT_CUTOFF_DATE,
     queryFn: async () => {
       const settings: Settings[] = await ApiService.getSettings()
-      const setting = settings.find(
+      const cutoffDateSetting = settings.find(
         (setting) => setting.settingId === 'CUTOFF_DATE_VACANCIES',
       )
 
-      return setting?.settingValue || '2000-01-01'
+      return cutoffDateSetting?.settingValue || DEFAULT_CUTOFF_DATE
     },
   })
 
   function isCutoffDate(day: CalendarDay) {
     const dateString = format(day.date, dateFormat)
-    console.log(dateString + ' ' + cutoffDate)
     return dateString === cutoffDate
   }
 
@@ -194,6 +195,7 @@ function MonthCalendar({
                   key={apartment.id}
                   day={day}
                   user={user}
+                  cutoffDate={cutoffDate}
                   apartment={apartment}
                   onNewBookingClick={handleInitNewBooking}
                   onBookingClick={handleInitEditBooking}

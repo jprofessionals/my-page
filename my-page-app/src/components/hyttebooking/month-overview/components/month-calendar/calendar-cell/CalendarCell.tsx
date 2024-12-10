@@ -18,6 +18,7 @@ type Props = {
   bookings?: Booking[]
   day: CalendarDay
   user?: User
+  cutoffDate: string
   apartment: Apartment
   onNewBookingClick: (newBooking: BookingPost) => void
   onBookingClick: (booking: Booking) => void
@@ -61,6 +62,7 @@ const CalendarCell = ({
   bookings,
   day,
   user,
+  cutoffDate,
   apartment,
   onNewBookingClick,
   onBookingClick,
@@ -71,6 +73,7 @@ const CalendarCell = ({
   const oneDayMS = 86400000
   const isWednesday = getIsDayOfWeek(day) === 3
   const dayString = format(day.date, dateFormat)
+  const isBeforeCutoffDate = dayString < cutoffDate
   const hasPeriodEnd = (bookings || []).find(
     (booking) => booking?.endDate === dayString,
   )
@@ -82,9 +85,7 @@ const CalendarCell = ({
   const today = format(currentDate, dateFormat)
   currentDate.setTime(currentDate.getTime() - oneDayMS)
   const isPast = day.date < currentDate
-  const showAddButton = !isPast && isWednesday && !hasPeriodStart
-  const showAddButtonPlaceholder =
-    !isPast && isWednesday && !hasPeriodEnd && !showAddButton
+  const showAddButton = !isPast && isWednesday && isBeforeCutoffDate && !hasPeriodStart
 
   const handleNewBooking = () => {
     const date = day.date
@@ -143,8 +144,6 @@ const CalendarCell = ({
             ${isPast && style.calendarCellPast}
         `}
     >
-      {showAddButtonPlaceholder && <div className={style.addButtonContainer} />}
-
       {bars?.map((bar) => (
         <BookingBar
           key={bar.key}
