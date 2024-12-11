@@ -74,7 +74,6 @@ function InfoNotices() {
   }
 
   async function deleteInfoNotice(infoNoticeId: number) {
-    console.log('deleteInfoNotice(' + infoNoticeId + ')')
     try {
       await ApiService.deleteInfoNotice(infoNoticeId)
       toast.success('Infonotis slettet')

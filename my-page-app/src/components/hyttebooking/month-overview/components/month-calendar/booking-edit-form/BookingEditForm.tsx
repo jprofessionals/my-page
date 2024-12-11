@@ -34,7 +34,6 @@ const BookingEditForm = ({
     queryKey: ['apartments'],
     queryFn: () => {
       const allApartments = ApiService.getAllApartments()
-      console.log('apartments=' + JSON.stringify(allApartments))
       return allApartments
     },
   })

@@ -92,7 +92,6 @@ function MonthCalendar({
   }
 
   const handleMonthChange = (month: Date) => {
-    console.log('handleMonthChange: ', month)
     // todo setStartDate, setEndDate
     // todo refetch
   }
@@ -149,10 +148,8 @@ function MonthCalendar({
     const canEdit = (isUserBookingOwner || isUserAdmin) && !isPast
 
     if (canEdit) {
-      console.log('edit ')
       setEditBooking(booking)
     } else {
-      console.log('info ')
       setInfoBooking(booking)
     }
   }
