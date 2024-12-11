@@ -151,19 +151,23 @@ function Hyttebooking() {
         </div>
         <div className="flex flex-col gap-3 mt-7">
           <div className="flex gap-2 bg-gray-100 rounded-lg">
-            <div className={`w-6 rounded-lg tooltip tooltip-right ${bookingBarStyles.bookingBarMine}`} />
+            <div
+              className={`w-6 rounded-lg tooltip tooltip-right ${bookingBarStyles.bookingBarMine}`}
+            />
             Dine reservasjoner
           </div>
 
           <div className="flex gap-2 bg-gray-100 rounded-lg tooltip">
-            <div className={`w-6 rounded-lg tooltip tooltip-right ${bookingBarStyles.bookingBarTheirs}`} />
+            <div
+              className={`w-6 rounded-lg tooltip tooltip-right ${bookingBarStyles.bookingBarTheirs}`}
+            />
             Andres reservasjoner
           </div>
 
           <div className="flex gap-2 bg-gray-100 rounded-lg">
             <div
               className={`w-6 rounded-lg tooltip tooltip-right ${bookingBarStyles.bookingBarTrain}`}
-              style={{borderLeftWidth: '6px', borderRightWidth: '6px'}}
+              style={{ borderLeftWidth: '6px', borderRightWidth: '6px' }}
             />
             Trekninger
           </div>

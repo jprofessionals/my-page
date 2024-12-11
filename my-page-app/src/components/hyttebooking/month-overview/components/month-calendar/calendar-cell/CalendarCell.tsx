@@ -85,7 +85,8 @@ const CalendarCell = ({
   const today = format(currentDate, dateFormat)
   currentDate.setTime(currentDate.getTime() - oneDayMS)
   const isPast = day.date < currentDate
-  const showAddButton = !isPast && isWednesday && isBeforeCutoffDate && !hasPeriodStart
+  const showAddButton =
+    !isPast && isWednesday && isBeforeCutoffDate && !hasPeriodStart
 
   const handleNewBooking = () => {
     const date = day.date
