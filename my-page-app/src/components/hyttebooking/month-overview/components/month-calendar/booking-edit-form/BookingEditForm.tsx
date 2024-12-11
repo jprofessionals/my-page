@@ -10,6 +10,7 @@ type Props = {
   user?: User
   onBookingSaved: () => void
   onCancel: () => void
+  showCancelButton: boolean
 }
 
 const BookingEditForm = ({
@@ -17,6 +18,7 @@ const BookingEditForm = ({
   user,
   onBookingSaved,
   onCancel,
+  showCancelButton,
 }: Props) => {
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
@@ -178,9 +180,11 @@ const BookingEditForm = ({
         >
           Slett
         </Button>
-        <Button onClick={handleCancel} style={{ marginLeft: '0.5em' }}>
-          Avbryt
-        </Button>
+        {showCancelButton && (
+          <Button onClick={handleCancel} style={{ marginLeft: '0.5em' }}>
+            Avbryt
+          </Button>
+        )}
         <Button
           onClick={handleConfirm}
           variant="primary"

@@ -8,3 +8,8 @@
 
   margin: 0.5em;
 }
+
+.drawPeriodTable th,
+.drawPeriodTable td {
+  padding: 4px;
+}

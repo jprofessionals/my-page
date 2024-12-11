@@ -26,6 +26,7 @@ const BookingEditModal = ({
           booking={booking}
           onCancel={onCancel}
           onBookingSaved={onBookingSaved}
+          showCancelButton={true}
         />
       }
       optionalButton={<></>}

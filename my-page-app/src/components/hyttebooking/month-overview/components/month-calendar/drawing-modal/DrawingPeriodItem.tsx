@@ -17,21 +17,35 @@ const DrawingPeriodItem = ({
 }: Props) => {
   return (
     <div className={style.drawPeriod}>
-      {drawingPeriod.pendingBookings.map((pendingBooking) => (
-        <DrawingPeriodPendingBooking
-          key={pendingBooking.id}
-          pendingBooking={{ ...pendingBooking, isPending: true }}
-          user={user}
-        />
-      ))}
-      {user?.admin && (
-        <Button
-          variant="primary"
-          onClick={() => onPerformDrawing(drawingPeriod)}
-        >
-          Trekk
-        </Button>
-      )}
+      <div>
+        Ønsker i perioden {drawingPeriod.startDate} to {drawingPeriod.endDate}
+      </div>
+      <table className={style.drawPeriodTable}>
+        <thead>
+          <tr>
+            <th>Ansatt</th>
+            <th>Enhet</th>
+            <th>Fra</th>
+            <th>Til</th>
+            <th></th>
+          </tr>
+        </thead>
+        {drawingPeriod.pendingBookings.map((pendingBooking) => (
+          <DrawingPeriodPendingBooking
+            key={pendingBooking.id}
+            pendingBooking={{ ...pendingBooking, isPending: true }}
+            user={user}
+          />
+        ))}
+        {user?.admin && (
+          <Button
+            variant="primary"
+            onClick={() => onPerformDrawing(drawingPeriod)}
+          >
+            Trekk
+          </Button>
+        )}
+      </table>
     </div>
   )
 }

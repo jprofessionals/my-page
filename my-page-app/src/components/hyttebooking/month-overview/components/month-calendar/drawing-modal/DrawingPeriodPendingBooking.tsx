@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Booking, User } from '@/types'
 import { Button } from '@/components/ui/button'
 import BookingEditForm from '../booking-edit-form/BookingEditForm'
@@ -12,6 +12,10 @@ type Props = {
 const DrawingPeriodPendingBooking = ({ pendingBooking, user }: Props) => {
   const [showForm, setShowForm] = useState<boolean>(false)
 
+  const adminOrOwner = useMemo(() => {
+    return user?.admin || pendingBooking.employeeName === user?.name
+  }, [pendingBooking, user])
+
   const queryClient = useQueryClient()
 
   const onBookingSaved = () => {
@@ -22,28 +26,37 @@ const DrawingPeriodPendingBooking = ({ pendingBooking, user }: Props) => {
   }
 
   return (
-    <div>
-      <span>
-        {pendingBooking.employeeName} ønsker{' '}
-        {pendingBooking.apartment.cabin_name} fra {pendingBooking.startDate} til{' '}
-        {pendingBooking.endDate}
-      </span>
-      <Button
-        variant="error"
-        style={{ marginLeft: '8px', height: '2em', minHeight: '2em' }}
-        onClick={() => setShowForm(!showForm)}
-      >
-        Endre
-      </Button>
+    <tbody>
+      <tr>
+        <td>{pendingBooking.employeeName}</td>
+        <td>{pendingBooking.apartment.cabin_name}</td>
+        <td>{pendingBooking.startDate}</td>
+        <td>{pendingBooking.endDate}</td>
+        <td>
+          {adminOrOwner && (
+            <Button
+              style={{ marginLeft: '8px', height: '2em', minHeight: '2em' }}
+              onClick={() => setShowForm(!showForm)}
+            >
+              Endre
+            </Button>
+          )}
+        </td>
+      </tr>
       {showForm && (
-        <BookingEditForm
-          booking={pendingBooking}
-          user={user}
-          onBookingSaved={onBookingSaved}
-          onCancel={() => {}}
-        />
+        <tr>
+          <td colSpan={5}>
+            <BookingEditForm
+              booking={pendingBooking}
+              user={user}
+              onBookingSaved={onBookingSaved}
+              onCancel={() => {}}
+              showCancelButton={false}
+            />
+          </td>
+        </tr>
       )}
-    </div>
+    </tbody>
   )
 }
 
