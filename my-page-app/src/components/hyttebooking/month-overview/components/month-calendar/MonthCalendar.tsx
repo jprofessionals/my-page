@@ -1,5 +1,5 @@
-import { CalendarDay, DayPicker, WeekNumber } from 'react-day-picker'
-import { add, sub, format } from 'date-fns'
+import { CalendarDay, DayPicker } from 'react-day-picker'
+import { add, format, sub } from 'date-fns'
 import {
   Apartment,
   Booking,
@@ -17,12 +17,12 @@ import CalendarWeekNumber from './calendar-week-number/CalendarWeekNumber'
 import CalendarCell from './calendar-cell/CalendarCell'
 import CalendarDate from './calendar-date/CalendarDate'
 import BookingAddModal from './booking-add-modal/BookingAddModal'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import classes from './MonthCalendar.module.css'
 import {
   getBookingsOnDayAndCabin,
-  getInfoNoticesOnDay,
   getBookingTrainsOnDayAndCabin,
+  getInfoNoticesOnDay,
 } from './monthCalendarUtil'
 import ApiService from '@/services/api.service'
 import BookingEditModal from '@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-modal/BookingEditModal'
@@ -72,7 +72,7 @@ function MonthCalendar({
     fetchAllApartments()
   }, [])
 
-  const DEFAULT_CUTOFF_DATE = '2000-01-01';
+  const DEFAULT_CUTOFF_DATE = '2000-01-01'
   const { data: cutoffDate } = useQuery<string>({
     queryKey: ['cutoffDate'],
     initialData: DEFAULT_CUTOFF_DATE,
@@ -121,12 +121,9 @@ function MonthCalendar({
     setBookingTrain(undefined)
   }
 
-  const handlePerformDrawing = async (bookingTrain: PendingBookingTrain) => {
+  const handlePerformDrawing = async (drawingPeriod: DrawingPeriod) => {
     try {
-      const pendingBookings = bookingTrain.drawingPeriodList.flatMap(
-        (drawingPeriod) => drawingPeriod.pendingBookings,
-      )
-      await ApiService.pickWinnerPendingBooking(pendingBookings)
+      await ApiService.pickWinnerPendingBooking(drawingPeriod.pendingBookings)
       toast.success('Trekning fullført')
     } catch {
       toast.error('Trekning feilet')

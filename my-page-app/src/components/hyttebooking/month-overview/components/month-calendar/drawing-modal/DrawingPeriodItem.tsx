@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 type Props = {
   drawingPeriod: DrawingPeriod
   user?: User
-  onPerformDrawing: () => void
+  onPerformDrawing: (drawingPeriod: DrawingPeriod) => void
 }
 
 const DrawingPeriodItem = ({
@@ -25,7 +25,10 @@ const DrawingPeriodItem = ({
         />
       ))}
       {user?.admin && (
-        <Button variant="primary" onClick={() => onPerformDrawing()}>
+        <Button
+          variant="primary"
+          onClick={() => onPerformDrawing(drawingPeriod)}
+        >
           Trekk
         </Button>
       )}

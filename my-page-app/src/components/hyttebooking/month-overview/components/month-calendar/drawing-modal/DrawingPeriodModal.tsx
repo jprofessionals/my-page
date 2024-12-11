@@ -1,5 +1,5 @@
 import React from 'react'
-import { PendingBookingTrain, User } from '@/types'
+import { DrawingPeriod, PendingBookingTrain, User } from '@/types'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
 import DrawingPeriodItem from './DrawingPeriodItem'
@@ -8,7 +8,7 @@ type Props = {
   user?: User
   bookingTrain?: PendingBookingTrain
   onCancel: () => void
-  onPerformDrawing: (bookingTrain: PendingBookingTrain) => void
+  onPerformDrawing: (drawingPeriod: DrawingPeriod) => void
 }
 
 const DrawingPeriodModal = ({
@@ -17,12 +17,6 @@ const DrawingPeriodModal = ({
   onCancel,
   onPerformDrawing,
 }: Props) => {
-  function handlePerformDrawing() {
-    if (bookingTrain) {
-      onPerformDrawing(bookingTrain)
-    }
-  }
-
   return (
     <SimpleModal
       header={'Trekningsperiode'}
@@ -34,7 +28,7 @@ const DrawingPeriodModal = ({
             <DrawingPeriodItem
               key={drawingPeriod.id}
               drawingPeriod={drawingPeriod}
-              onPerformDrawing={handlePerformDrawing}
+              onPerformDrawing={onPerformDrawing}
               user={user}
             />
           ))}
