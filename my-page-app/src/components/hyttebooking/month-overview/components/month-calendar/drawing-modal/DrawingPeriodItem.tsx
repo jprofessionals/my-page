@@ -15,6 +15,12 @@ const DrawingPeriodItem = ({
   user,
   onPerformDrawing,
 }: Props) => {
+  function getText() {
+    return drawingPeriod.drawingDate
+      ? `Planlagt trekning ${drawingPeriod.drawingDate}`
+      : 'Oppholdet starter før automatisk trekningsdato. Kontakt Roger for manuell trekning'
+  }
+
   return (
     <div className={style.drawPeriod}>
       <div>
@@ -37,15 +43,16 @@ const DrawingPeriodItem = ({
             user={user}
           />
         ))}
-        {user?.admin && (
-          <Button
-            variant="primary"
-            onClick={() => onPerformDrawing(drawingPeriod)}
-          >
-            Trekk
-          </Button>
-        )}
       </table>
+      <div>{getText()}</div>
+      {user?.admin && (
+        <Button
+          variant="primary"
+          onClick={() => onPerformDrawing(drawingPeriod)}
+        >
+          Trekk
+        </Button>
+      )}
     </div>
   )
 }

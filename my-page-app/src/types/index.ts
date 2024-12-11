@@ -121,6 +121,7 @@ export type DrawingPeriod = {
   id: string
   startDate: string
   endDate: string
+  drawingDate: string
   pendingBookings: Booking[]
 }
 

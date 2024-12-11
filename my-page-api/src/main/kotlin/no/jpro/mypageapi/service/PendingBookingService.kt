@@ -124,11 +124,14 @@ class PendingBookingService(
         return drawPeriodList.map { pb ->
             val startDate = pb[0].startDate
             val endDate = pb[pb.size - 1].endDate
+            val earliestCreatedDate = pb.minOfOrNull { it.createdDate }
+            val drawingDate = earliestCreatedDate?.plusDays(7)?.takeIf { it.isBefore(pb[0].startDate) }
 
             DrawingPeriodDTO(
                 startDate = startDate,
                 endDate = endDate,
-                pendingBookings = pb
+                drawingDate = drawingDate,
+                pendingBookings = pb,
             )
         }
     }
