@@ -9,7 +9,7 @@ import { toast } from 'react-toastify'
 
 type Props = {
   bookingPost?: BookingPost
-  user?: User
+  user: User | null
   onBookingCreated: () => void
   onCancel: () => void
 }
@@ -24,8 +24,8 @@ const BookingAddModal = ({
   const selectedApartment = allApartments.find(
     (apartment) => apartment.id === bookingPost?.apartmentID,
   )
-  const [startDate, setStartDate] = useState<string | undefined>()
-  const [endDate, setEndDate] = useState<string | undefined>()
+  const [startDate, setStartDate] = useState<string>('')
+  const [endDate, setEndDate] = useState<string>('')
 
   useEffect(() => {
     const fetchAllApartments = async () => {
@@ -36,8 +36,8 @@ const BookingAddModal = ({
   }, [])
 
   useEffect(() => {
-    setStartDate(bookingPost?.startDate)
-    setEndDate(bookingPost?.endDate)
+    setStartDate(bookingPost?.startDate || '')
+    setEndDate(bookingPost?.endDate || '')
   }, [bookingPost])
 
   const createBooking = async ({
@@ -91,7 +91,6 @@ const BookingAddModal = ({
             name="startDate"
             onChange={handleStartDateChange}
             value={startDate}
-            placeholder={startDate}
           />
           <br />
           <strong>Sluttdato:</strong>
@@ -100,7 +99,6 @@ const BookingAddModal = ({
             name="endDate"
             onChange={handleEndDateChange}
             value={endDate}
-            placeholder={endDate}
           />
         </>
       }

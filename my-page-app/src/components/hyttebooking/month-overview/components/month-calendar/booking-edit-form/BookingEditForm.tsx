@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 
 type Props = {
   booking?: Booking
-  user?: User
+  user: User | null
   onBookingSaved: () => void
   onCancel: () => void
   showCancelButton: boolean

@@ -1,6 +1,6 @@
 import jPro_Hytte from '../images/jPro_Hytte.png'
 import Image from 'next/image'
-import MonthOverview2 from '@/components/hyttebooking/month-overview/MonthOverview'
+import MonthOverview from '@/components/hyttebooking/month-overview/MonthOverview'
 import AdminBooking from '@/components/hyttebooking/AdminBooking'
 import InfoNotices from './InfoNotices'
 import bookingBarStyles from '@/components/hyttebooking/month-overview/components/month-calendar/calendar-cell/booking-bar/BookingBar.module.css'
@@ -174,7 +174,7 @@ function Hyttebooking() {
         </div>
       </div>
 
-      <MonthOverview2 />
+      <MonthOverview />
     </div>
   )
 }

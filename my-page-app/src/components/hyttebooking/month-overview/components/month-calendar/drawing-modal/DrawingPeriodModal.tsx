@@ -5,7 +5,7 @@ import SimpleModal from '@/components/ui/SimpleModal'
 import DrawingPeriodItem from './DrawingPeriodItem'
 
 type Props = {
-  user?: User
+  user: User | null
   bookingTrain?: PendingBookingTrain
   onCancel: () => void
   onPerformDrawing: (drawingPeriod: DrawingPeriod) => void
