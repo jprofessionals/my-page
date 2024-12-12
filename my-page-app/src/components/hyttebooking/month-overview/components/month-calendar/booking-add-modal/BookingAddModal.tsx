@@ -27,6 +27,8 @@ const BookingAddModal = ({
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
 
+  const [confirmInProgress, setConfirmInProgress] = useState(false)
+
   useEffect(() => {
     const fetchAllApartments = async () => {
       const response = await ApiService.getAllApartments()
@@ -58,11 +60,14 @@ const BookingAddModal = ({
   const handleConfirm = async () => {
     if (bookingPost) {
       try {
+        setConfirmInProgress(true)
         await createBooking({ bookingPost })
         onBookingCreated()
         toast.success('Booking opprettet')
       } catch (e) {
         toast.error(`Booking feilet: ${e}`)
+      } finally {
+        setConfirmInProgress(false)
       }
     }
   }
@@ -104,7 +109,7 @@ const BookingAddModal = ({
       }
       cancelButton={<Button onClick={onCancel}>Avbryt</Button>}
       confirmButton={
-        <Button onClick={handleConfirm} variant="primary">
+        <Button onClick={handleConfirm} variant="primary" disabled={confirmInProgress}>
           Bekreft
         </Button>
       }

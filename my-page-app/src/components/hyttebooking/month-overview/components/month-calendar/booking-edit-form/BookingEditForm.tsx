@@ -24,6 +24,9 @@ const BookingEditForm = ({
   const [endDate, setEndDate] = useState<string>('')
   const [apartmentId, setApartmentId] = useState<number>(0)
 
+  const [deleteInProgress, setDeleteInProgress] = useState(false)
+  const [confirmInProgress, setConfirmInProgress] = useState(false)
+
   useEffect(() => {
     setStartDate(booking?.startDate || '')
     setEndDate(booking?.endDate || '')
@@ -38,8 +41,9 @@ const BookingEditForm = ({
     },
   })
 
-  const deleteBookingByBookingId = async (bookingId: number | null) => {
+  const deleteBookingByBookingId = async (bookingId: number) => {
     try {
+      setDeleteInProgress(true)
       if (booking?.isPending) {
         if (user?.admin) {
           await ApiService.adminDeletePendingBooking(bookingId)
@@ -56,14 +60,17 @@ const BookingEditForm = ({
       toast.success('Reservasjonen er slettet')
     } catch (error) {
       toast.error(`Det oppstod en feil ved sletting: ${error}`)
+    } finally {
+      setDeleteInProgress(false)
     }
   }
 
   const patchBookingByBookingId = async (
-    bookingId: number | null,
+    bookingId: number,
     updatedBooking: BookingPost,
   ) => {
     try {
+      setConfirmInProgress(true)
       if (booking?.isPending) {
         if (user?.name === booking?.employeeName) {
           await ApiService.patchPendingBooking(bookingId, updatedBooking)
@@ -85,6 +92,8 @@ const BookingEditForm = ({
       }
     } catch (error) {
       toast.error(`Det oppstod en feil ved oppdatering: ${error}`)
+    } finally {
+      setConfirmInProgress(false)
     }
   }
 
@@ -174,6 +183,7 @@ const BookingEditForm = ({
       >
         <Button
           onClick={handleDelete}
+          disabled={deleteInProgress}
           variant="error"
           style={{ marginRight: 'auto' }}
         >
@@ -186,6 +196,7 @@ const BookingEditForm = ({
         )}
         <Button
           onClick={handleConfirm}
+          disabled={confirmInProgress}
           variant="primary"
           style={{ marginLeft: '0.5em' }}
         >

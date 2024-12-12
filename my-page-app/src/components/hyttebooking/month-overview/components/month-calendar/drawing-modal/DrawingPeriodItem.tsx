@@ -1,24 +1,50 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { DrawingPeriod, User } from '@/types'
 import DrawingPeriodPendingBooking from './DrawingPeriodPendingBooking'
 import style from './DrawingPeriodItem.module.css'
 import { Button } from '@/components/ui/button'
+import ApiService from "../../../../../../services/api.service";
+import {toast} from "react-toastify";
+import {useQueryClient} from "@tanstack/react-query";
 
 type Props = {
   drawingPeriod: DrawingPeriod
   user: User | null
-  onPerformDrawing: (drawingPeriod: DrawingPeriod) => void
+  onDrawingPerformed: () => void
 }
 
 const DrawingPeriodItem = ({
   drawingPeriod,
   user,
-  onPerformDrawing,
+  onDrawingPerformed,
 }: Props) => {
+  const queryClient = useQueryClient();
+
+  const [drawingInProgress, setDrawingInProgress] = useState(false)
+
   function getText() {
     return drawingPeriod.drawingDate
       ? `Planlagt trekning ${drawingPeriod.drawingDate}`
       : 'Oppholdet starter før automatisk trekningsdato. Kontakt Roger for manuell trekning'
+  }
+
+  const handleDrawingClick = async () => {
+    try {
+      setDrawingInProgress(true)
+      console.log('drawingInProgress=' + drawingInProgress)
+      await ApiService.pickWinnerPendingBooking(drawingPeriod.pendingBookings)
+      toast.success('Trekning fullført')
+      onDrawingPerformed()
+    } catch {
+      toast.error('Trekning feilet')
+    } finally {
+      setDrawingInProgress(false)
+      console.log('drawingInProgress=' + drawingInProgress)
+    }
+    await queryClient.invalidateQueries({ queryKey: ['bookings'] })
+    await queryClient.invalidateQueries({
+      queryKey: ['allPendingBookingTrains'],
+    })
   }
 
   return (
@@ -48,7 +74,8 @@ const DrawingPeriodItem = ({
       {user?.admin && (
         <Button
           variant="primary"
-          onClick={() => onPerformDrawing(drawingPeriod)}
+          onClick={handleDrawingClick}
+          disabled={drawingInProgress}
         >
           Trekk
         </Button>

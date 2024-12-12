@@ -95,18 +95,8 @@ function MonthCalendar({
     setBookingTrain(undefined)
   }
 
-  const handlePerformDrawing = async (drawingPeriod: DrawingPeriod) => {
-    try {
-      await ApiService.pickWinnerPendingBooking(drawingPeriod.pendingBookings)
-      toast.success('Trekning fullført')
-    } catch {
-      toast.error('Trekning feilet')
-    }
+  const handleDrawingPerformed = async () => {
     setBookingTrain(undefined)
-    await queryClient.invalidateQueries({ queryKey: ['bookings'] })
-    await queryClient.invalidateQueries({
-      queryKey: ['allPendingBookingTrains'],
-    })
   }
 
   const handleNewBookingCancelled = () => setNewBookingPost(undefined)
@@ -219,7 +209,7 @@ function MonthCalendar({
         user={user}
         bookingTrain={bookingTrain}
         onCancel={handleDrawingPeriodClose}
-        onPerformDrawing={handlePerformDrawing}
+        onDrawingPerformed={handleDrawingPerformed}
       />
     </>
   )
