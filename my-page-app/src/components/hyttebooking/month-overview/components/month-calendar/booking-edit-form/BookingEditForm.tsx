@@ -37,6 +37,7 @@ const BookingEditForm = ({
 
   const { data: apartments } = useQuery({
     queryKey: ['apartments'],
+    initialData: [],
     queryFn: () => {
       const allApartments = ApiService.getAllApartments()
       return allApartments
@@ -166,7 +167,7 @@ const BookingEditForm = ({
             className="w-48 input input-bordered input-sm ml-3 float-end"
           >
             <option value="">Velg enhet</option>
-            {(apartments || []).map((apartment: Apartment) => (
+            {apartments.map((apartment: Apartment) => (
               <option key={apartment.id} value={apartment.id}>
                 {apartment.cabin_name}
               </option>

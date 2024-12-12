@@ -15,14 +15,14 @@ import { format, isBefore, startOfDay } from 'date-fns'
 import { Button } from '@/components/ui/button'
 
 type Props = {
-  bookings?: Booking[]
+  bookings: Booking[]
   day: CalendarDay
   user: User | null
   cutoffDate: string
   apartment: Apartment
   onNewBookingClick: (newBooking: BookingPost) => void
   onBookingClick: (booking: Booking) => void
-  bookingTrains?: PendingBookingTrain[]
+  bookingTrains: PendingBookingTrain[]
   onBookingTrainClick: (bookingTrain: PendingBookingTrain) => void
 }
 
@@ -74,7 +74,7 @@ const CalendarCell = ({
   const isWednesday = getIsDayOfWeek(day) === 3
   const dayString = format(day.date, dateFormat)
   const isBeforeCutoffDate = dayString < cutoffDate
-  const hasPeriodStart = (bookings || []).find(
+  const hasPeriodStart = bookings.find(
     (booking) => booking?.startDate === dayString,
   )
 
