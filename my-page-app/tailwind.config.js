@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 
-module.exports = {
+import daisyui from 'daisyui'
+import typography from '@tailwindcss/typography'
+
+const tailwind = {
   content: [
     // New app directory layout:
     // './app/**/*.{js,ts,jsx,tsx,mdx}',
@@ -90,5 +93,7 @@ module.exports = {
       'light',
     ],
   },
-  plugins: [require('daisyui'), require('@tailwindcss/typography')],
+  plugins: [daisyui, typography],
 }
+
+export default tailwind
