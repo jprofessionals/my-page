@@ -47,6 +47,8 @@ function MonthCalendar({
 }: props) {
   const queryClient = useQueryClient()
 
+  const byIdDesc = (a: Apartment, b: Apartment) => b.id - a.id
+
   const style = classes
   const [startMonth, setStartMonth] = useState<Date>(
     sub(new Date(), { months: 6 }),
@@ -66,8 +68,8 @@ function MonthCalendar({
 
   useEffect(() => {
     const fetchAllApartments = async () => {
-      const response = await ApiService.getAllApartments()
-      setAllApartments(response)
+      const response: Apartment[] = await ApiService.getAllApartments()
+      setAllApartments(response.toSorted(byIdDesc))
     }
     fetchAllApartments()
   }, [])
