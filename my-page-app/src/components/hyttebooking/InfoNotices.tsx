@@ -66,6 +66,7 @@ function InfoNotices() {
         await ApiService.createInfoNotice({ startDate, endDate, description })
         toast.success('Infonotis opprettet')
         queryClient.invalidateQueries({ queryKey: ['infoNotices'] })
+        queryClient.invalidateQueries({ queryKey: ['allInfoNotices'] })
       } catch {
         toast.error('Oppretting av infonotis feilet')
       }
@@ -78,6 +79,7 @@ function InfoNotices() {
       await ApiService.deleteInfoNotice(infoNoticeId)
       toast.success('Infonotis slettet')
       queryClient.invalidateQueries({ queryKey: ['infoNotices'] })
+      queryClient.invalidateQueries({ queryKey: ['allInfoNotices'] })
     } catch {
       toast.error('Sletting av infonotis feilet')
     }
