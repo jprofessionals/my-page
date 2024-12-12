@@ -6,6 +6,8 @@ import authHeader from '@/services/auth-header'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
 import { toast } from 'react-toastify'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 
 type Props = {
   bookingPost?: BookingPost
@@ -26,6 +28,8 @@ const BookingAddModal = ({
   )
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
+
+  const [confirmInProgress, setConfirmInProgress] = useState(false)
 
   useEffect(() => {
     const fetchAllApartments = async () => {
@@ -58,11 +62,14 @@ const BookingAddModal = ({
   const handleConfirm = async () => {
     if (bookingPost) {
       try {
+        setConfirmInProgress(true)
         await createBooking({ bookingPost })
         onBookingCreated()
         toast.success('Booking opprettet')
       } catch (e) {
         toast.error(`Booking feilet: ${e}`)
+      } finally {
+        setConfirmInProgress(false)
       }
     }
   }
@@ -104,8 +111,21 @@ const BookingAddModal = ({
       }
       cancelButton={<Button onClick={onCancel}>Avbryt</Button>}
       confirmButton={
-        <Button onClick={handleConfirm} variant="primary">
+        <Button
+          onClick={handleConfirm}
+          variant="primary"
+          disabled={confirmInProgress}
+        >
           Bekreft
+          {confirmInProgress && (
+            <div className="flex justify-center">
+              <FontAwesomeIcon
+                icon={faRefresh}
+                className="animate-spin"
+                size="xl"
+              />
+            </div>
+          )}
         </Button>
       }
     />

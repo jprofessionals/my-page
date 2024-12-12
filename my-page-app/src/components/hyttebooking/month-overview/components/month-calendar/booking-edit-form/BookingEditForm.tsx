@@ -4,6 +4,8 @@ import ApiService from '@/services/api.service'
 import { Button } from '@/components/ui/button'
 import { toast } from 'react-toastify'
 import { useQuery } from '@tanstack/react-query'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 
 type Props = {
   booking?: Booking
@@ -24,6 +26,9 @@ const BookingEditForm = ({
   const [endDate, setEndDate] = useState<string>('')
   const [apartmentId, setApartmentId] = useState<number>(0)
 
+  const [deleteInProgress, setDeleteInProgress] = useState(false)
+  const [confirmInProgress, setConfirmInProgress] = useState(false)
+
   useEffect(() => {
     setStartDate(booking?.startDate || '')
     setEndDate(booking?.endDate || '')
@@ -38,8 +43,9 @@ const BookingEditForm = ({
     },
   })
 
-  const deleteBookingByBookingId = async (bookingId: number | null) => {
+  const deleteBookingByBookingId = async (bookingId: number) => {
     try {
+      setDeleteInProgress(true)
       if (booking?.isPending) {
         if (user?.admin) {
           await ApiService.adminDeletePendingBooking(bookingId)
@@ -56,14 +62,17 @@ const BookingEditForm = ({
       toast.success('Reservasjonen er slettet')
     } catch (error) {
       toast.error(`Det oppstod en feil ved sletting: ${error}`)
+    } finally {
+      setDeleteInProgress(false)
     }
   }
 
   const patchBookingByBookingId = async (
-    bookingId: number | null,
+    bookingId: number,
     updatedBooking: BookingPost,
   ) => {
     try {
+      setConfirmInProgress(true)
       if (booking?.isPending) {
         if (user?.name === booking?.employeeName) {
           await ApiService.patchPendingBooking(bookingId, updatedBooking)
@@ -85,6 +94,8 @@ const BookingEditForm = ({
       }
     } catch (error) {
       toast.error(`Det oppstod en feil ved oppdatering: ${error}`)
+    } finally {
+      setConfirmInProgress(false)
     }
   }
 
@@ -174,10 +185,20 @@ const BookingEditForm = ({
       >
         <Button
           onClick={handleDelete}
+          disabled={deleteInProgress}
           variant="error"
           style={{ marginRight: 'auto' }}
         >
           Slett
+          {deleteInProgress && (
+            <div className="flex justify-center">
+              <FontAwesomeIcon
+                icon={faRefresh}
+                className="animate-spin"
+                size="xl"
+              />
+            </div>
+          )}
         </Button>
         {showCancelButton && (
           <Button onClick={handleCancel} style={{ marginLeft: '0.5em' }}>
@@ -186,10 +207,20 @@ const BookingEditForm = ({
         )}
         <Button
           onClick={handleConfirm}
+          disabled={confirmInProgress}
           variant="primary"
           style={{ marginLeft: '0.5em' }}
         >
           Bekreft
+          {confirmInProgress && (
+            <div className="flex justify-center">
+              <FontAwesomeIcon
+                icon={faRefresh}
+                className="animate-spin"
+                size="xl"
+              />
+            </div>
+          )}
         </Button>
       </div>
     </div>

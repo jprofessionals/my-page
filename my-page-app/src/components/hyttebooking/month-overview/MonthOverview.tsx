@@ -1,12 +1,7 @@
 import React, { useMemo } from 'react'
 import { MonthCalendar } from './components/month-calendar/MonthCalendar'
 import ApiService from '@/services/api.service'
-import {
-  Apartment,
-  Booking,
-  InfoBooking,
-  PendingBookingTrain,
-} from '@/types'
+import { Apartment, Booking, InfoBooking, PendingBookingTrain } from '@/types'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { add, format, sub } from 'date-fns'
 import { useQuery } from '@tanstack/react-query'

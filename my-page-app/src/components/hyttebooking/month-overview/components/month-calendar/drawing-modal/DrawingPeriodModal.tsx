@@ -1,5 +1,5 @@
 import React from 'react'
-import { DrawingPeriod, PendingBookingTrain, User } from '@/types'
+import { PendingBookingTrain, User } from '@/types'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
 import DrawingPeriodItem from './DrawingPeriodItem'
@@ -8,14 +8,14 @@ type Props = {
   user: User | null
   bookingTrain?: PendingBookingTrain
   onCancel: () => void
-  onPerformDrawing: (drawingPeriod: DrawingPeriod) => void
+  onDrawingPerformed: () => void
 }
 
 const DrawingPeriodModal = ({
   bookingTrain,
   user,
   onCancel,
-  onPerformDrawing,
+  onDrawingPerformed,
 }: Props) => {
   return (
     <SimpleModal
@@ -28,7 +28,7 @@ const DrawingPeriodModal = ({
             <DrawingPeriodItem
               key={drawingPeriod.id}
               drawingPeriod={drawingPeriod}
-              onPerformDrawing={onPerformDrawing}
+              onDrawingPerformed={onDrawingPerformed}
               user={user}
             />
           ))}
