@@ -1,11 +1,13 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import { DrawingPeriod, User } from '@/types'
 import DrawingPeriodPendingBooking from './DrawingPeriodPendingBooking'
 import style from './DrawingPeriodItem.module.css'
 import { Button } from '@/components/ui/button'
-import ApiService from "../../../../../../services/api.service";
-import {toast} from "react-toastify";
-import {useQueryClient} from "@tanstack/react-query";
+import ApiService from '../../../../../../services/api.service'
+import { toast } from 'react-toastify'
+import { useQueryClient } from '@tanstack/react-query'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 
 type Props = {
   drawingPeriod: DrawingPeriod
@@ -18,7 +20,7 @@ const DrawingPeriodItem = ({
   user,
   onDrawingPerformed,
 }: Props) => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const [drawingInProgress, setDrawingInProgress] = useState(false)
 
@@ -78,6 +80,15 @@ const DrawingPeriodItem = ({
           disabled={drawingInProgress}
         >
           Trekk
+          {drawingInProgress && (
+            <div className="flex justify-center">
+              <FontAwesomeIcon
+                icon={faRefresh}
+                className="animate-spin"
+                size="xl"
+              />
+            </div>
+          )}
         </Button>
       )}
     </div>

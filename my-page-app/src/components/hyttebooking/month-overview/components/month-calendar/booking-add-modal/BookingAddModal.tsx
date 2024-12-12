@@ -6,6 +6,8 @@ import authHeader from '@/services/auth-header'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
 import { toast } from 'react-toastify'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 
 type Props = {
   bookingPost?: BookingPost
@@ -109,8 +111,21 @@ const BookingAddModal = ({
       }
       cancelButton={<Button onClick={onCancel}>Avbryt</Button>}
       confirmButton={
-        <Button onClick={handleConfirm} variant="primary" disabled={confirmInProgress}>
+        <Button
+          onClick={handleConfirm}
+          variant="primary"
+          disabled={confirmInProgress}
+        >
           Bekreft
+          {confirmInProgress && (
+            <div className="flex justify-center">
+              <FontAwesomeIcon
+                icon={faRefresh}
+                className="animate-spin"
+                size="xl"
+              />
+            </div>
+          )}
         </Button>
       }
     />

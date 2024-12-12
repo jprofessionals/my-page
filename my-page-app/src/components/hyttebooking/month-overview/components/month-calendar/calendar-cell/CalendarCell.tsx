@@ -11,7 +11,7 @@ import classes from './CalendarCell.module.css'
 import BookingBar, { BarType } from './booking-bar/BookingBar'
 import { getIsDayOfWeek } from '@/components/hyttebooking/month-overview/components/month-calendar/calendar-date/calendarDateUtil'
 import { dateFormat } from '@/components/hyttebooking/month-overview/monthOverviewUtils'
-import {format, isBefore, startOfDay} from 'date-fns'
+import { format, isBefore, startOfDay } from 'date-fns'
 import { Button } from '@/components/ui/button'
 
 type Props = {

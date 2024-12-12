@@ -4,6 +4,8 @@ import ApiService from '@/services/api.service'
 import { Button } from '@/components/ui/button'
 import { toast } from 'react-toastify'
 import { useQuery } from '@tanstack/react-query'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 
 type Props = {
   booking?: Booking
@@ -188,6 +190,15 @@ const BookingEditForm = ({
           style={{ marginRight: 'auto' }}
         >
           Slett
+          {deleteInProgress && (
+            <div className="flex justify-center">
+              <FontAwesomeIcon
+                icon={faRefresh}
+                className="animate-spin"
+                size="xl"
+              />
+            </div>
+          )}
         </Button>
         {showCancelButton && (
           <Button onClick={handleCancel} style={{ marginLeft: '0.5em' }}>
@@ -201,6 +212,15 @@ const BookingEditForm = ({
           style={{ marginLeft: '0.5em' }}
         >
           Bekreft
+          {confirmInProgress && (
+            <div className="flex justify-center">
+              <FontAwesomeIcon
+                icon={faRefresh}
+                className="animate-spin"
+                size="xl"
+              />
+            </div>
+          )}
         </Button>
       </div>
     </div>

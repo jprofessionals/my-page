@@ -5,7 +5,6 @@ import {
   Booking,
   BookingPost,
   CabinType,
-  DrawingPeriod,
   InfoBooking,
   PendingBookingTrain,
   User,
@@ -23,11 +22,9 @@ import {
   getBookingTrainsOnDayAndCabin,
   getInfoNoticesOnDay,
 } from './monthCalendarUtil'
-import ApiService from '@/services/api.service'
 import BookingEditModal from '@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-modal/BookingEditModal'
 import BookingReadOnlyInfoModal from '@/components/hyttebooking/month-overview/components/month-calendar/booking-read-only-info-Modal/BookingReadOnlyInfoModal'
 import DrawingPeriodModal from './drawing-modal/DrawingPeriodModal'
-import { toast } from 'react-toastify'
 import { useQueryClient } from '@tanstack/react-query'
 import { dateFormat } from '../../monthOverviewUtils'
 
@@ -51,12 +48,8 @@ function MonthCalendar({
   const queryClient = useQueryClient()
 
   const style = classes
-  const [startMonth] = useState<Date>(
-    sub(new Date(), { months: 6 }),
-  )
-  const [endMonth] = useState<Date>(
-    add(new Date(), { months: 12 }),
-  )
+  const [startMonth] = useState<Date>(sub(new Date(), { months: 6 }))
+  const [endMonth] = useState<Date>(add(new Date(), { months: 12 }))
   const [newBookingPost, setNewBookingPost] = useState<BookingPost | undefined>(
     undefined,
   )
