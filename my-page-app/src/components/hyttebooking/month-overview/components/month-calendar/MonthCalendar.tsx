@@ -8,7 +8,6 @@ import {
   DrawingPeriod,
   InfoBooking,
   PendingBookingTrain,
-  Settings,
   User,
 } from '@/types'
 import { nb } from 'date-fns/locale'
@@ -17,7 +16,7 @@ import CalendarWeekNumber from './calendar-week-number/CalendarWeekNumber'
 import CalendarCell from './calendar-cell/CalendarCell'
 import CalendarDate from './calendar-date/CalendarDate'
 import BookingAddModal from './booking-add-modal/BookingAddModal'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import classes from './MonthCalendar.module.css'
 import {
   getBookingsOnDayAndCabin,
@@ -29,7 +28,7 @@ import BookingEditModal from '@/components/hyttebooking/month-overview/component
 import BookingReadOnlyInfoModal from '@/components/hyttebooking/month-overview/components/month-calendar/booking-read-only-info-Modal/BookingReadOnlyInfoModal'
 import DrawingPeriodModal from './drawing-modal/DrawingPeriodModal'
 import { toast } from 'react-toastify'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { dateFormat } from '../../monthOverviewUtils'
 
 type props = {
@@ -51,18 +50,11 @@ function MonthCalendar({
 }: props) {
   const queryClient = useQueryClient()
 
-  console.log('apartments=' + apartments)
-  console.log('bookings=' + bookings)
-  console.log('cutoffDate=' + cutoffDate)
-  console.log('infoNotices=' + infoNotices)
-  console.log('pendingBookingTrains=' + pendingBookingTrains)
-  console.log('user=' + user)
-
   const style = classes
-  const [startMonth, setStartMonth] = useState<Date>(
+  const [startMonth] = useState<Date>(
     sub(new Date(), { months: 6 }),
   )
-  const [endMonth, setEndMonth] = useState<Date>(
+  const [endMonth] = useState<Date>(
     add(new Date(), { months: 12 }),
   )
   const [newBookingPost, setNewBookingPost] = useState<BookingPost | undefined>(
@@ -77,11 +69,6 @@ function MonthCalendar({
   function isCutoffDate(day: CalendarDay) {
     const dateString = format(day.date, dateFormat)
     return dateString === cutoffDate
-  }
-
-  const handleMonthChange = (month: Date) => {
-    // todo setStartDate, setEndDate
-    // todo refetch
   }
 
   const handleNewBookingCreated = async () => {
@@ -157,7 +144,6 @@ function MonthCalendar({
         locale={nb}
         startMonth={startMonth}
         endMonth={endMonth}
-        onMonthChange={handleMonthChange}
         showOutsideDays={true}
         fixedWeeks={true}
         showWeekNumber={true}
