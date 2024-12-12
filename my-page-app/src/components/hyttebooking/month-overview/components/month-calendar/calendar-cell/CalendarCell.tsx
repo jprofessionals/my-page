@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button'
 type Props = {
   bookings?: Booking[]
   day: CalendarDay
-  user?: User
+  user: User | null
   cutoffDate: string
   apartment: Apartment
   onNewBookingClick: (newBooking: BookingPost) => void

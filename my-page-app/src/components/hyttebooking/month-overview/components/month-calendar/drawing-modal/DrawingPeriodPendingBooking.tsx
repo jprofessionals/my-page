@@ -6,7 +6,7 @@ import { useQueryClient } from '@tanstack/react-query'
 
 type Props = {
   pendingBooking: Booking
-  user?: User
+  user: User | null
 }
 
 const DrawingPeriodPendingBooking = ({ pendingBooking, user }: Props) => {
@@ -21,7 +21,7 @@ const DrawingPeriodPendingBooking = ({ pendingBooking, user }: Props) => {
   const onBookingSaved = () => {
     queryClient.invalidateQueries({ queryKey: ['bookings'] })
     queryClient.invalidateQueries({
-      queryKey: ['allPendingBookingsAllApartments'],
+      queryKey: ['allPendingBookingTrains'],
     })
   }
 

@@ -33,21 +33,30 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { dateFormat } from '../../monthOverviewUtils'
 
 type props = {
+  apartments: Apartment[]
   bookings: Booking[]
+  cutoffDate: string
   infoNotices: InfoBooking[]
   pendingBookingTrains: PendingBookingTrain[]
-  user?: User
+  user: User | null
 }
 
 function MonthCalendar({
+  apartments,
   bookings,
+  cutoffDate,
   infoNotices,
   pendingBookingTrains,
   user,
 }: props) {
   const queryClient = useQueryClient()
 
-  const byIdDesc = (a: Apartment, b: Apartment) => b.id - a.id
+  console.log('apartments=' + apartments)
+  console.log('bookings=' + bookings)
+  console.log('cutoffDate=' + cutoffDate)
+  console.log('infoNotices=' + infoNotices)
+  console.log('pendingBookingTrains=' + pendingBookingTrains)
+  console.log('user=' + user)
 
   const style = classes
   const [startMonth, setStartMonth] = useState<Date>(
@@ -64,29 +73,6 @@ function MonthCalendar({
   const [bookingTrain, setBookingTrain] = useState<
     PendingBookingTrain | undefined
   >(undefined)
-  const [allApartments, setAllApartments] = useState<Apartment[]>([])
-
-  useEffect(() => {
-    const fetchAllApartments = async () => {
-      const response: Apartment[] = await ApiService.getAllApartments()
-      setAllApartments(response.toSorted(byIdDesc))
-    }
-    fetchAllApartments()
-  }, [])
-
-  const DEFAULT_CUTOFF_DATE = '2000-01-01'
-  const { data: cutoffDate } = useQuery<string>({
-    queryKey: ['cutoffDate'],
-    initialData: DEFAULT_CUTOFF_DATE,
-    queryFn: async () => {
-      const settings: Settings[] = await ApiService.getSettings()
-      const cutoffDateSetting = settings.find(
-        (setting) => setting.settingId === 'CUTOFF_DATE_VACANCIES',
-      )
-
-      return cutoffDateSetting?.settingValue || DEFAULT_CUTOFF_DATE
-    },
-  })
 
   function isCutoffDate(day: CalendarDay) {
     const dateString = format(day.date, dateFormat)
@@ -102,7 +88,7 @@ function MonthCalendar({
     setNewBookingPost(undefined)
     await queryClient.invalidateQueries({ queryKey: ['bookings'] })
     await queryClient.invalidateQueries({
-      queryKey: ['allPendingBookingsAllApartments'],
+      queryKey: ['allPendingBookingTrains'],
     })
   }
 
@@ -110,7 +96,7 @@ function MonthCalendar({
     setEditBooking(undefined)
     await queryClient.invalidateQueries({ queryKey: ['bookings'] })
     await queryClient.invalidateQueries({
-      queryKey: ['allPendingBookingsAllApartments'],
+      queryKey: ['allPendingBookingTrains'],
     })
   }
 
@@ -132,7 +118,7 @@ function MonthCalendar({
     setBookingTrain(undefined)
     await queryClient.invalidateQueries({ queryKey: ['bookings'] })
     await queryClient.invalidateQueries({
-      queryKey: ['allPendingBookingsAllApartments'],
+      queryKey: ['allPendingBookingTrains'],
     })
   }
 
@@ -185,7 +171,7 @@ function MonthCalendar({
                 day={day}
                 infoNotices={getInfoNoticesOnDay(day, infoNotices)}
               />
-              {allApartments.map((apartment) => (
+              {apartments.map((apartment) => (
                 <CalendarCell
                   key={apartment.id}
                   day={day}
@@ -212,7 +198,7 @@ function MonthCalendar({
           WeekNumber: ({ week }) => (
             <td className={`${style.dayContainer}`}>
               <CalendarWeekNumber week={week} />
-              {allApartments.map((apartment) => (
+              {apartments.map((apartment) => (
                 <CalendarWeekLabel
                   key={apartment.id}
                   cabinName={apartment.cabin_name}

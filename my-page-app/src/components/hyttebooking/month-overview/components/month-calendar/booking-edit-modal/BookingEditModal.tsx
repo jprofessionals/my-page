@@ -4,7 +4,7 @@ import BookingEditForm from '@/components/hyttebooking/month-overview/components
 
 type Props = {
   booking?: Booking
-  user?: User
+  user: User | null
   onBookingSaved: () => void
   onCancel: () => void
 }

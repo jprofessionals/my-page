@@ -130,7 +130,7 @@ export default function AdminBooking() {
       setIsLoadingPost(false)
       queryClient.invalidateQueries({ queryKey: ['bookings'] })
       queryClient.invalidateQueries({
-        queryKey: ['allPendingBookingsAllApartments'],
+        queryKey: ['allPendingBookingTrains'],
       })
       toast.success('Lagret reservasjon')
     },

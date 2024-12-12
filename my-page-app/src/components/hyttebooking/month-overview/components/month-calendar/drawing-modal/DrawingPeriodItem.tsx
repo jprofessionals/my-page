@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 
 type Props = {
   drawingPeriod: DrawingPeriod
-  user?: User
+  user: User | null
   onPerformDrawing: (drawingPeriod: DrawingPeriod) => void
 }
 
