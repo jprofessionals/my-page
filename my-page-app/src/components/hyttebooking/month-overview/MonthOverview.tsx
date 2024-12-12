@@ -1,15 +1,19 @@
-import React, {useEffect, useMemo, useState} from 'react'
-import {MonthCalendar} from './components/month-calendar/MonthCalendar'
+import React, { useMemo } from 'react'
+import { MonthCalendar } from './components/month-calendar/MonthCalendar'
 import ApiService from '@/services/api.service'
-import {Apartment, Booking, InfoBooking, LoadingStatus, PendingBookingTrain, User,} from '@/types'
-import {useAuthContext} from '@/providers/AuthProvider'
-import {add, format, sub} from 'date-fns'
-import {useQuery, useQueryClient} from '@tanstack/react-query'
+import {
+  Apartment,
+  Booking,
+  InfoBooking,
+  PendingBookingTrain,
+} from '@/types'
+import { useAuthContext } from '@/providers/AuthProvider'
+import { add, format, sub } from 'date-fns'
+import { useQuery } from '@tanstack/react-query'
 import getSetting from '@/utils/getSetting'
-import {byIdDesc, dateFormat,} from './monthOverviewUtils'
+import { byIdDesc, dateFormat } from './monthOverviewUtils'
 
 export default function MonthOverview() {
-  const queryClient = useQueryClient()
   const { user, settings } = useAuthContext()
 
   const startDateBookings = format(
@@ -34,36 +38,32 @@ export default function MonthOverview() {
   })
 
   const { data: infoNotices } = useQuery<InfoBooking[]>({
-    queryKey: ['infoNotices'],
+    queryKey: ['allInfoNotices'],
     initialData: [],
     queryFn: async () => {
       const infoNotices: InfoBooking[] = await ApiService.getInfoNotices(
         startDateBookings,
         endDateBookings,
-      );
-      console.log('fetchedInfoNotices=' + JSON.stringify(infoNotices))
-      return infoNotices;
+      )
+      return infoNotices
     },
   })
 
-  const { data: allPendingBookingTrains } =
-    useQuery<PendingBookingTrain[]>({
-      queryKey: ['allPendingBookingTrains'],
-      initialData: [],
-      queryFn: async () => {
-        return ApiService.getAllPendingBookingTrainsForAllApartments()
-      },
-    })
+  const { data: allPendingBookingTrains } = useQuery<PendingBookingTrain[]>({
+    queryKey: ['allPendingBookingTrains'],
+    initialData: [],
+    queryFn: async () => {
+      return ApiService.getAllPendingBookingTrainsForAllApartments()
+    },
+  })
 
-  const { data: allApartments } =
-    useQuery<Apartment[]>({
-      queryKey: ['allApartments'],
-      initialData: [],
-      queryFn: async () => {
-        console.log('getting all apartments')
-        return ApiService.getAllApartments()
-      },
-    })
+  const { data: allApartments } = useQuery<Apartment[]>({
+    queryKey: ['allApartments'],
+    initialData: [],
+    queryFn: async () => {
+      return ApiService.getAllApartments()
+    },
+  })
 
   const cutOffDateVacancies = useMemo(() => {
     return getSetting(settings, 'CUTOFF_DATE_VACANCIES')
@@ -80,7 +80,7 @@ export default function MonthOverview() {
             bookings={bookings}
             cutoffDate={cutOffDateVacancies}
             pendingBookingTrains={allPendingBookingTrains}
-            infoNotices={infoNotices || []}
+            infoNotices={infoNotices}
             user={user}
           />
         </div>

@@ -11,7 +11,7 @@ import classes from './CalendarCell.module.css'
 import BookingBar, { BarType } from './booking-bar/BookingBar'
 import { getIsDayOfWeek } from '@/components/hyttebooking/month-overview/components/month-calendar/calendar-date/calendarDateUtil'
 import { dateFormat } from '@/components/hyttebooking/month-overview/monthOverviewUtils'
-import { format } from 'date-fns'
+import {format, isBefore, startOfDay} from 'date-fns'
 import { Button } from '@/components/ui/button'
 
 type Props = {
@@ -74,17 +74,12 @@ const CalendarCell = ({
   const isWednesday = getIsDayOfWeek(day) === 3
   const dayString = format(day.date, dateFormat)
   const isBeforeCutoffDate = dayString < cutoffDate
-  const hasPeriodEnd = (bookings || []).find(
-    (booking) => booking?.endDate === dayString,
-  )
   const hasPeriodStart = (bookings || []).find(
     (booking) => booking?.startDate === dayString,
   )
 
-  const currentDate = new Date()
-  const today = format(currentDate, dateFormat)
-  currentDate.setTime(currentDate.getTime() - oneDayMS)
-  const isPast = day.date < currentDate
+  const today = startOfDay(new Date())
+  const isPast = isBefore(day.date, today)
   const showAddButton =
     !isPast && isWednesday && isBeforeCutoffDate && !hasPeriodStart
 

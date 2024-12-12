@@ -1,5 +1,5 @@
 import React from 'react'
-import { Booking, User } from '@/types'
+import { Booking } from '@/types'
 import { dateFormat } from '@/components/hyttebooking/month-overview/monthOverviewUtils'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'

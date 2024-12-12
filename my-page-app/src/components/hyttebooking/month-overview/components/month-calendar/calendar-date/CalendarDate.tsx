@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { CalendarDay } from 'react-day-picker'
 import { getIsDayOfWeek, getIsToday } from './calendarDateUtil'
 import classes from './CalendarDate.module.css'
