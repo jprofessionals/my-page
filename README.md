@@ -7,7 +7,7 @@ Min side
 ## Install development tools
 
 ### NVM (Node Version Manager)
-Install nvm - https://github.com/nvm-sh/nvm#installation or https://tecadmin.net/install-nvm-macos-with-homebrew/
+Install nvm - https://github.com/nvm-sh/nvm#installation or https://tecadmin.net/install-nvm-macos-with-homebrew/ 
 
 ### Node
 Install node - `nvm install node`
