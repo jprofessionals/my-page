@@ -28,7 +28,7 @@ export const getBookingTrainsOnDayAndCabin = (
   day: CalendarDay,
   cabinName: CabinType,
   trains: PendingBookingTrain[],
-): PendingBookingTrain[] | undefined => {
+): PendingBookingTrain[] => {
   const dateString = format(day.date, dateFormat)
   return trains.filter(
     (train: PendingBookingTrain) =>
