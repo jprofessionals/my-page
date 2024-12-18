@@ -40,7 +40,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "daisyui": "^4.12.14",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.1.0",
     "eslint": "8.57.0",
     "eslint-config-next": "^14.2.6",
     "dayjs": "1.11.13",
