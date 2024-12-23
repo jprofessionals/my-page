@@ -8,7 +8,7 @@ import {
 } from '@/data/types'
 import { DateTime } from 'luxon'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { faPlusSquare, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Switch from '@radix-ui/react-switch'
@@ -91,7 +91,8 @@ export const JobPostingModal = ({
     new DataTransfer().files,
   )
   const [filesToDelete, setFilesToDelete] = useState<JobPostingFilesType>([])
-  const [links] = useState(jobPosting ? jobPosting.links : [])
+  const [links, setLinks] = useState(jobPosting ? jobPosting.links : [])
+  const [linkToAddURL, setLinkToAddURL] = useState('')
   const [tags, setTags] = useState(jobPosting ? jobPosting.tags : [])
   const [tagInputValue, setTagInputValue] = useState('')
   const rteRef = useRef<RichTextEditorRef>(null)
@@ -503,6 +504,59 @@ export const JobPostingModal = ({
                   ))}
                 </ul>
               </div>
+
+              {user?.admin ? (
+              <div className="mb-4">
+                <label className="block text-gray-700">Lenker</label>
+                <div className="w-full flex space-x-2 items-center">
+                  <TextField
+                    onChange={(e) => setLinkToAddURL(e.target.value)}
+                    label="URL"
+                    variant="outlined"
+                    fullWidth
+                  />
+                  <FontAwesomeIcon
+                    icon={faPlusSquare}
+                    onClick={() => {
+                      setLinks((prevLinks) =>
+                        [...prevLinks, linkToAddURL],
+                      )
+                    }}
+                    className="cursor-pointer fa-xl"
+                    aria-label="Add link"
+                  />
+                </div>
+                <ul className="mt-2">
+                  {links.map((link, index) => (
+                    <li
+                      className="flex justify-between items-center w-full"
+                      key={`link-${index}`}
+                    >
+                      <a
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-grow text-blue-600 hover:underline"
+                      >
+                        {link}
+                      </a>
+                      <FontAwesomeIcon
+                        icon={faTrashAlt}
+                        onClick={() => {
+                          setLinks((prevLinks) =>
+                            prevLinks.filter((l) => l !== link),
+                          )
+                        }}
+                        className="text-red-600 hover:text-red-800 cursor-pointer"
+                        aria-label="Delete link"
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              ) : (
+                <span />
+              )}
               <div className="flex justify-end">
                 <Dialog.Close asChild>
                   <button
