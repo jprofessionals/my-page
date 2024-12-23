@@ -49,6 +49,7 @@ class JobPostingService(
             hidden = jobPosting.hidden,
             deadline = jobPosting.deadline,
             tags = tagEntities,
+            links = jobPosting.links.map { it.toString() }
         )
 
         val newJobPosting = jobPostingRepository.save(jobPostingToPersist)
