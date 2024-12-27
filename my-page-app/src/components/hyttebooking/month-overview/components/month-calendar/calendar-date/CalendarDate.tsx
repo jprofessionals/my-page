@@ -1,9 +1,9 @@
 import React from 'react'
 import { CalendarDay } from 'react-day-picker'
-import { getIsDayOfWeek, getIsToday } from './calendarDateUtil'
 import classes from './CalendarDate.module.css'
 import { InfoBooking } from '../../../../../../types'
 import CalendarInfoNotice from '../calendar-info-notice/CalendarInfoNotice'
+import { isToday as isTodayFn, isWednesday as isWednesdayFn } from 'date-fns'
 
 type Props = {
   day: CalendarDay
@@ -12,8 +12,8 @@ type Props = {
 
 const CalendarDate = ({ day, infoNotices }: Props) => {
   const style = classes
-  const isToday = getIsToday(day)
-  const isWednesday = getIsDayOfWeek(day) === 3
+  const isToday = isTodayFn(day.date)
+  const isWednesday = isWednesdayFn(day.date)
 
   return (
     <div className={style.container}>
