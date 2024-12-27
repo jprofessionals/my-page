@@ -9,7 +9,10 @@ import React, { useMemo } from 'react'
 import { CalendarDay } from 'react-day-picker'
 import classes from './CalendarCell.module.css'
 import BookingBar, { BarType } from './booking-bar/BookingBar'
-import { getIsDayOfWeek } from '@/components/hyttebooking/month-overview/components/month-calendar/calendar-date/calendarDateUtil'
+import {
+  getIsDayOfWeek,
+  getIsToday,
+} from '@/components/hyttebooking/month-overview/components/month-calendar/calendar-date/calendarDateUtil'
 import { dateFormat } from '@/components/hyttebooking/month-overview/monthOverviewUtils'
 import { format, isBefore, startOfDay } from 'date-fns'
 import { Button } from '@/components/ui/button'
@@ -77,11 +80,15 @@ const CalendarCell = ({
   const hasPeriodStart = bookings.find(
     (booking) => booking?.startDate === dayString,
   )
+  const hasBooking = bookings.find(
+    (booking) => booking?.startDate < dayString && booking?.endDate > dayString,
+  )
 
   const today = startOfDay(new Date())
+  const isToday = getIsToday(day)
   const isPast = isBefore(day.date, today)
   const showAddButton =
-    !isPast && isWednesday && isBeforeCutoffDate && !hasPeriodStart
+    !isPast && isBeforeCutoffDate && !hasPeriodStart && !hasBooking && (isWednesday || isToday)
 
   const handleNewBooking = () => {
     const date = day.date
