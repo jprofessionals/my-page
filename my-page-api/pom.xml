@@ -16,6 +16,7 @@
 
     <properties>
         <java.version>17</java.version>
+        <jetty.version>11.0.18</jetty.version>
         <kotlin.version>2.1.0</kotlin.version>
         <avro.version>1.12.0</avro.version>
         <slack.version>1.44.2</slack.version>
@@ -120,7 +121,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
@@ -143,6 +143,11 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>mysql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -391,6 +396,13 @@
                 <groupId>com.google.cloud</groupId>
                 <artifactId>spring-cloud-gcp-dependencies</artifactId>
                 <version>${spring-cloud-gcp.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.ee10</groupId>
+                <artifactId>jetty-ee10-bom</artifactId>
+                <version>12.0.15</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
