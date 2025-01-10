@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
-class UserContollerTest(@Autowired val httpHeaderTestRestTemplate: HttpHeaderTestRestTemplate)  : BaseIntegrationTest() {
+class UserContollerTest(@Autowired val httpHeaderTestRestTemplate: HttpHeaderTestRestTemplate)  : IntegrationTestBase() {
 
     @Test
     fun contextLoads() {}

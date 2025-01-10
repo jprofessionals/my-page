@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles
 @ActiveProfiles("test")
 @Import(TestRestTemplateConfiguration::class)
 @EnableMockOAuth2Server(port = 8099)
-abstract class BaseIntegrationTest (){
+abstract class IntegrationTestBase (){
 
     @Autowired
     private lateinit var userService: TestUserService
