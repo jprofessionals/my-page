@@ -38,8 +38,8 @@ class BookingServiceTests  @Autowired constructor(private val bookingService: Bo
     @MockBean
     lateinit var gcpProjectIdProvider: GcpProjectIdProvider //Used by Spring Boot at application startup
 
-    @MockBean
-    lateinit var bookingRepository: BookingRepository //Used by BookingService
+    @MockBean 
+    lateinit var bookingRepository: BookingRepository //Used by BookingService adfgadfgadfg
 
 
     private fun createBookings(): List<Booking> {
