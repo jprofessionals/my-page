@@ -40,8 +40,12 @@ class JobPosting(
         joinColumns = [JoinColumn(name = "job_posting_id")],
         inverseJoinColumns = [JoinColumn(name = "tag_id")]
     )
-    var tags: List<Tag> = mutableListOf()
+    var tags: List<Tag> = mutableListOf(),
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "links", joinColumns = [JoinColumn(name = "job_posting_id")])
+    @Column(name = "url", nullable = false)
+    var links: List<String> = mutableListOf(),
 ) {
 
     override fun equals(other: Any?): Boolean {

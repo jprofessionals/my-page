@@ -213,7 +213,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
           </div>
         )}
 
-        {jobPosting.links.length > 0 && (
+        {jobPosting.links.length > 0 && user?.admin && (
           <div className="mt-2">
             <h3 className="font-semibold text-gray-800">Lenker:</h3>
             <ul className="list-disc list-inside text-gray-800">

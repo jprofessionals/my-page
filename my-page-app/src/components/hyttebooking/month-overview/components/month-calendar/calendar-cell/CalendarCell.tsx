@@ -9,9 +9,15 @@ import React, { useMemo } from 'react'
 import { CalendarDay } from 'react-day-picker'
 import classes from './CalendarCell.module.css'
 import BookingBar, { BarType } from './booking-bar/BookingBar'
-import { getIsDayOfWeek } from '@/components/hyttebooking/month-overview/components/month-calendar/calendar-date/calendarDateUtil'
 import { dateFormat } from '@/components/hyttebooking/month-overview/monthOverviewUtils'
-import { format, isBefore, startOfDay } from 'date-fns'
+import {
+  format,
+  isBefore,
+  startOfDay,
+  nextWednesday,
+  isToday as isTodayFn,
+  isWednesday as isWednesdayFn,
+} from 'date-fns'
 import { Button } from '@/components/ui/button'
 
 type Props = {
@@ -70,24 +76,25 @@ const CalendarCell = ({
   onBookingTrainClick,
 }: Props) => {
   const style = classes
-  const oneDayMS = 86400000
-  const isWednesday = getIsDayOfWeek(day) === 3
+  const isWednesday = isWednesdayFn(day.date)
   const dayString = format(day.date, dateFormat)
   const isBeforeCutoffDate = dayString < cutoffDate
   const hasPeriodStart = bookings.find(
     (booking) => booking?.startDate === dayString,
   )
+  const hasBooking = bookings.find(
+    (booking) => booking?.startDate < dayString && booking?.endDate > dayString,
+  )
 
   const today = startOfDay(new Date())
+  const isToday = isTodayFn(day.date)
   const isPast = isBefore(day.date, today)
   const showAddButton =
-    !isPast && isWednesday && isBeforeCutoffDate && !hasPeriodStart
+    !isPast && isBeforeCutoffDate && !hasPeriodStart && !hasBooking && (isWednesday || isToday)
 
   const handleNewBooking = () => {
-    const date = day.date
-    const startDate = format(date, dateFormat)
-    date.setTime(date.getTime() + oneDayMS * 7)
-    const endDate = format(date, dateFormat)
+    const startDate = format(day.date, dateFormat)
+    const endDate = format(nextWednesday(day.date), dateFormat)
 
     onNewBookingClick({
       apartmentID: apartment.id,

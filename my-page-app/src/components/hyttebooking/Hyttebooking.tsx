@@ -75,7 +75,7 @@ function Hyttebooking() {
           </span>{' '}
           etter trekning vil det muligens være dager hvor hytte-enhetene er
           ledig. Da kan man legge inn ønske om å få en enhet ved å trykke på en
-          dato og velge enhet og ønsket start og slutt for periode. Merk at en
+          dato for en ledig enhet og ønsket start og slutt for periode. Merk at en
           periode ikke kan være 7 mer enn dager. Om det er mer enn 7 dager til
           ønsket periode starter vil det gjøres en automatisk trekning mellom de
           som har meldt interesse etter at 7 dager har gått fra det første
@@ -99,17 +99,6 @@ function Hyttebooking() {
           foregå når man trykker på en bestemt dato. Siste reserverbare dato
           markeres med en <span className="text-red-500">rød</span> kant i
           kalenderen, og det er ikke mulig å reservere datoer etter denne dagen.
-        </p>
-
-        <p>
-          <span>
-            <strong>Informasjon om reservasjoner:</strong>
-          </span>{' '}
-          Ved å trykke på en bestemt dag får man opp en fullstendig oversikt
-          over alle hyttene, hvem som har reservert, og i hvilken periode. I
-          tillegg får man opp eventuelle ledige hytter på den dagen. Dersom du
-          lurer på hvem som eier en spesifikk reservasjon kan du holde musa over
-          den i kalenderen. Dine egne reservasjoner markeres med en svart kant.
         </p>
 
         <div>

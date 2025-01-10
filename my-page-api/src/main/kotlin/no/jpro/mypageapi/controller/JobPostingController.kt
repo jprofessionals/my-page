@@ -12,6 +12,7 @@ import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import java.net.URI
 import java.time.OffsetDateTime
 
 @Service
@@ -153,10 +154,12 @@ class JobPostingController(
                             name = it.name
                         )
                     },
-                links = emptyList()
+                links = it.links
+                    .map {
+                        URI(it)
+                    }
             )
         }
-
         return ResponseEntity.ok(dto)
     }
 

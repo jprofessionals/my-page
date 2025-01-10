@@ -22,7 +22,7 @@ const artStyleOptions: Record<string, string> = {
   // Add more options here as needed
 }
 
-function ExplorerTextArea(): JSX.Element {
+function ExplorerTextArea(): React.JSX.Element {
   const [text, setText] = useState<string>('')
   const [artStyle, setArtStyle] = useState<string>('Default') // Default art style
 
