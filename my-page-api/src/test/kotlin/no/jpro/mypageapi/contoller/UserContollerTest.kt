@@ -2,13 +2,11 @@ package no.jpro.mypageapi.contoller
 
 
 import no.jpro.mypageapi.dto.UserDTO
-import no.jpro.mypageapi.testutil.HttpHeaderTestRestTemplate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
-class UserContollerTest(@Autowired val httpHeaderTestRestTemplate: HttpHeaderTestRestTemplate)  : IntegrationTestBase() {
+class UserContollerTest()  : IntegrationTestBase() {
 
     @Test
     fun contextLoads() {}
@@ -16,8 +14,14 @@ class UserContollerTest(@Autowired val httpHeaderTestRestTemplate: HttpHeaderTes
 
     @Test
     fun fetchUser() {
-        val response = httpHeaderTestRestTemplate.getForEntity<List<UserDTO>>("/user")
+        val response = restClient(true).getForEntity<List<UserDTO>>("/user")
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+    }
+
+    @Test
+    fun fetchUserAgain() {
+        val response = restClient(false).getForEntity<List<UserDTO>>("/user")
+        assertThat(response.statusCode).isEqualTo(HttpStatus.UNAUTHORIZED)
     }
 
 }
