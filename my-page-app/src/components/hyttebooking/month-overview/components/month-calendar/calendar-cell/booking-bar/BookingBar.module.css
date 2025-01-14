@@ -13,10 +13,14 @@
 
 .bookingBarMine {
   background-color: #5bceae;
+  border-color: #5bceae;
+  border-width: 6px 0;
 }
 
 .bookingBarTheirs {
   background-color: #2b809b;
+  border-color: #2b809b;
+  border-width: 6px 0;
 }
 
 .bookingBarTrain {
