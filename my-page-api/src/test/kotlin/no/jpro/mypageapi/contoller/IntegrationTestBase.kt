@@ -44,8 +44,9 @@ abstract class IntegrationTestBase (){
 
     fun restClient(authenticated: Boolean): HttpHeaderTestRestTemplate {
         val client = HttpHeaderTestRestTemplate(testRestTemplate)
-        if (authenticated)
+        if (authenticated) {
             client.add(HttpHeaders.AUTHORIZATION) { generateBearerToken() }
+        }
 
         return client
     }

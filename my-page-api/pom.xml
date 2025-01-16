@@ -20,7 +20,6 @@
         <avro.version>1.12.0</avro.version>
         <slack.version>1.44.2</slack.version>
         <mock-oauth2-server.version>2.1.10</mock-oauth2-server.version>
-        <token-validation-spring.version>5.0.13</token-validation-spring.version>
         <ktor.version>2.3.12</ktor.version>
         <spring-cloud-gcp.version>5.9.0</spring-cloud-gcp.version>
     </properties>
