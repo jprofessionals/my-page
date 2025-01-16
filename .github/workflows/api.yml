@@ -18,7 +18,7 @@ jobs:
           cache: 'maven'
       - name: Perform build
         run: |
-          ./mvnw -pl my-page-api -am package
+          ./mvnw -pl my-page-api -e -am package
       - name: Upload jar
         uses: actions/upload-artifact@v4
         with:

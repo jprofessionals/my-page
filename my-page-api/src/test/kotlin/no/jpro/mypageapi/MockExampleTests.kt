@@ -16,10 +16,12 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.test.context.ActiveProfiles
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension::class)
 @Import(MockApplicationConfig::class) //Import @Beans used by Spring Boot at application startup
 class MockExampleTests {

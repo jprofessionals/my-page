@@ -1,8 +1,5 @@
 package no.jpro.mypageapi.service
 
-import com.google.api.gax.core.CredentialsProvider
-import com.google.cloud.spring.core.GcpProjectIdProvider
-import jakarta.persistence.*
 import no.jpro.mypageapi.config.MockApplicationConfig
 import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.Booking
@@ -18,25 +15,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
-import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.util.*
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension::class)
 @Import(MockApplicationConfig::class) //Import @Beans used by Spring Boot at application startup
 class BookingServiceTests  @Autowired constructor(private val bookingService: BookingService) {
-
-    @MockBean
-    lateinit var jwtDecoder: JwtDecoder //Used by Spring Boot at application startup
-
-    @MockBean
-    lateinit var credentialsProvider: CredentialsProvider //Used by Spring Boot at application startup
-
-    @MockBean
-    lateinit var gcpProjectIdProvider: GcpProjectIdProvider //Used by Spring Boot at application startup
 
     @MockBean
     lateinit var bookingRepository: BookingRepository //Used by BookingService
