@@ -13,16 +13,16 @@ type Props = {
 const BookingReadOnlyInfoModal = ({ booking, onCancel }: Props) => {
   return (
     <SimpleModal
-      header={'Booking-info'}
+      header={'Booking info'}
       open={!!booking}
       onRequestClose={onCancel}
       content={
         <>
           {booking?.employeeName} har booket &quot;
-          {booking?.apartment?.cabin_name}&quot; for perioden
+          {booking?.apartment?.cabin_name}&quot; for perioden{' '}
           {booking?.startDate &&
             format(booking?.startDate, dateFormat)} til{' '}
-          {booking?.endDate && format(booking?.endDate, dateFormat)} ?
+          {booking?.endDate && format(booking?.endDate, dateFormat)}
         </>
       }
       cancelButton={<Button onClick={onCancel}>Lukk</Button>}

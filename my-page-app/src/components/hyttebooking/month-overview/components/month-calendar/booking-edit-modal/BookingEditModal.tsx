@@ -19,7 +19,7 @@ const BookingEditModal = ({
     <SimpleModal
       open={!!booking}
       onRequestClose={onCancel}
-      header={'Endre booking'}
+      header={`Endre booking for ${booking?.employeeName}`}
       content={
         <BookingEditForm
           user={user}
