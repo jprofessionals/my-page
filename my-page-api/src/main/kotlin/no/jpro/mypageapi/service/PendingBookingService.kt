@@ -9,6 +9,7 @@ import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.PendingBookingRepository
 import no.jpro.mypageapi.utils.mapper.PendingBookingMapper
 import org.springframework.stereotype.Service
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -19,6 +20,11 @@ class PendingBookingService(
     private val apartmentRepository: ApartmentRepository,
     private val pendingBookingMapper: PendingBookingMapper,
 ) {
+    companion object {
+        const val INCLUDES_WEDNESDAY_ERROR_MESSAGE = "En booking kan ikke inneholde en onsdag unntatt som start- eller sluttdato"
+        const val TOO_LONG_ERROR_MESSAGE = "En booking kan ikke være lenger enn 7 dager"
+    }
+
     @PersistenceContext
     private lateinit var entityManager: EntityManager
 
@@ -34,6 +40,12 @@ class PendingBookingService(
     ): PendingBookingDTO {
         if (createdFor.id == null) {
             throw IllegalArgumentException("Ikke mulig å opprette bookingen.")
+        }
+        if (ChronoUnit.DAYS.between(bookingRequest.startDate, bookingRequest.endDate) > 7) {
+            throw IllegalArgumentException(TOO_LONG_ERROR_MESSAGE)
+        }
+        if (containsWednesdayExceptAsStartOrEnd(bookingRequest.startDate, bookingRequest.endDate)) {
+            throw IllegalArgumentException(INCLUDES_WEDNESDAY_ERROR_MESSAGE)
         }
 
         val apartment = bookingService.getApartment(bookingRequest.apartmentID)
@@ -73,6 +85,14 @@ class PendingBookingService(
         )
         return pendingBookingMapper.toPendingBookingDTO(pendingBookingRepository.save(pendingBooking))
 
+    }
+
+    private fun containsWednesdayExceptAsStartOrEnd(startDate: LocalDate, endDate: LocalDate): Boolean {
+        val startOffset = 1L
+        val endOffset = ChronoUnit.DAYS.between(startDate, endDate) - 1
+        return LongRange(startOffset, endOffset)
+            .map { startDate.plusDays(it) }
+            .any { it.dayOfWeek == DayOfWeek.WEDNESDAY }
     }
 
     fun getDateListOfPendingBookingTrains(
