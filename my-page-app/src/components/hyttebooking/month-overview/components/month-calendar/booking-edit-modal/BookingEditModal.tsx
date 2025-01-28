@@ -29,9 +29,6 @@ const BookingEditModal = ({
           showCancelButton={true}
         />
       }
-      optionalButton={<></>}
-      confirmButton={<></>}
-      cancelButton={<></>}
     />
   )
 }

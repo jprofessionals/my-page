@@ -97,14 +97,8 @@ class PendingBookingService(
                 apartment = apartmentWeek.apartment,
                 startDate = earliestStartDate,
                 endDate = latestEndDate,
-                drawingPeriodList = listOf(
-                    DrawingPeriodDTO(
-                        startDate = earliestStartDate,
-                        endDate = latestEndDate,
-                        pendingBookings = pendingBookings.map { pendingBookingMapper.toPendingBookingDTO(it) },
-                        drawingDate = earliestCreatedDate.plusDays(7).takeIf { it.isBefore(earliestStartDate) }
-                    )
-                )
+                pendingBookings = pendingBookings.map { pendingBookingMapper.toPendingBookingDTO(it) },
+                drawingDate = earliestCreatedDate.plusDays(7).takeIf { it.isBefore(earliestStartDate) },
             )
         }
     }

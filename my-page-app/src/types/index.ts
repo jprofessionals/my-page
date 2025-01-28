@@ -114,14 +114,7 @@ export type PendingBookingTrain = {
   apartment: Apartment
   startDate: string
   endDate: string
-  drawingPeriodList: DrawingPeriod[]
-}
-
-export type DrawingPeriod = {
-  id: string
-  startDate: string
-  endDate: string
-  drawingDate: string
+  drawingDate?: string
   pendingBookings: Booking[]
 }
 
