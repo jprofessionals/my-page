@@ -81,7 +81,13 @@ interface PendingBookingRepository : JpaRepository<PendingBooking, Long> {
     fun findPendingBookingById(pendingBookingId: Long): PendingBooking?
     fun findPendingBookingsByCreatedDateLessThanEqual(cutoffDate: LocalDate): List<PendingBooking>
 
-    fun findPendingBookingsByEmployeeIdAndApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
+    @Query("""
+        SELECT p from PendingBooking p 
+        where p.apartment.id = :apartmentId 
+            AND p.employee.id = :employeeId 
+            AND ( p.endDate > :startDate AND p.startDate < :endDate OR :startDate < p.endDate AND :endDate > p.startDate)
+    """)
+    fun findOverlappingPendingBookings(
         employeeId: Long, apartmentId: Long, startDate: LocalDate, endDate: LocalDate
     ): List<PendingBooking>
 }

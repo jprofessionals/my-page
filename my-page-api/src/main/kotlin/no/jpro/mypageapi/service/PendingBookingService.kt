@@ -1,7 +1,5 @@
 package no.jpro.mypageapi.service
 
-import jakarta.persistence.EntityManager
-import jakarta.persistence.PersistenceContext
 import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.entity.PendingBooking
 import no.jpro.mypageapi.entity.User
@@ -23,10 +21,8 @@ class PendingBookingService(
     companion object {
         const val INCLUDES_WEDNESDAY_ERROR_MESSAGE = "En booking kan ikke inneholde en onsdag unntatt som start- eller sluttdato"
         const val TOO_LONG_ERROR_MESSAGE = "En booking kan ikke være lenger enn 7 dager"
+        const val ALREADY_HAS_PENDING_BOOKING_MESSAGE_TEMPLATE = "%s har allerede et bookingønske på denne leiligheten i dette tidsrommet."
     }
-
-    @PersistenceContext
-    private lateinit var entityManager: EntityManager
 
     val todayDateMinusSevenDays: LocalDate
         get() = LocalDate.now().minusDays(7)
@@ -58,22 +54,17 @@ class PendingBookingService(
             throw IllegalArgumentException("Ønsket leilighet er ikke ledig i dette tidsrommet.")
         }
 
-        val eksisterendePendingBookings = entityManager.createQuery(
-            "SELECT p from PendingBooking p where p.apartment.id = :apartmentId AND p.employee = :user AND ( p.endDate > :startDate AND p.startDate < :endDate\n" +
-                    "                               OR :startDate < p.endDate AND :endDate > p.startDate)",
-            PendingBooking::class.java
-        )
-        eksisterendePendingBookings.setParameter("apartmentId", bookingRequest.apartmentID)
-        eksisterendePendingBookings.setParameter("user", createdFor)
-        eksisterendePendingBookings.setParameter("startDate", bookingRequest.startDate)
-        eksisterendePendingBookings.setParameter("endDate", bookingRequest.endDate)
-        val userAlreadyHasPendingBooking = eksisterendePendingBookings.resultList.isNotEmpty()
+        val overlappingPendingBookings = pendingBookingRepository.findOverlappingPendingBookings(
+            createdFor.id,
+            bookingRequest.apartmentID,
+            bookingRequest.startDate,
+            bookingRequest.endDate,
+            )
+        val userAlreadyHasPendingBooking = overlappingPendingBookings.isNotEmpty()
 
         if (userAlreadyHasPendingBooking) {
             throw IllegalArgumentException(
-                if (creatorIsAdmin) createdFor.name else {
-                    "Du"
-                } + " har allerede et bookingønske på denne leiligheten i dette tidsrommet."
+                String.format(ALREADY_HAS_PENDING_BOOKING_MESSAGE_TEMPLATE, createdFor.name)
             )
         }
 
@@ -185,7 +176,7 @@ class PendingBookingService(
         val apartments = apartmentRepository.findAll()
 
         val allTrainAndPendingBookings = apartments.flatMap { apartment ->
-            getPendingBookingInformationForApartment(apartment.id)
+            getPendingBookingInformationForApartment(apartment.id!!)
         }
         return allTrainAndPendingBookings
     }
