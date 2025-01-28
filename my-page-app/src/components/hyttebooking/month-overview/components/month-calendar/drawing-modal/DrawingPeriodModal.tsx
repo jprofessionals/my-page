@@ -66,7 +66,7 @@ const DrawingPeriodModal = ({
           {bookingTrain && (
             <div className={style.drawPeriod}>
               <div>
-                Ønsker i perioden {bookingTrain.startDate} to{' '}
+                Registrerte ønsker i perioden {bookingTrain.startDate} to{' '}
                 {bookingTrain.endDate}
               </div>
               <table className={style.drawPeriodTable}>

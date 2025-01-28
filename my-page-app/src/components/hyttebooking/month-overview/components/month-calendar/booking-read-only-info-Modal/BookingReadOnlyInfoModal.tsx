@@ -20,8 +20,7 @@ const BookingReadOnlyInfoModal = ({ booking, onCancel }: Props) => {
         <>
           {booking?.employeeName} har booket &quot;
           {booking?.apartment?.cabin_name}&quot; for perioden{' '}
-          {booking?.startDate &&
-            format(booking?.startDate, dateFormat)} til{' '}
+          {booking?.startDate && format(booking?.startDate, dateFormat)} til{' '}
           {booking?.endDate && format(booking?.endDate, dateFormat)}
         </>
       }

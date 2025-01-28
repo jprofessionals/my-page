@@ -31,7 +31,9 @@ export default function Utlysninger() {
   )
   const { mutate: createJobPosting } = usePostJobPosting()
   // Definer en konstant for dagens dato
-  const now = useMemo(() => { return new Date() }, [])
+  const now = useMemo(() => {
+    return new Date()
+  }, [])
 
   const activeJobPostings = useMemo(() => {
     return (
