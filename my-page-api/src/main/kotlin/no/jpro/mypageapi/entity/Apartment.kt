@@ -9,7 +9,7 @@ import jakarta.persistence.Id
 data class Apartment(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long? = null,
     val cabin_name: String?,
 )
 

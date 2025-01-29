@@ -60,7 +60,7 @@ class BookingLotteryService(
                 val winner = pendingBookingList.random()
                 val user = winner.employeeName?.let { userRepository.findUserByName(it) }
 
-                winner.apartment?.let { CreateBookingDTO(it.id, winner.startDate, winner.endDate) }
+                winner.apartment?.let { CreateBookingDTO(it.id!!, winner.startDate, winner.endDate) }
                     ?.let {
                         if (user != null) {
                             bookingService.validateCutoffAndCreateBooking(it, user)
@@ -71,7 +71,7 @@ class BookingLotteryService(
                 val winner = pendingBookingList[0]
 
                 val user = winner.employeeName?.let { userRepository.findUserByName(it) }
-                winner.apartment?.let { CreateBookingDTO(it.id, winner.startDate, winner.endDate) }
+                winner.apartment?.let { CreateBookingDTO(it.id!!, winner.startDate, winner.endDate) }
                     ?.let {
                         if (user != null) {
                             bookingService.validateCutoffAndCreateBooking(it, user)

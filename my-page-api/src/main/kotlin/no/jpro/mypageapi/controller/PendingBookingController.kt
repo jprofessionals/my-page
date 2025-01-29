@@ -111,11 +111,7 @@ class PendingBookingController(
     fun getPendingBookingInformation(
         token: JwtAuthenticationToken,
     ): List<PendingBookingTrainDTO> {
-        try {
-            return pendingBookingService.getPendingBookingInformation()
-        } catch (e: DateTimeParseException) {
-            throw BookingController.InvalidDateException("Invalid date format. Date must be in the format of yyyy-mm-dd.")
-        }
+        return pendingBookingService.getPendingBookingInformation()
     }
 
     @PostMapping("/pendingBookingWin")

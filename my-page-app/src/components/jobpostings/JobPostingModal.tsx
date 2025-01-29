@@ -506,54 +506,52 @@ export const JobPostingModal = ({
               </div>
 
               {user?.admin ? (
-              <div className="mb-4">
-                <label className="block text-gray-700">Lenker</label>
-                <div className="w-full flex space-x-2 items-center">
-                  <TextField
-                    onChange={(e) => setLinkToAddURL(e.target.value)}
-                    label="URL"
-                    variant="outlined"
-                    fullWidth
-                  />
-                  <FontAwesomeIcon
-                    icon={faPlusSquare}
-                    onClick={() => {
-                      setLinks((prevLinks) =>
-                        [...prevLinks, linkToAddURL],
-                      )
-                    }}
-                    className="cursor-pointer fa-xl"
-                    aria-label="Add link"
-                  />
-                </div>
-                <ul className="mt-2">
-                  {links.map((link, index) => (
-                    <li
-                      className="flex justify-between items-center w-full"
-                      key={`link-${index}`}
-                    >
-                      <a
-                        href={link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-grow text-blue-600 hover:underline"
+                <div className="mb-4">
+                  <label className="block text-gray-700">Lenker</label>
+                  <div className="w-full flex space-x-2 items-center">
+                    <TextField
+                      onChange={(e) => setLinkToAddURL(e.target.value)}
+                      label="URL"
+                      variant="outlined"
+                      fullWidth
+                    />
+                    <FontAwesomeIcon
+                      icon={faPlusSquare}
+                      onClick={() => {
+                        setLinks((prevLinks) => [...prevLinks, linkToAddURL])
+                      }}
+                      className="cursor-pointer fa-xl"
+                      aria-label="Add link"
+                    />
+                  </div>
+                  <ul className="mt-2">
+                    {links.map((link, index) => (
+                      <li
+                        className="flex justify-between items-center w-full"
+                        key={`link-${index}`}
                       >
-                        {link}
-                      </a>
-                      <FontAwesomeIcon
-                        icon={faTrashAlt}
-                        onClick={() => {
-                          setLinks((prevLinks) =>
-                            prevLinks.filter((l) => l !== link),
-                          )
-                        }}
-                        className="text-red-600 hover:text-red-800 cursor-pointer"
-                        aria-label="Delete link"
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                        <a
+                          href={link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-grow text-blue-600 hover:underline"
+                        >
+                          {link}
+                        </a>
+                        <FontAwesomeIcon
+                          icon={faTrashAlt}
+                          onClick={() => {
+                            setLinks((prevLinks) =>
+                              prevLinks.filter((l) => l !== link),
+                            )
+                          }}
+                          className="text-red-600 hover:text-red-800 cursor-pointer"
+                          aria-label="Delete link"
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ) : (
                 <span />
               )}

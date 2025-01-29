@@ -1,6 +1,5 @@
 package no.jpro.mypageapi.repository
 
-import no.jpro.mypageapi.dto.PendingBookingDTO
 import no.jpro.mypageapi.entity.*
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -54,9 +53,6 @@ interface PostRepository : JpaRepository<Post, Long> {
 interface BookingRepository : JpaRepository<Booking, Long> {
     fun findBookingById(bookingId: Long): Booking?
     fun findBookingByEmployeeId(employeeId: Int): List<Booking>
-    fun findBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
-        startDate: LocalDate, endDate: LocalDate
-    ): List<Booking>
 
     fun findBookingsByStartDateBetweenOrEndDateBetween(startDate: LocalDate, endDate: LocalDate, startDate1: LocalDate, endDate2: LocalDate): List<Booking>
 
@@ -72,22 +68,19 @@ interface BookingRepository : JpaRepository<Booking, Long> {
 
 @Repository
 interface PendingBookingRepository : JpaRepository<PendingBooking, Long> {
-    fun findPendingBookingsByApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
-        apartmentId: Long, startDate: LocalDate, endDate: LocalDate
-    ): List<PendingBookingDTO>
-
     fun findPendingBookingsByStartDateBetweenOrEndDateBetween(startDate: LocalDate, endDate: LocalDate, startDate1: LocalDate, endDate2: LocalDate): List<PendingBooking>
-
-    fun findPendingBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(
-        startDate: LocalDate, endDate: LocalDate
-    ): List<PendingBookingDTO>
 
     fun findPendingBookingByEmployeeSub(employeeSub: String): List<PendingBooking>
 
     fun findPendingBookingById(pendingBookingId: Long): PendingBooking?
-    fun findPendingBookingsByCreatedDateLessThanEqual(cutoffDate: LocalDate): List<PendingBooking>
 
-    fun findPendingBookingsByEmployeeIdAndApartmentIdAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
+    @Query("""
+        SELECT p from PendingBooking p 
+        where p.apartment.id = :apartmentId 
+            AND p.employee.id = :employeeId 
+            AND ( p.endDate > :startDate AND p.startDate < :endDate OR :startDate < p.endDate AND :endDate > p.startDate)
+    """)
+    fun findOverlappingPendingBookings(
         employeeId: Long, apartmentId: Long, startDate: LocalDate, endDate: LocalDate
     ): List<PendingBooking>
 }
