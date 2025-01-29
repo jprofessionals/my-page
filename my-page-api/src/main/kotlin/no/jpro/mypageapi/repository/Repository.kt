@@ -17,7 +17,7 @@ interface SettingsRepository : JpaRepository<Setting, String> {
 @Repository
 interface SubscriptionRepository : JpaRepository<Subscription, Long> {
     fun findByUserIdOrderByTag(userId: Long?): List<Subscription>
-    fun findByUserIdAndTag(userId: Long?, tag: String): Subscription
+    fun findByUserIdAndTag(userId: Long?, tag: String): Subscription?
     fun deleteByUserIdAndTag(userId: Long?, tag: String)
 }
 

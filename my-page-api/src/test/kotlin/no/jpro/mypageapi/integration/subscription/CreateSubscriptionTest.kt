@@ -1,6 +1,7 @@
 package no.jpro.mypageapi.integration.subscription
 
 
+import no.jpro.mypageapi.entity.Subscription
 import no.jpro.mypageapi.integration.IntegrationTestBase
 import no.jpro.mypageapi.repository.SubscriptionRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -45,6 +46,19 @@ class CreateSubscriptionTest(
         assertThat(subscriptionRepository.findByUserIdOrderByTag(user.id)).hasSize(2)
         assertThat(subscriptionRepository.findByUserIdAndTag(user.id, "BBB")).isNotNull
         assertThat(subscriptionRepository.findByUserIdAndTag(user.id, "AAA")).isNotNull
+    }
+
+    @Test
+    fun subscribes_are_idempotent() {
+        subscriptionRepository.save(Subscription(userId = user.id!!, tag = "tag"))
+
+        val response = restClient(true)
+            .postForEntity<Void>(uri = "$ENDPOINT_URL/tag")
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        assertThat(subscriptionRepository.findAll()).hasSize(1)
+        assertThat(subscriptionRepository.findByUserIdOrderByTag(user.id)).hasSize(1)
+        assertThat(subscriptionRepository.findByUserIdAndTag(user.id, "tag")).isNotNull
     }
 
     @Test

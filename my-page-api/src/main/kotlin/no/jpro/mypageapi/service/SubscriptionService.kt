@@ -13,8 +13,9 @@ class SubscriptionService(
     private val subscriptionMapper: SubscriptionMapper,
 ) {
     fun createSubscription(tag: String, user: User) {
-        assert(user.id != null) { "User ID must not be null" }
-        subscriptionRepository.save(Subscription(userId = user.id!!, tag = tag))
+        val userId = requireNotNull(user.id) { "User ID must not be null" }
+        subscriptionRepository.findByUserIdAndTag(userId, tag)
+            ?: subscriptionRepository.save(Subscription(userId = userId, tag = tag))
     }
 
     fun listSubscriptions(userId: Long): List<SubscriptionDTO> {
