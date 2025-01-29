@@ -1,6 +1,7 @@
-package no.jpro.mypageapi.contoller
+package no.jpro.mypageapi.integration
 
 
+import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.testutil.HttpHeaderTestRestTemplate
 import no.jpro.mypageapi.testutil.TestUserService
@@ -29,18 +30,22 @@ abstract class IntegrationTestBase (){
 
     var mockOAuth2Server = MockOAuth2Server()
 
+    lateinit var user: User
+    lateinit var adminUser: User
+
 
     @BeforeEach
-    fun setup() {
+    fun baseSetup() {
         mockOAuth2Server = MockOAuth2Server()
         mockOAuth2Server.start(8099)
 
         userRepository.deleteAll()
-        userService.adminUser("test@test.no", 12345)
+        user = userService.createUser(email = "test@test.no", employeeNumber = 12345)
+        adminUser = userService.createUser(email = "admin_test@test.no", employeeNumber = 12346, isAdmin = true)
     }
 
     @AfterEach
-    fun shutdown() {mockOAuth2Server.shutdown()}
+    fun baseShutdown() {mockOAuth2Server.shutdown()}
 
     fun restClient(authenticated: Boolean): HttpHeaderTestRestTemplate {
         val client = HttpHeaderTestRestTemplate(testRestTemplate)

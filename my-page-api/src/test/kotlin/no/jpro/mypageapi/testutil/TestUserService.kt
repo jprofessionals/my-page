@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 @Component
 class TestUserService(private val userRepository: UserRepository,) {
 
-    fun adminUser(email: String, employeeNumber: Int): User {
+    fun createUser(email: String, employeeNumber: Int, isAdmin: Boolean = false): User {
         return userRepository.save(
             User(
                 email = email,

@@ -17,6 +17,13 @@ class GlobalExceptionHandler {
         return responseEntity
     }
 
+    @ExceptionHandler(InvalidUserSubException::class)
+    @ResponseBody
+    fun myCustomException(e: InvalidUserSubException): ResponseEntity<String> {
+        val responseEntity = ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+        return responseEntity
+    }
+
     @ExceptionHandler(IllegalArgumentException::class)
     @ResponseBody
     fun myCustomException(e: IllegalArgumentException): ResponseEntity<String> {
@@ -34,3 +41,4 @@ class GlobalExceptionHandler {
 }
 
 class MyPageRestException(val httpStatus: HttpStatus, override val message: String?) : RuntimeException() {}
+class InvalidUserSubException(message: String) : RuntimeException(message)
