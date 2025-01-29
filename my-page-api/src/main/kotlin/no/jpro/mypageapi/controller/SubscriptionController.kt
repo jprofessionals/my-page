@@ -1,0 +1,74 @@
+package no.jpro.mypageapi.controller
+
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import no.jpro.mypageapi.dto.SubscriptionDTO
+import no.jpro.mypageapi.extensions.getSub
+import no.jpro.mypageapi.service.SubscriptionService
+import no.jpro.mypageapi.service.UserService
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.*
+
+@RestController
+@RequestMapping("subscription")
+@SecurityRequirement(name = "Bearer Authentication")
+class SubscriptionController(
+    private val userService: UserService,
+    private val subscriptionService: SubscriptionService,
+) {
+
+    @PostMapping("/{tag}")
+    @Operation(summary = "Create a new subscription")
+    @ApiResponse(
+        responseCode = "201",
+        description = "New subscription created"
+    )
+    fun subscribe(
+        token: JwtAuthenticationToken,
+        @PathVariable tag: String,
+    ): ResponseEntity<String> {
+        val user = userService.getValidUserBySub(token.getSub())
+        subscriptionService.createSubscription(tag, user)
+        return ResponseEntity("A new subscription has been successfully created", HttpStatus.CREATED)
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "Get all subscriptions for the requesting User")
+    @ApiResponse(
+        responseCode = "200",
+        content = [Content(
+            mediaType = "application/json", array = ArraySchema(
+                schema = Schema(implementation = SubscriptionDTO::class)
+            )
+        )]
+    )
+    fun list(
+        token: JwtAuthenticationToken,
+    ): ResponseEntity<List<SubscriptionDTO>> {
+        val user = userService.getValidUserBySub(token.getSub())
+        return ResponseEntity.ok(subscriptionService.listSubscriptions(user.id!!))
+    }
+
+    @DeleteMapping("/{tag}")
+    @Transactional
+    @Operation(summary = "Delete a subscription")
+    @ApiResponse(
+        responseCode = "201",
+        description = "Subscription deleted"
+    )
+    fun delete(
+        token: JwtAuthenticationToken,
+        @PathVariable tag: String,
+    ): ResponseEntity<String> {
+        val user = userService.getValidUserBySub(token.getSub())
+        subscriptionService.deleteSubscription(tag, user)
+        return ResponseEntity("A new subscription has been successfully created", HttpStatus.CREATED)
+    }
+}

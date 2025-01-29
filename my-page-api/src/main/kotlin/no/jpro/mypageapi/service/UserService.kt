@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.service
 
+import no.jpro.mypageapi.controller.InvalidUserSubException
 import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.*
@@ -77,9 +78,18 @@ class UserService(
 
     fun getUserByEmail(email: String) = userRepository.findUserByEmail(email)
 
+    @Deprecated("Use getValidUserBySub (and then rename it")
+    // TODO: he service should throw the exception which should be mapped to the http code instead of handling this
+    // in the controller for each case
     fun getUserBySub(userSub: String) = userRepository.findUserBySub(userSub)
 
-    fun getAllUsers() = userRepository.findAll().map { userMapper.toUserDTO(it) }
+    fun getValidUserBySub(userSub: String?): User {
+        if (userSub == null) {
+            throw InvalidUserSubException("User sub cannot be null")
+        }
+        return userRepository.findUserBySub(userSub) ?: throw InvalidUserSubException("No user found for sub: $userSub")
+    }
+
     fun getAllActiveUsers() = userRepository.findByEnabled(true).map { userMapper.toUserDTO(it) }
 
     fun getUserByName(name: String) = userRepository.findUserByName(name)

@@ -15,13 +15,19 @@ interface SettingsRepository : JpaRepository<Setting, String> {
 }
 
 @Repository
+interface SubscriptionRepository : JpaRepository<Subscription, Long> {
+    fun findByUserIdOrderByTag(userId: Long?): List<Subscription>
+    fun findByUserIdAndTag(userId: Long?, tag: String): Subscription
+    fun deleteByUserIdAndTag(userId: Long?, tag: String)
+}
+
+@Repository
 interface UserRepository : JpaRepository<User, String> {
     fun existsUserBySub(userSub: String): Boolean
     fun findUserBySub(sub: String): User?
     fun findUserByEmailAndSubIsNull(email: String): User?
     fun findUserByEmail(email: String): User?
     fun findUserByName(name: String): User?
-    fun findUserById(id: Long): User
     fun findByEnabled(enabled: Boolean): List<User>
 }
 
@@ -168,5 +174,5 @@ interface JobPostingRepository : JpaRepository<JobPosting, Long> {
         @Param("includeIds") includeIds: List<String>,
         @Param("tagNames") tagNames: List<String>,
     ): List<JobPosting>
-
 }
+
