@@ -19,19 +19,19 @@ handlers:
   script: auto
 
 
-#readiness_check:
-#  path: "/actuator/health"
-#  check_interval_sec: 10
-#  timeout_sec: 4
-#  failure_threshold: 2
-#  success_threshold: 2
-#
-#liveness_check:
-#  path: "/actuator/health"
-#  check_interval_sec: 30
-#  timeout_sec: 4
-#  failure_threshold: 3
-#  success_threshold: 1
+readiness_check:
+  path: "/actuator/health"
+  check_interval_sec: 10
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+
+liveness_check:
+  path: "/actuator/health"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 3
+  success_threshold: 1
 
 env_variables:
   SPRING_PROFILES_ACTIVE: "gcp"
