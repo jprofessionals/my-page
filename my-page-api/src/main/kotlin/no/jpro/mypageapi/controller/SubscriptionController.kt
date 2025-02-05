@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.jpro.mypageapi.dto.SubscriptionDTO
 import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.service.SubscriptionService
@@ -18,6 +19,10 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("subscription")
+@Tag(
+    name = "Subscription",
+    description = "Lets users subscribe to tags"
+)
 @SecurityRequirement(name = "Bearer Authentication")
 class SubscriptionController(
     private val userService: UserService,
