@@ -13,7 +13,6 @@ class NotificationJob(private val notificationJobService: NotificationJobService
     @Value("\${job.enabled:true}")
     private var enabled: Boolean = true
 
-
     fun triggerJob () {
         if (enabled) {
             run()
