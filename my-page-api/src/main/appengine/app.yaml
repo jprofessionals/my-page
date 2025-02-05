@@ -18,24 +18,9 @@ handlers:
   redirect_http_response_code: 301
   script: auto
 
-
-readiness_check:
-  path: "/actuator/health"
-  check_interval_sec: 10
-  timeout_sec: 4
-  failure_threshold: 2
-  success_threshold: 2
-
-liveness_check:
-  path: "/actuator/health"
-  check_interval_sec: 30
-  timeout_sec: 4
-  failure_threshold: 3
-  success_threshold: 1
-
 env_variables:
   SPRING_PROFILES_ACTIVE: "gcp"
-  SPRING_LIQUIBASE_ENABLED: "false"
+  SPRING_LIQUIBASE_ENABLED: "true"
   SPRING_LIQUIBASE_CHANGE_LOG: "classpath:/db/changelog/db.changelog-root.yaml"
   GOOGLE_CLIENTID: "365277685106-agts9g8tvljvdflgqottt52ujp8p989d.apps.googleusercontent.com"
   GCP_PROJECTID: "my-page-jpro-test"
