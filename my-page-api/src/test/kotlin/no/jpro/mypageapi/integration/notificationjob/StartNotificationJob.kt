@@ -103,7 +103,7 @@ class StartNotificationJob(
     }
 
     @Test
-    fun startNotificationJob_ealier_failed_run() {
+    fun startNotificationJob_earlier_failed_run() {
         val jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
         entityFactory.createSubscription(userId = 1, tags = listOf("tag_to_use"))
         entityFactory.createSubscription(userId = 1, tags = listOf("noise"))
@@ -131,7 +131,7 @@ class StartNotificationJob(
     }
 
     private fun sendValidRequest(): ResponseEntity<Void> {
-        val response = restClient(true)
+        val response = restClient(false)
             .add("X-Appengine-Cron") { "true" }
             .getForEntity<Void>(uri = "/job/notification")
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
