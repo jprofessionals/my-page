@@ -74,7 +74,7 @@ class JobPostingService(
         jobPostingRepository.deleteById(id)
     }
 
-    fun getJobPostingTags(): List<no.jpro.mypageapi.entity.Tag> {
+    fun getJobPostingTags(): List<Tag> {
         return tagRepository.findAll()
     }
 
