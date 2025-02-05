@@ -56,6 +56,13 @@ jobs:
           APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         with:
           args: app deploy my-page-api-0.0.1-SNAPSHOT.jar --appyaml=app.yaml
+      - name: Test Deploy cron to test
+        uses: actions-hub/gcloud@master
+        env:
+          PROJECT_ID: my-page-jpro-test
+          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        with:
+          args: app deploy cron.yaml
   remove-old-versions-test:
     needs: deploy-test
     runs-on: ubuntu-latest
