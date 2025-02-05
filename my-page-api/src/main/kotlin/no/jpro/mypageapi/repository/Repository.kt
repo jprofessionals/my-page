@@ -30,7 +30,6 @@ interface NotificationTaskRepository : JpaRepository<NotificationTask, Long> {
 
 @Repository
 interface NotificationRepository : JpaRepository<Notification, Long> {
-    fun findBynotificationTaskId(notificationTaskId: Long): List<Notification>
     fun findByUserIdAndJobPostingId(userId: Long, jobPostingId: Long): Notification?
 }
 

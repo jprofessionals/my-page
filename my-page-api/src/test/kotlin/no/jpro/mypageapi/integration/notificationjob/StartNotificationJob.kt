@@ -32,7 +32,7 @@ class StartNotificationJob(
 
     @Test
     fun startNotificationJob_one_task_one_tag() {
-        var jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
+        val jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
         entityFactory.createSubscription(userId = 1, tags = listOf("tag_to_use", "noise"))
         entityFactory.createSubscription(userId = 2, tags = listOf("noise"))
 
@@ -40,7 +40,7 @@ class StartNotificationJob(
 
         assertThat(notificationRepository.findAll()).hasSize(1)
 
-        var persisted = notificationRepository.findByUserIdAndJobPostingId(1, jobPosting.id)
+        val persisted = notificationRepository.findByUserIdAndJobPostingId(1, jobPosting.id)
         assertThat(persisted!!.status).isEqualTo(Status.CREATED)
 
         assertThat(notificationTaskRepository.findAll()).hasSize(1)
@@ -49,8 +49,8 @@ class StartNotificationJob(
 
     @Test
     fun startNotificationJob_two_tasks_one_tag() {
-        var jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
-        var jobPosting2 = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
+        val jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
+        val jobPosting2 = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
         entityFactory.createSubscription(userId = 1, tags = listOf("tag_to_use", "noise"))
         entityFactory.createSubscription(userId = 2, tags = listOf("tag_to_use", "noise"))
 
@@ -68,8 +68,8 @@ class StartNotificationJob(
 
     @Test
     fun startNotificationJob_two_tasks_two_tags() {
-        var jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use", "another_tag_to_use"))
-        var jobPosting2 = entityFactory.createJobPosting(tags = listOf("tag_to_use", "another_tag_to_use"))
+        val jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use", "another_tag_to_use"))
+        val jobPosting2 = entityFactory.createJobPosting(tags = listOf("tag_to_use", "another_tag_to_use"))
         entityFactory.createSubscription(userId = 1, tags = listOf("tag_to_use", "another_tag_to_use"))
         entityFactory.createSubscription(userId = 2, tags = listOf("tag_to_use", "another_tag_to_use"))
 
@@ -87,7 +87,7 @@ class StartNotificationJob(
 
     @Test
     fun multiple_tags_make_one_notification() {
-        var jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use", "another_tag_to_use"))
+        val jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use", "another_tag_to_use"))
         entityFactory.createSubscription(userId = 1, tags = listOf("tag_to_use", "noise"))
         entityFactory.createSubscription(userId = 1, tags = listOf("another_tag_to_use"))
 
@@ -95,7 +95,7 @@ class StartNotificationJob(
 
         assertThat(notificationRepository.findAll()).hasSize(1)
 
-        var persisted = notificationRepository.findByUserIdAndJobPostingId(1, jobPosting.id)
+        val persisted = notificationRepository.findByUserIdAndJobPostingId(1, jobPosting.id)
         assertThat(persisted!!.status).isEqualTo(Status.CREATED)
 
         assertThat(notificationTaskRepository.findAll()).hasSize(1)
@@ -104,7 +104,7 @@ class StartNotificationJob(
 
     @Test
     fun startNotificationJob_ealier_failed_run() {
-        var jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
+        val jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
         entityFactory.createSubscription(userId = 1, tags = listOf("tag_to_use"))
         entityFactory.createSubscription(userId = 1, tags = listOf("noise"))
         entityFactory.createSubscription(userId = 2, tags = listOf("tag_to_use"))

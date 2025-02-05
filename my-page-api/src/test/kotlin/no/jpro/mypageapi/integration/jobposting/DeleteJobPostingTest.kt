@@ -26,7 +26,7 @@ class DeleteJobPostingTest(
 
     @Test
     fun delete() {
-        var jobPosting = entityFactory.createJobPosting(tags = listOf("tag1"))
+        val jobPosting = entityFactory.createJobPosting(tags = listOf("tag1"))
 
         assertThat(jobPostingRepository.findAll()).hasSize(1)
         assertThat(notificationTaskRepository.findAll()).hasSize(1)
