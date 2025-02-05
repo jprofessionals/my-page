@@ -4,10 +4,33 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
 
-    <changeSet id="200.008" author="JProfessionals">
+    <changeSet id="200.008.01" author="JProfessionals">
+        <createTable tableName="notification_task">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="job_posting_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="notification_task"
+                                 baseColumnNames="job_posting_id"
+                                 constraintName="FK_notification_task_job_posting_id"
+                                 referencedTableName="job_posting"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="200.008.02" author="JProfessionals">
         <createTable tableName="notification">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="notification_task_id" type="BIGINT">
+                <constraints nullable="false"/>
             </column>
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false"/>
@@ -15,11 +38,20 @@
             <column name="job_posting_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <addUniqueConstraint tableName="notification"
                              columnNames="user_id, job_posting_id"
                              constraintName="unique_userid_job_posting_id"/>
+        <addForeignKeyConstraint baseTableName="notification"
+                                 baseColumnNames="notification_task_id"
+                                 constraintName="FK_notification_task_id"
+                                 referencedTableName="notification_task"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
     </changeSet>
 
 </databaseChangeLog>

@@ -17,7 +17,21 @@ interface SettingsRepository : JpaRepository<Setting, String> {
 interface SubscriptionRepository : JpaRepository<Subscription, Long> {
     fun findByUserIdOrderByTag(userId: Long?): List<Subscription>
     fun findByUserIdAndTag(userId: Long?, tag: String): Subscription?
+    fun findAllByTagIn(tags: List<String>): List<Subscription>
     fun deleteByUserIdAndTag(userId: Long?, tag: String)
+}
+
+@Repository
+interface NotificationTaskRepository : JpaRepository<NotificationTask, Long> {
+    fun findByStatus(status: Status): List<NotificationTask>
+    fun findByStatusIn(status: List<Status>): List<NotificationTask>
+    fun findByJobPostingId(jobPostingId: Long): NotificationTask
+}
+
+@Repository
+interface NotificationRepository : JpaRepository<Notification, Long> {
+    fun findBynotificationTaskId(notificationTaskId: Long): List<Notification>
+    fun findByUserIdAndJobPostingId(userId: Long, jobPostingId: Long): Notification?
 }
 
 @Repository
