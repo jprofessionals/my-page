@@ -7,7 +7,6 @@ import no.jpro.mypageapi.repository.JobPostingRepository
 import no.jpro.mypageapi.repository.NotificationRepository
 import no.jpro.mypageapi.repository.NotificationTaskRepository
 import no.jpro.mypageapi.repository.SubscriptionRepository
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -20,15 +19,13 @@ class NotificationJobService(
     private val subscriptionRepository: SubscriptionRepository,
 )  {
 
-    private val logger = LoggerFactory.getLogger(NotificationJobService::class.java.name)
-
     fun fetchAvailableSets(): List<NotificationTask> {
         return notificationTaskRepository.findByStatusIn(listOf(Status.CREATED, Status.FAILED))
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun setInProgress(it: NotificationTask) {
-        it.status = Status.IN_PROGRESS
+    fun setStatus(it: NotificationTask, status: Status) {
+        it.status = status
         notificationTaskRepository.save(it)
     }
 
@@ -37,10 +34,9 @@ class NotificationJobService(
             .tags
             .map { it.name }
         val users = subscriptionRepository.findAllByTagIn(tags).distinctBy { it.userId }
-        try {
-            users.forEach {
-                notificationRepository.findByUserIdAndJobPostingId(it.userId, notificationTask.jobPostingId)
-                    ?:
+        users.forEach {
+            notificationRepository.findByUserIdAndJobPostingId(it.userId, notificationTask.jobPostingId)
+                ?:
                 notificationRepository.save(
                     Notification(
                         notificationTaskId = notificationTask.id,
@@ -48,13 +44,6 @@ class NotificationJobService(
                         jobPostingId = notificationTask.jobPostingId
                     )
                 )
-            }
-            notificationTask.status = Status.SENT
-        } catch (e: Exception) {
-            logger.error("Failed to create notifications for notificationTask: $notificationTask", e)
-            notificationTask.status = Status.FAILED
         }
-
-        notificationTaskRepository.save(notificationTask)
     }
 }
