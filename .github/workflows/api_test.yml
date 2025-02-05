@@ -49,6 +49,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app.yaml
+      - name: Download cron.yaml
+        uses: actions/download-artifact@v4
+        with:
+          name: cron.yaml
       - name: Deploy to test
         uses: actions-hub/gcloud@master
         env:
