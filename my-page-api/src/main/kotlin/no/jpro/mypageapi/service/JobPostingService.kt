@@ -2,10 +2,12 @@ package no.jpro.mypageapi.service
 
 import jakarta.persistence.EntityNotFoundException
 import no.jpro.mypageapi.entity.Customer
+import no.jpro.mypageapi.entity.NotificationTask
 import no.jpro.mypageapi.entity.Tag
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.repository.CustomerRepository
 import no.jpro.mypageapi.repository.JobPostingRepository
+import no.jpro.mypageapi.repository.NotificationTaskRepository
 import no.jpro.mypageapi.repository.TagRepository
 import no.jpro.mypageapi.service.slack.SlackService
 import org.springframework.stereotype.Service
@@ -17,6 +19,7 @@ class JobPostingService(
     private val customerRepository: CustomerRepository,
     private val tagRepository: TagRepository,
     private val jobPostingRepository: JobPostingRepository,
+    private val notificationTaskRepository: NotificationTaskRepository,
     private val slackService: SlackService,
 ) {
 
@@ -53,6 +56,7 @@ class JobPostingService(
         )
 
         val newJobPosting = jobPostingRepository.save(jobPostingToPersist)
+        notificationTaskRepository.save(NotificationTask(jobPostingId = newJobPosting.id))
 
         if (notify) {
             slackService.postJobPosting(
