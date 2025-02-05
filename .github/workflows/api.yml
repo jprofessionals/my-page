@@ -34,11 +34,6 @@ jobs:
         with:
           name: app-prod.yaml
           path: my-page-api/src/main/appengine/app-prod.yaml
-      - name: Upload cron.yaml
-        uses: actions/upload-artifact@v4
-        with:
-          name: cron.yaml
-          path: my-page-api/src/main/appengine/cron.yaml
   deploy-test:
     if: github.ref == 'refs/heads/main'
     needs: build
