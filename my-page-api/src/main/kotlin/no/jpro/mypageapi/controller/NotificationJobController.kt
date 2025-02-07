@@ -31,7 +31,7 @@ class NotificationJobController(
         responseCode = "200"
     )
     fun triggerNotificationJob(): ResponseEntity<Unit> {
-        notificationJob.triggerJob()
+        notificationJob.triggerNotificationGenerationJob()
         return ResponseEntity.ok().build()
     }
 

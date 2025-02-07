@@ -13,13 +13,14 @@ class NotificationJob(private val notificationJobService: NotificationJobService
     @Value("\${job.enabled:true}")
     private var enabled: Boolean = true
 
-    fun triggerJob () {
+    fun triggerNotificationGenerationJob () {
         if (enabled) {
-            run()
+            runNotificationGeneration()
         }
     }
 
-    private fun run () {
+
+    private fun runNotificationGeneration () {
         notificationJobService.fetchAvailableSets().forEach {
             notificationJobService.setStatus(it, Status.IN_PROGRESS)
 
