@@ -10,7 +10,7 @@ class NotificationJob(private val notificationJobService: NotificationJobService
 
     private val logger = LoggerFactory.getLogger(NotificationJobService::class.java.name)
 
-    @Value("\${job.enabled:true}")
+    @Value("\${notification.jobs.enabled}")
     private var enabled: Boolean = true
 
     fun triggerNotificationGenerationJob () {
