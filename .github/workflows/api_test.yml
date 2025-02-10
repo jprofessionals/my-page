@@ -1,4 +1,4 @@
-name: APITest
+name: APITest (Deprecated, use api for branch deploy)
 on:
   workflow_dispatch:
     inputs:

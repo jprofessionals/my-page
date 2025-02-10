@@ -5,6 +5,14 @@ on:
       - '.github/**'
       - 'my-page-api/**'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: Which environment should we deploy to
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
 
 jobs:
   build:
@@ -34,8 +42,14 @@ jobs:
         with:
           name: app-prod.yaml
           path: my-page-api/src/main/appengine/app-prod.yaml
+      - name: Upload cron.yaml
+        uses: actions/upload-artifact@v4
+        with:
+          name: cron.yaml
+          path: my-page-api/src/main/appengine/cron.yaml
   deploy-test:
-    if: github.ref == 'refs/heads/main'
+    if:  |
+      (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event.inputs.environment == 'dev'
     needs: build
     runs-on: ubuntu-latest
     environment: test
@@ -48,6 +62,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app.yaml
+      - name: Download cron.yaml
+        uses: actions/download-artifact@v4
+        with:
+          name: cron.yaml
       - name: Deploy to test
         uses: actions-hub/gcloud@master
         env:
@@ -55,8 +73,16 @@ jobs:
           APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         with:
           args: app deploy my-page-api-0.0.1-SNAPSHOT.jar --appyaml=app.yaml
+      - name: Deploy Cron to test
+        uses: actions-hub/gcloud@master
+        env:
+          PROJECT_ID: my-page-jpro-test
+          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        with:
+          args: app deploy cron.yaml
   remove-old-versions-test:
-    if: github.ref == 'refs/heads/main'
+    if:  |
+      (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event.inputs.environment == 'dev'
     needs: deploy-test
     runs-on: ubuntu-latest
     environment: test
@@ -79,7 +105,12 @@ jobs:
     # Add any additional setup or environment preparation steps if required
 
   deploy-prod:
-    if: ${{ always() && github.ref == 'refs/heads/main' && (needs.deploy-test.result == 'success' || needs.deploy-test.result == 'skipped') }}
+    if: |
+      ${{ always() &&
+          github.ref == 'refs/heads/main' &&
+          (needs.deploy-test.result == 'success' || needs.deploy-test.result == 'skipped') &&
+          (github.event_name == 'push' || github.event.inputs.environment == 'prod') 
+      }}
     needs: [always-run, deploy-test]
     runs-on: ubuntu-latest
     environment: prod
@@ -92,6 +123,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app-prod.yaml
+      - name: Download cron.yaml
+        uses: actions/download-artifact@v4
+        with:
+          name: cron.yaml
       - name: Deploy to prod
         uses: actions-hub/gcloud@master
         env:
@@ -99,8 +134,20 @@ jobs:
           APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         with:
           args: app deploy my-page-api-0.0.1-SNAPSHOT.jar --appyaml=app-prod.yaml
+      - name: Deploy Cron to prod
+        uses: actions-hub/gcloud@master
+        env:
+          PROJECT_ID: my-page-jpro
+          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        with:
+          args: app deploy cron.yaml
   remove-old-versions-prod:
-    if: github.ref == 'refs/heads/main'
+    if: |
+      ${{ always() &&
+          github.ref == 'refs/heads/main' &&
+          (needs.deploy-test.result == 'success' || needs.deploy-test.result == 'skipped') &&
+          (github.event_name == 'push' || github.event.inputs.environment == 'prod') 
+      }}
     needs: deploy-prod
     runs-on: ubuntu-latest
     environment: prod
