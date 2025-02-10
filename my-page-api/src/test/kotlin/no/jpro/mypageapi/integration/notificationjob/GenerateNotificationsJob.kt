@@ -126,14 +126,14 @@ class GenerateNotificationsJob(
     @Test
     fun startNotificationJob_no_header() {
         val response = restClient(true)
-            .getForEntity<Void>(uri = "/job/generate-notifications")
+            .getForEntity<Void>(uri = "/api/job/generate-notifications")
         assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
     }
 
     private fun sendValidRequest(): ResponseEntity<Void> {
         val response = restClient(false)
             .add("X-Appengine-Cron") { "true" }
-            .getForEntity<Void>(uri = "/job/generate-notifications")
+            .getForEntity<Void>(uri = "/api/job/generate-notifications")
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         return response
     }
