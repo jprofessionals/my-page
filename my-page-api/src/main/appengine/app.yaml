@@ -17,8 +17,6 @@ handlers:
   secure: always
   redirect_http_response_code: 301
   script: auto
-- url: /job/.*
-  secure: always
 
 env_variables:
   SPRING_PROFILES_ACTIVE: "gcp"
