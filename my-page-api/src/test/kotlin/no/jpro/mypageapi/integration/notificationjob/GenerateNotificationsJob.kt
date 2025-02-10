@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
-class StartNotificationJob(
+class GenerateNotificationsJob(
     @Autowired var jobPostingRepository: JobPostingRepository,
     @Autowired var notificationTaskRepository: NotificationTaskRepository,
     @Autowired var notificationRepository: NotificationRepository,
@@ -126,14 +126,14 @@ class StartNotificationJob(
     @Test
     fun startNotificationJob_no_header() {
         val response = restClient(true)
-            .getForEntity<Void>(uri = "/job/notification")
+            .getForEntity<Void>(uri = "/job/generate-notifications")
         assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
     }
 
     private fun sendValidRequest(): ResponseEntity<Void> {
         val response = restClient(false)
             .add("X-Appengine-Cron") { "true" }
-            .getForEntity<Void>(uri = "/job/notification")
+            .getForEntity<Void>(uri = "/job/generate-notifications")
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         return response
     }

@@ -24,7 +24,7 @@ class NotificationJobController(
     private val notificationJob: NotificationJob,
 ) {
 
-    @GetMapping("notification")
+    @GetMapping("generate-notifications")
     @Transactional
     @Operation(summary = "Trigger notification job")
     @ApiResponse(

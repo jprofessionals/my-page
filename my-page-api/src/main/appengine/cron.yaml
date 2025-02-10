@@ -1,4 +1,4 @@
 cron:
   - description: "generate notifications"
-    url: /job/notification
+    url: /job/generate-notifications
     schedule: every 10 minutes
