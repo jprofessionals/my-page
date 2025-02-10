@@ -19,6 +19,11 @@ class NotificationJob(private val notificationJobService: NotificationJobService
         }
     }
 
+    fun triggerNotificationSendingJob () {
+        if (enabled) {
+            runNotificationSending()
+        }
+    }
 
     private fun runNotificationGeneration () {
         notificationJobService.fetchAvailableSets().forEach {
@@ -32,5 +37,9 @@ class NotificationJob(private val notificationJobService: NotificationJobService
                 notificationJobService.setStatus(it, Status.FAILED)
             }
         }
+    }
+
+    private fun runNotificationSending() {
+        notificationJobService.sendNotifications()
     }
 }

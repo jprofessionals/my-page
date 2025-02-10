@@ -46,4 +46,8 @@ class NotificationJobService(
                 )
         }
     }
+
+    fun sendNotifications() {
+        TODO("Not yet implemented")
+    }
 }
