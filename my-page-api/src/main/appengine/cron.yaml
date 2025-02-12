@@ -1,0 +1,4 @@
+cron:
+  - description: "Generate job posting notifications"
+    url: /api/job/generate-notifications
+    schedule: every 15 minutes
