@@ -30,7 +30,7 @@ class ApplicationConfig {
     ): SecurityFilterChain {
         http.authorizeHttpRequests { authz ->
             authz.requestMatchers(
-                        "/job/**",
+                        "/api/job/**",
                         "/open/**",
                         "/v3/api-docs", "/v3/api-docs/**",
                         "/swagger-ui.html", "/swagger-ui/**",
