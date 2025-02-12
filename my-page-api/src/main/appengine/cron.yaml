@@ -1,4 +1,4 @@
 cron:
   - description: "Generate job posting notifications"
-    url: /api/job/generate-notifications
+    url: /job/generate-notifications
     schedule: every 5 minutes

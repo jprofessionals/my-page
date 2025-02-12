@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequiresCron
-@RequestMapping("/api/job")
+@RequestMapping("/job")
 @Tag(
     name = "Cron Job Trigger",
     description = "Limited to GCP Cron to trigger jobs"

@@ -30,13 +30,13 @@ class ApplicationConfig {
     ): SecurityFilterChain {
         http.authorizeHttpRequests { authz ->
             authz.requestMatchers(
-                        "/api/job/**",
                         "/open/**",
                         "/v3/api-docs", "/v3/api-docs/**",
                         "/swagger-ui.html", "/swagger-ui/**",
                         "/actuator/**", "/explorationSock",
                         "/explorationSock/**",
-                "/task/**","/task/drawPendingBookings","/task/auto/drawPendingBookings","/task/notifyUpcomingBookings"
+                "/task/**","/task/drawPendingBookings","/task/auto/drawPendingBookings","/task/notifyUpcomingBookings",
+                "/job/generate-notifications",
             ).permitAll().requestMatchers(HttpMethod.GET, "/settings").permitAll() //Alle (også ikke-påloggede brukere som vil bruke
                                                                                    //lønnskalkulatoren) skal kunne kalle "GET /settings"
                 .requestMatchers("/**").authenticated()
