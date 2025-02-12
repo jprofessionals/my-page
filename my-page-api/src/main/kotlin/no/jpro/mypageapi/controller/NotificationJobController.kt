@@ -2,7 +2,6 @@ package no.jpro.mypageapi.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.jpro.mypageapi.config.RequiresCron
 import no.jpro.mypageapi.job.NotificationJob
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController
     name = "Cron Job Trigger",
     description = "Limited to GCP Cron to trigger jobs"
 )
-@SecurityRequirement(name = "Bearer Authentication")
 class NotificationJobController(
     private val notificationJob: NotificationJob,
 ) {

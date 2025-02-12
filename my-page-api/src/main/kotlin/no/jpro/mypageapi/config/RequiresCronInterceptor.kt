@@ -2,12 +2,12 @@ package no.jpro.mypageapi.config
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import no.jpro.mypageapi.controller.MyPageRestException
 import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.stereotype.Component
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
 import org.springframework.http.HttpStatus
-import org.springframework.web.server.ResponseStatusException
 
 @Component
 class RequiresCronInterceptor : HandlerInterceptor {
@@ -23,7 +23,7 @@ class RequiresCronInterceptor : HandlerInterceptor {
             if (hasAnnotation) {
                 val cronHeader = request.getHeader("X-Appengine-Cron")
                 if (cronHeader != "true") {
-                    throw ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied. This endpoint can only be called by App Engine Cron.")
+                    throw MyPageRestException(HttpStatus.FORBIDDEN, "Access denied. This endpoint can only be called by App Engine Cron.")
                 }
             }
         }
