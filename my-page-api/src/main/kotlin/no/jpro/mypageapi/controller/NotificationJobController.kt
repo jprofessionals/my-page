@@ -14,17 +14,16 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequiresCron
-@RequestMapping("job")
+@RequestMapping("/job")
 @Tag(
     name = "Cron Job Trigger",
     description = "Limited to GCP Cron to trigger jobs"
 )
-@SecurityRequirement(name = "Bearer Authentication")
 class NotificationJobController(
     private val notificationJob: NotificationJob,
 ) {
 
-    @GetMapping("notification")
+    @GetMapping("generate-notifications")
     @Transactional
     @Operation(summary = "Trigger notification job")
     @ApiResponse(

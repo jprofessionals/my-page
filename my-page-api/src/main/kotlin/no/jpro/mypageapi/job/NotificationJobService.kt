@@ -29,6 +29,7 @@ class NotificationJobService(
         notificationTaskRepository.save(it)
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun createNotifications(notificationTask: NotificationTask) {
         val tags = jobPostingRepository.getReferenceById(notificationTask.jobPostingId)
             .tags
@@ -45,5 +46,9 @@ class NotificationJobService(
                     )
                 )
         }
+    }
+
+    fun sendNotifications() {
+        TODO("Not yet implemented")
     }
 }
