@@ -5,6 +5,7 @@ import jakarta.mail.Session
 import jakarta.mail.Transport
 import jakarta.mail.internet.InternetAddress
 import jakarta.mail.internet.MimeMessage
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.*
@@ -13,6 +14,7 @@ import java.util.*
 class EmailService (
     @Value("\${notification.jobs.email.sender}") private var sender: String
 ){
+    private val logger = LoggerFactory.getLogger(EmailService::class.java.name)
 
     fun sendMail() {
         val props = Properties()
@@ -29,7 +31,7 @@ class EmailService (
             msg.setText("This is a test")
             Transport.send(msg)
         } catch (e: Exception) {
-            // ...
+            logger.error("Failed to send email", e)
         }
     }
 }

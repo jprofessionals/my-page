@@ -39,7 +39,6 @@ class ApplicationConfig {
                 "/task/**","/task/drawPendingBookings",
                 "/task/auto/drawPendingBookings",
                 "/task/notifyUpcomingBookings",
-                "/job/generate-notifications",
             ).permitAll().requestMatchers(HttpMethod.GET, "/settings").permitAll() //Alle (også ikke-påloggede brukere som vil bruke
                                                                                    //lønnskalkulatoren) skal kunne kalle "GET /settings"
                 .requestMatchers("/**").authenticated()
