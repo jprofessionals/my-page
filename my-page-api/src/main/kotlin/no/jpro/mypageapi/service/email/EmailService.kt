@@ -19,6 +19,7 @@ class EmailService (
     fun sendMail() {
         val props = Properties()
         val session: Session = Session.getDefaultInstance(props, null)
+        logger.info("Preparing mail")
 
         try {
             val msg: Message = MimeMessage(session)
@@ -30,6 +31,7 @@ class EmailService (
             msg.subject = "Test"
             msg.setText("This is a test")
             Transport.send(msg)
+            logger.info("Sent mail")
         } catch (e: Exception) {
             logger.error("Failed to send email", e)
         }
