@@ -7,12 +7,14 @@ import no.jpro.mypageapi.repository.JobPostingRepository
 import no.jpro.mypageapi.repository.NotificationRepository
 import no.jpro.mypageapi.repository.NotificationTaskRepository
 import no.jpro.mypageapi.repository.SubscriptionRepository
+import no.jpro.mypageapi.service.email.EmailService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class NotificationJobService(
+    private val emailService: EmailService,
     private val notificationTaskRepository: NotificationTaskRepository,
     private val notificationRepository: NotificationRepository,
     private val jobPostingRepository: JobPostingRepository,
@@ -49,6 +51,6 @@ class NotificationJobService(
     }
 
     fun sendNotifications() {
-        TODO("Not yet implemented")
+        emailService.sendMail();
     }
 }
