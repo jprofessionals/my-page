@@ -23,7 +23,7 @@ class EmailService (
 
         try {
             val msg: Message = MimeMessage(session)
-            msg.setFrom(InternetAddress(sender, "no-reply"))
+            msg.setFrom(InternetAddress("matthew@jpro.no", "no-reply"))
             msg.addRecipient(
                 Message.RecipientType.TO,
                 InternetAddress("matthew@jpro.no", "Matthew Koranda")
