@@ -2,7 +2,6 @@ package no.jpro.mypageapi.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.jpro.mypageapi.config.RequiresCron
 import no.jpro.mypageapi.job.NotificationJob

@@ -51,6 +51,6 @@ class NotificationJobService(
     }
 
     fun sendNotifications() {
-        emailService.sendMail();
+        emailService.sendMail()
     }
 }
