@@ -18,7 +18,8 @@ class EmailService (
 
     fun sendMail() {
         val props = Properties()
-        val session: Session = Session.getDefaultInstance(props, null)
+
+        val session: Session = Session.getInstance(props, null)
         logger.info("Preparing mail")
 
         try {
