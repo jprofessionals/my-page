@@ -12,6 +12,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters.previousOrSame
+import java.util.*
 
 @Service
 class PendingBookingService(
@@ -86,6 +87,18 @@ class PendingBookingService(
     private data class ApartmentWeek (val apartment: Apartment, val weekStartingWednesday: LocalDate)
 
     fun getPendingBookingInformation(): List<PendingBookingTrainDTO> {
+        return getPendingBookingTrain().map { pbt ->
+            PendingBookingTrainDTO(
+                apartment = pbt.apartment,
+                startDate = pbt.startDate,
+                endDate = pbt.endDate,
+                pendingBookings = pbt.pendingBookings.map { pb -> pendingBookingMapper.toPendingBookingDTO(pb) },
+                drawingDate = pbt.drawingDate,
+            )
+        }
+    }
+
+    fun getPendingBookingTrain(): List<PendingBookingTrain> {
         val pendingBookings = pendingBookingRepository.findAll()
         return pendingBookings.groupBy {
             ApartmentWeek(it.apartment, it.startDate.with(previousOrSame(DayOfWeek.WEDNESDAY)))
@@ -93,11 +106,11 @@ class PendingBookingService(
             val earliestStartDate = pendingBookings.minOf { it.startDate }
             val earliestCreatedDate = pendingBookings.minOf { it.createdDate }
             val latestEndDate = pendingBookings.maxOf { it.endDate }
-            PendingBookingTrainDTO(
+            PendingBookingTrain(
                 apartment = apartmentWeek.apartment,
                 startDate = earliestStartDate,
                 endDate = latestEndDate,
-                pendingBookings = pendingBookings.map { pendingBookingMapper.toPendingBookingDTO(it) },
+                pendingBookings = pendingBookings,
                 drawingDate = earliestCreatedDate.plusDays(7).takeIf { it.isBefore(earliestStartDate) },
             )
         }
@@ -136,3 +149,12 @@ class PendingBookingService(
         pendingBookingRepository.save(bookingToSave)
     }
 }
+
+data class PendingBookingTrain(
+    val id: String = UUID.randomUUID().toString(),
+    val apartment: Apartment,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val drawingDate: LocalDate?,
+    val pendingBookings: List<PendingBooking>,
+)
