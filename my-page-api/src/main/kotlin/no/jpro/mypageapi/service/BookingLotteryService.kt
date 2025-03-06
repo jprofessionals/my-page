@@ -1,7 +1,5 @@
 package no.jpro.mypageapi.service
 
-import jakarta.persistence.EntityManager
-import jakarta.persistence.PersistenceContext
 import no.jpro.mypageapi.dto.CreateBookingDTO
 import no.jpro.mypageapi.dto.PendingBookingDTO
 import no.jpro.mypageapi.entity.Booking
@@ -16,6 +14,7 @@ import org.springframework.integration.support.locks.LockRegistry
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -33,6 +32,8 @@ class BookingLotteryService(
     @Lazy private val self: BookingLotteryService? // Lazy self injection for transactional metoder. Spring oppretter ikke transaksjoner hvis en @Transactional annotert metode blir kalt fra samme objekt
 ) {
     private val logger = LoggerFactory.getLogger(BookingLotteryService::class.java)
+    private val earliestDrawingTime = LocalTime.of(9, 0)
+    private val latestDrawingTime = LocalTime.of(21, 0)
 
     fun pickWinnerPendingBooking(pendingBookingList: List<PendingBookingDTO>) {
         if (self == null) {
@@ -96,10 +97,15 @@ class BookingLotteryService(
     }
 
     fun runPendingBookingsLottery() {
-        logger.info("Running pending bookings lottery")
         if (self == null) {
             throw IllegalStateException("Lazy self injection failed, cannot run runPendingBookingsLottery")
         }
+        val now = LocalTime.now()
+        if (now.isBefore(earliestDrawingTime) || now.isAfter(latestDrawingTime)) {
+            logger.info("Skipping lottery outside of configured hours $earliestDrawingTime - $latestDrawingTime")
+            return
+        }
+        logger.info("Running pending bookings lottery")
 
         val lock = lockRegistry.obtain(LOTTERY_LOCK_KEY)
         if (!lock.tryLock()) {
