@@ -14,6 +14,12 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
+import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.wait.strategy.Wait
+import org.testcontainers.utility.DockerImageName
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -32,7 +38,6 @@ abstract class IntegrationTestBase {
 
     lateinit var user: User
     lateinit var adminUser: User
-
 
     @BeforeEach
     fun baseSetup() {
@@ -64,5 +69,31 @@ abstract class IntegrationTestBase {
                 DefaultOAuth2TokenCallback(subject = "12345"),
             )
         return "Bearer " + token.serialize()
+    }
+
+    companion object {
+        private val greenMailContainer = GenericContainer(DockerImageName.parse("greenmail/standalone:1.6.1"))
+            .waitingFor(Wait.forListeningPort())
+            .withEnv(
+                "GREENMAIL_OPTS",
+                "-Dgreenmail.setup.test.smtp -Dgreenmail.hostname=0.0.0.0 -Dgreenmail.users=username:password"
+            )
+            .withExposedPorts(3025)
+
+        init {
+            greenMailContainer.start()
+        }
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun configureMailHost(registry: DynamicPropertyRegistry) {
+            val host = greenMailContainer.host
+            val port = greenMailContainer.getMappedPort(3025)
+
+            println("✅ Overriding SMTP: $host:$port") // Debugging
+
+            registry.add("spring.mail.host") { host }
+            registry.add("spring.mail.port") { port.toString() }
+        }
     }
 }

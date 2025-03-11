@@ -31,10 +31,12 @@ interface NotificationTaskRepository : JpaRepository<NotificationTask, Long> {
 @Repository
 interface NotificationRepository : JpaRepository<Notification, Long> {
     fun findByUserIdAndJobPostingId(userId: Long, jobPostingId: Long): Notification?
+    fun findByStatus(status: Status): List<Notification>
+    fun findByStatusIn(listOf: List<Status>): List<Notification>
 }
 
 @Repository
-interface UserRepository : JpaRepository<User, String> {
+interface UserRepository : JpaRepository<User, Long> {
     fun existsUserBySub(userSub: String): Boolean
     fun findUserBySub(sub: String): User?
     fun findUserByEmailAndSubIsNull(email: String): User?
