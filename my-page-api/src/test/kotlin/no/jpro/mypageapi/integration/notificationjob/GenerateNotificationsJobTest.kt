@@ -48,6 +48,45 @@ class GenerateNotificationsJobTest(
     }
 
     @Test
+    fun startNotificationJob_one_task_no_tag_profile_preference() {
+        val jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
+
+        user.jobNotifications = true
+        userRepository.save(user)
+
+        sendValidRequest()
+
+        assertThat(notificationRepository.findAll()).hasSize(1)
+
+        val persisted = notificationRepository.findByUserIdAndJobPostingId(user.id!!, jobPosting.id)
+        assertThat(persisted!!.status).isEqualTo(Status.CREATED)
+
+        assertThat(notificationTaskRepository.findAll()).hasSize(1)
+        assertThat(notificationTaskRepository.findByStatus(Status.SENT)).hasSize(1)
+    }
+
+    @Test
+    fun startNotificationJob_one_task_tag_and_profile_preference() {
+        val jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
+
+        user.jobNotifications = true
+        userRepository.save(user)
+
+        user.id?.let { entityFactory.createSubscription(userId = it, tags = listOf("tag_to_use", "noise")) }
+
+        sendValidRequest()
+
+        assertThat(notificationRepository.findAll()).hasSize(1)
+
+        val persisted = notificationRepository.findByUserIdAndJobPostingId(user.id!!, jobPosting.id)
+        assertThat(persisted!!.status).isEqualTo(Status.CREATED)
+
+        assertThat(notificationTaskRepository.findAll()).hasSize(1)
+        assertThat(notificationTaskRepository.findByStatus(Status.SENT)).hasSize(1)
+    }
+
+
+    @Test
     fun startNotificationJob_two_tasks_one_tag() {
         val jobPosting = entityFactory.createJobPosting(tags = listOf("tag_to_use"))
         val jobPosting2 = entityFactory.createJobPosting(tags = listOf("tag_to_use"))

@@ -44,14 +44,18 @@ class NotificationJobService(
         val tags = jobPostingRepository.getReferenceById(notificationTask.jobPostingId)
             .tags
             .map { it.name }
-        val users = subscriptionRepository.findAllByTagIn(tags).distinctBy { it.userId }
-        users.forEach {
-            notificationRepository.findByUserIdAndJobPostingId(it.userId, notificationTask.jobPostingId)
+
+        val subscriptions = subscriptionRepository.findAllByTagIn(tags).map { it.userId }
+        val users = userRepository.findByJobNotifications(true).mapNotNull { it.id }
+
+        val distinctUserIds = (subscriptions + users).toSet()
+        distinctUserIds.forEach {
+            notificationRepository.findByUserIdAndJobPostingId(it, notificationTask.jobPostingId)
                 ?:
                 notificationRepository.save(
                     Notification(
                         notificationTaskId = notificationTask.id,
-                        userId = it.userId,
+                        userId = it,
                         jobPostingId = notificationTask.jobPostingId
                     )
                 )

@@ -29,7 +29,7 @@ abstract class IntegrationTestBase {
     private lateinit var entityFactory: EntityFactory
 
     @Autowired
-    private lateinit var userRepository: UserRepository
+    lateinit var userRepository: UserRepository
 
     @Autowired
     private lateinit var testRestTemplate: TestRestTemplate
