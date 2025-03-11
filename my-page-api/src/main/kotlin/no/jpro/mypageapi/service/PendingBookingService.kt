@@ -12,6 +12,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters.previousOrSame
+import java.util.*
 
 @Service
 class PendingBookingService(
@@ -86,6 +87,18 @@ class PendingBookingService(
     private data class ApartmentWeek (val apartment: Apartment, val weekStartingWednesday: LocalDate)
 
     fun getPendingBookingInformation(): List<PendingBookingTrainDTO> {
+        return getPendingBookingTrain().map { pbt ->
+            PendingBookingTrainDTO(
+                apartment = pbt.apartment,
+                startDate = pbt.startDate,
+                endDate = pbt.endDate,
+                pendingBookings = pbt.pendingBookings.map { pb -> pendingBookingMapper.toPendingBookingDTO(pb) },
+                drawingDate = pbt.drawingDate,
+            )
+        }
+    }
+
+    fun getPendingBookingTrain(): List<PendingBookingTrain> {
         val pendingBookings = pendingBookingRepository.findAll()
         return pendingBookings.groupBy {
             ApartmentWeek(it.apartment, it.startDate.with(previousOrSame(DayOfWeek.WEDNESDAY)))
@@ -93,14 +106,28 @@ class PendingBookingService(
             val earliestStartDate = pendingBookings.minOf { it.startDate }
             val earliestCreatedDate = pendingBookings.minOf { it.createdDate }
             val latestEndDate = pendingBookings.maxOf { it.endDate }
-            PendingBookingTrainDTO(
+            PendingBookingTrain(
                 apartment = apartmentWeek.apartment,
                 startDate = earliestStartDate,
                 endDate = latestEndDate,
-                pendingBookings = pendingBookings.map { pendingBookingMapper.toPendingBookingDTO(it) },
-                drawingDate = earliestCreatedDate.plusDays(7).takeIf { it.isBefore(earliestStartDate) },
+                pendingBookings = pendingBookings,
+                drawingDate = getDrawingDate(earliestCreatedDate, earliestStartDate),
             )
         }
+    }
+
+    fun getDrawingDate(earliestCreatedDate: LocalDate, earliestStartDate: LocalDate): LocalDate? {
+        val daysBetween = ChronoUnit.DAYS.between(earliestCreatedDate, earliestStartDate)
+        if (daysBetween < 4) {
+            return null
+        }
+        val daysUntilDraw = Math.ceilDiv(daysBetween, 2)
+        val drawingDate = if (daysUntilDraw < 7) {
+            earliestCreatedDate.plusDays(daysUntilDraw)
+        } else {
+            earliestCreatedDate.plusDays(7)
+        }
+        return drawingDate
     }
 
     fun getPendingBookingsBetweenDates(startDate: LocalDate, endDate: LocalDate, ): List<PendingBookingDTO> {
@@ -136,3 +163,12 @@ class PendingBookingService(
         pendingBookingRepository.save(bookingToSave)
     }
 }
+
+data class PendingBookingTrain(
+    val id: String = UUID.randomUUID().toString(),
+    val apartment: Apartment,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val drawingDate: LocalDate?,
+    val pendingBookings: List<PendingBooking>,
+)
