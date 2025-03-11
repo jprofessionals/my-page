@@ -10,6 +10,7 @@ import no.jpro.mypageapi.repository.JobPostingRepository
 import no.jpro.mypageapi.repository.NotificationTaskRepository
 import no.jpro.mypageapi.repository.TagRepository
 import no.jpro.mypageapi.service.slack.SlackService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.OffsetDateTime
@@ -21,6 +22,7 @@ class JobPostingService(
     private val jobPostingRepository: JobPostingRepository,
     private val notificationTaskRepository: NotificationTaskRepository,
     private val slackService: SlackService,
+    @Value("\${slack.utlysning.channel}") private var channel: String,
 ) {
 
     @Transactional
@@ -60,7 +62,7 @@ class JobPostingService(
 
         if (notify) {
             slackService.postJobPosting(
-                "utlysninger",
+                channel,
                 newJobPosting,
             )
         }
