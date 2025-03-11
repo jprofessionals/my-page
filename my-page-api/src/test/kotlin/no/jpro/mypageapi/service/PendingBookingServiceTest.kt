@@ -14,11 +14,15 @@ import no.jpro.mypageapi.service.PendingBookingService.Companion.ALREADY_HAS_PEN
 import no.jpro.mypageapi.service.PendingBookingService.Companion.INCLUDES_WEDNESDAY_ERROR_MESSAGE
 import no.jpro.mypageapi.service.PendingBookingService.Companion.TOO_LONG_ERROR_MESSAGE
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -29,6 +33,9 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDate.parse
+import java.util.stream.Stream
+
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -177,6 +184,29 @@ class PendingBookingServiceTest @Autowired constructor(private val pendingBookin
             assertEquals(String.format(ALREADY_HAS_PENDING_BOOKING_MESSAGE_TEMPLATE, user.name), exception.message)
         } finally {
             pendingBookingRepository.delete(existingOverlappingBooking)
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("drawingDateData")
+    fun shouldCalculateDrawingDate(
+        earliestCreatedDate: LocalDate,
+        earliestStartDate: LocalDate,
+        expectedDrawingDate: LocalDate?
+    ) {
+        assertEquals(expectedDrawingDate, pendingBookingService.getDrawingDate(earliestCreatedDate, earliestStartDate))
+    }
+
+    companion object {
+        @JvmStatic
+        fun drawingDateData(): Stream<Arguments> {
+            return Stream.of(
+                Arguments.of(parse("2025-03-01"), parse("2025-03-02"), null),
+                Arguments.of(parse("2025-03-01"), parse("2025-03-04"), null),
+                Arguments.of(parse("2025-03-01"), parse("2025-03-05"), parse("2025-03-03")),
+                Arguments.of(parse("2025-03-01"), parse("2025-03-06"), parse("2025-03-04")),
+                Arguments.of(parse("2025-03-01"), parse("2025-04-01"), parse("2025-03-08")),
+            )
         }
     }
 }

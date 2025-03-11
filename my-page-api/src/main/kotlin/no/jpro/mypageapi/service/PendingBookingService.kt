@@ -111,9 +111,23 @@ class PendingBookingService(
                 startDate = earliestStartDate,
                 endDate = latestEndDate,
                 pendingBookings = pendingBookings,
-                drawingDate = earliestCreatedDate.plusDays(7).takeIf { it.isBefore(earliestStartDate) },
+                drawingDate = getDrawingDate(earliestCreatedDate, earliestStartDate),
             )
         }
+    }
+
+    fun getDrawingDate(earliestCreatedDate: LocalDate, earliestStartDate: LocalDate): LocalDate? {
+        val daysBetween = ChronoUnit.DAYS.between(earliestCreatedDate, earliestStartDate)
+        if (daysBetween < 4) {
+            return null
+        }
+        val daysUntilDraw = Math.ceilDiv(daysBetween, 2)
+        val drawingDate = if (daysUntilDraw < 7) {
+            earliestCreatedDate.plusDays(daysUntilDraw)
+        } else {
+            earliestCreatedDate.plusDays(7)
+        }
+        return drawingDate
     }
 
     fun getPendingBookingsBetweenDates(startDate: LocalDate, endDate: LocalDate, ): List<PendingBookingDTO> {
