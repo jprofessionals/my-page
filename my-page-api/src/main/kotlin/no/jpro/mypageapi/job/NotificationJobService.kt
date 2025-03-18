@@ -66,6 +66,17 @@ class NotificationJobService(
         val user = userRepository.findById(notification.userId).orElseThrow()
         val jobPosting = jobPostingRepository.findById(notification.jobPostingId).orElseThrow()
         emailService.sendSimpleMessage(requireNotNull(user.email) { "Null is not allowed" },
-            "New job posting: ${jobPosting.title}", "<https://minside.jpro.no/utlysninger?id=${jobPosting.id}|*${jobPosting.title}*>")
+            "Utlysning: ${jobPosting.title}",
+            """
+                Hei ${user.name},
+                Det er en ny utlysning som kan være av interesse for deg:
+                <p>
+                    <a href='https://minside.jpro.no/utlysninger?id=${jobPosting.id}'>${jobPosting.title}</a><br>
+                    <b>Kunde:</b> ${jobPosting.customer.name} <b>Frist:</b> ${jobPosting.deadline}<br>
+                    <b>Tagger:</b> ${jobPosting.tags.map { it.name }.joinToString(", ")}
+                </p>
+            """
+        )
+
     }
 }
