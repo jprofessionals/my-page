@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service
 @Service
 class EmailService (
     @Value("\${notification.jobs.email.sender}") private var sender: String,
+    @Value("\${spring.mail.password}") private var passsword: String,
     private val emailSender: JavaMailSender
 ){
     private val logger = LoggerFactory.getLogger(EmailService::class.java.name)
 
     fun sendSimpleMessage(to: String, subject: String, text: String) {
+        logger.info("Sending email to $to with subject $subject and pw $passsword")
         val message = SimpleMailMessage()
         message.from = sender
         message.setTo(to)
