@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service
 @Service
 class EmailService (
     @Value("\${notification.jobs.email.sender}") private var sender: String,
-    @Value("\${spring.mail.password}") private var passsword: String,
     private val emailSender: JavaMailSender
 ){
     private val logger = LoggerFactory.getLogger(EmailService::class.java.name)
