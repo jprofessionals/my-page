@@ -52,7 +52,9 @@ function Kalkulator() {
 
   useEffect(() => {
     setLoading(true)
-    setGarantilonn(parseInt(getSetting(settings, 'CALC_GRUNNBELOP') ?? '0')*5/12)
+    setGarantilonn(
+      (parseInt(getSetting(settings, 'CALC_GRUNNBELOP') ?? '0') * 5) / 12,
+    )
     setGrunnbelop(parseInt(getSetting(settings, 'CALC_GRUNNBELOP') ?? '0'))
     setTimeprisKompetanse(
       parseInt(getSetting(settings, 'CALC_TIMEPRIS_KOMPETANSE') ?? '0'),
