@@ -21,7 +21,7 @@ class EmailService (
         helper.setFrom(sender)
         helper.setTo(to)
         helper.setSubject(subject)
-        helper.setText(text)
+        helper.setText(text, true)
         logger.info("Sending message $message")
 
         emailSender.send(message)
