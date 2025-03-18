@@ -76,13 +76,14 @@ function Hyttebooking() {
           etter trekning vil det muligens være dager hvor hytte-enhetene er
           ledig. Da kan man legge inn ønske om å få en enhet ved å trykke på en
           dato for en ledig enhet og ønsket start og slutt for periode. Merk at
-          en periode ikke kan være 7 mer enn dager. Om det er mer enn 7 dager
-          til ønsket periode starter vil det gjøres en automatisk trekning
-          mellom de som har meldt interesse etter at 7 dager har gått fra det
-          første ønsket ble meldt. Er det mindre en 7 dager til ønsket periode
-          starter må trekningen gjøres manuelt, si ifra til Roger for få
-          gjennomført en trekning. Når en trekning er gjennomført postes det en
-          melding til{' '}
+          en periode ikke kan være 7 mer enn dager. Om det er minst 4 dager til
+          ønsket periode starter vil det gjøres en automatisk trekning mellom de
+          som har meldt interesse. Trekning finner sted midt mellom oppholdets
+          startdato, rundet oppover, og datoen det første ønsket ble meldt, men
+          aldri mer enn 7 dager etter det første ønsket ble meldt. Er det mindre
+          enn 4 dager til ønsket periode starter må trekningen gjøres manuelt,
+          si ifra til Roger for få gjennomført en trekning. Når en trekning er
+          gjennomført postes det en melding til{' '}
           <a
             href="https://jpro.slack.com/archives/C83007C8L"
             className="text-warning"
