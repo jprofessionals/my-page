@@ -5,6 +5,7 @@ import no.jpro.mypageapi.entity.NotificationTask
 import no.jpro.mypageapi.entity.Status
 import no.jpro.mypageapi.repository.*
 import no.jpro.mypageapi.service.email.EmailService
+import no.jpro.mypageapi.utils.JobPostingUtils.getDeadlineText
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -72,7 +73,7 @@ class NotificationJobService(
                 Det er en ny utlysning som kan være av interesse for deg:
                 <p>
                     <a href='https://minside.jpro.no/utlysninger?id=${jobPosting.id}'>${jobPosting.title}</a><br>
-                    <b>Kunde:</b> ${jobPosting.customer.name} <b>Frist:</b> ${jobPosting.deadline}<br>
+                    <b>Kunde:</b> ${jobPosting.customer.name} <b>Frist:</b> ${getDeadlineText(jobPosting)}<br>
                     <b>Tagger:</b> ${jobPosting.tags.map { it.name }.joinToString(", ")}
                 </p>
             """
