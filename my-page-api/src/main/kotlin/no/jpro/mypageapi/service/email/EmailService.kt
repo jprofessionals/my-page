@@ -16,7 +16,6 @@ class EmailService (
     private val logger = LoggerFactory.getLogger(EmailService::class.java.name)
 
     fun sendSimpleMessage(to: String, subject: String, text: String) {
-        logger.info("Sending email to $to with subject $subject and pw $passsword")
         val message = SimpleMailMessage()
         message.from = sender
         message.setTo(to)
