@@ -73,7 +73,8 @@ class NotificationJobService(
                 Det er en ny utlysning som kan være av interesse for deg:
                 <p>
                     <a href='https://minside.jpro.no/utlysninger?id=${jobPosting.id}'>${jobPosting.title}</a><br>
-                    <b>Kunde:</b> ${jobPosting.customer.name} <b>Frist:</b> ${getDeadlineText(jobPosting)}<br>
+                    <b>Kunde:</b> ${jobPosting.customer.name} <br> 
+                    <b>Frist:</b> ${getDeadlineText(jobPosting)}<br>
                     <b>Tagger:</b> ${jobPosting.tags.map { it.name }.joinToString(", ")}
                 </p>
             """
