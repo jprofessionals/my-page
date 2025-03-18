@@ -8,12 +8,10 @@ import com.slack.api.model.block.composition.BlockCompositions.plainText
 import no.jpro.mypageapi.entity.JobPosting
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.provider.SecretProvider
+import no.jpro.mypageapi.utils.JobPostingUtils.getDeadlineText
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @Service
 @Profile("gcp")
@@ -131,22 +129,6 @@ class SlackServiceImpl(
         return null
     }
 
-    private fun getDeadlineText(
-        jobPosting: JobPosting
-    ): String {
-        if (jobPosting.urgent) {
-            return "ASAP"
-        } else {
-            return jobPosting.deadline
-                ?.atZoneSameInstant(ZoneId.of("Europe/Oslo"))
-                ?.format(
-                    DateTimeFormatter.ofPattern(
-                        "dd. MMMM yyyy HH:mm",
-                        Locale.forLanguageTag("no-NO")
-                    )
-                ) ?: "Ingen frist"
-        }
-    }
 
 }
 
