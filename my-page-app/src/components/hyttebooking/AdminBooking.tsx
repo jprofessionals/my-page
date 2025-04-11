@@ -218,7 +218,7 @@ export default function AdminBooking() {
                       value={bookingOwnerName}
                     >
                       <option value="">Velg ansatt</option>
-                      {allUsersNames.map((name) => (
+                      {allUsersNames.sort().map((name) => (
                         <option key={name} value={name}>
                           {name}
                         </option>
