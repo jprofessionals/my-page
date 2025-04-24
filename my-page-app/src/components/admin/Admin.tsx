@@ -458,7 +458,7 @@ function Admin() {
               className="select select-bordered"
             >
               <option value="">Velg bruker…</option>
-              {users.filter(u => !u.admin).map(u => (
+              {users.filter(u => !u.admin).sort((a, b) => compareUsers(a, b)).map(u => (
                 <option key={u.email} value={u.email}>
                   {u.name ?? u.email}
                 </option>

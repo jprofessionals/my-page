@@ -60,7 +60,7 @@ class UserService(
     }
 
     fun updateAdmin(email: String, isAdmin: Boolean): User {
-        val user = userRepository.findUserByEmailAndSubIsNull(email)
+        val user = userRepository.findUserByEmail(email)
         return userRepository.save(user!!.copy(admin = isAdmin))
     }
 
