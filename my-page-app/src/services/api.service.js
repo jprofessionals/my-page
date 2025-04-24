@@ -271,6 +271,12 @@ const getImage = async (fileName) => {
   return response.data
 }
 
+const toggleAdmin = (email, isAdmin) => {
+  return axios.patch(API_URL + 'user', { email: email, isAdmin: isAdmin }, {
+    headers: authHeader(),
+  })
+}
+
 const ApiService = {
   getUsers,
   getUser,
@@ -301,6 +307,7 @@ const ApiService = {
   patchPendingBooking,
   adminPatchBooking,
   getImage,
+  toggleAdmin,
 }
 
 export default ApiService

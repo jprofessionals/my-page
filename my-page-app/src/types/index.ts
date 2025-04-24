@@ -156,6 +156,11 @@ export type Settings = {
   settingValue: string
 }
 
+export type ToggleAdmin = {
+  email: string
+  isAdmin: boolean
+}
+
 /* hyttebooking */
 export type CabinColorClasses = { [key: string]: string }
 export enum CabinType {

@@ -5,7 +5,7 @@ import {
   Budget,
   BudgetSummary,
   BudgetType,
-  BudgetYearSummary,
+  BudgetYearSummary, ToggleAdmin,
   User,
 } from '@/types'
 import BudgetList from '@/components/budget/BudgetList'
@@ -37,6 +37,7 @@ function Admin() {
   const [activeBudget, setActiveBudget] = useState<string | null>(null)
   const [budgetSummary, setBudgetsummary] = useState<BudgetSummary[]>([])
   const { user, settings } = useAuthContext()
+  const [newAdminUser, setNewAdminUser] = useState<ToggleAdmin>()
 
   useEffect(() => {
     refreshTable()
@@ -197,6 +198,29 @@ function Admin() {
   }
 
   if (!user?.admin) return null
+
+  async function handleMakeAdmin() {
+      if (!newAdminUser) return;
+      try {
+        await apiService.toggleAdmin(newAdminUser.email, newAdminUser.isAdmin);
+        toast.success("Admin oppdatert");
+        refreshTable();
+        setNewAdminUser(undefined);
+      } catch {
+        toast.error("Feil ved oppdatering av admin-status");
+      }
+  }
+
+  // Handler to remove admin status
+  async function handleRemoveAdmin(email: string) {
+    try {
+      await apiService.toggleAdmin(email, false);
+      toast.success("Admin-status fjernet");
+      refreshTable();
+    } catch {
+      toast.error("Feil ved fjerning av admin-status");
+    }
+  }
 
   if (isLoading) {
     return (
@@ -411,6 +435,43 @@ function Admin() {
                     ))}
             </tbody>
           </table>
+        </div>
+        <div className="overflow-auto p-4">
+          <h2 className="prose prose-xl">Admin brukere</h2>
+          <ul className="mt-4 space-y-2">
+            {users.filter(user => user.admin).map(userRow => (
+              <li key={userRow.email} className="flex items-center">
+                <span>{userRow.name ?? userRow.email}</span>
+                <button
+                  onClick={() => handleRemoveAdmin(userRow.email)}
+                  className="btn btn-secondary btn-sm ml-4"
+                >
+                  Fjern admin
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-4 flex items-center space-x-2">
+            <select
+              value={newAdminUser?.email || ''}
+              onChange={(e) => setNewAdminUser({ email: e.target.value, isAdmin: true })}
+              className="select select-bordered"
+            >
+              <option value="">Velg bruker…</option>
+              {users.filter(u => !u.admin).map(u => (
+                <option key={u.email} value={u.email}>
+                  {u.name ?? u.email}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleMakeAdmin}
+              disabled={!newAdminUser}
+              className="btn btn-primary"
+            >
+              Gjør admin
+            </button>
+          </div>
         </div>
       </>
     )

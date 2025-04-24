@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.NewEmployeeDTO
+import no.jpro.mypageapi.dto.ToggleAdminDTO
 import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.service.UserService
 import no.jpro.mypageapi.utils.mapper.UserMapper
@@ -53,6 +54,25 @@ class UserController(
             newEmployeeDTO.budgetStartDate
         )
 
+        return userMapper.toUserDTO(user)
+    }
+
+    @PatchMapping()
+    @Transactional
+    @RequiresAdmin
+    @Operation(summary = "Toggle admin")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(
+        responseCode = "200",
+        description = "Admin updated",
+        content = [Content(schema = Schema(implementation = UserDTO::class))]
+    )
+    fun toggleAdmin(
+        token: JwtAuthenticationToken,
+        @Valid @RequestBody toggleAdminDTO: ToggleAdminDTO
+    ): UserDTO {
+        logger.info("Toggle admin for ${toggleAdminDTO.email}")
+        val user = userService.updateAdmin(toggleAdminDTO.email, toggleAdminDTO.isAdmin)
         return userMapper.toUserDTO(user)
     }
 }

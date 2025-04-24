@@ -59,6 +59,11 @@ class UserService(
         return userRepository.save(userMapper.toUser(jwt))
     }
 
+    fun updateAdmin(email: String, isAdmin: Boolean): User {
+        val user = userRepository.findUserByEmailAndSubIsNull(email)
+        return userRepository.save(user!!.copy(admin = isAdmin))
+    }
+
     fun findUserByEmailAndConnect(jwt: Jwt): User? {
         val user = userRepository.findUserByEmailAndSubIsNull(jwt.getEmail()) ?: return null
         return userRepository.save(
