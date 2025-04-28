@@ -105,7 +105,7 @@ function Admin() {
   const budgetBalance = (budget: Budget) => {
     if (budget) {
       return budget.balance.toLocaleString('no-NO', {
-        maximumFractionDigits: 2,
+        maximumFractionDigits: 0,
         style: 'currency',
         currency: 'NOK',
       })
@@ -118,13 +118,13 @@ function Admin() {
     if (budget) {
       return (
         budget.sum.toLocaleString('no-NO', {
-          maximumFractionDigits: 2,
+          maximumFractionDigits: 0,
           style: 'currency',
           currency: 'NOK',
         }) +
         ' (' +
         budget.balance.toLocaleString('no-NO', {
-          maximumFractionDigits: 2,
+          maximumFractionDigits: 0,
           style: 'currency',
           currency: 'NOK',
         }) +
@@ -138,7 +138,7 @@ function Admin() {
   const budgetBalanceHoursCurrentYear = (budget: Budget) => {
     if (budget) {
       return (
-        budget.sumHoursCurrentYear +
+        Math.round(budget.sumHoursCurrentYear) +
         (budget.sumHoursCurrentYear === 1 ? ' time' : ' timer')
       )
     } else {
@@ -150,7 +150,7 @@ function Admin() {
     budget: BudgetYearSummary,
   ) => {
     if (budget) {
-      return budget.hours + (budget.hours === 1 ? ' time' : ' timer')
+      return Math.round(budget.hours) + (budget.hours === 1 ? ' time' : ' timer')
     } else {
       return '-'
     }
@@ -235,8 +235,8 @@ function Admin() {
     return (
       <>
         <div className="overflow-auto p-4">
-          <h2 className="prose prose-xl">Våre ansatte</h2>
-
+          <h2 className="prose prose-xl">Budsjetter</h2>
+          <div>Viser budsjetter og forbruk for alle ansatte. <b>Kompetanse</b> og <b>Laptop & mobil</b> viser hvor mye ansatte har igjen på respektive budsjett, <b>Kompetanse(timer)</b> viser hvor mye som er forbrukt inneværende år mens <b>Hjemmekontor</b> og <b>Bruttotrekk</b> viser hvor mye som er brukt.</div>
           {/* Add text input field */}
           <div className="flex gap-16">
             <div className="mb-4 form-control">
@@ -268,7 +268,6 @@ function Admin() {
 
             <NewUserModal />
           </div>
-
           <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
             <thead>
               <tr className="text-base text-slate-900">
@@ -358,6 +357,7 @@ function Admin() {
         </div>
         <div className="overflow-auto p-4">
           <h2 className="prose prose-xl">Oppsummering</h2>
+          <span>Viser totalt forbruk per år og hvor mye som er utestående (for <b>Kompetanse</b> & <b>Laptop & mobil</b>). NB! Kompetansebudsjett nulles hvert år, mens Laptop & mobil fortsetter å akumulere.</span>
           <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
             <thead>
               <tr className="text-base text-slate-900">
@@ -469,7 +469,7 @@ function Admin() {
               disabled={!newAdminUser}
               className="btn btn-primary"
             >
-              Gjør admin
+              Gjør til admin
             </button>
           </div>
         </div>
