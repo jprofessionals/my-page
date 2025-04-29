@@ -286,6 +286,7 @@ function Admin() {
             <tbody>
               {users
                 .filter((user) =>
+                  (user.budgets != undefined && user.budgets?.length > 0) &&
                   (user.name
                     ? user.name.toLowerCase()
                     : user.email.toLowerCase()

@@ -89,7 +89,7 @@ export default function NewUserModal() {
       <Modal.DialogContent className="bg-white">
         <Modal.DialogHeader>
           <Modal.DialogTitle>Legg til ny ansatt</Modal.DialogTitle>
-          <Modal.DialogDescription>Oppretter budsjetter for nyansatt. Fungerer både om det gjøres før ansatt har logget inn første gang og etter. Ansattnummer hentes fra Tripletex.</Modal.DialogDescription>
+          <Modal.DialogDescription>Oppretter budsjetter for nyansatt. Fungerer både om det gjøres før ansatt har logget inn første gang og etter. Ansattnummer hentes fra Tripletex. Oppstart for budsjetter er vanligvis samme som stardato for den ansatte.</Modal.DialogDescription>
         </Modal.DialogHeader>
         {error && <Alert variant="error">{error}</Alert>}
         <NewEmployeeForm inputData={inputData} setInputData={setInputData} />
