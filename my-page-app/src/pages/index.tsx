@@ -14,7 +14,7 @@ import {
   Accordions,
   AccordionTrigger,
 } from '@/components/ui/bookingAccordion'
-import { faHotel, IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import { faHotel, faTicket, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import cn from '@/utils/cn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { get } from 'radash'
@@ -37,6 +37,7 @@ export default function HomePage() {
   const [activeBudget, setActiveBudget] = useState<string | null>(null)
 
   const [bookings, setBookings] = useState<Booking[]>([])
+  const [pendingBookings, setPendingBookings] = useState<Booking[]>([])
   const [bookingLoadingStatus, setBookingLoadingStatus] =
     useState<BookingLoadingStatus>('init')
 
@@ -44,8 +45,10 @@ export default function HomePage() {
     setBookingLoadingStatus('loading')
 
     try {
+      const loadedPendingBookings = await ApiService.getPendingBookingsForUser()
       const loadedBookings = await ApiService.getBookingsForUser()
       setBookingLoadingStatus('completed')
+      setPendingBookings(loadedPendingBookings)
       setBookings(loadedBookings)
     } catch {
       setBookingLoadingStatus('failed')
@@ -99,9 +102,15 @@ export default function HomePage() {
       textColor: 'text-white',
       icon: faHotel,
     },
+    pendingbookings: {
+      bgColor: 'bg-blue-300',
+      textColor: 'text-white',
+      icon: faTicket,
+    },
   }
 
   const bookingConfig = get(bookingConfigs, 'default', bookingConfigs.default)
+  const pendingBookingConfig = get(bookingConfigs, 'pendingbookings', bookingConfigs.pendingbookings)
 
   return (
     <>
@@ -193,9 +202,85 @@ export default function HomePage() {
                 </div>
               ) : (
                 <p className="ml-4 prose">
-                  Du har ingen hyttereservasjoner. Se oversikt over ledige dager
-                  og reserver i kalenderen på firmahyttesiden.
+                  Du har ingen hyttereservasjoner. Se oversikt over ledige dager og reserver i kalenderen på firmahyttesiden.
                 </p>
+              )}
+
+              {pendingBookings.length > 0 ? (
+                <div className="px-4">
+                  <Accordions type="multiple" className="mb-3 w-full">
+                    <AccordionItem value="pendingbookings" className="border-none">
+                      <AccordionTrigger
+                        className={cn(
+                          'text-sm rounded-lg items-center px-3 gap-2 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none ',
+                          pendingBookingConfig?.textColor,
+                          pendingBookingConfig?.bgColor,
+                        )}
+                      >
+                        <div className="flex flex-1 gap-4 justify-between">
+                          <span
+                            title="Hyttebooking"
+                            className="flex flex-wrap gap-2 justify-center uppercase"
+                          >
+                            {pendingBookingConfig?.icon ? (
+                              <FontAwesomeIcon
+                                icon={pendingBookingConfig?.icon}
+                                size="xl"
+                                className="w-8"
+                              />
+                            ) : null}
+                            Ønsker
+                          </span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="p-2 rounded-b-lg data-open:border-2">
+                        {pendingBookings
+                          .sort((a, b) => {
+                            const startDateComparison =
+                              Date.parse(a.startDate) - Date.parse(b.startDate)
+                            if (startDateComparison !== 0) {
+                              return startDateComparison
+                            }
+                            return Date.parse(a.endDate) - Date.parse(b.endDate)
+                          })
+                          .map((booking, index) => {
+                            const startDate = new Date(booking.startDate)
+                            const endDate = new Date(booking.endDate)
+                            const formattedStartDate = `${startDate.getDate()}.${
+                              startDate.getMonth() + 1
+                            }.${startDate.getFullYear()}`
+                            const formattedEndDate = `${endDate.getDate()}.${
+                              endDate.getMonth() + 1
+                            }.${endDate.getFullYear()}`
+
+                            return (
+                              <div key={booking.id} className="ml-10 mt-3 ">
+                                <p>
+                                  Du har lagt inn ønske om{' '}
+                                  <span
+                                    className={
+                                      cabinTextColorClasses[
+                                        booking.apartment.cabin_name
+                                        ]
+                                    }
+                                  >
+                                    {booking.apartment.cabin_name}
+                                  </span>{' '}
+                                  fra {formattedStartDate} til{' '}
+                                  {formattedEndDate} - Se kalenderen på firmahyttesiden for informasjon om trekning
+                                </p>
+                                {index !== bookings.length - 1 && (
+                                  <hr className="mt-3" />
+                                )}
+                              </div>
+                            )
+                          })}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordions>
+                </div>
+              ) : (
+                <></>
               )}
             </>
           ) : (
