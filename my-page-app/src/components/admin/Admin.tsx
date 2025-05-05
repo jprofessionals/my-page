@@ -40,6 +40,7 @@ function Admin() {
   const { user, settings } = useAuthContext()
   const [newAdminUser, setNewAdminUser] = useState<ToggleAdmin>()
   const [deactivateUser, setDeactivateUser] = useState<ToggleActive>()
+  const [activateUser, setActivateUser] = useState<ToggleActive>()
 
   useEffect(() => {
     refreshTable()
@@ -235,13 +236,15 @@ function Admin() {
     }
   }
 
-  async function handleActivateUser(email: string) {
+  async function handleActivateUser() {
+    if (!activateUser) return;
     try {
-      await apiService.toggleActive(email, true);
+      await apiService.toggleActive(activateUser.email, activateUser.isActive);
       toast.success("Bruker aktivert");
       refreshTable();
+      setNewAdminUser(undefined);
     } catch {
-      toast.error("Feil ved aktivering av bruker");
+      toast.error("Feil ved oppdatering av bruker");
     }
   }
 
@@ -512,26 +515,35 @@ function Admin() {
 
         <div className="overflow-auto p-4">
           <h2 className="prose prose-xl">Deaktiverte brukere</h2>
-          <ul className="mt-4 space-y-2">
-            {disabledUsers.map(userRow => (
-              <li key={userRow.email} className="flex items-center">
-                <span>{userRow.name ?? userRow.email}</span>
-                <button
-                  onClick={() => handleActivateUser(userRow.email)}
-                  className="btn btn-secondary btn-sm ml-4"
-                >
-                  Aktiver
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-4 flex items-center space-x-2">
+            <select
+              value={activateUser?.email || ''}
+              onChange={(e) => setActivateUser({ email: e.target.value, isActive: true })}
+              className="select select-bordered"
+            >
+              <option value="">Velg bruker du vil aktivere</option>
+              {disabledUsers.sort((a, b) => compareUsers(a, b)).map(u => (
+                <option key={u.email} value={u.email}>
+                  {u.name ?? u.email}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleActivateUser}
+              disabled={!activateUser}
+              className="btn btn-primary"
+            >
+              Aktiver
+            </button>
+          </div>
+
           <div className="mt-4 flex items-center space-x-2">
             <select
               value={deactivateUser?.email || ''}
               onChange={(e) => setDeactivateUser({ email: e.target.value, isActive: false })}
               className="select select-bordered"
             >
-              <option value="">Velg bruker…</option>
+              <option value="">Velg bruker du vil deaktivere</option>
               {users.filter(u => !u.admin).sort((a, b) => compareUsers(a, b)).map(u => (
                 <option key={u.email} value={u.email}>
                   {u.name ?? u.email}
