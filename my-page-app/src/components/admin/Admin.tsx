@@ -5,7 +5,7 @@ import {
   Budget,
   BudgetSummary,
   BudgetType,
-  BudgetYearSummary, ToggleAdmin,
+  BudgetYearSummary, ToggleActive, ToggleAdmin,
   User,
 } from '@/types'
 import BudgetList from '@/components/budget/BudgetList'
@@ -30,6 +30,7 @@ function compareUsers(a: User, b: User): number {
 
 function Admin() {
   const [users, setUsers] = useState<User[]>([])
+  const [disabledUsers, setDisabledUsers] = useState<User[]>([])
   const [budgetTypes, setBudgetTypes] = useState<BudgetType[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [expandedUser, setExpandedUser] = useState<string>('')
@@ -38,6 +39,7 @@ function Admin() {
   const [budgetSummary, setBudgetsummary] = useState<BudgetSummary[]>([])
   const { user, settings } = useAuthContext()
   const [newAdminUser, setNewAdminUser] = useState<ToggleAdmin>()
+  const [deactivateUser, setDeactivateUser] = useState<ToggleActive>()
 
   useEffect(() => {
     refreshTable()
@@ -174,11 +176,21 @@ function Admin() {
 
   const refreshTable = () => {
     setIsLoading(true)
+
     apiService
       .getUsers()
       .then((responseSummary) => {
         setUsers(responseSummary.data)
         extractListOfBudgets(responseSummary.data)
+
+        apiService
+          .getDisabledUsers()
+          .then((disabledUsers) => {
+            setDisabledUsers(disabledUsers.data)
+          })
+          .catch(() => {
+            toast.error('Klarte ikke laste deaktiverte brukere, prøv igjen senere')
+          })
 
         apiService
           .getBudgetSummary()
@@ -209,6 +221,28 @@ function Admin() {
       } catch {
         toast.error("Feil ved oppdatering av admin-status");
       }
+  }
+
+  async function handleDeactivateUser() {
+    if (!deactivateUser) return;
+    try {
+      await apiService.toggleActive(deactivateUser.email, deactivateUser.isActive);
+      toast.success("Bruker deaktivert");
+      refreshTable();
+      setNewAdminUser(undefined);
+    } catch {
+      toast.error("Feil ved oppdatering av bruker");
+    }
+  }
+
+  async function handleActivateUser(email: string) {
+    try {
+      await apiService.toggleActive(email, true);
+      toast.success("Bruker aktivert");
+      refreshTable();
+    } catch {
+      toast.error("Feil ved aktivering av bruker");
+    }
   }
 
   // Handler to remove admin status
@@ -474,6 +508,46 @@ function Admin() {
             </button>
           </div>
         </div>
+
+
+        <div className="overflow-auto p-4">
+          <h2 className="prose prose-xl">Deaktiverte brukere</h2>
+          <ul className="mt-4 space-y-2">
+            {disabledUsers.map(userRow => (
+              <li key={userRow.email} className="flex items-center">
+                <span>{userRow.name ?? userRow.email}</span>
+                <button
+                  onClick={() => handleActivateUser(userRow.email)}
+                  className="btn btn-secondary btn-sm ml-4"
+                >
+                  Aktiver
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-4 flex items-center space-x-2">
+            <select
+              value={deactivateUser?.email || ''}
+              onChange={(e) => setDeactivateUser({ email: e.target.value, isActive: false })}
+              className="select select-bordered"
+            >
+              <option value="">Velg bruker…</option>
+              {users.filter(u => !u.admin).sort((a, b) => compareUsers(a, b)).map(u => (
+                <option key={u.email} value={u.email}>
+                  {u.name ?? u.email}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleDeactivateUser}
+              disabled={!deactivateUser}
+              className="btn btn-primary"
+            >
+              Deaktiver
+            </button>
+          </div>
+        </div>
+
       </>
     )
   }
