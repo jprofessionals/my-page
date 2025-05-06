@@ -40,6 +40,16 @@ class NotificationJob(private val notificationJobService: NotificationJobService
     }
 
     private fun runNotificationSending() {
-        notificationJobService.sendNotifications()
+        notificationJobService.fetchAvailableNotifications().forEach {
+            notificationJobService.setStatus(it, Status.IN_PROGRESS)
+
+            try {
+                notificationJobService.sendNotification(it)
+                notificationJobService.setStatus(it, Status.SENT)
+            } catch (e: Exception) {
+                logger.error("Failed to send notification: $it", e)
+                notificationJobService.setStatus(it, Status.FAILED)
+            }
+        }
     }
 }

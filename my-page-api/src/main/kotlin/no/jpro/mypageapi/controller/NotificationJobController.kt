@@ -33,4 +33,15 @@ class NotificationJobController(
         return ResponseEntity.ok().build()
     }
 
+    @GetMapping("send-notifications")
+    @Transactional
+    @Operation(summary = "Send notifications job")
+    @ApiResponse(
+        responseCode = "200"
+    )
+    fun triggerNotificationSendingJob(): ResponseEntity<Unit> {
+        notificationJob.triggerNotificationSendingJob()
+        return ResponseEntity.ok().build()
+    }
+
 }

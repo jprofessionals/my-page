@@ -49,10 +49,10 @@ class EntityFactory(
         }
     }
 
-    fun createNotification(userId: Long, jobPosting: JobPosting) {
+    fun createNotification(userId: Long?, jobPosting: JobPosting) {
         val notificationTask = notificationTaskRepository.findByJobPostingId(jobPosting.id)
         notificationRepository.save(
-            Notification(userId = userId, jobPostingId = jobPosting.id, notificationTaskId = notificationTask.id)
+            Notification(userId = requireNotNull(userId), jobPostingId = jobPosting.id, notificationTaskId = notificationTask.id)
         )
     }
 }
