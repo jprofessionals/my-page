@@ -322,7 +322,7 @@ export default function HomePage() {
               </a>
             </p>
             <p>
-              Kontakt Roger for å få rettigheter til å dytte kode til repoet.
+              Kontakt Runar eller Steinar for å få rettigheter til å dytte kode til repoet.
             </p>
           </div>
         </div>

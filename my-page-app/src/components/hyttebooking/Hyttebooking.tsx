@@ -82,7 +82,7 @@ function Hyttebooking() {
           startdato, rundet oppover, og datoen det første ønsket ble meldt, men
           aldri mer enn 7 dager etter det første ønsket ble meldt. Er det mindre
           enn 4 dager til ønsket periode starter må trekningen gjøres manuelt,
-          si ifra til Roger for få gjennomført en trekning. Når en trekning er
+          si ifra til Amalie for få gjennomført en trekning. Når en trekning er
           gjennomført postes det en melding til{' '}
           <a
             href="https://jpro.slack.com/archives/C83007C8L"
