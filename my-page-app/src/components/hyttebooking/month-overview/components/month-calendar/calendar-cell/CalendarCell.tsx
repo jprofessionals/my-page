@@ -90,7 +90,11 @@ const CalendarCell = ({
   const isToday = isTodayFn(day.date)
   const isPast = isBefore(day.date, today)
   const showAddButton =
-    !isPast && isBeforeCutoffDate && !hasPeriodStart && !hasBooking && (isWednesday || isToday)
+    !isPast &&
+    isBeforeCutoffDate &&
+    !hasPeriodStart &&
+    !hasBooking &&
+    (isWednesday || isToday)
 
   const handleNewBooking = () => {
     const startDate = format(day.date, dateFormat)

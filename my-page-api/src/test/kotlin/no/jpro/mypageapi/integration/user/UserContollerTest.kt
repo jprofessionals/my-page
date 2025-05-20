@@ -1,7 +1,8 @@
-package no.jpro.mypageapi.contoller
+package no.jpro.mypageapi.integration.user
 
 
 import no.jpro.mypageapi.dto.UserDTO
+import no.jpro.mypageapi.integration.IntegrationTestBase
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus

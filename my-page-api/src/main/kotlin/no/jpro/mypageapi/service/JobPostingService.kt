@@ -2,12 +2,15 @@ package no.jpro.mypageapi.service
 
 import jakarta.persistence.EntityNotFoundException
 import no.jpro.mypageapi.entity.Customer
+import no.jpro.mypageapi.entity.NotificationTask
 import no.jpro.mypageapi.entity.Tag
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.repository.CustomerRepository
 import no.jpro.mypageapi.repository.JobPostingRepository
+import no.jpro.mypageapi.repository.NotificationTaskRepository
 import no.jpro.mypageapi.repository.TagRepository
 import no.jpro.mypageapi.service.slack.SlackService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.OffsetDateTime
@@ -17,7 +20,9 @@ class JobPostingService(
     private val customerRepository: CustomerRepository,
     private val tagRepository: TagRepository,
     private val jobPostingRepository: JobPostingRepository,
+    private val notificationTaskRepository: NotificationTaskRepository,
     private val slackService: SlackService,
+    @Value("\${slack.utlysning.channel}") private var channel: String,
 ) {
 
     @Transactional
@@ -53,10 +58,11 @@ class JobPostingService(
         )
 
         val newJobPosting = jobPostingRepository.save(jobPostingToPersist)
+        notificationTaskRepository.save(NotificationTask(jobPostingId = newJobPosting.id))
 
         if (notify) {
             slackService.postJobPosting(
-                "utlysninger",
+                channel,
                 newJobPosting,
             )
         }
@@ -70,7 +76,7 @@ class JobPostingService(
         jobPostingRepository.deleteById(id)
     }
 
-    fun getJobPostingTags(): List<no.jpro.mypageapi.entity.Tag> {
+    fun getJobPostingTags(): List<Tag> {
         return tagRepository.findAll()
     }
 

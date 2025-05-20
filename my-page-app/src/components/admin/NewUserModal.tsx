@@ -83,12 +83,13 @@ export default function NewUserModal() {
   return (
     <Modal.Dialog>
       <Modal.DialogTrigger asChild>
-        <Button variant="outline">Legg til ny ansatt</Button>
+        <Button variant="outline" title="Oppretter budsjetter for ny ansatt">Legg til ny ansatt</Button>
       </Modal.DialogTrigger>
 
       <Modal.DialogContent className="bg-white">
         <Modal.DialogHeader>
           <Modal.DialogTitle>Legg til ny ansatt</Modal.DialogTitle>
+          <Modal.DialogDescription>Oppretter budsjetter for nyansatt. Fungerer både om det gjøres før ansatt har logget inn første gang og etter. Ansattnummer hentes fra Tripletex. Oppstart for budsjetter er vanligvis samme som stardato for den ansatte.</Modal.DialogDescription>
         </Modal.DialogHeader>
         {error && <Alert variant="error">{error}</Alert>}
         <NewEmployeeForm inputData={inputData} setInputData={setInputData} />

@@ -114,14 +114,7 @@ export type PendingBookingTrain = {
   apartment: Apartment
   startDate: string
   endDate: string
-  drawingPeriodList: DrawingPeriod[]
-}
-
-export type DrawingPeriod = {
-  id: string
-  startDate: string
-  endDate: string
-  drawingDate: string
+  drawingDate?: string
   pendingBookings: Booking[]
 }
 
@@ -161,6 +154,16 @@ export type Settings = {
   priority: number
   description: string
   settingValue: string
+}
+
+export type ToggleAdmin = {
+  email: string
+  isAdmin: boolean
+}
+
+export type ToggleActive = {
+  email: string
+  isActive: boolean
 }
 
 /* hyttebooking */

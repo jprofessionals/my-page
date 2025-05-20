@@ -1,7 +1,5 @@
 package no.jpro.mypageapi.service
 
-import jakarta.persistence.EntityManager
-import jakarta.persistence.PersistenceContext
 import no.jpro.mypageapi.dto.CreateBookingDTO
 import no.jpro.mypageapi.dto.PendingBookingDTO
 import no.jpro.mypageapi.entity.Booking
@@ -16,11 +14,11 @@ import org.springframework.integration.support.locks.LockRegistry
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.random.Random
 
-private const val LOTTERLY_LOCK_KEY = "BOOKING_LOTTERY"
+private const val LOTTERY_LOCK_KEY = "BOOKING_LOTTERY"
 
 @Service
 class BookingLotteryService(
@@ -30,12 +28,12 @@ class BookingLotteryService(
     private val lockRegistry: LockRegistry,
     private val slackService: SlackService,
     private val pendingBookingRepository: PendingBookingRepository,
+    private val pendingBookingService: PendingBookingService,
     @Lazy private val self: BookingLotteryService? // Lazy self injection for transactional metoder. Spring oppretter ikke transaksjoner hvis en @Transactional annotert metode blir kalt fra samme objekt
 ) {
-    @PersistenceContext
-    private lateinit var entityManager: EntityManager
-
     private val logger = LoggerFactory.getLogger(BookingLotteryService::class.java)
+    private val earliestDrawingTime = LocalTime.of(9, 0)
+    private val latestDrawingTime = LocalTime.of(21, 0)
 
     fun pickWinnerPendingBooking(pendingBookingList: List<PendingBookingDTO>) {
         if (self == null) {
@@ -51,16 +49,16 @@ class BookingLotteryService(
     internal fun runManualBookingLottery(pendingBookingList: List<PendingBookingDTO>): String? {
         val winningBooking: PendingBookingDTO?
 
-        val lock = lockRegistry.obtain(LOTTERLY_LOCK_KEY)
+        val lock = lockRegistry.obtain(LOTTERY_LOCK_KEY)
         if (!lock.tryLock()) {
             throw IllegalStateException("Booking lottery is already running, please wait a moment and try again.")
         }
         try {
-            if (pendingBookingList.size > 1) {
+            if (pendingBookingList.size > 0) {
                 val winner = pendingBookingList.random()
                 val user = winner.employeeName?.let { userRepository.findUserByName(it) }
 
-                winner.apartment?.let { CreateBookingDTO(it.id, winner.startDate, winner.endDate) }
+                winner.apartment?.let { CreateBookingDTO(it.id!!, winner.startDate, winner.endDate) }
                     ?.let {
                         if (user != null) {
                             bookingService.validateCutoffAndCreateBooking(it, user)
@@ -71,7 +69,7 @@ class BookingLotteryService(
                 val winner = pendingBookingList[0]
 
                 val user = winner.employeeName?.let { userRepository.findUserByName(it) }
-                winner.apartment?.let { CreateBookingDTO(it.id, winner.startDate, winner.endDate) }
+                winner.apartment?.let { CreateBookingDTO(it.id!!, winner.startDate, winner.endDate) }
                     ?.let {
                         if (user != null) {
                             bookingService.validateCutoffAndCreateBooking(it, user)
@@ -99,17 +97,22 @@ class BookingLotteryService(
     }
 
     fun runPendingBookingsLottery() {
-        logger.info("Running pending bookings lottery")
         if (self == null) {
             throw IllegalStateException("Lazy self injection failed, cannot run runPendingBookingsLottery")
         }
+        val now = LocalTime.now()
+        if (now.isBefore(earliestDrawingTime) || now.isAfter(latestDrawingTime)) {
+            logger.info("Skipping lottery outside of configured hours $earliestDrawingTime - $latestDrawingTime")
+            return
+        }
+        logger.info("Running pending bookings lottery")
 
-        val lock = lockRegistry.obtain(LOTTERLY_LOCK_KEY)
+        val lock = lockRegistry.obtain(LOTTERY_LOCK_KEY)
         if (!lock.tryLock()) {
             return
         }
         try {
-            val resultMsg = self.runTheLottery(LocalDate.now().minusDays(7))
+            val resultMsg = self.runTheLottery()
             if (resultMsg != null) {
                 slackService.postMessageToChannel(resultMsg)
             }
@@ -120,79 +123,29 @@ class BookingLotteryService(
     }
 
     @Transactional
-    internal fun runTheLottery(selectionDate: LocalDate): String? {
+    internal fun runTheLottery(): String? {
         val vinnere = mutableSetOf<PendingBooking>()
         val tapere = mutableSetOf<PendingBooking>()
 
-        //bruker en for-løkke for å unngå evig løkke selv om det skulle være noe galt med dataene i databasen
-        for (i in 0..100) {
-            val eldstePendingEldreEnn7DagerQuery = entityManager.createQuery(
-                "SELECT p from PendingBooking p where createdDate <= :selectionDate AND startDate >= :today AND NOT EXISTS(\n" +
-                        "    SELECT b FROM Booking b where b.apartment = p.apartment AND ( b.endDate > p.startDate AND b.startDate < p.endDate\n" +
-                        "                               OR p.startDate < b.endDate AND p.endDate > b.startDate))" +
-                        "ORDER BY createdDate ASC LIMIT 1", PendingBooking::class.java
-            )
-            eldstePendingEldreEnn7DagerQuery.setParameter("selectionDate", selectionDate)
-            eldstePendingEldreEnn7DagerQuery.setParameter("today", LocalDate.now())
-            val pendingEldreEnn7Dager = eldstePendingEldreEnn7DagerQuery.resultList
-            if (pendingEldreEnn7Dager.isEmpty()) {
-                return formatResult(vinnere.toSet(), tapere.toSet())
-            }
-            //hent ut alle pending bookings for aktuell hytte som ikke overlapper med en fastsatt booking
-            val pendingSomIkkeOverlapperMedFastsattQuery = entityManager.createQuery(
-                "SELECT p from PendingBooking p where apartment= :apartment and id != :id and startDate >= :today and not exists(\n" +
-                        "    SELECT b FROM Booking b where b.apartment = p.apartment AND ( b.endDate > p.startDate AND b.startDate < p.endDate\n" +
-                        "                               OR p.startDate < b.endDate AND p.endDate > b.startDate))",
-                PendingBooking::class.java
-            )
-            pendingSomIkkeOverlapperMedFastsattQuery.setParameter("today", LocalDate.now())
-            pendingSomIkkeOverlapperMedFastsattQuery.setParameter("id", pendingEldreEnn7Dager[0].id)
-            pendingSomIkkeOverlapperMedFastsattQuery.setParameter("apartment", pendingEldreEnn7Dager[0].apartment)
-            val pendingSomIkkeOverlapperMedFastsatt = pendingSomIkkeOverlapperMedFastsattQuery.resultList
+        pendingBookingService.getPendingBookingTrain()
+            .filter { it.drawingDate != null && !LocalDate.now().isBefore(it.drawingDate) }
+            .forEach { pendingBookingTrain ->
+                val winner = pendingBookingTrain.pendingBookings.random()
+                val winnerBooking = Booking(
+                    startDate = winner.startDate,
+                    endDate = winner.endDate,
+                    apartment = winner.apartment,
+                    employee = winner.employee,
+                )
+                bookingRepository.save(winnerBooking)
 
-            val pendingForTrekk = mutableSetOf<PendingBooking>()
-            pendingForTrekk.add(pendingEldreEnn7Dager[0])
+                vinnere.add(winner)
+                tapere.addAll(pendingBookingTrain.pendingBookings.filter { it != winner })
 
-            val tempList = mutableListOf<PendingBooking>()
-
-            //plukk ut alle bookings som overlapper med en booking som allerede er plukket ut
-            do {
-                tempList.clear()
-                for (pendingBooking in pendingSomIkkeOverlapperMedFastsatt) {
-                    if (pendingForTrekk.any { pb -> pb.startDate <= pendingBooking.endDate && pb.endDate >= pendingBooking.startDate }) {
-                        tempList.add(pendingBooking)
-                    }
-                }
-                pendingForTrekk.addAll(tempList)
-                pendingSomIkkeOverlapperMedFastsatt.removeAll(tempList)
-            } while (tempList.isNotEmpty())
-
-            //trekk en tilfeldig vinner
-            val vinnendePendingBooking = pendingForTrekk.toList()[Random.Default.nextInt(0, pendingForTrekk.size)]
-
-            //legg til vinneren i vinner-listen og tapere i taper-listen
-            vinnere.add(vinnendePendingBooking)
-            for (pendingBooking in pendingForTrekk) {
-                if (pendingBooking != vinnendePendingBooking &&
-                    pendingBooking.startDate <= vinnendePendingBooking.endDate && pendingBooking.endDate >= vinnendePendingBooking.startDate
-                ) {
-                    tapere.add(pendingBooking)
-                }
+                val pendingBookingIds = pendingBookingTrain.pendingBookings.map { pb -> pb.id }
+                pendingBookingRepository.deleteAllById(pendingBookingIds)
             }
 
-            //lag fastsatt booking for vinneren
-            val vinnendeBooking = Booking(
-                startDate = vinnendePendingBooking.startDate,
-                endDate = vinnendePendingBooking.endDate,
-                apartment = vinnendePendingBooking.apartment,
-                employee = vinnendePendingBooking.employee
-            )
-            bookingRepository.save(vinnendeBooking)
-            pendingBookingRepository.delete(vinnendePendingBooking)
-            pendingBookingRepository.deleteAll(tapere.toSet())
-        }
-
-        logger.warn("Pending lottery did not terminate after 100 iterations. Something is probably wrong with the data in the database.")
         return formatResult(vinnere.toSet(), tapere.toSet())
     }
 

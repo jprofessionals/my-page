@@ -9,5 +9,6 @@ data class PendingBookingTrainDTO(
     val apartment: Apartment,
     val startDate: LocalDate,
     val endDate: LocalDate,
-    val drawingPeriodList: List<DrawingPeriodDTO>
+    val drawingDate: LocalDate?,
+    val pendingBookings: List<PendingBookingDTO>,
 )

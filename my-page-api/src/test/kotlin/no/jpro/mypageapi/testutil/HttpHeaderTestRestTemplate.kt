@@ -136,11 +136,9 @@ class HttpHeaderTestRestTemplate(val testRestTemplate: TestRestTemplate) {
         return HttpEntity(request, tempHeaders)
     }
 
-    fun add(
-        headerName: String,
-        valueGenerator: ValueGenerator,
-    ) {
+    fun add(headerName: String, valueGenerator: ValueGenerator): HttpHeaderTestRestTemplate {
         valueGenerators[headerName] = valueGenerator
+        return this
     }
 
     fun addHeaderForSingleHttpEntityCallback(

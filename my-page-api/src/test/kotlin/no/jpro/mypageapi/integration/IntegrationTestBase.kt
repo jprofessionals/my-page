@@ -1,9 +1,10 @@
-package no.jpro.mypageapi.contoller
+package no.jpro.mypageapi.integration
 
 
+import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.UserRepository
+import no.jpro.mypageapi.testutil.EntityFactory
 import no.jpro.mypageapi.testutil.HttpHeaderTestRestTemplate
-import no.jpro.mypageapi.testutil.TestUserService
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import org.junit.jupiter.api.AfterEach
@@ -16,10 +17,10 @@ import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-abstract class IntegrationTestBase (){
+abstract class IntegrationTestBase {
 
     @Autowired
-    private lateinit var userService: TestUserService
+    private lateinit var entityFactory: EntityFactory
 
     @Autowired
     private lateinit var userRepository: UserRepository
@@ -29,18 +30,22 @@ abstract class IntegrationTestBase (){
 
     var mockOAuth2Server = MockOAuth2Server()
 
+    lateinit var user: User
+    lateinit var adminUser: User
+
 
     @BeforeEach
-    fun setup() {
+    fun baseSetup() {
         mockOAuth2Server = MockOAuth2Server()
         mockOAuth2Server.start(8099)
 
         userRepository.deleteAll()
-        userService.adminUser("test@test.no", 12345)
+        user = entityFactory.createUser(email = "test@test.no", employeeNumber = 12345)
+        adminUser = entityFactory.createUser(email = "admin_test@test.no", employeeNumber = 12346, isAdmin = true)
     }
 
     @AfterEach
-    fun shutdown() {mockOAuth2Server.shutdown()}
+    fun baseShutdown() {mockOAuth2Server.shutdown()}
 
     fun restClient(authenticated: Boolean): HttpHeaderTestRestTemplate {
         val client = HttpHeaderTestRestTemplate(testRestTemplate)
