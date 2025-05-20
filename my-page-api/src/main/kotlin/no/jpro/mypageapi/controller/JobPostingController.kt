@@ -8,9 +8,9 @@ import no.jpro.mypageapi.model.JobPostingFile
 import no.jpro.mypageapi.model.Tag
 import no.jpro.mypageapi.service.JobPostingFilesService
 import no.jpro.mypageapi.service.JobPostingService
-import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 import java.time.OffsetDateTime
@@ -182,16 +182,13 @@ class JobPostingController(
     override fun uploadJobPostingFile(
         jobPostingId: Long,
         filename: String,
-        content: Resource?
+        content: MultipartFile
     ): ResponseEntity<Unit> {
-        if (content == null) {
-            return ResponseEntity.badRequest().build()
-        }
 
         jobPostingFilesService.uploadJobPostingFile(
             jobPostingId,
             filename,
-            content
+            content.resource
         )
 
         return ResponseEntity
