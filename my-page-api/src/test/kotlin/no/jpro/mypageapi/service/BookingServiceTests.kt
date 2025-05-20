@@ -13,9 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.LocalDate
 import java.util.*
 
@@ -27,7 +27,7 @@ import java.util.*
 @Import(MockApplicationConfig::class) //Import @Beans used by Spring Boot at application startup
 class BookingServiceTests  @Autowired constructor(private val bookingService: BookingService) {
 
-    @MockBean
+    @MockitoBean
     lateinit var bookingRepository: BookingRepository //Used by BookingService
 
 

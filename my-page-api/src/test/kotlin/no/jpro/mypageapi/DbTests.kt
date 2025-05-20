@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 
 @SpringBootTest
@@ -22,13 +22,13 @@ import org.springframework.test.context.ActiveProfiles
 @Import(MockApplicationConfig::class)
 class DbTests @Autowired constructor(private val apartmentRepository: ApartmentRepository, private val dbUtils: DbUtils) {
 
-	@MockBean
+	@MockitoBean
 	lateinit var jwtDecoder: JwtDecoder
 
-	@MockBean
+	@MockitoBean
 	lateinit var credentialsProvider: CredentialsProvider
 
-	@MockBean
+	@MockitoBean
 	lateinit var gcpProjectIdProvider: GcpProjectIdProvider
 
 
