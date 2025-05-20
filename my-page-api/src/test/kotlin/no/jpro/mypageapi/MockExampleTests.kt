@@ -13,10 +13,10 @@ import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 
 @SpringBootTest
@@ -26,13 +26,13 @@ import org.springframework.test.context.ActiveProfiles
 @Import(MockApplicationConfig::class) //Import @Beans used by Spring Boot at application startup
 class MockExampleTests {
 
-	@MockBean
+	@MockitoBean
 	lateinit var jwtDecoder: JwtDecoder //Used by Spring Boot at application startup
 
-	@MockBean
+	@MockitoBean
 	lateinit var credentialsProvider: CredentialsProvider //Used by Spring Boot at application startup
 
-	@MockBean
+	@MockitoBean
 	lateinit var gcpProjectIdProvider: GcpProjectIdProvider //Used by Spring Boot at application startup
 
 
