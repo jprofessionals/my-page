@@ -59,6 +59,16 @@ class UserService(
         return userRepository.save(userMapper.toUser(jwt))
     }
 
+    fun updateAdmin(email: String, isAdmin: Boolean): User {
+        val user = userRepository.findUserByEmail(email)
+        return userRepository.save(user!!.copy(admin = isAdmin))
+    }
+
+    fun updateActive(email: String, isActive: Boolean): User {
+        val user = userRepository.findUserByEmail(email)
+        return userRepository.save(user!!.copy(enabled = isActive))
+    }
+
     fun findUserByEmailAndConnect(jwt: Jwt): User? {
         val user = userRepository.findUserByEmailAndSubIsNull(jwt.getEmail()) ?: return null
         return userRepository.save(
@@ -90,7 +100,7 @@ class UserService(
         return userRepository.findUserBySub(userSub) ?: throw InvalidUserSubException("No user found for sub: $userSub")
     }
 
-    fun getAllActiveUsers() = userRepository.findByEnabled(true).map { userMapper.toUserDTO(it) }
+    fun getAllUsers(isEnabled: Boolean) = userRepository.findByEnabled(isEnabled).map { userMapper.toUserDTO(it) }
 
     fun getUserByName(name: String) = userRepository.findUserByName(name)
 }

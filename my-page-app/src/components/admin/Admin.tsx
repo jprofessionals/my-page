@@ -5,7 +5,7 @@ import {
   Budget,
   BudgetSummary,
   BudgetType,
-  BudgetYearSummary,
+  BudgetYearSummary, ToggleActive, ToggleAdmin,
   User,
 } from '@/types'
 import BudgetList from '@/components/budget/BudgetList'
@@ -30,6 +30,7 @@ function compareUsers(a: User, b: User): number {
 
 function Admin() {
   const [users, setUsers] = useState<User[]>([])
+  const [disabledUsers, setDisabledUsers] = useState<User[]>([])
   const [budgetTypes, setBudgetTypes] = useState<BudgetType[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [expandedUser, setExpandedUser] = useState<string>('')
@@ -37,6 +38,9 @@ function Admin() {
   const [activeBudget, setActiveBudget] = useState<string | null>(null)
   const [budgetSummary, setBudgetsummary] = useState<BudgetSummary[]>([])
   const { user, settings } = useAuthContext()
+  const [newAdminUser, setNewAdminUser] = useState<ToggleAdmin>()
+  const [deactivateUser, setDeactivateUser] = useState<ToggleActive>()
+  const [activateUser, setActivateUser] = useState<ToggleActive>()
 
   useEffect(() => {
     refreshTable()
@@ -104,7 +108,7 @@ function Admin() {
   const budgetBalance = (budget: Budget) => {
     if (budget) {
       return budget.balance.toLocaleString('no-NO', {
-        maximumFractionDigits: 2,
+        maximumFractionDigits: 0,
         style: 'currency',
         currency: 'NOK',
       })
@@ -117,13 +121,13 @@ function Admin() {
     if (budget) {
       return (
         budget.sum.toLocaleString('no-NO', {
-          maximumFractionDigits: 2,
+          maximumFractionDigits: 0,
           style: 'currency',
           currency: 'NOK',
         }) +
         ' (' +
         budget.balance.toLocaleString('no-NO', {
-          maximumFractionDigits: 2,
+          maximumFractionDigits: 0,
           style: 'currency',
           currency: 'NOK',
         }) +
@@ -137,7 +141,7 @@ function Admin() {
   const budgetBalanceHoursCurrentYear = (budget: Budget) => {
     if (budget) {
       return (
-        budget.sumHoursCurrentYear +
+        Math.round(budget.sumHoursCurrentYear) +
         (budget.sumHoursCurrentYear === 1 ? ' time' : ' timer')
       )
     } else {
@@ -149,7 +153,7 @@ function Admin() {
     budget: BudgetYearSummary,
   ) => {
     if (budget) {
-      return budget.hours + (budget.hours === 1 ? ' time' : ' timer')
+      return Math.round(budget.hours) + (budget.hours === 1 ? ' time' : ' timer')
     } else {
       return '-'
     }
@@ -173,11 +177,21 @@ function Admin() {
 
   const refreshTable = () => {
     setIsLoading(true)
+
     apiService
       .getUsers()
       .then((responseSummary) => {
         setUsers(responseSummary.data)
         extractListOfBudgets(responseSummary.data)
+
+        apiService
+          .getDisabledUsers()
+          .then((disabledUsers) => {
+            setDisabledUsers(disabledUsers.data)
+          })
+          .catch(() => {
+            toast.error('Klarte ikke laste deaktiverte brukere, prøv igjen senere')
+          })
 
         apiService
           .getBudgetSummary()
@@ -198,6 +212,53 @@ function Admin() {
 
   if (!user?.admin) return null
 
+  async function handleMakeAdmin() {
+      if (!newAdminUser) return;
+      try {
+        await apiService.toggleAdmin(newAdminUser.email, newAdminUser.isAdmin);
+        toast.success("Admin oppdatert");
+        refreshTable();
+        setNewAdminUser(undefined);
+      } catch {
+        toast.error("Feil ved oppdatering av admin-status");
+      }
+  }
+
+  async function handleDeactivateUser() {
+    if (!deactivateUser) return;
+    try {
+      await apiService.toggleActive(deactivateUser.email, deactivateUser.isActive);
+      toast.success("Bruker deaktivert");
+      refreshTable();
+      setNewAdminUser(undefined);
+    } catch {
+      toast.error("Feil ved oppdatering av bruker");
+    }
+  }
+
+  async function handleActivateUser() {
+    if (!activateUser) return;
+    try {
+      await apiService.toggleActive(activateUser.email, activateUser.isActive);
+      toast.success("Bruker aktivert");
+      refreshTable();
+      setNewAdminUser(undefined);
+    } catch {
+      toast.error("Feil ved oppdatering av bruker");
+    }
+  }
+
+  // Handler to remove admin status
+  async function handleRemoveAdmin(email: string) {
+    try {
+      await apiService.toggleAdmin(email, false);
+      toast.success("Admin-status fjernet");
+      refreshTable();
+    } catch {
+      toast.error("Feil ved fjerning av admin-status");
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex flex-col justify-center items-center mt-[30%] gap-4">
@@ -211,8 +272,8 @@ function Admin() {
     return (
       <>
         <div className="overflow-auto p-4">
-          <h2 className="prose prose-xl">Våre ansatte</h2>
-
+          <h2 className="prose prose-xl">Budsjetter</h2>
+          <div>Viser budsjetter og forbruk for alle ansatte. <b>Kompetanse</b> og <b>Laptop & mobil</b> viser hvor mye ansatte har igjen på respektive budsjett, <b>Kompetanse(timer)</b> viser hvor mye som er forbrukt inneværende år mens <b>Hjemmekontor</b> og <b>Bruttotrekk</b> viser hvor mye som er brukt.</div>
           {/* Add text input field */}
           <div className="flex gap-16">
             <div className="mb-4 form-control">
@@ -244,7 +305,6 @@ function Admin() {
 
             <NewUserModal />
           </div>
-
           <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
             <thead>
               <tr className="text-base text-slate-900">
@@ -263,6 +323,7 @@ function Admin() {
             <tbody>
               {users
                 .filter((user) =>
+                  (user.budgets != undefined && user.budgets?.length > 0) &&
                   (user.name
                     ? user.name.toLowerCase()
                     : user.email.toLowerCase()
@@ -334,6 +395,7 @@ function Admin() {
         </div>
         <div className="overflow-auto p-4">
           <h2 className="prose prose-xl">Oppsummering</h2>
+          <span>Viser totalt forbruk per år og hvor mye som er utestående (for <b>Kompetanse</b> & <b>Laptop & mobil</b>). NB! Kompetansebudsjett nulles hvert år, mens Laptop & mobil fortsetter å akumulere.</span>
           <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
             <thead>
               <tr className="text-base text-slate-900">
@@ -412,6 +474,92 @@ function Admin() {
             </tbody>
           </table>
         </div>
+        <div className="overflow-auto p-4">
+          <h2 className="prose prose-xl">Admin brukere</h2>
+          <ul className="mt-4 space-y-2">
+            {users.filter(user => user.admin).map(userRow => (
+              <li key={userRow.email} className="flex items-center">
+                <span>{userRow.name ?? userRow.email}</span>
+                <button
+                  onClick={() => handleRemoveAdmin(userRow.email)}
+                  className="btn btn-secondary btn-sm ml-4"
+                >
+                  Fjern admin
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-4 flex items-center space-x-2">
+            <select
+              value={newAdminUser?.email || ''}
+              onChange={(e) => setNewAdminUser({ email: e.target.value, isAdmin: true })}
+              className="select select-bordered"
+            >
+              <option value="">Velg bruker…</option>
+              {users.filter(u => !u.admin).sort((a, b) => compareUsers(a, b)).map(u => (
+                <option key={u.email} value={u.email}>
+                  {u.name ?? u.email}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleMakeAdmin}
+              disabled={!newAdminUser}
+              className="btn btn-primary"
+            >
+              Gjør til admin
+            </button>
+          </div>
+        </div>
+
+
+        <div className="overflow-auto p-4">
+          <h2 className="prose prose-xl">Deaktiverte brukere</h2>
+          <div className="mt-4 flex items-center space-x-2">
+            <select
+              value={activateUser?.email || ''}
+              onChange={(e) => setActivateUser({ email: e.target.value, isActive: true })}
+              className="select select-bordered"
+            >
+              <option value="">Velg bruker du vil aktivere</option>
+              {disabledUsers.sort((a, b) => compareUsers(a, b)).map(u => (
+                <option key={u.email} value={u.email}>
+                  {u.name ?? u.email}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleActivateUser}
+              disabled={!activateUser}
+              className="btn btn-primary"
+            >
+              Aktiver
+            </button>
+          </div>
+
+          <div className="mt-4 flex items-center space-x-2">
+            <select
+              value={deactivateUser?.email || ''}
+              onChange={(e) => setDeactivateUser({ email: e.target.value, isActive: false })}
+              className="select select-bordered"
+            >
+              <option value="">Velg bruker du vil deaktivere</option>
+              {users.filter(u => !u.admin).sort((a, b) => compareUsers(a, b)).map(u => (
+                <option key={u.email} value={u.email}>
+                  {u.name ?? u.email}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleDeactivateUser}
+              disabled={!deactivateUser}
+              className="btn btn-primary"
+            >
+              Deaktiver
+            </button>
+          </div>
+        </div>
+
       </>
     )
   }

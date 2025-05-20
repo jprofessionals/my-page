@@ -32,7 +32,7 @@ const DrawingPeriodModal = ({
       return ''
     }
     if (!bookingTrain.drawingDate) {
-      return 'Oppholdet starter før automatisk trekningsdato. Kontakt Roger for manuell trekning'
+      return 'Oppholdet starter før automatisk trekningsdato. Kontakt Amalie for manuell trekning'
     }
     return `Planlagt trekning ${bookingTrain.drawingDate}`
   }, [bookingTrain])

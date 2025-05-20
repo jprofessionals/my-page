@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.dto.NewEmployeeDTO
+import no.jpro.mypageapi.dto.ToggleActiveDTO
+import no.jpro.mypageapi.dto.ToggleAdminDTO
 import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.service.UserService
 import no.jpro.mypageapi.utils.mapper.UserMapper
@@ -30,7 +32,7 @@ class UserController(
     @GetMapping
     @Transactional
     @RequiresAdmin
-    fun getAllUsers(): List<UserDTO> = userService.getAllActiveUsers()
+    fun getAllUsers(@RequestParam isEnabled: Boolean = true): List<UserDTO> = userService.getAllUsers(isEnabled)
 
     @PostMapping
     @Transactional
@@ -53,6 +55,44 @@ class UserController(
             newEmployeeDTO.budgetStartDate
         )
 
+        return userMapper.toUserDTO(user)
+    }
+
+    @PatchMapping()
+    @Transactional
+    @RequiresAdmin
+    @Operation(summary = "Toggle admin")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(
+        responseCode = "200",
+        description = "Admin updated",
+        content = [Content(schema = Schema(implementation = UserDTO::class))]
+    )
+    fun toggleAdmin(
+        token: JwtAuthenticationToken,
+        @Valid @RequestBody toggleAdminDTO: ToggleAdminDTO
+    ): UserDTO {
+        logger.info("Toggle admin for ${toggleAdminDTO.email}")
+        val user = userService.updateAdmin(toggleAdminDTO.email, toggleAdminDTO.isAdmin)
+        return userMapper.toUserDTO(user)
+    }
+
+    @PatchMapping("active")
+    @Transactional
+    @RequiresAdmin
+    @Operation(summary = "Toggle active")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(
+        responseCode = "200",
+        description = "Status updated",
+        content = [Content(schema = Schema(implementation = UserDTO::class))]
+    )
+    fun toggleAdmin(
+        token: JwtAuthenticationToken,
+        @Valid @RequestBody toggleActiveDTO: ToggleActiveDTO
+    ): UserDTO {
+        logger.info("Toggle aktiv for ${toggleActiveDTO.email}")
+        val user = userService.updateActive(toggleActiveDTO.email, toggleActiveDTO.isActive)
         return userMapper.toUserDTO(user)
     }
 }

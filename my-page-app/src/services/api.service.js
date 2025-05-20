@@ -7,6 +7,10 @@ const getUsers = () => {
   return axios.get(API_URL + 'user', { headers: authHeader() })
 }
 
+const getDisabledUsers = () => {
+  return axios.get(API_URL + 'user', { headers: authHeader(), params: { isEnabled: false } })
+}
+
 const getUser = () => {
   return axios.get(API_URL + 'me', { headers: authHeader() })
 }
@@ -271,8 +275,21 @@ const getImage = async (fileName) => {
   return response.data
 }
 
+const toggleAdmin = (email, isAdmin) => {
+  return axios.patch(API_URL + 'user', { email: email, isAdmin: isAdmin }, {
+    headers: authHeader(),
+  })
+}
+
+const toggleActive = (email, isActive) => {
+  return axios.patch(API_URL + 'user/active', { email: email, isActive: isActive }, {
+    headers: authHeader(),
+  })
+}
+
 const ApiService = {
   getUsers,
+  getDisabledUsers,
   getUser,
   getBudgets,
   getBudgetsForEmployee,
@@ -301,6 +318,8 @@ const ApiService = {
   patchPendingBooking,
   adminPatchBooking,
   getImage,
+  toggleAdmin,
+  toggleActive,
 }
 
 export default ApiService

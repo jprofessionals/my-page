@@ -77,7 +77,7 @@ const BudgetItem = ({ budget, refreshBudgets, type }: Props) => {
 
   const budgetConfig = get(
     budgetConfigs,
-    type === 'list' ? 'default' : budget.budgetType.name,
+    type === 'list' ? 'default' : budget.budgetType.name.split(' ')[0],
     budgetConfigs.default,
   )
 

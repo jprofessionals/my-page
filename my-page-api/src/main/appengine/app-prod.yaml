@@ -26,4 +26,5 @@ env_variables:
   GCS_BUCKET_NAME: "tavle-cropped-test"
   GCS_JOBPOSTINGS_BUCKET_NAME: "utlysninger-dokumenter"
   SLACK_HYTTEKANAL_ID: "C83007C8L"
+  SLACK_UTLYSNING_CHANNEL: "utlysninger"
   NOTIFICATION_JOB_ENABLED: "false"
