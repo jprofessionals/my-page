@@ -42,3 +42,6 @@ build/
 /my-page-api/src/main/resources/application.yml
 /my-page-api/src/main/resources/application.yaml
 /my-page-app/src/data
+/.run/MyPageApiApplication.run.xml
+/cloud_sql_proxy
+/gc-acc_cred.json
