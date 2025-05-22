@@ -123,7 +123,7 @@ function InfoNotices() {
             <div style={{ marginTop: '2em' }}>
               <b>Opprett ny infonotis</b>
               <form onSubmit={handleSubmit}>
-                <div className="overflow-hidden w-full rounded-xl border border-gray-500 shadow-sm">
+                <div className="overflow-hidden w-full rounded-xl border border-gray-500 shadow-xs">
                   <div className="flex flex-col gap-2 items-start p-3">
                     <strong>Beskrivelse:</strong>
                     <label>

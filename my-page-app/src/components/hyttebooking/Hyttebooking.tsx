@@ -38,7 +38,7 @@ function Hyttebooking() {
             </p>
           </div>
           <Image
-            className="hidden md:block mt-0 rounded"
+            className="hidden md:block mt-0 rounded-sm"
             src={jPro_Hytte}
             alt="jPro"
             priority={true}

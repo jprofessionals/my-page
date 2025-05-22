@@ -88,7 +88,7 @@ const NavBar = () => {
                   )}
                 >
                   <Menu as="div" className="relative ml-3">
-                    <Menu.Button className="flex text-sm bg-gray-800 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none">
+                    <Menu.Button className="flex text-sm bg-gray-800 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
                       <span className="sr-only">Open user menu</span>
                       <Image
                         src={user?.icon || '/default-profile.jpeg'}
@@ -107,7 +107,7 @@ const NavBar = () => {
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-28 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg origin-top-right focus:outline-none">
+                      <Menu.Items className="absolute right-0 z-10 mt-2 w-28 bg-white rounded-md ring-1 ring-black/5 shadow-lg origin-top-right focus:outline-hidden">
                         <Menu.Item>
                           <Button className="w-full" onClick={() => logout()}>
                             Logg ut
@@ -120,7 +120,7 @@ const NavBar = () => {
               </div>
               <div className="flex -mr-2 md:hidden">
                 {/* Mobile menu button */}
-                <Disclosure.Button className="inline-flex justify-center items-center p-2 text-white rounded-md hover:text-white hover:bg-gray-700 focus:ring-2 focus:ring-inset focus:ring-white focus:outline-none">
+                <Disclosure.Button className="inline-flex justify-center items-center p-2 text-white rounded-md hover:text-white hover:bg-gray-700 focus:ring-2 focus:ring-inset focus:ring-white focus:outline-hidden">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <div className="block w-6 h-6" aria-hidden="true">

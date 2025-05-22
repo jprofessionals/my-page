@@ -226,7 +226,7 @@ export const JobPostingModal = ({
                       isUrgent
                         ? 'bg-blue-600 border-blue-600'
                         : 'bg-gray-400 border-gray-400'
-                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                    } focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                     id="urgent"
                     checked={isUrgent}
                     onCheckedChange={(checked) => setIsUrgent(checked)}
@@ -250,7 +250,7 @@ export const JobPostingModal = ({
                       isHidden
                         ? 'bg-blue-600 border-blue-600'
                         : 'bg-gray-400 border-gray-400'
-                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                    } focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                     id="urgent"
                     checked={isHidden}
                     onCheckedChange={(checked) => {
@@ -280,7 +280,7 @@ export const JobPostingModal = ({
                         doSendUpdate
                           ? 'bg-blue-600 border-blue-600'
                           : 'bg-gray-400 border-gray-400'
-                      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                      } focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                       id="notify"
                       checked={doSendUpdate}
                       onCheckedChange={(checked) => {
@@ -306,7 +306,7 @@ export const JobPostingModal = ({
                         doNotify
                           ? 'bg-blue-600 border-blue-600'
                           : 'bg-gray-400 border-gray-400'
-                      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                      } focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                       id="notify"
                       checked={doNotify}
                       onCheckedChange={(checked) => setDoNotify(checked)}
@@ -559,14 +559,14 @@ export const JobPostingModal = ({
                 <Dialog.Close asChild>
                   <button
                     type="button"
-                    className="mr-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                    className="mr-4 px-4 py-2 bg-gray-200 rounded-sm hover:bg-gray-300"
                   >
                     Avbryt
                   </button>
                 </Dialog.Close>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700"
                 >
                   {submitText}
                 </button>
