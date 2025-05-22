@@ -193,7 +193,7 @@ function ExplorerTextArea(): React.JSX.Element {
             borderTop: '1px solid #ccc',
             marginBottom: '5px',
           }}
-          className="h-12 px-2 border-t border-black-nav shadow"
+          className="h-12 px-2 border-t border-black-nav shadow-sm"
         />
         <div
           style={{

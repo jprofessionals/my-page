@@ -62,7 +62,7 @@ const CreateBudgetPost = ({ budget, refreshBudgets, toggle }: Props) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="overflow-hidden w-full rounded-xl border border-gray-500 shadow-sm">
+      <div className="overflow-hidden w-full rounded-xl border border-gray-500 shadow-xs">
         <div className="flex justify-between items-center p-2 w-full text-sm bg-accent/80">
           <input
             className="input input-md"

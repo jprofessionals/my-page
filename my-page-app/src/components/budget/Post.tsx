@@ -56,7 +56,7 @@ const Post = ({ refreshBudgets, post, budget, showActions }: Props) => {
   }
 
   return (
-    <div className="overflow-hidden w-full rounded-xl border-2 border-gray-500 border-solid shadow-sm">
+    <div className="overflow-hidden w-full rounded-xl border-2 border-gray-500 border-solid shadow-xs">
       <div className="flex justify-between items-center p-3 pb-2 w-full text-sm bg-gray-200">
         <span className="flex gap-2 items-center p-1">
           {showActions ? (

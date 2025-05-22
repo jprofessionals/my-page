@@ -91,7 +91,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
             href={`?id=${jobPosting.id}`}
             aria-label="Lenke til denne ultysningen"
             title="Lenke til denne ultysningen"
-            className="focus:outline-none"
+            className="focus:outline-hidden"
           >
             <FontAwesomeIcon
               icon={faPaperclip}
@@ -103,7 +103,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
               <button
                 onClick={openModal}
                 aria-label="Edit job posting"
-                className="focus:outline-none"
+                className="focus:outline-hidden"
               >
                 <FontAwesomeIcon
                   icon={faPencilAlt}
@@ -113,7 +113,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
               <button
                 onClick={openDeleteDialog}
                 aria-label="Delete job posting"
-                className="focus:outline-none"
+                className="focus:outline-hidden"
               >
                 <FontAwesomeIcon
                   icon={faTrashAlt}
@@ -124,7 +124,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
           )}
         </div>
 
-        <Accordion.Trigger className="pt-4 group bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+        <Accordion.Trigger className="pt-4 group bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-hidden focus:ring-2 focus:ring-blue-500 w-full">
           <div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
             <div className="flex flex-col items-start px-4 pb-4">
               <h2
@@ -175,7 +175,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
               {jobPosting.tags.map((tag) => (
                 <span
                   key={tag.id}
-                  className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded"
+                  className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-sm"
                 >
                   {tag.name}
                 </span>
@@ -248,7 +248,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
         onOpenChange={setIsDeleteDialogOpen}
       >
         <AlertDialog.Portal>
-          <AlertDialog.Overlay className="fixed inset-0 bg-black bg-opacity-50" />
+          <AlertDialog.Overlay className="fixed inset-0 bg-black/50" />
           <AlertDialog.Content className="fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg">
             <AlertDialog.Title className="text-lg font-semibold text-gray-800">
               Bekreft sletting
@@ -265,7 +265,7 @@ export const JobPosting = (jobPosting: JobPostingType) => {
               <AlertDialog.Action asChild>
                 <button
                   onClick={handleDeleteJobPosting}
-                  className="px-4 py-2 text-white bg-red-600 hover:bg-red-800 rounded"
+                  className="px-4 py-2 text-white bg-red-600 hover:bg-red-800 rounded-sm"
                 >
                   Slett
                 </button>
