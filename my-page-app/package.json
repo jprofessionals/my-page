@@ -61,7 +61,7 @@
     "react-tooltip": "^5.28.1",
     "sass": "^1.89.0",
     "sockjs-client": "^1.6.1",
-    "tailwind-merge": "^2.6.0",
+    "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.25.20"
   },
