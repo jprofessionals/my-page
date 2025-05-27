@@ -1,16 +1,20 @@
 @import "tailwindcss";
 @config "../../tailwind.config.js";
+
+@plugin "daisyui" {
+  themes: light --default;
+}
 @plugin "daisyui/theme" {
-  name: "light";
-  default: false;
+  name: light;
+  default: true;
   prefersdark: false;
-  color-scheme: "light";
+  color-scheme: light;
   --color-base-100: #ffffff;
   --color-base-200: oklch(98% 0 0);
   --color-base-300: oklch(95% 0 0);
   --color-base-content: oklch(21% 0.006 285.885);
   --color-primary: #ff7a0c;
-  --color-primary-content: oklch(93% 0.034 272.788);
+  --color-primary-content: oklch(21% 0.006 285.885);
   --color-secondary: #ffa500;
   --color-secondary-content: oklch(94% 0.028 342.258);
   --color-accent: #2f4f4f;
@@ -34,7 +38,6 @@
   --depth: 1;
   --noise: 0;
 }
-
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
