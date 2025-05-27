@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
-import './globals.scss'
+import '@/styles/globals.scss'
 import { ToastContainer } from 'react-toastify'
 import Providers from '@/app/providers'
 import NavBar from '@/components/navbar/NavBar'

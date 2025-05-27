@@ -9,7 +9,7 @@ function Hyttebooking() {
   return (
     <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 p-4">
-        <div className="flex overflow-hidden gap-2 items-center p-2 max-w-7xl rounded-lg border prose bgColor: bg-slate-200">
+        <div className="flex overflow-hidden gap-2 items-center p-2 max-w-7xl rounded-lg prose bgColor: bg-slate-200">
           <div className="relative flex-1">
             <h1>Reservasjon av firmahytte</h1>
             <div className="h-1.5 bg-orange-500"></div>
