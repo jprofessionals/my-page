@@ -45,7 +45,7 @@ const SimpleModal = ({
     <div style={{ marginTop: '1rem' }}>{content}</div>
     <div
       style={{
-        marginTop: '2rem',
+        marginTop: '1rem',
         justifyContent: 'space-between',
         display: 'flex',
         gap: '2rem',

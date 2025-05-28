@@ -180,8 +180,7 @@ const BookingEditForm = ({
         style={{
           display: 'flex',
           justifyContent: 'right',
-          marginTop: '2em',
-          marginBottom: '2em',
+          marginTop: '1em',
         }}
       >
         <Button

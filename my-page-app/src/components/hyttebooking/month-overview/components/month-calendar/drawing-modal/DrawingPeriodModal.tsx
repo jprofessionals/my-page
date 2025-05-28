@@ -58,15 +58,15 @@ const DrawingPeriodModal = ({
 
   return (
     <SimpleModal
-      header={'Trekningsperiode'}
+      header={'Trekning'}
       open={!!bookingTrain}
       onRequestClose={onCancel}
       content={
         <>
           {bookingTrain && (
             <div className={style.drawPeriod}>
-              <div>
-                Registrerte ønsker i perioden {bookingTrain.startDate} to{' '}
+              <div className="text-center">
+                Registrerte ønsker i perioden {bookingTrain.startDate} til{' '}
                 {bookingTrain.endDate}
               </div>
               <table className={style.drawPeriodTable}>
@@ -87,7 +87,8 @@ const DrawingPeriodModal = ({
                   />
                 ))}
               </table>
-              <div>{helpText}</div>
+              <hr/>
+              <div className="italic font-bold text-center">{helpText}</div>
             </div>
           )}
         </>
