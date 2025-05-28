@@ -382,7 +382,7 @@ function Kalkulator() {
         </div>
         <Accordions type="multiple" className="mb-3 w-full">
           <AccordionItem value="bookings" className="border-none">
-            <AccordionTrigger className="text-sm rounded-lg items-center px-3 gap-2 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none bg-yellow-hotel">
+            <AccordionTrigger className="text-sm rounded-lg items-center px-3 gap-2 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none bg-[var(--color-hotel)]">
               <div className="flex flex-1 gap-4 justify-between">
                 <span
                   title="Eksempler"
@@ -397,7 +397,7 @@ function Kalkulator() {
                 <div className="space-x-2">
                   <button
                     onClick={loadScenarioAvg}
-                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                    className="bg-[var(--color-hotel)] text-white px-2 py-0.5 rounded-md"
                   >
                     Snitt
                   </button>
@@ -406,7 +406,7 @@ function Kalkulator() {
                 <div className="space-x-2">
                   <button
                     onClick={loadScenarioHigh}
-                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                    className="bg-[var(--color-hotel)] text-white px-2 py-0.5 rounded-md"
                   >
                     Høy
                   </button>
@@ -417,7 +417,7 @@ function Kalkulator() {
                 <div className="space-x-2">
                   <button
                     onClick={loadScenarioLow}
-                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                    className="bg-[var(--color-hotel)] text-white px-2 py-0.5 rounded-md"
                   >
                     Lav
                   </button>
@@ -428,7 +428,7 @@ function Kalkulator() {
                 <div className="space-x-2">
                   <button
                     onClick={loadScenarioBench}
-                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                    className="bg-[var(--color-hotel)] text-white px-2 py-0.5 rounded-md"
                   >
                     Ledig
                   </button>
@@ -437,7 +437,7 @@ function Kalkulator() {
                 <div className="space-x-2">
                   <button
                     onClick={loadScenario100to50}
-                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                    className="bg-[var(--color-hotel)] text-white px-2 py-0.5 rounded-md"
                   >
                     100% til 50%
                   </button>
@@ -446,7 +446,7 @@ function Kalkulator() {
                 <div className="space-x-2">
                   <button
                     onClick={loadScenario50}
-                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                    className="bg-[var(--color-hotel)] text-white px-2 py-0.5 rounded-md"
                   >
                     50%
                   </button>
@@ -455,7 +455,7 @@ function Kalkulator() {
                 <div className="space-x-2">
                   <button
                     onClick={loadScenario50to100}
-                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                    className="bg-[var(--color-hotel)] text-white px-2 py-0.5 rounded-md"
                   >
                     50% til 100%
                   </button>
@@ -464,7 +464,7 @@ function Kalkulator() {
                 <div className="space-x-2">
                   <button
                     onClick={loadScenarioFirstMonth}
-                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                    className="bg-[var(--color-hotel)] text-white px-2 py-0.5 rounded-md"
                   >
                     Oppstart
                   </button>
@@ -473,7 +473,7 @@ function Kalkulator() {
                 <div className="space-x-2">
                   <button
                     onClick={loadScenarioLastMonthPlusOne}
-                    className="bg-yellow-hotel text-white px-2 py-0.5 rounded-md"
+                    className="bg-[var(--color-hotel)] text-white px-2 py-0.5 rounded-md"
                   >
                     Fratredelse
                   </button>

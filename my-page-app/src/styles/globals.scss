@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@config "../../tailwind.config.js";
+@plugin "@tailwindcss/typography";
 
 @plugin "daisyui" {
   themes: light --default;
@@ -29,6 +29,10 @@
   --color-warning-content: oklch(41% 0.112 45.904);
   --color-error: #DC2626;
   --color-error-content: oklch(27% 0.105 12.094);
+  --color-nav: #2c2c2c;
+  --color-hotel: #f6b26b;
+  --color-annex: #5bceae;
+  --color-small-apartment: #2b809b;
   --radius-selector: 0.5rem;
   --radius-field: 0.25rem;
   --radius-box: 0.5rem;
@@ -37,6 +41,33 @@
   --border: 1px;
   --depth: 1;
   --noise: 0;
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 code {

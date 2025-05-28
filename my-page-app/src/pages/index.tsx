@@ -98,9 +98,9 @@ export default function HomePage() {
     [key: string]: string
   }
   const cabinTextColorClasses: CabinColorClasses = {
-    'Stor leilighet': 'text-orange-brand',
-    'Liten leilighet': 'text-blue-small-appartment',
-    Annekset: 'text-teal-annex',
+    'Stor leilighet': 'text-[var(--color-primary)]',
+    'Liten leilighet': 'text-[var(--color-small-apartment)]',
+    Annekset: 'text-[var(--color-annex)]',
   }
 
   const bookingConfigs: Record<
@@ -112,7 +112,7 @@ export default function HomePage() {
     }
   > = {
     default: {
-      bgColor: 'bg-yellow-hotel',
+      bgColor: 'bg-[var(--color-hotel)]',
       textColor: 'text-white',
       icon: faHotel,
     },
