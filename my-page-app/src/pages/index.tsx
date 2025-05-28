@@ -18,6 +18,8 @@ import { faHotel, faTicket, IconDefinition } from '@fortawesome/free-solid-svg-i
 import cn from '@/utils/cn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { get } from 'radash'
+import BookingEditModal
+  from '@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-modal/BookingEditModal'
 
 const BudgetList = dynamic(() => import('@/components/budget/BudgetList'), {
   ssr: false,
@@ -40,6 +42,19 @@ export default function HomePage() {
   const [pendingBookings, setPendingBookings] = useState<Booking[]>([])
   const [bookingLoadingStatus, setBookingLoadingStatus] =
     useState<BookingLoadingStatus>('init')
+
+  const { user } = useAuthContext()
+  const [editBooking, setEditBooking] = useState<Booking | undefined>(undefined)
+  const handleEditBookingCancelled = () => setEditBooking(undefined)
+  const handleEditBookingSaved = async () => {
+    setEditBooking(undefined)
+    refreshBookings();
+  }
+
+  const handleInitEditBooking = (booking: Booking) => {
+      setEditBooking(booking)
+    }
+
 
   const refreshBookings = useCallback(async () => {
     setBookingLoadingStatus('loading')
@@ -177,6 +192,7 @@ export default function HomePage() {
                             return (
                               <div key={booking.id} className="ml-10 mt-3 ">
                                 <p className={old ? 'old-booking' : ''}>
+                                  <span className='mr-1'>
                                   Du {old ? 'hadde' : 'har reservert'}{' '}
                                   <span
                                     className={
@@ -188,7 +204,8 @@ export default function HomePage() {
                                     {booking.apartment.cabin_name}
                                   </span>{' '}
                                   fra {formattedStartDate} til{' '}
-                                  {formattedEndDate}
+                                    {formattedEndDate}</span>
+                                  {old ? '' : <button className="btn btn-sm" onClick={() => handleInitEditBooking(booking)}>Rediger</button>}
                                 </p>
                                 {index !== bookings.length - 1 && (
                                   <hr className="mt-3" />
@@ -199,6 +216,12 @@ export default function HomePage() {
                       </AccordionContent>
                     </AccordionItem>
                   </Accordions>
+                  <BookingEditModal
+                    user={user}
+                    booking={editBooking}
+                    onCancel={handleEditBookingCancelled}
+                    onBookingSaved={handleEditBookingSaved}
+                  />
                 </div>
               ) : (
                 <p className="ml-4 prose">
