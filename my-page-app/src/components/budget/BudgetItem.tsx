@@ -1,5 +1,4 @@
 import Post from './Post'
-import CreateBudgetPost from './CreateBudgetPost'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faGraduationCap,
@@ -7,11 +6,8 @@ import {
   faLaptop,
   faMoneyBill,
   faPhone,
-  faPlus,
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons'
-import { useState } from 'react'
-import RequireAdmin from '../../utils/RequireAdmin'
 import BudgetInformation from './BudgetInformation'
 import { Budget } from '@/types'
 import getInNok from '@/utils/getInNok'
@@ -21,9 +17,6 @@ import cn from '@/utils/cn'
 
 type Props = {
   budget: Budget
-  isActive: boolean
-  setActiveId: (id: string) => void
-  refreshBudgets: () => void
   type: 'list' | 'tiles'
 }
 
@@ -67,13 +60,8 @@ const budgetConfigs: Record<
   },
 }
 
-const BudgetItem = ({ budget, refreshBudgets, type }: Props) => {
+const BudgetItem = ({ budget, type }: Props) => {
   const { posts } = budget
-  const [showCreateBudgetPost, setShowCreateBudgetPost] = useState(false)
-
-  const handleAddBudgetItem = () => {
-    setShowCreateBudgetPost(true)
-  }
 
   const budgetConfig = get(
     budgetConfigs,
@@ -112,29 +100,7 @@ const BudgetItem = ({ budget, refreshBudgets, type }: Props) => {
         <div className="flex flex-col gap-3">
           <div className="flex justify-between items-center py-3 pl-3">
             <h3 className="text-xl font-bold">Historikk</h3>
-            <RequireAdmin>
-              <button
-                onClick={handleAddBudgetItem}
-                className="text-xl rounded-full btn btn-info btn-sm"
-              >
-                <FontAwesomeIcon
-                  className={cn(
-                    showCreateBudgetPost ? 'rotate-45' : '',
-                    'transition-all',
-                  )}
-                  icon={faPlus}
-                  title={showCreateBudgetPost ? 'Avbryt' : 'Legg til ny post'}
-                />
-              </button>
-            </RequireAdmin>
           </div>
-          {showCreateBudgetPost ? (
-            <CreateBudgetPost
-              budget={budget}
-              refreshBudgets={refreshBudgets}
-              toggle={() => setShowCreateBudgetPost(false)}
-            />
-          ) : null}
           {posts.length > 0 ? (
             posts
               .sort((a, b) => (a.date < b.date ? 1 : -1))
@@ -142,9 +108,6 @@ const BudgetItem = ({ budget, refreshBudgets, type }: Props) => {
                 <Post
                   key={post.id}
                   post={post}
-                  budget={budget}
-                  refreshBudgets={refreshBudgets}
-                  showActions={type === 'list'}
                 />
               ))
           ) : (

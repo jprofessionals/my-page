@@ -36,7 +36,6 @@ export default function HomePage() {
   const [budgetLoadingStatus, setBudgetLoadingStatus] =
     useState<BudgetLoadingStatus>('init')
   const { userFetchStatus } = useAuthContext()
-  const [activeBudget, setActiveBudget] = useState<string | null>(null)
 
   const [bookings, setBookings] = useState<Booking[]>([])
   const [pendingBookings, setPendingBookings] = useState<Booking[]>([])
@@ -317,9 +316,6 @@ export default function HomePage() {
               <BudgetList
                 type="tiles"
                 budgets={budgets}
-                refreshBudgets={refreshBudgets}
-                activeBudgetId={activeBudget}
-                updateActiveBudget={setActiveBudget}
               />
             ) : (
               <ErrorPage errorText="Din bruker er autentisert, men vi klarte likevel ikke å hente ut dine budsjetter. Prøv igjen senere." />

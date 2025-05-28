@@ -5,18 +5,12 @@ import cn from '@/utils/cn'
 
 type Props = {
   budgets: Budget[]
-  refreshBudgets: (userId?: string) => void
-  activeBudgetId: string | null
-  updateActiveBudget: (budgetId: string) => void
   type: 'tiles' | 'list'
 }
 
 const BudgetList = ({
   budgets,
-  refreshBudgets,
   type,
-  activeBudgetId,
-  updateActiveBudget,
 }: Props) => {
   if (budgets.length === 0) {
     return (
@@ -53,10 +47,7 @@ const BudgetList = ({
           {budgets.map((budget) => (
             <BudgetItem
               key={budget.id}
-              isActive={budget.id === activeBudgetId}
               budget={budget}
-              refreshBudgets={refreshBudgets}
-              setActiveId={updateActiveBudget}
               type={type}
             />
           ))}

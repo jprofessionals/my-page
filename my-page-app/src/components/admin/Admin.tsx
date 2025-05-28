@@ -35,7 +35,6 @@ function Admin() {
   const [isLoading, setIsLoading] = useState(true)
   const [expandedUser, setExpandedUser] = useState<string>('')
   const [filterValue, setFilterValue] = useState('')
-  const [activeBudget, setActiveBudget] = useState<string | null>(null)
   const [budgetSummary, setBudgetsummary] = useState<BudgetSummary[]>([])
   const { user, settings } = useAuthContext()
   const [newAdminUser, setNewAdminUser] = useState<ToggleAdmin>()
@@ -275,9 +274,9 @@ function Admin() {
           <h2 className="prose prose-xl">Budsjetter</h2>
           <div>Viser budsjetter og forbruk for alle ansatte. <b>Kompetanse</b> og <b>Laptop & mobil</b> viser hvor mye ansatte har igjen på respektive budsjett, <b>Kompetanse(timer)</b> viser hvor mye som er forbrukt inneværende år mens <b>Hjemmekontor</b> og <b>Bruttotrekk</b> viser hvor mye som er brukt.</div>
           {/* Add text input field */}
-          <div className="flex gap-16">
-            <div className="mb-4 form-control">
-              <div className="input-group">
+          <div className="flex justify-between mt-4">
+            <div className="form-control">
+              <div className="input-group flex">
                 <input
                   type="text"
                   placeholder="Filtrer ansatte…"
@@ -381,9 +380,6 @@ function Admin() {
                           <BudgetList
                             type="list"
                             budgets={userRow.budgets ?? []}
-                            refreshBudgets={refreshTable}
-                            activeBudgetId={activeBudget}
-                            updateActiveBudget={setActiveBudget}
                           />
                         </td>
                       </tr>
