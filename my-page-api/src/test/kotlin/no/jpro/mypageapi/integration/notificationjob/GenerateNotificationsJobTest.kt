@@ -2,7 +2,10 @@ package no.jpro.mypageapi.integration.notificationjob
 
 import no.jpro.mypageapi.entity.Status
 import no.jpro.mypageapi.integration.IntegrationTestBase
-import no.jpro.mypageapi.repository.*
+import no.jpro.mypageapi.repository.JobPostingRepository
+import no.jpro.mypageapi.repository.NotificationRepository
+import no.jpro.mypageapi.repository.NotificationTaskRepository
+import no.jpro.mypageapi.repository.SubscriptionRepository
 import no.jpro.mypageapi.testutil.EntityFactory
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach

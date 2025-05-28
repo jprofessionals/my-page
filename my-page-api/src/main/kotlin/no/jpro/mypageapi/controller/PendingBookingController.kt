@@ -9,7 +9,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.controller.BookingController.InvalidDateException
-import no.jpro.mypageapi.dto.*
+import no.jpro.mypageapi.dto.BookingDTO
+import no.jpro.mypageapi.dto.CreatePendingBookingDTO
+import no.jpro.mypageapi.dto.PendingBookingDTO
+import no.jpro.mypageapi.dto.PendingBookingTrainDTO
+import no.jpro.mypageapi.dto.UpdateBookingDTO
 import no.jpro.mypageapi.entity.PendingBooking
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getSub
@@ -20,7 +24,15 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 

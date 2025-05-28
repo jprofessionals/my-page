@@ -8,8 +8,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import java.net.URI
-import java.util.Stack
-import kotlin.collections.HashMap
+import java.util.*
 
 class HttpHeaderTestRestTemplate(val testRestTemplate: TestRestTemplate) {
     private val headersForSingleCallbacks = Stack<Pair<String, String>>()

@@ -5,8 +5,6 @@ import com.aallam.openai.api.chat.ChatCompletion
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
 import kotlinx.coroutines.runBlocking
-import no.jpro.mypageapi.consumer.ai.GPT4_4_TURBO
-import no.jpro.mypageapi.consumer.ai.GPT_3_5_TURBO
 import no.jpro.mypageapi.consumer.ai.GPT_4o
 import no.jpro.mypageapi.consumer.ai.OpenAIConsumer
 import org.springframework.stereotype.Component

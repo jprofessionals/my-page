@@ -7,7 +7,9 @@ import com.google.gson.Gson
 import no.jpro.explorer.ExplorationChatDTO
 import no.jpro.explorer.ExplorationDTO
 import no.jpro.explorer.ExplorationRequest
-import no.jpro.mypageapi.consumer.ai.*
+import no.jpro.mypageapi.consumer.ai.GPT_4o
+import no.jpro.mypageapi.consumer.ai.ImageGenerator
+import no.jpro.mypageapi.consumer.ai.OpenAIConsumer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.*

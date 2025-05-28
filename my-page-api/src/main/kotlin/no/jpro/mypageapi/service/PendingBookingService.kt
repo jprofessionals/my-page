@@ -1,6 +1,9 @@
 package no.jpro.mypageapi.service
 
-import no.jpro.mypageapi.dto.*
+import no.jpro.mypageapi.dto.CreatePendingBookingDTO
+import no.jpro.mypageapi.dto.PendingBookingDTO
+import no.jpro.mypageapi.dto.PendingBookingTrainDTO
+import no.jpro.mypageapi.dto.UpdateBookingDTO
 import no.jpro.mypageapi.entity.Apartment
 import no.jpro.mypageapi.entity.PendingBooking
 import no.jpro.mypageapi.entity.User

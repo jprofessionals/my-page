@@ -2,7 +2,12 @@ package no.jpro.mypageapi.utils.mapper
 
 import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.entity.User
-import no.jpro.mypageapi.extensions.*
+import no.jpro.mypageapi.extensions.getEmail
+import no.jpro.mypageapi.extensions.getFamilyName
+import no.jpro.mypageapi.extensions.getGivenName
+import no.jpro.mypageapi.extensions.getIcon
+import no.jpro.mypageapi.extensions.getName
+import no.jpro.mypageapi.extensions.getSub
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
 

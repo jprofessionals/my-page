@@ -1,6 +1,21 @@
 package no.jpro.mypageapi.repository
 
-import no.jpro.mypageapi.entity.*
+import no.jpro.mypageapi.entity.Apartment
+import no.jpro.mypageapi.entity.Booking
+import no.jpro.mypageapi.entity.Budget
+import no.jpro.mypageapi.entity.BudgetType
+import no.jpro.mypageapi.entity.Customer
+import no.jpro.mypageapi.entity.InfoBooking
+import no.jpro.mypageapi.entity.JobPosting
+import no.jpro.mypageapi.entity.Notification
+import no.jpro.mypageapi.entity.NotificationTask
+import no.jpro.mypageapi.entity.PendingBooking
+import no.jpro.mypageapi.entity.Post
+import no.jpro.mypageapi.entity.Setting
+import no.jpro.mypageapi.entity.Status
+import no.jpro.mypageapi.entity.Subscription
+import no.jpro.mypageapi.entity.Tag
+import no.jpro.mypageapi.entity.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param

@@ -1,6 +1,13 @@
 package no.jpro.mypageapi.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 
 @Entity
 @Table(name = "notification", uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "job_posting_id"])])

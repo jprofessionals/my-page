@@ -2,7 +2,7 @@ package no.jpro.mypageapi.dto
 
 import no.jpro.mypageapi.entity.Apartment
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 data class PendingBookingTrainDTO(
     val id: String = UUID.randomUUID().toString(),

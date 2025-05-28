@@ -3,7 +3,12 @@ package no.jpro.mypageapi.service
 import no.jpro.mypageapi.controller.InvalidUserSubException
 import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.entity.User
-import no.jpro.mypageapi.extensions.*
+import no.jpro.mypageapi.extensions.getEmail
+import no.jpro.mypageapi.extensions.getFamilyName
+import no.jpro.mypageapi.extensions.getGivenName
+import no.jpro.mypageapi.extensions.getIcon
+import no.jpro.mypageapi.extensions.getName
+import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.UserMapper
 import org.springframework.security.oauth2.jwt.Jwt

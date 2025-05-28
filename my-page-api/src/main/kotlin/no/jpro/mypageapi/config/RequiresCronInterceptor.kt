@@ -4,10 +4,10 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.jpro.mypageapi.controller.MyPageRestException
 import org.springframework.core.annotation.AnnotatedElementUtils
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
-import org.springframework.http.HttpStatus
 
 @Component
 class RequiresCronInterceptor : HandlerInterceptor {

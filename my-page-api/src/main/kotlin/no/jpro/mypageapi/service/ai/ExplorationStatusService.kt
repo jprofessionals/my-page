@@ -1,6 +1,5 @@
 package no.jpro.mypageapi.service.ai
 
-import com.aallam.openai.api.chat.ChatMessage
 import org.springframework.stereotype.Component
 
 
