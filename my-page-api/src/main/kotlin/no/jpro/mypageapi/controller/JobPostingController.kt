@@ -40,7 +40,8 @@ class JobPostingController(
             deadline = entity.deadline,
             description = entity.description ?: "",
             tags = emptyList(),
-            links = emptyList()
+            links = emptyList(),
+            createdDate = entity.createdDate
         )
 
         return ResponseEntity
@@ -157,7 +158,8 @@ class JobPostingController(
                 links = it.links
                     .map {
                         URI(it)
-                    }
+                    },
+                createdDate = it.createdDate
             )
         }
         return ResponseEntity.ok(dto)

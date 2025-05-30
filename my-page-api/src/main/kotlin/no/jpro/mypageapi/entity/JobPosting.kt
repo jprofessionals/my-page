@@ -13,6 +13,7 @@ import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToMany
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.JdbcTypeCode
 import java.sql.Types
 import java.time.OffsetDateTime
@@ -45,6 +46,9 @@ class JobPosting(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     var customer: Customer,
+
+    @CreationTimestamp
+    val createdDate: OffsetDateTime? = null,
 
     @ManyToMany
     @JoinTable(
