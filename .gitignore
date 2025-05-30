@@ -42,6 +42,13 @@ build/
 /my-page-api/src/main/resources/application.yml
 /my-page-api/src/main/resources/application.yaml
 /my-page-app/src/data
+
+### Nix ###
+.direnv/
+result
+.envrc
+
+### GCP things ###
 /.run/MyPageApiApplication.run.xml
 /cloud_sql_proxy
 /gc-acc_cred.json

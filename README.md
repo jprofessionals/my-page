@@ -6,23 +6,91 @@ Min side
 
 ## Install development tools
 
-### NVM (Node Version Manager)
+### Option 1: Using Nix (recommended)
+
+This project includes a `flake.nix` file
+that sets up a complete development environment with all the required tools and dependencies.
+
+#### Prerequisites
+1. Install Nix package manager:
+   ```bash
+   sh <(curl -L https://nixos.org/nix/install) --daemon
+   ```
+
+2. Enable flakes and nix-command:
+   ```bash
+   mkdir -p ~/.config/nix
+   echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+   ```
+
+3. Install direnv (optional, but recommended):
+   If you have installed nix - the easiest way is to continue down the rabbit hole and install [home-manager](https://github.com/nix-community/home-manager)
+   to handle as much as possible of your setup - and then you would add it to your (presumably zsh) shell configuration
+   part, quite possibly like this:
+   ```
+   # direnv - https://direnv.net/ - allows us to manage our shell environment with Nix.
+   # It's a bit like nix-shell, but more powerful.
+   # Remember to hook direnv into your shell!
+   # For zsh Add `eval "$(direnv hook zsh)"` to the end of your Zsh initExtra in your host-specific home.nix.
+   programs.direnv = {
+      enable = true;          # Enable direnv itself
+      nix-direnv.enable = true; # Enable the crucial nix-direnv integration
+   };
+   ```
+   And then into your `home.nix` file, inside the `initExtra` part (at the end) you add this:
+   ```nix
+   # Hook direnv into the shell (see zsh.nix) - use this in stead of sdkman, etc
+   eval "$(direnv hook zsh)"
+   ```
+
+#### Using the Nix development environment
+1. Enter the development shell:
+   ```bash
+   nix develop
+   ```
+
+   Or if you have direnv installed and set up:
+   ```bash
+   direnv allow
+   ```
+
+2. All required tools (Java 21, Maven, Kotlin, Node.js, npm, Terraform, Google Cloud SDK) will be available in the shell.
+
+### Option 2: Manual installation
+
+#### NVM (Node Version Manager)
 Install nvm - https://github.com/nvm-sh/nvm#installation or https://tecadmin.net/install-nvm-macos-with-homebrew/ 
 
-### Node
+#### Node
 Install node - `nvm install node`
+
+#### SDK Man
+
+Install [SDK-man](https://sdkman.io/) to help you handle:
+
+* Java 21
+* Maven 3.x
+* (and other tools like gradle, activemq, jmeter, kotlin, spring boot, apache tomcat, spark, quarkus cli, etc etc)
+
+#### Terraform and Google Cloud SDK
+Follow the installation instructions in the Infrastructure section below.
 
 ## Running the API
 
-Running the API locally (in IDEA or on commandline) requires a database - activate the profile `h2` or `local` (the `local`profile requires a running MySQL db (see application-local.properties for connection details))
+Running the API locally (in IDEA or on commandline) requires a database - activate the profile `h2` or
+`local` (the `local`profile requires a running MySQL db
+(see [application-local.properties](my-page-api/src/main/resources/application-local.properties) 
+for connection details))
 
-The API can also be run using the maven wrapper locally `./mvnw -Dspring-boot.run.profiles=local clean spring-boot:run`
+The API can also be run using the maven wrapper locally 
+`./mvnw -Dspring-boot.run.profiles=local clean spring-boot:run`
 
 The api will run on localhost:8080 - See http://localhost:8080/api/swagger-ui/index.html for api doc
 
 ## Running the app
 
-The project relies on auto-generated code based on an OpenAPI specification, so for everything to work, you must first run:
+The project relies on auto-generated code based on an OpenAPI specification, so for everything to work, 
+you must first run:
 
 ```bash
 npm run build:openapi
