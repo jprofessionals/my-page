@@ -6,6 +6,11 @@ Min side
 
 ## Install development tools
 
+### Docker
+
+The setup of testcontainers requires use of Docker Desktop for development. If you use anything else (like Colima), good luck with getting the tests to run.
+(If you do manage, update the documentation on how, to help others in the same situation)
+
 ### Option 1: Using Nix (recommended)
 
 This project includes a `flake.nix` file
