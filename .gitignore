@@ -45,7 +45,6 @@ build/
 
 ### Nix ###
 .direnv/
-result
 .envrc
 
 ### GCP things ###

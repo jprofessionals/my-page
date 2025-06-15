@@ -1,0 +1,70 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <!--
+        A simple default settings.xml to be used in case you have some "project" override from your day-job,
+        or you are working on a clean install with no default settings.xml file. If the latter is true,
+        create (if not existing) a folder named `.m2` in your home directory. See if you have a settings.xml file there
+        and if not copy this file into that folder.
+
+        To use this settings.xml with your builds, make sure you build via the mvnw scripts and have set an env variable:
+        MAVEN_CONFIG=/path/to/this/settings.xml
+        For example like this in your .envrc file:
+        export MAVEN_CONFIG="$PWD/config/settings.xml"
+     -->
+
+    <!-- Local Repository - defaults to ~/.m2/repository -->
+<!--
+    <localRepository>${user.home}/.m2/repository</localRepository>
+-->
+    <!-- Mirrors define proxy repositories for Maven Central or other repos -->
+    <mirrors>
+        <!-- Example: Use a mirror for Maven Central -->
+        <!--
+        <mirror>
+          <id>central-mirror</id>
+          <mirrorOf>central</mirrorOf>
+          <url>http://central-repo-mirror.example.com</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </mirror>
+        -->
+    </mirrors>
+
+    <!-- Repositories define where Maven can find dependencies and plugins -->
+    <profiles>
+        <profile>
+            <id>default-profile</id>
+            <repositories>
+                <!-- Add repositories as needed -->
+                <!--
+                <repository>
+                  <id>my-repo</id>
+                  <url>http://repository.example.com/maven2</url>
+                  <releases><enabled>true</enabled></releases>
+                  <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                -->
+            </repositories>
+            <pluginRepositories>
+                <!-- Add plugin repositories if needed -->
+            </pluginRepositories>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>default-profile</activeProfile>
+    </activeProfiles>
+
+    <!-- Servers section can be used to define authentication for repositories -->
+    <!--
+    <servers>
+      <server>
+        <id>my-repo</id>
+        <username>user</username>
+        <password>password</password>
+      </server>
+    </servers>
+    -->
+</settings>

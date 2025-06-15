@@ -37,6 +37,9 @@
           jq
           yq
         ];
+
+        isAarch64Darwin = (system == "aarch64-darwin");
+
       in
       {
         devShells.default = pkgs.mkShell {
@@ -83,12 +86,73 @@
             echo "- Frontend: cd my-page-app && npm install && npm run dev"
             echo "- Infrastructure: cd infrastructure && terraform init"
             echo ""
+
+            # Environment validation
+            check_docker() {
+              echo "Validating Docker environment..."
+              if ! command -v docker &>/dev/null; then
+                echo "❌ ERROR: Docker not found. Install Docker Desktop or Colima"
+                return 1
+              fi
+
+              if ! docker info &>/dev/null; then
+                echo "ERROR: Docker daemon not running:"
+                ${pkgs.lib.optionalString isAarch64Darwin ''
+                  if command -v colima &>/dev/null; then
+                    echo "  Start Colima with: colima start"
+                  else
+                    echo "  Start Docker Desktop or install Colima"
+                  fi
+                ''}
+                return 1
+              fi
+
+              ${pkgs.lib.optionalString isAarch64Darwin ''
+                # only for arm64 macs - checks colima/docker info
+                if docker context inspect colima &>/dev/null; then
+                  colima status 2>&1 |grep -qi 'running' || {
+                    echo "❌ ERROR: Colima context exists but not running"
+                    echo "  Start with: colima start"
+                    return 1
+                  }
+                  # In addition, validate DOCKER_HOST and TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE
+                  local status=0
+                  if [ -z "$DOCKER_HOST" -o -z "$TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE" ]; then
+                    echo "❌ ERROR: DOCKER_HOST and/or TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE are not set"
+                    echo "  Set these environment variables for example in your .envrc file (or .zshrc/.bashrc files):"
+                    echo "    export DOCKER_HOST=\"unix://\$HOME/.colima/docker.sock\""
+                    echo "    export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock"
+                    echo ""
+                    status=1
+                  fi
+                  # Verify "fake" docker symlink exists
+                  if [ ! -L '/var/run/docker.sock' ]; then
+                    echo "❌ ERROR: /var/run/docker.sock is not a symlink, run this to make testcontainers work with colima:"
+                    echo "sudo ln -sf \$HOME/.colima/default/docker.sock /var/run/docker.sock"
+                    echo ""
+                    status=1
+                  fi
+                  return $status
+                fi
+              ''}
+              return 0
+            }
+
+            # Run validation check
+            if ! check_docker; then
+              echo "For Colima on Apple Silicon, fix all errors above and verify:"
+              echo "  1. Install Colima: brew install colima # (or install via nix/home-manager)"
+              echo "  2. Start Colima: colima start"
+              echo "  3. Set Docker context: docker context use colima"
+              echo "  4. verify environment and required symlinks"
+            else
+              echo "Docker environment validated successfully"
+            fi
           '';
 
           # Environment variables
           JAVA_HOME = "${jdk}";
           MAVEN_OPTS = "-Xmx2G";
-          GOOGLE_APPLICATION_CREDENTIALS = "$PWD/infrastructure/credentials.json";
         };
 
         # Provide packages individually if needed

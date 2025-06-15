@@ -1,0 +1,12 @@
+# Suggested .envrc file, for use with flake.nix, with additional info regarding colima on mac os silicone
+export DIRENV_WARN_TIMEOUT="30s"   # 0 disables the warning entirely, prevent warning when context is large or donwloads external resources
+# Required for colima and testcontainers on macos apple silicone
+export DOCKER_HOST="unix://$HOME/.colima/docker.sock"
+export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+# enable GOOGLE_APPLICATION_CREDENTIALS in terminal
+export GOOGLE_APPLICATION_CREDENTIALS="$PWD/infrastructure/credentials.json"
+# OPTIONAL: Set a "clean" settings.xml to override default, often project specific, settings.xml. Comment out if not needed
+# For this variable to take effect, run with ./mvnw
+export MAVEN_CONFIG=" --settings $PWD/config/settings.xml"
+
+use flake

@@ -2,16 +2,28 @@
 
 Min side
 
-# Local setup
-
-## Install development tools
+## Local setup
 
 ### Docker
 
-The setup of testcontainers requires use of Docker Desktop for development. If you use anything else (like Colima), good luck with getting the tests to run.
-(If you do manage, update the documentation on how, to help others in the same situation)
+The setup of testcontainers requires use of Docker Desktop for development.
 
-### Option 1: Using Nix (recommended)
+If you are using colima, there are two important things you *must* do (as of 2025-06-15) for testcontainers to work:
+
+1. symlink the colima sock to the expected docker location (can cause problems if later installing docker, so remember this)
+   ```shell
+   sudo ln -sf \$HOME/.colima/default/docker.sock /var/run/docker.sock
+   ```
+2. export some environment variables (.zshrc, .bashrc or the local .envrc if using direnv)
+   ```shell
+   # Required for colima and testcontainers
+   export DOCKER_HOST="unix://$HOME/.colima/docker.sock"
+   export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+   ```
+
+Docker Desktop or colima must be installed locally in the preferred way for your environment.
+
+### other tools, Option 1: Using Nix (recommended)
 
 This project includes a `flake.nix` file
 that sets up a complete development environment with all the required tools and dependencies.
@@ -61,7 +73,7 @@ that sets up a complete development environment with all the required tools and 
 
 2. All required tools (Java 21, Maven, Kotlin, Node.js, npm, Terraform, Google Cloud SDK) will be available in the shell.
 
-### Option 2: Manual installation
+### other tools Option 2: Manual installation
 
 #### NVM (Node Version Manager)
 Install nvm - https://github.com/nvm-sh/nvm#installation or https://tecadmin.net/install-nvm-macos-with-homebrew/ 
@@ -78,6 +90,7 @@ Install [SDK-man](https://sdkman.io/) to help you handle:
 * (and other tools like gradle, activemq, jmeter, kotlin, spring boot, apache tomcat, spark, quarkus cli, etc etc)
 
 #### Terraform and Google Cloud SDK
+
 Follow the installation instructions in the Infrastructure section below.
 
 ## Running the API
@@ -132,41 +145,58 @@ Install gcloud cli - https://cloud.google.com/sdk/docs/install & https://cloud.g
 
 `gcloud config set project my-page-jpro`
 
-# Setup resources in a new account
+## Setup resources in a new account
 
-## Database
-```
+For setting up everything "from scratch" in a new google cloud account (for example to introduce new environment)
+
+### Database
+
+create new MySQL instance in Google Cloud
+
+```shell
 gcloud sql instances create my-page-jpro-test --region europe-west1 --tier db-g1-small
 gcloud sql databases create my-page --instance my-page-jpro-test
 ```
 
-### Create tables with liquibase
-#### One time setup to proxy connections to the database
-```
+#### Create tables with liquibase
+
+After DB has been created we must create the tables by making use of liquibase for DB provisioning (and updating).
+
+##### One time setup to proxy connections to the database
+
+```shell
 curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.2.0/cloud-sql-proxy.darwin.arm64
 chmod +x cloud-sql-proxy
 gcloud auth application-default login
 ```
 
-#### Run the proxy in the background
-```
+##### Run the proxy in the background
+
+```shell
 ./cloud-sql-proxy --address 127.0.0.1 --port 3306 my-page-jpro-test:europe-west1:my-page-jpro-test &
 ```
 
-#### In the main shell run
-```
+##### In the main shell run
+
+```shell
 cd my-page-api
 ../mvnw -Dliquibase.url=jdbc:mysql://root:@localhost:3306/my-page liquibase:update
 cd..
 ```
 
-#### Stop the proxy in the background
-```
+##### Stop the proxy in the background
+
+```shell
 kill %1
 ```
 
+(or just select the window/terminal where `cloud-sql-proxy` is running and press ctrl+c)
+
 ### Github Actions
-```
+
+Set up and prepare github actions
+
+```shell
 gcloud iam service-accounts create github-actions --display-name="Service account for Github Actions"
 gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/appengine.deployer
 gcloud projects add-iam-policy-binding my-page-jpro-test --member=serviceAccount:github-actions@my-page-jpro-test.iam.gserviceaccount.com --role=roles/appengine.serviceAdmin
@@ -189,14 +219,24 @@ base64 -i github-actions-service-account-private-key.json | pbcopy
 ```
 
 ### App Engine
+
+Where the application is being deployed. If you have access, you can also view the deployments in the
+[Google Cloud Console - AppEngine](https://console.cloud.google.com/appengine?inv=1&invt=Ab0L_g&project=my-page-jpro)
+
 #### One time setup
-```
+
+```shell
 gcloud app create --region=europe-west
 ```
 
 #### Manual deploy
+
+Manuel deploy of the app and the AP. They are deployed in the `my-page-jpro` project, where the
+actual NextJS app is deployed as `default` service while the Java/Kotlin API is deployed as `api` service.
+
 ##### App
-```
+
+```shell
 cd my-page-app
 npm run build
 gcloud app deploy my-page-app/app.yaml
@@ -204,14 +244,16 @@ cd ..
 ```
 
 ##### API
-```
+
+```shell
 cd my-page-api
 ../mvnw package appengine:deploy
 cd ..
 ```
 
 ##### One time setup for routing after the first version of services have been deployed
-```
+
+```shell
 gcloud app deploy my-page-app/dispatch.yaml
 ```
 
