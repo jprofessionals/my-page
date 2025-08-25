@@ -63,7 +63,7 @@
     "sockjs-client": "^1.6.1",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.25.56"
+    "zod": "^4.1.1"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.71.1",
