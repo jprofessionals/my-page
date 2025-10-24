@@ -5,52 +5,30 @@ import authHeader from './auth-header'
 const API_BASE = '/api/cabin-lottery'
 const ADMIN_BASE = '/api/cabin-lottery/admin'
 
-// Get test user ID from localStorage (for local dev testing)
-const getTestUserId = () => {
-  // Only use test user ID in development mode
-  if (process.env.NODE_ENV !== 'development') {
-    return null
-  }
-  return localStorage.getItem('testUserId')
-}
-
-// Create headers with optional test user ID
-const createHeaders = () => {
-  const headers = authHeader()
-  // Only add test user header in development mode
-  if (process.env.NODE_ENV === 'development') {
-    const testUserId = getTestUserId()
-    if (testUserId) {
-      headers['X-Test-User-Id'] = testUserId
-    }
-  }
-  return headers
-}
-
 // ===== USER ENDPOINTS =====
 
 export const getCurrentDrawing = () => {
-  return axios.get(`${API_BASE}/current`, { headers: createHeaders() })
+  return axios.get(`${API_BASE}/current`, { headers: authHeader() })
 }
 
 export const getDrawing = (drawingId) => {
-  return axios.get(`${API_BASE}/drawings/${drawingId}`, { headers: createHeaders() })
+  return axios.get(`${API_BASE}/drawings/${drawingId}`, { headers: authHeader() })
 }
 
 export const getPeriods = (drawingId) => {
-  return axios.get(`${API_BASE}/drawings/${drawingId}/periods`, { headers: createHeaders() })
+  return axios.get(`${API_BASE}/drawings/${drawingId}/periods`, { headers: authHeader() })
 }
 
 export const submitWishes = (drawingId, wishes) => {
-  return axios.post(`${API_BASE}/drawings/${drawingId}/wishes`, { wishes }, { headers: createHeaders() })
+  return axios.post(`${API_BASE}/drawings/${drawingId}/wishes`, { wishes }, { headers: authHeader() })
 }
 
 export const getMyWishes = (drawingId) => {
-  return axios.get(`${API_BASE}/drawings/${drawingId}/my-wishes`, { headers: createHeaders() })
+  return axios.get(`${API_BASE}/drawings/${drawingId}/my-wishes`, { headers: authHeader() })
 }
 
 export const getMyAllocations = (drawingId) => {
-  return axios.get(`${API_BASE}/drawings/${drawingId}/my-allocations`, { headers: createHeaders() })
+  return axios.get(`${API_BASE}/drawings/${drawingId}/my-allocations`, { headers: authHeader() })
 }
 
 export const getAllAllocations = (drawingId) => {
