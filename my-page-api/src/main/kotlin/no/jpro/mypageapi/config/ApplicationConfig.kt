@@ -39,6 +39,8 @@ class ApplicationConfig {
                 "/task/auto/drawPendingBookings",
                 "/task/notifyUpcomingBookings",
                 "/job/generate-notifications",
+                "/cabin-lottery", "/cabin-lottery/**", // TODO: Remove in production - for local dev only
+                "/me", "/me/**" // TODO: Remove in production - for local dev only
             ).permitAll().requestMatchers(HttpMethod.GET, "/settings").permitAll() //Alle (også ikke-påloggede brukere som vil bruke
                                                                                    //lønnskalkulatoren) skal kunne kalle "GET /settings"
                 .requestMatchers("/**").authenticated()

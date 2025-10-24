@@ -14,6 +14,7 @@ import cn from '@/utils/cn'
 
 const navigation = [
   { href: '/admin', name: 'Admin 🛠️', requiresAdmin: true },
+  { href: '/admin/hyttetrekning', name: 'Hyttetrekning Admin', requiresAdmin: true },
   { href: '/', name: 'Hjem' },
   { href: '/utlysninger', name: 'Utlysninger' },
   { href: '/hyttebooking', name: 'Firmahytte' },

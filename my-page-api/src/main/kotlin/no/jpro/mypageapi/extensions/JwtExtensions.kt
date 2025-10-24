@@ -1,5 +1,7 @@
 package no.jpro.mypageapi.extensions
 
+import no.jpro.mypageapi.entity.User
+import no.jpro.mypageapi.repository.UserRepository
 import org.springframework.security.oauth2.jwt.Jwt
 
 fun Jwt.getEmail(): String {
@@ -23,4 +25,10 @@ fun Jwt.getIcon(): String {
 
 fun Jwt.getSub(): String {
     return getClaimAsString("sub")
+}
+
+fun Jwt.getUser(userRepository: UserRepository): User {
+    val userSub = this.subject
+    return userRepository.findUserBySub(userSub)
+        ?: throw IllegalArgumentException("User not found: $userSub")
 }

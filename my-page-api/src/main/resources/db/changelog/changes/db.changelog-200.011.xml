@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="200.011-1" author="JProfessionals">
+        <comment>Create cabin_drawing table</comment>
+        <createTable tableName="cabin_drawing">
+            <column name="id" type="BINARY(16)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="season" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locked_at" type="DATETIME"/>
+            <column name="drawn_at" type="DATETIME"/>
+            <column name="published_at" type="DATETIME"/>
+            <column name="random_seed" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="200.011-2" author="JProfessionals">
+        <comment>Create cabin_period table</comment>
+        <createTable tableName="cabin_period">
+            <column name="id" type="BINARY(16)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="drawing_id" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment" type="VARCHAR(255)"/>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="200.011-3" author="JProfessionals">
+        <comment>Add foreign key from cabin_period to cabin_drawing</comment>
+        <addForeignKeyConstraint
+            baseTableName="cabin_period"
+            baseColumnNames="drawing_id"
+            constraintName="fk_cabin_period_drawing"
+            referencedTableName="cabin_drawing"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="200.011-4" author="JProfessionals">
+        <comment>Create cabin_wish table</comment>
+        <createTable tableName="cabin_wish">
+            <column name="id" type="BINARY(16)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="drawing_id" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="period_id" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment" type="VARCHAR(1000)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="200.011-5" author="JProfessionals">
+        <comment>Add foreign keys for cabin_wish</comment>
+        <addForeignKeyConstraint
+            baseTableName="cabin_wish"
+            baseColumnNames="drawing_id"
+            constraintName="fk_cabin_wish_drawing"
+            referencedTableName="cabin_drawing"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="cabin_wish"
+            baseColumnNames="user_id"
+            constraintName="fk_cabin_wish_user"
+            referencedTableName="user"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="cabin_wish"
+            baseColumnNames="period_id"
+            constraintName="fk_cabin_wish_period"
+            referencedTableName="cabin_period"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="200.011-6" author="JProfessionals">
+        <comment>Create cabin_wish_apartments join table</comment>
+        <createTable tableName="cabin_wish_apartments">
+            <column name="wish_id" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="apartment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="200.011-7" author="JProfessionals">
+        <comment>Add primary key and foreign keys for cabin_wish_apartments</comment>
+        <addPrimaryKey
+            tableName="cabin_wish_apartments"
+            columnNames="wish_id, apartment_id"
+            constraintName="pk_cabin_wish_apartments"/>
+        <addForeignKeyConstraint
+            baseTableName="cabin_wish_apartments"
+            baseColumnNames="wish_id"
+            constraintName="fk_cabin_wish_apartments_wish"
+            referencedTableName="cabin_wish"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="cabin_wish_apartments"
+            baseColumnNames="apartment_id"
+            constraintName="fk_cabin_wish_apartments_apartment"
+            referencedTableName="apartment"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="200.011-8" author="JProfessionals">
+        <comment>Create cabin_allocation table</comment>
+        <createTable tableName="cabin_allocation">
+            <column name="id" type="BINARY(16)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="drawing_id" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="period_id" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="apartment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="allocation_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment" type="VARCHAR(500)"/>
+            <column name="allocated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="200.011-9" author="JProfessionals">
+        <comment>Add foreign keys and unique constraint for cabin_allocation</comment>
+        <addForeignKeyConstraint
+            baseTableName="cabin_allocation"
+            baseColumnNames="drawing_id"
+            constraintName="fk_cabin_allocation_drawing"
+            referencedTableName="cabin_drawing"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="cabin_allocation"
+            baseColumnNames="period_id"
+            constraintName="fk_cabin_allocation_period"
+            referencedTableName="cabin_period"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="cabin_allocation"
+            baseColumnNames="apartment_id"
+            constraintName="fk_cabin_allocation_apartment"
+            referencedTableName="apartment"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="cabin_allocation"
+            baseColumnNames="user_id"
+            constraintName="fk_cabin_allocation_user"
+            referencedTableName="user"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addUniqueConstraint
+            tableName="cabin_allocation"
+            columnNames="period_id, apartment_id"
+            constraintName="uk_cabin_allocation_period_apartment"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -92,6 +92,12 @@ interface BookingRepository : JpaRepository<Booking, Long> {
     fun findAllByStartDateLessThanEqualAndEndDateGreaterThanEqual(
         date: LocalDate, anotherDate: LocalDate
     ): List<Booking>
+
+    fun findBookingByStartDateAndEndDateAndApartmentId(
+        startDate: LocalDate,
+        endDate: LocalDate,
+        apartmentId: Long
+    ): Booking?
 }
 
 @Repository
