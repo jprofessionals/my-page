@@ -38,7 +38,6 @@ jobs:
             -backend-config="bucket=terraform-state-my-page-jpro-test"
       - uses: dflook/terraform-plan@v2
         with:
-          path: infrastructure
           var_file: test.tfvars
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
