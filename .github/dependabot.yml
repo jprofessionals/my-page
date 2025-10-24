@@ -16,14 +16,17 @@ updates:
         update-types:
           - minor
           - patch
-  - package-ecosystem: "maven" # See documentation for possible values
-    directory: "/my-page-api" # Location of package manifests
+  - package-ecosystem: "maven"
+    directory: "/my-page-api"
     schedule:
       interval: "weekly"
     groups:
       non-major:
         patterns:
           - "*"
+        exclude-patterns:
+          # Exclude Spring Boot so it gets separate PRs
+          - "org.springframework.boot:*"
         update-types:
           - minor
           - patch
