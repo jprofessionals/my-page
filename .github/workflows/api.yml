@@ -2,7 +2,7 @@ name: API
 on:
   push:
     paths:
-      - '.github/**'
+      - '.github/workflows/api.yml'
       - 'my-page-api/**'
   workflow_dispatch:
 
