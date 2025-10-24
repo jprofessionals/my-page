@@ -9,7 +9,7 @@ import bookingBarStyles from '@/components/hyttebooking/month-overview/component
 import cabinLotteryService from '@/services/cabinLottery.service'
 
 function Hyttebooking() {
-  const [currentDrawing, setCurrentDrawing] = useState(null)
+  const [currentDrawing, setCurrentDrawing] = useState<{ status: string } | null>(null)
   const [loadingDrawing, setLoadingDrawing] = useState(true)
 
   // Test user selection (for local dev)
@@ -30,7 +30,7 @@ function Hyttebooking() {
   })
 
   // Update localStorage when test user changes
-  const handleTestUserChange = (userId) => {
+  const handleTestUserChange = (userId: string) => {
     setSelectedTestUser(userId)
     if (userId) {
       localStorage.setItem('testUserId', userId)

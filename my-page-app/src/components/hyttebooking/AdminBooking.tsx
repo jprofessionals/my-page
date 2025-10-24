@@ -62,7 +62,7 @@ export default function AdminBooking() {
             API_URL + 'booking/admin/post?bookingOwnerName=' + bookingOwnerName,
             bookingPost,
             {
-              headers: authHeader() as Record<string, string>,
+              headers: authHeader() as unknown as Record<string, string>,
             },
           )
           .then((response) => response.data)
@@ -81,7 +81,7 @@ export default function AdminBooking() {
               bookingOwnerName,
             bookingPost,
             {
-              headers: authHeader() as Record<string, string>,
+              headers: authHeader() as unknown as Record<string, string>,
             },
           )
           .then((response) => response.data)
@@ -96,7 +96,7 @@ export default function AdminBooking() {
     } else {
       return axios
         .post(API_URL + 'pendingBooking/pendingPost', bookingPost, {
-          headers: authHeader() as Record<string, string>,
+          headers: authHeader() as unknown as Record<string, string>,
         })
         .then((response) => response.data)
         .catch((error) => {

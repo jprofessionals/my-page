@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import cabinLotteryService from '@/services/cabinLottery.service'
 
-export default function AdminDrawingDetail({ drawingId }) {
+export default function AdminDrawingDetail({ drawingId }: { drawingId: string }) {
   const router = useRouter()
   const [drawing, setDrawing] = useState(null)
   const [periods, setPeriods] = useState([])

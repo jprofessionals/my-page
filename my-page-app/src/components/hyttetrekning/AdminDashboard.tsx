@@ -5,9 +5,17 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import cabinLotteryService from '@/services/cabinLottery.service'
 
+interface Drawing {
+  id: string
+  season: string
+  status: string
+  createdAt: string
+  periods?: Array<unknown>
+}
+
 export default function AdminDashboard() {
   const router = useRouter()
-  const [drawings, setDrawings] = useState([])
+  const [drawings, setDrawings] = useState<Drawing[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [newSeason, setNewSeason] = useState('')
@@ -46,8 +54,8 @@ export default function AdminDashboard() {
     }
   }
 
-  const getStatusBadge = (status) => {
-    const styles = {
+  const getStatusBadge = (status: string) => {
+    const styles: Record<string, string> = {
       OPEN: 'bg-green-100 text-green-800',
       LOCKED: 'bg-yellow-100 text-yellow-800',
       DRAWN: 'bg-blue-100 text-blue-800',
@@ -56,8 +64,8 @@ export default function AdminDashboard() {
     return styles[status] || 'bg-gray-100 text-gray-800'
   }
 
-  const getStatusText = (status) => {
-    const texts = {
+  const getStatusText = (status: string) => {
+    const texts: Record<string, string> = {
       OPEN: 'Åpen',
       LOCKED: 'Låst',
       DRAWN: 'Trukket',

@@ -28,7 +28,7 @@ const createNewEmployee = async (newEmployee: NewEmployee) => {
   }
 
   return await axios.post(API_URL + 'user', modifiedNewEmployee, {
-    headers: authHeader() as Record<string, string>,
+    headers: authHeader() as unknown as Record<string, string>,
   })
 }
 
