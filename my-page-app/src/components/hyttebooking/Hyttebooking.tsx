@@ -55,36 +55,41 @@ function Hyttebooking() {
       })
   }, [])
 
+  // Only show test user selector in development
+  const isDevelopment = process.env.NODE_ENV === 'development'
+
   return (
     <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 p-4">
-        {/* Test user selector - Only works in development (backend enforces this) */}
-        <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4">
-          <div className="flex items-center gap-4">
-            <div className="flex-shrink-0">
-              <span className="text-sm font-medium text-yellow-800">🧪 DEV MODE</span>
+        {/* Test user selector - Only visible in development */}
+        {isDevelopment && (
+          <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4">
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0">
+                <span className="text-sm font-medium text-yellow-800">🧪 DEV MODE</span>
+              </div>
+              <div className="flex-grow">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Test som bruker:
+                </label>
+                <select
+                  value={selectedTestUser}
+                  onChange={(e) => handleTestUserChange(e.target.value)}
+                  className="w-full max-w-xs border border-gray-300 rounded-md px-3 py-2 text-sm"
+                >
+                  {testUsers.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div className="flex-grow">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Test som bruker:
-              </label>
-              <select
-                value={selectedTestUser}
-                onChange={(e) => handleTestUserChange(e.target.value)}
-                className="w-full max-w-xs border border-gray-300 rounded-md px-3 py-2 text-sm"
-              >
-                {testUsers.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <p className="text-xs text-gray-600 mt-2">
+              Velg en bruker for å teste hyttebooking og hyttetrekning som forskjellige personer. Fungerer kun i lokal utviklingsmodus.
+            </p>
           </div>
-          <p className="text-xs text-gray-600 mt-2">
-            Velg en bruker for å teste hyttebooking og hyttetrekning som forskjellige personer. Fungerer kun i lokal utviklingsmodus.
-          </p>
-        </div>
+        )}
         <div className="flex overflow-hidden gap-2 items-center p-2 max-w-7xl rounded-lg prose bgColor: bg-slate-200">
           <div className="relative flex-1">
             <h1>Reservasjon av firmahytte</h1>
