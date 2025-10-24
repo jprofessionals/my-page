@@ -36,12 +36,11 @@ jobs:
           terraform init \
             -lockfile=readonly \
             -backend-config="bucket=terraform-state-my-page-jpro-test"
-      - name: Echo path
-        run: ls -la
       - uses: dflook/terraform-plan@v2
         with:
           path: infrastructure
           var_file: infrastructure/test.tfvars
+          backend_config: bucket=terraform-state-my-page-jpro-test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
