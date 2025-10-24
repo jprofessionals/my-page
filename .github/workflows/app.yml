@@ -2,7 +2,7 @@ name: App
 on:
   push:
     paths:
-      - '.github/**'
+      - '.github/workflows/app.yml'
       - 'my-page-app/**'
   workflow_dispatch:
 
