@@ -36,6 +36,8 @@ jobs:
           terraform init \
             -lockfile=readonly \
             -backend-config="bucket=terraform-state-my-page-jpro-test"
+      - name: Echo path
+        run: ls -la
       - uses: dflook/terraform-plan@v2
         with:
           var_file: test.tfvars
