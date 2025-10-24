@@ -40,7 +40,8 @@ jobs:
         run: ls -la
       - uses: dflook/terraform-plan@v2
         with:
-          var_file: test.tfvars
+          path: infrastructure
+          var_file: infrastructure/test.tfvars
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
