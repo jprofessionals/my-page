@@ -20,6 +20,9 @@ jobs:
     concurrency:
       group: terraform-${{ github.ref }}-test
       cancel-in-progress: true
+    defaults:
+      run:
+        working-directory: infrastructure
     steps:
       - uses: actions/checkout@v5
       - uses: google-github-actions/auth@v2
