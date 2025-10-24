@@ -1,11 +1,47 @@
 name: infrastructure
 on:
   push:
+    branches:
+      - main
+    paths:
+      - 'infrastructure/**'
+      - '.github/workflows/infrastructure.yml'
+  pull_request:
+    paths:
+      - 'infrastructure/**'
+      - '.github/workflows/infrastructure.yml'
   workflow_dispatch:
 
 jobs:
+  plan:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    environment: test
+    concurrency:
+      group: terraform-${{ github.ref }}-test
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.4.6
+      - name: Terraform init
+        run: |
+          terraform init \
+            -lockfile=readonly \
+            -backend-config="bucket=terraform-state-my-page-jpro-test"
+      - uses: dflook/terraform-plan@v2
+        with:
+          path: infrastructure
+          var_file: test.tfvars
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   run-terraform-test:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: test
     concurrency: terraform-lock-test
