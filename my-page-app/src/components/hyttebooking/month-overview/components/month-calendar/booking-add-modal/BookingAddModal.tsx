@@ -52,7 +52,7 @@ const BookingAddModal = ({
     const data = { ...bookingPost, startDate, endDate }
     const url = `${API_URL}pendingBooking/pendingPost`
     return axios
-      .post(url, data, { headers: authHeader() })
+      .post(url, data, { headers: authHeader() as Record<string, string> })
       .then((response) => response.data)
       .catch((error) => {
         throw error?.response?.data || 'En feil oppstod ved lagring'

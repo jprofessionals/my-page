@@ -31,7 +31,7 @@ export const useDeleteJobPosting = () => {
         path: {
           id: id,
         },
-        headers: authHeader(),
+        headers: authHeader() as Record<string, string>,
         baseUrl: '/api',
       })
     },
@@ -58,7 +58,7 @@ export const useDeleteJobPostingFiles = () => {
           jobPostingId: jobPostingId,
           fileName: fileName,
         },
-        headers: authHeader(),
+        headers: authHeader() as Record<string, string>,
         baseUrl: '/api',
       })
     },
@@ -76,7 +76,7 @@ export const useJobPostingCustomers = () => {
 
   const fetchJobPostingCustomers = async () => {
     return await getJobPostingCustomers({
-      headers: authHeader(),
+      headers: authHeader() as Record<string, string>,
       baseUrl: '/api',
     })
   }
@@ -97,7 +97,7 @@ export const useJobPostingFiles = (id: number) => {
       path: {
         jobPostingId: id,
       },
-      headers: authHeader(),
+      headers: authHeader() as Record<string, string>,
       baseUrl: '/api',
     })
   }
@@ -126,7 +126,7 @@ export const usePostJobPostingFiles = () => {
           jobPostingId: jobPostingId,
         },
         body: newJobPostingFile,
-        headers: authHeader(),
+        headers: authHeader() as Record<string, string>,
         baseUrl: '/api',
       })
     },
@@ -144,7 +144,7 @@ export const useJobPostingTags = () => {
 
   const fetchJobPostingTags = async () => {
     return await getJobPostingTags({
-      headers: authHeader(),
+      headers: authHeader() as Record<string, string>,
       baseUrl: '/api',
     })
   }
@@ -177,7 +177,7 @@ export const useJobPostings = (
         'include-ids': includeIds ? includeIds : undefined,
         tags: tags ? tags : undefined,
       },
-      headers: authHeader(),
+      headers: authHeader() as Record<string, string>,
       baseUrl: '/api',
     })
   }
@@ -208,7 +208,7 @@ export const usePostJobPosting = () => {
           notify: notify,
         },
         body: newJobPosting,
-        headers: authHeader(),
+        headers: authHeader() as Record<string, string>,
         baseUrl: '/api',
       })
     },
@@ -255,7 +255,7 @@ export const usePutJobPosting = () => {
           'update-message': updateMessage ? updateMessage : undefined,
         },
         body: updatedJobPosting,
-        headers: authHeader(),
+        headers: authHeader() as Record<string, string>,
         baseUrl: '/api',
       })
     },
