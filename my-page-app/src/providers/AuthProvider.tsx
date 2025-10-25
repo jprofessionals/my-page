@@ -45,6 +45,18 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const token = sessionStorage.getItem('user_token')
+
+    // In development, check for test user
+    if (process.env.NODE_ENV === 'development') {
+      const testUserId = localStorage.getItem('testUserId')
+      if (testUserId) {
+        // Set a mock token for test user to bypass authentication
+        setUserToken('test-user-token')
+        setIsLoading(false)
+        return
+      }
+    }
+
     setUserToken(token)
     setIsLoading(false)
   }, [])

@@ -2,6 +2,7 @@ package no.jpro.mypageapi.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.env.Environment
 import org.springframework.http.HttpMethod
 import org.springframework.integration.jdbc.lock.DefaultLockRepository
 import org.springframework.integration.jdbc.lock.JdbcLockRegistry
@@ -21,28 +22,43 @@ import javax.sql.DataSource
 @EnableTransactionManagement
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
-class ApplicationConfig {
+class ApplicationConfig(private val environment: Environment) {
 
     @Bean
     fun filterChain(
         http: HttpSecurity,
         customJwtAuthenticationConverter: CustomJwtAuthenticationConverter
     ): SecurityFilterChain {
+        // Check if we're running in a development profile (local or h2)
+        val isDevelopment = environment.activeProfiles.any { it == "local" || it == "h2" }
+
         http.authorizeHttpRequests { authz ->
-            authz.requestMatchers(
-                        "/open/**",
-                        "/v3/api-docs", "/v3/api-docs/**",
-                        "/swagger-ui.html", "/swagger-ui/**",
-                        "/actuator/**", "/explorationSock",
-                        "/explorationSock/**",
+            // Base endpoints that are always permitted
+            val basePermittedEndpoints = mutableListOf(
+                "/open/**",
+                "/v3/api-docs", "/v3/api-docs/**",
+                "/swagger-ui.html", "/swagger-ui/**",
+                "/actuator/**", "/explorationSock",
+                "/explorationSock/**",
                 "/task/**","/task/drawPendingBookings",
                 "/task/auto/drawPendingBookings",
                 "/task/notifyUpcomingBookings",
-                "/job/generate-notifications",
-                "/cabin-lottery", "/cabin-lottery/**", // TODO: Remove in production - for local dev only
-                "/me", "/me/**" // TODO: Remove in production - for local dev only
-            ).permitAll().requestMatchers(HttpMethod.GET, "/settings").permitAll() //Alle (også ikke-påloggede brukere som vil bruke
-                                                                                   //lønnskalkulatoren) skal kunne kalle "GET /settings"
+                "/job/generate-notifications"
+            )
+
+            // Add development-only endpoints if in local/h2 profile
+            if (isDevelopment) {
+                basePermittedEndpoints.addAll(listOf(
+                    "/cabin-lottery", "/cabin-lottery/**",
+                    "/me", "/me/**",
+                    "/booking", "/booking/**",
+                    "/user", "/user/**"
+                ))
+            }
+
+            authz.requestMatchers(*basePermittedEndpoints.toTypedArray())
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, "/settings").permitAll() //Alle (også ikke-påloggede brukere som vil bruke lønnskalkulatoren) skal kunne kalle "GET /settings"
                 .requestMatchers("/**").authenticated()
         }
             .csrf { csrf ->

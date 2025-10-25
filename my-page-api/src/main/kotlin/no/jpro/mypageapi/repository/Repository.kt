@@ -121,6 +121,7 @@ interface PendingBookingRepository : JpaRepository<PendingBooking, Long> {
 
 @Repository
 interface ApartmentRepository : JpaRepository<Apartment, Long> {
+    @Query("SELECT a FROM Apartment a ORDER BY a.id ASC")
     override fun findAll(): List<Apartment>
     fun findApartmentById(apartmentId: Long): Apartment
     fun existsApartmentById(apartmentId: Long): Boolean
