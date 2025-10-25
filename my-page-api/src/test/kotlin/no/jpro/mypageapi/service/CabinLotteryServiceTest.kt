@@ -51,9 +51,9 @@ class CabinLotteryServiceTest {
         )
         
         // Opprett 3 apartments
-        val hovedhytta = Apartment(id = 1L, cabin_name = "Hovedhytta")
-        val leiligheten = Apartment(id = 2L, cabin_name = "Leiligheten")
-        val annekset = Apartment(id = 3L, cabin_name = "Annekset")
+        val hovedhytta = Apartment(id = 1L, cabin_name = "Hovedhytta", sort_order = 1)
+        val leiligheten = Apartment(id = 2L, cabin_name = "Leiligheten", sort_order = 2)
+        val annekset = Apartment(id = 3L, cabin_name = "Annekset", sort_order = 3)
         
         // Opprett 2 perioder
         val period1 = CabinPeriod(
@@ -191,7 +191,7 @@ class CabinLotteryServiceTest {
         val user1 = User(id = 1L, email = "user1@jpro.no", name = "User 1", givenName = "User", familyName = "One", budgets = emptyList())
         val user2 = User(id = 2L, email = "user2@jpro.no", name = "User 2", givenName = "User", familyName = "Two", budgets = emptyList())
         
-        val hovedhytta = Apartment(id = 1L, cabin_name = "Hovedhytta")
+        val hovedhytta = Apartment(id = 1L, cabin_name = "Hovedhytta", sort_order = 1)
         
         val period1 = CabinPeriod(
             id = UUID.randomUUID(),

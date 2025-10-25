@@ -63,9 +63,9 @@ class CabinLotteryDeterministicTest {
 
         // Create 3 apartments
         val apartments = listOf(
-            Apartment(id = 51L, cabin_name = "Stor leilighet"),
-            Apartment(id = 52L, cabin_name = "Liten leilighet"),
-            Apartment(id = 53L, cabin_name = "Annekset")
+            Apartment(id = 51L, cabin_name = "Stor leilighet", sort_order = 1),
+            Apartment(id = 52L, cabin_name = "Liten leilighet", sort_order = 1),
+            Apartment(id = 53L, cabin_name = "Annekset", sort_order = 1)
         )
 
         // Create 4 periods
@@ -275,9 +275,9 @@ class CabinLotteryDeterministicTest {
         }
 
         val apartments = listOf(
-            Apartment(id = 51L, cabin_name = "Stor leilighet"),
-            Apartment(id = 52L, cabin_name = "Liten leilighet"),
-            Apartment(id = 53L, cabin_name = "Annekset")
+            Apartment(id = 51L, cabin_name = "Stor leilighet", sort_order = 1),
+            Apartment(id = 52L, cabin_name = "Liten leilighet", sort_order = 1),
+            Apartment(id = 53L, cabin_name = "Annekset", sort_order = 1)
         )
 
         val periods = listOf(
@@ -402,7 +402,7 @@ class CabinLotteryDeterministicTest {
         )
 
         // Only 1 apartment available
-        val apartment = Apartment(id = 51L, cabin_name = "Only Cabin")
+        val apartment = Apartment(id = 51L, cabin_name = "Only Cabin", sort_order = 1)
 
         val periodHigh = CabinPeriod(
             id = UUID.randomUUID(),
@@ -508,7 +508,7 @@ class CabinLotteryDeterministicTest {
             )
         }
 
-        val apartment = Apartment(id = 51L, cabin_name = "Popular Cabin")
+        val apartment = Apartment(id = 51L, cabin_name = "Popular Cabin", sort_order = 1)
 
         val period = CabinPeriod(
             id = UUID.randomUUID(),
@@ -574,9 +574,9 @@ class CabinLotteryDeterministicTest {
         }
 
         val apartments = listOf(
-            Apartment(id = 51L, cabin_name = "Stor leilighet"),
-            Apartment(id = 52L, cabin_name = "Liten leilighet"),
-            Apartment(id = 53L, cabin_name = "Annekset")
+            Apartment(id = 51L, cabin_name = "Stor leilighet", sort_order = 1),
+            Apartment(id = 52L, cabin_name = "Liten leilighet", sort_order = 1),
+            Apartment(id = 53L, cabin_name = "Annekset", sort_order = 1)
         )
 
         val periods = listOf(

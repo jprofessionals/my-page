@@ -67,6 +67,7 @@ class PendingBookingServiceTest @Autowired constructor(private val pendingBookin
     private val apartment = Apartment(
         id = null,
         cabin_name = "Test apartment",
+        sort_order = 1,
     )
 
     @Autowired
