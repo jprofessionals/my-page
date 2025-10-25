@@ -435,11 +435,33 @@ cd my-page-api
 
 ### Frontend Tests
 
-Currently, the project has minimal frontend testing.
+The frontend uses Vitest with React Testing Library for testing.
+
+**Run all tests:**
+```bash
+cd my-page-app
+npm test           # Watch mode
+npm run test:run   # Run once
+```
+
+**Run tests with UI:**
+```bash
+npm run test:ui    # Interactive test dashboard
+```
+
+**Run tests with coverage:**
+```bash
+npm run test:coverage
+```
+
+**Test structure:**
+- Tests are co-located with source files (e.g., `utils/getAsNo.test.ts`)
+- Setup: `src/test/setup.ts` (global test configuration)
+- Framework: Vitest + React Testing Library + @testing-library/jest-dom
+- Current coverage: 37 tests covering `utils/` with 100% coverage
 
 **Linting:**
 ```bash
-cd my-page-app
 npm run lint
 ```
 
@@ -449,7 +471,7 @@ npm run format      # Check formatting
 npm run format:fix  # Auto-fix formatting issues
 ```
 
-**Note:** Frontend test infrastructure (Vitest + React Testing Library) should be added in a future PR.
+**Note:** Tests run automatically in CI/CD before build and deployment.
 
 ---
 
@@ -509,9 +531,10 @@ GitHub Actions handles continuous integration and deployment.
 **.github/workflows/app.yml** - Frontend Pipeline
 - Triggers: Push to `main` or changes in `my-page-app/**`
 - Steps:
-  1. npm ci && npm run build
-  2. Deploy to Test environment
-  3. Deploy to Production (if test succeeds)
+  1. Run tests (37 unit tests with Vitest)
+  2. npm ci && npm run build
+  3. Deploy to Test environment
+  4. Deploy to Production (if test succeeds)
 
 ### Viewing Build Status
 
@@ -661,8 +684,9 @@ gcloud app browse --service=api
 
    # Frontend
    cd my-page-app
-   npm run lint
-   npm run format
+   npm run test:run  # Run tests
+   npm run lint      # Lint check
+   npm run format    # Format check
    ```
 
 4. **Commit with descriptive message:**
@@ -716,7 +740,8 @@ gcloud app browse --service=api
 
 ### Code Review Checklist
 
-- [ ] Tests pass (`mvnw test`)
+- [ ] Backend tests pass (`mvnw test`)
+- [ ] Frontend tests pass (`npm run test:run`)
 - [ ] Lint passes (`npm run lint`)
 - [ ] OpenAPI spec updated (if API changes)
 - [ ] Liquibase changeset added (if database changes)
