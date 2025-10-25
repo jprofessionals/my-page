@@ -41,7 +41,7 @@ describe('getSetting', () => {
   })
 
   it('returns undefined when settings is null', () => {
-    expect(getSetting(null as any, 'any_key')).toBeUndefined()
+    expect(getSetting(null as unknown as Settings[], 'any_key')).toBeUndefined()
   })
 
   it('returns undefined when settings is an empty array', () => {
