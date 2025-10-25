@@ -96,7 +96,8 @@ data class DrawingResultDTO(
     val season: String,
     val drawnAt: LocalDateTime,
     val allocations: List<CabinAllocationDTO>,
-    val statistics: DrawingStatisticsDTO
+    val statistics: DrawingStatisticsDTO,
+    val auditLog: List<String>
 )
 
 data class DrawingStatisticsDTO(

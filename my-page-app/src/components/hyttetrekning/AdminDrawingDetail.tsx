@@ -28,6 +28,7 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
   const [periods, setPeriods] = useState<Period[]>([])
   const [wishes, setWishes] = useState<Wish[]>([])
   const [allocations, setAllocations] = useState<Allocation[]>([])
+  const [auditLog, setAuditLog] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState<ActiveTab>('periods')
   const [loading, setLoading] = useState<boolean>(true)
 
@@ -273,7 +274,13 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     try {
       const seed = drawSeed ? parseInt(drawSeed) : null
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await cabinLotteryService.adminPerformDraw(drawingId, seed as any)
+      const result = await cabinLotteryService.adminPerformDraw(drawingId, seed as any)
+
+      // Lagre audit log fra resultatet
+      if (result.data && result.data.auditLog) {
+        setAuditLog(result.data.auditLog)
+      }
+
       await loadData()
       setActiveTab('results')
       toast.success('Trekning gjennomført!')
@@ -437,6 +444,7 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
               <ResultsTab
                 periods={periods}
                 allocations={allocations}
+                auditLog={auditLog}
               />
             )}
           </div>
