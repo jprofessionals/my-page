@@ -343,14 +343,6 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back button */}
-        <button
-          onClick={() => router.push('/admin/hyttetrekning')}
-          className="text-blue-600 hover:text-blue-800 mb-4"
-        >
-          ← Tilbake til oversikt
-        </button>
-
         <DrawingHeader
           drawing={drawing}
           periodsCount={periods.length}
