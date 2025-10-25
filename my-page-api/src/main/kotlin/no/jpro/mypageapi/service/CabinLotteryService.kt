@@ -87,7 +87,7 @@ class CabinLotteryService(
             var allocated = false
             for (wish in wishes) {
                 // Prøv å finne en ledig enhet som matcher ønsket
-                val availableApartment = wish.desiredApartments.firstOrNull { apartment: Apartment ->
+                val availableApartment = wish.desiredApartments.sortedBy { it.sort_order }.firstOrNull { apartment: Apartment ->
                     val slot = Pair(wish.period.id!!, apartment.id!!)
                     !occupiedSlots.contains(slot)
                 }

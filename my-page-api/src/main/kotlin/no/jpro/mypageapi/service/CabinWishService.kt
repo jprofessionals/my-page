@@ -74,8 +74,8 @@ class CabinWishService(
             periodId = wish.period.id!!,
             periodDescription = wish.period.description,
             priority = wish.priority,
-            desiredApartmentIds = wish.desiredApartments.mapNotNull { it.id },
-            desiredApartmentNames = wish.desiredApartments.mapNotNull { it.cabin_name },
+            desiredApartmentIds = wish.desiredApartments.sortedBy { it.sort_order }.mapNotNull { it.id },
+            desiredApartmentNames = wish.desiredApartments.sortedBy { it.sort_order }.mapNotNull { it.cabin_name },
             comment = wish.comment
         )
     }
