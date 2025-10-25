@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { toast } from 'react-toastify'
 import cabinLotteryService from '@/services/cabinLottery.service'
 
 interface Drawing {
@@ -30,7 +31,7 @@ export default function AdminDashboard() {
       setDrawings(response.data)
     } catch (error) {
       console.error('Failed to load drawings:', error)
-      alert('Feil ved lasting av trekkinger')
+      toast.error('Feil ved lasting av trekkinger')
     } finally {
       setLoading(false)
     }
@@ -38,7 +39,7 @@ export default function AdminDashboard() {
 
   const handleCreateDrawing = async () => {
     if (!newSeason.trim()) {
-      alert('Vennligst fyll inn sesong')
+      toast.warning('Vennligst fyll inn sesong')
       return
     }
 
@@ -48,7 +49,7 @@ export default function AdminDashboard() {
       router.push(`/admin/hyttetrekning/${response.data.id}`)
     } catch (error) {
       console.error('Failed to create drawing:', error)
-      alert('Feil ved opprettelse av trekning')
+      toast.error('Feil ved opprettelse av trekning')
     } finally {
       setCreating(false)
     }

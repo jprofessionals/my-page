@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { toast } from 'react-toastify'
 import cabinLotteryService from '@/services/cabinLottery.service'
 import type {
   Drawing,
@@ -93,7 +94,7 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       }
     } catch (error) {
       console.error('Failed to load data:', error)
-      alert('Feil ved lasting av data')
+      toast.error('Feil ved lasting av data')
     } finally {
       setLoading(false)
     }
@@ -101,7 +102,7 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
 
   const handleAddPeriod = async (): Promise<void> => {
     if (!newPeriod.startDate || !newPeriod.endDate || !newPeriod.description) {
-      alert('Vennligst fyll ut alle felt')
+      toast.warning('Vennligst fyll ut alle felt')
       return
     }
 
@@ -110,10 +111,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       setShowPeriodForm(false)
       setNewPeriod({ startDate: '', endDate: '', description: '', comment: '', sortOrder: 0 })
       await loadData()
-      alert('Periode lagt til!')
+      toast.success('Periode lagt til!')
     } catch (error) {
       console.error('Failed to add period:', error)
-      alert('Feil ved tillegg av periode')
+      toast.error('Feil ved tillegg av periode')
     }
   }
 
@@ -130,7 +131,7 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
 
   const handleUpdatePeriod = async (): Promise<void> => {
     if (!editPeriod.startDate || !editPeriod.endDate || !editPeriod.description) {
-      alert('Vennligst fyll ut alle felt')
+      toast.warning('Vennligst fyll ut alle felt')
       return
     }
 
@@ -139,10 +140,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       setEditingPeriodId(null)
       setEditPeriod({ startDate: '', endDate: '', description: '', comment: '', sortOrder: 0 })
       await loadData()
-      alert('Periode oppdatert!')
+      toast.success('Periode oppdatert!')
     } catch (error) {
       console.error('Failed to update period:', error)
-      alert('Feil ved oppdatering av periode')
+      toast.error('Feil ved oppdatering av periode')
     }
   }
 
@@ -157,16 +158,16 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     try {
       await cabinLotteryService.adminDeletePeriod(drawingId, periodId)
       await loadData()
-      alert('Periode slettet!')
+      toast.success('Periode slettet!')
     } catch (error) {
       console.error('Failed to delete period:', error)
-      alert('Feil ved sletting av periode')
+      toast.error('Feil ved sletting av periode')
     }
   }
 
   const handleBulkAddPeriods = async () => {
     if (!bulkPeriod.startDate || !bulkPeriod.endDate) {
-      alert('Vennligst fyll ut både startdato og sluttdato')
+      toast.warning('Vennligst fyll ut både startdato og sluttdato')
       return
     }
 
@@ -179,10 +180,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       setShowBulkPeriodForm(false)
       setBulkPeriod({ startDate: '', endDate: '' })
       await loadData()
-      alert(`${response.data.periodsCreated} perioder opprettet!`)
+      toast.success(`${response.data.periodsCreated} perioder opprettet!`)
     } catch (error) {
       console.error('Failed to bulk add periods:', error)
-      alert('Feil ved oppretting av perioder')
+      toast.error('Feil ved oppretting av perioder')
     }
   }
 
@@ -192,10 +193,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     try {
       await cabinLotteryService.adminLockDrawing(drawingId)
       await loadData()
-      alert('Trekning låst!')
+      toast.success('Trekning låst!')
     } catch (error) {
       console.error('Failed to lock drawing:', error)
-      alert('Feil ved låsing')
+      toast.error('Feil ved låsing')
     }
   }
 
@@ -205,10 +206,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     try {
       await cabinLotteryService.adminUnlockDrawing(drawingId)
       await loadData()
-      alert('Trekning låst opp!')
+      toast.success('Trekning låst opp!')
     } catch (error) {
       console.error('Failed to unlock drawing:', error)
-      alert('Feil ved opplåsing')
+      toast.error('Feil ved opplåsing')
     }
   }
 
@@ -218,10 +219,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     try {
       await cabinLotteryService.adminOpenDrawing(drawingId)
       await loadData()
-      alert('Trekning åpnet!')
+      toast.success('Trekning åpnet!')
     } catch (error) {
       console.error('Failed to open drawing:', error)
-      alert('Feil ved åpning av trekning')
+      toast.error('Feil ved åpning av trekning')
     }
   }
 
@@ -231,16 +232,16 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     try {
       await cabinLotteryService.adminRevertToDraft(drawingId)
       await loadData()
-      alert('Trekning satt tilbake til utkast!')
+      toast.success('Trekning satt tilbake til utkast!')
     } catch (error) {
       console.error('Failed to revert drawing:', error)
-      alert('Feil ved tilbakestilling til utkast')
+      toast.error('Feil ved tilbakestilling til utkast')
     }
   }
 
   const handleImport = async () => {
     if (!importFile) {
-      alert('Velg en fil først')
+      toast.warning('Velg en fil først')
       return
     }
 
@@ -253,13 +254,13 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       await loadData()
 
       if (response.data.errorCount === 0) {
-        alert(`Import vellykket! ${response.data.successCount} brukere importert.`)
+        toast.success(`Import vellykket! ${response.data.successCount} brukere importert.`)
       } else {
-        alert(`Import delvis vellykket. ${response.data.successCount} brukere importert, ${response.data.errorCount} feil.`)
+        toast.warning(`Import delvis vellykket. ${response.data.successCount} brukere importert, ${response.data.errorCount} feil.`)
       }
     } catch (error) {
       console.error('Import failed:', error)
-      alert('Import feilet')
+      toast.error('Import feilet')
     } finally {
       setImporting(false)
     }
@@ -275,10 +276,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       await cabinLotteryService.adminPerformDraw(drawingId, seed as any)
       await loadData()
       setActiveTab('results')
-      alert('Trekning gjennomført!')
+      toast.success('Trekning gjennomført!')
     } catch (error) {
       console.error('Draw failed:', error)
-      alert('Trekning feilet')
+      toast.error('Trekning feilet')
     } finally {
       setIsDrawing(false)
     }
@@ -290,10 +291,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     try {
       await cabinLotteryService.adminPublishDrawing(drawingId)
       await loadData()
-      alert('Trekning publisert! Bookings er opprettet.')
+      toast.success('Trekning publisert! Bookings er opprettet.')
     } catch (error) {
       console.error('Publish failed:', error)
-      alert('Publisering feilet')
+      toast.error('Publisering feilet')
     }
   }
 
@@ -303,10 +304,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     try {
       await cabinLotteryService.adminDeleteDrawing(drawingId)
       router.push('/admin/hyttetrekning')
-      alert('Trekning slettet')
+      toast.success('Trekning slettet')
     } catch (error) {
       console.error('Delete failed:', error)
-      alert('Feil ved sletting av trekning. Trekningen kan være gjennomført eller publisert.')
+      toast.error('Feil ved sletting av trekning. Trekningen kan være gjennomført eller publisert.')
     }
   }
 

@@ -2,6 +2,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 import cabinLotteryService from '@/services/cabinLottery.service'
 import UserResults from './UserResults'
 import type {
@@ -151,7 +152,7 @@ export default function UserWishForm() {
 
     for (const wish of wishForm) {
       if (!wish.periodId || wish.apartmentIds.length === 0) {
-        alert('Alle ønsker må ha en periode og minst én enhet valgt')
+        toast.warning('Alle ønsker må ha en periode og minst én enhet valgt')
         return
       }
     }
@@ -167,10 +168,10 @@ export default function UserWishForm() {
 
       await cabinLotteryService.submitWishes(drawing.id, wishes)
       await loadData()
-      alert('Ønsker lagret!')
+      toast.success('Ønsker lagret!')
     } catch (error) {
       console.error('Failed to save wishes:', error)
-      alert('Feil ved lagring av ønsker')
+      toast.error('Feil ved lagring av ønsker')
     } finally {
       setSaving(false)
     }
