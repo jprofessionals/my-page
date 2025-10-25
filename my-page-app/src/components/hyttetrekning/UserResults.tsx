@@ -3,14 +3,22 @@
 
 import { useEffect, useState } from 'react'
 import cabinLotteryService from '@/services/cabinLottery.service'
+import type { Allocation, Period } from '@/types/cabinLottery.types'
 
-export default function UserResults({ drawingId, season, periods }) {
-  const [myAllocations, setMyAllocations] = useState([])
-  const [allAllocations, setAllAllocations] = useState([])
-  const [loading, setLoading] = useState(true)
+interface UserResultsProps {
+  drawingId: string
+  season: string
+  periods: Period[]
+}
+
+export default function UserResults({ drawingId, season, periods }: UserResultsProps) {
+  const [myAllocations, setMyAllocations] = useState<Allocation[]>([])
+  const [allAllocations, setAllAllocations] = useState<Allocation[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     loadResults()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drawingId])
 
   const loadResults = async () => {

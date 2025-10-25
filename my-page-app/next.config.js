@@ -3,12 +3,12 @@ const nextConfig = {
   reactStrictMode: true,
   distDir: 'build',
 
-  // Temporarily ignore TypeScript and ESLint errors during build
+  // Enable TypeScript and ESLint checking during build
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 
   async rewrites() {

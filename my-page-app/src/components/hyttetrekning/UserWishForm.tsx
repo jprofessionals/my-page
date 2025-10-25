@@ -4,16 +4,23 @@
 import { useEffect, useState } from 'react'
 import cabinLotteryService from '@/services/cabinLottery.service'
 import UserResults from './UserResults'
+import type {
+  Drawing,
+  Period,
+  Wish,
+  Apartment,
+  WishFormState
+} from '@/types/cabinLottery.types'
 
 export default function UserWishForm() {
-  const [drawing, setDrawing] = useState(null)
-  const [periods, setPeriods] = useState([])
-  const [myWishes, setMyWishes] = useState([])
-  const [apartments, setApartments] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const [drawing, setDrawing] = useState<Drawing | null>(null)
+  const [periods, setPeriods] = useState<Period[]>([])
+  const [myWishes, setMyWishes] = useState<Wish[]>([])
+  const [apartments, setApartments] = useState<Apartment[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [saving, setSaving] = useState<boolean>(false)
 
-  const [wishForm, setWishForm] = useState([])
+  const [wishForm, setWishForm] = useState<WishFormState[]>([])
 
   // Test user selection (for local dev)
   const testUsers = [
@@ -25,12 +32,12 @@ export default function UserWishForm() {
     { id: '5', name: 'Per Jensen' },
     { id: '6', name: 'Anne Olsen' },
   ]
-  const [selectedTestUser, setSelectedTestUser] = useState(() => {
+  const [selectedTestUser, setSelectedTestUser] = useState<string>(() => {
     return localStorage.getItem('testUserId') || ''
   })
 
   // Update localStorage when test user changes
-  const handleTestUserChange = (userId) => {
+  const handleTestUserChange = (userId: string): void => {
     setSelectedTestUser(userId)
     if (userId) {
       localStorage.setItem('testUserId', userId)
@@ -71,7 +78,7 @@ export default function UserWishForm() {
       setMyWishes(wishesRes.data)
 
       if (wishesRes.data.length > 0) {
-        const formData = wishesRes.data.map((w) => ({
+        const formData = wishesRes.data.map((w: Wish) => ({
           periodId: w.periodId,
           priority: w.priority,
           apartmentIds: w.desiredApartmentIds,
@@ -89,7 +96,7 @@ export default function UserWishForm() {
     }
   }
 
-  const addWish = () => {
+  const addWish = (): void => {
     setWishForm([
       ...wishForm,
       {
@@ -101,17 +108,17 @@ export default function UserWishForm() {
     ])
   }
 
-  const updateWish = (index, field, value) => {
+  const updateWish = (index: number, field: keyof WishFormState, value: unknown): void => {
     const updated = [...wishForm]
     updated[index] = { ...updated[index], [field]: value }
     setWishForm(updated)
   }
 
-  const removeWish = (index) => {
+  const removeWish = (index: number): void => {
     setWishForm(wishForm.filter((_, i) => i !== index))
   }
 
-  const toggleApartment = (wishIndex, apartmentId) => {
+  const toggleApartment = (wishIndex: number, apartmentId: number): void => {
     const wish = wishForm[wishIndex]
     const apartmentIds = wish.apartmentIds.includes(apartmentId)
       ? wish.apartmentIds.filter((id) => id !== apartmentId)
@@ -119,7 +126,7 @@ export default function UserWishForm() {
     updateWish(wishIndex, 'apartmentIds', apartmentIds)
   }
 
-  const moveApartmentUp = (wishIndex, apartmentIndex) => {
+  const moveApartmentUp = (wishIndex: number, apartmentIndex: number): void => {
     if (apartmentIndex === 0) return
     const wish = wishForm[wishIndex]
     const apartmentIds = [...wish.apartmentIds]
@@ -129,7 +136,7 @@ export default function UserWishForm() {
     updateWish(wishIndex, 'apartmentIds', apartmentIds)
   }
 
-  const moveApartmentDown = (wishIndex, apartmentIndex) => {
+  const moveApartmentDown = (wishIndex: number, apartmentIndex: number): void => {
     const wish = wishForm[wishIndex]
     if (apartmentIndex === wish.apartmentIds.length - 1) return
     const apartmentIds = [...wish.apartmentIds]
@@ -139,7 +146,7 @@ export default function UserWishForm() {
     updateWish(wishIndex, 'apartmentIds', apartmentIds)
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     if (!drawing) return
 
     for (const wish of wishForm) {
