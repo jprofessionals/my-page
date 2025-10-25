@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="200.012-1" author="JProfessionals">
+        <comment>Add sort_order column to apartment table</comment>
+        <addColumn tableName="apartment">
+            <column name="sort_order" type="INT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="200.012-2" author="JProfessionals">
+        <comment>Set sort_order values for existing apartments</comment>
+        <sql>
+            UPDATE apartment SET sort_order = 1 WHERE cabin_name = 'Stor leilighet';
+            UPDATE apartment SET sort_order = 2 WHERE cabin_name = 'Liten leilighet';
+            UPDATE apartment SET sort_order = 3 WHERE cabin_name = 'Annekset';
+        </sql>
+    </changeSet>
+
+    <changeSet id="200.012-3" author="JProfessionals">
+        <comment>Make sort_order NOT NULL after setting initial values</comment>
+        <addNotNullConstraint
+            tableName="apartment"
+            columnName="sort_order"
+            columnDataType="INT"
+            defaultNullValue="999"/>
+    </changeSet>
+
+</databaseChangeLog>

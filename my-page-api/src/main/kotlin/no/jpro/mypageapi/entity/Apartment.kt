@@ -11,5 +11,6 @@ data class Apartment(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     val cabin_name: String?,
+    val sort_order: Int?,
 )
 
