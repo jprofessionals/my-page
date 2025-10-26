@@ -108,8 +108,12 @@ export const adminGetAllWishes = (drawingId) => {
   return axios.get(`${ADMIN_BASE}/drawings/${drawingId}/wishes`, { headers: authHeader() })
 }
 
-export const adminGetAllocations = (drawingId) => {
-  return axios.get(`${ADMIN_BASE}/drawings/${drawingId}/allocations`, { headers: authHeader() })
+export const adminGetAllocations = (drawingId, executionId = null) => {
+  const params = executionId ? { executionId } : {}
+  return axios.get(`${ADMIN_BASE}/drawings/${drawingId}/allocations`, {
+    params,
+    headers: authHeader(),
+  })
 }
 
 export const adminImportWishes = (drawingId, file) => {

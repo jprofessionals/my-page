@@ -244,10 +244,11 @@ class CabinLotteryAdminController(
     // ===== Allocation Management =====
 
     @GetMapping("/drawings/{drawingId}/allocations")
-    @Operation(summary = "Get allocations for a drawing (published execution only if published)")
+    @Operation(summary = "Get allocations for a drawing (published or latest execution)")
     fun getAllocations(
         @AuthenticationPrincipal jwt: Jwt?,
-        @PathVariable drawingId: UUID
+        @PathVariable drawingId: UUID,
+        @RequestParam(required = false) executionId: UUID?
     ): ResponseEntity<List<CabinAllocationDTO>> {
         requireAdmin(jwt)
 
@@ -255,34 +256,42 @@ class CabinLotteryAdminController(
         val drawing = drawingRepository.findById(drawingId)
             .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
 
-        // If PUBLISHED, only return allocations from the published execution
-        val allocations = if (drawing.publishedExecutionId != null) {
-            val execution = executionRepository.findById(drawing.publishedExecutionId!!)
-                .orElseThrow { IllegalArgumentException("Published execution not found") }
-
-            allocationRepository.findByExecutionOrderByPeriodStartDateAscApartmentCabinNameAsc(execution)
-                .map { allocation ->
-                    CabinAllocationDTO(
-                        id = allocation.id,
-                        periodId = allocation.period.id!!,
-                        periodDescription = allocation.period.description,
-                        startDate = allocation.period.startDate,
-                        endDate = allocation.period.endDate,
-                        apartmentId = allocation.apartment.id!!,
-                        apartmentName = allocation.apartment.cabin_name ?: "Unknown",
-                        apartmentSortOrder = allocation.apartment.sort_order,
-                        userId = allocation.user.id!!,
-                        userName = allocation.user.name ?: "Unknown",
-                        userEmail = allocation.user.email ?: "Unknown",
-                        allocationType = allocation.allocationType.name,
-                        comment = allocation.comment,
-                        allocatedAt = allocation.allocatedAt
-                    )
-                }
-        } else {
-            // If not published, return all allocations (or could return empty list)
-            drawingService.getAllocations(drawingId)
+        // Determine which execution to use
+        val targetExecutionId = when {
+            // If executionId is specified, use it
+            executionId != null -> executionId
+            // If PUBLISHED, use the published execution
+            drawing.publishedExecutionId != null -> drawing.publishedExecutionId!!
+            // Otherwise, use the latest execution
+            else -> {
+                val latestExecution = executionRepository.findByDrawingOrderByExecutedAtDesc(drawing).firstOrNull()
+                latestExecution?.id ?: return ResponseEntity.ok(emptyList())
+            }
         }
+
+        // Fetch the execution and its allocations
+        val execution = executionRepository.findById(targetExecutionId)
+            .orElseThrow { IllegalArgumentException("Execution not found: $targetExecutionId") }
+
+        val allocations = allocationRepository.findByExecutionOrderByPeriodStartDateAscApartmentCabinNameAsc(execution)
+            .map { allocation ->
+                CabinAllocationDTO(
+                    id = allocation.id,
+                    periodId = allocation.period.id!!,
+                    periodDescription = allocation.period.description,
+                    startDate = allocation.period.startDate,
+                    endDate = allocation.period.endDate,
+                    apartmentId = allocation.apartment.id!!,
+                    apartmentName = allocation.apartment.cabin_name ?: "Unknown",
+                    apartmentSortOrder = allocation.apartment.sort_order,
+                    userId = allocation.user.id!!,
+                    userName = allocation.user.name ?: "Unknown",
+                    userEmail = allocation.user.email ?: "Unknown",
+                    allocationType = allocation.allocationType.name,
+                    comment = allocation.comment,
+                    allocatedAt = allocation.allocatedAt
+                )
+            }
 
         return ResponseEntity.ok(allocations)
     }
