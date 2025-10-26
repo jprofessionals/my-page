@@ -31,15 +31,33 @@ import org.springframework.web.bind.annotation.RestController
 @SecurityRequirement(name = "Bearer Authentication")
 class UserController(
     private val userService: UserService,
-    private val userMapper: UserMapper
+    private val userMapper: UserMapper,
+    private val environment: org.springframework.core.env.Environment,
+    private val userRepository: no.jpro.mypageapi.repository.UserRepository
 ) {
 
     private val logger = LoggerFactory.getLogger(UserController::class.java)
 
     @GetMapping
     @Transactional
-    @RequiresAdmin
-    fun getAllUsers(@RequestParam isEnabled: Boolean = true): List<UserDTO> = userService.getAllUsers(isEnabled)
+    fun getAllUsers(
+        @RequestParam isEnabled: Boolean = true,
+        @org.springframework.web.bind.annotation.RequestHeader("X-Test-User-Id", required = false) testUserId: String?
+    ): List<UserDTO> {
+        // In development mode with test user, check if test user is admin
+        if (isDevelopmentProfile() && testUserId != null) {
+            val testUser = userRepository.findById(testUserId).orElse(null)
+            if (testUser == null || !testUser.admin) {
+                throw org.springframework.security.access.AccessDeniedException("Only admins can access this endpoint")
+            }
+        }
+        return userService.getAllUsers(isEnabled)
+    }
+
+    // Check if we're running in a development profile (local or h2)
+    private fun isDevelopmentProfile(): Boolean {
+        return environment.activeProfiles.any { it == "local" || it == "h2" }
+    }
 
     @PostMapping
     @Transactional

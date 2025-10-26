@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import UserWishForm from '../UserWishForm'
 import cabinLotteryService from '@/services/cabinLottery.service'
-import axios from 'axios'
 import authHeader from '@/services/auth-header'
 import {
   createMockDrawing,

@@ -62,8 +62,6 @@ describe('UserWishForm', () => {
     })
 
     it('should show "no active drawing" when status is DRAFT', async () => {
-      const draftDrawing = createMockDrawing({ status: 'DRAFT' })
-
       vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: null })
       vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
 

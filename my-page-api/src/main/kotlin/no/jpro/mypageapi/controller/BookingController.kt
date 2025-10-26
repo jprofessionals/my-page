@@ -40,7 +40,8 @@ import java.time.format.DateTimeParseException
 @SecurityRequirement(name = "Bearer Authentication")
 class BookingController(
     private val bookingService: BookingService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val environment: org.springframework.core.env.Environment
 ) {
     @GetMapping("{bookingID}")
     @Transactional
@@ -179,11 +180,12 @@ class BookingController(
             schema = Schema(implementation = ApartmentDTO::class)
         )]
     )
-
     fun getApartments(
-        token: JwtAuthenticationToken,
-
-        ): List<ApartmentDTO> {
+        token: JwtAuthenticationToken?,
+        @org.springframework.web.bind.annotation.RequestHeader("X-Test-User-Id", required = false) testUserId: String?
+    ): List<ApartmentDTO> {
+        // In development mode, this endpoint is permitAll and works without JWT
+        // Just return all apartments regardless of authentication
         return bookingService.getAllApartments()
     }
 
