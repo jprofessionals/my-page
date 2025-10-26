@@ -388,7 +388,6 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
           onRevertToDraft={handleRevertToDraft}
           onLockDrawing={handleLockDrawing}
           onUnlockDrawing={handleUnlockDrawing}
-          onPublish={handlePublish}
           onGoToDraw={() => setActiveTab('draw')}
         />
 

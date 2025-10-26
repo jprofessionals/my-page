@@ -9,7 +9,6 @@ interface DrawingHeaderProps {
   onRevertToDraft: () => Promise<void>
   onLockDrawing: () => Promise<void>
   onUnlockDrawing: () => Promise<void>
-  onPublish: () => Promise<void>
   onGoToDraw: () => void
 }
 
@@ -21,7 +20,6 @@ export default function DrawingHeader({
   onRevertToDraft,
   onLockDrawing,
   onUnlockDrawing,
-  onPublish,
   onGoToDraw,
 }: DrawingHeaderProps) {
   const router = useRouter()
@@ -100,14 +98,6 @@ export default function DrawingHeader({
                 Kjør trekning
               </button>
             </>
-          )}
-          {drawing.status === 'DRAWN' && (
-            <button
-              onClick={onPublish}
-              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
-            >
-              Publiser resultater
-            </button>
           )}
         </div>
       </div>
