@@ -106,7 +106,8 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       }
 
       if (['DRAWN', 'PUBLISHED'].includes(drawingRes.data.status)) {
-        const allocsRes = await cabinLotteryService.adminGetAllocations(drawingId, selectedExecutionId || undefined)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const allocsRes = await cabinLotteryService.adminGetAllocations(drawingId, selectedExecutionId as any)
         setAllocations(allocsRes.data)
       }
     } catch (error) {
