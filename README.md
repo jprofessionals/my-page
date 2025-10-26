@@ -458,7 +458,7 @@ npm run test:coverage
 - Tests are co-located with source files (e.g., `utils/getAsNo.test.ts`)
 - Setup: `src/test/setup.ts` (global test configuration)
 - Framework: Vitest + React Testing Library + @testing-library/jest-dom
-- Current coverage: 37 tests covering `utils/` with 100% coverage
+- Component tests for cabin lottery admin UI with comprehensive coverage
 
 **Linting:**
 ```bash
@@ -524,14 +524,14 @@ GitHub Actions handles continuous integration and deployment.
 - Triggers: Push to `main` or changes in `my-page-api/**`
 - Steps:
   1. Build with Maven
-  2. Run all tests (39 tests with Testcontainers)
+  2. Run all tests (integration and unit tests with Testcontainers)
   3. Deploy to Test environment
   4. Deploy to Production (if test succeeds)
 
 **.github/workflows/app.yml** - Frontend Pipeline
 - Triggers: Push to `main` or changes in `my-page-app/**`
 - Steps:
-  1. Run tests (37 unit tests with Vitest)
+  1. Run tests (component and unit tests with Vitest)
   2. npm ci && npm run build
   3. Deploy to Test environment
   4. Deploy to Production (if test succeeds)
