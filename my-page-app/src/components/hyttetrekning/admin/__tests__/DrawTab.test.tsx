@@ -234,8 +234,10 @@ describe('DrawTab', () => {
           />
         )
 
-        if (status === 'LOCKED') {
+        if (status === 'LOCKED' || status === 'DRAWN') {
           expect(screen.getByText('Kjør trekning nå')).toBeInTheDocument()
+        } else if (status === 'PUBLISHED') {
+          expect(screen.getByText('Kan ikke kjøre ny trekning når den allerede er publisert')).toBeInTheDocument()
         } else {
           expect(screen.getByText('Trekningen må være låst før den kan kjøres')).toBeInTheDocument()
         }

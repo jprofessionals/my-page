@@ -91,7 +91,7 @@ describe('ResultsTab', () => {
         />
       )
 
-      expect(screen.getByText('Resultater')).toBeInTheDocument()
+      expect(screen.getByText('Oversikt over tildelinger')).toBeInTheDocument()
       expect(screen.getByText('Tildelinger per periode')).toBeInTheDocument()
     })
 
@@ -257,7 +257,7 @@ describe('ResultsTab', () => {
       )
 
       // Should not crash, component should render
-      expect(screen.getByText('Resultater')).toBeInTheDocument()
+      expect(screen.getByText('Oversikt over tildelinger')).toBeInTheDocument()
     })
 
     it('should handle allocations for non-existent periods', () => {
@@ -276,7 +276,7 @@ describe('ResultsTab', () => {
       )
 
       // Should render without crashing
-      expect(screen.getByText('Resultater')).toBeInTheDocument()
+      expect(screen.getByText('Oversikt over tildelinger')).toBeInTheDocument()
     })
   })
 })
