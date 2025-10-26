@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <!-- Step 1: Create cabin_drawing_execution table -->
+    <changeSet id="200.014-1" author="JProfessionals">
+        <comment>Create cabin_drawing_execution table to store multiple drawing executions</comment>
+        <createTable tableName="cabin_drawing_execution">
+            <column name="id" type="BINARY(16)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="drawing_id" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="executed_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="executed_by" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="random_seed" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="audit_log" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="cabin_drawing_execution"
+                                 baseColumnNames="drawing_id"
+                                 constraintName="fk_execution_drawing"
+                                 referencedTableName="cabin_drawing"
+                                 referencedColumnNames="id"/>
+        <createIndex tableName="cabin_drawing_execution" indexName="idx_execution_drawing_id">
+            <column name="drawing_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Step 2: Add published_execution_id to cabin_drawing -->
+    <changeSet id="200.014-2" author="JProfessionals">
+        <comment>Add published_execution_id to track which execution was published</comment>
+        <addColumn tableName="cabin_drawing">
+            <column name="published_execution_id" type="BINARY(16)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- Step 3: Add execution_id column to cabin_allocation (nullable for now) -->
+    <changeSet id="200.014-3" author="JProfessionals">
+        <comment>Add execution_id to cabin_allocation table</comment>
+        <addColumn tableName="cabin_allocation">
+            <column name="execution_id" type="BINARY(16)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- Step 4: Migrate existing DRAWN/PUBLISHED drawings to have executions -->
+    <changeSet id="200.014-4" author="JProfessionals">
+        <comment>Create executions for existing DRAWN/PUBLISHED drawings and link allocations</comment>
+        <sql>
+            <!-- For each DRAWN or PUBLISHED drawing, create an execution -->
+            INSERT INTO cabin_drawing_execution (id, drawing_id, executed_at, executed_by, random_seed, audit_log)
+            SELECT
+                UUID_TO_BIN(UUID()),
+                id as drawing_id,
+                COALESCE(drawn_at, NOW()) as executed_at,
+                1 as executed_by, -- Default to user ID 1 for legacy data
+                random_seed,
+                audit_log
+            FROM cabin_drawing
+            WHERE status IN ('DRAWN', 'PUBLISHED');
+
+            <!-- Link existing allocations to their drawing's execution -->
+            UPDATE cabin_allocation ca
+            INNER JOIN cabin_drawing cd ON ca.drawing_id = cd.id
+            INNER JOIN cabin_drawing_execution cde ON cde.drawing_id = cd.id
+            SET ca.execution_id = cde.id
+            WHERE cd.status IN ('DRAWN', 'PUBLISHED');
+
+            <!-- Set published_execution_id for PUBLISHED drawings -->
+            UPDATE cabin_drawing cd
+            INNER JOIN cabin_drawing_execution cde ON cde.drawing_id = cd.id
+            SET cd.published_execution_id = cde.id
+            WHERE cd.status = 'PUBLISHED';
+        </sql>
+    </changeSet>
+
+    <!-- Step 5: Make execution_id NOT NULL and add foreign key -->
+    <changeSet id="200.014-5" author="JProfessionals">
+        <comment>Make execution_id required and add foreign key</comment>
+        <addNotNullConstraint tableName="cabin_allocation"
+                               columnName="execution_id"
+                               columnDataType="BINARY(16)"/>
+        <addForeignKeyConstraint baseTableName="cabin_allocation"
+                                 baseColumnNames="execution_id"
+                                 constraintName="fk_allocation_execution"
+                                 referencedTableName="cabin_drawing_execution"
+                                 referencedColumnNames="id"/>
+        <createIndex tableName="cabin_allocation" indexName="idx_allocation_execution_id">
+            <column name="execution_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Step 6: Drop old unique constraint and create new one -->
+    <changeSet id="200.014-6" author="JProfessionals">
+        <comment>Update unique constraint to include execution_id</comment>
+        <dropUniqueConstraint tableName="cabin_allocation" constraintName="period_id"/>
+        <addUniqueConstraint tableName="cabin_allocation"
+                             columnNames="execution_id, period_id, apartment_id"
+                             constraintName="uk_execution_period_apartment"/>
+    </changeSet>
+
+    <!-- Step 7: Remove audit_log, random_seed, drawn_at from cabin_drawing -->
+    <changeSet id="200.014-7" author="JProfessionals">
+        <comment>Remove migrated columns from cabin_drawing</comment>
+        <dropColumn tableName="cabin_drawing" columnName="audit_log"/>
+        <dropColumn tableName="cabin_drawing" columnName="random_seed"/>
+        <dropColumn tableName="cabin_drawing" columnName="drawn_at"/>
+    </changeSet>
+
+</databaseChangeLog>

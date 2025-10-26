@@ -288,7 +288,7 @@ components:
         name:
           type: string
           description: The name of a customer
-          example: 'Skatteetaten'
+          example: "Skatteetaten"
         exclusive:
           type: boolean
           description: Whether the customer demands exclusive applications
@@ -329,7 +329,7 @@ components:
         title:
           type: string
           description: The title of a job posting
-          example: 'Software Engineer'
+          example: "Software Engineer"
         customer:
           $ref: '#/components/schemas/Customer'
         urgent:
@@ -346,11 +346,11 @@ components:
           type: string
           format: date-time
           description: The deadline for submitting applications
-          example: '2024-10-09T12:00:00+02:00'
+          example: "2024-10-09T12:00:00+02:00"
         description:
           type: string
           description: The description of the job posting
-          example: 'Skatteetaten leter etter en dyktig Kotlin-utvikler'
+          example: "Skatteetaten leter etter en dyktig Kotlin-utvikler"
         tags:
           $ref: '#/components/schemas/Tags'
         links:
@@ -360,8 +360,8 @@ components:
             type: string
             format: uri
           example:
-            - 'https://example.com/link1'
-            - 'https://example.com/link2'
+            - "https://example.com/link1"
+            - "https://example.com/link2"
         created_date:
           type: string
           format: date-time
@@ -382,16 +382,16 @@ components:
         blobId:
           type: string
           description: The unique ID of the blob
-          example: 'abc123'
+          example: "abc123"
         name:
           type: string
           description: File name
-          example: 'utlysning.pdf'
+          example: "utlysning.pdf"
         url:
           type: string
           format: uri
           description: URL of the file
-          example: 'https://www.myfile.no/utlysning.pdf'
+          example: "https://www.myfile.no/utlysning.pdf"
       required:
         - blobId
         - name
@@ -419,7 +419,7 @@ components:
         name:
           type: string
           description: The name of the tag
-          example: 'Kotlin'
+          example: "Kotlin"
       required:
         - id
         - name

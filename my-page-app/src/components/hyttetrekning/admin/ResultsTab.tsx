@@ -9,7 +9,7 @@ interface ResultsTabProps {
 export default function ResultsTab({ periods, allocations, auditLog = [] }: ResultsTabProps) {
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-6">Resultater</h2>
+      <h2 className="text-xl font-semibold mb-6">Oversikt over tildelinger</h2>
 
       {allocations.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
@@ -36,7 +36,17 @@ export default function ResultsTab({ periods, allocations, auditLog = [] }: Resu
             <h3 className="font-medium text-lg mb-3">Tildelinger per periode</h3>
             <div className="space-y-4">
               {periods.map((period) => {
-                const periodAllocs = allocations.filter((a) => a.periodId === period.id)
+                const periodAllocs = allocations
+                  .filter((a) => a.periodId === period.id)
+                  .sort((a, b) => {
+                    // Sort by apartmentSortOrder if available, otherwise by apartmentName
+                    const sortOrderA = a.apartmentSortOrder ?? Number.MAX_VALUE
+                    const sortOrderB = b.apartmentSortOrder ?? Number.MAX_VALUE
+                    if (sortOrderA !== sortOrderB) {
+                      return sortOrderA - sortOrderB
+                    }
+                    return (a.apartmentName || '').localeCompare(b.apartmentName || '')
+                  })
                 return (
                   <div key={period.id} className="border border-gray-200 rounded-lg p-4">
                     <h4 className="font-medium mb-3">{period.description}</h4>

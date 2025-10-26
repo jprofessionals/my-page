@@ -29,7 +29,10 @@ class CabinLotteryServiceTest {
     
     @Mock
     private lateinit var apartmentRepository: ApartmentRepository
-    
+
+    @Mock
+    private lateinit var executionRepository: CabinDrawingExecutionRepository
+
     @InjectMocks
     private lateinit var lotteryService: CabinLotteryService
     
@@ -140,13 +143,18 @@ class CabinLotteryServiceTest {
             .thenReturn(wishes.filter { it.user == users[1] })
         `when`(wishRepository.findByDrawingAndUserOrderByPriority(drawing, users[2]))
             .thenReturn(wishes.filter { it.user == users[2] })
+        `when`(executionRepository.save(org.mockito.ArgumentMatchers.any()))
+            .thenAnswer { invocation ->
+                val execution = invocation.arguments[0] as CabinDrawingExecution
+                execution.copy(id = UUID.randomUUID())
+            }
         `when`(allocationRepository.saveAll(org.mockito.ArgumentMatchers.anyList()))
             .thenAnswer { it.arguments[0] }
         `when`(drawingRepository.save(org.mockito.ArgumentMatchers.any()))
             .thenAnswer { it.arguments[0] }
         
         // Act
-        val result = lotteryService.performSnakeDraft(drawingId, seed = 42L)
+        val result = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 42L)
         
         // Assert
         assertNotNull(result)
@@ -229,20 +237,148 @@ class CabinLotteryServiceTest {
             .thenReturn(listOf(wishes[0]))
         `when`(wishRepository.findByDrawingAndUserOrderByPriority(drawing, user2))
             .thenReturn(listOf(wishes[1]))
+        `when`(executionRepository.save(org.mockito.ArgumentMatchers.any()))
+            .thenAnswer { invocation ->
+                val execution = invocation.arguments[0] as CabinDrawingExecution
+                execution.copy(id = UUID.randomUUID())
+            }
         `when`(allocationRepository.saveAll(org.mockito.ArgumentMatchers.anyList()))
             .thenAnswer { it.arguments[0] }
         `when`(drawingRepository.save(org.mockito.ArgumentMatchers.any()))
             .thenAnswer { it.arguments[0] }
-        
+
         // Act
-        val result = lotteryService.performSnakeDraft(drawingId, seed = 42L)
+        val result = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 42L)
         
         // Assert
         // Kun én bruker skal få tildeling
         assertEquals(1, result.allocations.size)
         
         // Statistikk skal vise at én bruker ikke fikk noe
-        assertTrue(result.statistics.participantsWithZeroAllocations == 1 || 
+        assertTrue(result.statistics.participantsWithZeroAllocations == 1 ||
                    result.statistics.participantsWithOneAllocation == 2)
+    }
+
+    @Test
+    fun `test user never gets same period twice even with multiple wishes for same period`() {
+        // Test at en bruker som ønsker samme periode med forskjellige enheter
+        // kun får perioden maksimalt én gang
+
+        // Arrange
+        val drawingId = UUID.randomUUID()
+        val drawing = CabinDrawing(
+            id = drawingId,
+            season = "TEST_2025",
+            status = DrawingStatus.LOCKED
+        )
+
+        val user1 = User(id = 1L, email = "user1@jpro.no", name = "User 1", givenName = "User", familyName = "One", budgets = emptyList())
+        val user2 = User(id = 2L, email = "user2@jpro.no", name = "User 2", givenName = "User", familyName = "Two", budgets = emptyList())
+
+        val hovedhytta = Apartment(id = 1L, cabin_name = "Hovedhytta", sort_order = 1)
+        val leiligheten = Apartment(id = 2L, cabin_name = "Leiligheten", sort_order = 2)
+        val annekset = Apartment(id = 3L, cabin_name = "Annekset", sort_order = 3)
+
+        val period1 = CabinPeriod(
+            id = UUID.randomUUID(),
+            drawing = drawing,
+            startDate = LocalDate.of(2025, 4, 1),
+            endDate = LocalDate.of(2025, 4, 8),
+            description = "Påske",
+            sortOrder = 1
+        )
+
+        val period2 = CabinPeriod(
+            id = UUID.randomUUID(),
+            drawing = drawing,
+            startDate = LocalDate.of(2025, 2, 18),
+            endDate = LocalDate.of(2025, 2, 25),
+            description = "Vinterferie",
+            sortOrder = 2
+        )
+
+        // User 1 ønsker Påske med BÅDE Hovedhytta (prioritet 1) og Leiligheten (prioritet 2)
+        // User 1 ønsker også Vinterferie med Annekset (prioritet 3)
+        val user1Wishes = listOf(
+            CabinWish(
+                id = UUID.randomUUID(),
+                drawing = drawing,
+                user = user1,
+                period = period1, // Påske
+                priority = 1,
+                desiredApartments = listOf(hovedhytta, leiligheten) // Ønsker begge enheter
+            ),
+            CabinWish(
+                id = UUID.randomUUID(),
+                drawing = drawing,
+                user = user1,
+                period = period1, // Påske igjen! (men annen enhet)
+                priority = 2,
+                desiredApartments = listOf(leiligheten, annekset)
+            ),
+            CabinWish(
+                id = UUID.randomUUID(),
+                drawing = drawing,
+                user = user1,
+                period = period2, // Vinterferie
+                priority = 3,
+                desiredApartments = listOf(annekset)
+            )
+        )
+
+        // User 2 ønsker noe annet for å ikke kollidere helt
+        val user2Wishes = listOf(
+            CabinWish(
+                id = UUID.randomUUID(),
+                drawing = drawing,
+                user = user2,
+                period = period2, // Vinterferie
+                priority = 1,
+                desiredApartments = listOf(hovedhytta)
+            )
+        )
+
+        // Mock repositories
+        `when`(drawingRepository.findById(drawingId)).thenReturn(Optional.of(drawing))
+        `when`(wishRepository.findDistinctUsersByDrawing(drawing)).thenReturn(listOf(user1, user2))
+        `when`(wishRepository.findByDrawingAndUserOrderByPriority(drawing, user1))
+            .thenReturn(user1Wishes)
+        `when`(wishRepository.findByDrawingAndUserOrderByPriority(drawing, user2))
+            .thenReturn(user2Wishes)
+        `when`(executionRepository.save(org.mockito.ArgumentMatchers.any()))
+            .thenAnswer { invocation ->
+                val execution = invocation.arguments[0] as CabinDrawingExecution
+                execution.copy(id = UUID.randomUUID())
+            }
+        `when`(allocationRepository.saveAll(org.mockito.ArgumentMatchers.anyList()))
+            .thenAnswer { it.arguments[0] }
+        `when`(drawingRepository.save(org.mockito.ArgumentMatchers.any()))
+            .thenAnswer { it.arguments[0] }
+
+        // Act
+        val result = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 42L)
+
+        // Assert - Dette er det viktigste: ingen bruker skal få samme periode mer enn én gang
+        val user1Allocations = result.allocations.filter { it.userId == 1L }
+        val user1Periods = user1Allocations.map { it.periodId }.toSet()
+
+        assertEquals(user1Periods.size, user1Allocations.size,
+            "User 1 fikk samme periode flere ganger! Perioder: $user1Periods, Tildelinger: ${user1Allocations.size}")
+
+        // Verifiser at user1 maksimalt har fått Påske én gang (ikke både Hovedhytta OG Leiligheten i Påske)
+        val user1PåskeAllocations = user1Allocations.filter { it.periodId == period1.id }
+        assertTrue(user1PåskeAllocations.size <= 1,
+            "User 1 fikk Påske-perioden ${user1PåskeAllocations.size} ganger, skal være maks 1. " +
+            "Enheter: ${user1PåskeAllocations.map { it.apartmentName }}")
+
+        // Verifiser også for user2
+        val user2Allocations = result.allocations.filter { it.userId == 2L }
+        val user2Periods = user2Allocations.map { it.periodId }.toSet()
+
+        assertEquals(user2Periods.size, user2Allocations.size,
+            "User 2 fikk samme periode flere ganger!")
+
+        // Verifiser at audit log ble generert
+        assertTrue(result.auditLog.isNotEmpty(), "Audit log skal inneholde informasjon om trekningsprosessen")
     }
 }

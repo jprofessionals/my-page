@@ -11,9 +11,12 @@ data class CabinDrawingDTO(
     val status: String,
     val createdAt: LocalDateTime,
     val lockedAt: LocalDateTime?,
-    val drawnAt: LocalDateTime?,
     val publishedAt: LocalDateTime?,
-    val periods: List<CabinPeriodDTO> = emptyList()
+    val publishedExecutionId: UUID?,
+    val publishedBy: Long?,
+    val publishedByName: String?,
+    val periods: List<CabinPeriodDTO> = emptyList(),
+    val executions: List<CabinDrawingExecutionDTO> = emptyList()
 )
 
 data class CreateDrawingDTO(
@@ -83,6 +86,7 @@ data class CabinAllocationDTO(
     val endDate: LocalDate,
     val apartmentId: Long,
     val apartmentName: String,
+    val apartmentSortOrder: Int?,
     val userId: Long,
     val userName: String,
     val userEmail: String,
@@ -91,8 +95,21 @@ data class CabinAllocationDTO(
     val allocatedAt: LocalDateTime
 )
 
+// Execution DTOs
+data class CabinDrawingExecutionDTO(
+    val id: UUID?,
+    val drawingId: UUID,
+    val executedAt: LocalDateTime,
+    val executedBy: Long,
+    val executedByName: String?,
+    val randomSeed: Long?,
+    val auditLog: List<String>?,
+    val allocationCount: Int
+)
+
 data class DrawingResultDTO(
     val drawingId: UUID,
+    val executionId: UUID,
     val season: String,
     val drawnAt: LocalDateTime,
     val allocations: List<CabinAllocationDTO>,

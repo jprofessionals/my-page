@@ -14,11 +14,12 @@ import java.util.UUID
 @Service
 class CabinBookingIntegrationService(
     private val drawingRepository: CabinDrawingRepository,
+    private val executionRepository: CabinDrawingExecutionRepository,
     private val allocationRepository: CabinAllocationRepository,
     private val bookingRepository: BookingRepository
 ) {
     private val logger = LoggerFactory.getLogger(CabinBookingIntegrationService::class.java)
-    
+
     /**
      * Oppretter faktiske Booking-objekter for alle allocations i en publisert trekning.
      * Dette kalles automatisk når en trekning publiseres.
@@ -27,14 +28,22 @@ class CabinBookingIntegrationService(
     fun createBookingsFromAllocations(drawingId: UUID) {
         val drawing = drawingRepository.findById(drawingId)
             .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
-        
+
         if (drawing.status != DrawingStatus.PUBLISHED) {
             throw IllegalStateException("Can only create bookings from published drawings")
         }
-        
-        val allocations = allocationRepository.findByDrawingOrderByPeriodStartDateAscApartmentCabinNameAsc(drawing)
-        
-        logger.info("Creating ${allocations.size} bookings from drawing ${drawing.season}")
+
+        // Get the published execution
+        val publishedExecutionId = drawing.publishedExecutionId
+            ?: throw IllegalStateException("Drawing is published but has no published execution ID")
+
+        val execution = executionRepository.findById(publishedExecutionId)
+            .orElseThrow { IllegalArgumentException("Published execution not found: $publishedExecutionId") }
+
+        // Only fetch allocations from the published execution
+        val allocations = allocationRepository.findByExecutionOrderByPeriodStartDateAscApartmentCabinNameAsc(execution)
+
+        logger.info("Creating ${allocations.size} bookings from published execution of drawing ${drawing.season}")
         
         val bookings = allocations.map { allocation ->
             // Sjekk om booking allerede finnes for denne perioden/apartment

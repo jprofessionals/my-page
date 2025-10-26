@@ -16,13 +16,14 @@ class CabinLotteryService(
     private val periodRepository: CabinPeriodRepository,
     private val wishRepository: CabinWishRepository,
     private val allocationRepository: CabinAllocationRepository,
-    private val apartmentRepository: ApartmentRepository
+    private val apartmentRepository: ApartmentRepository,
+    private val executionRepository: CabinDrawingExecutionRepository
 ) {
     private val logger = LoggerFactory.getLogger(CabinLotteryService::class.java)
 
     /**
-     * Utfører snake draft trekning
-     * 
+     * Utfører snake draft trekning og oppretter en ny execution
+     *
      * Algoritme:
      * 1. Trekk tilfeldig rekkefølge av deltakere
      * 2. Gå nedover listen: hver person får én tildeling hvis mulig
@@ -30,16 +31,18 @@ class CabinLotteryService(
      * 4. Hvis ingen ønsker er ledige, får personen ingenting den runden
      */
     @Transactional
-    fun performSnakeDraft(drawingId: UUID, seed: Long? = null): DrawingResultDTO {
+    fun performSnakeDraft(drawingId: UUID, executedBy: Long, seed: Long? = null): DrawingResultDTO {
         val drawing = drawingRepository.findById(drawingId)
             .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
-        
-        if (drawing.status != DrawingStatus.LOCKED) {
-            throw IllegalStateException("Drawing must be locked before performing draw. Current status: ${drawing.status}")
+
+        if (drawing.status != DrawingStatus.LOCKED && drawing.status != DrawingStatus.DRAWN) {
+            throw IllegalStateException("Drawing must be locked or drawn before performing draw. Current status: ${drawing.status}")
         }
-        
-        // Slett eventuelle eksisterende tildelinger
-        allocationRepository.deleteByDrawing(drawing)
+
+        // Prevent new executions if an execution has already been published
+        if (drawing.publishedExecutionId != null) {
+            throw IllegalStateException("Cannot run new drawing after an execution has been published")
+        }
         
         // Hent alle deltakere
         val participants = wishRepository.findDistinctUsersByDrawing(drawing)
@@ -64,9 +67,10 @@ class CabinLotteryService(
         val snakeOrder = shuffledParticipants + shuffledParticipants.reversed()
 
         // State tracking
-        val allocations = mutableListOf<CabinAllocation>()
+        val allocations = mutableListOf<Triple<CabinPeriod, Apartment, User>>() // Store tuples until we create execution
         val occupiedSlots = mutableSetOf<Pair<UUID, Long>>() // (periodId, apartmentId)
         val allocationCount = mutableMapOf<Long, Int>() // userId -> antall tildelinger
+        val userPeriods = mutableMapOf<Long, MutableSet<UUID>>() // userId -> set of periodIds
         val auditLog = mutableListOf<String>()
 
         // Log snake order setup
@@ -117,6 +121,13 @@ class CabinLotteryService(
                 val desiredApartmentNames = wish.desiredApartments.sortedBy { it.sort_order }.mapNotNull { it.cabin_name }.joinToString(", ")
                 auditLog.add("    Prioritet ${wish.priority}: ${wish.period.description} - ${desiredApartmentNames}")
 
+                // Sjekk om brukeren allerede har fått denne perioden
+                val userPeriodsSet = userPeriods.getOrDefault(user.id!!, emptySet())
+                if (userPeriodsSet.contains(wish.period.id!!)) {
+                    auditLog.add("      ✗ Brukeren har allerede denne perioden")
+                    continue
+                }
+
                 // Prøv å finne en ledig enhet som matcher ønsket
                 val availableApartment = wish.desiredApartments.sortedBy { it.sort_order }.firstOrNull { apartment: Apartment ->
                     val slot = Pair(wish.period.id!!, apartment.id!!)
@@ -124,20 +135,16 @@ class CabinLotteryService(
                 }
 
                 if (availableApartment != null) {
-                    // Tildel og marker som opptatt
-                    val allocation = CabinAllocation(
-                        drawing = drawing,
-                        period = wish.period,
-                        apartment = availableApartment,
-                        user = user,
-                        allocationType = AllocationType.DRAWN,
-                        allocatedAt = LocalDateTime.now()
-                    )
-                    allocations.add(allocation)
+                    // Note: We'll create allocations without execution for now, then update after execution is created
+                    allocations.add(Triple(wish.period, availableApartment, user))
 
                     val slot = Pair(wish.period.id!!, availableApartment.id!!)
                     occupiedSlots.add(slot)
                     allocationCount[user.id] = currentAllocations + 1
+
+                    // Marker at brukeren har fått denne perioden
+                    userPeriods.getOrPut(user.id) { mutableSetOf() }.add(wish.period.id!!)
+
                     allocated = true
 
                     auditLog.add("      ✓ TILDELT: ${availableApartment.cabin_name} i ${wish.period.description}")
@@ -153,34 +160,58 @@ class CabinLotteryService(
                 logger.debug("No available wish for ${user.email} in this round")
             }
         }
-        
-        // Lagre alle tildelinger
-        allocationRepository.saveAll(allocations)
-
-        // Oppdater drawing status
-        val updatedDrawing = drawing.copy(
-            status = DrawingStatus.DRAWN,
-            drawnAt = LocalDateTime.now(),
-            randomSeed = seed
-        )
-        drawingRepository.save(updatedDrawing)
 
         // Legg til oppsummering i audit log
         auditLog.add("")
         auditLog.add("=== TREKNING FULLFØRT ===")
         auditLog.add("Totalt antall tildelinger: ${allocations.size}")
-        val allocationsPerUser = allocations.groupBy { it.user.id }
+        val allocationsPerUser = allocations.groupBy { it.third.id }
         auditLog.add("Deltakere som fikk 0 tildelinger: ${participants.count { user -> allocationsPerUser[user.id]?.size ?: 0 == 0 }}")
         auditLog.add("Deltakere som fikk 1 tildeling: ${participants.count { user -> allocationsPerUser[user.id]?.size == 1 }}")
         auditLog.add("Deltakere som fikk 2 tildelinger: ${participants.count { user -> allocationsPerUser[user.id]?.size == 2 }}")
 
-        logger.info("Snake draft completed. Total allocations: ${allocations.size}")
+        // Serialize audit log to JSON string
+        val auditLogJson = com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(auditLog)
 
-        return createDrawingResult(updatedDrawing, allocations, participants, auditLog)
+        // Create the execution
+        val execution = CabinDrawingExecution(
+            drawing = drawing,
+            executedAt = LocalDateTime.now(),
+            executedBy = executedBy,
+            randomSeed = seed,
+            auditLog = auditLogJson
+        )
+        val savedExecution = executionRepository.save(execution)
+
+        // Now create and save the actual allocations with execution reference
+        val allocationEntities = allocations.map { (period, apartment, user) ->
+            CabinAllocation(
+                drawing = drawing,
+                execution = savedExecution,
+                period = period,
+                apartment = apartment,
+                user = user,
+                allocationType = AllocationType.DRAWN,
+                allocatedAt = LocalDateTime.now()
+            )
+        }
+        allocationRepository.saveAll(allocationEntities)
+
+        // Update drawing status to DRAWN after performing the first execution
+        if (drawing.status == DrawingStatus.LOCKED) {
+            drawing.status = DrawingStatus.DRAWN
+            drawingRepository.save(drawing)
+            logger.info("Drawing status updated to DRAWN")
+        }
+
+        logger.info("Snake draft completed. Total allocations: ${allocationEntities.size}, Execution ID: ${savedExecution.id}")
+
+        return createDrawingResult(drawing, savedExecution, allocationEntities, participants, auditLog)
     }
     
     private fun createDrawingResult(
         drawing: CabinDrawing,
+        execution: CabinDrawingExecution,
         allocations: List<CabinAllocation>,
         participants: List<User>,
         auditLog: List<String>
@@ -194,6 +225,7 @@ class CabinLotteryService(
                 endDate = allocation.period.endDate,
                 apartmentId = allocation.apartment.id!!,
                 apartmentName = allocation.apartment.cabin_name ?: "Unknown",
+                apartmentSortOrder = allocation.apartment.sort_order,
                 userId = allocation.user.id!!,
                 userName = allocation.user.name ?: "Unknown",
                 userEmail = allocation.user.email ?: "Unknown",
@@ -224,8 +256,9 @@ class CabinLotteryService(
 
         return DrawingResultDTO(
             drawingId = drawing.id!!,
+            executionId = execution.id!!,
             season = drawing.season,
-            drawnAt = drawing.drawnAt!!,
+            drawnAt = execution.executedAt,
             allocations = allocationDTOs,
             statistics = statistics,
             auditLog = auditLog

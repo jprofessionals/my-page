@@ -23,7 +23,10 @@ class CabinLotteryAdminController(
     private val lotteryService: CabinLotteryService,
     private val wishService: CabinWishService,
     private val importService: CabinImportService,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val allocationRepository: no.jpro.mypageapi.repository.CabinAllocationRepository,
+    private val executionRepository: no.jpro.mypageapi.repository.CabinDrawingExecutionRepository,
+    private val drawingRepository: no.jpro.mypageapi.repository.CabinDrawingRepository
 ) {
     
     // ===== Drawing Management =====
@@ -185,7 +188,19 @@ class CabinLotteryAdminController(
         @RequestParam(required = false) seed: Long?
     ): ResponseEntity<DrawingResultDTO> {
         requireAdmin(jwt)
-        val result = lotteryService.performSnakeDraft(drawingId, seed)
+
+        // Get user ID for audit trail
+        val userId = if (jwt != null) {
+            val userSub = jwt.subject
+            val user = userRepository.findUserBySub(userSub)
+                ?: throw IllegalArgumentException("User not found: $userSub")
+            user.id ?: throw IllegalStateException("User has no ID")
+        } else {
+            // For local development without authentication, use a default test user ID
+            1L
+        }
+
+        val result = lotteryService.performSnakeDraft(drawingId, userId, seed)
         return ResponseEntity.ok(result)
     }
 
@@ -193,10 +208,23 @@ class CabinLotteryAdminController(
     @Operation(summary = "Publish drawing results to users")
     fun publishDrawing(
         @AuthenticationPrincipal jwt: Jwt?,
-        @PathVariable drawingId: UUID
+        @PathVariable drawingId: UUID,
+        @RequestParam executionId: UUID
     ): ResponseEntity<CabinDrawingDTO> {
         requireAdmin(jwt)
-        val result = drawingService.publishDrawing(drawingId)
+
+        // Get user ID for audit trail
+        val userId = if (jwt != null) {
+            val userSub = jwt.subject
+            val user = userRepository.findUserBySub(userSub)
+                ?: throw IllegalArgumentException("User not found: $userSub")
+            user.id ?: throw IllegalStateException("User has no ID")
+        } else {
+            // For local development without authentication, use a default test user ID
+            1L
+        }
+
+        val result = drawingService.publishDrawing(drawingId, executionId, userId)
         return ResponseEntity.ok(result)
     }
 
@@ -216,13 +244,46 @@ class CabinLotteryAdminController(
     // ===== Allocation Management =====
 
     @GetMapping("/drawings/{drawingId}/allocations")
-    @Operation(summary = "Get all allocations for a drawing")
+    @Operation(summary = "Get allocations for a drawing (published execution only if published)")
     fun getAllocations(
         @AuthenticationPrincipal jwt: Jwt?,
         @PathVariable drawingId: UUID
     ): ResponseEntity<List<CabinAllocationDTO>> {
         requireAdmin(jwt)
-        val allocations = drawingService.getAllocations(drawingId)
+
+        // Get the drawing entity to check status and published execution
+        val drawing = drawingRepository.findById(drawingId)
+            .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
+
+        // If PUBLISHED, only return allocations from the published execution
+        val allocations = if (drawing.publishedExecutionId != null) {
+            val execution = executionRepository.findById(drawing.publishedExecutionId!!)
+                .orElseThrow { IllegalArgumentException("Published execution not found") }
+
+            allocationRepository.findByExecutionOrderByPeriodStartDateAscApartmentCabinNameAsc(execution)
+                .map { allocation ->
+                    CabinAllocationDTO(
+                        id = allocation.id,
+                        periodId = allocation.period.id!!,
+                        periodDescription = allocation.period.description,
+                        startDate = allocation.period.startDate,
+                        endDate = allocation.period.endDate,
+                        apartmentId = allocation.apartment.id!!,
+                        apartmentName = allocation.apartment.cabin_name ?: "Unknown",
+                        apartmentSortOrder = allocation.apartment.sort_order,
+                        userId = allocation.user.id!!,
+                        userName = allocation.user.name ?: "Unknown",
+                        userEmail = allocation.user.email ?: "Unknown",
+                        allocationType = allocation.allocationType.name,
+                        comment = allocation.comment,
+                        allocatedAt = allocation.allocatedAt
+                    )
+                }
+        } else {
+            // If not published, return all allocations (or could return empty list)
+            drawingService.getAllocations(drawingId)
+        }
+
         return ResponseEntity.ok(allocations)
     }
 

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.lenient
 import org.mockito.junit.jupiter.MockitoExtension
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
@@ -34,6 +35,9 @@ class CabinLotteryDeterministicTest {
 
     @Mock
     private lateinit var apartmentRepository: ApartmentRepository
+
+    @Mock
+    private lateinit var executionRepository: CabinDrawingExecutionRepository
 
     @InjectMocks
     private lateinit var lotteryService: CabinLotteryService
@@ -210,15 +214,15 @@ class CabinLotteryDeterministicTest {
 
         // Act: Run the draw 3 times with the same seed
         val seed = 42L
-        val result1 = lotteryService.performSnakeDraft(drawingId, seed)
+        val result1 = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = seed)
 
         // Reset mocks for second run
         setupMockRepositories(drawing, drawingId, users, wishes)
-        val result2 = lotteryService.performSnakeDraft(drawingId, seed)
+        val result2 = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = seed)
 
         // Reset mocks for third run
         setupMockRepositories(drawing, drawingId, users, wishes)
-        val result3 = lotteryService.performSnakeDraft(drawingId, seed)
+        val result3 = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = seed)
 
         // Assert: All three results should be identical
         assertEquals(result1.allocations.size, result2.allocations.size,
@@ -344,13 +348,13 @@ class CabinLotteryDeterministicTest {
 
         // Act: Run draws with different seeds
         setupMockRepositories(drawing, drawingId, users, wishes)
-        val resultSeed42 = lotteryService.performSnakeDraft(drawingId, seed = 42L)
+        val resultSeed42 = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 42L)
 
         setupMockRepositories(drawing, drawingId, users, wishes)
-        val resultSeed123 = lotteryService.performSnakeDraft(drawingId, seed = 123L)
+        val resultSeed123 = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 123L)
 
         setupMockRepositories(drawing, drawingId, users, wishes)
-        val resultSeed999 = lotteryService.performSnakeDraft(drawingId, seed = 999L)
+        val resultSeed999 = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 999L)
 
         // Assert: Results should differ
         val allocations42 = resultSeed42.allocations.map { Triple(it.userId, it.periodId, it.apartmentId) }.toSet()
@@ -463,7 +467,7 @@ class CabinLotteryDeterministicTest {
 
         // Act: Run multiple times to verify priority is respected
         setupMockRepositories(drawing, drawingId, users, wishes)
-        val result = lotteryService.performSnakeDraft(drawingId, seed = 42L)
+        val result = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 42L)
 
         // Assert: Each user should try their highest priority first
         assertEquals(2, result.allocations.size,
@@ -534,7 +538,7 @@ class CabinLotteryDeterministicTest {
         setupMockRepositories(drawing, drawingId, users, wishes)
 
         // Act
-        val result = lotteryService.performSnakeDraft(drawingId, seed = 42L)
+        val result = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 42L)
 
         // Assert: Only 1 user can get the apartment
         assertEquals(1, result.allocations.size,
@@ -623,7 +627,7 @@ class CabinLotteryDeterministicTest {
         // Act: Run draw 5 times WITHOUT seed (null)
         val results = (1..5).map {
             setupMockRepositories(drawing, drawingId, users, wishes)
-            lotteryService.performSnakeDraft(drawingId, seed = null)
+            lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = null)
         }
 
         // Assert: Results should vary (not all identical)
@@ -671,7 +675,16 @@ class CabinLotteryDeterministicTest {
 
         `when`(allocationRepository.saveAll(org.mockito.ArgumentMatchers.anyList()))
             .thenAnswer { it.arguments[0] }
-        `when`(drawingRepository.save(org.mockito.ArgumentMatchers.any()))
+        lenient().`when`(drawingRepository.save(org.mockito.ArgumentMatchers.any()))
             .thenAnswer { it.arguments[0] }
+        `when`(executionRepository.save(org.mockito.ArgumentMatchers.any()))
+            .thenAnswer { invocation ->
+                val arg = invocation.arguments[0]
+                if (arg is CabinDrawingExecution) {
+                    arg.copy(id = UUID.randomUUID())
+                } else {
+                    arg
+                }
+            }
     }
 }

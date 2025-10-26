@@ -10,7 +10,7 @@ import java.util.UUID
 @Table(
     name = "cabin_allocation",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["period_id", "apartment_id"])
+        UniqueConstraint(columnNames = ["execution_id", "period_id", "apartment_id"])
     ]
 )
 data class CabinAllocation(
@@ -21,6 +21,10 @@ data class CabinAllocation(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "drawing_id", nullable = false)
     val drawing: CabinDrawing,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "execution_id", nullable = false)
+    val execution: CabinDrawingExecution,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "period_id", nullable = false)

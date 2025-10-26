@@ -14,11 +14,13 @@ import no.jpro.mypageapi.dto.CreateBookingDTO
 import no.jpro.mypageapi.dto.UpdateBookingDTO
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.User
-import no.jpro.mypageapi.extensions.getSub
+import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.service.BookingService
 import no.jpro.mypageapi.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -41,8 +43,38 @@ import java.time.format.DateTimeParseException
 class BookingController(
     private val bookingService: BookingService,
     private val userService: UserService,
+    private val userRepository: UserRepository,
     private val environment: org.springframework.core.env.Environment
 ) {
+
+    // Check if we're running in a development profile (local or h2)
+    private fun isDevelopmentProfile(): Boolean {
+        return environment.activeProfiles.any { it == "local" || it == "h2" }
+    }
+
+    // For local development - get user by ID from header
+    private fun getTestUserById(testUserId: String?): User? {
+        if (testUserId == null) return null
+        return userRepository.findById(testUserId).orElse(null)
+    }
+
+    // Get the current user for local dev - supports test user ID header
+    private fun getCurrentUser(jwt: Jwt?, testUserId: String?): User {
+        // Only accept test user header in development profiles (local/h2)
+        if (isDevelopmentProfile()) {
+            val testUser = getTestUserById(testUserId)
+            if (testUser != null) return testUser
+        }
+
+        // Otherwise use normal auth flow
+        return if (jwt == null) {
+            throw IllegalArgumentException("Authentication required")
+        } else {
+            userService.getUserBySub(jwt.subject ?: throw IllegalArgumentException("Authentication required"))
+                ?: throw IllegalArgumentException("User not found")
+        }
+    }
+
     @GetMapping("{bookingID}")
     @Transactional
     @Operation(summary = "Get the booking connected to the booking id")
@@ -55,7 +87,7 @@ class BookingController(
         )]
     )
     fun getBooking(
-        token: JwtAuthenticationToken,
+        @AuthenticationPrincipal jwt: Jwt?,
         @PathVariable("bookingID") bookingID: Long,
     ): Booking? {
         return bookingService.getBooking(bookingID)
@@ -74,7 +106,7 @@ class BookingController(
     )
 
     fun getBookings(
-        token: JwtAuthenticationToken,
+        @AuthenticationPrincipal jwt: Jwt?,
         @RequestParam("startDate") startDate: String,
         @RequestParam("endDate") endDate: String,
     ): ResponseEntity<List<BookingDTO>?> {
@@ -111,7 +143,7 @@ class BookingController(
         )]
     )
     fun getBookings(
-        token: JwtAuthenticationToken,
+        @AuthenticationPrincipal jwt: Jwt?,
         @PathVariable("employee_id") employee_id: Int,
     ): List<BookingDTO>? {
         return bookingService.getBookings(employee_id)
@@ -130,7 +162,7 @@ class BookingController(
     )
 
     fun getBookingsPerDay(
-        token: JwtAuthenticationToken,
+        @AuthenticationPrincipal jwt: Jwt?,
         @RequestParam("date") date: String,
     ): ResponseEntity<List<BookingDTO>?> {
         try {
@@ -154,7 +186,7 @@ class BookingController(
     )
 
     fun getVacancies(
-        token: JwtAuthenticationToken,
+        @AuthenticationPrincipal jwt: Jwt?,
         @RequestParam("startdate") startdate: String,
         @RequestParam("enddate") enddate: String,
 
@@ -181,7 +213,7 @@ class BookingController(
         )]
     )
     fun getApartments(
-        token: JwtAuthenticationToken?,
+        @AuthenticationPrincipal jwt: Jwt?,
         @org.springframework.web.bind.annotation.RequestHeader("X-Test-User-Id", required = false) testUserId: String?
     ): List<ApartmentDTO> {
         // In development mode, this endpoint is permitAll and works without JWT
@@ -196,11 +228,12 @@ class BookingController(
         content = [Content(mediaType = "application/json")]
     )
     fun deleteBooking(
-        token: JwtAuthenticationToken,
+        @AuthenticationPrincipal jwt: Jwt?,
         @PathVariable("bookingID") bookingID: Long,
+        @org.springframework.web.bind.annotation.RequestHeader("X-Test-User-Id", required = false) testUserId: String?
     ): ResponseEntity<String> {
 
-        val user = userService.getUserBySub(token.getSub()) ?: return ResponseEntity(HttpStatus.FORBIDDEN)
+        val user = getCurrentUser(jwt, testUserId)
         val booking = bookingService.getBooking(bookingID) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
 
         if (!userPermittedToDeleteBooking(booking, user)) {
@@ -224,11 +257,11 @@ class BookingController(
         content = [Content(schema = Schema(implementation = BookingDTO::class))]
     )
     fun createBooking(
-        token: JwtAuthenticationToken,
+        @AuthenticationPrincipal jwt: Jwt?,
         @Valid @RequestBody bookingRequest: CreateBookingDTO,
+        @org.springframework.web.bind.annotation.RequestHeader("X-Test-User-Id", required = false) testUserId: String?
     ): ResponseEntity<String> {
-        val user =
-            userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val user = getCurrentUser(jwt, testUserId)
 
         bookingService.validateCutoffAndCreateBooking(bookingRequest, user)
         return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
@@ -238,13 +271,13 @@ class BookingController(
     @Transactional
     @Operation(summary = "Edit an existing booking")
     fun editBooking(
-        token: JwtAuthenticationToken,
+        @AuthenticationPrincipal jwt: Jwt?,
         @PathVariable("bookingId") bookingId: Long,
         @Valid @RequestBody editBookingRequest: UpdateBookingDTO,
+        @org.springframework.web.bind.annotation.RequestHeader("X-Test-User-Id", required = false) testUserId: String?
     ): ResponseEntity<String> {
         val bookingToEdit = bookingService.getBooking(bookingId) ?: return ResponseEntity.notFound().build()
-        val user =
-            userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val user = getCurrentUser(jwt, testUserId)
 
         if (!userPermittedToEditBooking(bookingToEdit, user)) {
             return ResponseEntity(HttpStatus.FORBIDDEN)

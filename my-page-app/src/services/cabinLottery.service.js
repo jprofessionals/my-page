@@ -100,8 +100,8 @@ export const adminPerformDraw = (drawingId, seed = null) => {
   return axios.post(url, {}, { headers: authHeader() })
 }
 
-export const adminPublishDrawing = (drawingId) => {
-  return axios.post(`${ADMIN_BASE}/drawings/${drawingId}/publish`, {}, { headers: authHeader() })
+export const adminPublishDrawing = (drawingId, executionId) => {
+  return axios.post(`${ADMIN_BASE}/drawings/${drawingId}/publish?executionId=${executionId}`, {}, { headers: authHeader() })
 }
 
 export const adminGetAllWishes = (drawingId) => {

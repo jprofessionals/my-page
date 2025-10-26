@@ -3,6 +3,8 @@ package no.jpro.mypageapi.service
 import no.jpro.mypageapi.dto.*
 import no.jpro.mypageapi.entity.*
 import no.jpro.mypageapi.repository.*
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,6 +16,8 @@ class CabinDrawingService(
     private val drawingRepository: CabinDrawingRepository,
     private val periodRepository: CabinPeriodRepository,
     private val allocationRepository: CabinAllocationRepository,
+    private val executionRepository: CabinDrawingExecutionRepository,
+    private val userRepository: UserRepository,
     @Lazy private val bookingIntegrationService: CabinBookingIntegrationService
 ) {
     
@@ -212,16 +216,32 @@ class CabinDrawingService(
     }
 
     @Transactional
-    fun publishDrawing(drawingId: UUID): CabinDrawingDTO {
+    fun publishDrawing(drawingId: UUID, executionId: UUID, publishedBy: Long): CabinDrawingDTO {
         val drawing = drawingRepository.findById(drawingId)
             .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
 
+        // Validate that drawing must be DRAWN before publishing
         if (drawing.status != DrawingStatus.DRAWN) {
             throw IllegalStateException("Drawing must be drawn before publishing. Current status: ${drawing.status}")
         }
 
+        // Validate that the execution exists and belongs to this drawing
+        val execution = executionRepository.findById(executionId)
+            .orElseThrow { IllegalArgumentException("Execution not found: $executionId") }
+
+        if (execution.drawing.id != drawingId) {
+            throw IllegalArgumentException("Execution does not belong to this drawing")
+        }
+
+        // Validate that no execution has been published yet
+        if (drawing.publishedExecutionId != null) {
+            throw IllegalStateException("An execution has already been published for this drawing")
+        }
+
         drawing.status = DrawingStatus.PUBLISHED
         drawing.publishedAt = LocalDateTime.now()
+        drawing.publishedExecutionId = executionId
+        drawing.publishedBy = publishedBy
 
         val saved = drawingRepository.save(drawing)
 
@@ -271,6 +291,7 @@ class CabinDrawingService(
                 endDate = allocation.period.endDate,
                 apartmentId = allocation.apartment.id!!,
                 apartmentName = allocation.apartment.cabin_name ?: "Unknown",
+                apartmentSortOrder = allocation.apartment.sort_order,
                 userId = allocation.user.id!!,
                 userName = allocation.user.name ?: "Unknown",
                 userEmail = allocation.user.email ?: "Unknown",
@@ -283,15 +304,56 @@ class CabinDrawingService(
     
     private fun toDTO(drawing: CabinDrawing): CabinDrawingDTO {
         val periods = periodRepository.findByDrawingOrderBySortOrder(drawing)
+
+        // Populate executions
+        val executions = executionRepository.findByDrawingOrderByExecutedAtDesc(drawing).map { execution ->
+            toDTO(execution)
+        }
+
+        // Get publishedBy user name
+        val publishedByName = drawing.publishedBy?.let { userId ->
+            userRepository.findById(userId.toString()).orElse(null)?.name
+        }
+
         return CabinDrawingDTO(
             id = drawing.id,
             season = drawing.season,
             status = drawing.status.name,
             createdAt = drawing.createdAt,
             lockedAt = drawing.lockedAt,
-            drawnAt = drawing.drawnAt,
             publishedAt = drawing.publishedAt,
-            periods = periods.map { toDTO(it) }
+            publishedExecutionId = drawing.publishedExecutionId,
+            publishedBy = drawing.publishedBy,
+            publishedByName = publishedByName,
+            periods = periods.map { toDTO(it) },
+            executions = executions
+        )
+    }
+
+    private fun toDTO(execution: CabinDrawingExecution): CabinDrawingExecutionDTO {
+        // Parse audit log from JSON
+        val objectMapper = ObjectMapper()
+        val auditLog: List<String>? = try {
+            execution.auditLog?.let { objectMapper.readValue(it) }
+        } catch (e: Exception) {
+            null
+        }
+
+        // Get executed by user name
+        val executedByName = userRepository.findById(execution.executedBy.toString()).orElse(null)?.name
+
+        // Count allocations for this execution
+        val allocationCount = allocationRepository.countByExecution(execution)
+
+        return CabinDrawingExecutionDTO(
+            id = execution.id,
+            drawingId = execution.drawing.id!!,
+            executedAt = execution.executedAt,
+            executedBy = execution.executedBy,
+            executedByName = executedByName,
+            randomSeed = execution.randomSeed,
+            auditLog = auditLog,
+            allocationCount = allocationCount
         )
     }
     

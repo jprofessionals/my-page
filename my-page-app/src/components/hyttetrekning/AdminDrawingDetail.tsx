@@ -10,6 +10,7 @@ import type {
   Period,
   Wish,
   Allocation,
+  Execution,
   PeriodFormState,
   BulkPeriodFormState,
   ImportResult,
@@ -21,6 +22,7 @@ import PeriodsTab from './admin/PeriodsTab/PeriodsTab'
 import WishesTab from './admin/WishesTab/WishesTab'
 import DrawTab from './admin/DrawTab'
 import ResultsTab from './admin/ResultsTab'
+import ExecutionsTab from './admin/ExecutionsTab'
 
 export default function AdminDrawingDetail({ drawingId }: { drawingId: string }) {
   const router = useRouter()
@@ -31,6 +33,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
   const [auditLog, setAuditLog] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState<ActiveTab>('periods')
   const [loading, setLoading] = useState<boolean>(true)
+
+  // Executions state
+  const [executions, setExecutions] = useState<Execution[]>([])
+  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null)
 
   // Period form
   const [showPeriodForm, setShowPeriodForm] = useState<boolean>(false)
@@ -83,6 +89,16 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       ])
       setDrawing(drawingRes.data)
       setPeriods(periodsRes.data)
+
+      // Load executions from drawing
+      if (drawingRes.data.executions && drawingRes.data.executions.length > 0) {
+        setExecutions(drawingRes.data.executions)
+        // Auto-select the most recent execution if none is selected
+        if (!selectedExecutionId && drawingRes.data.executions.length > 0) {
+          const latestExecution = drawingRes.data.executions[drawingRes.data.executions.length - 1]
+          setSelectedExecutionId(latestExecution.id)
+        }
+      }
 
       if (['OPEN', 'LOCKED', 'DRAWN', 'PUBLISHED'].includes(drawingRes.data.status)) {
         const wishesRes = await cabinLotteryService.adminGetAllWishes(drawingId)
@@ -276,13 +292,21 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await cabinLotteryService.adminPerformDraw(drawingId, seed as any)
 
-      // Lagre audit log fra resultatet
+      // Lagre audit log og allocations fra resultatet
       if (result.data && result.data.auditLog) {
         setAuditLog(result.data.auditLog)
       }
+      if (result.data && result.data.allocations) {
+        setAllocations(result.data.allocations)
+      }
+
+      // Auto-select the newly created execution
+      if (result.data && result.data.executionId) {
+        setSelectedExecutionId(result.data.executionId)
+      }
 
       await loadData()
-      setActiveTab('results')
+      setActiveTab('executions')
       toast.success('Trekning gjennomført!')
     } catch (error) {
       console.error('Draw failed:', error)
@@ -292,11 +316,16 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     }
   }
 
-  const handlePublish = async () => {
+  const handlePublish = async (executionId: string) => {
+    if (!executionId) {
+      toast.error('Velg en trekning først')
+      return
+    }
+
     if (!confirm('Er du sikker på at du vil publisere? Dette oppretter faktiske bookings.')) return
 
     try {
-      await cabinLotteryService.adminPublishDrawing(drawingId)
+      await cabinLotteryService.adminPublishDrawing(drawingId, executionId)
       await loadData()
       toast.success('Trekning publisert! Bookings er opprettet.')
     } catch (error) {
@@ -371,23 +400,26 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
                 { id: 'periods' as const, label: 'Perioder', count: periods.length },
                 { id: 'wishes' as const, label: 'Ønsker', count: wishes.length },
                 { id: 'draw' as const, label: 'Trekning', count: undefined },
-                { id: 'results' as const, label: 'Resultater', count: allocations.length },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-6 py-4 text-sm font-medium border-b-2 ${
-                    activeTab === tab.id
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  {tab.label}
-                  {tab.count !== undefined && (
-                    <span className="ml-2 text-xs text-gray-400">({tab.count})</span>
-                  )}
-                </button>
-              ))}
+                { id: 'results' as const, label: 'Oversikt', count: allocations.length, showOnlyWhen: ['DRAWN', 'PUBLISHED'].includes(drawing.status) },
+                { id: 'executions' as const, label: 'Trekningshistorikk', count: executions.length },
+              ]
+                .filter((tab) => tab.showOnlyWhen === undefined || tab.showOnlyWhen)
+                .map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-6 py-4 text-sm font-medium border-b-2 ${
+                      activeTab === tab.id
+                        ? 'border-blue-600 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    {tab.label}
+                    {tab.count !== undefined && (
+                      <span className="ml-2 text-xs text-gray-400">({tab.count})</span>
+                    )}
+                  </button>
+                ))}
             </nav>
           </div>
 
@@ -445,6 +477,16 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
                 periods={periods}
                 allocations={allocations}
                 auditLog={auditLog}
+              />
+            )}
+
+            {activeTab === 'executions' && (
+              <ExecutionsTab
+                executions={executions}
+                publishedExecutionId={drawing.publishedExecutionId}
+                publishedByName={drawing.publishedByName}
+                drawingStatus={drawing.status}
+                onPublishExecution={handlePublish}
               />
             )}
           </div>

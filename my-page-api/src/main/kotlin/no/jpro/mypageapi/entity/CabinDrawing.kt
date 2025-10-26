@@ -10,37 +10,40 @@ data class CabinDrawing(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null,
-    
+
     @Column(nullable = false)
     val season: String, // "VINTER_2025_2026", "SOMMER_2026"
-    
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     var status: DrawingStatus = DrawingStatus.DRAFT,
-    
+
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
-    
+
     @Column
     var lockedAt: LocalDateTime? = null,
-    
-    @Column
-    var drawnAt: LocalDateTime? = null,
-    
+
     @Column
     var publishedAt: LocalDateTime? = null,
-    
-    @Column
-    val randomSeed: Long? = null, // For reproduserbarhet
-    
+
+    @Column(name = "published_execution_id")
+    var publishedExecutionId: UUID? = null, // Which execution was published
+
+    @Column(name = "published_by")
+    var publishedBy: Long? = null, // User ID who published the execution
+
     @OneToMany(mappedBy = "drawing", cascade = [CascadeType.ALL])
     val periods: List<CabinPeriod> = emptyList(),
-    
+
     @OneToMany(mappedBy = "drawing", cascade = [CascadeType.ALL])
     val wishes: List<CabinWish> = emptyList(),
-    
+
     @OneToMany(mappedBy = "drawing", cascade = [CascadeType.ALL])
-    val allocations: List<CabinAllocation> = emptyList()
+    val allocations: List<CabinAllocation> = emptyList(),
+
+    @OneToMany(mappedBy = "drawing", cascade = [CascadeType.ALL])
+    val executions: List<CabinDrawingExecution> = emptyList()
 )
 
 enum class DrawingStatus {

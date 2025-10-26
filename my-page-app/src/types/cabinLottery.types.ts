@@ -10,9 +10,23 @@ export interface Drawing {
   status: DrawingStatus
   createdAt: string
   lockedAt?: string | null
-  drawnAt?: string | null
   publishedAt?: string | null
+  publishedExecutionId?: string | null
+  publishedBy?: number | null
+  publishedByName?: string | null
+  periods?: Period[]
+  executions?: Execution[]
+}
+
+export interface Execution {
+  id: string
+  drawingId: string
+  executedAt: string
+  executedBy: number
+  executedByName?: string | null
   randomSeed?: number | null
+  auditLog?: string[] | null
+  allocationCount: number
 }
 
 export interface Period {
@@ -51,6 +65,7 @@ export interface Allocation {
   endDate: string
   apartmentId: number
   apartmentName: string
+  apartmentSortOrder?: number
   allocationRound: number
 }
 
@@ -104,7 +119,7 @@ export interface ImportResult {
 
 // View modes
 export type WishesViewMode = 'by-user' | 'by-period'
-export type ActiveTab = 'periods' | 'wishes' | 'draw' | 'results'
+export type ActiveTab = 'periods' | 'wishes' | 'draw' | 'results' | 'executions'
 
 // Grouped data structures
 export interface WishesByUser {

@@ -19,9 +19,11 @@ export default function DrawTab({
     <div>
       <h2 className="text-xl font-semibold mb-6">Kjør trekning</h2>
 
-      {drawingStatus !== 'LOCKED' ? (
+      {drawingStatus !== 'LOCKED' && drawingStatus !== 'DRAWN' ? (
         <div className="text-center py-12 text-gray-500">
-          Trekningen må være låst før den kan kjøres
+          {drawingStatus === 'PUBLISHED'
+            ? 'Kan ikke kjøre ny trekning når den allerede er publisert'
+            : 'Trekningen må være låst før den kan kjøres'}
         </div>
       ) : (
         <div className="max-w-md">

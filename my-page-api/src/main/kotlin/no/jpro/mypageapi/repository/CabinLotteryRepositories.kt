@@ -36,10 +36,22 @@ interface CabinAllocationRepository : JpaRepository<CabinAllocation, UUID> {
     @Query("SELECT a FROM CabinAllocation a WHERE a.drawing = :drawing ORDER BY a.period.startDate ASC, a.apartment.cabin_name ASC")
     fun findByDrawingOrderByPeriodStartDateAscApartmentCabinNameAsc(drawing: CabinDrawing): List<CabinAllocation>
 
+    @Query("SELECT a FROM CabinAllocation a WHERE a.execution = :execution ORDER BY a.period.startDate ASC, a.apartment.cabin_name ASC")
+    fun findByExecutionOrderByPeriodStartDateAscApartmentCabinNameAsc(execution: CabinDrawingExecution): List<CabinAllocation>
+
     fun findByDrawingIdOrderByPeriodStartDateAsc(drawingId: UUID): List<CabinAllocation>
     fun findByDrawingAndUser(drawing: CabinDrawing, user: User): List<CabinAllocation>
     fun deleteByDrawing(drawing: CabinDrawing)
 
     @Query("SELECT COUNT(a) FROM CabinAllocation a WHERE a.drawing = :drawing AND a.user = :user")
     fun countByDrawingAndUser(drawing: CabinDrawing, user: User): Int
+
+    fun countByExecution(execution: CabinDrawingExecution): Int
+}
+
+@Repository
+interface CabinDrawingExecutionRepository : JpaRepository<CabinDrawingExecution, UUID> {
+    fun findByDrawingOrderByExecutedAtDesc(drawing: CabinDrawing): List<CabinDrawingExecution>
+    fun findByDrawingIdOrderByExecutedAtDesc(drawingId: UUID): List<CabinDrawingExecution>
+    fun findByDrawingAndId(drawing: CabinDrawing, id: UUID): CabinDrawingExecution?
 }
