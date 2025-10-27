@@ -46,7 +46,11 @@ class UserController(
     ): List<UserDTO> {
         // In development mode with test user, check if test user is admin
         if (isDevelopmentProfile() && testUserId != null) {
-            val testUser = userRepository.findById(testUserId).orElse(null)
+            val testUser = try {
+                userRepository.findById(testUserId.toLong()).orElse(null)
+            } catch (e: NumberFormatException) {
+                null
+            }
             if (testUser == null || !testUser.admin) {
                 throw org.springframework.security.access.AccessDeniedException("Only admins can access this endpoint")
             }

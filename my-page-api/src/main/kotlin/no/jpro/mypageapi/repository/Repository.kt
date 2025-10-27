@@ -49,7 +49,7 @@ interface NotificationRepository : JpaRepository<Notification, Long> {
 }
 
 @Repository
-interface UserRepository : JpaRepository<User, String> {
+interface UserRepository : JpaRepository<User, Long> {
     fun existsUserBySub(userSub: String): Boolean
     fun findUserBySub(sub: String): User?
     fun findUserByEmailAndSubIsNull(email: String): User?

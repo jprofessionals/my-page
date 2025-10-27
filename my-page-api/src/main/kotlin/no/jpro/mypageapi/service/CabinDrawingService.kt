@@ -391,7 +391,7 @@ class CabinDrawingService(
 
         // Get publishedBy user name
         val publishedByName = drawing.publishedBy?.let { userId ->
-            userRepository.findById(userId.toString()).orElse(null)?.name
+            userRepository.findById(userId).orElse(null)?.name
         }
 
         return CabinDrawingDTO(
@@ -420,7 +420,7 @@ class CabinDrawingService(
         }
 
         // Get executed by user name
-        val executedByName = userRepository.findById(execution.executedBy.toString()).orElse(null)?.name
+        val executedByName = userRepository.findById(execution.executedBy).orElse(null)?.name
 
         // Count allocations for this execution
         val allocationCount = allocationRepository.countByExecution(execution)

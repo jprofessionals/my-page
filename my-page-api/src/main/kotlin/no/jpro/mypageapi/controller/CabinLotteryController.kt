@@ -43,7 +43,11 @@ class CabinLotteryController(
     // For local development - get user by ID from header
     private fun getTestUserById(testUserId: String?): no.jpro.mypageapi.entity.User? {
         if (testUserId == null) return null
-        return userRepository.findById(testUserId).orElse(null)
+        return try {
+            userRepository.findById(testUserId.toLong()).orElse(null)
+        } catch (e: NumberFormatException) {
+            null
+        }
     }
 
     // Check if we're running in a development profile (local or h2)
