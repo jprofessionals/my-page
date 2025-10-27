@@ -123,8 +123,17 @@
                              constraintName="uk_execution_period_apartment"/>
     </changeSet>
 
-    <!-- Step 6b: Drop old unique constraint that doesn't include execution_id -->
-    <changeSet id="200.014-6-drop-old-constraint" author="JProfessionals">
+    <!-- Step 6b: Temporarily drop period foreign key to allow dropping old unique constraint -->
+    <changeSet id="200.014-6b-drop-period-fk" author="JProfessionals">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fk_cabin_allocation_period" foreignKeyTableName="cabin_allocation"/>
+        </preConditions>
+        <comment>Temporarily drop foreign key on period_id to allow dropping old unique constraint that MySQL considers as dependency</comment>
+        <dropForeignKeyConstraint baseTableName="cabin_allocation" constraintName="fk_cabin_allocation_period"/>
+    </changeSet>
+
+    <!-- Step 6c: Drop old unique constraint that doesn't include execution_id -->
+    <changeSet id="200.014-6c-drop-old-constraint" author="JProfessionals">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*)
@@ -134,8 +143,24 @@
             </sqlCheck>
         </preConditions>
         <comment>Drop old unique constraint (period_id, apartment_id) now that we have the new constraint with execution_id</comment>
-        <dropUniqueConstraint tableName="cabin_allocation"
-                              constraintName="uk_cabin_allocation_period_apartment"/>
+        <dropUniqueConstraint tableName="cabin_allocation" constraintName="uk_cabin_allocation_period_apartment"/>
+    </changeSet>
+
+    <!-- Step 6d: Recreate period foreign key -->
+    <changeSet id="200.014-6d-recreate-period-fk" author="JProfessionals">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_cabin_allocation_period" foreignKeyTableName="cabin_allocation"/>
+            </not>
+        </preConditions>
+        <comment>Recreate foreign key on period_id after dropping old unique constraint</comment>
+        <addForeignKeyConstraint
+            baseTableName="cabin_allocation"
+            baseColumnNames="period_id"
+            constraintName="fk_cabin_allocation_period"
+            referencedTableName="cabin_period"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
     </changeSet>
 
     <!-- Step 7: Remove audit_log, random_seed, drawn_at from cabin_drawing -->
