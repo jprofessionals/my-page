@@ -16,6 +16,7 @@ export interface Drawing {
   publishedByName?: string | null
   periods?: Period[]
   executions?: Execution[]
+  bookingWarnings?: string[] | null
 }
 
 export interface Execution {
