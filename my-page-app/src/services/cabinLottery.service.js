@@ -93,6 +93,10 @@ export const adminRevertToDraft = (drawingId) => {
   return axios.post(`${ADMIN_BASE}/drawings/${drawingId}/revert-to-draft`, {}, { headers: authHeader() })
 }
 
+export const adminRevertToLocked = (drawingId) => {
+  return axios.post(`${ADMIN_BASE}/drawings/${drawingId}/revert-to-locked`, {}, { headers: authHeader() })
+}
+
 export const adminPerformDraw = (drawingId, seed = null) => {
   const url = seed 
     ? `${ADMIN_BASE}/drawings/${drawingId}/draw?seed=${seed}`
@@ -119,13 +123,17 @@ export const adminGetAllocations = (drawingId, executionId = null) => {
 export const adminImportWishes = (drawingId, file) => {
   const formData = new FormData()
   formData.append('file', file)
-  
+
   return axios.post(`${ADMIN_BASE}/drawings/${drawingId}/import`, formData, {
     headers: {
       ...authHeader(),
       'Content-Type': 'multipart/form-data',
     },
   })
+}
+
+export const adminDeleteExecution = (drawingId, executionId) => {
+  return axios.delete(`${ADMIN_BASE}/drawings/${drawingId}/executions/${executionId}`, { headers: authHeader() })
 }
 
 const cabinLotteryService = {
@@ -150,11 +158,13 @@ const cabinLotteryService = {
   adminUnlockDrawing,
   adminOpenDrawing,
   adminRevertToDraft,
+  adminRevertToLocked,
   adminPerformDraw,
   adminPublishDrawing,
   adminGetAllWishes,
   adminGetAllocations,
   adminImportWishes,
+  adminDeleteExecution,
 }
 
 export default cabinLotteryService

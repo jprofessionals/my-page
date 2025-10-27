@@ -7,6 +7,7 @@ interface DrawingHeaderProps {
   onDeleteDrawing: () => Promise<void>
   onOpenDrawing: () => Promise<void>
   onRevertToDraft: () => Promise<void>
+  onRevertToLocked: () => Promise<void>
   onLockDrawing: () => Promise<void>
   onUnlockDrawing: () => Promise<void>
   onGoToDraw: () => void
@@ -18,6 +19,7 @@ export default function DrawingHeader({
   onDeleteDrawing,
   onOpenDrawing,
   onRevertToDraft,
+  onRevertToLocked,
   onLockDrawing,
   onUnlockDrawing,
   onGoToDraw,
@@ -51,7 +53,7 @@ export default function DrawingHeader({
           </p>
         </div>
         <div className="flex gap-3">
-          {(drawing.status === 'DRAFT' || drawing.status === 'OPEN' || drawing.status === 'LOCKED') && (
+          {(drawing.status === 'DRAFT' || drawing.status === 'OPEN' || drawing.status === 'LOCKED' || drawing.status === 'DRAWN') && (
             <button
               onClick={onDeleteDrawing}
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
@@ -98,6 +100,14 @@ export default function DrawingHeader({
                 Kjør trekning
               </button>
             </>
+          )}
+          {drawing.status === 'DRAWN' && (
+            <button
+              onClick={onRevertToLocked}
+              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+            >
+              Tilbake til låst
+            </button>
           )}
         </div>
       </div>

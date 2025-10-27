@@ -158,6 +158,17 @@ class CabinLotteryAdminController(
         return ResponseEntity.ok(result)
     }
 
+    @PostMapping("/drawings/{drawingId}/revert-to-locked")
+    @Operation(summary = "Revert drawing to LOCKED (DRAWN -> LOCKED)")
+    fun revertToLocked(
+        @AuthenticationPrincipal jwt: Jwt?,
+        @PathVariable drawingId: UUID
+    ): ResponseEntity<CabinDrawingDTO> {
+        requireAdmin(jwt)
+        val result = drawingService.revertToLocked(drawingId)
+        return ResponseEntity.ok(result)
+    }
+
     @PostMapping("/drawings/{drawingId}/lock")
     @Operation(summary = "Lock a drawing (no more wish changes allowed)")
     fun lockDrawing(
@@ -226,6 +237,18 @@ class CabinLotteryAdminController(
 
         val result = drawingService.publishDrawing(drawingId, executionId, userId)
         return ResponseEntity.ok(result)
+    }
+
+    @DeleteMapping("/drawings/{drawingId}/executions/{executionId}")
+    @Operation(summary = "Delete an execution (only if drawing not published)")
+    fun deleteExecution(
+        @AuthenticationPrincipal jwt: Jwt?,
+        @PathVariable drawingId: UUID,
+        @PathVariable executionId: UUID
+    ): ResponseEntity<Void> {
+        requireAdmin(jwt)
+        drawingService.deleteExecution(drawingId, executionId)
+        return ResponseEntity.noContent().build()
     }
 
     // ===== Wish Management =====

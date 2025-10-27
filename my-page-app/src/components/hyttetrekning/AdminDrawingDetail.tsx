@@ -90,12 +90,16 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       setDrawing(drawingRes.data)
       setPeriods(periodsRes.data)
 
+      // Determine which execution to use for allocations
+      let executionIdToUse = selectedExecutionId
+
       // Load executions from drawing
       if (drawingRes.data.executions && drawingRes.data.executions.length > 0) {
         setExecutions(drawingRes.data.executions)
         // Auto-select the most recent execution if none is selected
         if (!selectedExecutionId && drawingRes.data.executions.length > 0) {
           const latestExecution = drawingRes.data.executions[drawingRes.data.executions.length - 1]
+          executionIdToUse = latestExecution.id
           setSelectedExecutionId(latestExecution.id)
         }
       }
@@ -107,7 +111,7 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
 
       if (['DRAWN', 'PUBLISHED'].includes(drawingRes.data.status)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const allocsRes = await cabinLotteryService.adminGetAllocations(drawingId, selectedExecutionId as any)
+        const allocsRes = await cabinLotteryService.adminGetAllocations(drawingId, executionIdToUse as any)
         setAllocations(allocsRes.data)
       }
     } catch (error) {
@@ -257,6 +261,19 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     }
   }
 
+  const handleRevertToLocked = async () => {
+    if (!confirm('Er du sikker på at du vil sette trekningen tilbake til låst?')) return
+
+    try {
+      await cabinLotteryService.adminRevertToLocked(drawingId)
+      await loadData()
+      toast.success('Trekning satt tilbake til låst!')
+    } catch (error) {
+      console.error('Failed to revert drawing:', error)
+      toast.error('Feil ved tilbakestilling til låst')
+    }
+  }
+
   const handleImport = async () => {
     if (!importFile) {
       toast.warning('Velg en fil først')
@@ -387,6 +404,7 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
           onDeleteDrawing={handleDeleteDrawing}
           onOpenDrawing={handleOpenDrawing}
           onRevertToDraft={handleRevertToDraft}
+          onRevertToLocked={handleRevertToLocked}
           onLockDrawing={handleLockDrawing}
           onUnlockDrawing={handleUnlockDrawing}
           onGoToDraw={() => setActiveTab('draw')}

@@ -198,17 +198,49 @@ class CabinDrawingService(
     }
 
     @Transactional
+    fun revertToLocked(drawingId: UUID): CabinDrawingDTO {
+        val drawing = drawingRepository.findById(drawingId)
+            .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
+
+        if (drawing.status != DrawingStatus.DRAWN) {
+            throw IllegalStateException("Can only revert DRAWN drawings to LOCKED. Current status: ${drawing.status}")
+        }
+
+        // Don't allow reverting if an execution has been published
+        if (drawing.publishedExecutionId != null) {
+            throw IllegalStateException("Cannot revert a drawing that has been published")
+        }
+
+        val updatedDrawing = drawing.copy(status = DrawingStatus.LOCKED)
+        val saved = drawingRepository.save(updatedDrawing)
+        return toDTO(saved)
+    }
+
+    @Transactional
     fun deleteDrawing(drawingId: UUID) {
         val drawing = drawingRepository.findById(drawingId)
             .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
 
-        if (drawing.status == DrawingStatus.DRAWN || drawing.status == DrawingStatus.PUBLISHED) {
-            throw IllegalStateException("Cannot delete a drawing that has been drawn or published. Current status: ${drawing.status}")
+        // Only block deletion if the drawing has been published
+        if (drawing.status == DrawingStatus.PUBLISHED) {
+            throw IllegalStateException("Cannot delete a published drawing. Current status: ${drawing.status}")
         }
 
-        // Can delete: DRAFT, OPEN, LOCKED
+        // If drawing has been published, prevent deletion
+        if (drawing.publishedExecutionId != null) {
+            throw IllegalStateException("Cannot delete a drawing that has been published")
+        }
 
-        // Delete all related periods first (cascade should handle this, but being explicit)
+        // Can delete: DRAFT, OPEN, LOCKED, DRAWN (as long as not published)
+
+        // Delete all related executions and their allocations
+        val executions = executionRepository.findByDrawingOrderByExecutedAtDesc(drawing)
+        for (execution in executions) {
+            allocationRepository.deleteAll(execution.allocations)
+            executionRepository.delete(execution)
+        }
+
+        // Delete all related periods
         periodRepository.deleteAll(periodRepository.findByDrawingOrderBySortOrder(drawing))
 
         // Delete the drawing
@@ -248,6 +280,37 @@ class CabinDrawingService(
         bookingIntegrationService.createBookingsFromAllocations(drawingId)
 
         return toDTO(saved)
+    }
+
+    @Transactional
+    fun deleteExecution(drawingId: UUID, executionId: UUID) {
+        val drawing = drawingRepository.findById(drawingId)
+            .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
+
+        // Cannot delete executions if any execution has been published
+        if (drawing.publishedExecutionId != null) {
+            throw IllegalStateException("Cannot delete executions after an execution has been published")
+        }
+
+        val execution = executionRepository.findById(executionId)
+            .orElseThrow { IllegalArgumentException("Execution not found: $executionId") }
+
+        if (execution.drawing.id != drawingId) {
+            throw IllegalArgumentException("Execution does not belong to this drawing")
+        }
+
+        // Delete all allocations associated with this execution
+        allocationRepository.deleteAll(execution.allocations)
+
+        // Delete the execution
+        executionRepository.delete(execution)
+
+        // If this was the last execution and drawing is DRAWN, revert to LOCKED
+        val remainingExecutions = executionRepository.findByDrawingOrderByExecutedAtDesc(drawing)
+        if (remainingExecutions.isEmpty() && drawing.status == DrawingStatus.DRAWN) {
+            drawing.status = DrawingStatus.LOCKED
+            drawingRepository.save(drawing)
+        }
     }
     
     fun getDrawing(drawingId: UUID): CabinDrawingDTO {
