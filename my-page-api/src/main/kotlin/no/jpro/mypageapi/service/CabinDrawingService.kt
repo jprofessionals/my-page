@@ -15,6 +15,7 @@ import java.util.UUID
 class CabinDrawingService(
     private val drawingRepository: CabinDrawingRepository,
     private val periodRepository: CabinPeriodRepository,
+    private val wishRepository: CabinWishRepository,
     private val allocationRepository: CabinAllocationRepository,
     private val executionRepository: CabinDrawingExecutionRepository,
     private val userRepository: UserRepository,
@@ -239,6 +240,10 @@ class CabinDrawingService(
             allocationRepository.deleteAll(execution.allocations)
             executionRepository.delete(execution)
         }
+
+        // Delete all wishes related to this drawing (must be done before deleting periods)
+        val wishes = wishRepository.findByDrawingOrderByPriority(drawing)
+        wishRepository.deleteAll(wishes)
 
         // Delete all related periods
         periodRepository.deleteAll(periodRepository.findByDrawingOrderBySortOrder(drawing))
