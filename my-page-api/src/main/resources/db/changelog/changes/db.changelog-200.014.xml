@@ -105,9 +105,12 @@
     </changeSet>
 
     <!-- Step 6: Drop old unique constraint and create new one -->
-    <changeSet id="200.014-6" author="JProfessionals">
+    <changeSet id="200.014-6-fixed" author="JProfessionals">
         <comment>Update unique constraint to include execution_id</comment>
-        <dropUniqueConstraint tableName="cabin_allocation" constraintName="period_id"/>
+        <preConditions onFail="MARK_RAN">
+            <uniqueConstraintExists tableName="cabin_allocation" constraintName="uk_cabin_allocation_period_apartment"/>
+        </preConditions>
+        <dropUniqueConstraint tableName="cabin_allocation" constraintName="uk_cabin_allocation_period_apartment"/>
         <addUniqueConstraint tableName="cabin_allocation"
                              columnNames="execution_id, period_id, apartment_id"
                              constraintName="uk_execution_period_apartment"/>
