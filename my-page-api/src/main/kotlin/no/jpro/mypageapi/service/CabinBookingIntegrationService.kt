@@ -8,6 +8,15 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 /**
+ * Result of creating bookings from lottery allocations
+ */
+data class BookingCreationResult(
+    val successCount: Int,
+    val failureCount: Int,
+    val errors: List<String>
+)
+
+/**
  * Service for å konvertere cabin lottery allocations til faktiske bookings
  * når trekningen publiseres.
  */
@@ -23,9 +32,10 @@ class CabinBookingIntegrationService(
     /**
      * Oppretter faktiske Booking-objekter for alle allocations i en publisert trekning.
      * Dette kalles automatisk når en trekning publiseres.
+     *
+     * @return BookingCreationResult med antall suksesser, feil og feilmeldinger
      */
-    @Transactional
-    fun createBookingsFromAllocations(drawingId: UUID) {
+    fun createBookingsFromAllocations(drawingId: UUID): BookingCreationResult {
         val drawing = drawingRepository.findById(drawingId)
             .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
 
@@ -44,33 +54,48 @@ class CabinBookingIntegrationService(
         val allocations = allocationRepository.findByExecutionOrderByPeriodStartDateAscApartmentCabinNameAsc(execution)
 
         logger.info("Creating ${allocations.size} bookings from published execution of drawing ${drawing.season}")
-        
-        val bookings = allocations.map { allocation ->
+
+        val errors = mutableListOf<String>()
+        val bookings = allocations.mapNotNull { allocation ->
             // Sjekk om booking allerede finnes for denne perioden/apartment
             val existingBooking = bookingRepository.findBookingByStartDateAndEndDateAndApartmentId(
                 allocation.period.startDate,
                 allocation.period.endDate,
                 allocation.apartment.id!!
             )
-            
+
             if (existingBooking != null) {
-                logger.warn("Booking already exists for ${allocation.apartment.cabin_name} " +
-                        "from ${allocation.period.startDate} to ${allocation.period.endDate}")
-                return@map null
+                val errorMsg = "Booking already exists for ${allocation.apartment.cabin_name} " +
+                        "from ${allocation.period.startDate} to ${allocation.period.endDate} " +
+                        "(allocated to: ${allocation.user.name}, existing booking: ${existingBooking.employee?.name ?: "Unknown"})"
+                logger.error(errorMsg)
+                errors.add(errorMsg)
+                return@mapNotNull null
             }
-            
+
             Booking(
                 startDate = allocation.period.startDate,
                 endDate = allocation.period.endDate,
                 apartment = allocation.apartment,
                 employee = allocation.user
             )
-        }.filterNotNull()
-        
+        }
+
         if (bookings.isNotEmpty()) {
             bookingRepository.saveAll(bookings)
             logger.info("Successfully created ${bookings.size} bookings from lottery allocations")
         }
+
+        if (errors.isNotEmpty()) {
+            val errorMessage = "Failed to create ${errors.size} booking(s) due to conflicts"
+            logger.warn("$errorMessage:\n${errors.joinToString("\n")}")
+        }
+
+        return BookingCreationResult(
+            successCount = bookings.size,
+            failureCount = errors.size,
+            errors = errors
+        )
     }
     
     /**

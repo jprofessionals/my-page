@@ -5,6 +5,7 @@ import no.jpro.mypageapi.entity.*
 import no.jpro.mypageapi.repository.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,6 +22,7 @@ class CabinDrawingService(
     private val userRepository: UserRepository,
     @Lazy private val bookingIntegrationService: CabinBookingIntegrationService
 ) {
+    private val logger = LoggerFactory.getLogger(CabinDrawingService::class.java)
     
     @Transactional
     fun createDrawing(dto: CreateDrawingDTO): CabinDrawingDTO {
@@ -282,7 +284,17 @@ class CabinDrawingService(
 
         val saved = drawingRepository.save(drawing)
 
-        bookingIntegrationService.createBookingsFromAllocations(drawingId)
+        // Create bookings from allocations - errors are logged but don't fail the operation
+        val bookingResult = bookingIntegrationService.createBookingsFromAllocations(drawingId)
+
+        if (bookingResult.failureCount > 0) {
+            // TODO: Return this information to frontend so admin can see warnings
+            val warningMsg = "Published drawing but ${bookingResult.failureCount} booking(s) failed to create due to conflicts:\n" +
+                bookingResult.errors.joinToString("\n")
+            logger.warn(warningMsg)
+        } else {
+            logger.info("Successfully published drawing and created ${bookingResult.successCount} bookings")
+        }
 
         return toDTO(saved)
     }
