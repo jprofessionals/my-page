@@ -117,10 +117,25 @@
                 AND table_name = 'cabin_allocation'
             </sqlCheck>
         </preConditions>
-        <comment>Add new unique constraint including execution_id. The old constraint (period_id, apartment_id) remains as it may be used by foreign keys.</comment>
+        <comment>Add new unique constraint including execution_id</comment>
         <addUniqueConstraint tableName="cabin_allocation"
                              columnNames="execution_id, period_id, apartment_id"
                              constraintName="uk_execution_period_apartment"/>
+    </changeSet>
+
+    <!-- Step 6b: Drop old unique constraint that doesn't include execution_id -->
+    <changeSet id="200.014-6-drop-old-constraint" author="JProfessionals">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*)
+                FROM information_schema.table_constraints
+                WHERE constraint_name = 'uk_cabin_allocation_period_apartment'
+                AND table_name = 'cabin_allocation'
+            </sqlCheck>
+        </preConditions>
+        <comment>Drop old unique constraint (period_id, apartment_id) now that we have the new constraint with execution_id</comment>
+        <dropUniqueConstraint tableName="cabin_allocation"
+                              constraintName="uk_cabin_allocation_period_apartment"/>
     </changeSet>
 
     <!-- Step 7: Remove audit_log, random_seed, drawn_at from cabin_drawing -->
