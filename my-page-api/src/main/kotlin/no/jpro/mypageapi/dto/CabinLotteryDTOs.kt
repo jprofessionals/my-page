@@ -16,7 +16,8 @@ data class CabinDrawingDTO(
     val publishedBy: Long?,
     val publishedByName: String?,
     val periods: List<CabinPeriodDTO> = emptyList(),
-    val executions: List<CabinDrawingExecutionDTO> = emptyList()
+    val executions: List<CabinDrawingExecutionDTO> = emptyList(),
+    val bookingWarnings: List<String>? = null  // Warnings from booking creation when publishing
 )
 
 data class CreateDrawingDTO(

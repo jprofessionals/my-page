@@ -38,6 +38,9 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
   const [executions, setExecutions] = useState<Execution[]>([])
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null)
 
+  // Booking warnings (persistent across tab changes)
+  const [bookingWarnings, setBookingWarnings] = useState<string[]>([])
+
   // Period form
   const [showPeriodForm, setShowPeriodForm] = useState<boolean>(false)
   const [showBulkPeriodForm, setShowBulkPeriodForm] = useState<boolean>(false)
@@ -343,9 +346,17 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     if (!confirm('Er du sikker på at du vil publisere? Dette oppretter faktiske bookings.')) return
 
     try {
-      await cabinLotteryService.adminPublishDrawing(drawingId, executionId)
+      const result = await cabinLotteryService.adminPublishDrawing(drawingId, executionId)
       await loadData()
-      toast.success('Trekning publisert! Bookings er opprettet.')
+
+      // Check if there were any booking warnings
+      if (result?.bookingWarnings && result.bookingWarnings.length > 0) {
+        setBookingWarnings(result.bookingWarnings)
+        toast.warning(`Trekning publisert, men ${result.bookingWarnings.length} booking(s) feilet. Se advarsler under.`)
+      } else {
+        setBookingWarnings([])
+        toast.success('Trekning publisert! Alle bookings er opprettet.')
+      }
     } catch (error) {
       console.error('Publish failed:', error)
       toast.error('Publisering feilet')
@@ -409,6 +420,61 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
           onUnlockDrawing={handleUnlockDrawing}
           onGoToDraw={() => setActiveTab('draw')}
         />
+
+        {/* Booking Warnings - persistent across tab changes */}
+        {bookingWarnings.length > 0 && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg shadow">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-yellow-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <h3 className="text-sm font-medium text-yellow-800">
+                  Advarsler ved publisering ({bookingWarnings.length} booking(s) feilet)
+                </h3>
+                <div className="mt-2 text-sm text-yellow-700">
+                  <ul className="list-disc pl-5 space-y-1">
+                    {bookingWarnings.map((warning, index) => (
+                      <li key={index}>{warning}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <div className="ml-auto pl-3">
+                <div className="-mx-1.5 -my-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setBookingWarnings([])}
+                    className="inline-flex rounded-md bg-yellow-50 p-1.5 text-yellow-500 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2 focus:ring-offset-yellow-50"
+                  >
+                    <span className="sr-only">Lukk</span>
+                    <svg
+                      className="h-5 w-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow mb-6">

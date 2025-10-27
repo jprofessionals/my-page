@@ -288,15 +288,14 @@ class CabinDrawingService(
         val bookingResult = bookingIntegrationService.createBookingsFromAllocations(drawingId)
 
         if (bookingResult.failureCount > 0) {
-            // TODO: Return this information to frontend so admin can see warnings
-            val warningMsg = "Published drawing but ${bookingResult.failureCount} booking(s) failed to create due to conflicts:\n" +
-                bookingResult.errors.joinToString("\n")
-            logger.warn(warningMsg)
+            val warningMsg = "Published drawing but ${bookingResult.failureCount} booking(s) failed to create due to conflicts"
+            logger.warn("$warningMsg:\n${bookingResult.errors.joinToString("\n")}")
         } else {
             logger.info("Successfully published drawing and created ${bookingResult.successCount} bookings")
         }
 
-        return toDTO(saved)
+        // Return DTO with booking warnings if any
+        return toDTO(saved, bookingWarnings = if (bookingResult.failureCount > 0) bookingResult.errors else null)
     }
 
     @Transactional
@@ -382,7 +381,7 @@ class CabinDrawingService(
         }
     }
     
-    private fun toDTO(drawing: CabinDrawing): CabinDrawingDTO {
+    private fun toDTO(drawing: CabinDrawing, bookingWarnings: List<String>? = null): CabinDrawingDTO {
         val periods = periodRepository.findByDrawingOrderBySortOrder(drawing)
 
         // Populate executions
@@ -406,7 +405,8 @@ class CabinDrawingService(
             publishedBy = drawing.publishedBy,
             publishedByName = publishedByName,
             periods = periods.map { toDTO(it) },
-            executions = executions
+            executions = executions,
+            bookingWarnings = bookingWarnings
         )
     }
 
