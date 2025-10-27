@@ -37,11 +37,14 @@
         </createIndex>
     </changeSet>
 
-    <!-- Step 2: Add published_execution_id to cabin_drawing -->
+    <!-- Step 2: Add published_execution_id and published_by to cabin_drawing -->
     <changeSet id="200.014-2" author="JProfessionals">
-        <comment>Add published_execution_id to track which execution was published</comment>
+        <comment>Add published_execution_id to track which execution was published and published_by to track who published it</comment>
         <addColumn tableName="cabin_drawing">
             <column name="published_execution_id" type="BINARY(16)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="published_by" type="BIGINT">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
