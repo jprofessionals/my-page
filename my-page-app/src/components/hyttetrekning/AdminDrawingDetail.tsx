@@ -350,9 +350,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       await loadData()
 
       // Check if there were any booking warnings
-      if (result?.bookingWarnings && result.bookingWarnings.length > 0) {
-        setBookingWarnings(result.bookingWarnings)
-        toast.warning(`Trekning publisert, men ${result.bookingWarnings.length} booking(s) feilet. Se advarsler under.`)
+      console.log('Publish result:', result.data)
+      if (result?.data?.bookingWarnings && result.data.bookingWarnings.length > 0) {
+        setBookingWarnings(result.data.bookingWarnings)
+        toast.warning(`Trekning publisert, men ${result.data.bookingWarnings.length} booking(s) feilet. Se advarsler under.`)
       } else {
         setBookingWarnings([])
         toast.success('Trekning publisert! Alle bookings er opprettet.')
