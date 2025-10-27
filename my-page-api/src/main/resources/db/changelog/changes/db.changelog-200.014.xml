@@ -107,7 +107,12 @@
     <!-- Step 6a: Drop old unique constraint if it exists -->
     <changeSet id="200.014-6a-drop-old-constraint" author="JProfessionals">
         <preConditions onFail="MARK_RAN">
-            <uniqueConstraintExists tableName="cabin_allocation" constraintName="uk_cabin_allocation_period_apartment"/>
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*)
+                FROM information_schema.table_constraints
+                WHERE constraint_name = 'uk_cabin_allocation_period_apartment'
+                AND table_name = 'cabin_allocation'
+            </sqlCheck>
         </preConditions>
         <comment>Drop old unique constraint if it exists</comment>
         <dropUniqueConstraint tableName="cabin_allocation" constraintName="uk_cabin_allocation_period_apartment"/>
@@ -116,9 +121,12 @@
     <!-- Step 6b: Add new unique constraint with execution_id -->
     <changeSet id="200.014-6b-add-new-constraint" author="JProfessionals">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <uniqueConstraintExists tableName="cabin_allocation" constraintName="uk_execution_period_apartment"/>
-            </not>
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM information_schema.table_constraints
+                WHERE constraint_name = 'uk_execution_period_apartment'
+                AND table_name = 'cabin_allocation'
+            </sqlCheck>
         </preConditions>
         <comment>Add new unique constraint including execution_id</comment>
         <addUniqueConstraint tableName="cabin_allocation"
