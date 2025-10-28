@@ -33,6 +33,7 @@ data class CabinWish(
         joinColumns = [JoinColumn(name = "wish_id")],
         inverseJoinColumns = [JoinColumn(name = "apartment_id")]
     )
+    @OrderColumn(name = "apartment_order")
     val desiredApartments: List<Apartment> = emptyList(), // Kan ønske flere enheter
     
     @Column(length = 1000)

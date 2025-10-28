@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="200.015-1" author="JProfessionals">
+        <comment>Add apartment_order column to cabin_wish_apartments to preserve user-selected order</comment>
+        <addColumn tableName="cabin_wish_apartments">
+            <column name="apartment_order" type="INT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="200.015-2" author="JProfessionals">
+        <comment>Set default order for existing data (0 for all) - will be updated when wishes are re-saved</comment>
+        <sql>
+            UPDATE cabin_wish_apartments SET apartment_order = 0;
+        </sql>
+    </changeSet>
+
+    <changeSet id="200.015-3" author="JProfessionals">
+        <comment>Make apartment_order NOT NULL after setting values</comment>
+        <addNotNullConstraint
+            tableName="cabin_wish_apartments"
+            columnName="apartment_order"
+            columnDataType="INT"
+            defaultNullValue="0"/>
+    </changeSet>
+
+</databaseChangeLog>

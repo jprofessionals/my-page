@@ -31,13 +31,17 @@ class CabinWishService(
         val wishes = dto.wishes.map { wishDto ->
             val period = periodRepository.findById(wishDto.periodId)
                 .orElseThrow { IllegalArgumentException("Period not found: ${wishDto.periodId}") }
-            
-            val apartments = apartmentRepository.findAllById(wishDto.desiredApartmentIds)
-            
-            if (apartments.size != wishDto.desiredApartmentIds.size) {
+
+            val apartmentsById = apartmentRepository.findAllById(wishDto.desiredApartmentIds)
+                .associateBy { it.id }
+
+            if (apartmentsById.size != wishDto.desiredApartmentIds.size) {
                 throw IllegalArgumentException("Some apartments not found")
             }
-            
+
+            // Preserve the order from the input by mapping IDs to apartments in same order
+            val apartments = wishDto.desiredApartmentIds.mapNotNull { apartmentsById[it] }
+
             CabinWish(
                 drawing = drawing,
                 user = user,
@@ -74,8 +78,9 @@ class CabinWishService(
             periodId = wish.period.id!!,
             periodDescription = wish.period.description,
             priority = wish.priority,
-            desiredApartmentIds = wish.desiredApartments.sortedBy { it.sort_order }.mapNotNull { it.id },
-            desiredApartmentNames = wish.desiredApartments.sortedBy { it.sort_order }.mapNotNull { it.cabin_name },
+            // Do NOT sort by sort_order - preserve the order as stored in the list
+            desiredApartmentIds = wish.desiredApartments.mapNotNull { it.id },
+            desiredApartmentNames = wish.desiredApartments.mapNotNull { it.cabin_name },
             comment = wish.comment
         )
     }
