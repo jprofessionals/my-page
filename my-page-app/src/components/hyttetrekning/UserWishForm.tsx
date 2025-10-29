@@ -87,7 +87,7 @@ export default function UserWishForm() {
         }))
 
         // Check for duplicate periods in existing wishes
-        const periodIds = formData.map(w => w.periodId)
+        const periodIds = formData.map((w: WishFormState) => w.periodId)
         const hasDuplicates = periodIds.length !== new Set(periodIds).size
 
         if (hasDuplicates) {
@@ -193,13 +193,16 @@ export default function UserWishForm() {
       await cabinLotteryService.submitWishes(drawing.id, wishes)
       await loadData()
       toast.success('Ønsker lagret!')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to save wishes:', error)
 
       // Show specific error message from backend if available
-      const errorMessage = error?.response?.data?.message ||
-                          error?.message ||
-                          'Feil ved lagring av ønsker'
+      let errorMessage = 'Feil ved lagring av ønsker'
+
+      if (error && typeof error === 'object') {
+        const err = error as { response?: { data?: { message?: string } }; message?: string }
+        errorMessage = err.response?.data?.message || err.message || errorMessage
+      }
 
       toast.error(errorMessage)
     } finally {
