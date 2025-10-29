@@ -85,6 +85,20 @@ export default function UserWishForm() {
           apartmentIds: w.desiredApartmentIds,
           comment: w.comment || '',
         }))
+
+        // Check for duplicate periods in existing wishes
+        const periodIds = formData.map(w => w.periodId)
+        const hasDuplicates = periodIds.length !== new Set(periodIds).size
+
+        if (hasDuplicates) {
+          toast.warning(
+            'Du har registrert flere ønsker på samme periode. ' +
+            'Dette kan gi uventet resultat i trekningen. ' +
+            'Vi anbefaler at du samler alle enheter for én periode i ett ønske.',
+            { autoClose: 10000 }
+          )
+        }
+
         setWishForm(formData)
       } else {
         // Clear form if no wishes
@@ -98,15 +112,25 @@ export default function UserWishForm() {
   }
 
   const addWish = (): void => {
+    // Find first available period that's not already used
+    const usedPeriodIds = new Set(wishForm.map(w => w.periodId))
+    const availablePeriod = periods.find(p => !usedPeriodIds.has(p.id))
+
     setWishForm([
       ...wishForm,
       {
-        periodId: periods[0]?.id || '',
+        periodId: availablePeriod?.id || '',
         priority: wishForm.length + 1,
         apartmentIds: [],
         comment: '',
       },
     ])
+  }
+
+  // Helper to check if all periods are used
+  const allPeriodsUsed = (): boolean => {
+    const usedPeriodIds = new Set(wishForm.map(w => w.periodId))
+    return periods.length > 0 && usedPeriodIds.size >= periods.length
   }
 
   const updateWish = (index: number, field: keyof WishFormState, value: unknown): void => {
@@ -169,9 +193,15 @@ export default function UserWishForm() {
       await cabinLotteryService.submitWishes(drawing.id, wishes)
       await loadData()
       toast.success('Ønsker lagret!')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save wishes:', error)
-      toast.error('Feil ved lagring av ønsker')
+
+      // Show specific error message from backend if available
+      const errorMessage = error?.response?.data?.message ||
+                          error?.message ||
+                          'Feil ved lagring av ønsker'
+
+      toast.error(errorMessage)
     } finally {
       setSaving(false)
     }
@@ -329,11 +359,20 @@ export default function UserWishForm() {
                         onChange={(e) => updateWish(index, 'periodId', e.target.value)}
                         className="w-full border border-gray-300 rounded-md px-3 py-2"
                       >
-                        {periods.map((period) => (
-                          <option key={period.id} value={period.id}>
-                            {period.description}
-                          </option>
-                        ))}
+                        {periods
+                          .filter((period) => {
+                            // Show period if it's the currently selected one OR if it's not used in other wishes
+                            const isCurrentlySelected = period.id === wish.periodId
+                            const isUsedInOtherWish = wishForm.some(
+                              (w, i) => i !== index && w.periodId === period.id
+                            )
+                            return isCurrentlySelected || !isUsedInOtherWish
+                          })
+                          .map((period) => (
+                            <option key={period.id} value={period.id}>
+                              {period.description}
+                            </option>
+                          ))}
                       </select>
                     </div>
 
@@ -429,21 +468,31 @@ export default function UserWishForm() {
               })}
             </div>
 
-            <div className="mt-6 flex gap-4">
-              <button
-                onClick={addWish}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Legg til ønske
-              </button>
+            <div className="mt-6">
+              <div className="flex gap-4">
+                <button
+                  onClick={addWish}
+                  disabled={allPeriodsUsed()}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  title={allPeriodsUsed() ? 'Alle perioder er allerede i bruk' : ''}
+                >
+                  Legg til ønske
+                </button>
 
-              <button
-                onClick={handleSubmit}
-                disabled={saving || wishForm.length === 0}
-                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400"
-              >
-                {saving ? 'Lagrer...' : 'Lagre ønsker'}
-              </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={saving || wishForm.length === 0}
+                  className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400"
+                >
+                  {saving ? 'Lagrer...' : 'Lagre ønsker'}
+                </button>
+              </div>
+
+              {allPeriodsUsed() && (
+                <p className="text-sm text-gray-600 mt-2">
+                  Du har allerede lagt til ønsker for alle tilgjengelige perioder.
+                </p>
+              )}
             </div>
           </div>
         )}

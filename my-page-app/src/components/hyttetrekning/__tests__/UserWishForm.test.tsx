@@ -548,7 +548,8 @@ describe('UserWishForm', () => {
       await user.click(submitButton)
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Feil ved lagring av ønsker')
+        // Now shows the specific error message from the error object
+        expect(toast.error).toHaveBeenCalledWith('Network error')
       })
     })
 
@@ -630,6 +631,130 @@ describe('UserWishForm', () => {
       })
 
       // Should not crash when no apartments available
+    })
+  })
+
+  describe('Period Selection Logic', () => {
+    beforeEach(() => {
+      const openDrawing = createMockDrawing({ status: 'OPEN' })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
+    })
+
+    it('should hide periods that are already selected in other wishes', async () => {
+      const user = userEvent.setup()
+
+      render(<UserWishForm />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Legg til ønske')).toBeInTheDocument()
+      })
+
+      // Add first wish and select first period
+      const addButton = screen.getByText('Legg til ønske')
+      await user.click(addButton)
+
+      const firstPeriodOption = screen.getAllByText(mockPeriods[0].description)[0]
+      expect(firstPeriodOption).toBeInTheDocument()
+
+      // Add second wish
+      await user.click(addButton)
+
+      // Check that we have two period selects
+      const allSelects = screen.getAllByRole('combobox')
+      const periodSelects = allSelects.filter(select =>
+        select.previousElementSibling?.textContent === 'Periode'
+      )
+      expect(periodSelects.length).toBeGreaterThanOrEqual(2)
+
+      // The second wish should default to next available period
+      expect(periodSelects[1]).toHaveValue(mockPeriods[1].id)
+    })
+
+    it('should disable "Add wish" button when all periods are used', async () => {
+      const user = userEvent.setup()
+
+      render(<UserWishForm />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Legg til ønske')).toBeInTheDocument()
+      })
+
+      const addButton = screen.getByText('Legg til ønske')
+
+      // Add wishes for all periods (mockPeriods has 3 periods)
+      await user.click(addButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Ønske 1')).toBeInTheDocument()
+      })
+
+      await user.click(addButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Ønske 2')).toBeInTheDocument()
+      })
+
+      await user.click(addButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Ønske 3')).toBeInTheDocument()
+      })
+
+      // Button should now be disabled
+      await waitFor(() => {
+        expect(addButton).toBeDisabled()
+      })
+
+      // Should show helpful message
+      expect(screen.getByText('Du har allerede lagt til ønsker for alle tilgjengelige perioder.')).toBeInTheDocument()
+    })
+
+    it('should allow selecting same period after removing wish', async () => {
+      const user = userEvent.setup()
+
+      render(<UserWishForm />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Legg til ønske')).toBeInTheDocument()
+      })
+
+      const addButton = screen.getByText('Legg til ønske')
+
+      // Add three wishes (uses all periods)
+      await user.click(addButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Ønske 1')).toBeInTheDocument()
+      })
+
+      await user.click(addButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Ønske 2')).toBeInTheDocument()
+      })
+
+      await user.click(addButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Ønske 3')).toBeInTheDocument()
+      })
+
+      // Button should be disabled after using all periods
+      await waitFor(() => {
+        expect(addButton).toBeDisabled()
+      })
+
+      // Remove first wish
+      const removeButtons = screen.getAllByText('Fjern')
+      await user.click(removeButtons[0])
+
+      // Should now be able to add another wish with the first period
+      await waitFor(() => {
+        expect(addButton).not.toBeDisabled()
+      })
     })
   })
 })
