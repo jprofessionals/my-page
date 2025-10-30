@@ -212,8 +212,8 @@ class GetAllocationsTest(
         // Perform two draws
         lotteryService.performSnakeDraft(drawing.id!!, user.id!!, seed = 123L)
 
-        // Small delay to ensure different timestamps
-        Thread.sleep(100)
+        // Delay to ensure different timestamps (increased due to shuffling logic)
+        Thread.sleep(500)
 
         val latestResult = lotteryService.performSnakeDraft(drawing.id!!, user.id!!, seed = 456L)
         val latestExecutionId = latestResult.executionId
