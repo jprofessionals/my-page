@@ -14,7 +14,6 @@ import no.jpro.mypageapi.dto.CreateBookingDTO
 import no.jpro.mypageapi.dto.UpdateBookingDTO
 import no.jpro.mypageapi.entity.Booking
 import no.jpro.mypageapi.entity.User
-import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.service.BookingService
 import no.jpro.mypageapi.service.UserService
 import org.springframework.http.HttpStatus
@@ -22,7 +21,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
@@ -43,7 +41,6 @@ import java.time.format.DateTimeParseException
 class BookingController(
     private val bookingService: BookingService,
     private val userService: UserService,
-    private val userRepository: UserRepository,
     private val environment: org.springframework.core.env.Environment
 ) {
 
@@ -52,21 +49,11 @@ class BookingController(
         return environment.activeProfiles.any { it == "local" || it == "h2" }
     }
 
-    // For local development - get user by ID from header
-    private fun getTestUserById(testUserId: String?): User? {
-        if (testUserId == null) return null
-        return try {
-            userRepository.findById(testUserId.toLong()).orElse(null)
-        } catch (e: NumberFormatException) {
-            null
-        }
-    }
-
     // Get the current user for local dev - supports test user ID header
     private fun getCurrentUser(jwt: Jwt?, testUserId: String?): User {
         // Only accept test user header in development profiles (local/h2)
         if (isDevelopmentProfile()) {
-            val testUser = getTestUserById(testUserId)
+            val testUser = userService.getTestUserById(testUserId)
             if (testUser != null) return testUser
         }
 
@@ -80,7 +67,6 @@ class BookingController(
     }
 
     @GetMapping("{bookingID}")
-    @Transactional
     @Operation(summary = "Get the booking connected to the booking id")
     @ApiResponse(
         responseCode = "200",
@@ -98,7 +84,6 @@ class BookingController(
     }
 
     @GetMapping
-    @Transactional
     @Operation(summary = "Get all bookings in the given month")
     @ApiResponse(
         responseCode = "200",
@@ -136,7 +121,6 @@ class BookingController(
 
 
     @GetMapping("employee/{employee_id}")
-    @Transactional
     @Operation(summary = "Get the booking connected to the employee id")
     @ApiResponse(
         responseCode = "200",
@@ -154,7 +138,6 @@ class BookingController(
     }
 
     @GetMapping("/date")
-    @Transactional
     @Operation(summary = "Get all bookings on the specified date")
     @ApiResponse(
         responseCode = "200",
@@ -179,7 +162,6 @@ class BookingController(
     }
 
     @GetMapping("/vacancy")
-    @Transactional
     @Operation(summary = "Gets booking vacancies in a time period for all apartments")
     @ApiResponse(
         responseCode = "200",
@@ -207,7 +189,6 @@ class BookingController(
     }
 
     @GetMapping("/apartment")
-    @Transactional
     @Operation(summary = "Gets all apartments")
     @ApiResponse(
         responseCode = "200",
@@ -253,7 +234,6 @@ class BookingController(
 
     @Deprecated("Bare admin kan opprette booking, bruk createPendingBooking i stedet")
     @PostMapping("/post")
-    @Transactional
     @Operation(summary = "Create a new booking")
     @ApiResponse(
         responseCode = "201",
@@ -272,7 +252,6 @@ class BookingController(
     }
 
     @PatchMapping("{bookingId}")
-    @Transactional
     @Operation(summary = "Edit an existing booking")
     fun editBooking(
         @AuthenticationPrincipal jwt: Jwt?,
@@ -299,7 +278,6 @@ class BookingController(
     private fun userPermittedToEditBooking(booking: Booking, employee: User) = (booking.employee?.id == employee.id)
 
     @PatchMapping("admin/{bookingId}")
-    @Transactional
     @RequiresAdmin
     @Operation(summary = "An admin edits an existing booking")
     fun adminEditBooking(
@@ -318,7 +296,6 @@ class BookingController(
     }
 
     @DeleteMapping("admin/{bookingID}")
-    @Transactional
     @RequiresAdmin
     @Operation(summary = "An admin deletes the booking connected to the booking id")
     @ApiResponse(
@@ -338,7 +315,6 @@ class BookingController(
     }
 
     @PostMapping("/admin/post")
-    @Transactional
     @RequiresAdmin
     @Operation(summary = "Admin creates a new booking for a user")
     @ApiResponse(

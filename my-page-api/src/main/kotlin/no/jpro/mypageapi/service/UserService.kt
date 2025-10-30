@@ -108,4 +108,17 @@ class UserService(
     fun getAllUsers(isEnabled: Boolean) = userRepository.findByEnabled(isEnabled).map { userMapper.toUserDTO(it) }
 
     fun getUserByName(name: String) = userRepository.findUserByName(name)
+
+    /**
+     * Get user by ID for testing purposes only.
+     * Should only be used in development/test environments.
+     */
+    fun getTestUserById(testUserId: String?): User? {
+        if (testUserId == null) return null
+        return try {
+            userRepository.findById(testUserId.toLong()).orElse(null)
+        } catch (e: NumberFormatException) {
+            null
+        }
+    }
 }
