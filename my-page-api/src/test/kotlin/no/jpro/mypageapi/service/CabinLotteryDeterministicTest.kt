@@ -658,6 +658,119 @@ class CabinLotteryDeterministicTest {
         logger.info("Random draw produced ${uniqueResults.size} unique results out of 5 runs")
     }
 
+    @Test
+    fun `wishes with same priority are shuffled deterministically with seed`() {
+        // Arrange: User with 3 wishes all having the same priority
+        val drawingId = UUID.randomUUID()
+        val drawing = CabinDrawing(
+            id = drawingId,
+            season = "TEST_SAME_PRIORITY",
+            status = DrawingStatus.LOCKED
+        )
+
+        val user = User(
+            id = 1L,
+            email = "user1@jpro.no",
+            name = "User 1",
+            givenName = "User",
+            familyName = "One",
+            sub = "sub-1",
+            budgets = emptyList()
+        )
+
+        val apartment = Apartment(id = 51L, cabin_name = "Hytte", sort_order = 1)
+
+        // Create 3 different periods
+        val periods = listOf(
+            CabinPeriod(
+                id = UUID.randomUUID(),
+                drawing = drawing,
+                startDate = LocalDate.of(2025, 1, 1),
+                endDate = LocalDate.of(2025, 1, 8),
+                description = "Periode A",
+                sortOrder = 1
+            ),
+            CabinPeriod(
+                id = UUID.randomUUID(),
+                drawing = drawing,
+                startDate = LocalDate.of(2025, 2, 1),
+                endDate = LocalDate.of(2025, 2, 8),
+                description = "Periode B",
+                sortOrder = 2
+            ),
+            CabinPeriod(
+                id = UUID.randomUUID(),
+                drawing = drawing,
+                startDate = LocalDate.of(2025, 3, 1),
+                endDate = LocalDate.of(2025, 3, 8),
+                description = "Periode C",
+                sortOrder = 3
+            )
+        )
+
+        // All 3 wishes have priority = 1 (same priority!)
+        val wishes = periods.map { period ->
+            CabinWish(
+                id = UUID.randomUUID(),
+                drawing = drawing,
+                user = user,
+                period = period,
+                priority = 1, // SAME PRIORITY
+                desiredApartments = listOf(apartment)
+            )
+        }
+
+        // Act: Run with same seed multiple times
+        setupMockRepositories(drawing, drawingId, listOf(user), wishes)
+        val result1 = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 100L)
+
+        setupMockRepositories(drawing, drawingId, listOf(user), wishes)
+        val result2 = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 100L)
+
+        setupMockRepositories(drawing, drawingId, listOf(user), wishes)
+        val result3 = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 100L)
+
+        // Assert: Same seed should produce identical results
+        assertEquals(result1.allocations.size, result2.allocations.size,
+            "Same seed should produce same number of allocations")
+        assertEquals(result1.allocations.size, result3.allocations.size,
+            "Same seed should produce same number of allocations")
+
+        // The allocated period should be the same across all runs with same seed
+        val period1 = result1.allocations.firstOrNull()?.periodId
+        val period2 = result2.allocations.firstOrNull()?.periodId
+        val period3 = result3.allocations.firstOrNull()?.periodId
+
+        assertEquals(period1, period2,
+            "Same seed should allocate same period when wishes have same priority")
+        assertEquals(period1, period3,
+            "Same seed should allocate same period when wishes have same priority")
+
+        // Act: Run with different seed
+        setupMockRepositories(drawing, drawingId, listOf(user), wishes)
+        val resultDifferentSeed = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = 200L)
+
+        // The algorithm should still give the user ONE allocation (snake draft with 1 user = 2 rounds, but max 2 allocations)
+        assertTrue(resultDifferentSeed.allocations.isNotEmpty(),
+            "User should get at least one allocation")
+        assertTrue(resultDifferentSeed.allocations.size <= 2,
+            "User should get at most 2 allocations")
+
+        // Run multiple times with different seeds to verify randomness
+        val resultsWithDifferentSeeds = (300L..310L).map { seed ->
+            setupMockRepositories(drawing, drawingId, listOf(user), wishes)
+            val result = lotteryService.performSnakeDraft(drawingId, executedBy = 1L, seed = seed)
+            result.allocations.map { it.periodId }.toSet()
+        }
+
+        // With wishes having the same priority, different seeds should produce some variation
+        // (not all results should be identical)
+        val uniqueResults = resultsWithDifferentSeeds.toSet()
+        assertTrue(uniqueResults.size > 1,
+            "Different seeds should produce varying results when wishes have same priority. " +
+            "Got ${uniqueResults.size} unique result(s) out of ${resultsWithDifferentSeeds.size} runs.")
+    }
+
     private fun setupMockRepositories(
         drawing: CabinDrawing,
         drawingId: UUID,

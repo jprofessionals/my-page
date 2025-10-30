@@ -57,10 +57,11 @@ class CabinLotteryService(
         
         logger.info("Starting snake draft for drawing $drawingId with ${shuffledParticipants.size} participants")
         logger.info("Participant order: ${shuffledParticipants.map { it.email }}")
-        
-        // Hent alle ønsker per person, sortert etter prioritet
+
+        // Hent alle ønsker per person, sortert etter prioritet, og shuffle innenfor hver prioritetsgruppe
         val wishesByUser = shuffledParticipants.associateWith { user ->
-            wishRepository.findByDrawingAndUserOrderByPriority(drawing, user)
+            val wishes = wishRepository.findByDrawingAndUserOrderByPriority(drawing, user)
+            shuffleWishesWithinPriority(wishes, random)
         }
         
         // Opprett snake order: ned og opp
@@ -263,5 +264,19 @@ class CabinLotteryService(
             statistics = statistics,
             auditLog = auditLog
         )
+    }
+
+    /**
+     * Shuffler ønsker med samme prioritet tilfeldig.
+     * Ønsker med lavere prioritet (lavere tall) evalueres fortsatt først,
+     * men innenfor hver prioritetsgruppe blir rekkefølgen tilfeldig.
+     */
+    private fun shuffleWishesWithinPriority(wishes: List<CabinWish>, random: Random): List<CabinWish> {
+        return wishes
+            .groupBy { it.priority }           // Grupper etter prioritet
+            .toSortedMap()                      // Sorter gruppene etter prioritet (1, 2, 3, ...)
+            .flatMap { (_, wishesInGroup) ->
+                wishesInGroup.shuffled(random)  // Shuffle innenfor hver gruppe
+            }
     }
 }
