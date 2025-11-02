@@ -277,42 +277,8 @@ class BookingController(
 
     private fun userPermittedToEditBooking(booking: Booking, employee: User) = (booking.employee?.id == employee.id)
 
-    @PatchMapping("admin/{bookingId}")
-    @RequiresAdmin
-    @Operation(summary = "An admin edits an existing booking")
-    fun adminEditBooking(
-        token: JwtAuthenticationToken,
-        @PathVariable("bookingId") bookingId: Long,
-        @Valid @RequestBody editBookingRequest: UpdateBookingDTO,
-    ): ResponseEntity<String> {
-        val bookingToEdit = bookingService.getBooking(bookingId) ?: return ResponseEntity.notFound().build()
-        try {
-            bookingService.editBooking(editBookingRequest, bookingToEdit)
-            return ResponseEntity.ok("The booking has been successfully edited")
-        } catch (e: IllegalArgumentException) {
-            val errorMessage = e.message ?: "An error occurred while editing the booking."
-            throw MyPageRestException(HttpStatus.BAD_REQUEST, errorMessage)
-        }
-    }
-
-    @DeleteMapping("admin/{bookingID}")
-    @RequiresAdmin
-    @Operation(summary = "An admin deletes the booking connected to the booking id")
-    @ApiResponse(
-        responseCode = "200",
-        content = [Content(mediaType = "application/json")]
-    )
-    fun adminDeleteBooking(
-        token: JwtAuthenticationToken,
-        @PathVariable("bookingID") bookingID: Long,
-    ): ResponseEntity<String> {
-        val booking = bookingService.getBooking(bookingID)
-        if (booking === null) {
-            return ResponseEntity(HttpStatus.NOT_FOUND)
-        }
-        bookingService.deleteBooking(bookingID)
-        return ResponseEntity.ok("Booking with ID $bookingID has been deleted")
-    }
+    // NOTE: Admin booking methods (adminEditBooking, adminDeleteBooking) have been moved to BookingApiDelegateImpl
+    // to use OpenAPI-generated endpoints. See BookingApiDelegateImpl for implementations.
 
     @PostMapping("/admin/post")
     @RequiresAdmin

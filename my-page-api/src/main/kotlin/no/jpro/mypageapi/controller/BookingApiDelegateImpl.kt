@@ -121,6 +121,27 @@ class BookingApiDelegateImpl(
             .body("A new booking has been successfully created")
     }
 
+    override fun adminDeleteBooking(bookingId: Long): ResponseEntity<Unit> {
+        val booking = bookingService.getBooking(bookingId)
+            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+
+        bookingService.deleteBooking(bookingId)
+        return ResponseEntity.ok().build()
+    }
+
+    override fun adminUpdateBooking(bookingId: Long, bookingUpdate: BookingUpdate): ResponseEntity<Unit> {
+        val bookingToEdit = bookingService.getBooking(bookingId)
+            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+
+        try {
+            val updateBookingDTO = bookingMapper.toUpdateBookingDTO(bookingUpdate)
+            bookingService.validateAndEditBooking(updateBookingDTO, bookingToEdit)
+            return ResponseEntity.ok().build()
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build()
+        }
+    }
+
     private fun isDevelopmentProfile(): Boolean {
         return environment.activeProfiles.any { it == "local" || it == "h2" }
     }
