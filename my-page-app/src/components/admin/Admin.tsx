@@ -6,8 +6,8 @@ import {
   BudgetSummary,
   BudgetType,
   BudgetYearSummary, ToggleActive, ToggleAdmin,
-  User,
 } from '@/types'
+import { User } from '@/data/types/sdk.gen'
 import BudgetList from '@/components/budget/BudgetList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown'

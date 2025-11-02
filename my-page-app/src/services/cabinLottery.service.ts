@@ -268,7 +268,7 @@ export const adminDeleteExecution = async (drawingId: string, executionId: strin
 }
 
 // For backwards compatibility with axios-style responses
-export default {
+const cabinLotteryServiceCompat = {
   getCurrentDrawing: () => cabinLotteryService.getCurrentDrawing().then((data) => ({ data })),
   getDrawing: (drawingId: string) => cabinLotteryService.getDrawing(drawingId).then((data) => ({ data })),
   getPeriods: (drawingId: string) => cabinLotteryService.getPeriods(drawingId).then((data) => ({ data })),
@@ -301,3 +301,5 @@ export default {
   adminImportWishes,
   adminDeleteExecution,
 }
+
+export default cabinLotteryServiceCompat
