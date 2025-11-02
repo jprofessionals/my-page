@@ -19,11 +19,11 @@ import { Accordions, AccordionTrigger } from '@/components/ui/bookingAccordion'
 import { AccordionContent, AccordionItem } from '@radix-ui/react-accordion'
 
 function compareUsers(a: User, b: User): number {
-  if (a.name === null && b.name === null) {
+  if (!a.name && !b.name) {
     return a.email.localeCompare(b.email)
-  } else if (a.name === null) {
-    return a.email.localeCompare(b.name)
-  } else if (b.name === null) {
+  } else if (!a.name) {
+    return a.email.localeCompare(b.name ?? b.email)
+  } else if (!b.name) {
     return a.name.localeCompare(b.email)
   } else {
     return a.name.localeCompare(b.name)
