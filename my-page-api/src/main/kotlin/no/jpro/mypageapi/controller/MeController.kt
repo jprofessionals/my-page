@@ -21,7 +21,6 @@ import org.springframework.core.env.Environment
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
@@ -40,7 +39,6 @@ class MeController(
 ) {
 
     @GetMapping
-    @Transactional
     @Operation(summary = "Get data for user identified by the bearer token")
     @ApiResponse(
         responseCode = "200",
@@ -73,9 +71,9 @@ class MeController(
         return userService.getOrCreateUser(jwt).apply { this.budgets = null }
     }
 
-    // Check if we're running in a development profile (local or h2)
+    // Check if we're running in a development/test profile (local, h2, or test)
     private fun isDevelopmentProfile(): Boolean {
-        return environment.activeProfiles.any { it == "local" || it == "h2" }
+        return environment.activeProfiles.any { it == "local" || it == "h2" || it == "test" }
     }
 
     // For local development - get user by ID from header
@@ -89,7 +87,6 @@ class MeController(
     }
 
     @GetMapping("budgets")
-    @Transactional
     @Operation(summary = "Get the different budgets that belong to logged in user.")
     @ApiResponse(
         responseCode = "200",
@@ -99,12 +96,23 @@ class MeController(
             )
         )]
     )
-    fun getBudgets(token: JwtAuthenticationToken): List<BudgetDTO> {
-        return budgetService.getBudgets(token.getSub())
+    fun getBudgets(
+        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt?,
+        @RequestHeader("X-Test-User-Id", required = false) testUserId: String?
+    ): List<BudgetDTO> {
+        // In development mode, support test user header
+        if (isDevelopmentProfile()) {
+            val testUser = getTestUserById(testUserId)
+            if (testUser?.sub != null) {
+                return budgetService.getBudgets(testUser.sub)
+            }
+        }
+
+        // For production or when no test user, use JWT
+        return budgetService.getBudgets(jwt?.getSub() ?: throw IllegalStateException("No authentication provided"))
     }
 
     @GetMapping("bookings")
-    @Transactional
     @Operation(summary = "Get the different cabin bookings that belong to logged in user.")
     @ApiResponse(
         responseCode = "200",
@@ -114,11 +122,22 @@ class MeController(
             )
         )]
     )
-    fun getBookings(token: JwtAuthenticationToken): List<BookingDTO> {
-        return bookingService.getUserBookings(token.getSub())
+    fun getBookings(
+        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt?,
+        @RequestHeader("X-Test-User-Id", required = false) testUserId: String?
+    ): List<BookingDTO> {
+        // In development mode, support test user header
+        if (isDevelopmentProfile()) {
+            val testUser = getTestUserById(testUserId)
+            if (testUser?.sub != null) {
+                return bookingService.getUserBookings(testUser.sub)
+            }
+        }
+
+        // For production or when no test user, use JWT
+        return bookingService.getUserBookings(jwt?.getSub() ?: throw IllegalStateException("No authentication provided"))
     }
     @GetMapping("pendingBookings")
-    @Transactional
     @Operation(summary = "Get the different cabin pending bookings that belong to logged in user.")
     @ApiResponse(
         responseCode = "200",
@@ -128,7 +147,19 @@ class MeController(
             )
         )]
     )
-    fun getPendingBookings(token: JwtAuthenticationToken): List<PendingBookingDTO> {
-        return pendingBookingService.getUserPendingBookings(token.getSub())
+    fun getPendingBookings(
+        @Parameter(hidden = true) @AuthenticationPrincipal jwt: Jwt?,
+        @RequestHeader("X-Test-User-Id", required = false) testUserId: String?
+    ): List<PendingBookingDTO> {
+        // In development mode, support test user header
+        if (isDevelopmentProfile()) {
+            val testUser = getTestUserById(testUserId)
+            if (testUser?.sub != null) {
+                return pendingBookingService.getUserPendingBookings(testUser.sub)
+            }
+        }
+
+        // For production or when no test user, use JWT
+        return pendingBookingService.getUserPendingBookings(jwt?.getSub() ?: throw IllegalStateException("No authentication provided"))
     }
 }

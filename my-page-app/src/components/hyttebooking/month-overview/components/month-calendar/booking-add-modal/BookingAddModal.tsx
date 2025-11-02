@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import { Apartment, BookingPost, User } from '@/types'
-import axios from 'axios'
-import ApiService, { API_URL } from '@/services/api.service'
-import authHeader from '@/services/auth-header'
+import ApiService from '@/services/api.service'
+import { createPendingBooking } from '@/data/types/sdk.gen'
+import '@/services/openapi-client'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
 import { toast } from 'react-toastify'
@@ -49,14 +49,21 @@ const BookingAddModal = ({
   }: {
     bookingPost: BookingPost
   }) => {
-    const data = { ...bookingPost, startDate, endDate }
-    const url = `${API_URL}pendingBooking/pendingPost`
-    return axios
-      .post(url, data, { headers: authHeader() as unknown as Record<string, string> })
-      .then((response) => response.data)
-      .catch((error) => {
-        throw error?.response?.data || 'En feil oppstod ved lagring'
+    try {
+      const { data } = await createPendingBooking({
+        body: {
+          apartmentID: bookingPost.apartmentID,
+          startDate,
+          endDate,
+        },
       })
+      return data
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error.message
+      }
+      throw 'En feil oppstod ved lagring'
+    }
   }
 
   const handleConfirm = async () => {

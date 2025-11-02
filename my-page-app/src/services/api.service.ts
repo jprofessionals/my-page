@@ -1,0 +1,337 @@
+/**
+ * API Service
+ *
+ * Uses OpenAPI-generated SDK (type-safe)
+ */
+
+import {
+  getMe,
+  getMyBudgets,
+  getMyBookings,
+  getUsers,
+  updateUser as updateUserSDK,
+  getBookings as getBookingsSDK,
+  getApartments as getApartmentsSDK,
+  deleteBooking as deleteBookingSDK,
+  updateBooking as updateBookingSDK,
+  getBudgetsForEmployee as getBudgetsForEmployeeSDK,
+  createBudgetPost as createBudgetPostSDK,
+  deleteBudgetPost as deleteBudgetPostSDK,
+  updateBudgetPost as updateBudgetPostSDK,
+  getPendingBookingInformation as getPendingBookingInformationSDK,
+  pickWinnerPendingBooking as pickWinnerPendingBookingSDK,
+  getMyPendingBookings as getMyPendingBookingsSDK,
+  deleteMyPendingBooking as deleteMyPendingBookingSDK,
+  adminDeletePendingBooking as adminDeletePendingBookingSDK,
+  getInformationNotices as getInformationNoticesSDK,
+  createInformationNotice as createInformationNoticeSDK,
+  deleteInformationNotice as deleteInformationNoticeSDK,
+  getInformationNoticeVacancies as getInformationNoticeVacanciesSDK,
+  getBookingVacancies as getBookingVacanciesSDK,
+  adminDeleteBooking as adminDeleteBookingSDK,
+  getBudgetSummary as getBudgetSummarySDK,
+  getSettings as getSettingsSDK,
+  updateSetting as updateSettingSDK,
+  adminUpdateBooking as adminUpdateBookingSDK,
+  updatePendingBooking as updatePendingBookingSDK,
+  getImage as getImageSDK,
+} from '@/data/types/sdk.gen'
+import '@/services/openapi-client' // Ensure client is configured
+
+export const API_URL = '/api/'
+
+// ===== USER ENDPOINTS (OpenAPI SDK) =====
+
+const getUser = async () => {
+  const { data } = await getMe()
+  return { data }
+}
+
+const getUsersAll = async () => {
+  const { data } = await getUsers()
+  return { data }
+}
+
+const getDisabledUsers = async () => {
+  const { data } = await getUsers({
+    query: { isEnabled: false },
+  })
+  return { data }
+}
+
+// ===== BUDGET ENDPOINTS (OpenAPI SDK) =====
+
+const getBudgets = async () => {
+  const { data } = await getMyBudgets()
+  const budgets = data || []
+  return budgets.map((budget: any) => ({
+    ...budget,
+    id: String(budget.id),
+  }))
+}
+
+const getBudgetsForEmployee = async (employeeNumber: number) => {
+  const { data } = await getBudgetsForEmployeeSDK({
+    path: { employeeNumber },
+  })
+  return { data }
+}
+
+const createBudgetPost = async (post: any, budgetId: number) => {
+  const { data } = await createBudgetPostSDK({
+    path: { budgetId },
+    body: post,
+  })
+  return { data }
+}
+
+const deleteBudgetPost = async (postId: number) => {
+  const { data } = await deleteBudgetPostSDK({
+    path: { postId },
+  })
+  return { data }
+}
+
+const editBudgetPost = async (postId: number, editPostRequest: any) => {
+  const { data } = await updateBudgetPostSDK({
+    path: { postId },
+    body: editPostRequest,
+  })
+  return { data }
+}
+
+// ===== BOOKING ENDPOINTS (OpenAPI SDK) =====
+
+const getBookings = async (startDate: string, endDate: string) => {
+  const { data } = await getBookingsSDK({
+    query: { startDate, endDate },
+  })
+  const bookings = data || []
+  return bookings.map((booking: any) => ({
+    id: booking.id,
+    startDate: booking.startDate,
+    endDate: booking.endDate,
+    apartment: {
+      id: booking.apartment.id,
+      cabin_name: booking.apartment.cabin_name,
+    },
+    employeeName: booking.employeeName,
+    isPending: false,
+  }))
+}
+
+const getBookingsForUser = async () => {
+  const { data } = await getMyBookings()
+  const bookings = data || []
+  return bookings.map((booking: any) => ({
+    ...booking,
+    id: String(booking.id),
+    isPending: false,
+  }))
+}
+
+const getAllApartments = async () => {
+  const { data } = await getApartmentsSDK()
+  return data || []
+}
+
+const deleteBooking = async (bookingId: number) => {
+  const { data } = await deleteBookingSDK({
+    path: { bookingId },
+  })
+  return { data }
+}
+
+const patchBooking = async (bookingId: number, updatedBooking: any) => {
+  const { data } = await updateBookingSDK({
+    path: { bookingId },
+    body: updatedBooking,
+  })
+  return { data }
+}
+
+// ===== USER ADMIN ENDPOINTS (OpenAPI SDK) =====
+
+const toggleAdmin = async (email: string, isAdmin: boolean) => {
+  const { data } = await updateUserSDK({
+    body: { email, isAdmin },
+  })
+  return { data }
+}
+
+const toggleActive = async (email: string, isActive: boolean) => {
+  const { data } = await updateUserSDK({
+    body: { email, isActive },
+  })
+  return { data }
+}
+
+// ===== MORE BOOKING ENDPOINTS (OpenAPI SDK) =====
+
+const getAllVacancies = async (startDate: string, endDate: string) => {
+  const { data } = await getBookingVacanciesSDK({
+    query: { startdate: startDate, enddate: endDate },
+  })
+  return data || {}
+}
+
+const adminDeleteBooking = async (bookingId: number) => {
+  const { data } = await adminDeleteBookingSDK({
+    path: { bookingId },
+  })
+  return { data }
+}
+
+const getAllPendingBookingTrainsForAllApartments = async () => {
+  const { data } = await getPendingBookingInformationSDK()
+  return data || []
+}
+
+const pickWinnerPendingBooking = async (pendingBookingList: any[]) => {
+  const { data } = await pickWinnerPendingBookingSDK({
+    body: pendingBookingList,
+  })
+  return data
+}
+
+const getPendingBookingsForUser = async () => {
+  const { data } = await getMyPendingBookingsSDK()
+  const pendingBookings = data || []
+  return pendingBookings.map((pendingBooking: any) => ({
+    ...pendingBooking,
+    id: String(pendingBooking.id),
+    isPending: true,
+  }))
+}
+
+const deletePendingBooking = async (pendingBookingId: number) => {
+  const { data } = await deleteMyPendingBookingSDK({
+    path: { pendingBookingId },
+  })
+  return { data }
+}
+
+const adminDeletePendingBooking = async (pendingBookingId: number) => {
+  const { data } = await adminDeletePendingBookingSDK({
+    path: { pendingBookingId },
+  })
+  return { data }
+}
+
+// ===== INFORMATION NOTICE ENDPOINTS (OpenAPI SDK) =====
+
+const getInfoNotices = async (startDate: string, endDate: string) => {
+  const { data } = await getInformationNoticesSDK({
+    query: { startDate, endDate },
+  })
+  const infoNotices = data || []
+  return infoNotices.map((infoNotice: any) => ({
+    id: infoNotice.id ? String(infoNotice.id) : '',
+    startDate: infoNotice.startDate,
+    endDate: infoNotice.endDate,
+    description: infoNotice.description,
+  }))
+}
+
+const deleteInfoNotice = async (infoNoticeId: number) => {
+  const { data } = await deleteInformationNoticeSDK({
+    path: { infoNoticeId },
+  })
+  return { data }
+}
+
+const createInfoNotice = async (infoNotice: any) => {
+  const { data } = await createInformationNoticeSDK({
+    body: infoNotice,
+  })
+  return { data }
+}
+
+const getAllInfoNoticeVacancies = async (startDate: string, endDate: string) => {
+  const { data } = await getInformationNoticeVacanciesSDK({
+    query: { startdate: startDate, enddate: endDate },
+  })
+  return data || []
+}
+
+// ===== ADMIN & SETTINGS ENDPOINTS (OpenAPI SDK) =====
+
+const getBudgetSummary = async () => {
+  const { data } = await getBudgetSummarySDK()
+  return data || []
+}
+
+const getSettings = async () => {
+  const { data } = await getSettingsSDK()
+  return data || []
+}
+
+const patchSetting = async (settingId: string, updatedSetting: any) => {
+  const { data } = await updateSettingSDK({
+    path: { settingId },
+    body: updatedSetting,
+  })
+  return { data }
+}
+
+const adminPatchBooking = async (bookingId: number, updatedBooking: any) => {
+  const { data } = await adminUpdateBookingSDK({
+    path: { bookingId },
+    body: updatedBooking,
+  })
+  return { data }
+}
+
+const patchPendingBooking = async (pendingBookingId: number, updatedBooking: any) => {
+  const { data } = await updatePendingBookingSDK({
+    path: { pendingBookingId },
+    body: updatedBooking,
+  })
+  return { data }
+}
+
+// ===== IMAGE ENDPOINT (OpenAPI SDK) =====
+
+const getImage = async (fileName: string) => {
+  const { data } = await getImageSDK({
+    path: { fileName },
+  })
+  return data
+}
+
+const ApiService = {
+  getUsers: getUsersAll,
+  getDisabledUsers,
+  getUser,
+  getBudgets,
+  getBudgetsForEmployee,
+  createBudgetPost,
+  deleteBudgetPost,
+  editBudgetPost,
+  getBookings,
+  getBookingsForUser,
+  getAllVacancies,
+  getAllApartments,
+  deleteBooking,
+  adminDeleteBooking,
+  getAllPendingBookingTrainsForAllApartments,
+  pickWinnerPendingBooking,
+  getPendingBookingsForUser,
+  deletePendingBooking,
+  adminDeletePendingBooking,
+  getInfoNotices,
+  createInfoNotice,
+  deleteInfoNotice,
+  getAllInfoNoticeVacancies,
+  getBudgetSummary,
+  getSettings,
+  patchSetting,
+  patchBooking,
+  patchPendingBooking,
+  adminPatchBooking,
+  getImage,
+  toggleAdmin,
+  toggleActive,
+}
+
+export default ApiService

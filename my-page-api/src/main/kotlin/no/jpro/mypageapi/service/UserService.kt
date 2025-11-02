@@ -13,6 +13,7 @@ import no.jpro.mypageapi.repository.UserRepository
 import no.jpro.mypageapi.utils.mapper.UserMapper
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
@@ -22,6 +23,7 @@ class UserService(
     private val budgetService: BudgetService
 ) {
 
+    @Transactional
     fun initializeNewEmployee(email: String, employeeNumber: Int, budgetStartDate: LocalDate): User {
         val existingUser = getUserByEmail(email)
 
@@ -52,6 +54,7 @@ class UserService(
         return userRepository.save(updatedUser)
     }
 
+    @Transactional
     fun getOrCreateUser(jwt: Jwt): UserDTO {
         val user =
             userRepository.findUserBySub(jwt.getSub())
@@ -64,11 +67,13 @@ class UserService(
         return userRepository.save(userMapper.toUser(jwt))
     }
 
+    @Transactional
     fun updateAdmin(email: String, isAdmin: Boolean): User {
         val user = userRepository.findUserByEmail(email)
         return userRepository.save(user!!.copy(admin = isAdmin))
     }
 
+    @Transactional
     fun updateActive(email: String, isActive: Boolean): User {
         val user = userRepository.findUserByEmail(email)
         return userRepository.save(user!!.copy(enabled = isActive))
@@ -87,10 +92,6 @@ class UserService(
         )
     }
 
-    fun checkIfUserExists(userSub: String): Boolean {
-        return userRepository.existsUserBySub(userSub)
-    }
-
     fun getUserByEmail(email: String) = userRepository.findUserByEmail(email)
 
     @Deprecated("Use getValidUserBySub (and then rename it")
@@ -105,6 +106,7 @@ class UserService(
         return userRepository.findUserBySub(userSub) ?: throw InvalidUserSubException("No user found for sub: $userSub")
     }
 
+    @Transactional(readOnly = true)
     fun getAllUsers(isEnabled: Boolean) = userRepository.findByEnabled(isEnabled).map { userMapper.toUserDTO(it) }
 
     fun getUserByName(name: String) = userRepository.findUserByName(name)

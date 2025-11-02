@@ -1,0 +1,12 @@
+🚫 client needs to be set to generate SDKs - which HTTP client do you want to use?
+Error: 🚫 client needs to be set to generate SDKs - which HTTP client do you want to use?
+    at Object.pluginByTag (file:///Users/steinarhansen/IdeaProjects/my-page/my-page-app/node_modules/@hey-api/openapi-ts/dist/chunk-EZKCBI4J.js:14:70870)
+    at Object._infer (file:///Users/steinarhansen/IdeaProjects/my-page/my-page-app/node_modules/@hey-api/openapi-ts/dist/chunk-EZKCBI4J.js:14:1578)
+    at a (file:///Users/steinarhansen/IdeaProjects/my-page/my-page-app/node_modules/@hey-api/openapi-ts/dist/chunk-EZKCBI4J.js:14:70949)
+    at jl (file:///Users/steinarhansen/IdeaProjects/my-page/my-page-app/node_modules/@hey-api/openapi-ts/dist/chunk-EZKCBI4J.js:14:71042)
+    at Nl (file:///Users/steinarhansen/IdeaProjects/my-page/my-page-app/node_modules/@hey-api/openapi-ts/dist/chunk-EZKCBI4J.js:14:71721)
+    at file:///Users/steinarhansen/IdeaProjects/my-page/my-page-app/node_modules/@hey-api/openapi-ts/dist/chunk-EZKCBI4J.js:14:73057
+    at Array.map (<anonymous>)
+    at aj (file:///Users/steinarhansen/IdeaProjects/my-page/my-page-app/node_modules/@hey-api/openapi-ts/dist/chunk-EZKCBI4J.js:14:72362)
+    at async $i (file:///Users/steinarhansen/IdeaProjects/my-page/my-page-app/node_modules/@hey-api/openapi-ts/dist/index.js:1304:3001)
+    at async file:///Users/steinarhansen/IdeaProjects/my-page/my-page-app/generate-types.js:8:1

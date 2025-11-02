@@ -9,7 +9,6 @@ import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.entity.Setting
 import no.jpro.mypageapi.service.SettingsService
 import org.slf4j.LoggerFactory
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -27,11 +26,9 @@ class SettingsController(private val settingsService: SettingsService) {
 
 
     @GetMapping
-    @Transactional
     fun getSettings(): List<Setting> = settingsService.getAllSettings()
 
     @GetMapping("{settingId}")
-    @Transactional
     @ApiResponse(
         responseCode = "200",
         description = "Get requested setting",
@@ -42,7 +39,6 @@ class SettingsController(private val settingsService: SettingsService) {
 
 
     @PatchMapping("{settingId}")
-    @Transactional
     @RequiresAdmin
     @ApiResponse(
         responseCode = "200",

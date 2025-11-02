@@ -2,6 +2,7 @@ package no.jpro.mypageapi.utils.mapper
 
 import no.jpro.mypageapi.dto.CreateInformationNoticeDTO
 import no.jpro.mypageapi.dto.InformationNoticeDTO
+import no.jpro.mypageapi.dto.UpdateInformationNoticeDTO
 import no.jpro.mypageapi.entity.InfoBooking
 import org.springframework.stereotype.Service
 
@@ -18,4 +19,27 @@ class InformationNoticeMapper {
         endDate = createInformationNoticeDTO.endDate,
         description = createInformationNoticeDTO.description,
     )
+
+    // OpenAPI model conversions
+    fun toOpenApiModel(dto: InformationNoticeDTO): no.jpro.mypageapi.model.InformationNotice =
+        no.jpro.mypageapi.model.InformationNotice(
+            id = dto.id,
+            startDate = dto.startDate,
+            endDate = dto.endDate,
+            description = dto.description
+        )
+
+    fun toDTO(model: no.jpro.mypageapi.model.CreateInformationNotice): CreateInformationNoticeDTO =
+        CreateInformationNoticeDTO(
+            startDate = model.startDate,
+            endDate = model.endDate,
+            description = model.description
+        )
+
+    fun toDTO(model: no.jpro.mypageapi.model.UpdateInformationNotice): UpdateInformationNoticeDTO =
+        UpdateInformationNoticeDTO(
+            startDate = model.startDate,
+            endDate = model.endDate,
+            description = model.description
+        )
 }

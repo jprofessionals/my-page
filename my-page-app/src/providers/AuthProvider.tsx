@@ -13,7 +13,7 @@ import ApiService from '@/services/api.service'
 import config from '../config/config'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
+import { configureOpenAPIClient } from '@/services/openapi-client'
 
 type UserFetchStatus =
   | 'init'
@@ -43,20 +43,33 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [userFetchStatus, setUserFetchStatus] =
     useState<UserFetchStatus>('init')
 
+  // Configure OpenAPI client on mount (client-side only)
+  useEffect(() => {
+    configureOpenAPIClient()
+  }, [])
+
   useEffect(() => {
     const token = sessionStorage.getItem('user_token')
 
-    // In development, check for test user
-    if (process.env.NODE_ENV === 'development') {
-      const testUserId = localStorage.getItem('testUserId')
-      if (testUserId) {
-        // Set a mock token for test user to bypass authentication
-        setUserToken('test-user-token')
-        setIsLoading(false)
-        return
-      }
+    // Check for test user (works in any environment if testUserId is set)
+    const testUserId = localStorage.getItem('testUserId')
+
+    if (testUserId) {
+      // If testUserId is set, use test mode
+      setUserToken('test-user-token')
+      setIsLoading(false)
+      return
     }
 
+    // In development without test user, set default test user
+    if (process.env.NODE_ENV === 'development') {
+      localStorage.setItem('testUserId', '1')
+      setUserToken('test-user-token')
+      setIsLoading(false)
+      return
+    }
+
+    // Production mode - use real token
     setUserToken(token)
     setIsLoading(false)
   }, [])
@@ -74,15 +87,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
         })
         setUserFetchStatus('fetched')
       } catch (e) {
-        if (axios.isAxiosError(e) && e.response) {
-          const headerAuthToken = e.response.headers['www-authenticate'] || ''
-          if (
-            typeof headerAuthToken === 'string' &&
-            headerAuthToken.includes('invalid_token')
-          ) {
-            sessionStorage.removeItem('user_token')
-            setUserToken(null)
-          }
+        // If authentication fails, clear the token
+        if (e instanceof Error && e.message.includes('401')) {
+          sessionStorage.removeItem('user_token')
+          setUserToken(null)
         }
         setUserFetchStatus('fetchFailed')
       }

@@ -45,15 +45,19 @@ class MockExampleTests {
 		//Create a mock instance of the UserService class. A mock will return null for all method calls, unless told otherwise
 		val mock = Mockito.mock(UserService::class.java)
 
-		//Mock returned value for UserService.checkIfUserExists(String userSub)
-		Mockito.`when`(mock.checkIfUserExists("test1")).thenReturn(false)
-		Mockito.`when`(mock.checkIfUserExists("test2")).thenReturn(true)
+		//Create a real instance of the User class for testing
+		val user1 = User(email="test1@example.com", name="Test User 1", givenName="Test", familyName="User1", budgets=emptyList())
+		val user2 = User(email="test2@example.com", name="Test User 2", givenName="Test", familyName="User2", budgets=emptyList())
+
+		//Mock returned value for UserService.getUserByEmail(String email)
+		Mockito.`when`(mock.getUserByEmail("test1@example.com")).thenReturn(user1)
+		Mockito.`when`(mock.getUserByEmail("test2@example.com")).thenReturn(user2)
 
 		//Verify that the provided mocks works as expected
-		Assertions.assertFalse(mock.checkIfUserExists("test1"))
-		Assertions.assertTrue(mock.checkIfUserExists("test2"))
+		Assertions.assertEquals(user1, mock.getUserByEmail("test1@example.com"))
+		Assertions.assertEquals(user2, mock.getUserByEmail("test2@example.com"))
 
-		//Call UserService.getUserByEmail(String email). As this method is not mocked yet, it should return null
+		//Call UserService.getUserByEmail(String email) with an unmocked email. As this email is not mocked, it should return null
 		var user = mock.getUserByEmail("test@invalid.org")
 
 		//Verify that a not mocked method actually returns null

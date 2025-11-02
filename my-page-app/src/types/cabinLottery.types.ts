@@ -1,79 +1,28 @@
 // Type definitions for Cabin Lottery feature
+// Re-export OpenAPI generated types
 
-// Drawing statuses
+import type {
+  CabinDrawing,
+  CabinPeriod,
+  CabinWish,
+  CabinAllocation,
+  CabinDrawingExecution,
+  Apartment as ApartmentType,
+  CreateCabinWish,
+  BulkCreateWishes,
+} from '@/data/types/types.gen'
+
+// Re-export with simpler names
+export type Drawing = CabinDrawing
+export type Period = CabinPeriod
+export type Wish = CabinWish
+export type Allocation = CabinAllocation
+export type Execution = CabinDrawingExecution
+export type Apartment = ApartmentType
+export type { CreateCabinWish, BulkCreateWishes }
+
+// Drawing statuses (kept for backwards compatibility)
 export type DrawingStatus = 'DRAFT' | 'OPEN' | 'LOCKED' | 'DRAWN' | 'PUBLISHED'
-
-// Main entities
-export interface Drawing {
-  id: string
-  season: string
-  status: DrawingStatus
-  createdAt: string
-  lockedAt?: string | null
-  publishedAt?: string | null
-  publishedExecutionId?: string | null
-  publishedBy?: number | null
-  publishedByName?: string | null
-  periods?: Period[]
-  executions?: Execution[]
-  bookingWarnings?: string[] | null
-}
-
-export interface Execution {
-  id: string
-  drawingId: string
-  executedAt: string
-  executedBy: number
-  executedByName?: string | null
-  randomSeed?: number | null
-  auditLog?: string[] | null
-  allocationCount: number
-}
-
-export interface Period {
-  id: string
-  drawingId: string
-  startDate: string
-  endDate: string
-  description: string
-  sortOrder: number
-  comment?: string | null
-}
-
-export interface Wish {
-  id: string
-  drawingId: string
-  userId: number
-  userName: string
-  userEmail: string
-  periodId: string
-  periodDescription: string
-  priority: number
-  desiredApartmentIds: number[]
-  desiredApartmentNames: string[]
-  comment?: string | null
-}
-
-export interface Allocation {
-  id: string
-  drawingId: string
-  userId: number
-  userName: string
-  userEmail: string
-  periodId: string
-  periodDescription: string
-  startDate: string
-  endDate: string
-  apartmentId: number
-  apartmentName: string
-  apartmentSortOrder?: number
-  allocationRound: number
-}
-
-export interface Apartment {
-  id: number
-  cabin_name: string
-}
 
 // Form states
 export interface PeriodFormState {

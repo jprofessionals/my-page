@@ -23,7 +23,6 @@ import no.jpro.mypageapi.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -46,7 +45,6 @@ class PendingBookingController(
 ) {
 
     @GetMapping
-    @Transactional
     @Operation(summary = "Get all pending bookings in the given date range")
     @ApiResponse(
         responseCode = "200",
@@ -72,7 +70,6 @@ class PendingBookingController(
     }
 
     @PostMapping("/pendingPost")
-    @Transactional
     @Operation(summary = "Create a new pending booking")
     @ApiResponse(
         responseCode = "201",
@@ -91,7 +88,6 @@ class PendingBookingController(
 
     @RequiresAdmin
     @PostMapping("/pendingPostForUser")
-    @Transactional
     @Operation(summary = "Create a new pending booking on behalf of a user")
     @ApiResponse(
         responseCode = "201",
@@ -110,7 +106,6 @@ class PendingBookingController(
     }
 
     @GetMapping("/pendingBookingInformation")
-    @Transactional
     @Operation(summary = "Get the pending booking trains and the corresponding drawing periods")
     @ApiResponse(
         responseCode = "200",
@@ -185,7 +180,6 @@ class PendingBookingController(
     }
 
     @PatchMapping("{pendingBookingId}")
-    @Transactional
     @Operation(summary = "Edit an existing pending booking")
     fun editPendingBooking(
         token: JwtAuthenticationToken,

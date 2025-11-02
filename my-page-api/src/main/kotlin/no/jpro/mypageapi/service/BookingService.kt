@@ -49,6 +49,7 @@ class BookingService(
         return bookings.map { bookingMapper.toBookingDTO(it) }
     }
 
+    @Transactional(readOnly = true)
     fun getUserBookings(userSub: String): List<BookingDTO> {
         val bookings = bookingRepository.findBookingsByEmployeeSub(userSub)
         return bookings.map { bookingMapper.toBookingDTO(it) }

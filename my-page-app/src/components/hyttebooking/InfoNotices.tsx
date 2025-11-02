@@ -23,7 +23,7 @@ function InfoNotices() {
   const getUserIsAdmin = async () => {
     try {
       const response = await ApiService.getUser()
-      setUserIsAdmin(response.data.admin)
+      setUserIsAdmin(response.data?.admin || false)
     } catch {
       toast.error('Kunne ikke hente brukers admin status')
     }

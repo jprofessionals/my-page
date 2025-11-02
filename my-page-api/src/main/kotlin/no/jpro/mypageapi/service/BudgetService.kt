@@ -15,6 +15,7 @@ import no.jpro.mypageapi.repository.PostRepository
 import no.jpro.mypageapi.utils.mapper.BudgetPostMapper
 import no.jpro.mypageapi.utils.mapper.BudgetTypeMapper
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
@@ -26,6 +27,7 @@ class BudgetService(
     private val budgetTypeMapper: BudgetTypeMapper
 ) {
 
+    @Transactional(readOnly = true)
     fun getBudgets(userSub: String): List<BudgetDTO> {
         val budgets = budgetRepository.findBudgetsByUserSub(userSub)
         return budgets.map { budgetPostMapper.toBudgetDTO(it) }
@@ -121,6 +123,7 @@ class BudgetService(
 
     class Balance(val year: Int, val budgetTypeId: Long, val balance: Double)
 
+    @Transactional(readOnly = true)
     fun getSummary(): List<BudgetSummary> {
         val hours = getHours()
         val balances = getBalances()

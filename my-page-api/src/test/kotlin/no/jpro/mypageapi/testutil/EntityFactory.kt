@@ -38,7 +38,7 @@ class EntityFactory(
                 familyName = null,
                 givenName = null,
                 name = null,
-                admin = true
+                admin = isAdmin
             )
         )
     }

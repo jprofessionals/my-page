@@ -4,6 +4,7 @@ import no.jpro.mypageapi.entity.Status
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class NotificationJob(private val notificationJobService: NotificationJobService) {
@@ -13,6 +14,7 @@ class NotificationJob(private val notificationJobService: NotificationJobService
     @Value("\${notification.jobs.enabled}")
     private var enabled: Boolean = true
 
+    @Transactional
     fun triggerNotificationGenerationJob () {
         if (enabled) {
             runNotificationGeneration()

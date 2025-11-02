@@ -2,9 +2,8 @@ import { FormEvent, useState } from 'react'
 import NewEmployeeForm from '@/components/newemployee/NewEmployeeForm'
 import { NewEmployee } from '@/types'
 import { useMutation } from '@tanstack/react-query'
-import axios, { AxiosError } from 'axios'
-import { API_URL } from '@/services/api.service'
-import authHeader from '@/services/auth-header'
+import { createUser } from '@/data/types/sdk.gen'
+import '@/services/openapi-client'
 import { toast } from 'react-toastify'
 import { Button } from '../ui/button'
 import { Alert } from '../ui/alert'
@@ -22,14 +21,15 @@ const parseEmail = (email?: string) => {
 
 const createNewEmployee = async (newEmployee: NewEmployee) => {
   const modifiedNewEmployee = {
-    ...newEmployee,
     email: parseEmail(newEmployee.email),
     employeeNumber: parseInt(newEmployee.employeeNumber, 10),
+    budgetStartDate: newEmployee.budgetStartDate,
   }
 
-  return await axios.post(API_URL + 'user', modifiedNewEmployee, {
-    headers: authHeader() as unknown as Record<string, string>,
+  const { data } = await createUser({
+    body: modifiedNewEmployee,
   })
+  return { data }
 }
 
 const initialInputData: NewEmployee = {
@@ -51,8 +51,8 @@ export default function NewUserModal() {
       setError(null)
     },
 
-    onError: (error: AxiosError) => {
-      toast.error(`Klarte ikke opprette ny bruker: ${error.response?.data}`)
+    onError: (error: Error) => {
+      toast.error(`Klarte ikke opprette ny bruker: ${error.message}`)
     },
   })
 

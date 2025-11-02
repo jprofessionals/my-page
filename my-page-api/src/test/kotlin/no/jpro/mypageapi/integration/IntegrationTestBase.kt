@@ -56,6 +56,19 @@ abstract class IntegrationTestBase {
         return client
     }
 
+    fun restClient(authenticated: Boolean, asAdmin: Boolean): HttpHeaderTestRestTemplate {
+        val client = HttpHeaderTestRestTemplate(testRestTemplate)
+        if (authenticated) {
+            if (asAdmin) {
+                client.addHeaderForSingleHttpEntityCallback("X-Test-User-Id", adminUser.id.toString())
+            } else {
+                client.add(HttpHeaders.AUTHORIZATION) { generateBearerToken() }
+            }
+        }
+
+        return client
+    }
+
     fun generateBearerToken(): String {
         val token =
             mockOAuth2Server.issueToken(

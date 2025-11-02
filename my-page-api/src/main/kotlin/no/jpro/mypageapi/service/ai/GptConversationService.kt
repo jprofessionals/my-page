@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import no.jpro.mypageapi.consumer.ai.GPT_4o
 import no.jpro.mypageapi.consumer.ai.OpenAIConsumer
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
@@ -18,6 +19,7 @@ class GptConversationService(
     @OptIn(BetaOpenAI::class)
     private val conversations: MutableMap<UUID, MutableList<ChatMessage>> = mutableMapOf()
 
+    @Transactional
     fun converseWithGpt(message: String, conversationId: UUID): String {
 
         var response: String

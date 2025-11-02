@@ -16,7 +16,6 @@ import no.jpro.mypageapi.utils.mapper.UserMapper
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -39,7 +38,6 @@ class UserController(
     private val logger = LoggerFactory.getLogger(UserController::class.java)
 
     @GetMapping
-    @Transactional
     fun getAllUsers(
         @RequestParam isEnabled: Boolean = true,
         @org.springframework.web.bind.annotation.RequestHeader("X-Test-User-Id", required = false) testUserId: String?
@@ -64,7 +62,6 @@ class UserController(
     }
 
     @PostMapping
-    @Transactional
     @RequiresAdmin
     @Operation(summary = "Create a new employee")
     @ResponseStatus(HttpStatus.CREATED)
@@ -88,7 +85,6 @@ class UserController(
     }
 
     @PatchMapping()
-    @Transactional
     @RequiresAdmin
     @Operation(summary = "Toggle admin")
     @ResponseStatus(HttpStatus.OK)
@@ -107,7 +103,6 @@ class UserController(
     }
 
     @PatchMapping("active")
-    @Transactional
     @RequiresAdmin
     @Operation(summary = "Toggle active")
     @ResponseStatus(HttpStatus.OK)

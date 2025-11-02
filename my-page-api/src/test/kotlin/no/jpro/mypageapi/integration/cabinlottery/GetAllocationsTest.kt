@@ -1,8 +1,8 @@
 package no.jpro.mypageapi.integration.cabinlottery
 
-import no.jpro.mypageapi.dto.CabinAllocationDTO
 import no.jpro.mypageapi.entity.*
 import no.jpro.mypageapi.integration.IntegrationTestBase
+import no.jpro.mypageapi.model.CabinAllocation
 import no.jpro.mypageapi.repository.*
 import no.jpro.mypageapi.service.CabinLotteryService
 import org.assertj.core.api.Assertions.assertThat
@@ -86,22 +86,20 @@ class GetAllocationsTest(
         // Act - Get allocations without specifying executionId (should return published execution)
         val url = "/cabin-lottery/admin/drawings/${drawing.id}/allocations"
         val response = restClient(true)
-            .exchange(url, HttpMethod.GET, null, object : ParameterizedTypeReference<List<CabinAllocationDTO>>() {})
+            .exchange(url, HttpMethod.GET, null, object : ParameterizedTypeReference<List<CabinAllocation>>() {})
 
         // Assert
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         val allocations = response.body!!
+        assertThat(allocations).isNotEmpty
 
         // Verify all allocations are from the published (second) execution
-        val allocationExecutions = executionRepository.findAll()
-            .filter { exec -> allocations.any { alloc ->
-                allocationRepository.findById(alloc.id!!)
-                    .map { it.execution.id == exec.id }
-                    .orElse(false)
-            }}
+        val allocationIds = allocations.map { it.id }
+        val allocationEntities = allocationRepository.findAllById(allocationIds)
+        val executionIds = allocationEntities.map { it.execution.id }.toSet()
 
-        assertThat(allocationExecutions).hasSize(1)
-        assertThat(allocationExecutions.first().id).isEqualTo(secondExecutionId)
+        assertThat(executionIds).hasSize(1)
+        assertThat(executionIds.first()).isEqualTo(secondExecutionId)
     }
 
     @Test
@@ -155,23 +153,21 @@ class GetAllocationsTest(
         // Act - Get allocations for the FIRST execution specifically
         val url = "/cabin-lottery/admin/drawings/${drawing.id}/allocations?executionId=$firstExecutionId"
         val response = restClient(true)
-            .exchange(url, HttpMethod.GET, null, object : ParameterizedTypeReference<List<CabinAllocationDTO>>() {})
+            .exchange(url, HttpMethod.GET, null, object : ParameterizedTypeReference<List<CabinAllocation>>() {})
 
         // Assert
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         val allocations = response.body!!
+        assertThat(allocations).isNotEmpty
 
         // Verify all allocations are from the first execution (not the published one)
-        val allocationExecutions = executionRepository.findAll()
-            .filter { exec -> allocations.any { alloc ->
-                allocationRepository.findById(alloc.id!!)
-                    .map { it.execution.id == exec.id }
-                    .orElse(false)
-            }}
+        val allocationIds = allocations.map { it.id }
+        val allocationEntities = allocationRepository.findAllById(allocationIds)
+        val executionIds = allocationEntities.map { it.execution.id }.toSet()
 
-        assertThat(allocationExecutions).hasSize(1)
-        assertThat(allocationExecutions.first().id).isEqualTo(firstExecutionId)
-        assertThat(allocationExecutions.first().id).isNotEqualTo(secondExecutionId)
+        assertThat(executionIds).hasSize(1)
+        assertThat(executionIds.first()).isEqualTo(firstExecutionId)
+        assertThat(executionIds.first()).isNotEqualTo(secondExecutionId)
     }
 
     @Test
@@ -212,8 +208,8 @@ class GetAllocationsTest(
         // Perform two draws
         lotteryService.performSnakeDraft(drawing.id!!, user.id!!, seed = 123L)
 
-        // Delay to ensure different timestamps (increased due to shuffling logic)
-        Thread.sleep(500)
+        // Delay to ensure different timestamps (increased due to shuffling logic and delegate implementation)
+        Thread.sleep(1000)
 
         val latestResult = lotteryService.performSnakeDraft(drawing.id!!, user.id!!, seed = 456L)
         val latestExecutionId = latestResult.executionId
@@ -221,22 +217,20 @@ class GetAllocationsTest(
         // Act - Get allocations without executionId (should return latest execution)
         val url = "/cabin-lottery/admin/drawings/${drawing.id}/allocations"
         val response = restClient(true)
-            .exchange(url, HttpMethod.GET, null, object : ParameterizedTypeReference<List<CabinAllocationDTO>>() {})
+            .exchange(url, HttpMethod.GET, null, object : ParameterizedTypeReference<List<CabinAllocation>>() {})
 
         // Assert
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         val allocations = response.body!!
+        assertThat(allocations).isNotEmpty
 
         // Verify all allocations are from the latest execution
-        val allocationExecutions = executionRepository.findAll()
-            .filter { exec -> allocations.any { alloc ->
-                allocationRepository.findById(alloc.id!!)
-                    .map { it.execution.id == exec.id }
-                    .orElse(false)
-            }}
+        val allocationIds = allocations.map { it.id }
+        val allocationEntities = allocationRepository.findAllById(allocationIds)
+        val executionIds = allocationEntities.map { it.execution.id }.toSet()
 
-        assertThat(allocationExecutions).hasSize(1)
-        assertThat(allocationExecutions.first().id).isEqualTo(latestExecutionId)
+        assertThat(executionIds).hasSize(1)
+        assertThat(executionIds.first()).isEqualTo(latestExecutionId)
     }
 
     @Test
@@ -252,7 +246,7 @@ class GetAllocationsTest(
         // Act - Get allocations
         val url = "/cabin-lottery/admin/drawings/${drawing.id}/allocations"
         val response = restClient(true)
-            .exchange(url, HttpMethod.GET, null, object : ParameterizedTypeReference<List<CabinAllocationDTO>>() {})
+            .exchange(url, HttpMethod.GET, null, object : ParameterizedTypeReference<List<CabinAllocation>>() {})
 
         // Assert
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)

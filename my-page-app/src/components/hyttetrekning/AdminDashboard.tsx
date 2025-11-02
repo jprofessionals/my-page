@@ -28,10 +28,11 @@ export default function AdminDashboard() {
   const loadDrawings = async () => {
     try {
       const response = await cabinLotteryService.adminGetAllDrawings()
-      setDrawings(response.data)
+      setDrawings(response.data || [])
     } catch (error) {
       console.error('Failed to load drawings:', error)
       toast.error('Feil ved lasting av trekkinger')
+      setDrawings([])
     } finally {
       setLoading(false)
     }
@@ -46,7 +47,11 @@ export default function AdminDashboard() {
     setCreating(true)
     try {
       const response = await cabinLotteryService.adminCreateDrawing(newSeason)
-      router.push(`/admin/hyttetrekning/${response.data.id}`)
+      if (response.data?.id) {
+        router.push(`/admin/hyttetrekning/${response.data.id}`)
+      } else {
+        toast.error('Kunne ikke opprette trekning')
+      }
     } catch (error) {
       console.error('Failed to create drawing:', error)
       toast.error('Feil ved opprettelse av trekning')

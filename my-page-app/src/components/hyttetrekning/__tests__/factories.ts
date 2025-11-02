@@ -15,13 +15,8 @@ export const createMockDrawing = (overrides: Partial<Drawing> = {}): Drawing => 
   season: 'Test Sommer 2025',
   status: 'DRAFT',
   createdAt: '2025-01-01T00:00:00Z',
-  updatedAt: '2025-01-01T00:00:00Z',
-  wishesOpenAt: null,
-  wishesCloseAt: null,
-  lockedAt: null,
-  drawnAt: null,
-  publishedAt: null,
-  randomSeed: null,
+  lockedAt: undefined,
+  publishedAt: undefined,
   periods: [],
   ...overrides,
 })
@@ -36,7 +31,6 @@ export const createMockPeriod = (overrides: Partial<Period> = {}): Period => ({
   description: 'Påske',
   sortOrder: 1,
   comment: '',
-  createdAt: '2025-01-01T00:00:00Z',
   ...overrides,
 })
 
@@ -63,7 +57,6 @@ export const createMockWish = (overrides: Partial<Wish> = {}): Wish => ({
   priority: 1,
   desiredApartmentIds: [1, 2],
   desiredApartmentNames: ['Stor leilighet', 'Liten leilighet'],
-  comment: null,
   ...overrides,
 })
 
@@ -82,7 +75,6 @@ export const createMockAllocation = (overrides: Partial<Allocation> = {}): Alloc
   userName: 'Ola Nordmann',
   userEmail: 'ola@example.com',
   allocationType: 'DRAWN',
-  comment: null,
   allocatedAt: '2025-01-15T10:00:00Z',
   ...overrides,
 })
@@ -146,8 +138,6 @@ export const createCompleteDrawing = (): Drawing => {
     season: 'Komplett Test 2025',
     status: 'OPEN',
     periods,
-    wishesOpenAt: '2025-01-01T00:00:00Z',
-    wishesCloseAt: '2025-02-01T00:00:00Z',
   })
 }
 

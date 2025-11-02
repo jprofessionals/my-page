@@ -9,6 +9,7 @@ import no.jpro.mypageapi.entity.InfoBooking
 import no.jpro.mypageapi.repository.InformationNoticeRepository
 import no.jpro.mypageapi.utils.mapper.InformationNoticeMapper
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -21,6 +22,7 @@ class InformationNoticeService (
     fun getInfoNotice(infoNoticeId: Long): InfoBooking? {
         return informationNoticeRepository.findInfoBookingById(infoNoticeId)
     }
+    @Transactional(readOnly = true)
     fun getInformationNoticesInPeriod(startDate: LocalDate, endDate: LocalDate): List<InformationNoticeDTO> {
         val informationNotices =
             informationNoticeRepository.findInfoBookingsByStartDateGreaterThanEqualAndEndDateLessThanEqual(startDate, endDate)
@@ -54,6 +56,7 @@ class InformationNoticeService (
         return filteredInfoNotices
     }
 
+    @Transactional
     fun createInfoNotice(infoNoticeRequest: CreateInformationNoticeDTO): InformationNoticeDTO {
         val overlappingInfoNotices = filterOverlappingInfoNotices(infoNoticeRequest.startDate, infoNoticeRequest.endDate)
         if(overlappingInfoNotices.isEmpty()) {
@@ -71,6 +74,7 @@ class InformationNoticeService (
         return filteredInformationNotices.filter { it.id != informationNoticeToExclude?.id }
     }
 
+    @Transactional
     fun editInformationNotice(editPostRequest: UpdateInformationNoticeDTO, infoNoticeToEdit: InfoBooking): InformationNoticeDTO {
         val overlappingInfoNotices = filterOverlappingInfoNoticesExcludingInfoBookingToEdit(editPostRequest.startDate, editPostRequest.endDate, infoNoticeToEdit)
 
@@ -89,10 +93,12 @@ class InformationNoticeService (
         }
     }
 
+    @Transactional
     fun deleteInformationNotice(infoNoticeId: Long) {
         return informationNoticeRepository.deleteById(infoNoticeId)
     }
 
+    @Transactional(readOnly = true)
     fun getAllVacanciesInAPeriod(startDate: LocalDate, endDate: LocalDate): List<LocalDate> {
         val datesInRange = LongRange(0, ChronoUnit.DAYS.between(startDate, endDate))
             .map { startDate.plusDays(it) }

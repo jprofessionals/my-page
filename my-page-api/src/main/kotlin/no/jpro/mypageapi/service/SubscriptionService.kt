@@ -6,6 +6,7 @@ import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.SubscriptionRepository
 import no.jpro.mypageapi.utils.mapper.SubscriptionMapper
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class SubscriptionService(
@@ -23,6 +24,7 @@ class SubscriptionService(
         return subscriptions.map { subscriptionMapper.toSubscriptionDTO(it)}
     }
 
+    @Transactional
     fun deleteSubscription(tag: String, user: User) {
         assert(user.id != null) { "User ID must not be null" }
         subscriptionRepository.deleteByUserIdAndTag(userId = user.id!!, tag = tag)

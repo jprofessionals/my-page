@@ -31,7 +31,7 @@ class DeleteJobPostingTest(
         assertThat(jobPostingRepository.findAll()).hasSize(1)
         assertThat(notificationTaskRepository.findAll()).hasSize(1)
 
-        val response = restClient(true)
+        val response = restClient(authenticated = true, asAdmin = true)
             .delete<Void>(uri = "$ENDPOINT_URL/${jobPosting.id}")
         assertThat(response.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
 

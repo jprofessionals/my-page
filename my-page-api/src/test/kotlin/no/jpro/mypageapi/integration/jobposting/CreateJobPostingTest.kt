@@ -29,7 +29,7 @@ class CreateJobPostingTest(
 
     @Test
     fun create() {
-        val response = restClient(true)
+        val response = restClient(authenticated = true, asAdmin = true)
             .postForEntity<JobPosting>(uri = ENDPOINT_URL, modelFactory.createJobPosting(tags = listOf("tag1")))
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
         assertThat(jobPostingRepository.findAll()).hasSize(1)

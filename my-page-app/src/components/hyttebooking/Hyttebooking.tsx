@@ -45,7 +45,7 @@ function Hyttebooking() {
     cabinLotteryService
       .getCurrentDrawing()
       .then((response) => {
-        setCurrentDrawing(response.data)
+        setCurrentDrawing(response.data || null)
       })
       .catch((error) => {
         console.error('Failed to fetch current drawing:', error)

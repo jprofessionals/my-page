@@ -12,7 +12,6 @@ import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.service.BudgetService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -25,7 +24,6 @@ class AdminController(
     private val budgetService: BudgetService,
 ) {
     @GetMapping("budgetSummary")
-    @Transactional
     @Operation(summary = "Get summary of all budgets per year")
     @ApiResponse(
         responseCode = "200",

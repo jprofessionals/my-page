@@ -97,29 +97,4 @@ class CabinBookingIntegrationService(
             errors = errors
         )
     }
-    
-    /**
-     * Sletter alle bookings som ble opprettet fra en trekning.
-     * Nyttig hvis man vil angre en publisering.
-     */
-    @Transactional
-    fun deleteBookingsFromDrawing(drawingId: UUID) {
-        val drawing = drawingRepository.findById(drawingId)
-            .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
-        
-        val allocations = allocationRepository.findByDrawingOrderByPeriodStartDateAscApartmentCabinNameAsc(drawing)
-        
-        allocations.forEach { allocation ->
-            val booking = bookingRepository.findBookingByStartDateAndEndDateAndApartmentId(
-                allocation.period.startDate,
-                allocation.period.endDate,
-                allocation.apartment.id!!
-            )
-            
-            if (booking != null && booking.employee?.id == allocation.user.id) {
-                bookingRepository.delete(booking)
-                logger.info("Deleted booking for ${allocation.user.name} - ${allocation.apartment.cabin_name}")
-            }
-        }
-    }
 }

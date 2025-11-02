@@ -601,6 +601,34 @@ describe('UserWishForm', () => {
       consoleSpy.mockRestore()
     })
 
+    it('should handle undefined wishes data (401 unauthorized)', async () => {
+      const openDrawing = createMockDrawing({ status: 'OPEN' })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      // Simulate 401 response with undefined data (empty body)
+      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: undefined as any })
+
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+      render(<UserWishForm />)
+
+      await waitFor(() => {
+        // Should still render the form without crashing
+        expect(screen.getByText('Registrer dine ønsker')).toBeInTheDocument()
+      })
+
+      // Should NOT log an error about .length on undefined (because we handle it)
+      expect(consoleSpy).not.toHaveBeenCalledWith(
+        'Failed to load data:',
+        expect.objectContaining({
+          message: expect.stringContaining("Cannot read properties of undefined (reading 'length')")
+        })
+      )
+
+      consoleSpy.mockRestore()
+    })
+
     it('should handle empty periods array', async () => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
       vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })

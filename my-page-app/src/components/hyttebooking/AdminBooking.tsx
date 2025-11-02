@@ -1,12 +1,16 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
-import ApiService, { API_URL } from '@/services/api.service'
+import ApiService from '@/services/api.service'
 import { toast } from 'react-toastify'
 import { Button } from '@/components/ui/button'
 import { differenceInDays } from 'date-fns'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Apartment, BookingPost } from '@/types'
-import axios from 'axios'
-import authHeader from '@/services/auth-header'
+import {
+  adminCreateBooking,
+  createPendingBooking as createPendingBookingSDK,
+  createPendingBookingForUser
+} from '@/data/types/sdk.gen'
+import '@/services/openapi-client'
 import Loading from '@/components/Loading'
 import * as Modal from '@/components/ui/modal'
 
@@ -26,7 +30,7 @@ export default function AdminBooking() {
     try {
       const response = await ApiService.getUser()
       const user = response.data
-      const adminStatus = user.admin
+      const adminStatus = user?.admin || false
       setUserIsAdmin(adminStatus)
     } catch {
       toast.error('Kunne ikke hente brukers admin status')
@@ -35,10 +39,12 @@ export default function AdminBooking() {
 
   const fetchAllUsers = async () => {
     const response = await ApiService.getUsers()
-    const users = response.data
+    const users = response.data || []
     const usersNames: string[] = []
     for (const user of users) {
-      usersNames.push(user.name)
+      if (user.name) {
+        usersNames.push(user.name)
+      }
     }
     setAllUsersNames(usersNames)
   }
@@ -55,57 +61,44 @@ export default function AdminBooking() {
     startDate: string
     bookingWithoutDrawing: boolean
   }) => {
-    if (userIsAdmin) {
-      if (bookingWithoutDrawing) {
-        return axios
-          .post(
-            API_URL + 'booking/admin/post?bookingOwnerName=' + bookingOwnerName,
-            bookingPost,
-            {
-              headers: authHeader() as unknown as Record<string, string>,
+    try {
+      if (userIsAdmin) {
+        if (bookingWithoutDrawing) {
+          const { data } = await adminCreateBooking({
+            query: { bookingOwnerName },
+            body: {
+              apartmentID: bookingPost.apartmentID,
+              startDate: bookingPost.startDate,
+              endDate: bookingPost.endDate,
             },
-          )
-          .then((response) => response.data)
-          .catch((error) => {
-            if (error.response && error.response.data) {
-              throw error.response.data
-            } else {
-              throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
-            }
           })
+          return data
+        } else {
+          const { data } = await createPendingBookingForUser({
+            query: { bookingOwnerName },
+            body: {
+              apartmentID: bookingPost.apartmentID,
+              startDate: bookingPost.startDate,
+              endDate: bookingPost.endDate,
+            },
+          })
+          return data
+        }
       } else {
-        return axios
-          .post(
-            API_URL +
-              'pendingBooking/pendingPostForUser?bookingOwnerName=' +
-              bookingOwnerName,
-            bookingPost,
-            {
-              headers: authHeader() as unknown as Record<string, string>,
-            },
-          )
-          .then((response) => response.data)
-          .catch((error) => {
-            if (error.response && error.response.data) {
-              throw error.response.data
-            } else {
-              throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
-            }
-          })
+        const { data } = await createPendingBookingSDK({
+          body: {
+            apartmentID: bookingPost.apartmentID,
+            startDate: bookingPost.startDate,
+            endDate: bookingPost.endDate,
+          },
+        })
+        return data
       }
-    } else {
-      return axios
-        .post(API_URL + 'pendingBooking/pendingPost', bookingPost, {
-          headers: authHeader() as unknown as Record<string, string>,
-        })
-        .then((response) => response.data)
-        .catch((error) => {
-          if (error.response && error.response.data) {
-            throw error.response.data
-          } else {
-            throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
-          }
-        })
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error.message
+      }
+      throw 'En feil skjedde under oppretting, sjekk input verdier og prøv igjen.'
     }
   }
 

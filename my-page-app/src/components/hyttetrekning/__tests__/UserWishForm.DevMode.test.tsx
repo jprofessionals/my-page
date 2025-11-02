@@ -17,9 +17,6 @@ vi.mock('../UserResults', () => ({
   default: () => <div>User Results Component</div>,
 }))
 
-// Spy on axios to verify headers
-vi.mock('axios')
-
 describe('Development Mode - Test User Authentication', () => {
   const mockPeriods = createMockPeriods()
   const mockApartments = createMockApartments()

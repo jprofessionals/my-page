@@ -224,3 +224,4 @@ GitHub Actions handles CI/CD (see `.github/workflows/`).
 - Use Spring profiles appropriately (h2 for quick tests, local for integration testing)
 - GCP secrets stored in Secret Manager (referenced via `sm://` in properties)
 - WebSocket endpoint available for real-time features
+- Use an actual TOOD.md file on the root of the project to show and update a plan of action

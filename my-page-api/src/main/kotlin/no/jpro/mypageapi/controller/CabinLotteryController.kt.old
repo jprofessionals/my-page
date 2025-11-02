@@ -50,9 +50,9 @@ class CabinLotteryController(
         }
     }
 
-    // Check if we're running in a development profile (local or h2)
+    // Check if we're running in a development profile (local, h2, or test)
     private fun isDevelopmentProfile(): Boolean {
-        return environment.activeProfiles.any { it == "local" || it == "h2" }
+        return environment.activeProfiles.any { it == "local" || it == "h2" || it == "test" }
     }
 
     // Get the current user for local dev - supports test user ID header

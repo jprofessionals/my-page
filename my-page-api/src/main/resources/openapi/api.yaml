@@ -274,6 +274,1532 @@ paths:
           description: Not found
         '500':
           description: Internal server error
+  /me:
+    get:
+      tags:
+        - User
+      operationId: getMe
+      summary: Get current user
+      description: Returns the currently authenticated user
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+  /me/budgets:
+    get:
+      tags:
+        - Budget
+      operationId: getMyBudgets
+      summary: Get current user's budgets
+      description: Returns all budgets for the current user
+      responses:
+        '200':
+          description: List of budgets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Budget'
+  /me/bookings:
+    get:
+      tags:
+        - Booking
+      operationId: getMyBookings
+      summary: Get current user's bookings
+      description: Returns all bookings for the current user
+      responses:
+        '200':
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+  /me/pendingBookings:
+    get:
+      tags:
+        - PendingBooking
+      operationId: getMyPendingBookings
+      summary: Get current user's pending bookings
+      description: Returns all pending bookings for the current user
+      responses:
+        '200':
+          description: List of pending bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PendingBookingDTO'
+  /user:
+    get:
+      tags:
+        - User
+      operationId: getUsers
+      summary: Get users
+      description: Returns all users, optionally filtered by enabled status
+      parameters:
+        - in: query
+          name: isEnabled
+          required: false
+          schema:
+            type: boolean
+          description: Filter by enabled status
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    patch:
+      tags:
+        - User
+      operationId: updateUser
+      summary: Update user
+      description: Update user admin status or active status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                isAdmin:
+                  type: boolean
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          description: User updated
+    post:
+      tags:
+        - User
+      operationId: createUser
+      summary: Create a new employee
+      description: Initialize a new employee with budget start date (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewEmployee'
+      responses:
+        '201':
+          description: Employee created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+        '409':
+          description: User already exists
+  /booking:
+    get:
+      tags:
+        - Booking
+      operationId: getBookings
+      summary: Get bookings
+      description: Returns bookings within a date range
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+  /booking/apartment:
+    get:
+      tags:
+        - Booking
+      operationId: getApartments
+      summary: Get all apartments
+      description: Returns all available apartments
+      responses:
+        '200':
+          description: List of apartments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Apartment'
+  /booking/{bookingId}:
+    delete:
+      tags:
+        - Booking
+      operationId: deleteBooking
+      summary: Delete booking
+      description: Delete a booking by ID
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Booking deleted
+    patch:
+      tags:
+        - Booking
+      operationId: updateBooking
+      summary: Update booking
+      description: Update a booking by ID
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdate'
+      responses:
+        '200':
+          description: Booking updated
+  /booking/vacancy:
+    get:
+      tags:
+        - Booking
+      operationId: getBookingVacancies
+      summary: Get booking vacancies in a time period
+      parameters:
+        - in: query
+          name: startdate
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: enddate
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Map of apartment IDs to lists of available dates
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+                    format: date
+        '400':
+          description: Invalid date format
+  /booking/admin/{bookingId}:
+    delete:
+      tags:
+        - Booking
+      operationId: adminDeleteBooking
+      summary: Admin delete booking
+      description: Admin deletes a booking by ID
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Booking deleted
+        '404':
+          description: Booking not found
+    patch:
+      tags:
+        - Booking
+      operationId: adminUpdateBooking
+      summary: Admin update booking
+      description: Admin updates a booking by ID
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdate'
+      responses:
+        '200':
+          description: Booking updated
+        '400':
+          description: Bad request
+        '404':
+          description: Booking not found
+  /booking/admin/post:
+    post:
+      tags:
+        - Booking
+      operationId: adminCreateBooking
+      summary: Admin creates a booking for a user
+      description: Admin creates a new booking on behalf of a specific user
+      parameters:
+        - name: bookingOwnerName
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBooking'
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: User not found
+  /budget/{employeeNumber}:
+    get:
+      tags:
+        - Budget
+      operationId: getBudgetsForEmployee
+      summary: Get budgets for employee
+      description: Returns all budgets for a specific employee (admin only)
+      parameters:
+        - name: employeeNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of budgets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BudgetDetail'
+  /budget/{budgetId}/posts:
+    post:
+      tags:
+        - Budget
+      operationId: createBudgetPost
+      summary: Create budget post
+      description: Create a new post for a budget
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePost'
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Bad request
+        '403':
+          description: Forbidden
+  /budget/posts/{postId}:
+    delete:
+      tags:
+        - Budget
+      operationId: deleteBudgetPost
+      summary: Delete budget post
+      description: Delete a budget post by ID
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Post deleted
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    patch:
+      tags:
+        - Budget
+      operationId: updateBudgetPost
+      summary: Update budget post
+      description: Update an existing budget post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePost'
+      responses:
+        '200':
+          description: Post updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /cabin-lottery/current:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getCurrentDrawing
+      summary: Get current active drawing
+      description: Returns the current active drawing (excludes DRAFT status)
+      responses:
+        '200':
+          description: Current drawing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+  /cabin-lottery/drawings/{drawingId}:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getDrawing
+      summary: Get drawing details
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+  /cabin-lottery/drawings/{drawingId}/periods:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getDrawingPeriods
+      summary: Get all periods for a drawing
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of periods
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinPeriod'
+  /cabin-lottery/drawings/{drawingId}/wishes:
+    post:
+      tags:
+        - CabinLottery
+      operationId: submitWishes
+      summary: Submit wishes for a drawing
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkCreateWishes'
+      responses:
+        '200':
+          description: Wishes created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinWish'
+  /cabin-lottery/drawings/{drawingId}/my-wishes:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getMyWishes
+      summary: Get current user's wishes
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of wishes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinWish'
+  /cabin-lottery/drawings/{drawingId}/my-allocations:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getMyAllocations
+      summary: Get current user's allocations
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of allocations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinAllocation'
+  /cabin-lottery/drawings/{drawingId}/allocations:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getDrawingAllocations
+      summary: Get all allocations for a drawing
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: executionId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of allocations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinAllocation'
+  /cabin-lottery/apartments:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getLotteryApartments
+      summary: Get all apartments for lottery
+      responses:
+        '200':
+          description: List of apartments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Apartment'
+  /cabin-lottery/admin/drawings:
+    post:
+      tags:
+        - CabinLottery
+      operationId: createAdminDrawing
+      summary: Create a new cabin drawing (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                season:
+                  type: string
+              required:
+                - season
+      responses:
+        '200':
+          description: Drawing created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+    get:
+      tags:
+        - CabinLottery
+      operationId: getAllDrawings
+      summary: Get all drawings (admin only)
+      responses:
+        '200':
+          description: List of all drawings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinDrawing'
+  /cabin-lottery/admin/drawings/{drawingId}:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getAdminDrawing
+      summary: Get drawing by ID (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '404':
+          description: Drawing not found
+    delete:
+      tags:
+        - CabinLottery
+      operationId: deleteDrawing
+      summary: Delete a drawing (admin only, only if not drawn or published)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Drawing deleted
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/periods:
+    post:
+      tags:
+        - CabinLottery
+      operationId: createPeriod
+      summary: Add a period to a drawing (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePeriod'
+      responses:
+        '200':
+          description: Period created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinPeriod'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+    get:
+      tags:
+        - CabinLottery
+      operationId: getAdminPeriods
+      summary: Get all periods for a drawing (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of periods
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinPeriod'
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/periods/{periodId}:
+    put:
+      tags:
+        - CabinLottery
+      operationId: updatePeriod
+      summary: Update a period (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: periodId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePeriod'
+      responses:
+        '200':
+          description: Period updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinPeriod'
+        '400':
+          description: Bad request
+        '404':
+          description: Period not found
+    delete:
+      tags:
+        - CabinLottery
+      operationId: deletePeriod
+      summary: Delete a period (admin only, only if drawing is OPEN)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: periodId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Period deleted
+        '400':
+          description: Bad request
+        '404':
+          description: Period not found
+  /cabin-lottery/admin/drawings/{drawingId}/periods/bulk:
+    post:
+      tags:
+        - CabinLottery
+      operationId: bulkCreatePeriods
+      summary: Bulk create periods (admin only, Wednesday to Wednesday)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                descriptionTemplate:
+                  type: string
+              required:
+                - startDate
+                - endDate
+      responses:
+        '200':
+          description: Periods created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  periodsCreated:
+                    type: integer
+                  periods:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CabinPeriod'
+                required:
+                  - periodsCreated
+                  - periods
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/open:
+    post:
+      tags:
+        - CabinLottery
+      operationId: openDrawing
+      summary: Open a drawing (admin only, DRAFT -> OPEN, makes it visible to users)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing opened
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/revert-to-draft:
+    post:
+      tags:
+        - CabinLottery
+      operationId: revertToDraft
+      summary: Revert drawing to DRAFT (admin only, OPEN/LOCKED -> DRAFT)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing reverted to draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/revert-to-locked:
+    post:
+      tags:
+        - CabinLottery
+      operationId: revertToLocked
+      summary: Revert drawing to LOCKED (admin only, DRAWN -> LOCKED)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing reverted to locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/lock:
+    post:
+      tags:
+        - CabinLottery
+      operationId: lockDrawing
+      summary: Lock a drawing (admin only, no more wish changes allowed)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/unlock:
+    post:
+      tags:
+        - CabinLottery
+      operationId: unlockDrawing
+      summary: Unlock a drawing (admin only, allow wish changes again)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing unlocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/draw:
+    post:
+      tags:
+        - CabinLottery
+      operationId: performDrawing
+      summary: Perform the snake draft lottery (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: seed
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: Optional random seed for reproducibility
+      responses:
+        '200':
+          description: Drawing performed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DrawingResult'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/publish:
+    post:
+      tags:
+        - CabinLottery
+      operationId: publishDrawing
+      summary: Publish drawing results to users (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: executionId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The execution ID to publish
+      responses:
+        '200':
+          description: Drawing published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing or execution not found
+  /cabin-lottery/admin/drawings/{drawingId}/executions/{executionId}:
+    delete:
+      tags:
+        - CabinLottery
+      operationId: deleteExecution
+      summary: Delete an execution (admin only, only if drawing not published)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Execution deleted
+        '400':
+          description: Bad request
+        '404':
+          description: Execution not found
+  /cabin-lottery/admin/drawings/{drawingId}/wishes:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getAllWishes
+      summary: Get all wishes for a drawing (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of all wishes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinWish'
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/allocations:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getAdminAllocations
+      summary: Get allocations for a drawing (admin only, published or latest execution)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: executionId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Optional execution ID, defaults to published or latest
+      responses:
+        '200':
+          description: List of allocations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinAllocation'
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/import:
+    post:
+      tags:
+        - CabinLottery
+      operationId: importWishes
+      summary: Import wishes from CSV file (admin only, Google Forms format)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        '200':
+          description: Wishes imported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalLines:
+                    type: integer
+                  successCount:
+                    type: integer
+                  errorCount:
+                    type: integer
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - totalLines
+                  - successCount
+                  - errorCount
+                  - errors
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /informationNotice:
+    get:
+      tags:
+        - InformationNotice
+      operationId: getInformationNotices
+      summary: Get all information notices in a given period
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of information notices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InformationNotice'
+        '400':
+          description: Invalid date format
+    post:
+      tags:
+        - InformationNotice
+      operationId: createInformationNotice
+      summary: Create a new information notice (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInformationNotice'
+      responses:
+        '201':
+          description: Information notice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InformationNotice'
+        '400':
+          description: Bad request
+  /informationNotice/{infoNoticeId}:
+    patch:
+      tags:
+        - InformationNotice
+      operationId: updateInformationNotice
+      summary: Update an existing information notice (admin only)
+      parameters:
+        - name: infoNoticeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInformationNotice'
+      responses:
+        '200':
+          description: Information notice updated
+        '400':
+          description: Bad request
+        '404':
+          description: Information notice not found
+    delete:
+      tags:
+        - InformationNotice
+      operationId: deleteInformationNotice
+      summary: Delete an information notice (admin only)
+      parameters:
+        - name: infoNoticeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Information notice deleted
+        '404':
+          description: Information notice not found
+  /informationNotice/vacancy:
+    get:
+      tags:
+        - InformationNotice
+      operationId: getInformationNoticeVacancies
+      summary: Get information notice vacancies in a time period
+      parameters:
+        - in: query
+          name: startdate
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: enddate
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of vacant dates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: date
+        '400':
+          description: Invalid date format
+  /pendingBooking/pendingBookingInformation:
+    get:
+      tags:
+        - PendingBooking
+      operationId: getPendingBookingInformation
+      summary: Get the pending booking trains and the corresponding drawing periods
+      responses:
+        '200':
+          description: List of pending booking trains
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PendingBookingTrain'
+  /pendingBooking/pendingBookingWin:
+    post:
+      tags:
+        - PendingBooking
+      operationId: pickWinnerPendingBooking
+      summary: Pending booking becomes a booking
+      description: Converts pending bookings to actual bookings (lottery winner selection)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PendingBookingDTO'
+      responses:
+        '201':
+          description: New booking created
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad request
+  /pendingBooking/{pendingBookingId}:
+    delete:
+      tags:
+        - PendingBooking
+      operationId: deleteMyPendingBooking
+      summary: Delete a pending booking
+      description: Deletes a pending booking if the user has permission
+      parameters:
+        - name: pendingBookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Pending booking deleted successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Forbidden - User does not have permission to delete this pending booking
+        '404':
+          description: Pending booking not found
+  /pendingBooking/admin/{pendingBookingId}:
+    delete:
+      tags:
+        - PendingBooking
+      operationId: adminDeletePendingBooking
+      summary: Delete a pending booking (admin only)
+      description: Deletes any pending booking (requires admin privileges)
+      parameters:
+        - name: pendingBookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Pending booking deleted successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Pending booking not found
+    patch:
+      tags:
+        - PendingBooking
+      operationId: updatePendingBooking
+      summary: Update a pending booking
+      description: Updates a pending booking by ID
+      parameters:
+        - name: pendingBookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdate'
+      responses:
+        '200':
+          description: Pending booking updated
+        '400':
+          description: Bad request
+        '403':
+          description: Forbidden
+        '404':
+          description: Pending booking not found
+  /pendingBooking/pendingPost:
+    post:
+      tags:
+        - PendingBooking
+      operationId: createPendingBooking
+      summary: Create a new pending booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePendingBooking'
+      responses:
+        '201':
+          description: Pending booking created successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+  /pendingBooking/pendingPostForUser:
+    post:
+      tags:
+        - PendingBooking
+      operationId: createPendingBookingForUser
+      summary: Admin creates a pending booking for a user
+      description: Admin creates a new pending booking on behalf of a specific user
+      parameters:
+        - name: bookingOwnerName
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePendingBooking'
+      responses:
+        '201':
+          description: Pending booking created successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: User not found
+  /settings:
+    get:
+      tags:
+        - Settings
+      operationId: getSettings
+      summary: Get all settings
+      responses:
+        '200':
+          description: List of all settings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Setting'
+  /settings/{settingId}:
+    patch:
+      tags:
+        - Settings
+      operationId: updateSetting
+      summary: Update a setting (admin only)
+      parameters:
+        - name: settingId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Setting'
+      responses:
+        '200':
+          description: Setting updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Setting'
+        '404':
+          description: Setting not found
+  /admin/budgetSummary:
+    get:
+      tags:
+        - Admin
+      operationId: getBudgetSummary
+      summary: Get summary of all budgets per year (admin only)
+      responses:
+        '200':
+          description: List of budget summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BudgetSummary'
+  /image/{fileName}:
+    get:
+      tags:
+        - Image
+      operationId: getImage
+      summary: Get an image file
+      parameters:
+        - name: fileName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Image file
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Image not found
 components:
   schemas:
     Customer:
@@ -428,3 +1954,664 @@ components:
       description: List of tags
       items:
         $ref: '#/components/schemas/Tag'
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+        name:
+          type: string
+        givenName:
+          type: string
+        familyName:
+          type: string
+        sub:
+          type: string
+        admin:
+          type: boolean
+        enabled:
+          type: boolean
+        employeeNumber:
+          type: integer
+      required:
+        - id
+        - email
+    Budget:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        budgetYear:
+          type: integer
+        amount:
+          type: number
+        remaining:
+          type: number
+        user:
+          $ref: '#/components/schemas/User'
+    Booking:
+      type: object
+      properties:
+        id:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        apartment:
+          $ref: '#/components/schemas/Apartment'
+        employeeName:
+          type: string
+        isPending:
+          type: boolean
+      required:
+        - id
+        - startDate
+        - endDate
+        - apartment
+    Apartment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        cabin_name:
+          type: string
+        sort_order:
+          type: integer
+      required:
+        - id
+        - cabin_name
+    BookingUpdate:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        apartmentId:
+          type: integer
+          format: int64
+    BudgetDetail:
+      type: object
+      description: Detailed budget information including posts
+      properties:
+        id:
+          type: integer
+          format: int64
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        budgetType:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+            name:
+              type: string
+            startAmount:
+              type: number
+        startDate:
+          type: string
+          format: date
+        startAmount:
+          type: number
+        hours:
+          type: array
+          items:
+            type: object
+      required:
+        - id
+        - posts
+        - budgetType
+        - startDate
+        - startAmount
+    CreatePost:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        amountIncMva:
+          type: number
+        amountExMva:
+          type: number
+        expense:
+          type: boolean
+      required:
+        - date
+        - amountIncMva
+        - amountExMva
+        - expense
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        amountIncMva:
+          type: number
+        amountExMva:
+          type: number
+        documentNumber:
+          type: string
+        dateOfPayment:
+          type: string
+          format: date
+        dateOfDeduction:
+          type: string
+          format: date
+        expense:
+          type: boolean
+        locked:
+          type: boolean
+        createdDate:
+          type: string
+          format: date-time
+        lastModifiedDate:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+      required:
+        - id
+        - date
+        - expense
+        - locked
+    UpdatePost:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        amountExMva:
+          type: number
+    CabinDrawing:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        season:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, OPEN, LOCKED, DRAWN, PUBLISHED]
+        createdAt:
+          type: string
+          format: date-time
+        lockedAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+        publishedExecutionId:
+          type: string
+          format: uuid
+        publishedBy:
+          type: integer
+          format: int64
+        publishedByName:
+          type: string
+        periods:
+          type: array
+          items:
+            $ref: '#/components/schemas/CabinPeriod'
+        executions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CabinDrawingExecution'
+        bookingWarnings:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - season
+        - status
+        - createdAt
+    CabinPeriod:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        description:
+          type: string
+        comment:
+          type: string
+        sortOrder:
+          type: integer
+      required:
+        - id
+        - startDate
+        - endDate
+        - description
+        - sortOrder
+    CreatePeriod:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        description:
+          type: string
+        comment:
+          type: string
+        sortOrder:
+          type: integer
+          default: 0
+      required:
+        - startDate
+        - endDate
+        - description
+    CabinWish:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: integer
+          format: int64
+        userName:
+          type: string
+        userEmail:
+          type: string
+        periodId:
+          type: string
+          format: uuid
+        periodDescription:
+          type: string
+        priority:
+          type: integer
+        desiredApartmentIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        desiredApartmentNames:
+          type: array
+          items:
+            type: string
+        comment:
+          type: string
+      required:
+        - id
+        - userId
+        - userName
+        - userEmail
+        - periodId
+        - periodDescription
+        - priority
+        - desiredApartmentIds
+        - desiredApartmentNames
+    CreateCabinWish:
+      type: object
+      properties:
+        periodId:
+          type: string
+          format: uuid
+        priority:
+          type: integer
+        desiredApartmentIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        comment:
+          type: string
+      required:
+        - periodId
+        - priority
+        - desiredApartmentIds
+    BulkCreateWishes:
+      type: object
+      properties:
+        wishes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateCabinWish'
+      required:
+        - wishes
+    CabinAllocation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        periodId:
+          type: string
+          format: uuid
+        periodDescription:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        apartmentId:
+          type: integer
+          format: int64
+        apartmentName:
+          type: string
+        apartmentSortOrder:
+          type: integer
+        userId:
+          type: integer
+          format: int64
+        userName:
+          type: string
+        userEmail:
+          type: string
+        allocationType:
+          type: string
+        comment:
+          type: string
+        allocatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - periodId
+        - periodDescription
+        - startDate
+        - endDate
+        - apartmentId
+        - apartmentName
+        - userId
+        - userName
+        - userEmail
+        - allocationType
+        - allocatedAt
+    CabinDrawingExecution:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        drawingId:
+          type: string
+          format: uuid
+        executedAt:
+          type: string
+          format: date-time
+        executedBy:
+          type: integer
+          format: int64
+        executedByName:
+          type: string
+        randomSeed:
+          type: integer
+          format: int64
+        auditLog:
+          type: array
+          items:
+            type: string
+        allocationCount:
+          type: integer
+      required:
+        - id
+        - drawingId
+        - executedAt
+        - executedBy
+        - allocationCount
+    DrawingResult:
+      type: object
+      properties:
+        drawingId:
+          type: string
+          format: uuid
+        executionId:
+          type: string
+          format: uuid
+        season:
+          type: string
+        drawnAt:
+          type: string
+          format: date-time
+        allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CabinAllocation'
+        statistics:
+          $ref: '#/components/schemas/DrawingStatistics'
+        auditLog:
+          type: array
+          items:
+            type: string
+      required:
+        - drawingId
+        - executionId
+        - season
+        - drawnAt
+        - allocations
+        - statistics
+        - auditLog
+    DrawingStatistics:
+      type: object
+      properties:
+        totalParticipants:
+          type: integer
+        participantsWithZeroAllocations:
+          type: integer
+        participantsWithOneAllocation:
+          type: integer
+        participantsWithTwoAllocations:
+          type: integer
+        totalAllocations:
+          type: integer
+        allocationsPerPeriod:
+          type: object
+          additionalProperties:
+            type: integer
+      required:
+        - totalParticipants
+        - participantsWithZeroAllocations
+        - participantsWithOneAllocation
+        - participantsWithTwoAllocations
+        - totalAllocations
+        - allocationsPerPeriod
+    PendingBookingTrain:
+      type: object
+      properties:
+        id:
+          type: string
+        apartment:
+          $ref: '#/components/schemas/Apartment'
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        drawingDate:
+          type: string
+          format: date
+        pendingBookings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PendingBookingDTO'
+      required:
+        - id
+        - apartment
+        - startDate
+        - endDate
+        - pendingBookings
+    PendingBookingDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        apartment:
+          $ref: '#/components/schemas/Apartment'
+        employeeName:
+          type: string
+        createdDate:
+          type: string
+          format: date
+      required:
+        - startDate
+        - endDate
+        - createdDate
+    InformationNotice:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        description:
+          type: string
+      required:
+        - startDate
+        - endDate
+        - description
+    CreateInformationNotice:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        description:
+          type: string
+      required:
+        - startDate
+        - endDate
+        - description
+    UpdateInformationNotice:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        description:
+          type: string
+      required:
+        - startDate
+        - endDate
+        - description
+    Setting:
+      type: object
+      properties:
+        settingId:
+          type: string
+        settingValue:
+          type: string
+        settingDescription:
+          type: string
+      required:
+        - settingId
+        - settingValue
+    BudgetSummary:
+      type: object
+      properties:
+        budgetYear:
+          type: integer
+        totalAllocated:
+          type: number
+        totalUsed:
+          type: number
+        totalRemaining:
+          type: number
+      required:
+        - budgetYear
+        - totalAllocated
+        - totalUsed
+        - totalRemaining
+    CreateBooking:
+      type: object
+      properties:
+        apartmentID:
+          type: integer
+          format: int64
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+      required:
+        - apartmentID
+        - startDate
+        - endDate
+    CreatePendingBooking:
+      type: object
+      properties:
+        apartmentID:
+          type: integer
+          format: int64
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+      required:
+        - apartmentID
+        - startDate
+        - endDate
+    NewEmployee:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        employeeNumber:
+          type: integer
+        budgetStartDate:
+          type: string
+          format: date
+      required:
+        - email
+        - employeeNumber
+        - budgetStartDate

@@ -76,9 +76,9 @@ export default function UserWishForm() {
       ])
 
       setPeriods(periodsRes.data)
-      setMyWishes(wishesRes.data)
+      setMyWishes(wishesRes.data || [])
 
-      if (wishesRes.data.length > 0) {
+      if (wishesRes.data && wishesRes.data.length > 0) {
         const formData = wishesRes.data.map((w: Wish) => ({
           periodId: w.periodId,
           priority: w.priority,

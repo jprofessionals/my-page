@@ -15,7 +15,6 @@ import no.jpro.mypageapi.service.InformationNoticeService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
@@ -37,7 +36,6 @@ class InformationNoticeController(
     private val informationNoticeService: InformationNoticeService
 ) {
     @GetMapping
-    @Transactional
     @Operation(summary = "Get all information notices in the given period")
     @ApiResponse(
         responseCode = "200",
@@ -72,7 +70,6 @@ class InformationNoticeController(
     class InvalidDateException(message: String) : RuntimeException(message)
 
     @PostMapping("/post")
-    @Transactional
     @RequiresAdmin
     @Operation(summary = "An admin creates a new information notice")
     @ApiResponse(
@@ -93,7 +90,6 @@ class InformationNoticeController(
     }
 
     @PatchMapping("admin/{infoNoticeId}")
-    @Transactional
     @RequiresAdmin
     @Operation(summary = "An admin edits an existing information notice")
     fun adminEditInfoNotice(
@@ -113,7 +109,6 @@ class InformationNoticeController(
     }
 
     @DeleteMapping("admin/{infoNoticeId}")
-    @Transactional
     @RequiresAdmin
     @Operation(summary = "An admin deletes the information notice connected to the notice id")
     @ApiResponse(
@@ -133,7 +128,6 @@ class InformationNoticeController(
     }
 
     @GetMapping("/vacancy")
-    @Transactional
     @Operation(summary = "Gets information notice vacancies in a time period")
     @ApiResponse(
         responseCode = "200",

@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.jpro.mypageapi.config.RequiresCron
 import no.jpro.mypageapi.job.NotificationJob
 import org.springframework.http.ResponseEntity
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -23,7 +22,6 @@ class NotificationJobController(
 ) {
 
     @GetMapping("generate-notifications")
-    @Transactional
     @Operation(summary = "Trigger notification job")
     @ApiResponse(
         responseCode = "200"

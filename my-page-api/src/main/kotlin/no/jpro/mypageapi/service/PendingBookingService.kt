@@ -11,6 +11,7 @@ import no.jpro.mypageapi.repository.ApartmentRepository
 import no.jpro.mypageapi.repository.PendingBookingRepository
 import no.jpro.mypageapi.utils.mapper.PendingBookingMapper
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -30,6 +31,7 @@ class PendingBookingService(
         const val ALREADY_HAS_PENDING_BOOKING_MESSAGE_TEMPLATE = "%s har allerede et bookingønske på denne leiligheten i dette tidsrommet."
     }
 
+    @Transactional
     fun createPendingBooking(
         bookingRequest: CreatePendingBookingDTO,
         createdFor: User,
@@ -89,6 +91,7 @@ class PendingBookingService(
 
     private data class ApartmentWeek (val apartment: Apartment, val weekStartingWednesday: LocalDate)
 
+    @Transactional(readOnly = true)
     fun getPendingBookingInformation(): List<PendingBookingTrainDTO> {
         return getPendingBookingTrain().map { pbt ->
             PendingBookingTrainDTO(
@@ -133,12 +136,14 @@ class PendingBookingService(
         return drawingDate
     }
 
+    @Transactional(readOnly = true)
     fun getPendingBookingsBetweenDates(startDate: LocalDate, endDate: LocalDate, ): List<PendingBookingDTO> {
         val pendingBookings =
             pendingBookingRepository.findPendingBookingsByStartDateBetweenOrEndDateBetween(startDate, endDate, startDate, endDate)
         return pendingBookings.map { pendingBookingMapper.toPendingBookingDTO(it) }
     }
 
+    @Transactional(readOnly = true)
     fun getUserPendingBookings(userSub: String): List<PendingBookingDTO> {
         val pendingBookings = pendingBookingRepository.findPendingBookingByEmployeeSub(userSub)
         return pendingBookings.map { pendingBookingMapper.toPendingBookingDTO(it) }
@@ -152,6 +157,7 @@ class PendingBookingService(
         return pendingBookingRepository.deleteById(pendingBookingId)
     }
 
+    @Transactional
     fun editPendingBooking(editBookingRequest: UpdateBookingDTO, bookingToEdit: PendingBooking) {
         val apartment = apartmentRepository.findApartmentById(editBookingRequest.apartmentID)
         //TODO: sjekk om det finnes en overlappende fastsatt booking

@@ -182,13 +182,13 @@ function Admin() {
     apiService
       .getUsers()
       .then((responseSummary) => {
-        setUsers(responseSummary.data)
-        extractListOfBudgets(responseSummary.data)
+        setUsers(responseSummary.data || [])
+        extractListOfBudgets(responseSummary.data || [])
 
         apiService
           .getDisabledUsers()
           .then((disabledUsers) => {
-            setDisabledUsers(disabledUsers.data)
+            setDisabledUsers(disabledUsers.data || [])
           })
           .catch(() => {
             toast.error('Klarte ikke laste deaktiverte brukere, prøv igjen senere')

@@ -338,11 +338,7 @@ class CabinDrawingService(
     fun getAllDrawings(): List<CabinDrawingDTO> {
         return drawingRepository.findAll().map { toDTO(it) }
     }
-    
-    fun getDrawingsBySeason(season: String): List<CabinDrawingDTO> {
-        return drawingRepository.findBySeasonOrderByCreatedAtDesc(season).map { toDTO(it) }
-    }
-    
+
     fun getCurrentDrawing(): CabinDrawingDTO? {
         return drawingRepository.findTopByOrderByCreatedAtDesc()?.let { toDTO(it) }
     }
@@ -361,6 +357,68 @@ class CabinDrawingService(
     
     fun getAllocations(drawingId: UUID): List<CabinAllocationDTO> {
         val allocations = allocationRepository.findByDrawingIdOrderByPeriodStartDateAsc(drawingId)
+        return allocations.map { allocation ->
+            CabinAllocationDTO(
+                id = allocation.id,
+                periodId = allocation.period.id!!,
+                periodDescription = allocation.period.description,
+                startDate = allocation.period.startDate,
+                endDate = allocation.period.endDate,
+                apartmentId = allocation.apartment.id!!,
+                apartmentName = allocation.apartment.cabin_name ?: "Unknown",
+                apartmentSortOrder = allocation.apartment.sort_order,
+                userId = allocation.user.id!!,
+                userName = allocation.user.name ?: "Unknown",
+                userEmail = allocation.user.email ?: "Unknown",
+                allocationType = allocation.allocationType.name,
+                comment = allocation.comment,
+                allocatedAt = allocation.allocatedAt
+            )
+        }
+    }
+
+    fun getAllocationsForExecution(drawingId: UUID, executionId: UUID): List<CabinAllocationDTO> {
+        val drawing = drawingRepository.findById(drawingId)
+            .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
+        val execution = executionRepository.findByDrawingAndId(drawing, executionId)
+            ?: throw IllegalArgumentException("Execution not found: $executionId")
+
+        val allocations = allocationRepository.findByExecutionOrderByPeriodStartDateAscApartmentCabinNameAsc(execution)
+        return allocations.map { allocation ->
+            CabinAllocationDTO(
+                id = allocation.id,
+                periodId = allocation.period.id!!,
+                periodDescription = allocation.period.description,
+                startDate = allocation.period.startDate,
+                endDate = allocation.period.endDate,
+                apartmentId = allocation.apartment.id!!,
+                apartmentName = allocation.apartment.cabin_name ?: "Unknown",
+                apartmentSortOrder = allocation.apartment.sort_order,
+                userId = allocation.user.id!!,
+                userName = allocation.user.name ?: "Unknown",
+                userEmail = allocation.user.email ?: "Unknown",
+                allocationType = allocation.allocationType.name,
+                comment = allocation.comment,
+                allocatedAt = allocation.allocatedAt
+            )
+        }
+    }
+
+    fun getAllocationsForDefaultExecution(drawingId: UUID): List<CabinAllocationDTO> {
+        val drawing = drawingRepository.findById(drawingId)
+            .orElseThrow { IllegalArgumentException("Drawing not found: $drawingId") }
+
+        // If drawing is published, use published execution
+        val executionToUse = if (drawing.publishedExecutionId != null) {
+            executionRepository.findById(drawing.publishedExecutionId!!)
+                .orElseThrow { IllegalArgumentException("Published execution not found") }
+        } else {
+            // Otherwise use latest execution
+            executionRepository.findByDrawingOrderByExecutedAtDesc(drawing).firstOrNull()
+                ?: return emptyList() // No executions yet
+        }
+
+        val allocations = allocationRepository.findByExecutionOrderByPeriodStartDateAscApartmentCabinNameAsc(executionToUse)
         return allocations.map { allocation ->
             CabinAllocationDTO(
                 id = allocation.id,

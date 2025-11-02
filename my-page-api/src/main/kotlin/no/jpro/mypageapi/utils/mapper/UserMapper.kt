@@ -10,6 +10,7 @@ import no.jpro.mypageapi.extensions.getName
 import no.jpro.mypageapi.extensions.getSub
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
+import no.jpro.mypageapi.model.User as UserModel
 
 @Service
 class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
@@ -35,4 +36,18 @@ class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
         icon = jwt.getIcon(),
         budgets = listOf()
     )
+
+    fun toUserModel(userDTO: UserDTO): UserModel = UserModel(
+        id = 0, // Will be set from entity if needed
+        email = userDTO.email ?: "",
+        name = userDTO.name,
+        givenName = userDTO.givenName,
+        familyName = userDTO.familyName,
+        sub = null,
+        admin = userDTO.admin ?: false,
+        enabled = true,
+        employeeNumber = userDTO.employeeNumber
+    )
+
+    fun toUserModel(user: User): UserModel = toUserModel(toUserDTO(user))
 }

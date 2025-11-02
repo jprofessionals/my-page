@@ -198,13 +198,4 @@ class ExplorationService(
 
         return Gson().fromJson(jsonString, ExplorationChatDTO::class.java)
     }
-
-    fun default(): ExplorationDTO {
-        return ExplorationDTO(
-            "Welcome to the exploration game! Tell me where you want to go",
-            "https://labs.openai.com/s/CccKoaABM4Z3gZhBuipRjtfn",
-            listOf("New York", "Paris", "Tokyo", "Oslo")
-        )
-
-    }
 }

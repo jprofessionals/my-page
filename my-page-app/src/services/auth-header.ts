@@ -1,7 +1,12 @@
-export default function authHeader() {
-  const headers = {}
+export default function authHeader(): Record<string, string> {
+  const headers: Record<string, string> = {}
 
-  // In development mode with test user, skip Authorization header
+  // Only access localStorage/sessionStorage in browser environment
+  if (typeof window === 'undefined') {
+    return headers
+  }
+
+  // Check for test user only in development mode
   if (process.env.NODE_ENV === 'development') {
     const testUserId = localStorage.getItem('testUserId')
     if (testUserId) {
