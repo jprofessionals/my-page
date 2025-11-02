@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: ./my-page-app
+      - name: Generate OpenAPI types
+        run: npm run build:openapi
+        working-directory: ./my-page-app
       - name: Run tests
         run: npm run test:run
         working-directory: ./my-page-app
