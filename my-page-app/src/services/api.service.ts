@@ -35,6 +35,15 @@ import {
   adminUpdateBooking as adminUpdateBookingSDK,
   updatePendingBooking as updatePendingBookingSDK,
   getImage as getImageSDK,
+  type Budget,
+  type CreatePost,
+  type UpdatePost,
+  type Booking,
+  type BookingUpdate,
+  type PendingBookingDto,
+  type InformationNotice,
+  type CreateInformationNotice,
+  type Setting,
 } from '@/data/types/sdk.gen'
 import '@/services/openapi-client' // Ensure client is configured
 
@@ -64,7 +73,7 @@ const getDisabledUsers = async () => {
 const getBudgets = async () => {
   const { data } = await getMyBudgets()
   const budgets = data || []
-  return budgets.map((budget: any) => ({
+  return budgets.map((budget: Budget) => ({
     ...budget,
     id: String(budget.id),
   }))
@@ -77,7 +86,7 @@ const getBudgetsForEmployee = async (employeeNumber: number) => {
   return { data }
 }
 
-const createBudgetPost = async (post: any, budgetId: number) => {
+const createBudgetPost = async (post: CreatePost, budgetId: number) => {
   const { data } = await createBudgetPostSDK({
     path: { budgetId },
     body: post,
@@ -92,7 +101,7 @@ const deleteBudgetPost = async (postId: number) => {
   return { data }
 }
 
-const editBudgetPost = async (postId: number, editPostRequest: any) => {
+const editBudgetPost = async (postId: number, editPostRequest: UpdatePost) => {
   const { data } = await updateBudgetPostSDK({
     path: { postId },
     body: editPostRequest,
@@ -107,7 +116,7 @@ const getBookings = async (startDate: string, endDate: string) => {
     query: { startDate, endDate },
   })
   const bookings = data || []
-  return bookings.map((booking: any) => ({
+  return bookings.map((booking: Booking) => ({
     id: booking.id,
     startDate: booking.startDate,
     endDate: booking.endDate,
@@ -123,7 +132,7 @@ const getBookings = async (startDate: string, endDate: string) => {
 const getBookingsForUser = async () => {
   const { data } = await getMyBookings()
   const bookings = data || []
-  return bookings.map((booking: any) => ({
+  return bookings.map((booking: Booking) => ({
     ...booking,
     id: String(booking.id),
     isPending: false,
@@ -142,7 +151,7 @@ const deleteBooking = async (bookingId: number) => {
   return { data }
 }
 
-const patchBooking = async (bookingId: number, updatedBooking: any) => {
+const patchBooking = async (bookingId: number, updatedBooking: BookingUpdate) => {
   const { data } = await updateBookingSDK({
     path: { bookingId },
     body: updatedBooking,
@@ -187,7 +196,7 @@ const getAllPendingBookingTrainsForAllApartments = async () => {
   return data || []
 }
 
-const pickWinnerPendingBooking = async (pendingBookingList: any[]) => {
+const pickWinnerPendingBooking = async (pendingBookingList: PendingBookingDto[]) => {
   const { data } = await pickWinnerPendingBookingSDK({
     body: pendingBookingList,
   })
@@ -197,7 +206,7 @@ const pickWinnerPendingBooking = async (pendingBookingList: any[]) => {
 const getPendingBookingsForUser = async () => {
   const { data } = await getMyPendingBookingsSDK()
   const pendingBookings = data || []
-  return pendingBookings.map((pendingBooking: any) => ({
+  return pendingBookings.map((pendingBooking: PendingBookingDto) => ({
     ...pendingBooking,
     id: String(pendingBooking.id),
     isPending: true,
@@ -225,7 +234,7 @@ const getInfoNotices = async (startDate: string, endDate: string) => {
     query: { startDate, endDate },
   })
   const infoNotices = data || []
-  return infoNotices.map((infoNotice: any) => ({
+  return infoNotices.map((infoNotice: InformationNotice) => ({
     id: infoNotice.id ? String(infoNotice.id) : '',
     startDate: infoNotice.startDate,
     endDate: infoNotice.endDate,
@@ -240,7 +249,7 @@ const deleteInfoNotice = async (infoNoticeId: number) => {
   return { data }
 }
 
-const createInfoNotice = async (infoNotice: any) => {
+const createInfoNotice = async (infoNotice: CreateInformationNotice) => {
   const { data } = await createInformationNoticeSDK({
     body: infoNotice,
   })
@@ -266,7 +275,7 @@ const getSettings = async () => {
   return data || []
 }
 
-const patchSetting = async (settingId: string, updatedSetting: any) => {
+const patchSetting = async (settingId: string, updatedSetting: Setting) => {
   const { data } = await updateSettingSDK({
     path: { settingId },
     body: updatedSetting,
@@ -274,7 +283,7 @@ const patchSetting = async (settingId: string, updatedSetting: any) => {
   return { data }
 }
 
-const adminPatchBooking = async (bookingId: number, updatedBooking: any) => {
+const adminPatchBooking = async (bookingId: number, updatedBooking: BookingUpdate) => {
   const { data } = await adminUpdateBookingSDK({
     path: { bookingId },
     body: updatedBooking,
@@ -282,7 +291,7 @@ const adminPatchBooking = async (bookingId: number, updatedBooking: any) => {
   return { data }
 }
 
-const patchPendingBooking = async (pendingBookingId: number, updatedBooking: any) => {
+const patchPendingBooking = async (pendingBookingId: number, updatedBooking: BookingUpdate) => {
   const { data } = await updatePendingBookingSDK({
     path: { pendingBookingId },
     body: updatedBooking,

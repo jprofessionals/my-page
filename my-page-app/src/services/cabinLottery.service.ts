@@ -33,6 +33,8 @@ import {
   getAdminAllocations,
   importWishes,
   deleteExecution,
+  type CreateCabinWish,
+  type CreatePeriod as CreatePeriodType,
 } from '@/data/types/sdk.gen'
 import '@/services/openapi-client' // Ensure client is configured
 
@@ -70,7 +72,7 @@ export const cabinLotteryService = {
   /**
    * Submit wishes for a drawing
    */
-  async submitWishes(drawingId: string, wishes: any[]) {
+  async submitWishes(drawingId: string, wishes: CreateCabinWish[]) {
     const { data } = await submitWishes({
       path: { drawingId },
       body: { wishes },
@@ -146,7 +148,7 @@ export const adminDeleteDrawing = async (drawingId: string) => {
   return { data }
 }
 
-export const adminAddPeriod = async (drawingId: string, period: any) => {
+export const adminAddPeriod = async (drawingId: string, period: CreatePeriodType) => {
   const { data } = await createPeriod({
     path: { drawingId },
     body: period,
@@ -161,7 +163,7 @@ export const adminGetPeriods = async (drawingId: string) => {
   return { data }
 }
 
-export const adminUpdatePeriod = async (drawingId: string, periodId: string, period: any) => {
+export const adminUpdatePeriod = async (drawingId: string, periodId: string, period: CreatePeriodType) => {
   const { data } = await updatePeriod({
     path: { drawingId, periodId },
     body: period,
@@ -270,7 +272,7 @@ export default {
   getCurrentDrawing: () => cabinLotteryService.getCurrentDrawing().then((data) => ({ data })),
   getDrawing: (drawingId: string) => cabinLotteryService.getDrawing(drawingId).then((data) => ({ data })),
   getPeriods: (drawingId: string) => cabinLotteryService.getPeriods(drawingId).then((data) => ({ data })),
-  submitWishes: (drawingId: string, wishes: any[]) =>
+  submitWishes: (drawingId: string, wishes: CreateCabinWish[]) =>
     cabinLotteryService.submitWishes(drawingId, wishes).then((data) => ({ data })),
   getMyWishes: (drawingId: string) => cabinLotteryService.getMyWishes(drawingId).then((data) => ({ data })),
   getMyAllocations: (drawingId: string) =>

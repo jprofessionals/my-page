@@ -607,7 +607,7 @@ describe('UserWishForm', () => {
       vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
       vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
       // Simulate 401 response with undefined data (empty body)
-      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: undefined as any })
+      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: undefined })
 
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
