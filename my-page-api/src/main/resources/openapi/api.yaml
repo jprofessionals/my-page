@@ -2597,19 +2597,30 @@ components:
     BudgetSummary:
       type: object
       properties:
-        budgetYear:
+        year:
           type: integer
-        totalAllocated:
+        yearSummary:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetYearSummary'
+      required:
+        - year
+        - yearSummary
+    BudgetYearSummary:
+      type: object
+      properties:
+        budgetType:
+          $ref: '#/components/schemas/BudgetType'
+        sum:
           type: number
-        totalUsed:
+        hours:
           type: number
-        totalRemaining:
+        balance:
           type: number
       required:
-        - budgetYear
-        - totalAllocated
-        - totalUsed
-        - totalRemaining
+        - sum
+        - hours
+        - balance
     CreateBooking:
       type: object
       properties:
