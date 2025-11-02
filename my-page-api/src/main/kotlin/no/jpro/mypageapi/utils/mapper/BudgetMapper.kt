@@ -13,7 +13,6 @@ class BudgetMapper(
     private val budgetTypeMapper: BudgetTypeMapper,
     private val hoursMapper: HoursMapper,
     private val postMapper: BudgetPostMapper,
-    private val userMapper: UserMapper,
     private val postModelMapper: PostMapper
 ) {
 
@@ -31,12 +30,37 @@ class BudgetMapper(
     fun toBudgetModel(budget: Budget): BudgetModel {
         val budgetDTO = toBudgetDTO(budget)
         return BudgetModel(
-            id = budget.id?.toString(),
-            name = budget.budgetType.name,
-            budgetYear = budget.startDate.year,
-            amount = BigDecimal.valueOf(budget.startAmount),
-            remaining = BigDecimal.valueOf(budgetDTO.balance()),
-            user = budget.user?.let { userMapper.toUserModel(userMapper.toUserDTO(it)) }
+            id = budget.id,
+            posts = budgetDTO.posts.map { postModelMapper.toPostModel(it) },
+            budgetType = budgetTypeMapper.toBudgetTypeModel(budget.budgetType),
+            startDate = budget.startDate,
+            startAmount = BigDecimal.valueOf(budget.startAmount),
+            hours = budgetDTO.hours.map { hoursMapper.toHoursModel(it) },
+            balance = BigDecimal.valueOf(budgetDTO.balance()),
+            sumPosts = BigDecimal.valueOf(budgetDTO.sumPosts()),
+            sumPostsCurrentYear = BigDecimal.valueOf(budgetDTO.sumPostsCurrentYear()),
+            sumPostsLastTwelveMonths = BigDecimal.valueOf(budgetDTO.sumPostsLastTwelveMonths()),
+            sumHours = BigDecimal.valueOf(budgetDTO.sumHours()),
+            sumHoursCurrentYear = BigDecimal.valueOf(budgetDTO.sumHoursCurrentYear()),
+            sumHoursLastTwelveMonths = BigDecimal.valueOf(budgetDTO.sumHoursLastTwelveMonths())
+        )
+    }
+
+    fun toBudgetModel(budgetDTO: BudgetDTO): BudgetModel {
+        return BudgetModel(
+            id = budgetDTO.id,
+            posts = budgetDTO.posts.map { postModelMapper.toPostModel(it) },
+            budgetType = budgetTypeMapper.toBudgetTypeModel(budgetDTO.budgetType),
+            startDate = budgetDTO.startDate,
+            startAmount = BigDecimal.valueOf(budgetDTO.startAmount),
+            hours = budgetDTO.hours.map { hoursMapper.toHoursModel(it) },
+            balance = BigDecimal.valueOf(budgetDTO.balance()),
+            sumPosts = BigDecimal.valueOf(budgetDTO.sumPosts()),
+            sumPostsCurrentYear = BigDecimal.valueOf(budgetDTO.sumPostsCurrentYear()),
+            sumPostsLastTwelveMonths = BigDecimal.valueOf(budgetDTO.sumPostsLastTwelveMonths()),
+            sumHours = BigDecimal.valueOf(budgetDTO.sumHours()),
+            sumHoursCurrentYear = BigDecimal.valueOf(budgetDTO.sumHoursCurrentYear()),
+            sumHoursLastTwelveMonths = BigDecimal.valueOf(budgetDTO.sumHoursLastTwelveMonths())
         )
     }
 

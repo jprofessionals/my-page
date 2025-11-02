@@ -1957,9 +1957,6 @@ components:
     User:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
         email:
           type: string
         name:
@@ -1968,32 +1965,77 @@ components:
           type: string
         familyName:
           type: string
-        sub:
+        icon:
           type: string
+        nickName:
+          type: string
+        startDate:
+          type: string
+          format: date
         admin:
           type: boolean
-        enabled:
-          type: boolean
+          default: false
         employeeNumber:
           type: integer
-      required:
-        - id
-        - email
+        budgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Budget'
     Budget:
       type: object
       properties:
         id:
-          type: string
-        name:
-          type: string
-        budgetYear:
           type: integer
-        amount:
+          format: int64
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        budgetType:
+          $ref: '#/components/schemas/BudgetType'
+        startDate:
+          type: string
+          format: date
+        startAmount:
           type: number
-        remaining:
+        hours:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hours'
+        balance:
           type: number
-        user:
-          $ref: '#/components/schemas/User'
+          readOnly: true
+          description: Calculated balance (startAmount + deposits - posts)
+        sumPosts:
+          type: number
+          readOnly: true
+          description: Sum of all posts
+        sumPostsCurrentYear:
+          type: number
+          readOnly: true
+          description: Sum of posts for current year
+        sumPostsLastTwelveMonths:
+          type: number
+          readOnly: true
+          description: Sum of posts for last 12 months
+        sumHours:
+          type: number
+          readOnly: true
+          description: Sum of all hours
+        sumHoursCurrentYear:
+          type: number
+          readOnly: true
+          description: Sum of hours for current year
+        sumHoursLastTwelveMonths:
+          type: number
+          readOnly: true
+          description: Sum of hours for last 12 months
+      required:
+        - posts
+        - budgetType
+        - startDate
+        - startAmount
+        - hours
     Booking:
       type: object
       properties:
@@ -2615,3 +2657,47 @@ components:
         - email
         - employeeNumber
         - budgetStartDate
+    BudgetType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        rollOver:
+          type: boolean
+        deposit:
+          type: number
+        intervalOfDepositInMonths:
+          type: integer
+          format: int64
+        startAmount:
+          type: number
+        allowTimeBalance:
+          type: boolean
+          default: false
+      required:
+        - id
+        - name
+        - rollOver
+        - deposit
+        - intervalOfDepositInMonths
+        - startAmount
+    Hours:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        hours:
+          type: number
+        createdBy:
+          type: string
+        dateOfUsage:
+          type: string
+          format: date
+      required:
+        - hours
+        - createdBy
+        - dateOfUsage

@@ -38,15 +38,16 @@ class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
     )
 
     fun toUserModel(userDTO: UserDTO): UserModel = UserModel(
-        id = 0, // Will be set from entity if needed
-        email = userDTO.email ?: "",
+        email = userDTO.email,
         name = userDTO.name,
         givenName = userDTO.givenName,
         familyName = userDTO.familyName,
-        sub = null,
-        admin = userDTO.admin ?: false,
-        enabled = true,
-        employeeNumber = userDTO.employeeNumber
+        icon = userDTO.icon,
+        nickName = userDTO.nickName,
+        startDate = userDTO.startDate,
+        admin = userDTO.admin,
+        employeeNumber = userDTO.employeeNumber,
+        budgets = null // Budgets are mapped separately to avoid circular dependency
     )
 
     fun toUserModel(user: User): UserModel = toUserModel(toUserDTO(user))

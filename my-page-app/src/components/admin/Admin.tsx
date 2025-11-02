@@ -7,7 +7,7 @@ import {
   BudgetType,
   BudgetYearSummary, ToggleActive, ToggleAdmin,
 } from '@/types'
-import { User } from '@/data/types/types.gen'
+import { User as SDKUser } from '@/data/types/types.gen'
 import BudgetList from '@/components/budget/BudgetList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown'
@@ -17,6 +17,11 @@ import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 import cn from '@/utils/cn'
 import { Accordions, AccordionTrigger } from '@/components/ui/bookingAccordion'
 import { AccordionContent, AccordionItem } from '@radix-ui/react-accordion'
+
+// Extend SDK User type with budgets for Admin component
+type User = SDKUser & {
+  budgets?: Budget[]
+}
 
 function compareUsers(a: User, b: User): number {
   if (!a.name && !b.name) {
