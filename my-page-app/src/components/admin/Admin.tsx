@@ -189,16 +189,16 @@ function Admin() {
     apiService
       .getUsers()
       .then((responseSummary) => {
-        // Map UserReadable to User by adding the 'loaded' field
-        const users = (responseSummary.data || []).map(user => ({ ...user, loaded: true }))
+        // Map UserReadable to User by adding the 'loaded' field and cast to User[]
+        const users = (responseSummary.data || []).map(user => ({ ...user, loaded: true })) as User[]
         setUsers(users)
         extractListOfBudgets(users)
 
         apiService
           .getDisabledUsers()
           .then((disabledUsers) => {
-            // Map UserReadable to User by adding the 'loaded' field
-            const mappedDisabledUsers = (disabledUsers.data || []).map(user => ({ ...user, loaded: true }))
+            // Map UserReadable to User by adding the 'loaded' field and cast to User[]
+            const mappedDisabledUsers = (disabledUsers.data || []).map(user => ({ ...user, loaded: true })) as User[]
             setDisabledUsers(mappedDisabledUsers)
           })
           .catch(() => {
