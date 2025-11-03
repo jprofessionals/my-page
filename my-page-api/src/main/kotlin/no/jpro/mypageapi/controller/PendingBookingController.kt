@@ -35,8 +35,11 @@ import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
-@RestController
-@RequestMapping("pendingBooking")
+// NOTE: This controller has been replaced by PendingBookingApiDelegateImpl
+// All endpoints are now handled by OpenAPI-generated controllers
+// Disabled to prevent ambiguous handler mapping conflicts
+//@RestController
+//@RequestMapping("pendingBooking")
 @SecurityRequirement(name = "Bearer Authentication")
 class PendingBookingController(
     private val pendingBookingService: PendingBookingService,

@@ -50,17 +50,12 @@ function RequireAuth({ children }: PropsWithChildren) {
               </label>
               <select
                 className="w-full p-2 border rounded"
-                value={localStorage.getItem('testUserId') || ''}
+                value={localStorage.getItem('testUserId') || '1'}
                 onChange={(e) => {
-                  if (e.target.value) {
-                    localStorage.setItem('testUserId', e.target.value)
-                  } else {
-                    localStorage.removeItem('testUserId')
-                  }
+                  localStorage.setItem('testUserId', e.target.value)
                   window.location.reload()
                 }}
               >
-                <option value="">Standard bruker (ingen test)</option>
                 <option value="1">Steinar Hansen (Admin)</option>
                 <option value="2">Ola Nordmann</option>
                 <option value="3">Kari Hansen</option>

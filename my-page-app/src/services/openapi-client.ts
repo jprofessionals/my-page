@@ -48,17 +48,22 @@ export function configureOpenAPIClient() {
     return
   }
 
-  // Get auth headers
-  const authHeaders = getAuthHeaders()
-
-  // Set base URL and headers
+  // Set base URL
   client.setConfig({
     baseUrl: '/api',
-    headers: authHeaders,
   })
 
-  // Note: Removed interceptors temporarily to debug [object Object] issue
-  // TODO: Add interceptor back when we figure out the correct signature
+  // Set up request interceptor to dynamically add auth headers
+  client.interceptors.request.use((request) => {
+    const authHeaders = getAuthHeaders()
+
+    // Append auth headers to the existing headers
+    Object.entries(authHeaders).forEach(([key, value]) => {
+      request.headers.set(key, value)
+    })
+
+    return request
+  })
 }
 
 // Auto-configure on import (only in browser)

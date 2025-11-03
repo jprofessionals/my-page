@@ -76,6 +76,31 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const isAuthenticated = !!userToken
 
+  // Track testUserId changes to refetch user when test user changes
+  const [testUserId, setTestUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Listen for storage changes (when test user changes)
+    const handleStorageChange = () => {
+      const newTestUserId = localStorage.getItem('testUserId')
+      setTestUserId(newTestUserId)
+    }
+
+    // Initial value
+    handleStorageChange()
+
+    // Listen for changes
+    window.addEventListener('storage', handleStorageChange)
+
+    // Also listen for custom event when test user changes in same tab
+    window.addEventListener('testUserChanged', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('testUserChanged', handleStorageChange)
+    }
+  }, [])
+
   useEffect(() => {
     const getUser = async () => {
       setUserFetchStatus('fetchingUser')
@@ -95,10 +120,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setUserFetchStatus('fetchFailed')
       }
     }
-    if (isAuthenticated && !user) {
+    if (isAuthenticated) {
+      // Refetch user when testUserId changes
       getUser()
     }
-  }, [isAuthenticated, user])
+  }, [isAuthenticated, testUserId])
 
   const router = useRouter()
   const logout = () => {

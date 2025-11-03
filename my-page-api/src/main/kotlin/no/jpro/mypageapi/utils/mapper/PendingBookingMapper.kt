@@ -43,4 +43,34 @@ class PendingBookingMapper(
             endDate = createPendingBooking.endDate ?: throw IllegalArgumentException("End date is required")
         )
     }
+
+    fun toPendingBookingTrainModel(dto: no.jpro.mypageapi.dto.PendingBookingTrainDTO): no.jpro.mypageapi.model.PendingBookingTrain {
+        return no.jpro.mypageapi.model.PendingBookingTrain(
+            id = dto.id,
+            apartment = apartmentMapper.toApartmentModel(dto.apartment),
+            startDate = dto.startDate,
+            endDate = dto.endDate,
+            drawingDate = dto.drawingDate,
+            pendingBookings = dto.pendingBookings.map { toPendingBookingModel(it) }
+        )
+    }
+
+    fun toPendingBookingDTO(model: no.jpro.mypageapi.model.PendingBookingDTO): PendingBookingDTO {
+        return PendingBookingDTO(
+            id = model.id,
+            startDate = model.startDate,
+            endDate = model.endDate,
+            apartment = model.apartment?.let { apartmentMapper.toApartment(it) },
+            employeeName = model.employeeName,
+            createdDate = model.createdDate
+        )
+    }
+
+    fun toUpdateBookingDTO(model: no.jpro.mypageapi.model.BookingUpdate): no.jpro.mypageapi.dto.UpdateBookingDTO {
+        return no.jpro.mypageapi.dto.UpdateBookingDTO(
+            startDate = model.startDate ?: throw IllegalArgumentException("Start date is required"),
+            endDate = model.endDate ?: throw IllegalArgumentException("End date is required"),
+            apartmentID = model.apartmentId ?: throw IllegalArgumentException("Apartment ID is required")
+        )
+    }
 }

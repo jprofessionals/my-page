@@ -26,8 +26,16 @@ class UserApiDelegateImpl(
     override fun getRequest(): Optional<NativeWebRequest> = request
 
     override fun getMe(): ResponseEntity<User> {
-        // Get authentication from security context
+        val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
         val authentication = SecurityContextHolder.getContext().authentication
+
+        // In development mode, support test user header
+        if (isDevelopmentProfile()) {
+            val testUser = userService.getTestUserById(testUserId)
+            if (testUser != null) {
+                return ResponseEntity.ok(userMapper.toUserModel(testUser))
+            }
+        }
 
         // Handle JWT authentication (both production and test mode)
         if (authentication is JwtAuthenticationToken) {

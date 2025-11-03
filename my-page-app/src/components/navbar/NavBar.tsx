@@ -28,6 +28,24 @@ const NavBar = () => {
   const { user, logout } = useAuthContext()
   const pathname = usePathname()
 
+  // Test user selection (for local dev only)
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  const testUsers = [
+    { id: '1', name: 'Steinar Hansen (Admin)' },
+    { id: '2', name: 'Ola Nordmann' },
+    { id: '3', name: 'Kari Hansen' },
+    { id: '4', name: 'Per Olsen' },
+    { id: '5', name: 'Anne Johansen' },
+  ]
+
+  const handleTestUserChange = (userId: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('testUserId', userId)
+      window.dispatchEvent(new Event('testUserChanged'))
+      window.location.reload()
+    }
+  }
+
   const navigationItems = useMemo(
     () =>
       navigation.filter(({ requiresAdmin }) => {
@@ -85,9 +103,26 @@ const NavBar = () => {
                 <div
                   className={cn(
                     !user ? 'pointer-events-none' : '',
-                    'flex items-center',
+                    'flex items-center gap-3',
                   )}
                 >
+                  {/* Dev mode test user selector */}
+                  {isDevelopment && typeof window !== 'undefined' && (
+                    <div className="flex items-center gap-2 bg-yellow-500/20 border border-yellow-500/50 rounded-md px-3 py-1">
+                      <span className="text-xs text-white">🧪</span>
+                      <select
+                        value={localStorage.getItem('testUserId') || '1'}
+                        onChange={(e) => handleTestUserChange(e.target.value)}
+                        className="bg-transparent text-white text-xs border-none focus:ring-0 cursor-pointer"
+                      >
+                        {testUsers.map((testUser) => (
+                          <option key={testUser.id} value={testUser.id} className="bg-gray-800">
+                            {testUser.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                   <Menu as="div" className="relative ml-3">
                     <Menu.Button className="flex text-sm bg-gray-800 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
                       <span className="sr-only">Open user menu</span>
@@ -151,6 +186,25 @@ const NavBar = () => {
                   </Disclosure.Button>
                 )
               })}
+              {/* Dev mode test user selector (mobile) */}
+              {isDevelopment && typeof window !== 'undefined' && (
+                <div className="mx-2 mb-2 bg-yellow-500/20 border border-yellow-500/50 rounded-md p-3">
+                  <label className="block text-xs text-white mb-1 font-medium">
+                    🧪 Test som bruker:
+                  </label>
+                  <select
+                    value={localStorage.getItem('testUserId') || '1'}
+                    onChange={(e) => handleTestUserChange(e.target.value)}
+                    className="w-full bg-gray-800 text-white text-sm border border-gray-600 rounded-md px-2 py-1"
+                  >
+                    {testUsers.map((testUser) => (
+                      <option key={testUser.id} value={testUser.id}>
+                        {testUser.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               {user ? (
                 <>
                   <hr className="!m-4" />

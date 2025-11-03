@@ -23,4 +23,10 @@ class ApartmentMapper {
         cabinName = apartment.cabin_name ?: "",
         sortOrder = apartment.sort_order
     )
+
+    fun toApartment(apartmentModel: ApartmentModel): Apartment = Apartment(
+        id = apartmentModel.id?.toLong(),
+        cabin_name = apartmentModel.cabinName,
+        sort_order = apartmentModel.sortOrder
+    )
 }

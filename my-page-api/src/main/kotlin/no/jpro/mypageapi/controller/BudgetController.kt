@@ -31,8 +31,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
-@RestController
-@RequestMapping("budget")
+// NOTE: This controller has been replaced by BudgetApiDelegateImpl
+// All endpoints are now handled by OpenAPI-generated controllers
+// Disabled to prevent ambiguous handler mapping conflicts
+//@RestController
+//@RequestMapping("budget")
 @SecurityRequirement(name = "Bearer Authentication")
 class BudgetController(
     private val userService: UserService,

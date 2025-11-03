@@ -29,8 +29,11 @@ import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
-@RestController
-@RequestMapping("informationNotice")
+// NOTE: This controller has been replaced by InformationNoticeApiDelegateImpl
+// All endpoints are now handled by OpenAPI-generated controllers
+// Disabled to prevent ambiguous handler mapping conflicts
+//@RestController
+//@RequestMapping("informationNotice")
 @SecurityRequirement(name = "Bearer Authentication")
 class InformationNoticeController(
     private val informationNoticeService: InformationNoticeService

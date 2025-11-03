@@ -23,32 +23,6 @@ export default function UserWishForm() {
 
   const [wishForm, setWishForm] = useState<WishFormState[]>([])
 
-  // Test user selection (for local dev)
-  const testUsers = [
-    { id: '', name: 'Standard bruker' },
-    { id: '1', name: 'Steinar Hansen' },
-    { id: '2', name: 'Test User' },
-    { id: '3', name: 'Ola Nordmann' },
-    { id: '4', name: 'Kari Hansen' },
-    { id: '5', name: 'Per Jensen' },
-    { id: '6', name: 'Anne Olsen' },
-  ]
-  const [selectedTestUser, setSelectedTestUser] = useState<string>(() => {
-    return localStorage.getItem('testUserId') || ''
-  })
-
-  // Update localStorage when test user changes
-  const handleTestUserChange = (userId: string): void => {
-    setSelectedTestUser(userId)
-    if (userId) {
-      localStorage.setItem('testUserId', userId)
-    } else {
-      localStorage.removeItem('testUserId')
-    }
-    // Reload data with new user
-    loadData()
-  }
-
   useEffect(() => {
     loadData()
   }, [])
@@ -234,42 +208,9 @@ export default function UserWishForm() {
     return <UserResults drawingId={drawing.id} season={drawing.season} periods={periods} />
   }
 
-  // Only show test user selector in development
-  const isDevelopment = process.env.NODE_ENV === 'development'
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Test user selector - Only visible in development */}
-        {isDevelopment && (
-          <div className="mb-6 bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4">
-            <div className="flex items-center gap-4">
-              <div className="flex-shrink-0">
-                <span className="text-sm font-medium text-yellow-800">🧪 DEV MODE</span>
-              </div>
-              <div className="flex-grow">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Test som bruker:
-                </label>
-                <select
-                  value={selectedTestUser}
-                  onChange={(e) => handleTestUserChange(e.target.value)}
-                  className="w-full max-w-xs border border-gray-300 rounded-md px-3 py-2 text-sm"
-                >
-                  {testUsers.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <p className="text-xs text-gray-600 mt-2">
-              Velg en bruker for å teste ønskeregistrering som forskjellige personer. Fungerer kun i lokal utviklingsmodus.
-            </p>
-          </div>
-        )}
-
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{drawing.season}</h1>
           <p className="mt-2 text-gray-600">

@@ -26,10 +26,12 @@ class CabinLotteryApiDelegateImpl(
     private val bookingService: BookingService,
     private val userService: UserService,
     private val cabinLotteryMapper: CabinLotteryMapper,
-    private val apartmentMapper: ApartmentMapper
+    private val apartmentMapper: ApartmentMapper,
+    private val environment: org.springframework.core.env.Environment,
+    private val request: Optional<NativeWebRequest>
 ) : CabinLotteryApiDelegate {
 
-    override fun getRequest(): Optional<NativeWebRequest> = Optional.empty()
+    override fun getRequest(): Optional<NativeWebRequest> = request
 
     override fun getCurrentDrawing(): ResponseEntity<CabinDrawing> {
         val drawingDTO = drawingService.getCurrentDrawingForUsers()
@@ -51,46 +53,55 @@ class CabinLotteryApiDelegateImpl(
     }
 
     override fun submitWishes(drawingId: UUID, bulkCreateWishes: BulkCreateWishes): ResponseEntity<List<CabinWish>> {
+        val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
         val authentication = SecurityContextHolder.getContext().authentication
 
-        if (authentication !is JwtAuthenticationToken) {
-            return ResponseEntity.status(401).build()
-        }
-
-        val user = userService.getUserBySub(authentication.getSub())
+        // Get current user
+        val user = if (isDevelopmentProfile()) {
+            userService.getTestUserById(testUserId)
+        } else null
+            ?: if (authentication is JwtAuthenticationToken) {
+                userService.getUserBySub(authentication.getSub())
+            } else null
             ?: return ResponseEntity.status(401).build()
 
         val bulkCreateWishesDTO = cabinLotteryMapper.toBulkCreateWishesDTO(bulkCreateWishes)
-        val createdWishes = wishService.createWishes(drawingId, user, bulkCreateWishesDTO)
+        val createdWishes = wishService.createWishes(drawingId, user!!, bulkCreateWishesDTO)
         return ResponseEntity.ok(createdWishes.map { cabinLotteryMapper.toCabinWishModel(it) })
     }
 
     override fun getMyWishes(drawingId: UUID): ResponseEntity<List<CabinWish>> {
+        val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
         val authentication = SecurityContextHolder.getContext().authentication
 
-        if (authentication !is JwtAuthenticationToken) {
-            return ResponseEntity.status(401).build()
-        }
-
-        val user = userService.getUserBySub(authentication.getSub())
+        // Get current user
+        val user = if (isDevelopmentProfile()) {
+            userService.getTestUserById(testUserId)
+        } else null
+            ?: if (authentication is JwtAuthenticationToken) {
+                userService.getUserBySub(authentication.getSub())
+            } else null
             ?: return ResponseEntity.status(401).build()
 
-        val wishes = wishService.getUserWishes(drawingId, user.id!!)
+        val wishes = wishService.getUserWishes(drawingId, user?.id!!)
         return ResponseEntity.ok(wishes.map { cabinLotteryMapper.toCabinWishModel(it) })
     }
 
     override fun getMyAllocations(drawingId: UUID): ResponseEntity<List<CabinAllocation>> {
+        val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
         val authentication = SecurityContextHolder.getContext().authentication
 
-        if (authentication !is JwtAuthenticationToken) {
-            return ResponseEntity.status(401).build()
-        }
-
-        val user = userService.getUserBySub(authentication.getSub())
+        // Get current user
+        val user = if (isDevelopmentProfile()) {
+            userService.getTestUserById(testUserId)
+        } else null
+            ?: if (authentication is JwtAuthenticationToken) {
+                userService.getUserBySub(authentication.getSub())
+            } else null
             ?: return ResponseEntity.status(401).build()
 
         val allocations = drawingService.getAllocations(drawingId)
-            .filter { it.userId == user.id }
+            .filter { it.userId == user?.id }
         return ResponseEntity.ok(allocations.map { cabinLotteryMapper.toCabinAllocationModel(it) })
     }
 
@@ -253,5 +264,9 @@ class CabinLotteryApiDelegateImpl(
     override fun deleteExecution(drawingId: UUID, executionId: UUID): ResponseEntity<Unit> {
         drawingService.deleteExecution(drawingId, executionId)
         return ResponseEntity.noContent().build()
+    }
+
+    private fun isDevelopmentProfile(): Boolean {
+        return environment.activeProfiles.any { it == "local" || it == "h2" || it == "test" }
     }
 }

@@ -18,6 +18,7 @@ class PendingBookingApiDelegateImpl(
     private val pendingBookingService: PendingBookingService,
     private val userService: UserService,
     private val pendingBookingMapper: PendingBookingMapper,
+    private val bookingLotteryService: no.jpro.mypageapi.service.BookingLotteryService,
     private val environment: org.springframework.core.env.Environment,
     private val request: Optional<NativeWebRequest>
 ) : PendingBookingApiDelegate {
@@ -78,6 +79,81 @@ class PendingBookingApiDelegateImpl(
 
         return ResponseEntity.status(201)
             .body("A new booking has been successfully created for ${user.name}")
+    }
+
+    override fun getPendingBookingInformation(): ResponseEntity<List<no.jpro.mypageapi.model.PendingBookingTrain>> {
+        val trains = pendingBookingService.getPendingBookingInformation()
+        val models = trains.map { pendingBookingMapper.toPendingBookingTrainModel(it) }
+        return ResponseEntity.ok(models)
+    }
+
+    override fun pickWinnerPendingBooking(pendingBookingDTO: List<no.jpro.mypageapi.model.PendingBookingDTO>): ResponseEntity<String> {
+        val dtos = pendingBookingDTO.map { pendingBookingMapper.toPendingBookingDTO(it) }
+        bookingLotteryService.pickWinnerPendingBooking(dtos)
+        return ResponseEntity.status(201).body("A new booking has been successfully created")
+    }
+
+    override fun adminDeletePendingBooking(pendingBookingId: Long): ResponseEntity<String> {
+        val pendingBooking = pendingBookingService.getPendingBooking(pendingBookingId)
+            ?: return ResponseEntity.status(404).body("Pending booking not found")
+
+        pendingBookingService.deletePendingBooking(pendingBookingId)
+        return ResponseEntity.ok("Pending booking with ID $pendingBookingId has been deleted")
+    }
+
+    override fun deleteMyPendingBooking(pendingBookingId: Long): ResponseEntity<String> {
+        val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
+        val authentication = SecurityContextHolder.getContext().authentication
+
+        // Get current user
+        val user = if (isDevelopmentProfile()) {
+            userService.getTestUserById(testUserId)
+        } else null
+            ?: if (authentication is JwtAuthenticationToken) {
+                userService.getUserBySub(authentication.getSub())
+            } else null
+            ?: return ResponseEntity.status(401).body("Unauthorized")
+
+        val pendingBooking = pendingBookingService.getPendingBooking(pendingBookingId)
+            ?: return ResponseEntity.status(404).body("Pending booking not found")
+
+        // Check permission
+        if (pendingBooking.employee?.id != user?.id) {
+            return ResponseEntity.status(403).body("Forbidden")
+        }
+
+        pendingBookingService.deletePendingBooking(pendingBookingId)
+        return ResponseEntity.ok("Pending booking with ID $pendingBookingId has been deleted")
+    }
+
+    override fun updatePendingBooking(pendingBookingId: Long, bookingUpdate: no.jpro.mypageapi.model.BookingUpdate): ResponseEntity<Unit> {
+        val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
+        val authentication = SecurityContextHolder.getContext().authentication
+
+        // Get current user
+        val user = if (isDevelopmentProfile()) {
+            userService.getTestUserById(testUserId)
+        } else null
+            ?: if (authentication is JwtAuthenticationToken) {
+                userService.getUserBySub(authentication.getSub())
+            } else null
+            ?: return ResponseEntity.status(401).build()
+
+        val bookingToEdit = pendingBookingService.getPendingBooking(pendingBookingId)
+            ?: return ResponseEntity.notFound().build()
+
+        // Check permission
+        if (bookingToEdit.employee?.id != user?.id) {
+            return ResponseEntity.status(403).build()
+        }
+
+        try {
+            val updateBookingDTO = pendingBookingMapper.toUpdateBookingDTO(bookingUpdate)
+            pendingBookingService.editPendingBooking(updateBookingDTO, bookingToEdit)
+            return ResponseEntity.ok().build()
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.status(400).build()
+        }
     }
 
     private fun isDevelopmentProfile(): Boolean {
