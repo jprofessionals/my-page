@@ -4,12 +4,15 @@ import { toast } from 'react-toastify'
 import { Button } from '@/components/ui/button'
 import { differenceInDays } from 'date-fns'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Apartment, BookingPost } from '@/types'
 import {
   adminCreateBooking,
   createPendingBooking as createPendingBookingSDK,
   createPendingBookingForUser
 } from '@/data/types/sdk.gen'
+import {
+  type Apartment,
+  type CreateBooking
+} from '@/data/types/types.gen'
 import '@/services/openapi-client'
 import Loading from '@/components/Loading'
 import * as Modal from '@/components/ui/modal'
@@ -55,7 +58,7 @@ export default function AdminBooking() {
     bookingOwnerName,
     bookingWithoutDrawing,
   }: {
-    bookingPost: BookingPost
+    bookingPost: CreateBooking
     userIsAdmin: boolean
     bookingOwnerName: string
     startDate: string

@@ -1,7 +1,11 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
-import { Apartment, BookingPost, User } from '@/types'
 import ApiService from '@/services/api.service'
 import { createPendingBooking } from '@/data/types/sdk.gen'
+import {
+  type Apartment,
+  type CreateBooking
+} from '@/data/types/types.gen'
+import { type User } from '@/types'
 import '@/services/openapi-client'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
@@ -10,7 +14,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 
 type Props = {
-  bookingPost?: BookingPost
+  bookingPost?: CreateBooking
   user: User | null
   onBookingCreated: () => void
   onCancel: () => void
@@ -47,7 +51,7 @@ const BookingAddModal = ({
   const createBooking = async ({
     bookingPost,
   }: {
-    bookingPost: BookingPost
+    bookingPost: CreateBooking
   }) => {
     try {
       const { data } = await createPendingBooking({

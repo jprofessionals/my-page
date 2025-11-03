@@ -1,9 +1,14 @@
 import { ChangeEvent, Dispatch, SetStateAction } from 'react'
-import { NewEmployee } from '@/types'
+
+type NewEmployeeFormData = {
+  email: string
+  employeeNumber: string
+  budgetStartDate: string
+}
 
 type Props = {
-  inputData: NewEmployee
-  setInputData: Dispatch<SetStateAction<NewEmployee>>
+  inputData: NewEmployeeFormData
+  setInputData: Dispatch<SetStateAction<NewEmployeeFormData>>
 }
 
 const NewEmployeeForm = ({ inputData, setInputData }: Props) => {

@@ -3,11 +3,13 @@ import apiService from '../../services/api.service'
 import { toast } from 'react-toastify'
 import {
   Budget,
-  BudgetSummary,
   BudgetType,
-  BudgetYearSummary, ToggleActive, ToggleAdmin,
+  ToggleActive,
+  ToggleAdmin,
+  type User as SDKUser,
+  type BudgetSummary,
+  type BudgetYearSummary,
 } from '@/types'
-import { User as SDKUser } from '@/data/types/types.gen'
 import BudgetList from '@/components/budget/BudgetList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown'

@@ -1,13 +1,20 @@
 import { FormEvent, useState } from 'react'
 import NewEmployeeForm from '@/components/newemployee/NewEmployeeForm'
-import { NewEmployee } from '@/types'
 import { useMutation } from '@tanstack/react-query'
 import { createUser } from '@/data/types/sdk.gen'
+import { type NewEmployee } from '@/data/types/types.gen'
 import '@/services/openapi-client'
 import { toast } from 'react-toastify'
 import { Button } from '../ui/button'
 import { Alert } from '../ui/alert'
 import * as Modal from '../ui/modal'
+
+// Form state type - uses strings for all fields (as they come from inputs)
+type NewEmployeeFormData = {
+  email: string
+  employeeNumber: string
+  budgetStartDate: string
+}
 
 // @jpro.no in the form is now optional, indicated by a new label on the input.
 // Add the @jpro.no if no @ is provided, otherwise let it through like normal
@@ -19,20 +26,20 @@ const parseEmail = (email?: string) => {
   return `${email}@jpro.no`
 }
 
-const createNewEmployee = async (newEmployee: NewEmployee) => {
-  const modifiedNewEmployee = {
-    email: parseEmail(newEmployee.email),
-    employeeNumber: parseInt(newEmployee.employeeNumber, 10),
-    budgetStartDate: newEmployee.budgetStartDate,
+const createNewEmployee = async (formData: NewEmployeeFormData): Promise<{ data: any }> => {
+  const newEmployee: NewEmployee = {
+    email: parseEmail(formData.email),
+    employeeNumber: parseInt(formData.employeeNumber, 10),
+    budgetStartDate: formData.budgetStartDate,
   }
 
   const { data } = await createUser({
-    body: modifiedNewEmployee,
+    body: newEmployee,
   })
   return { data }
 }
 
-const initialInputData: NewEmployee = {
+const initialInputData: NewEmployeeFormData = {
   email: '',
   employeeNumber: '',
   budgetStartDate: '',
@@ -40,7 +47,7 @@ const initialInputData: NewEmployee = {
 
 export default function NewUserModal() {
   const [error, setError] = useState<string | null>(null)
-  const [inputData, setInputData] = useState<NewEmployee>(initialInputData)
+  const [inputData, setInputData] = useState<NewEmployeeFormData>(initialInputData)
 
   const { mutate } = useMutation({
     mutationFn: createNewEmployee,
