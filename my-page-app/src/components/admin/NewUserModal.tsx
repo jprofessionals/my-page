@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react'
 import NewEmployeeForm from '@/components/newemployee/NewEmployeeForm'
 import { useMutation } from '@tanstack/react-query'
 import { createUser } from '@/data/types/sdk.gen'
-import { type NewEmployee } from '@/data/types/types.gen'
+import { type NewEmployee, type UserReadable } from '@/data/types/types.gen'
 import '@/services/openapi-client'
 import { toast } from 'react-toastify'
 import { Button } from '../ui/button'
@@ -26,7 +26,7 @@ const parseEmail = (email?: string) => {
   return `${email}@jpro.no`
 }
 
-const createNewEmployee = async (formData: NewEmployeeFormData): Promise<{ data: any }> => {
+const createNewEmployee = async (formData: NewEmployeeFormData): Promise<{ data: UserReadable }> => {
   const newEmployee: NewEmployee = {
     email: parseEmail(formData.email),
     employeeNumber: parseInt(formData.employeeNumber, 10),
