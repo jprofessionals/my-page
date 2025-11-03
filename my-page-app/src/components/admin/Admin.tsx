@@ -189,13 +189,17 @@ function Admin() {
     apiService
       .getUsers()
       .then((responseSummary) => {
-        setUsers(responseSummary.data || [])
-        extractListOfBudgets(responseSummary.data || [])
+        // Map UserReadable to User by adding the 'loaded' field
+        const users = (responseSummary.data || []).map(user => ({ ...user, loaded: true }))
+        setUsers(users)
+        extractListOfBudgets(users)
 
         apiService
           .getDisabledUsers()
           .then((disabledUsers) => {
-            setDisabledUsers(disabledUsers.data || [])
+            // Map UserReadable to User by adding the 'loaded' field
+            const mappedDisabledUsers = (disabledUsers.data || []).map(user => ({ ...user, loaded: true }))
+            setDisabledUsers(mappedDisabledUsers)
           })
           .catch(() => {
             toast.error('Klarte ikke laste deaktiverte brukere, prøv igjen senere')
