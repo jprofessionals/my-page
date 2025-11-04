@@ -27,8 +27,8 @@ export default function UserResults({ drawingId, season, periods }: UserResultsP
         cabinLotteryService.getMyAllocations(drawingId),
         cabinLotteryService.getAllAllocations(drawingId),
       ])
-      setMyAllocations(myRes.data)
-      setAllAllocations(allRes.data)
+      setMyAllocations(myRes.data ?? [])
+      setAllAllocations(allRes.data ?? [])
     } catch (error) {
       console.error('Failed to load results:', error)
     } finally {

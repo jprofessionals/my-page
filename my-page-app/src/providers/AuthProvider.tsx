@@ -8,7 +8,8 @@ import {
   useEffect,
   useState,
 } from 'react'
-import { Settings, User } from '@/types'
+import { User } from '@/types'
+import { Setting } from '@/data/types/types.gen'
 import ApiService from '@/services/api.service'
 import config from '../config/config'
 import { useRouter } from 'next/navigation'
@@ -30,7 +31,7 @@ type AuthContextType = {
   user: User | null
   logout: () => void
   setUser: (user: User | null) => void
-  settings: Settings[] | undefined
+  settings: Setting[] | undefined
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -109,7 +110,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setUser({
           ...user.data,
           loaded: true,
-        })
+          employeeNumber: user.data?.employeeNumber?.toString() ?? '',
+        } as User)
         setUserFetchStatus('fetched')
       } catch (e) {
         // If authentication fails, clear the token

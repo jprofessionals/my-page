@@ -114,7 +114,7 @@ function Admin() {
   }
 
   const budgetBalance = (budget: Budget) => {
-    if (budget) {
+    if (budget && budget.balance !== undefined) {
       return budget.balance.toLocaleString('no-NO', {
         maximumFractionDigits: 0,
         style: 'currency',
@@ -147,7 +147,7 @@ function Admin() {
   }
 
   const budgetBalanceHoursCurrentYear = (budget: Budget) => {
-    if (budget) {
+    if (budget && budget.sumHoursCurrentYear !== undefined) {
       return (
         Math.round(budget.sumHoursCurrentYear) +
         (budget.sumHoursCurrentYear === 1 ? ' time' : ' timer')
@@ -189,16 +189,26 @@ function Admin() {
     apiService
       .getUsers()
       .then((responseSummary) => {
-        // Map UserReadable to User by adding the 'loaded' field and cast to User[]
-        const users = (responseSummary.data || []).map(user => ({ ...user, loaded: true })) as User[]
+        // Map UserReadable to User by adding the 'loaded' field
+        // Convert employeeNumber from number to string and cast to User[]
+        const users = (responseSummary.data || []).map(user => ({
+          ...user,
+          loaded: true,
+          employeeNumber: user.employeeNumber?.toString() ?? ''
+        })) as unknown as User[]
         setUsers(users)
         extractListOfBudgets(users)
 
         apiService
           .getDisabledUsers()
           .then((disabledUsers) => {
-            // Map UserReadable to User by adding the 'loaded' field and cast to User[]
-            const mappedDisabledUsers = (disabledUsers.data || []).map(user => ({ ...user, loaded: true })) as User[]
+            // Map UserReadable to User by adding the 'loaded' field
+            // Convert employeeNumber from number to string and cast to User[]
+            const mappedDisabledUsers = (disabledUsers.data || []).map(user => ({
+              ...user,
+              loaded: true,
+              employeeNumber: user.employeeNumber?.toString() ?? ''
+            })) as unknown as User[]
             setDisabledUsers(mappedDisabledUsers)
           })
           .catch(() => {
@@ -208,7 +218,8 @@ function Admin() {
         apiService
           .getBudgetSummary()
           .then((budgetSummary) => {
-            setBudgetsummary(budgetSummary)
+            // Cast to manual BudgetSummary[] type to avoid type conflicts
+            setBudgetsummary(budgetSummary as unknown as BudgetSummary[])
             setIsLoading(false)
           })
           .catch(() => {
@@ -511,10 +522,9 @@ function Admin() {
                 {settings == null
                   ? ''
                   : settings
-                    .sort((a, b) => a.priority - b.priority)
                     .map((setting) => (
                       <tr key={setting.settingId}>
-                        <td>{setting.description}</td>
+                        <td>{setting.settingDescription ?? setting.settingId}</td>
                         <td>
                           <input
                             id={setting.settingId}

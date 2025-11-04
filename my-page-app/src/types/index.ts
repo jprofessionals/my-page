@@ -15,30 +15,30 @@ export type Budget = {
   id: string
   posts: Post[]
   budgetType: BudgetType
-  startDate: Date
+  startDate: string
   startAmount: number
   hours: Hour[]
-  balance: number
-  sumHours: number
-  sumHoursCurrentYear: number
-  sumPostsCurrentYear: number
-  sumPostsLastTwelveMonths: number
-  sumHoursLastTwelveMonths: number
+  balance?: number
+  sumHours?: number
+  sumHoursCurrentYear?: number
+  sumPostsCurrentYear?: number
+  sumPostsLastTwelveMonths?: number
+  sumHoursLastTwelveMonths?: number
 }
 
 type Post = {
   id?: number
-  date: Date
+  date: string
   description?: string
   amountIncMva?: number
   amountExMva?: number
   documentNumber?: string
-  dateOfPayment?: Date
-  dateOfDeduction?: Date
+  dateOfPayment?: string
+  dateOfDeduction?: string
   expense: boolean
   locked: boolean
-  createdDate?: Date
-  lastModifiedDate?: Date
+  createdDate?: string
+  lastModifiedDate?: string
   createdBy?: string
 }
 
@@ -46,7 +46,7 @@ type Hour = {
   id?: number
   hours: number
   createdBy: string
-  dateOfUsage: Date
+  dateOfUsage: string
 }
 
 export type BudgetType = {
@@ -56,7 +56,7 @@ export type BudgetType = {
   deposit: number
   intervalOfDepositInMonths: number
   startAmount: number
-  allowTimeBalance: boolean
+  allowTimeBalance?: boolean
   balanceIsHours?: boolean
 }
 
@@ -107,15 +107,6 @@ export type EditedBooking = {
   startDate: string
   endDate: string
   apartmentId: number
-}
-
-export type PendingBookingTrain = {
-  id: string
-  apartment: Apartment
-  startDate: string
-  endDate: string
-  drawingDate?: string
-  pendingBookings: Booking[]
 }
 
 export type InfoBooking = {

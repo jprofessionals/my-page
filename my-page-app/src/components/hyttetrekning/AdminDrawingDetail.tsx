@@ -90,14 +90,14 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
         cabinLotteryService.adminGetDrawing(drawingId),
         cabinLotteryService.adminGetPeriods(drawingId),
       ])
-      setDrawing(drawingRes.data)
-      setPeriods(periodsRes.data)
+      setDrawing(drawingRes.data ?? null)
+      setPeriods(periodsRes.data ?? [])
 
       // Determine which execution to use for allocations
       let executionIdToUse = selectedExecutionId
 
       // Load executions from drawing
-      if (drawingRes.data.executions && drawingRes.data.executions.length > 0) {
+      if (drawingRes.data && drawingRes.data.executions && drawingRes.data.executions.length > 0) {
         setExecutions(drawingRes.data.executions)
         // Auto-select the most recent execution if none is selected
         if (!selectedExecutionId && drawingRes.data.executions.length > 0) {
@@ -107,15 +107,15 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
         }
       }
 
-      if (['OPEN', 'LOCKED', 'DRAWN', 'PUBLISHED'].includes(drawingRes.data.status)) {
+      if (drawingRes.data && ['OPEN', 'LOCKED', 'DRAWN', 'PUBLISHED'].includes(drawingRes.data.status)) {
         const wishesRes = await cabinLotteryService.adminGetAllWishes(drawingId)
-        setWishes(wishesRes.data)
+        setWishes(wishesRes.data ?? [])
       }
 
-      if (['DRAWN', 'PUBLISHED'].includes(drawingRes.data.status)) {
+      if (drawingRes.data && ['DRAWN', 'PUBLISHED'].includes(drawingRes.data.status)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const allocsRes = await cabinLotteryService.adminGetAllocations(drawingId, executionIdToUse as any)
-        setAllocations(allocsRes.data)
+        setAllocations(allocsRes.data ?? [])
       }
     } catch (error) {
       console.error('Failed to load data:', error)
@@ -205,7 +205,7 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       setShowBulkPeriodForm(false)
       setBulkPeriod({ startDate: '', endDate: '' })
       await loadData()
-      toast.success(`${response.data.periodsCreated} perioder opprettet!`)
+      toast.success(`${response.data?.periodsCreated ?? 0} perioder opprettet!`)
     } catch (error) {
       console.error('Failed to bulk add periods:', error)
       toast.error('Feil ved oppretting av perioder')
@@ -288,12 +288,12 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
 
     try {
       const response = await cabinLotteryService.adminImportWishes(drawingId, importFile)
-      setImportResult(response.data)
+      setImportResult((response.data as unknown as ImportResult) ?? null)
       await loadData()
 
-      if (response.data.errorCount === 0) {
+      if (response.data && response.data.errorCount === 0) {
         toast.success(`Import vellykket! ${response.data.successCount} brukere importert.`)
-      } else {
+      } else if (response.data) {
         toast.warning(`Import delvis vellykket. ${response.data.successCount} brukere importert, ${response.data.errorCount} feil.`)
       }
     } catch (error) {

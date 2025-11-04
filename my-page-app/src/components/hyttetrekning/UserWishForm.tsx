@@ -49,7 +49,7 @@ export default function UserWishForm() {
         cabinLotteryService.getMyWishes(drawingRes.data.id),
       ])
 
-      setPeriods(periodsRes.data)
+      setPeriods(periodsRes.data ?? [])
       setMyWishes(wishesRes.data || [])
 
       if (wishesRes.data && wishesRes.data.length > 0) {

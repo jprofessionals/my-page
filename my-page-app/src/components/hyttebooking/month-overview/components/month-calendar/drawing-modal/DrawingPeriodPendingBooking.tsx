@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react'
-import { Booking, User } from '@/types'
+import { User } from '@/types'
+import { PendingBookingDto } from '@/data/types/types.gen'
 import { Button } from '@/components/ui/button'
 import BookingEditForm from '../booking-edit-form/BookingEditForm'
 import { useQueryClient } from '@tanstack/react-query'
 
 type Props = {
-  pendingBooking: Booking
+  pendingBooking: PendingBookingDto & { isPending: boolean }
   user: User | null
 }
 
@@ -29,7 +30,7 @@ const DrawingPeriodPendingBooking = ({ pendingBooking, user }: Props) => {
     <tbody>
       <tr>
         <td>{pendingBooking.employeeName}</td>
-        <td>{pendingBooking.apartment.cabin_name}</td>
+        <td>{pendingBooking.apartment?.cabin_name}</td>
         <td>{pendingBooking.startDate}</td>
         <td>{pendingBooking.endDate}</td>
         <td>

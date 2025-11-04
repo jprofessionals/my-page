@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
-import { PendingBookingTrain, User } from '@/types'
+import { User } from '@/types'
+import { PendingBookingTrain } from '@/data/types/types.gen'
 import { Button } from '@/components/ui/button'
 import SimpleModal from '@/components/ui/SimpleModal'
 import { useQueryClient } from '@tanstack/react-query'

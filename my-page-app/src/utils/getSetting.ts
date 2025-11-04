@@ -1,13 +1,13 @@
-import { Settings } from '@/types'
+import { Setting } from '@/data/types/types.gen'
 
 export default function getSetting(
-  settings: Settings[] | undefined,
+  settings: Setting[] | undefined,
   key: string,
 ): string | undefined {
   if (settings == null) {
     return undefined
   }
-  const setting = (settings as Settings[]).find(
+  const setting = settings.find(
     (element) => element.settingId === key,
   )
   return setting ? setting.settingValue : undefined

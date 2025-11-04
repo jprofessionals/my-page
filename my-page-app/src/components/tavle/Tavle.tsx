@@ -9,6 +9,7 @@ function Tavle() {
 
   const getImage = async () => {
     const image = await apiService.getImage('cropped-tavle.jpg')
+    if (!image) return
     const reader = new FileReader()
     reader.onloadend = () => {
       setImageBase64(reader.result as string)

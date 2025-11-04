@@ -33,9 +33,14 @@ const createNewEmployee = async (formData: NewEmployeeFormData): Promise<{ data:
     budgetStartDate: formData.budgetStartDate,
   }
 
-  const { data } = await createUser({
+  const { data, error } = await createUser({
     body: newEmployee,
   })
+
+  if (error || !data) {
+    throw new Error(error ? String(error) : 'Failed to create user')
+  }
+
   return { data }
 }
 

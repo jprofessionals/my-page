@@ -6,9 +6,9 @@ import {
   BookingPost,
   CabinType,
   InfoBooking,
-  PendingBookingTrain,
   User,
 } from '@/types'
+import { PendingBookingTrain } from '@/data/types/types.gen'
 import { nb } from 'date-fns/locale'
 import CalendarWeekLabel from './calendar-week-label/CalendarWeekLabel'
 import CalendarWeekNumber from './calendar-week-number/CalendarWeekNumber'

@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import { Apartment, Booking, BookingPost, User } from '@/types'
+import { PendingBookingDto } from '@/data/types/types.gen'
 import ApiService from '@/services/api.service'
 import { Button } from '@/components/ui/button'
 import { toast } from 'react-toastify'
@@ -8,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 
 type Props = {
-  booking?: Booking
+  booking?: Booking | (PendingBookingDto & { isPending: boolean })
   user: User | null
   onBookingSaved: () => void
   onCancel: () => void
@@ -32,7 +33,7 @@ const BookingEditForm = ({
   useEffect(() => {
     setStartDate(booking?.startDate || '')
     setEndDate(booking?.endDate || '')
-    setApartmentId(booking?.apartment.id || 0)
+    setApartmentId(booking?.apartment?.id || 0)
   }, [booking])
 
   const { data: apartments } = useQuery({
@@ -101,14 +102,14 @@ const BookingEditForm = ({
   }
 
   const handleDelete = async () => {
-    if (booking) {
+    if (booking && booking.id) {
       await deleteBookingByBookingId(booking.id)
       onBookingSaved()
     }
   }
 
   const handleConfirm = async () => {
-    if (booking && startDate && endDate) {
+    if (booking && booking.id && startDate && endDate) {
       const updatedBooking: BookingPost = {
         apartmentID: apartmentId,
         startDate,

@@ -1,5 +1,6 @@
 import { CalendarDay } from 'react-day-picker'
-import { Booking, CabinType, InfoBooking, PendingBookingTrain } from '@/types'
+import { Booking, CabinType, InfoBooking } from '@/types'
+import { PendingBookingTrain } from '@/data/types/types.gen'
 import { dateFormat } from '@/components/hyttebooking/month-overview/monthOverviewUtils'
 import { format } from 'date-fns'
 

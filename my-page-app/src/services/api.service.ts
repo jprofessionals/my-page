@@ -35,16 +35,18 @@ import {
   adminUpdateBooking as adminUpdateBookingSDK,
   updatePendingBooking as updatePendingBookingSDK,
   getImage as getImageSDK,
-  type Budget,
+} from '@/data/types/sdk.gen'
+import {
+  type BudgetReadable,
   type CreatePost,
   type UpdatePost,
-  type Booking,
+  type Booking as BookingDto,
   type BookingUpdate,
   type PendingBookingDto,
   type InformationNotice,
   type CreateInformationNotice,
   type Setting,
-} from '@/data/types/sdk.gen'
+} from '@/data/types/types.gen'
 import '@/services/openapi-client' // Ensure client is configured
 
 export const API_URL = '/api/'
@@ -73,7 +75,7 @@ const getDisabledUsers = async () => {
 const getBudgets = async () => {
   const { data } = await getMyBudgets()
   const budgets = data || []
-  return budgets.map((budget: Budget) => ({
+  return budgets.map((budget: BudgetReadable) => ({
     ...budget,
     id: String(budget.id),
   }))
@@ -116,15 +118,15 @@ const getBookings = async (startDate: string, endDate: string) => {
     query: { startDate, endDate },
   })
   const bookings = data || []
-  return bookings.map((booking: Booking) => ({
-    id: booking.id,
+  return bookings.map((booking: BookingDto) => ({
+    id: Number(booking.id),
     startDate: booking.startDate,
     endDate: booking.endDate,
     apartment: {
       id: booking.apartment.id,
       cabin_name: booking.apartment.cabin_name,
     },
-    employeeName: booking.employeeName,
+    employeeName: booking.employeeName || '',
     isPending: false,
   }))
 }
@@ -132,9 +134,15 @@ const getBookings = async (startDate: string, endDate: string) => {
 const getBookingsForUser = async () => {
   const { data } = await getMyBookings()
   const bookings = data || []
-  return bookings.map((booking: Booking) => ({
-    ...booking,
-    id: String(booking.id),
+  return bookings.map((booking: BookingDto) => ({
+    id: Number(booking.id),
+    startDate: booking.startDate,
+    endDate: booking.endDate,
+    apartment: {
+      id: booking.apartment.id,
+      cabin_name: booking.apartment.cabin_name,
+    },
+    employeeName: booking.employeeName || '',
     isPending: false,
   }))
 }
@@ -207,8 +215,15 @@ const getPendingBookingsForUser = async () => {
   const { data } = await getMyPendingBookingsSDK()
   const pendingBookings = data || []
   return pendingBookings.map((pendingBooking: PendingBookingDto) => ({
-    ...pendingBooking,
-    id: String(pendingBooking.id),
+    id: Number(pendingBooking.id),
+    startDate: pendingBooking.startDate,
+    endDate: pendingBooking.endDate,
+    apartment: {
+      id: pendingBooking.apartment?.id || 0,
+      cabin_name: pendingBooking.apartment?.cabin_name || '',
+    },
+    employeeName: pendingBooking.employeeName || '',
+    createdDate: pendingBooking.createdDate,
     isPending: true,
   }))
 }
@@ -234,12 +249,14 @@ const getInfoNotices = async (startDate: string, endDate: string) => {
     query: { startDate, endDate },
   })
   const infoNotices = data || []
-  return infoNotices.map((infoNotice: InformationNotice) => ({
-    id: infoNotice.id ? String(infoNotice.id) : '',
-    startDate: infoNotice.startDate,
-    endDate: infoNotice.endDate,
-    description: infoNotice.description,
-  }))
+  return infoNotices
+    .filter((infoNotice: InformationNotice) => infoNotice.id !== undefined)
+    .map((infoNotice: InformationNotice) => ({
+      id: infoNotice.id!,
+      startDate: infoNotice.startDate,
+      endDate: infoNotice.endDate,
+      description: infoNotice.description,
+    }))
 }
 
 const deleteInfoNotice = async (infoNoticeId: number) => {

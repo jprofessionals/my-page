@@ -33,9 +33,11 @@ import {
   getAdminAllocations,
   importWishes,
   deleteExecution,
+} from '@/data/types/sdk.gen'
+import {
   type CreateCabinWish,
   type CreatePeriod as CreatePeriodType,
-} from '@/data/types/sdk.gen'
+} from '@/data/types/types.gen'
 import '@/services/openapi-client' // Ensure client is configured
 
 // ===== USER ENDPOINTS (OpenAPI SDK) =====
