@@ -22,11 +22,12 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 /**
- * Legacy SubscriptionController - not yet migrated to OpenAPI
- * TODO: Migrate to SubscriptionApiDelegateImpl when time permits
+ * Legacy SubscriptionController - MIGRATED to OpenAPI
+ * This controller has been replaced by SubscriptionApiDelegateImpl
+ * @see SubscriptionApiDelegateImpl
  */
-@RestController
-@RequestMapping("subscription")
+// @RestController - DISABLED: Migrated to OpenAPI delegate pattern
+// @RequestMapping("subscription")
 @Tag(
     name = "Subscription",
     description = "Lets users subscribe to tags"

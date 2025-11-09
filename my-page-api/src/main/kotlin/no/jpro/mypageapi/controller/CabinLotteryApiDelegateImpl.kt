@@ -55,26 +55,8 @@ class CabinLotteryApiDelegateImpl(
 
     override fun submitWishes(drawingId: UUID, bulkCreateWishes: BulkCreateWishes): ResponseEntity<List<CabinWish>> {
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
-        val authentication = SecurityContextHolder.getContext().authentication
+        val user = authHelper.getCurrentUser(testUserId) ?: return ResponseEntity.status(401).build()
 
-        // Get current user - try X-Test-User-Id header first (development mode)
-        var nullableUser: no.jpro.mypageapi.entity.User? = null
-
-        if (authHelper.isDevelopmentProfile() && testUserId != null) {
-            nullableUser = authHelper.getTestUserById(testUserId)
-        }
-
-        // If not found via test header, try JWT authentication
-        if (nullableUser == null && authentication is JwtAuthenticationToken) {
-            nullableUser = userService.getUserBySub(authentication.getSub())
-        }
-
-        // If still no user found, return 401
-        if (nullableUser == null) {
-            return ResponseEntity.status(401).build()
-        }
-
-        val user = nullableUser
         if (user.id == null) {
             throw IllegalStateException("User ID cannot be null for user sub: ${user.sub}")
         }
@@ -86,26 +68,7 @@ class CabinLotteryApiDelegateImpl(
 
     override fun getMyWishes(drawingId: UUID): ResponseEntity<List<CabinWish>> {
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
-        val authentication = SecurityContextHolder.getContext().authentication
-
-        // Get current user - try X-Test-User-Id header first (development mode)
-        var nullableUser: no.jpro.mypageapi.entity.User? = null
-
-        if (authHelper.isDevelopmentProfile() && testUserId != null) {
-            nullableUser = authHelper.getTestUserById(testUserId)
-        }
-
-        // If not found via test header, try JWT authentication
-        if (nullableUser == null && authentication is JwtAuthenticationToken) {
-            nullableUser = userService.getUserBySub(authentication.getSub())
-        }
-
-        // If still no user found, return 401
-        if (nullableUser == null) {
-            return ResponseEntity.status(401).build()
-        }
-
-        val user = nullableUser
+        val user = authHelper.getCurrentUser(testUserId) ?: return ResponseEntity.status(401).build()
         val userId = user.id ?: throw IllegalStateException("User ID cannot be null for user sub: ${user.sub}")
 
         val wishes = wishService.getUserWishes(drawingId, userId)
@@ -114,26 +77,7 @@ class CabinLotteryApiDelegateImpl(
 
     override fun getMyAllocations(drawingId: UUID): ResponseEntity<List<CabinAllocation>> {
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
-        val authentication = SecurityContextHolder.getContext().authentication
-
-        // Get current user - try X-Test-User-Id header first (development mode)
-        var nullableUser: no.jpro.mypageapi.entity.User? = null
-
-        if (authHelper.isDevelopmentProfile() && testUserId != null) {
-            nullableUser = authHelper.getTestUserById(testUserId)
-        }
-
-        // If not found via test header, try JWT authentication
-        if (nullableUser == null && authentication is JwtAuthenticationToken) {
-            nullableUser = userService.getUserBySub(authentication.getSub())
-        }
-
-        // If still no user found, return 401
-        if (nullableUser == null) {
-            return ResponseEntity.status(401).build()
-        }
-
-        val user = nullableUser
+        val user = authHelper.getCurrentUser(testUserId) ?: return ResponseEntity.status(401).build()
         val userId = user.id ?: throw IllegalStateException("User ID cannot be null for user sub: ${user.sub}")
 
         val allocations = drawingService.getAllocations(drawingId)
@@ -245,13 +189,7 @@ class CabinLotteryApiDelegateImpl(
 
     override fun performDrawing(drawingId: UUID, seed: Long?): ResponseEntity<DrawingResult> {
         // Get authenticated user (admin performing the drawing)
-        val authentication = SecurityContextHolder.getContext().authentication
-        val user = if (authentication is JwtAuthenticationToken) {
-            userService.getUserBySub(authentication.getSub())
-        } else {
-            null
-        }
-
+        val user = authHelper.getCurrentUser()
         val executedBy = user?.id ?: 0L // Default to 0 if not authenticated (for testing)
 
         // Perform the snake draft drawing
@@ -263,13 +201,7 @@ class CabinLotteryApiDelegateImpl(
 
     override fun publishDrawing(drawingId: UUID, executionId: UUID): ResponseEntity<CabinDrawing> {
         // Get authenticated user (admin publishing the drawing)
-        val authentication = SecurityContextHolder.getContext().authentication
-        val user = if (authentication is JwtAuthenticationToken) {
-            userService.getUserBySub(authentication.getSub())
-        } else {
-            null
-        }
-
+        val user = authHelper.getCurrentUser()
         val publishedBy = user?.id ?: throw IllegalStateException("User must be authenticated to publish drawing")
 
         val drawing = drawingService.publishDrawing(drawingId, executionId, publishedBy)

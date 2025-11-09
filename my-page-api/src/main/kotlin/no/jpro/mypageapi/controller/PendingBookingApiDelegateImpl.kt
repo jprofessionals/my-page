@@ -53,19 +53,10 @@ class PendingBookingApiDelegateImpl(
 
     override fun createPendingBooking(createPendingBooking: no.jpro.mypageapi.model.CreatePendingBooking): ResponseEntity<String> {
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
-        val authentication = SecurityContextHolder.getContext().authentication
-
-        // Get current user
-        val user = if (authHelper.isDevelopmentProfile()) {
-            authHelper.getTestUserById(testUserId)
-        } else null
-            ?: if (authentication is JwtAuthenticationToken) {
-                userService.getUserBySub(authentication.getSub())
-            } else null
-            ?: return ResponseEntity.status(403).body("Forbidden")
+        val user = authHelper.getCurrentUser(testUserId) ?: return ResponseEntity.status(403).body("Forbidden")
 
         val createPendingBookingDTO = pendingBookingMapper.toCreatePendingBookingDTO(createPendingBooking)
-        pendingBookingService.createPendingBooking(createPendingBookingDTO, user!!, false)
+        pendingBookingService.createPendingBooking(createPendingBookingDTO, user, false)
 
         return ResponseEntity.status(201)
             .body("A new booking has been successfully created")
@@ -104,22 +95,13 @@ class PendingBookingApiDelegateImpl(
 
     override fun deleteMyPendingBooking(pendingBookingId: Long): ResponseEntity<String> {
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
-        val authentication = SecurityContextHolder.getContext().authentication
-
-        // Get current user
-        val user = if (authHelper.isDevelopmentProfile()) {
-            authHelper.getTestUserById(testUserId)
-        } else null
-            ?: if (authentication is JwtAuthenticationToken) {
-                userService.getUserBySub(authentication.getSub())
-            } else null
-            ?: return ResponseEntity.status(401).body("Unauthorized")
+        val user = authHelper.getCurrentUser(testUserId) ?: return ResponseEntity.status(401).body("Unauthorized")
 
         val pendingBooking = pendingBookingService.getPendingBooking(pendingBookingId)
             ?: return ResponseEntity.status(404).body("Pending booking not found")
 
         // Check permission
-        if (pendingBooking.employee?.id != user?.id) {
+        if (pendingBooking.employee?.id != user.id) {
             return ResponseEntity.status(403).body("Forbidden")
         }
 
@@ -129,22 +111,13 @@ class PendingBookingApiDelegateImpl(
 
     override fun updatePendingBooking(pendingBookingId: Long, bookingUpdate: no.jpro.mypageapi.model.BookingUpdate): ResponseEntity<Unit> {
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
-        val authentication = SecurityContextHolder.getContext().authentication
-
-        // Get current user
-        val user = if (authHelper.isDevelopmentProfile()) {
-            authHelper.getTestUserById(testUserId)
-        } else null
-            ?: if (authentication is JwtAuthenticationToken) {
-                userService.getUserBySub(authentication.getSub())
-            } else null
-            ?: return ResponseEntity.status(401).build()
+        val user = authHelper.getCurrentUser(testUserId) ?: return ResponseEntity.status(401).build()
 
         val bookingToEdit = pendingBookingService.getPendingBooking(pendingBookingId)
             ?: return ResponseEntity.notFound().build()
 
         // Check permission
-        if (bookingToEdit.employee?.id != user?.id) {
+        if (bookingToEdit.employee?.id != user.id) {
             return ResponseEntity.status(403).build()
         }
 

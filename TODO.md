@@ -205,37 +205,21 @@ Frontend-tester er ikke nødvendige fordi:
 
 ---
 
-## 7. 🔄 Migrere backend controllers til OpenAPI delegates
-**Status: DELVIS FERDIG (1/3 controllers migrert)**
+## 7. ✅ Migrere backend controllers til OpenAPI delegates
+**Status: FULLFØRT - Alle user-facing controllers migrert**
 
 Backend-kontrollere migreres fra tradisjonelle @RestController til OpenAPI delegate pattern for å sikre at all API-funksjonalitet er definert i OpenAPI spec.
 
 ### Fullførte migrasjoner:
 
 #### ✅ MeController.kt
-- **Status:** FERDIG - Disabled i denne økten
-- **Endepunkter migrert:** GET /me
-- **Implementering:** UserApiDelegateImpl.getMe()
+- **Status:** FERDIG
+- **Endepunkter migrert:** GET /me, GET /me/budgets, GET /me/bookings, GET /me/pendingBookings
+- **Implementering:** UserApiDelegateImpl, BudgetApiDelegateImpl, BookingApiDelegateImpl, PendingBookingApiDelegateImpl
 - **Notater:** MeController er deaktivert med `// @RestController` kommentar
-- **Alle tester passerer:** 82 tester, 0 feil
-
-### Gjenstående migrasjoner:
-
-#### ⏸️ SubscriptionController.kt
-- **Status:** UTSATT - For kompleks for nå
-- **Endepunkter:**
-  - POST /subscription/{tag}
-  - GET /subscription/list
-  - DELETE /subscription/{tag}
-- **Problemer:**
-  - Testene feilet med 500 INTERNAL_SERVER_ERROR etter migrering
-  - Autentisering/routing konflikter ikke løst
-  - Forsøkte flere autentiseringsmønstre uten suksess
-- **Beslutning:** Kontroller re-aktivert med TODO-kommentar for fremtidig migrering
-- **Kommentar i kode:** "Legacy SubscriptionController - not yet migrated to OpenAPI"
 
 #### ✅ BookingController.kt
-- **Status:** FERDIG - Disabled i denne økten
+- **Status:** FERDIG
 - **Legacy endepunkter (ubrukte):**
   - GET /booking/{bookingID}
   - GET /booking/employee/{employee_id}
@@ -243,6 +227,78 @@ Backend-kontrollere migreres fra tradisjonelle @RestController til OpenAPI deleg
 - **Avgjørelse:** Disse endpoints brukes ikke i frontend eller tester, så de er deaktivert
 - **Notater:** BookingController er deaktivert med `// @RestController` kommentar
 - **Kommentar i kode:** "Legacy BookingController - fully replaced by BookingApiDelegateImpl"
+
+#### ✅ AdminController.kt
+- **Status:** FERDIG
+- **Endepunkter migrert:** GET /admin/budgetSummary
+- **Implementering:** AdminApiDelegateImpl
+- **Notater:** Ny BudgetMapper.toBudgetSummaryModel() for mapping
+- **Controller disabled:** Ja
+
+#### ✅ SettingsController.kt
+- **Status:** FERDIG
+- **Endepunkter migrert:**
+  - GET /settings - Alle innstillinger
+  - GET /settings/{settingId} - Spesifikk innstilling (ble lagt til i OpenAPI spec)
+  - PATCH /settings/{settingId} - Oppdater innstilling
+- **Implementering:** SettingsApiDelegateImpl
+- **Notater:** GET /settings/{settingId} manglet i OpenAPI spec og ble lagt til
+- **Controller disabled:** Ja
+
+#### ✅ SubscriptionController.kt (Attempt 2 - SUCCESS!)
+- **Status:** FERDIG - Migrert på andre forsøk
+- **Endepunkter migrert:**
+  - POST /subscription/{tag}
+  - GET /subscription/list
+  - DELETE /subscription/{tag}
+- **Implementering:** SubscriptionApiDelegateImpl
+- **Problemer løst:**
+  - Første forsøk feilet pga content type negotiation
+  - Løst ved å bruke `*/*` content type i OpenAPI spec
+  - Bruker korrekt `X-Test-User-Id` header
+  - Alle 9 subscription-tester passerer nå
+- **Notater:** Controller disabled, alle endepunkter i OpenAPI spec
+- **Tester:** 9/9 passerer ✓
+
+### Controllers som forblir som @RestController (infrastruktur):
+
+#### ✅ TaskController.kt
+- **Status:** BEHOLD SOM @RestController
+- **Årsak:** Cron job triggers for GCP Cloud Scheduler
+- **Endepunkter:**
+  - GET /task/drawPendingBookings - Trigger hyttetrekning
+  - GET /task/notifyUpcomingBookings - Send Slack-varsler
+- **Autentisering:** Custom `auth-key` header (ikke JWT)
+- **Konklusjon:** Infrastruktur-endpoint, skal ikke i OpenAPI spec
+
+#### ✅ NotificationJobController.kt
+- **Status:** BEHOLD SOM @RestController
+- **Årsak:** GCP Cloud Scheduler cron job endpoint
+- **Endepunkter:** GET /job/generate-notifications
+- **Autentisering:** `@RequiresCron` annotation for GCP
+- **Konfigurasjon:** cron.yaml kjører hver 15. minutt
+- **Konklusjon:** Infrastruktur-endpoint, skal ikke i OpenAPI spec
+
+#### ✅ SlackController.kt
+- **Status:** BEHOLD SOM @RestController
+- **Årsak:** Admin/debugging utility
+- **Endepunkter:** POST /slack/message
+- **Bruk:** Manuell sending av Slack-meldinger (admin tool)
+- **Konklusjon:** Intern admin-funksjon, skal ikke i OpenAPI spec
+
+#### ⚠️ GptController.kt
+- **Status:** UBRUKT - Vurder fjerning
+- **Årsak:** Eksperimentell AI-funksjon som ikke brukes i frontend
+- **Endepunkter:** POST /openai/chat
+- **Anbefaling:** Vurder om funksjonen trengs, hvis ikke - fjern
+- **Hvis beholdes:** Burde migreres til OpenAPI
+
+#### ⚠️ ImageController.kt
+- **Status:** EVALUERES - Vurder Cloud Storage
+- **Årsak:** Serverer bildefiler direkte
+- **Endepunkter:** GET /image/{fileName}
+- **Anbefaling:** Bruk GCP Cloud Storage med signed URLs i stedet
+- **Hvis beholdes:** Kan migreres til OpenAPI med binary response schema
 
 ### Forbedringer fullført:
 

@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 
-@RestController
+// DEPRECATED: This controller has been migrated to OpenAPI delegate pattern.
+// See SettingsApiDelegateImpl.kt for the new implementation.
+// @RestController
 @RequestMapping("settings")
 @SecurityRequirement(name = "Bearer Authentication")
 class SettingsController(private val settingsService: SettingsService) {

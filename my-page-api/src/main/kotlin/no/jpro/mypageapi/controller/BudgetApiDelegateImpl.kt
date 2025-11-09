@@ -10,6 +10,7 @@ import no.jpro.mypageapi.model.UpdatePost
 import no.jpro.mypageapi.repository.BudgetRepository
 import no.jpro.mypageapi.service.BudgetService
 import no.jpro.mypageapi.service.UserService
+import no.jpro.mypageapi.utils.AuthenticationHelper
 import no.jpro.mypageapi.utils.mapper.BudgetMapper
 import no.jpro.mypageapi.utils.mapper.PostMapper
 import org.springframework.http.HttpStatus
@@ -27,6 +28,7 @@ class BudgetApiDelegateImpl(
     private val userService: UserService,
     private val budgetMapper: BudgetMapper,
     private val postMapper: PostMapper,
+    private val authHelper: AuthenticationHelper,
     private val request: Optional<NativeWebRequest>
 ) : BudgetApiDelegate {
 
@@ -53,13 +55,10 @@ class BudgetApiDelegateImpl(
     }
 
     override fun createBudgetPost(budgetId: Long, createPost: CreatePost): ResponseEntity<Post> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication !is JwtAuthenticationToken) {
-            return ResponseEntity.status(401).build()
-        }
+        val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
+        val user = authHelper.getCurrentUser(testUserId) ?: return ResponseEntity.status(401).build()
 
         val budget = budgetService.getBudget(budgetId) ?: return ResponseEntity.badRequest().build()
-        val user = userService.getUserBySub(authentication.getSub()) ?: return ResponseEntity.badRequest().build()
 
         // Check permission
         if (budget.user?.id != user.id && !user.admin) {
@@ -73,13 +72,10 @@ class BudgetApiDelegateImpl(
     }
 
     override fun deleteBudgetPost(postId: Long): ResponseEntity<Unit> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication !is JwtAuthenticationToken) {
-            return ResponseEntity.status(401).build()
-        }
+        val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
+        val user = authHelper.getCurrentUser(testUserId) ?: return ResponseEntity.status(401).build()
 
         val postToDelete = budgetService.getPost(postId) ?: return ResponseEntity.notFound().build()
-        val user = userService.getUserBySub(authentication.getSub()) ?: return ResponseEntity.badRequest().build()
         val budget = postToDelete.budget ?: return ResponseEntity.badRequest().build()
 
         // Check permission
@@ -96,13 +92,10 @@ class BudgetApiDelegateImpl(
     }
 
     override fun updateBudgetPost(postId: Long, updatePost: UpdatePost): ResponseEntity<Post> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication !is JwtAuthenticationToken) {
-            return ResponseEntity.status(401).build()
-        }
+        val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
+        val user = authHelper.getCurrentUser(testUserId) ?: return ResponseEntity.status(401).build()
 
         val postToEdit = budgetService.getPost(postId) ?: return ResponseEntity.notFound().build()
-        val user = userService.getUserBySub(authentication.getSub()) ?: return ResponseEntity.badRequest().build()
         val budget = postToEdit.budget ?: return ResponseEntity.badRequest().build()
 
         // Check permission

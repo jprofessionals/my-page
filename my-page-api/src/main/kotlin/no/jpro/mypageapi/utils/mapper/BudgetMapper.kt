@@ -1,11 +1,15 @@
 package no.jpro.mypageapi.utils.mapper
 
 import no.jpro.mypageapi.dto.BudgetDTO
+import no.jpro.mypageapi.dto.BudgetSummary as BudgetSummaryDTO
+import no.jpro.mypageapi.dto.BudgetYearSummary as BudgetYearSummaryDTO
 import no.jpro.mypageapi.entity.Budget
 import org.springframework.stereotype.Service
 import no.jpro.mypageapi.model.Budget as BudgetModel
 import no.jpro.mypageapi.model.BudgetDetail
 import no.jpro.mypageapi.model.BudgetDetailBudgetType
+import no.jpro.mypageapi.model.BudgetSummary as BudgetSummaryModel
+import no.jpro.mypageapi.model.BudgetYearSummary as BudgetYearSummaryModel
 import java.math.BigDecimal
 
 @Service
@@ -77,6 +81,22 @@ class BudgetMapper(
             startDate = budget.startDate,
             startAmount = BigDecimal.valueOf(budget.startAmount),
             hours = emptyList() // Hours are complex and not needed for the API yet
+        )
+    }
+
+    fun toBudgetSummaryModel(budgetSummaryDTO: BudgetSummaryDTO): BudgetSummaryModel {
+        return BudgetSummaryModel(
+            year = budgetSummaryDTO.year,
+            yearSummary = budgetSummaryDTO.yearSummary.map { toBudgetYearSummaryModel(it) }
+        )
+    }
+
+    private fun toBudgetYearSummaryModel(budgetYearSummaryDTO: BudgetYearSummaryDTO): BudgetYearSummaryModel {
+        return BudgetYearSummaryModel(
+            sum = BigDecimal.valueOf(budgetYearSummaryDTO.sum),
+            hours = BigDecimal.valueOf(budgetYearSummaryDTO.hours),
+            balance = BigDecimal.valueOf(budgetYearSummaryDTO.balance),
+            budgetType = budgetYearSummaryDTO.budgetType?.let { budgetTypeMapper.toBudgetTypeModel(it) }
         )
     }
 
