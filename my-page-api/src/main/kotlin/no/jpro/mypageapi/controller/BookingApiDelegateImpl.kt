@@ -7,6 +7,7 @@ import no.jpro.mypageapi.model.Booking
 import no.jpro.mypageapi.model.BookingUpdate
 import no.jpro.mypageapi.service.BookingService
 import no.jpro.mypageapi.service.UserService
+import no.jpro.mypageapi.utils.AuthenticationHelper
 import no.jpro.mypageapi.utils.mapper.ApartmentMapper
 import no.jpro.mypageapi.utils.mapper.BookingMapper
 import org.springframework.http.HttpStatus
@@ -24,7 +25,7 @@ class BookingApiDelegateImpl(
     private val userService: UserService,
     private val bookingMapper: BookingMapper,
     private val apartmentMapper: ApartmentMapper,
-    private val environment: org.springframework.core.env.Environment,
+    private val authHelper: AuthenticationHelper,
     private val request: Optional<NativeWebRequest>
 ) : BookingApiDelegate {
 
@@ -55,15 +56,9 @@ class BookingApiDelegateImpl(
 
     override fun deleteBooking(bookingId: Long): ResponseEntity<Unit> {
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
-        val authentication = SecurityContextHolder.getContext().authentication
 
         // Get current user
-        val user = if (isDevelopmentProfile()) {
-            userService.getTestUserById(testUserId)
-        } else null
-            ?: if (authentication is JwtAuthenticationToken) {
-                userService.getUserBySub(authentication.getSub())
-            } else null
+        val user = authHelper.getCurrentUser(testUserId)
             ?: return ResponseEntity.status(401).build()
 
         // Check if booking exists
@@ -71,7 +66,7 @@ class BookingApiDelegateImpl(
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
 
         // Check permission
-        if (booking.employee?.id != user?.id) {
+        if (booking.employee?.id != user.id) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
@@ -81,15 +76,9 @@ class BookingApiDelegateImpl(
 
     override fun updateBooking(bookingId: Long, bookingUpdate: BookingUpdate): ResponseEntity<Unit> {
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
-        val authentication = SecurityContextHolder.getContext().authentication
 
         // Get current user
-        val user = if (isDevelopmentProfile()) {
-            userService.getTestUserById(testUserId)
-        } else null
-            ?: if (authentication is JwtAuthenticationToken) {
-                userService.getUserBySub(authentication.getSub())
-            } else null
+        val user = authHelper.getCurrentUser(testUserId)
             ?: return ResponseEntity.status(401).build()
 
         // Check if booking exists
@@ -97,7 +86,7 @@ class BookingApiDelegateImpl(
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
 
         // Check permission
-        if (bookingToEdit.employee?.id != user?.id) {
+        if (bookingToEdit.employee?.id != user.id) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
@@ -140,9 +129,5 @@ class BookingApiDelegateImpl(
         } catch (e: IllegalArgumentException) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build()
         }
-    }
-
-    private fun isDevelopmentProfile(): Boolean {
-        return environment.activeProfiles.any { it == "local" || it == "h2" }
     }
 }

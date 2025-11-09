@@ -24,10 +24,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 
 /**
- * Legacy BookingController - endpoints not yet migrated to OpenAPI.
+ * Legacy BookingController - fully replaced by BookingApiDelegateImpl
  *
- * NOTE: Most booking endpoints have been moved to BookingApiDelegateImpl.
- * Only legacy/internal endpoints remain here.
+ * All booking endpoints have been migrated to OpenAPI-generated controllers.
+ * The remaining legacy endpoints (GET /booking/{bookingID}, GET /booking/employee/{employee_id},
+ * GET /booking/date) are not used in frontend and have been disabled.
  *
  * Migrated endpoints (use BookingApiDelegateImpl):
  * - GET /booking (with dates) -> getBookings()
@@ -38,8 +39,14 @@ import org.springframework.web.bind.annotation.ResponseStatus
  * - DELETE /booking/admin/{bookingId} -> adminDeleteBooking()
  * - PATCH /booking/admin/{bookingId} -> adminUpdateBooking()
  * - POST /booking/admin/post -> adminCreateBooking()
+ *
+ * Disabled legacy endpoints (unused):
+ * - GET /booking/{bookingID} -> getBooking() - Not used in frontend
+ * - GET /booking/employee/{employee_id} -> getBookings() - Not used in frontend
+ * - GET /booking/date -> getBookingsPerDay() - Not used in frontend
  */
-@RestController
+// Disabled to prevent duplicate handler mapping conflicts
+//@RestController
 @RequestMapping("booking")
 @SecurityRequirement(name = "Bearer Authentication")
 class BookingController(

@@ -9,6 +9,7 @@ import no.jpro.mypageapi.service.CabinDrawingService
 import no.jpro.mypageapi.service.CabinLotteryService
 import no.jpro.mypageapi.service.CabinWishService
 import no.jpro.mypageapi.service.UserService
+import no.jpro.mypageapi.utils.AuthenticationHelper
 import no.jpro.mypageapi.utils.mapper.ApartmentMapper
 import no.jpro.mypageapi.utils.mapper.CabinLotteryMapper
 import org.springframework.http.ResponseEntity
@@ -27,7 +28,7 @@ class CabinLotteryApiDelegateImpl(
     private val userService: UserService,
     private val cabinLotteryMapper: CabinLotteryMapper,
     private val apartmentMapper: ApartmentMapper,
-    private val environment: org.springframework.core.env.Environment,
+    private val authHelper: AuthenticationHelper,
     private val request: Optional<NativeWebRequest>
 ) : CabinLotteryApiDelegate {
 
@@ -59,8 +60,8 @@ class CabinLotteryApiDelegateImpl(
         // Get current user - try X-Test-User-Id header first (development mode)
         var nullableUser: no.jpro.mypageapi.entity.User? = null
 
-        if (isDevelopmentProfile() && testUserId != null) {
-            nullableUser = userService.getTestUserById(testUserId)
+        if (authHelper.isDevelopmentProfile() && testUserId != null) {
+            nullableUser = authHelper.getTestUserById(testUserId)
         }
 
         // If not found via test header, try JWT authentication
@@ -90,8 +91,8 @@ class CabinLotteryApiDelegateImpl(
         // Get current user - try X-Test-User-Id header first (development mode)
         var nullableUser: no.jpro.mypageapi.entity.User? = null
 
-        if (isDevelopmentProfile() && testUserId != null) {
-            nullableUser = userService.getTestUserById(testUserId)
+        if (authHelper.isDevelopmentProfile() && testUserId != null) {
+            nullableUser = authHelper.getTestUserById(testUserId)
         }
 
         // If not found via test header, try JWT authentication
@@ -118,8 +119,8 @@ class CabinLotteryApiDelegateImpl(
         // Get current user - try X-Test-User-Id header first (development mode)
         var nullableUser: no.jpro.mypageapi.entity.User? = null
 
-        if (isDevelopmentProfile() && testUserId != null) {
-            nullableUser = userService.getTestUserById(testUserId)
+        if (authHelper.isDevelopmentProfile() && testUserId != null) {
+            nullableUser = authHelper.getTestUserById(testUserId)
         }
 
         // If not found via test header, try JWT authentication
@@ -299,9 +300,5 @@ class CabinLotteryApiDelegateImpl(
     override fun deleteExecution(drawingId: UUID, executionId: UUID): ResponseEntity<Unit> {
         drawingService.deleteExecution(drawingId, executionId)
         return ResponseEntity.noContent().build()
-    }
-
-    private fun isDevelopmentProfile(): Boolean {
-        return environment.activeProfiles.any { it == "local" || it == "h2" || it == "test" }
     }
 }

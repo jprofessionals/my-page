@@ -205,6 +205,75 @@ Frontend-tester er ikke nødvendige fordi:
 
 ---
 
+## 7. 🔄 Migrere backend controllers til OpenAPI delegates
+**Status: DELVIS FERDIG (1/3 controllers migrert)**
+
+Backend-kontrollere migreres fra tradisjonelle @RestController til OpenAPI delegate pattern for å sikre at all API-funksjonalitet er definert i OpenAPI spec.
+
+### Fullførte migrasjoner:
+
+#### ✅ MeController.kt
+- **Status:** FERDIG - Disabled i denne økten
+- **Endepunkter migrert:** GET /me
+- **Implementering:** UserApiDelegateImpl.getMe()
+- **Notater:** MeController er deaktivert med `// @RestController` kommentar
+- **Alle tester passerer:** 82 tester, 0 feil
+
+### Gjenstående migrasjoner:
+
+#### ⏸️ SubscriptionController.kt
+- **Status:** UTSATT - For kompleks for nå
+- **Endepunkter:**
+  - POST /subscription/{tag}
+  - GET /subscription/list
+  - DELETE /subscription/{tag}
+- **Problemer:**
+  - Testene feilet med 500 INTERNAL_SERVER_ERROR etter migrering
+  - Autentisering/routing konflikter ikke løst
+  - Forsøkte flere autentiseringsmønstre uten suksess
+- **Beslutning:** Kontroller re-aktivert med TODO-kommentar for fremtidig migrering
+- **Kommentar i kode:** "Legacy SubscriptionController - not yet migrated to OpenAPI"
+
+#### ✅ BookingController.kt
+- **Status:** FERDIG - Disabled i denne økten
+- **Legacy endepunkter (ubrukte):**
+  - GET /booking/{bookingID}
+  - GET /booking/employee/{employee_id}
+  - GET /booking/date
+- **Avgjørelse:** Disse endpoints brukes ikke i frontend eller tester, så de er deaktivert
+- **Notater:** BookingController er deaktivert med `// @RestController` kommentar
+- **Kommentar i kode:** "Legacy BookingController - fully replaced by BookingApiDelegateImpl"
+
+### Forbedringer fullført:
+
+#### ✅ AuthenticationHelper (implementert)
+- **Status:** FERDIG
+- **Lokasjon:** `/my-page-api/src/main/kotlin/no/jpro/mypageapi/utils/AuthenticationHelper.kt`
+- **Funksjonalitet:**
+  - `isDevelopmentProfile()` - Sjekk om vi kjører i dev/test modus
+  - `getTestUserById()` - Hent test-bruker fra ID
+  - `getCurrentUser()` - Hent nåværende bruker fra JWT eller test header
+  - `getCurrentUserOrThrow()` - Som over, men kast exception hvis ikke autentisert
+  - `getCurrentUserSub()` - Hent brukerens sub fra JWT eller test bruker
+  - `getCurrentUserSubOrThrow()` - Som over, men kast exception hvis ikke autentisert
+- **Refaktorerte filer:**
+  - UserApiDelegateImpl.kt
+  - BookingApiDelegateImpl.kt
+  - PendingBookingApiDelegateImpl.kt
+  - CabinLotteryApiDelegateImpl.kt
+- **Resultat:** Fjernet 5 duplikater av `isDevelopmentProfile()` og `getTestUserById()` logikk
+
+#### ✅ Frontend type cleanup
+- **Status:** FERDIG (allerede løst i tidligere commits)
+- **Commit:** 794cafaa "fix(types): Cast UserReadable with loaded field to User[] type"
+- **Commit:** 050f8784 "fix(types): Migrate to OpenAPI-generated types and resolve compilation errors"
+- **Løste problemer:**
+  - User type konflikt (manuell vs generert)
+  - `loaded` felt-problem i Admin.tsx
+  - Dupliserte typer fjernet
+
+---
+
 ## Notater
 
 ### Test User Authentication

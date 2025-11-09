@@ -5,6 +5,7 @@ import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.model.PendingBookingDTO
 import no.jpro.mypageapi.service.PendingBookingService
 import no.jpro.mypageapi.service.UserService
+import no.jpro.mypageapi.utils.AuthenticationHelper
 import no.jpro.mypageapi.utils.mapper.PendingBookingMapper
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
@@ -19,7 +20,7 @@ class PendingBookingApiDelegateImpl(
     private val userService: UserService,
     private val pendingBookingMapper: PendingBookingMapper,
     private val bookingLotteryService: no.jpro.mypageapi.service.BookingLotteryService,
-    private val environment: org.springframework.core.env.Environment,
+    private val authHelper: AuthenticationHelper,
     private val request: Optional<NativeWebRequest>
 ) : PendingBookingApiDelegate {
 
@@ -30,8 +31,8 @@ class PendingBookingApiDelegateImpl(
         val authentication = SecurityContextHolder.getContext().authentication
 
         // In development mode, support test user header
-        if (isDevelopmentProfile()) {
-            val testUser = userService.getTestUserById(testUserId)
+        if (authHelper.isDevelopmentProfile()) {
+            val testUser = authHelper.getTestUserById(testUserId)
             if (testUser?.sub != null) {
                 val pendingBookingDTOs = pendingBookingService.getUserPendingBookings(testUser.sub)
                 val models = pendingBookingDTOs.map { pendingBookingMapper.toPendingBookingModel(it) }
@@ -55,8 +56,8 @@ class PendingBookingApiDelegateImpl(
         val authentication = SecurityContextHolder.getContext().authentication
 
         // Get current user
-        val user = if (isDevelopmentProfile()) {
-            userService.getTestUserById(testUserId)
+        val user = if (authHelper.isDevelopmentProfile()) {
+            authHelper.getTestUserById(testUserId)
         } else null
             ?: if (authentication is JwtAuthenticationToken) {
                 userService.getUserBySub(authentication.getSub())
@@ -106,8 +107,8 @@ class PendingBookingApiDelegateImpl(
         val authentication = SecurityContextHolder.getContext().authentication
 
         // Get current user
-        val user = if (isDevelopmentProfile()) {
-            userService.getTestUserById(testUserId)
+        val user = if (authHelper.isDevelopmentProfile()) {
+            authHelper.getTestUserById(testUserId)
         } else null
             ?: if (authentication is JwtAuthenticationToken) {
                 userService.getUserBySub(authentication.getSub())
@@ -131,8 +132,8 @@ class PendingBookingApiDelegateImpl(
         val authentication = SecurityContextHolder.getContext().authentication
 
         // Get current user
-        val user = if (isDevelopmentProfile()) {
-            userService.getTestUserById(testUserId)
+        val user = if (authHelper.isDevelopmentProfile()) {
+            authHelper.getTestUserById(testUserId)
         } else null
             ?: if (authentication is JwtAuthenticationToken) {
                 userService.getUserBySub(authentication.getSub())
@@ -154,9 +155,5 @@ class PendingBookingApiDelegateImpl(
         } catch (e: IllegalArgumentException) {
             return ResponseEntity.status(400).build()
         }
-    }
-
-    private fun isDevelopmentProfile(): Boolean {
-        return environment.activeProfiles.any { it == "local" || it == "h2" || it == "test" }
     }
 }
