@@ -56,17 +56,30 @@ class CabinLotteryApiDelegateImpl(
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
         val authentication = SecurityContextHolder.getContext().authentication
 
-        // Get current user
-        val user = if (isDevelopmentProfile()) {
-            userService.getTestUserById(testUserId)
-        } else null
-            ?: if (authentication is JwtAuthenticationToken) {
-                userService.getUserBySub(authentication.getSub())
-            } else null
-            ?: return ResponseEntity.status(401).build()
+        // Get current user - try X-Test-User-Id header first (development mode)
+        var nullableUser: no.jpro.mypageapi.entity.User? = null
+
+        if (isDevelopmentProfile() && testUserId != null) {
+            nullableUser = userService.getTestUserById(testUserId)
+        }
+
+        // If not found via test header, try JWT authentication
+        if (nullableUser == null && authentication is JwtAuthenticationToken) {
+            nullableUser = userService.getUserBySub(authentication.getSub())
+        }
+
+        // If still no user found, return 401
+        if (nullableUser == null) {
+            return ResponseEntity.status(401).build()
+        }
+
+        val user = nullableUser
+        if (user.id == null) {
+            throw IllegalStateException("User ID cannot be null for user sub: ${user.sub}")
+        }
 
         val bulkCreateWishesDTO = cabinLotteryMapper.toBulkCreateWishesDTO(bulkCreateWishes)
-        val createdWishes = wishService.createWishes(drawingId, user!!, bulkCreateWishesDTO)
+        val createdWishes = wishService.createWishes(drawingId, user, bulkCreateWishesDTO)
         return ResponseEntity.ok(createdWishes.map { cabinLotteryMapper.toCabinWishModel(it) })
     }
 
@@ -74,16 +87,27 @@ class CabinLotteryApiDelegateImpl(
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
         val authentication = SecurityContextHolder.getContext().authentication
 
-        // Get current user
-        val user = if (isDevelopmentProfile()) {
-            userService.getTestUserById(testUserId)
-        } else null
-            ?: if (authentication is JwtAuthenticationToken) {
-                userService.getUserBySub(authentication.getSub())
-            } else null
-            ?: return ResponseEntity.status(401).build()
+        // Get current user - try X-Test-User-Id header first (development mode)
+        var nullableUser: no.jpro.mypageapi.entity.User? = null
 
-        val wishes = wishService.getUserWishes(drawingId, user?.id!!)
+        if (isDevelopmentProfile() && testUserId != null) {
+            nullableUser = userService.getTestUserById(testUserId)
+        }
+
+        // If not found via test header, try JWT authentication
+        if (nullableUser == null && authentication is JwtAuthenticationToken) {
+            nullableUser = userService.getUserBySub(authentication.getSub())
+        }
+
+        // If still no user found, return 401
+        if (nullableUser == null) {
+            return ResponseEntity.status(401).build()
+        }
+
+        val user = nullableUser
+        val userId = user.id ?: throw IllegalStateException("User ID cannot be null for user sub: ${user.sub}")
+
+        val wishes = wishService.getUserWishes(drawingId, userId)
         return ResponseEntity.ok(wishes.map { cabinLotteryMapper.toCabinWishModel(it) })
     }
 
@@ -91,17 +115,28 @@ class CabinLotteryApiDelegateImpl(
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
         val authentication = SecurityContextHolder.getContext().authentication
 
-        // Get current user
-        val user = if (isDevelopmentProfile()) {
-            userService.getTestUserById(testUserId)
-        } else null
-            ?: if (authentication is JwtAuthenticationToken) {
-                userService.getUserBySub(authentication.getSub())
-            } else null
-            ?: return ResponseEntity.status(401).build()
+        // Get current user - try X-Test-User-Id header first (development mode)
+        var nullableUser: no.jpro.mypageapi.entity.User? = null
+
+        if (isDevelopmentProfile() && testUserId != null) {
+            nullableUser = userService.getTestUserById(testUserId)
+        }
+
+        // If not found via test header, try JWT authentication
+        if (nullableUser == null && authentication is JwtAuthenticationToken) {
+            nullableUser = userService.getUserBySub(authentication.getSub())
+        }
+
+        // If still no user found, return 401
+        if (nullableUser == null) {
+            return ResponseEntity.status(401).build()
+        }
+
+        val user = nullableUser
+        val userId = user.id ?: throw IllegalStateException("User ID cannot be null for user sub: ${user.sub}")
 
         val allocations = drawingService.getAllocations(drawingId)
-            .filter { it.userId == user?.id }
+            .filter { it.userId == userId }
         return ResponseEntity.ok(allocations.map { cabinLotteryMapper.toCabinAllocationModel(it) })
     }
 
