@@ -21,6 +21,16 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * TODO: SubscriptionController migration to OpenAPI in progress
+ * SubscriptionApiDelegateImpl has been created but tests are failing
+ * Keeping this controller active until migration is complete
+ *
+ * Target endpoints for migration:
+ * - POST /subscription/{tag} -> SubscriptionApiDelegateImpl.createSubscription()
+ * - GET /subscription/list -> SubscriptionApiDelegateImpl.listSubscriptions()
+ * - DELETE /subscription/{tag} -> SubscriptionApiDelegateImpl.deleteSubscription()
+ */
 @RestController
 @RequestMapping("subscription")
 @Tag(

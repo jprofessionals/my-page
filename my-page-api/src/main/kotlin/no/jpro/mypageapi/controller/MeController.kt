@@ -26,7 +26,18 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RestController
+/**
+ * MeController has been fully replaced by OpenAPI-generated controllers
+ * All endpoints are now handled by their respective ApiDelegateImpl classes
+ *
+ * Migrated endpoints:
+ * - GET /me -> UserApiDelegateImpl.getMe()
+ * - GET /me/budgets -> BudgetApiDelegateImpl.getMyBudgets()
+ * - GET /me/bookings -> BookingApiDelegateImpl.getMyBookings()
+ * - GET /me/pendingBookings -> PendingBookingApiDelegateImpl.getMyPendingBookings()
+ */
+// Disabled to prevent duplicate handler mapping conflicts
+//@RestController
 @RequestMapping("me")
 @SecurityRequirement(name = "Bearer Authentication")
 class MeController(
