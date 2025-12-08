@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <!-- Sales Pipeline Feature - Additional columns for sales_activity table -->
+
+    <changeSet id="200.017-1" author="JProfessionals">
+        <comment>Add customer_name column for free-text customer names</comment>
+        <addColumn tableName="sales_activity">
+            <column name="customer_name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="200.017-2" author="JProfessionals">
+        <comment>Add supplier_name column for broker/supplier names (when subcontracting)</comment>
+        <addColumn tableName="sales_activity">
+            <column name="supplier_name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="200.017-3" author="JProfessionals">
+        <comment>Add max_price column for maximum hourly rate</comment>
+        <addColumn tableName="sales_activity">
+            <column name="max_price" type="INT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="200.017-4" author="JProfessionals">
+        <comment>Add offered_price column for offered hourly rate</comment>
+        <addColumn tableName="sales_activity">
+            <column name="offered_price" type="INT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="200.017-5" author="JProfessionals">
+        <comment>Add offer_deadline column for tracking submission deadlines</comment>
+        <addColumn tableName="sales_activity">
+            <column name="offer_deadline" type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="200.017-6" author="JProfessionals">
+        <comment>Add deadline_reminder_sent column to track if Slack reminder has been sent</comment>
+        <addColumn tableName="sales_activity">
+            <column name="deadline_reminder_sent" type="BIT(1)" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

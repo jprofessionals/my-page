@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="200.019-1" author="JProfessionals">
+        <comment>Change offer_deadline from DATE to DATETIME to support time-based deadlines</comment>
+        <modifyDataType tableName="sales_activity" columnName="offer_deadline" newDataType="DATETIME"/>
+    </changeSet>
+
+    <changeSet id="200.019-2" author="JProfessionals">
+        <comment>Add offer_deadline_asap flag for ASAP deadlines</comment>
+        <addColumn tableName="sales_activity">
+            <column name="offer_deadline_asap" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

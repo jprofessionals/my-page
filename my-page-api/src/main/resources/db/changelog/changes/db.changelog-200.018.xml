@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <!-- Migrate PROSPECTING stage to INTERESTED after removing PROSPECTING from enum -->
+
+    <changeSet id="200.018-1" author="JProfessionals">
+        <comment>Migrate sales_activity records from PROSPECTING to INTERESTED stage</comment>
+        <update tableName="sales_activity">
+            <column name="current_stage" value="INTERESTED"/>
+            <where>current_stage = 'PROSPECTING'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="200.018-2" author="JProfessionals">
+        <comment>Migrate sales_stage_history records from PROSPECTING to INTERESTED</comment>
+        <update tableName="sales_stage_history">
+            <column name="from_stage" value="INTERESTED"/>
+            <where>from_stage = 'PROSPECTING'</where>
+        </update>
+        <update tableName="sales_stage_history">
+            <column name="to_stage" value="INTERESTED"/>
+            <where>to_stage = 'PROSPECTING'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

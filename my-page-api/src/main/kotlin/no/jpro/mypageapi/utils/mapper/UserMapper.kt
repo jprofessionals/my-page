@@ -37,7 +37,8 @@ class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
         budgets = listOf()
     )
 
-    fun toUserModel(userDTO: UserDTO): UserModel = UserModel(
+    fun toUserModel(userDTO: UserDTO, id: Long? = null): UserModel = UserModel(
+        id = id,
         email = userDTO.email,
         name = userDTO.name,
         givenName = userDTO.givenName,
@@ -50,5 +51,5 @@ class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
         budgets = null // Budgets are mapped separately to avoid circular dependency
     )
 
-    fun toUserModel(user: User): UserModel = toUserModel(toUserDTO(user))
+    fun toUserModel(user: User): UserModel = toUserModel(toUserDTO(user), user.id)
 }

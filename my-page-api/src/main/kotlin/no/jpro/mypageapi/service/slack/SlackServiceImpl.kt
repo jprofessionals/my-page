@@ -23,6 +23,9 @@ class SlackServiceImpl(
     @Value("\${slack.hyttekanal.id}")
     private var hytteBookingChannel: String = "NOT_SET"
 
+    @Value("\${slack.salgstavle.id:NOT_SET}")
+    private var salesPipelineChannel: String = "NOT_SET"
+
     private val slack = Slack.getInstance()
 
     override fun getUserToNotify(
@@ -114,6 +117,29 @@ class SlackServiceImpl(
 
                 return "Feil ved sending av melding: ${response.error}\n\n ${response.errors}"
 
+            }
+        }
+
+        return "Response == null!"
+    }
+
+    override fun postMessageToSalesPipelineChannel(
+        msg: String
+    ): String {
+        if (salesPipelineChannel == "NOT_SET") {
+            return "Salgstavle-kanal er ikke konfigurert"
+        }
+        val token = secretProvider.getSlackSecret()
+        val methods: MethodsClient? = slack.methods(token)
+        val response = methods?.chatPostMessage {
+            it.channel(salesPipelineChannel).text(msg)
+        }
+
+        if (response != null) {
+            if (response.isOk) {
+                return "Melding sendt til salgstavle-kanal"
+            } else {
+                return "Feil ved sending av melding: ${response.error}\n\n ${response.errors}"
             }
         }
 

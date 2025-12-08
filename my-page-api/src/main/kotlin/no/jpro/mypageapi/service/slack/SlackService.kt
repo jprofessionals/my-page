@@ -25,4 +25,8 @@ interface SlackService {
         msg: String
     ): String
 
+    fun postMessageToSalesPipelineChannel(
+        msg: String
+    ): String
+
 }

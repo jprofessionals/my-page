@@ -50,6 +50,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, [])
 
   useEffect(() => {
+    // Only access storage in browser environment
+    if (typeof window === 'undefined') {
+      return
+    }
+
     const token = sessionStorage.getItem('user_token')
 
     // Check for test user (works in any environment if testUserId is set)
@@ -81,6 +86,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [testUserId, setTestUserId] = useState<string | null>(null)
 
   useEffect(() => {
+    // Only access storage in browser environment
+    if (typeof window === 'undefined') {
+      return
+    }
+
     // Listen for storage changes (when test user changes)
     const handleStorageChange = () => {
       const newTestUserId = localStorage.getItem('testUserId')

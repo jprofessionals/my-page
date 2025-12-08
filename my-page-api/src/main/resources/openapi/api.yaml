@@ -1914,6 +1914,425 @@ paths:
           description: Internal server error
       security:
         - BearerAuth: []
+
+  # Sales Pipeline - Flowcase Consultants
+  /flowcase/consultants:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getFlowcaseConsultants
+      summary: Get all consultants from Flowcase
+      description: Returns all active consultants from Flowcase (CVPartner)
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search query to filter consultants by name or email
+      responses:
+        '200':
+          description: List of consultants from Flowcase
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FlowcaseConsultant'
+        '500':
+          description: Internal server error
+
+  # Sales Pipeline - Consultant Availability
+  /consultants/availability:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getAllConsultantAvailability
+      summary: Get all consultants with their availability status
+      description: Returns all consultants with their current availability status (available, available soon, occupied)
+      responses:
+        '200':
+          description: List of consultant availability
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsultantAvailability'
+        '500':
+          description: Internal server error
+
+  /consultants/{userId}/availability:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getConsultantAvailability
+      summary: Get availability for a specific consultant
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Consultant availability
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultantAvailability'
+        '404':
+          description: Consultant not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - SalesPipeline
+      operationId: updateConsultantAvailability
+      summary: Update consultant availability
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConsultantAvailability'
+      responses:
+        '200':
+          description: Updated consultant availability
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultantAvailability'
+        '404':
+          description: Consultant not found
+        '500':
+          description: Internal server error
+
+  # Sales Pipeline - Sales Activities
+  /sales-activities:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesActivities
+      summary: Get all active sales activities
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ACTIVE, WON, CLOSED_OTHER_WON]
+          description: Filter by status (default ACTIVE)
+      responses:
+        '200':
+          description: List of sales activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesActivity'
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - SalesPipeline
+      operationId: createSalesActivity
+      summary: Create a new sales activity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSalesActivity'
+      responses:
+        '201':
+          description: Created sales activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivity'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /sales-activities/{id}:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesActivity
+      summary: Get a sales activity with history
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Sales activity with history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivityWithHistory'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - SalesPipeline
+      operationId: updateSalesActivity
+      summary: Update a sales activity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSalesActivity'
+      responses:
+        '200':
+          description: Updated sales activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivity'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+        - SalesPipeline
+      operationId: deleteSalesActivity
+      summary: Delete a sales activity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+
+  /sales-activities/{id}/stage:
+    put:
+      tags:
+        - SalesPipeline
+      operationId: updateSalesActivityStage
+      summary: Move sales activity to a new stage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStage'
+      responses:
+        '200':
+          description: Updated sales activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivity'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+
+  /sales-activities/{id}/won:
+    put:
+      tags:
+        - SalesPipeline
+      operationId: markSalesActivityWon
+      summary: Mark sales activity as won (closes other active activities for same consultant)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Updated sales activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivity'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+
+  /sales-activities/{id}/close:
+    put:
+      tags:
+        - SalesPipeline
+      operationId: closeSalesActivity
+      summary: Close a sales activity with a reason
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloseActivity'
+      responses:
+        '200':
+          description: Closed sales activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivity'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+
+  /sales-activities/by-consultant/{userId}:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesActivitiesByConsultant
+      summary: Get all sales activities for a consultant
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: includeInactive
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Include non-active (closed) activities
+      responses:
+        '200':
+          description: List of sales activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesActivity'
+        '500':
+          description: Internal server error
+
+  /sales-activities/by-customer/{customerId}:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesActivitiesByCustomer
+      summary: Get all sales activities for a customer
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: includeInactive
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Include non-active (closed) activities
+      responses:
+        '200':
+          description: List of sales activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesActivity'
+        '500':
+          description: Internal server error
+
+  /sales-activities/board:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesPipelineBoard
+      summary: Get the full sales pipeline board data
+      description: Returns all consultants with availability and their active sales activities, grouped for board display
+      responses:
+        '200':
+          description: Sales pipeline board data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesPipelineBoard'
+        '500':
+          description: Internal server error
+
+  /sales-activities/consultant/{userId}:
+    delete:
+      tags:
+        - SalesPipeline
+      operationId: removeConsultantFromPipeline
+      summary: Remove a consultant from the sales pipeline
+      description: Deletes all sales activities and availability info for a consultant. Used when a consultant leaves the company.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The user ID of the consultant to remove
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Consultant removed from pipeline successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Consultant not found
+        '500':
+          description: Internal server error
+
 components:
   schemas:
     Customer:
@@ -2071,6 +2490,9 @@ components:
     User:
       type: object
       properties:
+        id:
+          type: integer
+          format: int64
         email:
           type: string
         name:
@@ -2834,3 +3256,353 @@ components:
         - hours
         - createdBy
         - dateOfUsage
+
+    # Sales Pipeline Schemas
+    FlowcaseConsultant:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Flowcase user ID
+        email:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        imageUrl:
+          type: string
+          nullable: true
+      required:
+        - id
+
+    AvailabilityStatus:
+      type: string
+      enum: [AVAILABLE, AVAILABLE_SOON, OCCUPIED]
+      description: Consultant availability status
+
+    ActivityStatus:
+      type: string
+      enum: [ACTIVE, WON, CLOSED_OTHER_WON]
+      description: Sales activity status
+
+    SalesStage:
+      type: string
+      enum: [INTERESTED, SENT_TO_SUPPLIER, SENT_TO_CUSTOMER, INTERVIEW, LOST]
+      description: Stage in the sales process
+
+    ClosedReason:
+      type: string
+      enum: [REJECTED_BY_SUPPLIER, REJECTED_BY_CUSTOMER, MISSING_REQUIREMENTS, OTHER_CANDIDATE_CHOSEN, ASSIGNMENT_CANCELLED, CONSULTANT_UNAVAILABLE, CONSULTANT_WON_OTHER, OTHER]
+      description: Reason why a sales activity was closed
+
+    ConsultantAvailability:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        consultant:
+          $ref: '#/components/schemas/User'
+        status:
+          $ref: '#/components/schemas/AvailabilityStatus'
+        availableFrom:
+          type: string
+          format: date
+          nullable: true
+        currentCustomer:
+          $ref: '#/components/schemas/Customer'
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
+          nullable: true
+      required:
+        - id
+        - consultant
+        - status
+        - updatedAt
+
+    UpdateConsultantAvailability:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/AvailabilityStatus'
+        availableFrom:
+          type: string
+          format: date
+          nullable: true
+        currentCustomerId:
+          type: integer
+          format: int64
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+      required:
+        - status
+
+    SalesActivity:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        consultant:
+          $ref: '#/components/schemas/User'
+        customer:
+          $ref: '#/components/schemas/Customer'
+          nullable: true
+        customerName:
+          type: string
+          nullable: true
+          description: Free-text customer name (used when customer is not in the system)
+        supplierName:
+          type: string
+          nullable: true
+          description: Supplier/broker name (when we are subcontractor)
+        title:
+          type: string
+        currentStage:
+          $ref: '#/components/schemas/SalesStage'
+        status:
+          $ref: '#/components/schemas/ActivityStatus'
+        closedReason:
+          $ref: '#/components/schemas/ClosedReason'
+          nullable: true
+        closedReasonNote:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        maxPrice:
+          type: integer
+          nullable: true
+          description: Maximum hourly rate for the assignment
+        offeredPrice:
+          type: integer
+          nullable: true
+          description: Offered hourly rate for the assignment
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        createdBy:
+          $ref: '#/components/schemas/User'
+          nullable: true
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        expectedStartDate:
+          type: string
+          format: date
+          nullable: true
+        offerDeadline:
+          type: string
+          format: date-time
+          nullable: true
+          description: Deadline for submitting the offer (date and time)
+        offerDeadlineAsap:
+          type: boolean
+          description: If true, the offer deadline is ASAP (as soon as possible)
+      required:
+        - id
+        - consultant
+        - title
+        - currentStage
+        - status
+        - createdAt
+        - updatedAt
+
+    SalesActivityWithHistory:
+      allOf:
+        - $ref: '#/components/schemas/SalesActivity'
+        - type: object
+          properties:
+            stageHistory:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesStageHistoryEntry'
+
+    SalesStageHistoryEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        fromStage:
+          $ref: '#/components/schemas/SalesStage'
+          nullable: true
+        toStage:
+          $ref: '#/components/schemas/SalesStage'
+        changedAt:
+          type: string
+          format: date-time
+        changedBy:
+          $ref: '#/components/schemas/User'
+          nullable: true
+        daysInPreviousStage:
+          type: integer
+          nullable: true
+      required:
+        - id
+        - toStage
+        - changedAt
+
+    CreateSalesActivity:
+      type: object
+      properties:
+        consultantId:
+          type: integer
+          format: int64
+          nullable: true
+          description: Internal consultant user ID (use either this or flowcaseEmail)
+        flowcaseEmail:
+          type: string
+          nullable: true
+          description: Flowcase consultant email (use either this or consultantId)
+        flowcaseName:
+          type: string
+          nullable: true
+          description: Flowcase consultant name (optional, used when creating from Flowcase)
+        customerId:
+          type: integer
+          format: int64
+          nullable: true
+        customerName:
+          type: string
+          nullable: true
+          description: Free-text customer name (used when customer is not in the system)
+        supplierName:
+          type: string
+          nullable: true
+          description: Supplier/broker name (when we are subcontractor)
+        title:
+          type: string
+        currentStage:
+          $ref: '#/components/schemas/SalesStage'
+        notes:
+          type: string
+          nullable: true
+        maxPrice:
+          type: integer
+          nullable: true
+          description: Maximum hourly rate for the assignment
+        offeredPrice:
+          type: integer
+          nullable: true
+          description: Offered hourly rate for the assignment
+        expectedStartDate:
+          type: string
+          format: date
+          nullable: true
+        offerDeadline:
+          type: string
+          format: date-time
+          nullable: true
+          description: Deadline for submitting the offer (date and time)
+        offerDeadlineAsap:
+          type: boolean
+          description: If true, the offer deadline is ASAP (as soon as possible)
+      required:
+        - title
+
+    UpdateSalesActivity:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+          nullable: true
+        customerName:
+          type: string
+          nullable: true
+          description: Free-text customer name (used when customer is not in the system)
+        supplierName:
+          type: string
+          nullable: true
+          description: Supplier/broker name (when we are subcontractor)
+        title:
+          type: string
+        notes:
+          type: string
+          nullable: true
+        maxPrice:
+          type: integer
+          nullable: true
+          description: Maximum hourly rate for the assignment
+        offeredPrice:
+          type: integer
+          nullable: true
+          description: Offered hourly rate for the assignment
+        expectedStartDate:
+          type: string
+          format: date
+          nullable: true
+        offerDeadline:
+          type: string
+          format: date-time
+          nullable: true
+          description: Deadline for submitting the offer (date and time)
+        offerDeadlineAsap:
+          type: boolean
+          description: If true, the offer deadline is ASAP (as soon as possible)
+
+    UpdateStage:
+      type: object
+      properties:
+        stage:
+          $ref: '#/components/schemas/SalesStage'
+      required:
+        - stage
+
+    CloseActivity:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/ClosedReason'
+        note:
+          type: string
+          nullable: true
+      required:
+        - reason
+
+    ConsultantWithActivities:
+      type: object
+      properties:
+        consultant:
+          $ref: '#/components/schemas/User'
+        availability:
+          $ref: '#/components/schemas/ConsultantAvailability'
+          nullable: true
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesActivity'
+      required:
+        - consultant
+        - activities
+
+    SalesPipelineBoard:
+      type: object
+      properties:
+        consultants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsultantWithActivities'
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesStage'
+      required:
+        - consultants
+        - stages

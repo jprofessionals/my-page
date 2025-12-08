@@ -35,4 +35,11 @@ class SlackServiceMock : SlackService {
         return "Melding sendt til kanal med ID mock-id";
     }
 
+    override fun postMessageToSalesPipelineChannel(
+        msg: String
+    ): String {
+        println("[MOCK SLACK] Salgstavle: $msg")
+        return "Melding sendt til salgstavle-kanal (mock)"
+    }
+
 }

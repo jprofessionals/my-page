@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <!-- Sales Pipeline Feature - Consultant Availability and Sales Activities -->
+
+    <changeSet id="200.016-1" author="JProfessionals">
+        <comment>Create consultant_availability table to track consultant availability status</comment>
+        <createTable tableName="consultant_availability">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="consultant_id" type="BIGINT">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="available_from" type="DATE">
+                <constraints nullable="true"/>
+            </column>
+            <column name="current_customer_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="notes" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+            baseTableName="consultant_availability"
+            baseColumnNames="consultant_id"
+            constraintName="fk_consultant_availability_consultant"
+            referencedTableName="user"
+            referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="consultant_availability"
+            baseColumnNames="current_customer_id"
+            constraintName="fk_consultant_availability_customer"
+            referencedTableName="customer"
+            referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="consultant_availability"
+            baseColumnNames="updated_by_id"
+            constraintName="fk_consultant_availability_updated_by"
+            referencedTableName="user"
+            referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="200.016-2" author="JProfessionals">
+        <comment>Create sales_activity table to track sales processes per consultant</comment>
+        <createTable tableName="sales_activity">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="consultant_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="title" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_stage" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="closed_reason" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="closed_reason_note" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="notes" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="closed_at" type="DATETIME">
+                <constraints nullable="true"/>
+            </column>
+            <column name="expected_start_date" type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+            baseTableName="sales_activity"
+            baseColumnNames="consultant_id"
+            constraintName="fk_sales_activity_consultant"
+            referencedTableName="user"
+            referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="sales_activity"
+            baseColumnNames="customer_id"
+            constraintName="fk_sales_activity_customer"
+            referencedTableName="customer"
+            referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="sales_activity"
+            baseColumnNames="created_by_id"
+            constraintName="fk_sales_activity_created_by"
+            referencedTableName="user"
+            referencedColumnNames="id"/>
+        <createIndex tableName="sales_activity" indexName="idx_sales_activity_consultant">
+            <column name="consultant_id"/>
+        </createIndex>
+        <createIndex tableName="sales_activity" indexName="idx_sales_activity_customer">
+            <column name="customer_id"/>
+        </createIndex>
+        <createIndex tableName="sales_activity" indexName="idx_sales_activity_status">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="200.016-3" author="JProfessionals">
+        <comment>Create sales_stage_history table to track stage changes</comment>
+        <createTable tableName="sales_stage_history">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="activity_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_stage" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="to_stage" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_by_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="days_in_previous_stage" type="INT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+            baseTableName="sales_stage_history"
+            baseColumnNames="activity_id"
+            constraintName="fk_sales_stage_history_activity"
+            referencedTableName="sales_activity"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="sales_stage_history"
+            baseColumnNames="changed_by_id"
+            constraintName="fk_sales_stage_history_changed_by"
+            referencedTableName="user"
+            referencedColumnNames="id"/>
+        <createIndex tableName="sales_stage_history" indexName="idx_sales_stage_history_activity">
+            <column name="activity_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

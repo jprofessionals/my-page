@@ -226,6 +226,12 @@
             <version>${slack.version}</version>
         </dependency>
 
+        <!-- Automatically loads .env files -->
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
 
     </dependencies>
 
