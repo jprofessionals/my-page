@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   distDir: 'build',
+  output: 'standalone',
 
   // Enable TypeScript and ESLint checking during build
   typescript: {
@@ -12,10 +13,12 @@ const nextConfig = {
   },
 
   async rewrites() {
+    // Use API_URL env var in production (Railway), localhost in development
+    const apiUrl = process.env.API_URL || 'http://localhost:8080'
     return [
       {
         source: '/api/:slug*',
-        destination: `http://localhost:8080/api/:slug*`,
+        destination: `${apiUrl}/api/:slug*`,
       },
     ]
   },

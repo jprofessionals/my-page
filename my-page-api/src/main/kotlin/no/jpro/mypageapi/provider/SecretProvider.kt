@@ -11,6 +11,7 @@ interface SecretProvider {
     fun getTaskSchedulerKey(): String
     fun getSlackSecret(): String
     fun getSlackAppUtlysningerToken(): String
+    fun getFlowcaseApiKey(): String
 }
 
 @Component
@@ -28,6 +29,9 @@ class SecretProviderLocal : SecretProvider {
     @Value("\${slack.app.utlysninger.token:NOT_SET}")
     private lateinit var slackAppUtlysningerToken: String
 
+    @Value("\${flowcase.apiKey:NOT_SET}")
+    private var flowcaseApiKey: String = "NOT_SET"
+
     override fun getOpenAiApiKey(): String {
         return apiKey
     }
@@ -41,6 +45,10 @@ class SecretProviderLocal : SecretProvider {
 
     override fun getSlackAppUtlysningerToken(): String {
         return slackAppUtlysningerToken
+    }
+
+    override fun getFlowcaseApiKey(): String {
+        return flowcaseApiKey
     }
 }
 
@@ -59,6 +67,9 @@ class SecretProviderGcp : SecretProvider {
 
     @Value("\${sm@slack_app_utlysninger_token}")
     private val slackAppUtlysningerToken: String = "NOT_SET"
+
+    @Value("\${sm@flowcase_api_key}")
+    private val flowcaseApiKey: String = "NOT_SET"
 
     private val logger = LoggerFactory.getLogger(SecretProviderGcp::class.java.name)
 
@@ -88,5 +99,73 @@ class SecretProviderGcp : SecretProvider {
             throw IllegalStateException("Unable to evaluate authorization key, slack_app_utlysninger_token not set in Secret Manager")
         }
         return slackAppUtlysningerToken
+    }
+
+    override fun getFlowcaseApiKey(): String {
+        if (flowcaseApiKey == "NOT_SET") {
+            logger.warn("Flowcase API key not set in Secret Manager")
+        }
+        return flowcaseApiKey
+    }
+}
+
+/**
+ * Secret provider for Railway deployment.
+ * Reads secrets from environment variables instead of GCP Secret Manager.
+ */
+@Component
+@Profile("railway")
+class SecretProviderRailway : SecretProvider {
+
+    @Value("\${OPENAI_API_KEY:NOT_SET}")
+    private val openAIapiKey: String = "NOT_SET"
+
+    @Value("\${TASK_SCHEDULER_KEY:NOT_SET}")
+    private val taskSchedulerKey: String = "NOT_SET"
+
+    @Value("\${SLACK_BOT_TOKEN:NOT_SET}")
+    private val slackBotToken: String = "NOT_SET"
+
+    @Value("\${SLACK_APP_UTLYSNINGER_TOKEN:NOT_SET}")
+    private val slackAppUtlysningerToken: String = "NOT_SET"
+
+    @Value("\${FLOWCASE_API_KEY:NOT_SET}")
+    private val flowcaseApiKey: String = "NOT_SET"
+
+    private val logger = LoggerFactory.getLogger(SecretProviderRailway::class.java.name)
+
+    override fun getOpenAiApiKey(): String {
+        if (openAIapiKey == "NOT_SET") {
+            logger.error("OpenAI API key not set in environment variables")
+        }
+        return openAIapiKey
+    }
+
+    override fun getTaskSchedulerKey(): String {
+        if (taskSchedulerKey == "NOT_SET") {
+            throw IllegalStateException("TASK_SCHEDULER_KEY not set in environment variables")
+        }
+        return taskSchedulerKey
+    }
+
+    override fun getSlackSecret(): String {
+        if (slackBotToken == "NOT_SET") {
+            throw IllegalStateException("SLACK_BOT_TOKEN not set in environment variables")
+        }
+        return slackBotToken
+    }
+
+    override fun getSlackAppUtlysningerToken(): String {
+        if (slackAppUtlysningerToken == "NOT_SET") {
+            throw IllegalStateException("SLACK_APP_UTLYSNINGER_TOKEN not set in environment variables")
+        }
+        return slackAppUtlysningerToken
+    }
+
+    override fun getFlowcaseApiKey(): String {
+        if (flowcaseApiKey == "NOT_SET") {
+            logger.warn("FLOWCASE_API_KEY not set in environment variables")
+        }
+        return flowcaseApiKey
     }
 }
