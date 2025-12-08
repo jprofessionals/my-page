@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { toast } from 'react-toastify'
 import {
   salesPipelineService,
-  type CreateSalesActivity,
   type SalesStage,
   type FlowcaseConsultant,
 } from '@/services/salesPipeline.service'
