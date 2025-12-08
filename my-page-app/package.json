@@ -26,7 +26,7 @@
     "@fontsource/roboto": "5.2.8",
     "@fortawesome/fontawesome-common-types": "^6.7.2",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@headlessui/react": "^2.2.9",
     "@hey-api/client-fetch": "0.12.0",
