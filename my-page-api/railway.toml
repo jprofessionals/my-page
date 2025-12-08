@@ -1,9 +1,11 @@
 [build]
-builder = "dockerfile"
-dockerfilePath = "Dockerfile"
+builder = "DOCKERFILE"
+dockerfilePath = "./Dockerfile"
+watchPatterns = ["src/**", "pom.xml", "Dockerfile"]
 
 [deploy]
 healthcheckPath = "/api/actuator/health"
 healthcheckTimeout = 60
+startCommand = "java -jar app.jar --spring.profiles.active=railway"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
