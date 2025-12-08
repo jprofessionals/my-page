@@ -6,7 +6,7 @@
 
     <changeSet id="1.9.1" author="JProfessionals">
         <addColumn tableName="user">
-            <column name="enabled" type="BIT(1)" defaultValue="true">
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>
         </addColumn>

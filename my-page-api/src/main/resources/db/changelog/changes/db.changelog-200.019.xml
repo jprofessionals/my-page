@@ -13,7 +13,7 @@
     <changeSet id="200.019-2" author="JProfessionals">
         <comment>Add offer_deadline_asap flag for ASAP deadlines</comment>
         <addColumn tableName="sales_activity">
-            <column name="offer_deadline_asap" type="BIT(1)" defaultValueBoolean="false">
+            <column name="offer_deadline_asap" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
         </addColumn>

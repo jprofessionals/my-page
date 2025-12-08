@@ -28,16 +28,16 @@
                 <constraints nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(255)"/>
-            <column name="roll_over" type="BIT(1)">
+            <column name="roll_over" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="start_amount" type="DOUBLE">
                 <constraints nullable="false"/>
             </column>
-            <column name="allow_time_balance" type="BIT(1)">
+            <column name="allow_time_balance" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="default" type="BIT(1)">
+            <column name="default" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -69,11 +69,11 @@
             <column name="date_of_payment" type="date"/>
             <column name="description" type="VARCHAR(255)"/>
             <column name="document_number" type="VARCHAR(255)"/>
-            <column name="expense" type="BIT(1)">
+            <column name="expense" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="last_modified_date" type="datetime"/>
-            <column name="locked" type="BIT(1)">
+            <column name="locked" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="budget_id" type="BIGINT"/>
@@ -85,7 +85,7 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="admin" type="BIT(1)">
+            <column name="admin" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="email" type="VARCHAR(255)">

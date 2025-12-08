@@ -54,7 +54,7 @@
     <changeSet id="200.017-6" author="JProfessionals">
         <comment>Add deadline_reminder_sent column to track if Slack reminder has been sent</comment>
         <addColumn tableName="sales_activity">
-            <column name="deadline_reminder_sent" type="BIT(1)" defaultValueBoolean="false">
+            <column name="deadline_reminder_sent" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
