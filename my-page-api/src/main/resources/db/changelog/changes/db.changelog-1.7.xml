@@ -12,7 +12,7 @@
             <column name="priority" type="INT">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="LONGTEXT">
+            <column name="description" type="TEXT">
                 <constraints nullable="false"/>
             </column>
             <column name="setting_value" type="VARCHAR(50)">

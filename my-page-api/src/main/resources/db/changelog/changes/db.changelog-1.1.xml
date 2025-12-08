@@ -9,7 +9,7 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="customer" type="VARCHAR(255)"/>
-            <column name="description" type="LONGTEXT"/>
+            <column name="description" type="TEXT"/>
             <column name="due_date_for_application" type="date"/>
             <column name="location" type="VARCHAR(255)"/>
             <column name="required_years_of_experience" type="INT"/>

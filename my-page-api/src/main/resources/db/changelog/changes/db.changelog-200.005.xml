@@ -9,7 +9,7 @@
     </changeSet>
 
     <changeSet id="200.005.02" author="JProfessionals">
-        <renameColumn tableName="job_posting" oldColumnName="description_migrated" newColumnName="description" columnDataType="LONGTEXT"/>
+        <renameColumn tableName="job_posting" oldColumnName="description_migrated" newColumnName="description" columnDataType="TEXT"/>
     </changeSet>
 
 </databaseChangeLog>

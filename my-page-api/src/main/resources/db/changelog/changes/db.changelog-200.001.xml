@@ -16,8 +16,11 @@
     </changeSet>
 
     <changeSet id="1.11.2" author="JProfessionals">
-        <!-- Rename existing customer column for clarity -->
-        <renameColumn tableName="job_posting" oldColumnName="customer" newColumnName="customer_id" columnDataType="BIGINT"/>
+        <!-- Drop old VARCHAR customer column and add new BIGINT customer_id column -->
+        <dropColumn tableName="job_posting" columnName="customer"/>
+        <addColumn tableName="job_posting">
+            <column name="customer_id" type="BIGINT"/>
+        </addColumn>
 
         <!-- Drop unused columns from job_posting table -->
         <dropColumn tableName="job_posting" columnName="location"/>
