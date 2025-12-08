@@ -21,7 +21,7 @@
         <slack.version>1.45.4</slack.version>
         <mock-oauth2-server.version>3.0.0</mock-oauth2-server.version>
         <ktor.version>3.3.1</ktor.version>
-        <spring-cloud-gcp.version>6.2.1</spring-cloud-gcp.version>
+        <spring-cloud-gcp.version>7.4.0</spring-cloud-gcp.version>
     </properties>
 
     <dependencies>
