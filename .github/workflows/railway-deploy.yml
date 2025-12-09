@@ -81,7 +81,6 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy API to Railway
-        working-directory: my-page-api
         run: railway up --service ${{ vars.RAILWAY_API_SERVICE_NAME || 'my-page-api' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_TEST }}
@@ -99,7 +98,6 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy App to Railway
-        working-directory: my-page-app
         run: railway up --service ${{ vars.RAILWAY_APP_SERVICE_NAME || 'my-page-app' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_TEST }}
@@ -117,7 +115,6 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy API to Railway Production
-        working-directory: my-page-api
         run: railway up --service ${{ vars.RAILWAY_API_SERVICE_NAME || 'my-page-api' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PROD }}
@@ -134,7 +131,6 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy App to Railway Production
-        working-directory: my-page-app
         run: railway up --service ${{ vars.RAILWAY_APP_SERVICE_NAME || 'my-page-app' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PROD }}
