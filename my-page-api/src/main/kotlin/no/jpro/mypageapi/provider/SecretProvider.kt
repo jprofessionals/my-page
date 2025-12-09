@@ -15,7 +15,7 @@ interface SecretProvider {
 }
 
 @Component
-@Profile("!gcp")
+@Profile("!gcp & !railway")
 @Default
 class SecretProviderLocal : SecretProvider {
     //For lokal kjøring av AI tjenester, sett denne i for eksempel application-local.yml og legg den til .gitignore så den ikke blir committed
