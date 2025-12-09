@@ -10,4 +10,5 @@ interface ConsultantAvailabilityRepository : JpaRepository<ConsultantAvailabilit
     fun findByConsultantId(consultantId: Long): ConsultantAvailability?
     fun findByStatus(status: AvailabilityStatus): List<ConsultantAvailability>
     fun findByStatusIn(statuses: List<AvailabilityStatus>): List<ConsultantAvailability>
+    fun findAllByOrderByDisplayOrderAsc(): List<ConsultantAvailability>
 }

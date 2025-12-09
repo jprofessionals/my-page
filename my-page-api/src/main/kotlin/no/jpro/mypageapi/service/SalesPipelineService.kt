@@ -56,6 +56,7 @@ class SalesPipelineService(
         }
 
         val existing = consultantAvailabilityRepository.findByConsultantId(consultantId)
+        val previousStatus = existing?.status
 
         val availability = existing?.apply {
             this.status = status
@@ -73,7 +74,38 @@ class SalesPipelineService(
             updatedBy = updatedBy
         )
 
+        // If status changed to AVAILABLE, move consultant to bottom of AVAILABLE consultants
+        if (status == AvailabilityStatus.AVAILABLE && previousStatus != AvailabilityStatus.AVAILABLE) {
+            val allAvailabilities = consultantAvailabilityRepository.findAllByOrderByDisplayOrderAsc()
+            val availableConsultants = allAvailabilities.filter {
+                it.status == AvailabilityStatus.AVAILABLE && it.consultant.id != consultantId
+            }
+
+            // Set display order to be after the last AVAILABLE consultant (or 0 if none)
+            val lastAvailableOrder = availableConsultants.maxOfOrNull { it.displayOrder } ?: -1
+            availability.displayOrder = lastAvailableOrder + 1
+
+            // Shift all non-AVAILABLE consultants down
+            allAvailabilities
+                .filter { it.status != AvailabilityStatus.AVAILABLE && it.consultant.id != consultantId }
+                .forEachIndexed { index, other ->
+                    other.displayOrder = availability.displayOrder + index + 1
+                    consultantAvailabilityRepository.save(other)
+                }
+        }
+
         return consultantAvailabilityRepository.save(availability)
+    }
+
+    @Transactional
+    fun reorderConsultants(consultantIds: List<Long>) {
+        consultantIds.forEachIndexed { index, consultantId ->
+            val availability = consultantAvailabilityRepository.findByConsultantId(consultantId)
+            if (availability != null) {
+                availability.displayOrder = index
+                consultantAvailabilityRepository.save(availability)
+            }
+        }
     }
 
     // ==================== Sales Activities ====================

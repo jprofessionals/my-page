@@ -46,7 +46,10 @@ class ConsultantAvailability(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by_id")
-    var updatedBy: User? = null
+    var updatedBy: User? = null,
+
+    @Column(name = "display_order")
+    var displayOrder: Int = 0
 
 ) {
     override fun equals(other: Any?): Boolean {

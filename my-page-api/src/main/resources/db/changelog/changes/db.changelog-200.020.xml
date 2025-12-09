@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="200.020-1" author="JProfessionals">
+        <comment>Add display_order column to consultant_availability for custom sorting</comment>
+        <addColumn tableName="consultant_availability">
+            <column name="display_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="200.020-2" author="JProfessionals">
+        <comment>Initialize display_order based on existing records (ordered by id)</comment>
+        <sql>
+            SET @row_number = 0;
+            UPDATE consultant_availability
+            SET display_order = (@row_number := @row_number + 1)
+            ORDER BY id;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

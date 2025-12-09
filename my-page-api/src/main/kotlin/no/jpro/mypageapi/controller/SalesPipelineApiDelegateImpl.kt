@@ -8,6 +8,7 @@ import no.jpro.mypageapi.model.CloseActivity
 import no.jpro.mypageapi.model.ConsultantWithActivities
 import no.jpro.mypageapi.model.CreateSalesActivity
 import no.jpro.mypageapi.model.FlowcaseConsultant
+import no.jpro.mypageapi.model.ReorderConsultantsRequest
 import no.jpro.mypageapi.model.SalesPipelineBoard
 import no.jpro.mypageapi.model.UpdateConsultantAvailability
 import no.jpro.mypageapi.model.UpdateSalesActivity
@@ -350,7 +351,7 @@ class SalesPipelineApiDelegateImpl(
                 activities = activities.map { salesPipelineMapper.toSalesActivityModel(it) },
                 availability = availability?.let { salesPipelineMapper.toConsultantAvailabilityModel(it) }
             )
-        }
+        }.sortedBy { it.availability?.displayOrder ?: Int.MAX_VALUE }
 
         // All stages
         val stages = SalesStage.entries.map { SalesStageModel.valueOf(it.name) }
@@ -361,5 +362,19 @@ class SalesPipelineApiDelegateImpl(
         )
 
         return ResponseEntity.ok(board)
+    }
+
+    override fun reorderConsultants(
+        reorderConsultantsRequest: ReorderConsultantsRequest
+    ): ResponseEntity<Unit> {
+        val currentUser = authHelper.getCurrentUser(getTestUserId())
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+
+        if (!currentUser.admin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        salesPipelineService.reorderConsultants(reorderConsultantsRequest.consultantIds)
+        return ResponseEntity.ok().build()
     }
 }

@@ -14,6 +14,12 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core'
 import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable'
+import {
   salesPipelineService,
   type SalesPipelineBoard,
   type SalesStage,
@@ -52,6 +58,7 @@ export default function SalesPipelineBoardComponent() {
   const [activeActivity, setActiveActivity] = useState<SalesActivity | null>(null)
   const [editingActivity, setEditingActivity] = useState<SalesActivity | null>(null)
   const [editingConsultant, setEditingConsultant] = useState<ConsultantWithActivities | null>(null)
+  const [activeConsultantId, setActiveConsultantId] = useState<number | null>(null)
 
   const isAdmin = user?.admin ?? false
 
@@ -62,7 +69,9 @@ export default function SalesPipelineBoardComponent() {
         distance: 8, // 8px movement required before drag starts
       },
     }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
   )
 
   useEffect(() => {
@@ -185,18 +194,71 @@ export default function SalesPipelineBoardComponent() {
     return null
   }
 
+  // Check if the dragged item is a consultant row (prefixed with 'consultant-')
+  const isConsultantDrag = (id: string | number): boolean => {
+    return String(id).startsWith('consultant-')
+  }
+
+  const getConsultantIdFromDragId = (dragId: string | number): number => {
+    return Number(String(dragId).replace('consultant-', ''))
+  }
+
   const handleDragStart = (event: DragStartEvent) => {
-    const activityId = Number(event.active.id)
-    const activity = findActivityById(activityId)
-    setActiveActivity(activity)
+    const id = event.active.id
+    if (isConsultantDrag(id)) {
+      setActiveConsultantId(getConsultantIdFromDragId(id))
+      setActiveActivity(null)
+    } else {
+      const activityId = Number(id)
+      const activity = findActivityById(activityId)
+      setActiveActivity(activity)
+      setActiveConsultantId(null)
+    }
   }
 
   const handleDragEnd = async (event: DragEndEvent) => {
     setActiveActivity(null)
+    setActiveConsultantId(null)
 
     const { active, over } = event
     if (!over || !isAdmin) return
 
+    // Handle consultant row reordering
+    if (isConsultantDrag(active.id) && isConsultantDrag(over.id)) {
+      const activeConsultantId = getConsultantIdFromDragId(active.id)
+      const overConsultantId = getConsultantIdFromDragId(over.id)
+
+      if (activeConsultantId === overConsultantId || !board) return
+
+      const oldIndex = board.consultants.findIndex(
+        (c) => c.consultant.id === activeConsultantId
+      )
+      const newIndex = board.consultants.findIndex(
+        (c) => c.consultant.id === overConsultantId
+      )
+
+      if (oldIndex === -1 || newIndex === -1) return
+
+      // Optimistic update
+      const newConsultants = arrayMove(board.consultants, oldIndex, newIndex)
+      setBoard({ ...board, consultants: newConsultants })
+
+      // API call
+      try {
+        const consultantIds = newConsultants
+          .map((c) => c.consultant.id)
+          .filter((id): id is number => id !== undefined)
+        await salesPipelineService.reorderConsultants(consultantIds)
+        toast.success('Rekkefølge oppdatert')
+      } catch (error) {
+        console.error('Failed to reorder consultants:', error)
+        toast.error('Kunne ikke oppdatere rekkefølgen')
+        loadBoard() // Revert on error
+      }
+      return
+    }
+
+    // Handle activity stage change
     const activityId = Number(active.id)
     const newStage = over.id as SalesStage
 
@@ -297,36 +359,41 @@ export default function SalesPipelineBoardComponent() {
                 ))}
               </tr>
             </thead>
-            <tbody>
-              {board.consultants && board.consultants.length > 0 ? (
-                board.consultants.map((consultant, index) => (
-                  <SalesPipelineConsultantRow
-                    key={consultant.consultant.id}
-                    consultant={consultant}
-                    stages={STAGE_ORDER}
-                    stageLabels={STAGE_LABELS}
-                    isAdmin={isAdmin}
-                    onStageChange={handleStageChange}
-                    onMarkAsWon={handleMarkAsWon}
-                    onCloseActivity={handleCloseActivity}
-                    onEditActivity={handleEditActivity}
-                    onEditAvailability={handleEditAvailability}
-                    onRemoveConsultant={handleRemoveConsultant}
-                    isEvenRow={index % 2 === 0}
-                  />
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={STAGE_ORDER.length + 1} className="text-center py-8 text-gray-500">
-                    Ingen aktive salgsaktiviteter
-                  </td>
-                </tr>
-              )}
-            </tbody>
+            <SortableContext
+              items={board.consultants.map((c) => `consultant-${c.consultant.id}`)}
+              strategy={verticalListSortingStrategy}
+            >
+              <tbody>
+                {board.consultants && board.consultants.length > 0 ? (
+                  board.consultants.map((consultant, index) => (
+                    <SalesPipelineConsultantRow
+                      key={consultant.consultant.id}
+                      consultant={consultant}
+                      stages={STAGE_ORDER}
+                      stageLabels={STAGE_LABELS}
+                      isAdmin={isAdmin}
+                      onStageChange={handleStageChange}
+                      onMarkAsWon={handleMarkAsWon}
+                      onCloseActivity={handleCloseActivity}
+                      onEditActivity={handleEditActivity}
+                      onEditAvailability={handleEditAvailability}
+                      onRemoveConsultant={handleRemoveConsultant}
+                      isEvenRow={index % 2 === 0}
+                    />
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={STAGE_ORDER.length + 1} className="text-center py-8 text-gray-500">
+                      Ingen aktive salgsaktiviteter
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </SortableContext>
           </table>
         </div>
 
-        {/* Drag overlay - shows the card being dragged */}
+        {/* Drag overlay - shows the card or row being dragged */}
         <DragOverlay>
           {activeActivity ? (
             <div className="opacity-80">
@@ -339,6 +406,12 @@ export default function SalesPipelineBoardComponent() {
                 onMarkAsWon={() => {}}
                 isDragging
               />
+            </div>
+          ) : activeConsultantId ? (
+            <div className="bg-base-100 p-3 rounded shadow-lg opacity-80 border">
+              <span className="font-semibold">
+                {board.consultants.find((c) => c.consultant.id === activeConsultantId)?.consultant.name || 'Konsulent'}
+              </span>
             </div>
           ) : null}
         </DragOverlay>

@@ -21,6 +21,7 @@ import {
   updateConsultantAvailability,
   getFlowcaseConsultants,
   removeConsultantFromPipeline,
+  reorderConsultants,
 } from '@/data/types/sdk.gen'
 import {
   type CreateSalesActivity,
@@ -188,6 +189,16 @@ export const salesPipelineService = {
   async removeConsultantFromPipeline(userId: number) {
     await removeConsultantFromPipeline({
       path: { userId },
+    })
+  },
+
+  /**
+   * Reorder consultants on the sales pipeline board
+   * @param consultantIds - List of consultant IDs in the desired display order
+   */
+  async reorderConsultants(consultantIds: number[]) {
+    await reorderConsultants({
+      body: { consultantIds },
     })
   },
 

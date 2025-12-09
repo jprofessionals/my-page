@@ -44,7 +44,8 @@ class SalesPipelineMapper(
             currentCustomer = entity.currentCustomer?.let { toCustomerModel(it) },
             notes = entity.notes,
             updatedAt = toOffsetDateTime(entity.updatedAt),
-            updatedBy = entity.updatedBy?.let { userMapper.toUserModel(it) }
+            updatedBy = entity.updatedBy?.let { userMapper.toUserModel(it) },
+            displayOrder = entity.displayOrder
         )
 
     fun toSalesStageHistoryEntryModel(entity: SalesStageHistory): SalesStageHistoryEntryModel =
