@@ -13,7 +13,7 @@ class CustomJwtGrantedAuthoritiesConverter(private val jdbcTemplate: JdbcTemplat
     override fun convert(source: Jwt): Collection<GrantedAuthority> {
         val userSub = source.getSub()
         val admin = try  {
-            jdbcTemplate.queryForObject("SELECT admin from user where sub = $userSub", Boolean::class.java)
+            jdbcTemplate.queryForObject("SELECT admin from user where sub = ?", Boolean::class.java, userSub)
         } catch (noHits: EmptyResultDataAccessException) {
             return mutableListOf()
         }
