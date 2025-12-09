@@ -15,10 +15,7 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Generate OpenAPI types
-RUN npm run build:openapi
-
-# Build the application (standalone output)
+# Build the application (includes openapi generation via run-s "build:*")
 RUN npm run build
 
 # Production stage
