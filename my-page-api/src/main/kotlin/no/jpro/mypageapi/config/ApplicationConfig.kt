@@ -1,6 +1,7 @@
 package no.jpro.mypageapi.config
 
 import no.jpro.mypageapi.repository.UserRepository
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
@@ -14,8 +15,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.core.GrantedAuthorityDefaults
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import javax.sql.DataSource
 
@@ -26,23 +27,17 @@ import javax.sql.DataSource
 @EnableMethodSecurity(securedEnabled = true)
 class ApplicationConfig(
     private val environment: Environment,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    @Value("\${security.test-auth.enabled:false}") private val testAuthEnabled: Boolean
 ) {
-
-    @Bean
-    fun testUserAuthenticationFilter(): TestUserAuthenticationFilter {
-        return TestUserAuthenticationFilter(userRepository)
-    }
 
     @Bean
     fun filterChain(
         http: HttpSecurity,
-        customJwtAuthenticationConverter: CustomJwtAuthenticationConverter,
-        testUserAuthenticationFilter: TestUserAuthenticationFilter
+        customJwtAuthenticationConverter: CustomJwtAuthenticationConverter
     ): SecurityFilterChain {
         // Check which profile we're in to determine authentication requirements
         val isLocalDevelopment = environment.activeProfiles.any { it == "local" || it == "h2" }
-        val isDevelopmentOrTest = environment.activeProfiles.any { it == "local" || it == "h2" || it == "test" }
 
         http.authorizeHttpRequests { authz ->
             // Base endpoints that are always permitted
@@ -74,22 +69,31 @@ class ApplicationConfig(
                 .requestMatchers(HttpMethod.GET, "/settings").permitAll()
                 .requestMatchers("/**").authenticated()
         }
-            .csrf { csrf ->
-                csrf.disable()
-            }
 
-        // Enable OAuth2 resource server
+        // CSRF protection is disabled because this is a stateless REST API using JWT tokens
+        // in Authorization headers (not cookies). JWT tokens in headers are immune to CSRF
+        // attacks since the browser never automatically attaches them to requests.
+        // See: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
+        http.csrf { csrf -> csrf.disable() }
+
+        // Stateless session management - no session cookies used
+        http.sessionManagement { session ->
+            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        }
+
+        // Enable OAuth2 resource server with JWT authentication
         http.oauth2ResourceServer { server ->
             server.jwt { jwt ->
                 jwt.jwtAuthenticationConverter(customJwtAuthenticationConverter)
             }
         }
 
-        // Add X-Test-User-Id authentication filter in development/test mode
-        // This runs BEFORE JWT authentication to set authentication first
-        if (isDevelopmentOrTest) {
+        // SECURITY: X-Test-User-Id authentication is ONLY enabled when security.test-auth.enabled=true
+        // This property should ONLY be set in test profile (application-test.properties)
+        // and NEVER in production configurations.
+        if (testAuthEnabled) {
             http.addFilterBefore(
-                testUserAuthenticationFilter,
+                TestUserAuthenticationFilter(userRepository),
                 org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter::class.java
             )
         }
