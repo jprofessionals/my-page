@@ -83,10 +83,10 @@ jobs:
       - name: Deploy API to Railway
         run: |
           cd my-page-api
-          railway link ${{ vars.RAILWAY_PROJECT_ID_TEST }}
           railway up --service ${{ vars.RAILWAY_API_SERVICE_NAME || 'my-page-api' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_TEST }}
+          RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID_TEST }}
 
   # Deploy App to Railway (test environment)
   deploy-app-test:
@@ -102,9 +102,10 @@ jobs:
       - name: Deploy App to Railway
         run: |
           cd my-page-app
-          railway up --service my-page-app
+          railway up --service ${{ vars.RAILWAY_APP_SERVICE_NAME || 'my-page-app' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_TEST }}
+          RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID_TEST }}
 
   # Deploy to production (manual approval required via GitHub environment)
   deploy-api-prod:
@@ -120,9 +121,10 @@ jobs:
       - name: Deploy API to Railway Production
         run: |
           cd my-page-api
-          railway up --service my-page-api
+          railway up --service ${{ vars.RAILWAY_API_SERVICE_NAME || 'my-page-api' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PROD }}
+          RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID_PROD }}
 
   deploy-app-prod:
     needs: deploy-app-test
@@ -137,6 +139,7 @@ jobs:
       - name: Deploy App to Railway Production
         run: |
           cd my-page-app
-          railway up --service my-page-app
+          railway up --service ${{ vars.RAILWAY_APP_SERVICE_NAME || 'my-page-app' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PROD }}
+          RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID_PROD }}
