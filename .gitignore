@@ -47,6 +47,12 @@ build/
 .direnv/
 .envrc
 
+### Environment files (secrets) ###
+.env
+*.env
+.env.*
+!.env.example
+
 ### GCP things ###
 /.run/MyPageApiApplication.run.xml
 /cloud_sql_proxy
