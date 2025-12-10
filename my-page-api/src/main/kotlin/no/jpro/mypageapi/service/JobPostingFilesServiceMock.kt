@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import java.net.URI
 
 @Service
-@Profile("!gcp")
+@Profile("!gcp & !railway")
 class JobPostingFilesServiceMock : JobPostingFilesService {
 
     override fun deleteJobPostingFile(

@@ -14,7 +14,7 @@ import java.net.URLConnection
 import java.util.concurrent.TimeUnit
 
 @Service
-@Profile("gcp")
+@Profile("gcp", "railway")
 class JobPostingFilesServiceImpl(
     @Value("\${gcs.jobpostings.bucket.name}") private val bucketName: String,
     private val storage: Storage
