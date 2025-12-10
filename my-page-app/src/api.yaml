@@ -2358,6 +2358,25 @@ paths:
         '500':
           description: Internal server error
 
+  /sales-activities/analytics:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesPipelineAnalytics
+      summary: Get analytics data for the sales pipeline
+      description: Returns aggregated statistics and metrics for the sales pipeline including win rates, funnel data, and consultant performance
+      responses:
+        '200':
+          description: Sales pipeline analytics data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesPipelineAnalytics'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
 components:
   schemas:
     Customer:
@@ -3647,3 +3666,144 @@ components:
       required:
         - consultants
         - stages
+
+    SalesPipelineAnalytics:
+      type: object
+      properties:
+        totalActiveActivities:
+          type: integer
+          description: Total number of active (non-closed) sales activities
+        wonThisMonth:
+          type: integer
+          description: Number of won activities this month
+        wonThisQuarter:
+          type: integer
+          description: Number of won activities this quarter
+        wonThisYear:
+          type: integer
+          description: Number of won activities this year
+        lostThisMonth:
+          type: integer
+          description: Number of lost activities this month
+        lostThisQuarter:
+          type: integer
+          description: Number of lost activities this quarter
+        conversionRate:
+          type: number
+          format: double
+          description: Win rate (won / (won + lost)) as percentage
+        averageDaysToClose:
+          type: number
+          format: double
+          description: Average number of days from creation to close (won or lost)
+        activitiesByStage:
+          type: array
+          items:
+            $ref: '#/components/schemas/StageCount'
+          description: Count of activities in each stage (funnel data)
+        consultantStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsultantActivityStats'
+          description: Statistics per consultant
+        customerStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerActivityStats'
+          description: Statistics per customer
+        closedReasonStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClosedReasonCount'
+          description: Count of activities by closed reason
+        availabilityStats:
+          $ref: '#/components/schemas/AvailabilityStats'
+          description: Overview of consultant availability
+      required:
+        - totalActiveActivities
+        - wonThisMonth
+        - wonThisQuarter
+        - wonThisYear
+        - lostThisMonth
+        - lostThisQuarter
+        - conversionRate
+        - averageDaysToClose
+        - activitiesByStage
+        - consultantStats
+        - customerStats
+        - closedReasonStats
+        - availabilityStats
+
+    StageCount:
+      type: object
+      properties:
+        stage:
+          $ref: '#/components/schemas/SalesStage'
+        count:
+          type: integer
+      required:
+        - stage
+        - count
+
+    ConsultantActivityStats:
+      type: object
+      properties:
+        consultant:
+          $ref: '#/components/schemas/User'
+        activeActivities:
+          type: integer
+        wonTotal:
+          type: integer
+        lostTotal:
+          type: integer
+      required:
+        - consultant
+        - activeActivities
+        - wonTotal
+        - lostTotal
+
+    CustomerActivityStats:
+      type: object
+      properties:
+        customerName:
+          type: string
+          description: Customer name (from customer entity or free text)
+        activeActivities:
+          type: integer
+        wonTotal:
+          type: integer
+        lostTotal:
+          type: integer
+      required:
+        - customerName
+        - activeActivities
+        - wonTotal
+        - lostTotal
+
+    ClosedReasonCount:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/ClosedReason'
+        count:
+          type: integer
+      required:
+        - reason
+        - count
+
+    AvailabilityStats:
+      type: object
+      properties:
+        available:
+          type: integer
+          description: Number of consultants currently available
+        availableSoon:
+          type: integer
+          description: Number of consultants available soon
+        occupied:
+          type: integer
+          description: Number of consultants occupied
+      required:
+        - available
+        - availableSoon
+        - occupied

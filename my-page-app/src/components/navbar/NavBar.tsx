@@ -18,6 +18,7 @@ const navigation = [
   { href: '/', name: 'Hjem' },
   { href: '/utlysninger', name: 'Utlysninger' },
   { href: '/salgstavle', name: 'Salgstavle' },
+  { href: '/salgstavle-analytics', name: 'Salgsanalyse', requiresAdmin: true },
   { href: '/hyttebooking', name: 'Firmahytte' },
   { href: '/kalkulator', name: 'Lønnskalkulator' },
   { href: '/ai', name: 'AI' },

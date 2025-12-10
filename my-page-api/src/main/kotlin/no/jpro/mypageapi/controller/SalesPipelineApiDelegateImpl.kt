@@ -5,11 +5,17 @@ import no.jpro.mypageapi.entity.ActivityStatus
 import no.jpro.mypageapi.entity.ClosedReason
 import no.jpro.mypageapi.entity.SalesStage
 import no.jpro.mypageapi.model.CloseActivity
+import no.jpro.mypageapi.model.AvailabilityStats
+import no.jpro.mypageapi.model.ClosedReasonCount
+import no.jpro.mypageapi.model.ConsultantActivityStats
 import no.jpro.mypageapi.model.ConsultantWithActivities
 import no.jpro.mypageapi.model.CreateSalesActivity
+import no.jpro.mypageapi.model.CustomerActivityStats
 import no.jpro.mypageapi.model.FlowcaseConsultant
 import no.jpro.mypageapi.model.ReorderConsultantsRequest
+import no.jpro.mypageapi.model.SalesPipelineAnalytics
 import no.jpro.mypageapi.model.SalesPipelineBoard
+import no.jpro.mypageapi.model.StageCount
 import no.jpro.mypageapi.model.UpdateConsultantAvailability
 import no.jpro.mypageapi.model.UpdateSalesActivity
 import no.jpro.mypageapi.model.UpdateStage
@@ -28,6 +34,7 @@ import no.jpro.mypageapi.model.ConsultantAvailability as ConsultantAvailabilityM
 import no.jpro.mypageapi.model.SalesActivity as SalesActivityModel
 import no.jpro.mypageapi.model.SalesActivityWithHistory as SalesActivityWithHistoryModel
 import no.jpro.mypageapi.model.AvailabilityStatus as AvailabilityStatusModel
+import no.jpro.mypageapi.model.ClosedReason as ClosedReasonModel
 import no.jpro.mypageapi.model.SalesStage as SalesStageModel
 
 @Service
@@ -376,5 +383,57 @@ class SalesPipelineApiDelegateImpl(
 
         salesPipelineService.reorderConsultants(reorderConsultantsRequest.consultantIds)
         return ResponseEntity.ok().build()
+    }
+
+    // ==================== Analytics ====================
+
+    override fun getSalesPipelineAnalytics(): ResponseEntity<SalesPipelineAnalytics> {
+        val analytics = salesPipelineService.getAnalytics()
+
+        val response = SalesPipelineAnalytics(
+            totalActiveActivities = analytics.totalActiveActivities.toInt(),
+            wonThisMonth = analytics.wonThisMonth,
+            wonThisQuarter = analytics.wonThisQuarter,
+            wonThisYear = analytics.wonThisYear,
+            lostThisMonth = analytics.lostThisMonth,
+            lostThisQuarter = analytics.lostThisQuarter,
+            conversionRate = analytics.conversionRate,
+            averageDaysToClose = analytics.averageDaysToClose,
+            activitiesByStage = analytics.activitiesByStage.map { (stage, count) ->
+                StageCount(
+                    stage = SalesStageModel.valueOf(stage.name),
+                    count = count
+                )
+            },
+            consultantStats = analytics.consultantStats.map { stat ->
+                ConsultantActivityStats(
+                    consultant = salesPipelineMapper.userMapper.toUserModel(stat.consultant),
+                    activeActivities = stat.activeActivities,
+                    wonTotal = stat.wonTotal,
+                    lostTotal = stat.lostTotal
+                )
+            },
+            customerStats = analytics.customerStats.map { stat ->
+                CustomerActivityStats(
+                    customerName = stat.customerName,
+                    activeActivities = stat.activeActivities,
+                    wonTotal = stat.wonTotal,
+                    lostTotal = stat.lostTotal
+                )
+            },
+            closedReasonStats = analytics.closedReasonStats.map { (reason, count) ->
+                ClosedReasonCount(
+                    reason = ClosedReasonModel.valueOf(reason.name),
+                    count = count
+                )
+            },
+            availabilityStats = AvailabilityStats(
+                available = analytics.availabilityStats.available,
+                availableSoon = analytics.availabilityStats.availableSoon,
+                occupied = analytics.availabilityStats.occupied
+            )
+        )
+
+        return ResponseEntity.ok(response)
     }
 }

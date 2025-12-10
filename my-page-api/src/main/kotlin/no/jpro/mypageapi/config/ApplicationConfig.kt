@@ -60,7 +60,11 @@ class ApplicationConfig(
                     "/me", "/me/**",
                     "/booking", "/booking/**",
                     "/user", "/user/**",
-                    "/image", "/image/**"
+                    "/image", "/image/**",
+                    "/sales-activities", "/sales-activities/**",
+                    "/sales-pipeline", "/sales-pipeline/**",
+                    "/flowcase", "/flowcase/**",
+                    "/consultant-availability", "/consultant-availability/**"
                 ))
             }
 

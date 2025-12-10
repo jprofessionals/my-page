@@ -421,4 +421,141 @@ class SalesPipelineService(
         val activeActivities = salesActivityRepository.findByStatus(ActivityStatus.ACTIVE)
         return activeActivities.groupBy { it.currentStage }
     }
+
+    // ==================== Analytics ====================
+
+    data class AnalyticsData(
+        val totalActiveActivities: Long,
+        val wonThisMonth: Int,
+        val wonThisQuarter: Int,
+        val wonThisYear: Int,
+        val lostThisMonth: Int,
+        val lostThisQuarter: Int,
+        val conversionRate: Double,
+        val averageDaysToClose: Double,
+        val activitiesByStage: Map<SalesStage, Int>,
+        val consultantStats: List<ConsultantStats>,
+        val customerStats: List<CustomerStats>,
+        val closedReasonStats: Map<ClosedReason, Int>,
+        val availabilityStats: AvailabilityStatsData
+    )
+
+    data class ConsultantStats(
+        val consultant: User,
+        val activeActivities: Int,
+        val wonTotal: Int,
+        val lostTotal: Int
+    )
+
+    data class CustomerStats(
+        val customerName: String,
+        val activeActivities: Int,
+        val wonTotal: Int,
+        val lostTotal: Int
+    )
+
+    data class AvailabilityStatsData(
+        val available: Int,
+        val availableSoon: Int,
+        val occupied: Int
+    )
+
+    @Transactional(readOnly = true)
+    fun getAnalytics(): AnalyticsData {
+        val now = LocalDateTime.now()
+        val startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0)
+        val startOfQuarter = now.withMonth(((now.monthValue - 1) / 3) * 3 + 1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0)
+        val startOfYear = now.withDayOfYear(1).withHour(0).withMinute(0).withSecond(0)
+
+        // Active activities count
+        val totalActiveActivities = salesActivityRepository.countByStatus(ActivityStatus.ACTIVE)
+
+        // Won activities
+        val wonThisMonth = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.WON, startOfMonth).size
+        val wonThisQuarter = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.WON, startOfQuarter).size
+        val wonThisYear = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.WON, startOfYear).size
+
+        // Lost activities (CLOSED_OTHER_WON is used for closed/lost)
+        val lostThisMonth = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.CLOSED_OTHER_WON, startOfMonth).size
+        val lostThisQuarter = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.CLOSED_OTHER_WON, startOfQuarter).size
+
+        // Conversion rate (won / (won + lost) for this year)
+        val wonYearTotal = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.WON, startOfYear).size
+        val lostYearTotal = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.CLOSED_OTHER_WON, startOfYear).size
+        val conversionRate = if (wonYearTotal + lostYearTotal > 0) {
+            (wonYearTotal.toDouble() / (wonYearTotal + lostYearTotal)) * 100
+        } else 0.0
+
+        // Average days to close
+        val allClosedActivities = salesActivityRepository.findAll()
+            .filter { it.closedAt != null }
+        val averageDaysToClose = if (allClosedActivities.isNotEmpty()) {
+            allClosedActivities.mapNotNull { activity ->
+                activity.closedAt?.let { closedAt ->
+                    ChronoUnit.DAYS.between(activity.createdAt, closedAt).toDouble()
+                }
+            }.average()
+        } else 0.0
+
+        // Activities by stage (funnel)
+        val activeActivities = salesActivityRepository.findByStatus(ActivityStatus.ACTIVE)
+        val activitiesByStage = SalesStage.entries.associateWith { stage ->
+            activeActivities.count { it.currentStage == stage }
+        }
+
+        // Consultant stats
+        val allActivities = salesActivityRepository.findAll()
+        val consultantStats = allActivities.groupBy { it.consultant }
+            .map { (consultant, activities) ->
+                ConsultantStats(
+                    consultant = consultant,
+                    activeActivities = activities.count { it.status == ActivityStatus.ACTIVE },
+                    wonTotal = activities.count { it.status == ActivityStatus.WON },
+                    lostTotal = activities.count { it.status == ActivityStatus.CLOSED_OTHER_WON }
+                )
+            }
+            .sortedByDescending { it.activeActivities + it.wonTotal }
+
+        // Customer stats
+        val customerStats = allActivities.groupBy { activity ->
+            activity.customer?.name ?: activity.customerName ?: "Ukjent"
+        }.map { (customerName, activities) ->
+            CustomerStats(
+                customerName = customerName,
+                activeActivities = activities.count { it.status == ActivityStatus.ACTIVE },
+                wonTotal = activities.count { it.status == ActivityStatus.WON },
+                lostTotal = activities.count { it.status == ActivityStatus.CLOSED_OTHER_WON }
+            )
+        }.sortedByDescending { it.activeActivities + it.wonTotal }
+
+        // Closed reason stats
+        val activitiesWithReason = salesActivityRepository.findAllWithClosedReason()
+        val closedReasonStats = ClosedReason.entries.associateWith { reason ->
+            activitiesWithReason.count { it.closedReason == reason }
+        }
+
+        // Availability stats
+        val availabilities = consultantAvailabilityRepository.findAll()
+        val availabilityStats = AvailabilityStatsData(
+            available = availabilities.count { it.status == AvailabilityStatus.AVAILABLE },
+            availableSoon = availabilities.count { it.status == AvailabilityStatus.AVAILABLE_SOON },
+            occupied = availabilities.count { it.status == AvailabilityStatus.OCCUPIED }
+        )
+
+        return AnalyticsData(
+            totalActiveActivities = totalActiveActivities,
+            wonThisMonth = wonThisMonth,
+            wonThisQuarter = wonThisQuarter,
+            wonThisYear = wonThisYear,
+            lostThisMonth = lostThisMonth,
+            lostThisQuarter = lostThisQuarter,
+            conversionRate = conversionRate,
+            averageDaysToClose = averageDaysToClose,
+            activitiesByStage = activitiesByStage,
+            consultantStats = consultantStats,
+            customerStats = customerStats,
+            closedReasonStats = closedReasonStats,
+            availabilityStats = availabilityStats
+        )
+    }
 }

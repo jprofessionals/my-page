@@ -16,6 +16,7 @@ import {
   getSalesActivitiesByConsultant,
   getSalesActivitiesByCustomer,
   getSalesPipelineBoard,
+  getSalesPipelineAnalytics,
   getAllConsultantAvailability,
   getConsultantAvailability,
   updateConsultantAvailability,
@@ -151,6 +152,14 @@ export const salesPipelineService = {
     return data
   },
 
+  /**
+   * Get analytics data for the sales pipeline
+   */
+  async getAnalytics() {
+    const { data } = await getSalesPipelineAnalytics()
+    return data
+  },
+
   // ===== CONSULTANT AVAILABILITY =====
 
   /**
@@ -221,8 +230,14 @@ export type {
   SalesActivityWithHistoryReadable as SalesActivityWithHistory,
   SalesStageHistoryEntryReadable as SalesStageHistoryEntry,
   SalesPipelineBoardReadable as SalesPipelineBoard,
+  SalesPipelineAnalyticsReadable as SalesPipelineAnalytics,
   ConsultantWithActivitiesReadable as ConsultantWithActivities,
   ConsultantAvailabilityReadable as ConsultantAvailability,
+  ConsultantActivityStatsReadable as ConsultantActivityStats,
+  CustomerActivityStats,
+  StageCount,
+  ClosedReasonCount,
+  AvailabilityStats,
   FlowcaseConsultant,
   SalesStage,
   ActivityStatus,

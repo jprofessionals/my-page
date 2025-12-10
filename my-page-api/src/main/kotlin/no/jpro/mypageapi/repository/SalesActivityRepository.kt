@@ -31,4 +31,13 @@ interface SalesActivityRepository : JpaRepository<SalesActivity, Long> {
         AND sa.deadlineReminderSent = false
     """)
     fun findActivitiesWithUpcomingDeadline(fromTime: LocalDateTime, toTime: LocalDateTime): List<SalesActivity>
+
+    // Analytics queries
+    fun countByStatus(status: ActivityStatus): Long
+
+    @Query("SELECT sa FROM SalesActivity sa WHERE sa.status = :status AND sa.closedAt >= :since")
+    fun findByStatusAndClosedAtAfter(status: ActivityStatus, since: LocalDateTime): List<SalesActivity>
+
+    @Query("SELECT sa FROM SalesActivity sa WHERE sa.closedReason IS NOT NULL")
+    fun findAllWithClosedReason(): List<SalesActivity>
 }

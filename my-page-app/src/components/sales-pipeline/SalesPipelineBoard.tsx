@@ -34,6 +34,7 @@ import EditActivityModal from './EditActivityModal'
 import EditAvailabilityModal from './EditAvailabilityModal'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { type ConsultantWithActivities } from '@/services/salesPipeline.service'
+import Link from 'next/link'
 
 // Active stages shown as columns on the board (LOST is not shown as a column)
 const STAGE_ORDER: SalesStage[] = [
@@ -350,6 +351,11 @@ export default function SalesPipelineBoardComponent() {
             <span className="text-sm text-gray-500">
               Dra kort for å flytte mellom steg
             </span>
+          )}
+          {isAdmin && (
+            <Link href="/salgstavle-analytics" className="btn btn-outline btn-sm">
+              📊 Analytics
+            </Link>
           )}
           {isAdmin && (
             <button
