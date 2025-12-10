@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 @Service
-@Profile("!gcp")
+@Profile("!gcp & !railway")
 class SlackServiceMock : SlackService {
 
     override fun getUserToNotify(

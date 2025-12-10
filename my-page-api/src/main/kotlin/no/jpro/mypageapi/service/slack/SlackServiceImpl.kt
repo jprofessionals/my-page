@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Service
-@Profile("gcp")
+@Profile("gcp", "railway")
 class SlackServiceImpl(
     private val secretProvider: SecretProvider
 ) : SlackService {
