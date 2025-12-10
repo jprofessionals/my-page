@@ -5,13 +5,14 @@ import { toast } from 'react-toastify'
 import {
   DndContext,
   DragOverlay,
-  closestCenter,
+  rectIntersection,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
   type DragStartEvent,
   type DragEndEvent,
+  type CollisionDetection,
 } from '@dnd-kit/core'
 import {
   SortableContext,
@@ -48,6 +49,34 @@ const STAGE_LABELS: Record<SalesStage, string> = {
   SENT_TO_CUSTOMER: 'Sendt til kunde',
   INTERVIEW: 'Intervju',
   LOST: 'Tapt',
+}
+
+// Helper to check if an ID is a stage cell (format: "consultantId-STAGE")
+const isStageCellId = (id: string | number): boolean => {
+  const str = String(id)
+  return STAGE_ORDER.some((stage) => str.endsWith(`-${stage}`))
+}
+
+// Custom collision detection that prioritizes stage cells over consultant rows
+// when dragging activity cards
+const customCollisionDetection: CollisionDetection = (args) => {
+  const { active } = args
+  const isActivityDrag = !String(active.id).startsWith('consultant-')
+
+  // Get all collisions using rectIntersection
+  const collisions = rectIntersection(args)
+
+  if (isActivityDrag && collisions.length > 0) {
+    // When dragging an activity, prioritize stage droppables over consultant sortables
+    const stageCollision = collisions.find((collision) =>
+      isStageCellId(collision.id)
+    )
+    if (stageCollision) {
+      return [stageCollision]
+    }
+  }
+
+  return collisions
 }
 
 export default function SalesPipelineBoardComponent() {
@@ -260,10 +289,13 @@ export default function SalesPipelineBoardComponent() {
 
     // Handle activity stage change
     const activityId = Number(active.id)
-    const newStage = over.id as SalesStage
+
+    // Parse stage from droppable ID (format: "consultantId-STAGE")
+    const overId = String(over.id)
+    const newStage = STAGE_ORDER.find((stage) => overId.endsWith(`-${stage}`))
 
     // Check if dropped on a valid stage
-    if (!STAGE_ORDER.includes(newStage)) return
+    if (!newStage) return
 
     const activity = findActivityById(activityId)
     if (!activity || activity.currentStage === newStage) return
@@ -333,7 +365,7 @@ export default function SalesPipelineBoardComponent() {
       {/* Pipeline board with DnD */}
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={customCollisionDetection}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >

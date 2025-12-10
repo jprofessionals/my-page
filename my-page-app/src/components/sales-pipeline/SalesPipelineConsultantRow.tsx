@@ -15,6 +15,7 @@ import SalesPipelineCard from './SalesPipelineCard'
 // Droppable cell component for each stage
 function DroppableStageCell({
   stage,
+  consultantId,
   activities,
   stages,
   stageLabels,
@@ -27,6 +28,7 @@ function DroppableStageCell({
   rowBgClass,
 }: {
   stage: SalesStage
+  consultantId: number
   activities: SalesActivity[]
   stages: SalesStage[]
   stageLabels: Record<SalesStage, string>
@@ -38,8 +40,10 @@ function DroppableStageCell({
   onEditActivity: (activity: SalesActivity) => void
   rowBgClass: string
 }) {
+  // Use unique ID per consultant-stage combination
   const { isOver, setNodeRef } = useDroppable({
-    id: stage,
+    id: `${consultantId}-${stage}`,
+    data: { stage, consultantId },
   })
 
   return (
@@ -229,6 +233,7 @@ export default function SalesPipelineConsultantRow({
         <DroppableStageCell
           key={stage}
           stage={stage}
+          consultantId={user.id!}
           activities={activitiesByStage[stage]}
           stages={stages}
           stageLabels={stageLabels}
