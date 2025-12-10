@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component
 interface SecretProvider {
     fun getOpenAiApiKey(): String
     fun getTaskSchedulerKey(): String
-    fun getSlackSecret(): String
     fun getSlackAppUtlysningerToken(): String
     fun getFlowcaseApiKey(): String
 }
@@ -23,9 +22,6 @@ class SecretProviderLocal : SecretProvider {
     @Value("\${openai.apiKey:NOT_SET}")
     private var apiKey: String = "NOT_SET"
 
-    @Value("\${slack.bot.token:NOT_SET}")
-    private val slackBotToken : String = "NOT_SET"
-
     @Value("\${slack.app.utlysninger.token:NOT_SET}")
     private lateinit var slackAppUtlysningerToken: String
 
@@ -37,10 +33,6 @@ class SecretProviderLocal : SecretProvider {
     }
     override fun getTaskSchedulerKey(): String {
         return "DUMMY_KEY"
-    }
-
-    override fun getSlackSecret(): String {
-        return slackBotToken
     }
 
     override fun getSlackAppUtlysningerToken(): String {
@@ -62,9 +54,6 @@ class SecretProviderGcp : SecretProvider {
     @Value("\${sm@BookingLotteryKey}")//secret heter bookinglottery key av historiske grunner, vil endres etterhvert
     private val taskSchedulerKey: String = "NOT_SET"
 
-    @Value("\${sm@slack_bot_token}")
-    private val slackBotToken : String = "NOT_SET"
-
     @Value("\${sm@slack_app_utlysninger_token}")
     private val slackAppUtlysningerToken: String = "NOT_SET"
 
@@ -85,13 +74,6 @@ class SecretProviderGcp : SecretProvider {
             throw IllegalStateException("Unable to evaluate authorization key, BookingLotteryKey not set in Secret Manager")
         }
         return taskSchedulerKey
-    }
-
-    override fun getSlackSecret(): String {
-        if (slackBotToken == "NOT_SET") {
-            throw IllegalStateException("Unable to evaluate authorization key, slack_bot_token not set in Secret Manager")
-        }
-        return slackBotToken
     }
 
     override fun getSlackAppUtlysningerToken(): String {
@@ -123,9 +105,6 @@ class SecretProviderRailway : SecretProvider {
     @Value("\${TASK_SCHEDULER_KEY:NOT_SET}")
     private val taskSchedulerKey: String = "NOT_SET"
 
-    @Value("\${SLACK_BOT_TOKEN:NOT_SET}")
-    private val slackBotToken: String = "NOT_SET"
-
     @Value("\${SLACK_APP_UTLYSNINGER_TOKEN:NOT_SET}")
     private val slackAppUtlysningerToken: String = "NOT_SET"
 
@@ -146,13 +125,6 @@ class SecretProviderRailway : SecretProvider {
             throw IllegalStateException("TASK_SCHEDULER_KEY not set in environment variables")
         }
         return taskSchedulerKey
-    }
-
-    override fun getSlackSecret(): String {
-        if (slackBotToken == "NOT_SET") {
-            throw IllegalStateException("SLACK_BOT_TOKEN not set in environment variables")
-        }
-        return slackBotToken
     }
 
     override fun getSlackAppUtlysningerToken(): String {

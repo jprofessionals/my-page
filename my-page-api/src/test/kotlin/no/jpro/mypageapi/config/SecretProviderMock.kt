@@ -15,10 +15,6 @@ class SecretProviderMock: SecretProvider {
         return "mock"
     }
 
-    override fun getSlackSecret(): String {
-        return "mock"
-    }
-
     override fun getSlackAppUtlysningerToken(): String {
         return "mock"
     }

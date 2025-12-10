@@ -102,7 +102,7 @@ class SlackServiceImpl(
     override fun postMessageToChannel(
         msg: String
     ): String {
-        val token = secretProvider.getSlackSecret()
+        val token = secretProvider.getSlackAppUtlysningerToken()
         val channelId = hytteBookingChannel
         val methods: MethodsClient? = slack.methods(token)
         val response = methods?.chatPostMessage {
@@ -129,7 +129,7 @@ class SlackServiceImpl(
         if (salesPipelineChannel == "NOT_SET") {
             return "Salgstavle-kanal er ikke konfigurert"
         }
-        val token = secretProvider.getSlackSecret()
+        val token = secretProvider.getSlackAppUtlysningerToken()
         val methods: MethodsClient? = slack.methods(token)
         val response = methods?.chatPostMessage {
             it.channel(salesPipelineChannel).text(msg)
@@ -147,7 +147,7 @@ class SlackServiceImpl(
     }
 
     private fun getUserIdByEmail(email: String): String? {
-        val token = secretProvider.getSlackSecret()
+        val token = secretProvider.getSlackAppUtlysningerToken()
         val methods: MethodsClient? = slack.methods(token)
         val response = methods?.usersLookupByEmail { it.email(email) }
 
