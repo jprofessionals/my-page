@@ -190,6 +190,32 @@ paths:
           description: Not found
         '500':
           description: Internal server error
+  /job-postings/{id}/notify:
+    post:
+      tags:
+        - JobPosting
+      operationId: notifyJobPosting
+      summary: Resend job posting notification to Slack
+      description: Posts the job posting to the Slack utlysninger channel. Admin only.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the job posting to notify about
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Notification sent successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Job posting not found
+        '500':
+          description: Internal server error
   /job-postings/{jobPostingId}/files:
     get:
       tags:

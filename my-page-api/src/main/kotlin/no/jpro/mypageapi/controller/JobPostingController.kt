@@ -166,6 +166,14 @@ class JobPostingController(
     }
 
     @RequiresAdmin
+    override fun notifyJobPosting(
+        id: Long
+    ): ResponseEntity<Unit> {
+        jobPostingService.notifyJobPosting(id)
+        return ResponseEntity.noContent().build()
+    }
+
+    @RequiresAdmin
     override fun updateJobPosting(
         id: Long,
         jobPosting: JobPosting,

@@ -9,10 +9,12 @@ import { EditJobPostingModal } from '@/components/jobpostings/EditJobPostingModa
 import {
   useDeleteJobPosting,
   useJobPostingFiles,
+  useNotifyJobPosting,
   usePutJobPosting,
 } from '@/hooks/jobPosting'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
+  faBullhorn,
   faLock,
   faPaperclip,
   faPencilAlt,
@@ -29,9 +31,12 @@ import { StarterKit } from '@tiptap/starter-kit'
 export const JobPosting = (jobPosting: JobPostingType) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isNotifyDialogOpen, setIsNotifyDialogOpen] = useState(false)
   const { data: existingJobPostingFiles } = useJobPostingFiles(jobPosting.id)
   const { mutate: updateJobPosting } = usePutJobPosting()
   const { mutate: deleteJobPosting } = useDeleteJobPosting()
+  const { mutate: notifyJobPosting, isPending: isNotifying } =
+    useNotifyJobPosting()
   const { user } = useAuthContext()
 
   const openModal: MouseEventHandler<HTMLButtonElement> = (e) => {
@@ -50,6 +55,20 @@ export const JobPosting = (jobPosting: JobPostingType) => {
 
   const closeDeleteDialog = () => {
     setIsDeleteDialogOpen(false)
+  }
+
+  const openNotifyDialog: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation()
+    setIsNotifyDialogOpen(true)
+  }
+
+  const closeNotifyDialog = () => {
+    setIsNotifyDialogOpen(false)
+  }
+
+  const handleNotifyJobPosting = () => {
+    notifyJobPosting(jobPosting.id)
+    closeNotifyDialog()
   }
 
   const editJobPosting = (
@@ -100,6 +119,18 @@ export const JobPosting = (jobPosting: JobPostingType) => {
           </Link>
           {user?.admin && (
             <>
+              <button
+                onClick={openNotifyDialog}
+                aria-label="Send til Slack"
+                title="Send til Slack"
+                className="focus:outline-hidden"
+                disabled={isNotifying}
+              >
+                <FontAwesomeIcon
+                  icon={faBullhorn}
+                  className={`${isNotifying ? 'text-gray-400' : 'text-blue-600 hover:text-blue-800'}`}
+                />
+              </button>
               <button
                 onClick={openModal}
                 aria-label="Edit job posting"
@@ -268,6 +299,37 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                   className="px-4 py-2 text-white bg-red-600 hover:bg-red-800 rounded-sm"
                 >
                   Slett
+                </button>
+              </AlertDialog.Action>
+            </div>
+          </AlertDialog.Content>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
+      <AlertDialog.Root
+        open={isNotifyDialogOpen}
+        onOpenChange={setIsNotifyDialogOpen}
+      >
+        <AlertDialog.Portal>
+          <AlertDialog.Overlay className="fixed inset-0 bg-black/50" />
+          <AlertDialog.Content className="fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg">
+            <AlertDialog.Title className="text-lg font-semibold text-gray-800">
+              Send til Slack
+            </AlertDialog.Title>
+            <AlertDialog.Description className="text-gray-600">
+              Vil du sende denne utlysningen til Slack-kanalen?
+            </AlertDialog.Description>
+            <div className="flex justify-end space-x-4 mt-4">
+              <AlertDialog.Cancel asChild>
+                <button className="px-4 py-2 text-gray-600 hover:text-gray-800">
+                  Avbryt
+                </button>
+              </AlertDialog.Cancel>
+              <AlertDialog.Action asChild>
+                <button
+                  onClick={handleNotifyJobPosting}
+                  className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-800 rounded-sm"
+                >
+                  Send
                 </button>
               </AlertDialog.Action>
             </div>

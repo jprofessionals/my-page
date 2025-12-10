@@ -100,6 +100,20 @@ class JobPostingService(
         return customerRepository.findAll()
     }
 
+    fun notifyJobPosting(
+        id: Long
+    ) {
+        val jobPosting = jobPostingRepository.findById(id)
+            .orElseThrow {
+                EntityNotFoundException("Job posting with id $id not found")
+            }
+
+        slackService.postJobPosting(
+            channel,
+            jobPosting,
+        )
+    }
+
     @Transactional
     fun updateJobPosting(
         jobPosting: JobPosting,

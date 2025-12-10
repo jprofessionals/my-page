@@ -9,6 +9,7 @@ import {
   getJobPostingTags,
   JobPosting,
   JobPostingFiles,
+  notifyJobPosting,
   updateJobPosting,
   uploadJobPostingFile,
 } from '@/data/types'
@@ -283,6 +284,20 @@ export const usePutJobPosting = () => {
           })
         })
       }
+    },
+  })
+}
+
+export const useNotifyJobPosting = () => {
+  return useMutation({
+    mutationFn: async (id: number) => {
+      return await notifyJobPosting({
+        path: {
+          id: id,
+        },
+        headers: authHeader() as unknown as Record<string, string>,
+        baseUrl: '/api',
+      })
     },
   })
 }
