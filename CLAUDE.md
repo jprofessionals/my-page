@@ -4,14 +4,49 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-My-Page is a monorepo containing a Spring Boot Kotlin backend API and Next.js TypeScript frontend application, deployed to Google Cloud Platform App Engine.
+My-Page is a monorepo containing a Spring Boot Kotlin backend API and Next.js TypeScript frontend application, deployed to Railway.
 
 **Tech Stack:**
 - Backend: Spring Boot 3.4.5, Kotlin 2.1.21, Java 21, JPA/Hibernate, MySQL
 - Frontend: Next.js 15.3, React 19, TypeScript 5.8, Tailwind CSS, TanStack Query
-- Database: MySQL 5.7+ (Cloud SQL on GCP, local Docker for development)
-- Infrastructure: Google Cloud Platform (App Engine, Cloud SQL, Cloud Storage, Secret Manager)
-- Testing: JUnit 5, Testcontainers, Spring Security Test
+- Database: MySQL (Railway production, local Docker for development)
+- Infrastructure: Railway (hosting), GitHub Actions (CI/CD)
+- Testing: JUnit 5, Testcontainers, Spring Security Test, Vitest
+
+## Language
+
+All user-facing text is in Norwegian. Validation messages, UI labels, and error messages use Norwegian.
+
+## Working Budget Constraints
+
+Hard limits on working set:
+- Max ~15,000 lines of code per work step
+- Assume 10–15 tokens per line, stay well under 150,000 tokens of code
+
+**NEVER:**
+- Open or analyze the "entire repo" in one step
+- Work on more than ~40 files simultaneously (unless they are very small config files)
+- Make large, broadly spread changes across many modules in one step
+
+**Fixed process for each task:**
+
+1. **PLANNING PHASE** (no code changes):
+    - Read only directories, filenames, and short excerpts as needed
+    - Identify which modules/packages are relevant
+    - Estimate number of files and scope (small, medium, large)
+    - If the change affects more than ~15,000 lines: create a plan that splits the task into subtasks
+
+2. **WORKING SET SELECTION:**
+    - Choose a limited set of files (typically 5–20, max ~40)
+    - Fetch only necessary context per file
+    - Stop and revise the plan if you need to read too many files
+
+3. **IMPLEMENTATION:**
+    - Work ONLY on files in the selected working set
+    - Don't add extra refactoring in other modules "while you're at it"
+    - Summarize the change when done, suggest next subtask if needed
+
+**Self-check:** If a task requires more than ~15,000 lines, say so and suggest how it can be split up.
 
 ## Development Environment Setup
 
@@ -52,10 +87,6 @@ mvn clean compile
 
 # Run specific test
 ./mvnw test -Dtest=CreateJobPostingTest
-
-# Deploy to App Engine
-cd my-page-api
-../mvnw package appengine:deploy
 ```
 
 **API runs on:** http://localhost:8080/api
@@ -77,11 +108,6 @@ npm run build
 
 # Format code
 npm run format:fix
-
-# Deploy to App Engine
-cd my-page-app
-npm run build
-gcloud app deploy my-page-app/app.yaml
 ```
 
 **App runs on:** http://localhost:3000 (proxies API requests to localhost:8080)
@@ -89,11 +115,10 @@ gcloud app deploy my-page-app/app.yaml
 ### Database Migrations
 The project uses Liquibase for database schema management. Migrations are in `my-page-api/src/main/resources/db/changelog/`.
 
+Migrations run automatically on application startup. To run manually:
 ```bash
-# Apply migrations to remote database (requires cloud-sql-proxy)
-./cloud-sql-proxy --address 127.0.0.1 --port 3306 my-page-jpro-test:europe-west1:my-page-jpro-test &
 cd my-page-api
-../mvnw -Dliquibase.url=jdbc:mysql://root:@localhost:3306/my-page liquibase:update
+../mvnw liquibase:update
 ```
 
 ## Architecture
@@ -108,7 +133,7 @@ cd my-page-api
 - `dto/` - Data Transfer Objects for API requests/responses
 - `config/` - Spring configuration classes (security, beans, etc.)
 - `extensions/` - Kotlin extension functions
-- `consumer/` - Event consumers and message handlers
+- `consumer/` - External API consumers (CVPartner, Slack, etc.)
 - `provider/` - External service integrations
 - `job/` - Scheduled jobs and background tasks
 - `websocket/` - WebSocket endpoints
@@ -118,8 +143,8 @@ cd my-page-api
 - OpenAPI-first design: API spec at `src/main/resources/openapi/api.yaml` generates Kotlin interfaces
 - Controllers implement generated delegate interfaces (e.g., `JobPostingApiDelegate`)
 - Service layer contains business logic, repositories handle data access
-- OAuth2 JWT authentication via Google (configured in SecurityConfig)
-- Spring profiles: `h2` (in-memory), `local` (local MySQL), `mysql` (Cloud SQL)
+- OAuth2 JWT authentication via Google (configured in ApplicationConfig)
+- Spring profiles: `h2` (in-memory), `local` (local MySQL)
 - Liquibase manages all database schema changes
 
 **Testing:**
@@ -132,7 +157,7 @@ cd my-page-api
 
 **Directory Organization:**
 - `src/pages/` - Next.js pages router (main routing)
-- `src/app/` - Next.js app router (newer features)
+- `src/app/` - Next.js app router (newer features like /utlysninger)
 - `src/components/` - React components
 - `src/services/` - API client services
 - `src/data/types/` - Auto-generated TypeScript types from OpenAPI (DO NOT EDIT)
@@ -148,6 +173,7 @@ cd my-page-api
 - React Hook Form with Zod for form validation
 - Tailwind CSS + DaisyUI + Radix UI for styling
 - Google One Tap authentication
+- @dnd-kit for drag-and-drop functionality (sales pipeline, cabin lottery)
 
 **Important:** Always run `npm run build:openapi` after backend API changes before running the app.
 
@@ -175,7 +201,7 @@ cd my-page-api
 - Prefer generated API types over manual definitions
 - Use TanStack Query for data fetching
 - Component files: PascalCase.tsx
-- Service files: camelCase.service.js/ts
+- Service files: camelCase.service.ts
 
 ## Common Development Tasks
 
@@ -201,20 +227,20 @@ cd my-page-api
 cd my-page-api
 ../mvnw test
 
-# Frontend linting
+# Frontend tests and linting
 cd my-page-app
+npm run test:run
 npm run lint
 npm run format
 ```
 
 ## Deployment
 
-The project deploys to Google Cloud App Engine:
-- Frontend: `default` service (my-page-app)
-- Backend: `api` service (my-page-api)
-- Routing configured in `my-page-app/dispatch.yaml`
+The project deploys to **Railway** with automatic deployments:
+- Push to `main` triggers production deployment
+- Pull requests create preview environments
 
-GitHub Actions handles CI/CD (see `.github/workflows/`).
+GitHub Actions runs tests before deployment (see `.github/workflows/`).
 
 ## Important Notes
 
@@ -222,6 +248,6 @@ GitHub Actions handles CI/CD (see `.github/workflows/`).
 - Database schema changes require Liquibase changesets (no manual DDL)
 - Always regenerate frontend types after OpenAPI spec changes
 - Use Spring profiles appropriately (h2 for quick tests, local for integration testing)
-- GCP secrets stored in Secret Manager (referenced via `sm://` in properties)
+- Environment variables and secrets are configured in Railway dashboard
 - WebSocket endpoint available for real-time features
-- Use an actual TOOD.md file on the root of the project to show and update a plan of action
+- Use a TODO.md file on the root of the project to show and update a plan of action
