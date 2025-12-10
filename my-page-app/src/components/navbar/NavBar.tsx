@@ -21,8 +21,6 @@ const navigation = [
   { href: '/salgstavle-analytics', name: 'Salgsanalyse', requiresAdmin: true },
   { href: '/hyttebooking', name: 'Firmahytte' },
   { href: '/kalkulator', name: 'Lønnskalkulator' },
-  { href: '/ai', name: 'AI' },
-  { href: '/tavle', name: 'Tavle' },
   { href: 'https://intranet.jpro.no', name: 'Intranett 🔗' },
 ]
 
