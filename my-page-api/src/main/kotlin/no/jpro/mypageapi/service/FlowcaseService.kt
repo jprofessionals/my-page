@@ -22,12 +22,18 @@ class FlowcaseService(
 
     private val restClient: RestClient by lazy {
         val apiKey = secretProvider.getFlowcaseApiKey()
-        logger.info("Initializing Flowcase RestClient for subdomain: $subdomain, API key present: ${apiKey != "NOT_SET" && apiKey.isNotBlank()}")
+        val baseUrl = "https://$subdomain.flowcase.com/api/v2"
+        logger.info("Initializing Flowcase RestClient:")
+        logger.info("  - Base URL: $baseUrl")
+        logger.info("  - API key present: ${apiKey != "NOT_SET" && apiKey.isNotBlank()}")
+        logger.info("  - API key length: ${apiKey.length}")
+        logger.info("  - API key first 4 chars: ${apiKey.take(4)}...")
+        logger.info("  - API key last 4 chars: ...${apiKey.takeLast(4)}")
         if (apiKey == "NOT_SET" || apiKey.isBlank()) {
             logger.warn("Flowcase API key is not configured!")
         }
         RestClient.builder()
-            .baseUrl("https://$subdomain.flowcase.com/api/v2")
+            .baseUrl(baseUrl)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer $apiKey")
             .build()

@@ -108,6 +108,68 @@ class SalesPipelineService(
         }
     }
 
+    /**
+     * Add a consultant to the board without a sales activity.
+     * Creates a ConsultantAvailability record if one doesn't exist.
+     * @return the created or existing ConsultantAvailability
+     * @throws IllegalStateException if consultant is already on the board
+     */
+    @Transactional
+    fun addConsultantToBoard(
+        consultantId: Long?,
+        flowcaseEmail: String?,
+        flowcaseName: String?,
+        status: AvailabilityStatus?,
+        notes: String?,
+        addedBy: User
+    ): ConsultantAvailability {
+        // Resolve consultant: either by ID or by Flowcase email
+        val consultant = when {
+            consultantId != null -> {
+                userRepository.findById(consultantId)
+                    .orElseThrow { IllegalArgumentException("Consultant not found: $consultantId") }
+            }
+            !flowcaseEmail.isNullOrBlank() -> {
+                // Find or create user by email
+                userRepository.findUserByEmail(flowcaseEmail) ?: run {
+                    // Create a minimal user record for the Flowcase consultant
+                    val displayName = flowcaseName ?: flowcaseEmail.substringBefore("@")
+                    val nameParts = displayName.split(" ", limit = 2)
+                    val newUser = User(
+                        email = flowcaseEmail,
+                        name = displayName,
+                        givenName = nameParts.getOrNull(0),
+                        familyName = nameParts.getOrNull(1),
+                        sub = "flowcase:$flowcaseEmail", // Unique identifier for Flowcase users
+                        budgets = emptyList()
+                    )
+                    userRepository.save(newUser)
+                }
+            }
+            else -> throw IllegalArgumentException("Either consultantId or flowcaseEmail must be provided")
+        }
+
+        // Check if consultant is already on the board
+        val existingAvailability = consultantAvailabilityRepository.findByConsultantId(consultant.id!!)
+        if (existingAvailability != null) {
+            throw IllegalStateException("Consultant is already on the board")
+        }
+
+        // Get the next display order (at the end of the list)
+        val maxDisplayOrder = consultantAvailabilityRepository.findAllByOrderByDisplayOrderAsc()
+            .maxOfOrNull { it.displayOrder } ?: -1
+
+        val availability = ConsultantAvailability(
+            consultant = consultant,
+            status = status ?: AvailabilityStatus.AVAILABLE,
+            notes = notes,
+            displayOrder = maxDisplayOrder + 1,
+            updatedBy = addedBy
+        )
+
+        return consultantAvailabilityRepository.save(availability)
+    }
+
     // ==================== Sales Activities ====================
 
     @Transactional(readOnly = true)

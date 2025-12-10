@@ -2315,6 +2315,37 @@ paths:
         '500':
           description: Internal server error
 
+  /sales-pipeline/consultants:
+    post:
+      tags:
+        - SalesPipeline
+      operationId: addConsultantToBoard
+      summary: Add a consultant to the sales pipeline board
+      description: Adds a consultant to the board without requiring a sales activity. Creates availability record.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddConsultantToBoardRequest'
+      responses:
+        '201':
+          description: Consultant added to board successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultantAvailability'
+        '400':
+          description: Bad request - consultant already on board
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Consultant not found
+        '500':
+          description: Internal server error
+
   /sales-pipeline/consultants/reorder:
     put:
       tags:
@@ -3432,6 +3463,22 @@ components:
           description: List of consultant IDs in the desired display order
       required:
         - consultantIds
+
+    AddConsultantToBoardRequest:
+      type: object
+      properties:
+        consultantId:
+          type: integer
+          format: int64
+          description: The ID of the consultant to add (use this or flowcaseEmail)
+        flowcaseEmail:
+          type: string
+          description: The Flowcase email of the consultant to add (use this or consultantId)
+        availabilityStatus:
+          $ref: '#/components/schemas/AvailabilityStatus'
+        notes:
+          type: string
+          description: Optional notes about the consultant
 
     SalesActivity:
       type: object

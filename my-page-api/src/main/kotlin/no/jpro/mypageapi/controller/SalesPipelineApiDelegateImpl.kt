@@ -4,6 +4,7 @@ import no.jpro.mypageapi.api.SalesPipelineApiDelegate
 import no.jpro.mypageapi.entity.ActivityStatus
 import no.jpro.mypageapi.entity.ClosedReason
 import no.jpro.mypageapi.entity.SalesStage
+import no.jpro.mypageapi.model.AddConsultantToBoardRequest
 import no.jpro.mypageapi.model.CloseActivity
 import no.jpro.mypageapi.model.AvailabilityStats
 import no.jpro.mypageapi.model.ClosedReasonCount
@@ -83,6 +84,44 @@ class SalesPipelineApiDelegateImpl(
         }
 
         return ResponseEntity.ok(models)
+    }
+
+    override fun addConsultantToBoard(
+        addConsultantToBoardRequest: AddConsultantToBoardRequest
+    ): ResponseEntity<ConsultantAvailabilityModel> {
+        val currentUser = authHelper.getCurrentUser(getTestUserId())
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+
+        if (!currentUser.admin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        // Validate that either consultantId or flowcaseEmail is provided
+        if (addConsultantToBoardRequest.consultantId == null && addConsultantToBoardRequest.flowcaseEmail.isNullOrBlank()) {
+            return ResponseEntity.badRequest().build()
+        }
+
+        val status = addConsultantToBoardRequest.availabilityStatus?.let {
+            no.jpro.mypageapi.entity.AvailabilityStatus.valueOf(it.name)
+        }
+
+        try {
+            val availability = salesPipelineService.addConsultantToBoard(
+                consultantId = addConsultantToBoardRequest.consultantId,
+                flowcaseEmail = addConsultantToBoardRequest.flowcaseEmail,
+                flowcaseName = null, // Could be added to the request if needed
+                status = status,
+                notes = addConsultantToBoardRequest.notes,
+                addedBy = currentUser
+            )
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                .body(salesPipelineMapper.toConsultantAvailabilityModel(availability))
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.notFound().build()
+        } catch (e: IllegalStateException) {
+            return ResponseEntity.badRequest().build()
+        }
     }
 
     // ==================== Consultant Availability ====================

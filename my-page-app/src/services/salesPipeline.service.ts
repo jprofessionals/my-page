@@ -23,6 +23,7 @@ import {
   getFlowcaseConsultants,
   removeConsultantFromPipeline,
   reorderConsultants,
+  addConsultantToBoard,
 } from '@/data/types/sdk.gen'
 import {
   type CreateSalesActivity,
@@ -30,6 +31,7 @@ import {
   type UpdateStage,
   type CloseActivity,
   type UpdateConsultantAvailability,
+  type AddConsultantToBoardRequest,
   type ActivityStatus,
 } from '@/data/types/types.gen'
 import '@/services/openapi-client' // Ensure client is configured
@@ -202,6 +204,17 @@ export const salesPipelineService = {
   },
 
   /**
+   * Add a consultant to the board without a sales activity.
+   * Creates an availability record for the consultant.
+   */
+  async addConsultantToBoard(request: AddConsultantToBoardRequest) {
+    const { data } = await addConsultantToBoard({
+      body: request,
+    })
+    return data
+  },
+
+  /**
    * Reorder consultants on the sales pipeline board
    * @param consultantIds - List of consultant IDs in the desired display order
    */
@@ -248,4 +261,5 @@ export type {
   UpdateStage,
   CloseActivity,
   UpdateConsultantAvailability,
+  AddConsultantToBoardRequest,
 } from '@/data/types/types.gen'

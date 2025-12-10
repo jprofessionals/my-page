@@ -32,6 +32,7 @@ import SalesPipelineCard from './SalesPipelineCard'
 import CreateActivityModal from './CreateActivityModal'
 import EditActivityModal from './EditActivityModal'
 import EditAvailabilityModal from './EditAvailabilityModal'
+import AddConsultantModal from './AddConsultantModal'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { type ConsultantWithActivities } from '@/services/salesPipeline.service'
 import Link from 'next/link'
@@ -85,6 +86,7 @@ export default function SalesPipelineBoardComponent() {
   const [board, setBoard] = useState<SalesPipelineBoard | null>(null)
   const [loading, setLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showAddConsultantModal, setShowAddConsultantModal] = useState(false)
   const [activeActivity, setActiveActivity] = useState<SalesActivity | null>(null)
   const [editingActivity, setEditingActivity] = useState<SalesActivity | null>(null)
   const [editingConsultant, setEditingConsultant] = useState<ConsultantWithActivities | null>(null)
@@ -193,6 +195,11 @@ export default function SalesPipelineBoardComponent() {
 
   const handleActivityCreated = () => {
     setShowCreateModal(false)
+    loadBoard()
+  }
+
+  const handleConsultantAdded = () => {
+    setShowAddConsultantModal(false)
     loadBoard()
   }
 
@@ -359,6 +366,14 @@ export default function SalesPipelineBoardComponent() {
           )}
           {isAdmin && (
             <button
+              className="btn btn-outline"
+              onClick={() => setShowAddConsultantModal(true)}
+            >
+              + Konsulent
+            </button>
+          )}
+          {isAdmin && (
+            <button
               className="btn btn-primary"
               onClick={() => setShowCreateModal(true)}
             >
@@ -460,6 +475,14 @@ export default function SalesPipelineBoardComponent() {
         <CreateActivityModal
           onClose={() => setShowCreateModal(false)}
           onCreated={handleActivityCreated}
+        />
+      )}
+
+      {/* Add consultant modal */}
+      {showAddConsultantModal && (
+        <AddConsultantModal
+          onClose={() => setShowAddConsultantModal(false)}
+          onAdded={handleConsultantAdded}
         />
       )}
 
