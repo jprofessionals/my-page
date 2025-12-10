@@ -8,12 +8,16 @@ import no.jpro.mypageapi.extensions.getGivenName
 import no.jpro.mypageapi.extensions.getIcon
 import no.jpro.mypageapi.extensions.getName
 import no.jpro.mypageapi.extensions.getSub
+import org.springframework.context.annotation.Lazy
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
 import no.jpro.mypageapi.model.User as UserModel
 
 @Service
-class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
+class UserMapper(
+    private val budgetPostMapper: BudgetPostMapper,
+    @Lazy private val budgetMapper: BudgetMapper
+) {
     fun toUserDTO(user: User): UserDTO = UserDTO(
         email = user.email,
         name = user.name,
@@ -48,7 +52,7 @@ class UserMapper(private val budgetPostMapper: BudgetPostMapper) {
         startDate = userDTO.startDate,
         admin = userDTO.admin,
         employeeNumber = userDTO.employeeNumber,
-        budgets = null // Budgets are mapped separately to avoid circular dependency
+        budgets = userDTO.budgets?.map { budgetMapper.toBudgetModel(it) }
     )
 
     fun toUserModel(user: User): UserModel = toUserModel(toUserDTO(user), user.id)
