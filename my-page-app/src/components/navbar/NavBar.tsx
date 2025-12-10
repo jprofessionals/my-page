@@ -17,7 +17,7 @@ const navigation = [
   { href: '/admin/hyttetrekning', name: 'Hyttetrekning Admin', requiresAdmin: true },
   { href: '/', name: 'Hjem' },
   { href: '/utlysninger', name: 'Utlysninger' },
-  { href: '/salgstavle', name: 'Salgstavle', requiresAdmin: true },
+  { href: '/salgstavle', name: 'Salgstavle' },
   { href: '/hyttebooking', name: 'Firmahytte' },
   { href: '/kalkulator', name: 'Lønnskalkulator' },
   { href: '/ai', name: 'AI' },
