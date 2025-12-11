@@ -46,7 +46,7 @@ class TaskController(val bookingLotteryService: BookingLotteryService, val slack
         if (authKey != secretProvider.getTaskSchedulerKey()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
-        slackNotificationService.notifySlackChannelWithUpcomingBookings()
-        return ResponseEntity.ok("Notifications have been posted to slack")
+        val result = slackNotificationService.notifySlackChannelWithUpcomingBookings()
+        return ResponseEntity.ok(result)
     }
 }

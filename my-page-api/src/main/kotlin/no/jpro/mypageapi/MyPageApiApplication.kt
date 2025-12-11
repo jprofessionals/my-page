@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.servers.Server
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.scheduling.annotation.EnableScheduling
 
 @OpenAPIDefinition(
     servers = [Server(url = "/api")]
@@ -17,6 +18,7 @@ import org.springframework.boot.runApplication
     scheme = "bearer"
 )
 @SpringBootApplication
+@EnableScheduling
 class MyPageApiApplication
 
 fun main(args: Array<String>) {

@@ -622,6 +622,28 @@ paths:
                 type: string
         '403':
           description: User not found
+  /booking/admin/notify-upcoming:
+    post:
+      tags:
+        - Booking
+      operationId: notifyUpcomingBookings
+      summary: Send Slack notification about upcoming cabin bookings
+      description: |
+        Triggers a Slack notification to the cabin channel with information about
+        who has booked the cabins for the upcoming week. Admin only.
+      responses:
+        '200':
+          description: Notification sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Result message from Slack
+        '403':
+          description: Not authorized (admin only)
   /budget/{employeeNumber}:
     get:
       tags:

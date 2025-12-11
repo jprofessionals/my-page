@@ -7,10 +7,37 @@ import AdminBooking from '@/components/hyttebooking/AdminBooking'
 import InfoNotices from './InfoNotices'
 import bookingBarStyles from '@/components/hyttebooking/month-overview/components/month-calendar/calendar-cell/booking-bar/BookingBar.module.css'
 import cabinLotteryService from '@/services/cabinLottery.service'
+import { useAuthContext } from '@/providers/AuthProvider'
+import { notifyUpcomingBookings } from '@/data/types/sdk.gen'
+import { toast } from 'react-toastify'
+import { Button } from '@/components/ui/button'
 
 function Hyttebooking() {
   const [currentDrawing, setCurrentDrawing] = useState<{ status: string } | null>(null)
   const [loadingDrawing, setLoadingDrawing] = useState(true)
+  const [sendingNotification, setSendingNotification] = useState(false)
+  const { user } = useAuthContext()
+
+  const handleSendNotification = async () => {
+    setSendingNotification(true)
+    try {
+      const response = await notifyUpcomingBookings()
+      console.log('Notification response:', response)
+      if (response.error) {
+        console.error('Notification error:', response.error)
+        toast.error('Kunne ikke sende melding')
+      } else if (response.data?.message) {
+        toast.success('Slack-melding sendt!')
+      } else {
+        toast.error('Kunne ikke sende melding')
+      }
+    } catch (error) {
+      console.error('Failed to send notification:', error)
+      toast.error('Kunne ikke sende melding')
+    } finally {
+      setSendingNotification(false)
+    }
+  }
 
   useEffect(() => {
     cabinLotteryService
@@ -175,7 +202,25 @@ function Hyttebooking() {
             flexGrow: '1',
           }}
         >
-          <AdminBooking />
+          <div className="flex flex-col gap-4 items-start">
+            <AdminBooking />
+            {user?.admin && (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">Admin: Slack-varsling</h3>
+                <p className="text-xs text-gray-500 mb-3">
+                  Ukesvarsel sendes automatisk hver tirsdag kl. 09:00. Bruk knappen under for å sende manuelt.
+                </p>
+                <Button
+                  onClick={handleSendNotification}
+                  disabled={sendingNotification}
+                  variant="outline"
+                  size="sm"
+                >
+                  {sendingNotification ? 'Sender...' : 'Send ukesvarsel til Slack'}
+                </Button>
+              </div>
+            )}
+          </div>
           <InfoNotices />
         </div>
         <div className="flex flex-col gap-3 mt-7">

@@ -15,7 +15,7 @@ class SlackNotificationService(
     val apartmentRepository: ApartmentRepository
 ) {
 
-    fun notifySlackChannelWithUpcomingBookings() {
+    fun notifySlackChannelWithUpcomingBookings(): String {
 
         val periodStart= findPeriodStart();
 
@@ -44,7 +44,7 @@ class SlackNotificationService(
             }
         }
 
-        slackService.postMessageToChannel(notificationBuilder.toString())
+        return slackService.postMessageToChannel(notificationBuilder.toString())
     }
 
     private fun findPeriodStart(): LocalDate {

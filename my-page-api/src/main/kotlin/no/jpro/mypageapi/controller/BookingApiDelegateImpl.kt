@@ -5,7 +5,9 @@ import no.jpro.mypageapi.extensions.getSub
 import no.jpro.mypageapi.model.Apartment
 import no.jpro.mypageapi.model.Booking
 import no.jpro.mypageapi.model.BookingUpdate
+import no.jpro.mypageapi.model.NotifyUpcomingBookings200Response
 import no.jpro.mypageapi.service.BookingService
+import no.jpro.mypageapi.service.SlackNotificationService
 import no.jpro.mypageapi.service.UserService
 import no.jpro.mypageapi.utils.AuthenticationHelper
 import no.jpro.mypageapi.utils.mapper.ApartmentMapper
@@ -26,6 +28,7 @@ class BookingApiDelegateImpl(
     private val bookingMapper: BookingMapper,
     private val apartmentMapper: ApartmentMapper,
     private val authHelper: AuthenticationHelper,
+    private val slackNotificationService: SlackNotificationService,
     private val request: Optional<NativeWebRequest>
 ) : BookingApiDelegate {
 
@@ -129,5 +132,20 @@ class BookingApiDelegateImpl(
         } catch (e: IllegalArgumentException) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build()
         }
+    }
+
+    override fun notifyUpcomingBookings(): ResponseEntity<NotifyUpcomingBookings200Response> {
+        val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
+
+        // Check if user is admin
+        val user = authHelper.getCurrentUser(testUserId)
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+
+        if (!user.admin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        val result = slackNotificationService.notifySlackChannelWithUpcomingBookings()
+        return ResponseEntity.ok(NotifyUpcomingBookings200Response(message = result))
     }
 }

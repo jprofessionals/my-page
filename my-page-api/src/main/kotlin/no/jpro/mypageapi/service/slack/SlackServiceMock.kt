@@ -32,6 +32,7 @@ class SlackServiceMock : SlackService {
     override fun postMessageToChannel(
         msg: String
     ): String {
+        println("[MOCK SLACK] Hytte-kanal: $msg")
         return "Melding sendt til kanal med ID mock-id";
     }
 
