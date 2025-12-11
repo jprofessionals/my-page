@@ -215,6 +215,8 @@ export default function CreateActivityModal({ onClose, onCreated }: Props) {
     offerDeadlineDate: '',
     offerDeadlineTime: '12:00',
     offerDeadlineAsap: false,
+    interviewDate: '',
+    interviewTime: '10:00',
   })
 
   useEffect(() => {
@@ -283,6 +285,18 @@ export default function CreateActivityModal({ onClose, onCreated }: Props) {
         offerDeadline = `${formData.offerDeadlineDate}T${formData.offerDeadlineTime || '12:00'}:00${tzSign}${tzHours}:${tzMins}`
       }
 
+      // Combine date and time for interviewDate
+      let interviewDate: string | undefined = undefined
+      if (formData.interviewDate) {
+        const dateTime = `${formData.interviewDate}T${formData.interviewTime || '10:00'}:00`
+        const date = new Date(dateTime)
+        const tzOffset = -date.getTimezoneOffset()
+        const tzHours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0')
+        const tzMins = (Math.abs(tzOffset) % 60).toString().padStart(2, '0')
+        const tzSign = tzOffset >= 0 ? '+' : '-'
+        interviewDate = `${formData.interviewDate}T${formData.interviewTime || '10:00'}:00${tzSign}${tzHours}:${tzMins}`
+      }
+
       // Create activity using flowcaseEmail - backend will find or create the user
       await salesPipelineService.createActivity({
         flowcaseEmail: selectedConsultant.email,
@@ -297,6 +311,7 @@ export default function CreateActivityModal({ onClose, onCreated }: Props) {
         expectedStartDate: formData.expectedStartDate || undefined,
         offerDeadline: offerDeadline,
         offerDeadlineAsap: formData.offerDeadlineAsap,
+        interviewDate: interviewDate,
       })
       toast.success('Aktivitet opprettet!')
       onCreated()
@@ -525,6 +540,46 @@ export default function CreateActivityModal({ onClose, onCreated }: Props) {
                 </select>
               </div>
             )}
+          </div>
+
+          {/* Interview date */}
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Intervjudato</span>
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="date"
+                className="input input-bordered flex-1"
+                value={formData.interviewDate}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    interviewDate: e.target.value || '',
+                  })
+                }
+              />
+              <select
+                className="select select-bordered w-28"
+                value={formData.interviewTime}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    interviewTime: e.target.value,
+                  })
+                }
+              >
+                {Array.from({ length: 24 * 12 }, (_, i) => {
+                  const hour = Math.floor(i / 12)
+                  const minute = (i % 12) * 5
+                  return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+                }).map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Notes */}

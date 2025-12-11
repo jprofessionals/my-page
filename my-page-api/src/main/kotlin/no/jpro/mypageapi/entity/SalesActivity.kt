@@ -90,6 +90,9 @@ class SalesActivity(
     @Column(name = "deadline_reminder_sent")
     var deadlineReminderSent: Boolean = false,
 
+    @Column(name = "interview_date")
+    var interviewDate: LocalDateTime? = null,
+
     @OneToMany(mappedBy = "activity", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     var stageHistory: MutableList<SalesStageHistory> = mutableListOf()
 

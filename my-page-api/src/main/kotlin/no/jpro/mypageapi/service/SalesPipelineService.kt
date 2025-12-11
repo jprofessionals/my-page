@@ -216,6 +216,7 @@ class SalesPipelineService(
         expectedStartDate: LocalDate?,
         offerDeadline: LocalDateTime?,
         offerDeadlineAsap: Boolean?,
+        interviewDate: LocalDateTime?,
         createdBy: User
     ): SalesActivity {
         // Resolve consultant: either by ID or by Flowcase email
@@ -262,6 +263,7 @@ class SalesPipelineService(
             expectedStartDate = expectedStartDate,
             offerDeadline = offerDeadline,
             offerDeadlineAsap = offerDeadlineAsap ?: false,
+            interviewDate = interviewDate,
             createdBy = createdBy
         )
 
@@ -292,6 +294,7 @@ class SalesPipelineService(
         expectedStartDate: LocalDate?,
         offerDeadline: LocalDateTime?,
         offerDeadlineAsap: Boolean?,
+        interviewDate: LocalDateTime?,
         updatedBy: User
     ): SalesActivity {
         val activity = salesActivityRepository.findById(id)
@@ -318,6 +321,8 @@ class SalesPipelineService(
         // Allow clearing offerDeadline by setting it directly
         activity.offerDeadline = offerDeadline
         offerDeadlineAsap?.let { activity.offerDeadlineAsap = it }
+        // Allow clearing interviewDate by setting it directly
+        activity.interviewDate = interviewDate
         activity.updatedAt = LocalDateTime.now()
 
         return salesActivityRepository.save(activity)

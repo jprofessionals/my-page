@@ -79,7 +79,8 @@ class SalesPipelineMapper(
             closedAt = entity.closedAt?.let { toOffsetDateTime(it) },
             expectedStartDate = entity.expectedStartDate,
             offerDeadline = entity.offerDeadline?.let { toOffsetDateTime(it) },
-            offerDeadlineAsap = entity.offerDeadlineAsap
+            offerDeadlineAsap = entity.offerDeadlineAsap,
+            interviewDate = entity.interviewDate?.let { toOffsetDateTime(it) }
         )
 
     fun toSalesActivityWithHistoryModel(entity: SalesActivity): SalesActivityWithHistoryModel =
@@ -104,6 +105,7 @@ class SalesPipelineMapper(
             expectedStartDate = entity.expectedStartDate,
             offerDeadline = entity.offerDeadline?.let { toOffsetDateTime(it) },
             offerDeadlineAsap = entity.offerDeadlineAsap,
+            interviewDate = entity.interviewDate?.let { toOffsetDateTime(it) },
             stageHistory = entity.stageHistory.map { toSalesStageHistoryEntryModel(it) }
         )
 

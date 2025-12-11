@@ -234,6 +234,7 @@ class SalesPipelineApiDelegateImpl(
             expectedStartDate = createSalesActivity.expectedStartDate,
             offerDeadline = createSalesActivity.offerDeadline?.toOsloLocalDateTime(),
             offerDeadlineAsap = createSalesActivity.offerDeadlineAsap,
+            interviewDate = createSalesActivity.interviewDate?.toOsloLocalDateTime(),
             createdBy = currentUser
         )
 
@@ -265,6 +266,7 @@ class SalesPipelineApiDelegateImpl(
                 expectedStartDate = updateSalesActivity.expectedStartDate,
                 offerDeadline = updateSalesActivity.offerDeadline?.toOsloLocalDateTime(),
                 offerDeadlineAsap = updateSalesActivity.offerDeadlineAsap,
+                interviewDate = updateSalesActivity.interviewDate?.toOsloLocalDateTime(),
                 updatedBy = currentUser
             )
             return ResponseEntity.ok(salesPipelineMapper.toSalesActivityModel(activity))

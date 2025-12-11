@@ -3547,6 +3547,11 @@ components:
         offerDeadlineAsap:
           type: boolean
           description: If true, the offer deadline is ASAP (as soon as possible)
+        interviewDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date and time of the interview
       required:
         - id
         - consultant
@@ -3646,6 +3651,11 @@ components:
         offerDeadlineAsap:
           type: boolean
           description: If true, the offer deadline is ASAP (as soon as possible)
+        interviewDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date and time of the interview
       required:
         - title
 
@@ -3689,6 +3699,11 @@ components:
         offerDeadlineAsap:
           type: boolean
           description: If true, the offer deadline is ASAP (as soon as possible)
+        interviewDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date and time of the interview
 
     UpdateStage:
       type: object

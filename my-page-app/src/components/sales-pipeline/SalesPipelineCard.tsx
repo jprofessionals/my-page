@@ -136,6 +136,18 @@ export default function SalesPipelineCard({
           </div>
         )}
 
+        {/* Interview date */}
+        {activity.interviewDate && (
+          <div className="text-xs text-purple-600 font-medium">
+            Intervju: {new Date(activity.interviewDate).toLocaleDateString('nb-NO', {
+              day: 'numeric',
+              month: 'short',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </div>
+        )}
+
         {/* Admin actions */}
         {isAdmin && showActions && (
           <div className="mt-2 flex flex-wrap gap-1">

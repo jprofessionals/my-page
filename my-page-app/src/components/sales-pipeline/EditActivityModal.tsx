@@ -39,21 +39,23 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
   const [closeReason, setCloseReason] = useState<ClosedReason>('OTHER_CANDIDATE_CHOSEN')
   const [closeReasonNote, setCloseReasonNote] = useState('')
 
-  // Parse datetime for form input (round to nearest half hour)
-  const parseOfferDeadline = () => {
-    if (!activity.offerDeadline) return { date: '', time: '12:00' }
-    const dt = new Date(activity.offerDeadline)
+  // Parse datetime for form input (round to nearest 5 minutes)
+  const parseDateTime = (dateTimeStr: string | undefined | null, defaultTime: string) => {
+    if (!dateTimeStr) return { date: '', time: defaultTime }
+    const dt = new Date(dateTimeStr)
     const date = dt.toISOString().split('T')[0]
     const hours = dt.getHours()
     const minutes = dt.getMinutes()
-    // Round to nearest half hour
-    const roundedMinutes = minutes < 15 ? '00' : minutes < 45 ? '30' : '00'
-    const roundedHours = minutes >= 45 ? hours + 1 : hours
-    const time = `${roundedHours.toString().padStart(2, '0')}:${roundedMinutes}`
+    // Round to nearest 5 minutes
+    const roundedMinutes = Math.round(minutes / 5) * 5
+    const adjustedHours = roundedMinutes === 60 ? hours + 1 : hours
+    const finalMinutes = roundedMinutes === 60 ? 0 : roundedMinutes
+    const time = `${adjustedHours.toString().padStart(2, '0')}:${finalMinutes.toString().padStart(2, '0')}`
     return { date, time }
   }
 
-  const { date: initialDeadlineDate, time: initialDeadlineTime } = parseOfferDeadline()
+  const { date: initialDeadlineDate, time: initialDeadlineTime } = parseDateTime(activity.offerDeadline, '12:00')
+  const { date: initialInterviewDate, time: initialInterviewTime } = parseDateTime(activity.interviewDate, '10:00')
 
   const [formData, setFormData] = useState({
     title: activity.title,
@@ -67,6 +69,8 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
     offerDeadlineDate: initialDeadlineDate,
     offerDeadlineTime: initialDeadlineTime || '12:00',
     offerDeadlineAsap: activity.offerDeadlineAsap || false,
+    interviewDate: initialInterviewDate,
+    interviewTime: initialInterviewTime || '10:00',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,6 +97,18 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
         offerDeadline = `${formData.offerDeadlineDate}T${formData.offerDeadlineTime || '12:00'}:00${tzSign}${tzHours}:${tzMins}`
       }
 
+      // Combine date and time for interviewDate
+      let interviewDate: string | undefined = undefined
+      if (formData.interviewDate) {
+        const dateTime = `${formData.interviewDate}T${formData.interviewTime || '10:00'}:00`
+        const date = new Date(dateTime)
+        const tzOffset = -date.getTimezoneOffset()
+        const tzHours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0')
+        const tzMins = (Math.abs(tzOffset) % 60).toString().padStart(2, '0')
+        const tzSign = tzOffset >= 0 ? '+' : '-'
+        interviewDate = `${formData.interviewDate}T${formData.interviewTime || '10:00'}:00${tzSign}${tzHours}:${tzMins}`
+      }
+
       // Update activity details
       await salesPipelineService.updateActivity(activity.id, {
         title: formData.title,
@@ -104,6 +120,7 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
         expectedStartDate: formData.expectedStartDate || undefined,
         offerDeadline: offerDeadline,
         offerDeadlineAsap: formData.offerDeadlineAsap,
+        interviewDate: interviewDate,
       })
 
       // Update stage separately if it changed
@@ -427,6 +444,46 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
                   </select>
                 </div>
               )}
+            </div>
+
+            {/* Interview date */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Intervjudato</span>
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="date"
+                  className="input input-bordered flex-1"
+                  value={formData.interviewDate}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      interviewDate: e.target.value || '',
+                    })
+                  }
+                />
+                <select
+                  className="select select-bordered w-28"
+                  value={formData.interviewTime}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      interviewTime: e.target.value,
+                    })
+                  }
+                >
+                  {Array.from({ length: 24 * 12 }, (_, i) => {
+                    const hour = Math.floor(i / 12)
+                    const minute = (i % 12) * 5
+                    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+                  }).map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Notes */}
