@@ -73,10 +73,12 @@ jobs:
   deploy-api-test:
     needs: build-api
     runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
     environment: railway-test
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: bash <(curl -fsSL cli.new)
 
       - name: Deploy API to Railway
         run: railway up --service ${{ vars.RAILWAY_API_SERVICE_NAME || 'my-page-api' }}
@@ -88,10 +90,12 @@ jobs:
   deploy-app-test:
     needs: build-app
     runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
     environment: railway-test
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: bash <(curl -fsSL cli.new)
 
       - name: Deploy App to Railway
         run: railway up --service ${{ vars.RAILWAY_APP_SERVICE_NAME || 'my-page-app' }}
@@ -103,10 +107,12 @@ jobs:
   deploy-api-prod:
     needs: deploy-api-test
     runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
     environment: railway-prod
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: bash <(curl -fsSL cli.new)
 
       - name: Deploy API to Railway Production
         run: railway up --service ${{ vars.RAILWAY_API_SERVICE_NAME || 'my-page-api' }}
@@ -117,10 +123,12 @@ jobs:
   deploy-app-prod:
     needs: deploy-app-test
     runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
     environment: railway-prod
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: bash <(curl -fsSL cli.new)
 
       - name: Deploy App to Railway Production
         run: railway up --service ${{ vars.RAILWAY_APP_SERVICE_NAME || 'my-page-app' }}
