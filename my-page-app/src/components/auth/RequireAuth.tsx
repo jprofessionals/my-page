@@ -37,6 +37,34 @@ function RequireAuth({ children }: PropsWithChildren) {
     }
   }
 
+  // Show session expired message with clear instructions
+  if (userFetchStatus === 'sessionExpired') {
+    return (
+      <div className="flex justify-center flex-col items-center gap-4 w-full mt-[30%]">
+        <div className="text-center max-w-md">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
+            <h2 className="text-xl font-semibold text-amber-800 mb-2">
+              Sesjonen har utløpt
+            </h2>
+            <p className="text-amber-700 mb-4">
+              Du har blitt logget ut. Dette kan skje etter en oppdatering av
+              Min Side eller hvis du har vært inaktiv en stund.
+            </p>
+            <p className="text-amber-600 text-sm">
+              Logg inn på nytt for å fortsette.
+            </p>
+          </div>
+        </div>
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="lazyOnload"
+          onReady={() => authenticate(signInDivRef)}
+        />
+        <div id="signInDiv" ref={signInDivRef}></div>
+      </div>
+    )
+  }
+
   if (!isAuthenticated || userFetchStatus === 'signedOut') {
     return (
       <div className="flex justify-center flex-col items-center gap-4 w-full mt-[30%]">

@@ -14,9 +14,11 @@ import {
   uploadJobPostingFile,
 } from '@/data/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import authHeader from '@/services/auth-header'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { DateTime } from 'luxon'
+
+// Note: Auth headers and baseUrl are now configured globally in openapi-client.ts
+// via request interceptor, so we don't need to pass them to each API call
 
 const jobPostingsCacheName = 'job-postings'
 const jobPostingFilesCacheName = 'job-posting-files'
@@ -32,8 +34,6 @@ export const useDeleteJobPosting = () => {
         path: {
           id: id,
         },
-        headers: authHeader() as unknown as Record<string, string>,
-        baseUrl: '/api',
       })
     },
 
@@ -59,8 +59,6 @@ export const useDeleteJobPostingFiles = () => {
           jobPostingId: jobPostingId,
           fileName: fileName,
         },
-        headers: authHeader() as unknown as Record<string, string>,
-        baseUrl: '/api',
       })
     },
 
@@ -76,10 +74,7 @@ export const useJobPostingCustomers = () => {
   const { userFetchStatus } = useAuthContext()
 
   const fetchJobPostingCustomers = async () => {
-    return await getJobPostingCustomers({
-      headers: authHeader() as unknown as Record<string, string>,
-      baseUrl: '/api',
-    })
+    return await getJobPostingCustomers({})
   }
 
   return useQuery({
@@ -98,8 +93,6 @@ export const useJobPostingFiles = (id: number) => {
       path: {
         jobPostingId: id,
       },
-      headers: authHeader() as unknown as Record<string, string>,
-      baseUrl: '/api',
     })
   }
 
@@ -127,8 +120,6 @@ export const usePostJobPostingFiles = () => {
           jobPostingId: jobPostingId,
         },
         body: newJobPostingFile,
-        headers: authHeader() as unknown as Record<string, string>,
-        baseUrl: '/api',
       })
     },
 
@@ -144,10 +135,7 @@ export const useJobPostingTags = () => {
   const { userFetchStatus } = useAuthContext()
 
   const fetchJobPostingTags = async () => {
-    return await getJobPostingTags({
-      headers: authHeader() as unknown as Record<string, string>,
-      baseUrl: '/api',
-    })
+    return await getJobPostingTags({})
   }
 
   return useQuery({
@@ -178,8 +166,6 @@ export const useJobPostings = (
         'include-ids': includeIds ? includeIds : undefined,
         tags: tags ? tags : undefined,
       },
-      headers: authHeader() as unknown as Record<string, string>,
-      baseUrl: '/api',
     })
   }
 
@@ -209,8 +195,6 @@ export const usePostJobPosting = () => {
           notify: notify,
         },
         body: newJobPosting,
-        headers: authHeader() as unknown as Record<string, string>,
-        baseUrl: '/api',
       })
     },
 
@@ -256,8 +240,6 @@ export const usePutJobPosting = () => {
           'update-message': updateMessage ? updateMessage : undefined,
         },
         body: updatedJobPosting,
-        headers: authHeader() as unknown as Record<string, string>,
-        baseUrl: '/api',
       })
     },
 
@@ -295,8 +277,6 @@ export const useNotifyJobPosting = () => {
         path: {
           id: id,
         },
-        headers: authHeader() as unknown as Record<string, string>,
-        baseUrl: '/api',
       })
     },
   })

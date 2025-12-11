@@ -14,7 +14,11 @@ import ApiService from '@/services/api.service'
 import config from '../config/config'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { configureOpenAPIClient } from '@/services/openapi-client'
+import {
+  configureOpenAPIClient,
+  SESSION_EXPIRED_EVENT,
+  resetSessionExpiredFlag,
+} from '@/services/openapi-client'
 
 type UserFetchStatus =
   | 'init'
@@ -22,6 +26,7 @@ type UserFetchStatus =
   | 'fetched'
   | 'fetchFailed'
   | 'signedOut'
+  | 'sessionExpired'
 
 type AuthContextType = {
   isAuthenticated: boolean
@@ -48,6 +53,26 @@ export function AuthProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     configureOpenAPIClient()
   }, [])
+
+  // Listen for session expired events from the API client
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const handleSessionExpired = () => {
+      // Only handle if we think we're authenticated
+      if (userToken) {
+        setUserToken(null)
+        setUser(null)
+        setUserFetchStatus('sessionExpired')
+      }
+    }
+
+    window.addEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired)
+
+    return () => {
+      window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired)
+    }
+  }, [userToken])
 
   useEffect(() => {
     // Only access storage in browser environment
@@ -163,6 +188,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
         callback: (response) => {
           sessionStorage.setItem('user_token', response.credential)
           setUserToken(response.credential)
+          setUserFetchStatus('init') // Reset status so user data is fetched
+          resetSessionExpiredFlag() // Allow future 401s to be handled
         },
       })
 

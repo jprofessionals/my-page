@@ -5,9 +5,23 @@
  * - Base URL
  * - Authentication headers (Bearer token or X-Test-User-Id)
  * - Request/response interceptors
+ * - Global 401 handling for session expiry
  */
 
 import { client } from '@/data/types/client.gen'
+
+// Custom event for session expiry - components can listen to this
+export const SESSION_EXPIRED_EVENT = 'sessionExpired'
+
+/**
+ * Dispatch session expired event
+ * This allows any component to react to authentication failures
+ */
+export function dispatchSessionExpired() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT))
+  }
+}
 
 /**
  * Get authentication headers for API requests
@@ -38,6 +52,16 @@ function getAuthHeaders(): Record<string, string> {
   return headers
 }
 
+// Track if we've already dispatched a session expired event to avoid duplicates
+let sessionExpiredDispatched = false
+
+/**
+ * Reset the session expired flag (called after user logs in again)
+ */
+export function resetSessionExpiredFlag() {
+  sessionExpiredDispatched = false
+}
+
 /**
  * Configure the OpenAPI client
  * Call this once when the app starts
@@ -63,6 +87,21 @@ export function configureOpenAPIClient() {
     })
 
     return request
+  })
+
+  // Set up response interceptor to handle 401 errors globally
+  client.interceptors.response.use((response) => {
+    if (response.status === 401 && !sessionExpiredDispatched) {
+      sessionExpiredDispatched = true
+
+      // Clear the stored token
+      sessionStorage.removeItem('user_token')
+
+      // Dispatch event so AuthProvider can handle it
+      dispatchSessionExpired()
+    }
+
+    return response
   })
 }
 
