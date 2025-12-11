@@ -18,16 +18,16 @@ function Hyttebooking() {
   const [sendingNotification, setSendingNotification] = useState(false)
   const { user } = useAuthContext()
 
-  const handleSendNotification = async () => {
+  const handleSendNotification = async (testMode: boolean = false) => {
     setSendingNotification(true)
     try {
-      const response = await notifyUpcomingBookings()
+      const response = await notifyUpcomingBookings({ query: { testMode } })
       console.log('Notification response:', response)
       if (response.error) {
         console.error('Notification error:', response.error)
         toast.error('Kunne ikke sende melding')
       } else if (response.data?.message) {
-        toast.success('Slack-melding sendt!')
+        toast.success(response.data.message)
       } else {
         toast.error('Kunne ikke sende melding')
       }
@@ -208,16 +208,26 @@ function Hyttebooking() {
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 <h3 className="text-sm font-semibold text-gray-700 mb-2">Admin: Slack-varsling</h3>
                 <p className="text-xs text-gray-500 mb-3">
-                  Ukesvarsel sendes automatisk hver tirsdag kl. 09:00. Bruk knappen under for å sende manuelt.
+                  Ukesvarsel sendes automatisk hver tirsdag kl. 09:00. Bruk knappene under for å sende manuelt.
                 </p>
-                <Button
-                  onClick={handleSendNotification}
-                  disabled={sendingNotification}
-                  variant="outline"
-                  size="sm"
-                >
-                  {sendingNotification ? 'Sender...' : 'Send ukesvarsel til Slack'}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => handleSendNotification(true)}
+                    disabled={sendingNotification}
+                    variant="outline"
+                    size="sm"
+                  >
+                    {sendingNotification ? 'Sender...' : 'Test (send til meg)'}
+                  </Button>
+                  <Button
+                    onClick={() => handleSendNotification(false)}
+                    disabled={sendingNotification}
+                    variant="default"
+                    size="sm"
+                  >
+                    {sendingNotification ? 'Sender...' : 'Send til #hytte'}
+                  </Button>
+                </div>
               </div>
             )}
           </div>

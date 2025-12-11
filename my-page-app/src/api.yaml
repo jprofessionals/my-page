@@ -631,6 +631,14 @@ paths:
       description: |
         Triggers a Slack notification to the cabin channel with information about
         who has booked the cabins for the upcoming week. Admin only.
+      parameters:
+        - name: testMode
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: If true, sends the message as a DM to the requesting user instead of the cabin channel
       responses:
         '200':
           description: Notification sent successfully

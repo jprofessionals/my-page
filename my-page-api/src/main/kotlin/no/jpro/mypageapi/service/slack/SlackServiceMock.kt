@@ -36,6 +36,14 @@ class SlackServiceMock : SlackService {
         return "Melding sendt til kanal med ID mock-id";
     }
 
+    override fun sendDirectMessage(
+        userEmail: String,
+        msg: String
+    ): String {
+        println("[MOCK SLACK] DM til $userEmail: $msg")
+        return "Testmelding sendt til $userEmail (mock)"
+    }
+
     override fun postMessageToSalesPipelineChannel(
         msg: String
     ): String {

@@ -20,6 +20,7 @@ import java.util.*
 class SlackServiceImpl(
     private val secretProvider: SecretProvider
 ) : SlackService {
+    private val logger = org.slf4j.LoggerFactory.getLogger(SlackServiceImpl::class.java)
     @Value("\${slack.hyttekanal.id}")
     private var hytteBookingChannel: String = "NOT_SET"
 
@@ -32,8 +33,17 @@ class SlackServiceImpl(
         user: User?
     ): String {
         if (user == null) return "Ukjent bruker"
-        val slackId = user.email?.let { getUserIdByEmail(it) }
-        return if (slackId != null) "<@$slackId>" else user.name ?: "Ukjent bruker"
+        val email = user.email
+        if (email == null) {
+            logger.warn("User ${user.name} has no email, cannot look up Slack ID")
+            return user.name ?: "Ukjent bruker"
+        }
+        val slackId = getUserIdByEmail(email)
+        if (slackId == null) {
+            logger.warn("Could not find Slack ID for user ${user.name} with email $email")
+            return user.name ?: "Ukjent bruker"
+        }
+        return "<@$slackId>"
     }
 
     override fun postJobPosting(
@@ -123,6 +133,29 @@ class SlackServiceImpl(
         return "Response == null!"
     }
 
+    override fun sendDirectMessage(
+        userEmail: String,
+        msg: String
+    ): String {
+        val slackUserId = getUserIdByEmail(userEmail)
+            ?: return "Kunne ikke finne Slack-bruker for $userEmail"
+
+        val token = secretProvider.getSlackToken()
+        val methods: MethodsClient? = slack.methods(token)
+        val response = methods?.chatPostMessage {
+            it.channel(slackUserId).text(msg)
+        }
+
+        if (response != null) {
+            if (response.isOk) {
+                return "Testmelding sendt til deg på Slack"
+            } else {
+                return "Feil ved sending av DM: ${response.error}"
+            }
+        }
+        return "Response == null!"
+    }
+
     override fun postMessageToSalesPipelineChannel(
         msg: String
     ): String {
@@ -154,6 +187,7 @@ class SlackServiceImpl(
         if (response?.isOk == true) {
             return response.user.id
         }
+        logger.warn("Slack usersLookupByEmail failed for $email: ${response?.error}")
         return null
     }
 

@@ -134,7 +134,7 @@ class BookingApiDelegateImpl(
         }
     }
 
-    override fun notifyUpcomingBookings(): ResponseEntity<NotifyUpcomingBookings200Response> {
+    override fun notifyUpcomingBookings(testMode: Boolean): ResponseEntity<NotifyUpcomingBookings200Response> {
         val testUserId = getRequest().map { it.getHeader("X-Test-User-Id") }.orElse(null)
 
         // Check if user is admin
@@ -145,7 +145,8 @@ class BookingApiDelegateImpl(
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
-        val result = slackNotificationService.notifySlackChannelWithUpcomingBookings()
+        val testModeEmail = if (testMode) user.email else null
+        val result = slackNotificationService.notifySlackChannelWithUpcomingBookings(testModeEmail)
         return ResponseEntity.ok(NotifyUpcomingBookings200Response(message = result))
     }
 }

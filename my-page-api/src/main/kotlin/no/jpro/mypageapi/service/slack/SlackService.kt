@@ -25,6 +25,11 @@ interface SlackService {
         msg: String
     ): String
 
+    fun sendDirectMessage(
+        userEmail: String,
+        msg: String
+    ): String
+
     fun postMessageToSalesPipelineChannel(
         msg: String
     ): String
