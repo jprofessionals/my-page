@@ -5,6 +5,7 @@ import no.jpro.mypageapi.config.RequiresAdmin
 import no.jpro.mypageapi.model.Customer
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.model.JobPostingFile
+import no.jpro.mypageapi.model.JobPostingSource
 import no.jpro.mypageapi.model.Tag
 import no.jpro.mypageapi.service.JobPostingFilesService
 import no.jpro.mypageapi.service.JobPostingService
@@ -41,7 +42,12 @@ class JobPostingController(
             description = entity.description ?: "",
             tags = emptyList(),
             links = emptyList(),
-            createdDate = entity.createdDate
+            createdDate = entity.createdDate,
+            updatedAt = entity.updatedAt,
+            source = entity.source?.let { JobPostingSource.valueOf(it.name) },
+            estimatedHourlyRate = entity.estimatedHourlyRate?.toDouble(),
+            location = entity.location,
+            intermediary = entity.intermediary
         )
 
         return ResponseEntity
@@ -149,17 +155,22 @@ class JobPostingController(
                 deadline = it.deadline,
                 description = it.description ?: "",
                 tags = it.tags
-                    .map {
+                    .map { tag ->
                         Tag(
-                            id = it.id,
-                            name = it.name
+                            id = tag.id,
+                            name = tag.name
                         )
                     },
                 links = it.links
-                    .map {
-                        URI(it)
+                    .map { link ->
+                        URI(link)
                     },
-                createdDate = it.createdDate
+                createdDate = it.createdDate,
+                updatedAt = it.updatedAt,
+                source = it.source?.let { src -> JobPostingSource.valueOf(src.name) },
+                estimatedHourlyRate = it.estimatedHourlyRate?.toDouble(),
+                location = it.location,
+                intermediary = it.intermediary
             )
         }
         return ResponseEntity.ok(dto)

@@ -19,6 +19,9 @@ import {
   faPaperclip,
   faPencilAlt,
   faTrashAlt,
+  faLocationDot,
+  faCoins,
+  faBriefcase,
 } from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Accordion from '@radix-ui/react-accordion'
@@ -102,19 +105,52 @@ export const JobPosting = (jobPosting: JobPostingType) => {
         }).format(new Date(jobPosting.deadline))
       : 'Ukjent'
 
+  // Source labels in Norwegian
+  const sourceLabels: Record<string, string> = {
+    DIRECT: 'Direkte fra kunde',
+    BROKER: 'Via megler',
+    SUPPLIER: 'Via leverandør',
+    FRAMEWORK_DIRECT: 'Rammeavtale (direkte)',
+    FRAMEWORK_SUBCONTRACTOR: 'Rammeavtale (underlev.)',
+    OTHER: 'Annet',
+  }
+
+  const formatHourlyRate = (rate: number | undefined) => {
+    if (!rate) return null
+    return new Intl.NumberFormat('no-NO', {
+      style: 'currency',
+      currency: 'NOK',
+      maximumFractionDigits: 0,
+    }).format(rate)
+  }
+
   return (
     <>
-      <Accordion.Header className="relative border border-gray-200 rounded-lg">
-        <div className="absolute top-1 right-2 flex space-x-2">
+      <Accordion.Header
+        className={`relative rounded-lg shadow-sm bg-white overflow-hidden ${
+          jobPosting.urgent
+            ? 'ring-2 ring-orange-500'
+            : 'border border-gray-200'
+        }`}
+      >
+        {/* Urgent badge */}
+        {jobPosting.urgent && (
+          <div className="absolute top-0 left-0 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-br-lg">
+            HASTER
+          </div>
+        )}
+
+        {/* Action buttons */}
+        <div className="absolute top-2 right-3 flex space-x-3">
           <Link
             href={`?id=${jobPosting.id}`}
             aria-label="Lenke til denne ultysningen"
             title="Lenke til denne ultysningen"
-            className="focus:outline-hidden"
+            className="focus:outline-hidden p-1"
           >
             <FontAwesomeIcon
               icon={faPaperclip}
-              className="text-gray-600 hover:text-gray-800"
+              className="text-gray-400 hover:text-gray-600 transition-colors"
             />
           </Link>
           {user?.admin && (
@@ -123,51 +159,52 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                 onClick={openNotifyDialog}
                 aria-label="Send til Slack"
                 title="Send til Slack"
-                className="focus:outline-hidden"
+                className="focus:outline-hidden p-1"
                 disabled={isNotifying}
               >
                 <FontAwesomeIcon
                   icon={faBullhorn}
-                  className={`${isNotifying ? 'text-gray-400' : 'text-blue-600 hover:text-blue-800'}`}
+                  className={`transition-colors ${isNotifying ? 'text-gray-300' : 'text-blue-500 hover:text-blue-700'}`}
                 />
               </button>
               <button
                 onClick={openModal}
                 aria-label="Edit job posting"
-                className="focus:outline-hidden"
+                className="focus:outline-hidden p-1"
               >
                 <FontAwesomeIcon
                   icon={faPencilAlt}
-                  className="text-gray-600 hover:text-gray-800"
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
                 />
               </button>
               <button
                 onClick={openDeleteDialog}
                 aria-label="Delete job posting"
-                className="focus:outline-hidden"
+                className="focus:outline-hidden p-1"
               >
                 <FontAwesomeIcon
                   icon={faTrashAlt}
-                  className="text-red-600 hover:text-red-800"
+                  className="text-red-400 hover:text-red-600 transition-colors"
                 />
               </button>
             </>
           )}
         </div>
 
-        <Accordion.Trigger className="pt-4 group bg-gray-200 hover:bg-gray-300 hover:shadow-lg transition-shadow focus:outline-hidden focus:ring-2 focus:ring-blue-500 w-full">
-          <div className="flex flex-col md:flex-row justify-between space-y-5 md:space-y-0">
-            <div className="flex flex-col items-start px-4 pb-4">
+        <Accordion.Trigger className="pt-5 group bg-white hover:bg-gray-50 transition-colors focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-inset w-full rounded-lg">
+          <div className="flex flex-col md:flex-row justify-between">
+            {/* Left side - title and customer */}
+            <div className="flex flex-col items-start px-4 pb-3">
               <h2
-                className={`text-xl text-left font-bold ${
-                  jobPosting.hidden ? 'text-gray-500' : 'text-gray-800'
+                className={`text-lg text-left font-semibold ${
+                  jobPosting.hidden ? 'text-gray-400' : 'text-gray-900'
                 }`}
               >
                 {jobPosting.title}
               </h2>
               <p
-                className={`text-left ${
-                  jobPosting.hidden ? 'text-gray-500' : 'text-gray-700'
+                className={`text-sm text-left mt-0.5 ${
+                  jobPosting.hidden ? 'text-gray-400' : 'text-gray-600'
                 }`}
               >
                 {jobPosting.customer.name}
@@ -178,35 +215,91 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                         <FontAwesomeIcon
                           icon={faLock}
                           aria-label="Krever eksklusivitet"
-                          className="text-gray-600 hover:text-gray-800 ml-1 cursor-pointer"
+                          className="text-amber-500 hover:text-amber-600 ml-1.5 cursor-pointer text-xs"
                         />
                       </Tooltip.Trigger>
                       <Tooltip.Content
-                        className="bg-black text-white text-xs px-2 py-1 rounded-md shadow-md"
+                        className="bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg"
                         side="top"
                         align="center"
                       >
                         Krever eksklusivitet
-                        <Tooltip.Arrow className="fill-black" />
+                        <Tooltip.Arrow className="fill-gray-900" />
                       </Tooltip.Content>
                     </Tooltip.Root>
                   </Tooltip.Provider>
                 )}
               </p>
             </div>
-            <div className="flex flex-col items-start justify-center w-[230px] pr-4 pl-4 pb-4 mb:pl-0 mb:pb-0">
-              <p className="text-sm text-left font-bold text-gray-800">Frist</p>
-              <p className="text-sm text-gray-700 text-left">
-                {formattedDeadline}
-              </p>
+
+            {/* Right side - metadata */}
+            <div className="flex flex-wrap gap-x-6 gap-y-2 items-center px-4 pb-3 md:pr-20">
+              {/* Deadline */}
+              <div className="flex flex-col items-start">
+                <p className="text-xs text-gray-500 uppercase tracking-wide">
+                  Frist
+                </p>
+                <p
+                  className={`text-sm font-medium ${
+                    jobPosting.urgent ? 'text-orange-600' : 'text-gray-700'
+                  }`}
+                >
+                  {formattedDeadline}
+                </p>
+              </div>
+
+              {/* Location - if available */}
+              {jobPosting.location && (
+                <div className="flex items-center gap-1.5 text-gray-600">
+                  <FontAwesomeIcon
+                    icon={faLocationDot}
+                    className="text-gray-400 text-xs"
+                  />
+                  <span className="text-sm">{jobPosting.location}</span>
+                </div>
+              )}
+
+              {/* Hourly rate - if available and user is admin */}
+              {user?.admin && jobPosting.estimated_hourly_rate && (
+                <div className="flex items-center gap-1.5 text-gray-600">
+                  <FontAwesomeIcon
+                    icon={faCoins}
+                    className="text-gray-400 text-xs"
+                  />
+                  <span className="text-sm">
+                    {formatHourlyRate(jobPosting.estimated_hourly_rate)}/t
+                  </span>
+                </div>
+              )}
+
+              {/* Source - if available and user is admin */}
+              {user?.admin && jobPosting.source && (
+                <div className="flex items-center gap-1.5 text-gray-600">
+                  <FontAwesomeIcon
+                    icon={faBriefcase}
+                    className="text-gray-400 text-xs"
+                  />
+                  <span className="text-sm">
+                    {sourceLabels[jobPosting.source] || jobPosting.source}
+                    {jobPosting.intermediary && (
+                      <span className="text-gray-500">
+                        {' '}
+                        ({jobPosting.intermediary})
+                      </span>
+                    )}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Tags section */}
           {jobPosting.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 pl-6 pr-4 pb-2 pt-2 items-center border-t border-orange-300">
+            <div className="flex flex-wrap gap-1.5 px-4 pb-3 pt-2 border-t border-gray-100">
               {jobPosting.tags.map((tag) => (
                 <span
                   key={tag.id}
-                  className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-sm"
+                  className="bg-blue-50 text-blue-700 text-xs font-medium px-2 py-0.5 rounded-full"
                 >
                   {tag.name}
                 </span>
@@ -216,53 +309,62 @@ export const JobPosting = (jobPosting: JobPostingType) => {
         </Accordion.Trigger>
       </Accordion.Header>
 
-      <Accordion.Content className="p-4 bg-white">
-        <div className="prose max-w-none">
-          <RichTextReadOnly
-            content={jobPosting.description}
-            extensions={[StarterKit]}
-          />
-        </div>
+      <Accordion.Content className="px-4 pb-4 pt-0 bg-white border-x border-b border-gray-200 rounded-b-lg -mt-1">
+        <div className="pt-4 border-t border-gray-100">
+          <div className="prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-a:text-blue-600">
+            <RichTextReadOnly
+              content={jobPosting.description}
+              extensions={[StarterKit]}
+            />
+          </div>
 
-        {existingJobPostingFiles && existingJobPostingFiles?.length > 0 && (
-          <div className="mt-4">
-            <h3 className="font-semibold text-gray-800">Filer:</h3>
-            <ul className="list-disc list-inside text-gray-800">
-              {existingJobPostingFiles.map((file) => (
-                <li key={file.blobId}>
+          {existingJobPostingFiles && existingJobPostingFiles?.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                Vedlegg
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {existingJobPostingFiles.map((file) => (
                   <a
+                    key={file.blobId}
                     href={file.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-md text-sm text-gray-700 transition-colors"
                   >
+                    <FontAwesomeIcon
+                      icon={faPaperclip}
+                      className="text-gray-400 text-xs"
+                    />
                     {file.name}
                   </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+                ))}
+              </div>
+            </div>
+          )}
 
-        {jobPosting.links.length > 0 && user?.admin && (
-          <div className="mt-2">
-            <h3 className="font-semibold text-gray-800">Lenker:</h3>
-            <ul className="list-disc list-inside text-gray-800">
-              {jobPosting.links.map((link, index) => (
-                <li key={index}>
-                  <a
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    {link}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          {jobPosting.links.length > 0 && user?.admin && (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                Lenker (kun synlig for admin)
+              </h3>
+              <ul className="space-y-1">
+                {jobPosting.links.map((link, index) => (
+                  <li key={index}>
+                    <a
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </Accordion.Content>
       {isModalOpen && (
         <EditJobPostingModal

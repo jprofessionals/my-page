@@ -2,6 +2,7 @@ package no.jpro.mypageapi.service
 
 import jakarta.persistence.EntityNotFoundException
 import no.jpro.mypageapi.entity.Customer
+import no.jpro.mypageapi.entity.JobPostingSource
 import no.jpro.mypageapi.entity.NotificationTask
 import no.jpro.mypageapi.entity.Tag
 import no.jpro.mypageapi.model.JobPosting
@@ -54,7 +55,11 @@ class JobPostingService(
             hidden = jobPosting.hidden,
             deadline = jobPosting.deadline,
             tags = tagEntities,
-            links = jobPosting.links.map { it.toString() }
+            links = jobPosting.links.map { it.toString() },
+            source = jobPosting.source?.let { JobPostingSource.valueOf(it.name) },
+            estimatedHourlyRate = jobPosting.estimatedHourlyRate?.toBigDecimal(),
+            location = jobPosting.location,
+            intermediary = jobPosting.intermediary
         )
 
         val newJobPosting = jobPostingRepository.save(jobPostingToPersist)
@@ -150,6 +155,10 @@ class JobPostingService(
                 deadline = jobPosting.deadline
                 tags = tagEntities
                 links = jobPosting.links.map { it.toString() }
+                source = jobPosting.source?.let { JobPostingSource.valueOf(it.name) }
+                estimatedHourlyRate = jobPosting.estimatedHourlyRate?.toBigDecimal()
+                location = jobPosting.location
+                intermediary = jobPosting.intermediary
             }
         )
 

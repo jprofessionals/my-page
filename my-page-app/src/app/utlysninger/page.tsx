@@ -12,6 +12,8 @@ import CustomerFilter from '@/components/jobpostings/CustomerFilter'
 import DateFilter from '@/components/jobpostings/DateFilter'
 import { Dayjs } from 'dayjs'
 import { useSearchParams } from 'next/navigation'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlus, faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
 
 export default function Utlysninger() {
   const { user } = useAuthContext()
@@ -20,6 +22,7 @@ export default function Utlysninger() {
   const [tags, setTags] = useState<Tags>([])
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [selectedFromDate, setSelectedFromDate] = useState<Dayjs | null>(null)
+  const [showPastPostings, setShowPastPostings] = useState(false)
 
   const id = searchParams?.get('id')
   const { data: jobPostings } = useJobPostings(
@@ -30,10 +33,18 @@ export default function Utlysninger() {
     tags.map((tag) => tag.name),
   )
   const { mutate: createJobPosting } = usePostJobPosting()
-  // Definer en konstant for dagens dato
+
   const now = useMemo(() => {
     return new Date()
   }, [])
+
+  const hasActiveFilters = tags.length > 0 || customer !== null || selectedFromDate !== null
+
+  const clearFilters = () => {
+    setTags([])
+    setCustomer(null)
+    setSelectedFromDate(null)
+  }
 
   const activeJobPostings = useMemo(() => {
     return (
@@ -108,38 +119,66 @@ export default function Utlysninger() {
 
   return (
     <RequireAuth>
-      <div className="container mx-auto px-4 py-8 relative z-0">
-        <h1 className="text-3xl font-bold mb-6">Utlysninger</h1>
+      <div className="container mx-auto px-4 py-8">
+        {/* Header with title and action button */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Utlysninger</h1>
+          {user?.admin && (
+            <button
+              onClick={openModal}
+              className="mt-4 sm:mt-0 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+            >
+              <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+              Ny utlysning
+            </button>
+          )}
+        </div>
 
-        {user?.admin && (
-          <button
-            onClick={openModal}
-            className="mb-6 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700"
-          >
-            Legg til ny utlysning
-          </button>
-        )}
+        {/* Filter section */}
+        <div className="bg-gray-50 rounded-xl p-4 mb-8 border border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <TagFilter tags={tags} setTags={setTags} />
+            <CustomerFilter customer={customer} setCustomer={setCustomer} />
+            <DateFilter value={selectedFromDate} onChange={setSelectedFromDate} />
+          </div>
+          {hasActiveFilters && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <button
+                onClick={clearFilters}
+                className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <FontAwesomeIcon icon={faFilterCircleXmark} className="w-4 h-4" />
+                Nullstill filter
+              </button>
+            </div>
+          )}
+        </div>
 
-        <h2 className="text-2xl font-bold mb-6">Filtrer utlysninger</h2>
-        <TagFilter tags={tags} setTags={setTags} />
-        <div className="mb-4" />
-        <CustomerFilter customer={customer} setCustomer={setCustomer} />
-        <div className="mb-4" />
-        <DateFilter value={selectedFromDate} onChange={setSelectedFromDate} />
-
-        <div className="mb-12" />
-
+        {/* Active job postings */}
         <JobPostingList
-          title={`Aktive utlysninger${activeJobPostings.length > 0 ? ` (${activeJobPostings.length})` : ''}`}
+          title={`Aktive utlysninger (${activeJobPostings.length})`}
           jobPostings={activeJobPostings}
         />
 
-        <div className="mb-12" />
-
-        <JobPostingList
-          title="Tidligere utlysninger"
-          jobPostings={pastJobPostings}
-        />
+        {/* Past job postings - collapsible */}
+        {pastJobPostings.length > 0 && (
+          <div className="mt-12">
+            <button
+              onClick={() => setShowPastPostings(!showPastPostings)}
+              className="flex items-center gap-2 text-xl font-bold text-gray-700 hover:text-gray-900 mb-5"
+            >
+              <span
+                className={`transform transition-transform ${showPastPostings ? 'rotate-90' : ''}`}
+              >
+                ▶
+              </span>
+              Tidligere utlysninger ({pastJobPostings.length})
+            </button>
+            {showPastPostings && (
+              <JobPostingList title="" jobPostings={pastJobPostings} />
+            )}
+          </div>
+        )}
       </div>
 
       {isModalOpen && (

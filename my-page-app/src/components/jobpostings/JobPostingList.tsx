@@ -39,12 +39,14 @@ export const JobPostingList = ({ title, jobPostings }: PropsType) => {
   }, [openItems, id, jobPostings])
 
   return (
-    <>
-      <h2 className="text-2xl font-bold mb-5">{title}</h2>
+    <div>
+      {title && (
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">{title}</h2>
+      )}
       {jobPostings.length > 0 ? (
         <Accordion.Root
           type="multiple"
-          className="space-y-4"
+          className="space-y-3"
           value={openItems}
           onValueChange={setOpenItems}
         >
@@ -59,8 +61,10 @@ export const JobPostingList = ({ title, jobPostings }: PropsType) => {
           ))}
         </Accordion.Root>
       ) : (
-        <p className="mb-3">Ingen utlysninger</p>
+        <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+          <p className="text-gray-500">Ingen utlysninger funnet</p>
+        </div>
       )}
-    </>
+    </div>
   )
 }

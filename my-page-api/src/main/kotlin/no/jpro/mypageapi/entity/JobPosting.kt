@@ -4,6 +4,8 @@ import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -15,8 +17,19 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.annotations.UpdateTimestamp
+import java.math.BigDecimal
 import java.sql.Types
 import java.time.OffsetDateTime
+
+enum class JobPostingSource {
+    DIRECT,                  // Direkte fra kunde
+    BROKER,                  // Via megler
+    SUPPLIER,                // Via leverandør
+    FRAMEWORK_DIRECT,        // Rammeavtale (direkte)
+    FRAMEWORK_SUBCONTRACTOR, // Rammeavtale (underleverandør)
+    OTHER                    // Annet
+}
 
 @Entity
 @Table(name = "job_posting")
@@ -49,6 +62,22 @@ class JobPosting(
 
     @CreationTimestamp
     val createdDate: OffsetDateTime? = null,
+
+    @UpdateTimestamp
+    var updatedAt: OffsetDateTime? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source")
+    var source: JobPostingSource? = null,
+
+    @Column(name = "estimated_hourly_rate", precision = 10, scale = 2)
+    var estimatedHourlyRate: BigDecimal? = null,
+
+    @Column(name = "location")
+    var location: String? = null,
+
+    @Column(name = "intermediary")
+    var intermediary: String? = null,
 
     @ManyToMany
     @JoinTable(

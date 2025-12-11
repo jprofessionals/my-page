@@ -2527,6 +2527,34 @@ components:
           format: date-time
           description: The date the job posting was created
           example: "2024-10-09T12:00:00+02:00"
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The date the job posting was last updated
+          example: "2024-10-10T14:30:00+02:00"
+        source:
+          $ref: '#/components/schemas/JobPostingSource'
+        estimated_hourly_rate:
+          type: number
+          format: double
+          nullable: true
+          description: Estimated hourly rate for the position
+          example: 1200
+        location:
+          type: string
+          nullable: true
+          description: Location of the position (e.g. Oslo, Remote, Hybrid)
+          example: "Oslo"
+        intermediary:
+          type: string
+          nullable: true
+          description: |
+            Name of the intermediary company when applicable:
+            - For BROKER: The broker company name
+            - For SUPPLIER: The supplier company name
+            - For FRAMEWORK_SUBCONTRACTOR: The company holding the framework agreement
+          example: "Experis"
       required:
         - id
         - title
@@ -2536,6 +2564,23 @@ components:
         - hidden
         - tags
         - links
+    JobPostingSource:
+      type: string
+      enum:
+        - DIRECT
+        - BROKER
+        - SUPPLIER
+        - FRAMEWORK_DIRECT
+        - FRAMEWORK_SUBCONTRACTOR
+        - OTHER
+      description: |
+        Source of the job posting:
+        - DIRECT: Direkte fra kunde
+        - BROKER: Via megler
+        - SUPPLIER: Via leverandør
+        - FRAMEWORK_DIRECT: Rammeavtale (direkte)
+        - FRAMEWORK_SUBCONTRACTOR: Rammeavtale (underleverandør)
+        - OTHER: Annet
     JobPostingFile:
       type: object
       properties:
