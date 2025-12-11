@@ -22,6 +22,7 @@ import {
   faLocationDot,
   faCoins,
   faBriefcase,
+  faCalendarPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import { useAuthContext } from '@/providers/AuthProvider'
 import * as Accordion from '@radix-ui/react-accordion'
@@ -247,6 +248,21 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                   {formattedDeadline}
                 </p>
               </div>
+
+              {/* Created date */}
+              {jobPosting.created_date && (
+                <div className="flex items-center gap-1.5 text-gray-600">
+                  <FontAwesomeIcon
+                    icon={faCalendarPlus}
+                    className="text-gray-400 text-xs"
+                  />
+                  <span className="text-sm">
+                    {new Intl.DateTimeFormat('no-NO', {
+                      dateStyle: 'medium',
+                    }).format(new Date(jobPosting.created_date))}
+                  </span>
+                </div>
+              )}
 
               {/* Location - if available */}
               {jobPosting.location && (

@@ -38,6 +38,9 @@ export default function Utlysninger() {
     return new Date()
   }, [])
 
+  // ASAP postings are prioritized (sorted to top) only for 5 days after creation
+  const ASAP_PRIORITY_DAYS = 5
+
   const hasActiveFilters = tags.length > 0 || customer !== null || selectedFromDate !== null
 
   const clearFilters = () => {
@@ -47,6 +50,15 @@ export default function Utlysninger() {
   }
 
   const activeJobPostings = useMemo(() => {
+    const priorityCutoff = new Date(now.getTime() - ASAP_PRIORITY_DAYS * 24 * 60 * 60 * 1000)
+
+    // Helper to check if ASAP posting is still in priority period
+    const isAsapPriority = (jobPosting: JobPostingType) => {
+      if (!jobPosting.urgent) return false
+      if (!jobPosting.created_date) return true // If no created_date, keep at top
+      return new Date(jobPosting.created_date) >= priorityCutoff
+    }
+
     return (
       jobPostings
         ?.filter((jobPosting) => {
@@ -57,20 +69,33 @@ export default function Utlysninger() {
           }
         })
         .sort((a, b) => {
+          const aIsAsapPriority = isAsapPriority(a)
+          const bIsAsapPriority = isAsapPriority(b)
+
+          // Both are ASAP priority - sort by created_date (newest first)
+          if (aIsAsapPriority && bIsAsapPriority) {
+            const aCreated = a.created_date ? new Date(a.created_date).getTime() : 0
+            const bCreated = b.created_date ? new Date(b.created_date).getTime() : 0
+            return bCreated - aCreated
+          }
+
+          // Only a is ASAP priority - a comes first
+          if (aIsAsapPriority) return -1
+
+          // Only b is ASAP priority - b comes first
+          if (bIsAsapPriority) return 1
+
+          // Neither is ASAP priority - sort by deadline (or created_date for old ASAP)
           const aVal = a.urgent
-            ? 0
-            : a.deadline
-              ? new Date(a.deadline).getTime()
-              : 0
+            ? (a.created_date ? new Date(a.created_date).getTime() : Number.MAX_SAFE_INTEGER)
+            : (a.deadline ? new Date(a.deadline).getTime() : Number.MAX_SAFE_INTEGER)
           const bVal = b.urgent
-            ? 0
-            : b.deadline
-              ? new Date(b.deadline).getTime()
-              : 0
+            ? (b.created_date ? new Date(b.created_date).getTime() : Number.MAX_SAFE_INTEGER)
+            : (b.deadline ? new Date(b.deadline).getTime() : Number.MAX_SAFE_INTEGER)
           return aVal - bVal
         }) || []
     )
-  }, [jobPostings, now])
+  }, [jobPostings, now, ASAP_PRIORITY_DAYS])
 
   const pastJobPostings = useMemo(() => {
     return (
