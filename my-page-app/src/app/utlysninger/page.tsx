@@ -129,12 +129,17 @@ export default function Utlysninger() {
           return jobPosting
         })
         .sort((a, b) => {
+          // Use deadline if available, otherwise fall back to created_date
           const aVal = a.deadline
             ? new Date(a.deadline).getTime()
-            : Number.MAX_SAFE_INTEGER
+            : a.created_date
+              ? new Date(a.created_date).getTime()
+              : 0
           const bVal = b.deadline
             ? new Date(b.deadline).getTime()
-            : Number.MAX_SAFE_INTEGER
+            : b.created_date
+              ? new Date(b.created_date).getTime()
+              : 0
           return bVal - aVal
         }) || []
     )

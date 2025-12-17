@@ -651,7 +651,7 @@ export const JobPostingModal = ({
               )}
               {isUrgent ? null : (
                 <div className="mb-4">
-                  <label className="block text-gray-700">Frist</label>
+                  <label className="block text-gray-700">Frist (valgfritt)</label>
                   <div className="flex gap-2 mt-1">
                     <input
                       type="date"
@@ -662,7 +662,6 @@ export const JobPostingModal = ({
                       }
                       onChange={handleDateChange}
                       className="flex-1 border border-gray-300 rounded p-2"
-                      required
                     />
                     <select
                       value={
@@ -672,7 +671,6 @@ export const JobPostingModal = ({
                       }
                       onChange={handleTimeChange}
                       className="w-28 border border-gray-300 rounded p-2"
-                      required
                     >
                       {timeOptions.map((time) => (
                         <option key={time} value={time}>
