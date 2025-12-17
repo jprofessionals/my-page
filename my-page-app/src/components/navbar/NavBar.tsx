@@ -8,18 +8,20 @@ import Image from 'next/image'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { usePathname } from 'next/navigation'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Fragment, useMemo } from 'react'
+import { Fragment, useMemo, useState, useEffect } from 'react'
 import { Button } from '../ui/button'
 import cn from '@/utils/cn'
 
 const navigation = [
   { href: '/admin', name: 'Admin 🛠️', requiresAdmin: true },
   { href: '/admin/hyttetrekning', name: 'Hyttetrekning Admin', requiresAdmin: true },
+  { href: '/admin/kti', name: 'KTI Admin', requiresAdmin: true },
   { href: '/', name: 'Hjem' },
   { href: '/utlysninger', name: 'Utlysninger' },
   { href: '/salgstavle', name: 'Salgstavle' },
   { href: '/salgstavle-analytics', name: 'Salgsanalyse', requiresAdmin: true },
   { href: '/hyttebooking', name: 'Firmahytte' },
+  { href: '/kti', name: 'KTI' },
   { href: '/kalkulator', name: 'Lønnskalkulator' },
   { href: 'https://intranet.jpro.no', name: 'Intranett 🔗' },
 ]
@@ -30,6 +32,16 @@ const NavBar = () => {
 
   // Test user selection (for local dev only)
   const isDevelopment = process.env.NODE_ENV === 'development'
+  const [testUserId, setTestUserId] = useState<string>('1')
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+    if (typeof window !== 'undefined') {
+      setTestUserId(localStorage.getItem('testUserId') || '1')
+    }
+  }, [])
+
   const testUsers = [
     { id: '1', name: 'Steinar Hansen (Admin)' },
     { id: '2', name: 'Ola Nordmann' },
@@ -41,6 +53,7 @@ const NavBar = () => {
   const handleTestUserChange = (userId: string) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('testUserId', userId)
+      setTestUserId(userId)
       window.dispatchEvent(new Event('testUserChanged'))
       window.location.reload()
     }
@@ -107,11 +120,11 @@ const NavBar = () => {
                   )}
                 >
                   {/* Dev mode test user selector */}
-                  {isDevelopment && typeof window !== 'undefined' && (
+                  {isDevelopment && isMounted && (
                     <div className="flex items-center gap-2 bg-yellow-500/20 border border-yellow-500/50 rounded-md px-3 py-1">
                       <span className="text-xs text-white">🧪</span>
                       <select
-                        value={localStorage.getItem('testUserId') || '1'}
+                        value={testUserId}
                         onChange={(e) => handleTestUserChange(e.target.value)}
                         className="bg-transparent text-white text-xs border-none focus:ring-0 cursor-pointer"
                       >
@@ -187,13 +200,13 @@ const NavBar = () => {
                 )
               })}
               {/* Dev mode test user selector (mobile) */}
-              {isDevelopment && typeof window !== 'undefined' && (
+              {isDevelopment && isMounted && (
                 <div className="mx-2 mb-2 bg-yellow-500/20 border border-yellow-500/50 rounded-md p-3">
                   <label className="block text-xs text-white mb-1 font-medium">
                     🧪 Test som bruker:
                   </label>
                   <select
-                    value={localStorage.getItem('testUserId') || '1'}
+                    value={testUserId}
                     onChange={(e) => handleTestUserChange(e.target.value)}
                     className="w-full bg-gray-800 text-white text-sm border border-gray-600 rounded-md px-2 py-1"
                   >

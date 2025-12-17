@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- KTI Module: Round-specific questions -->
+
+    <changeSet id="300.005-1" author="claude">
+        <comment>Create kti_round_question junction table for round-specific question configuration</comment>
+        <createTable tableName="kti_round_question">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="round_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="question_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="kti_round_question" baseColumnNames="round_id"
+                                 constraintName="fk_kti_round_question_round"
+                                 referencedTableName="kti_round" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="kti_round_question" baseColumnNames="question_id"
+                                 constraintName="fk_kti_round_question_question"
+                                 referencedTableName="kti_question" referencedColumnNames="id"/>
+        <addUniqueConstraint tableName="kti_round_question" columnNames="round_id, question_id"
+                             constraintName="uk_kti_round_question_round_question"/>
+        <createIndex tableName="kti_round_question" indexName="idx_kti_round_question_round">
+            <column name="round_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="300.005-2" author="claude">
+        <comment>Populate kti_round_question for existing rounds with all active questions</comment>
+        <sql>
+            INSERT INTO kti_round_question (round_id, question_id, display_order, active, created_at)
+            SELECT r.id, q.id, q.display_order, q.active, NOW()
+            FROM kti_round r
+            CROSS JOIN kti_question q
+            WHERE q.active = true
+            ORDER BY r.id, q.display_order
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

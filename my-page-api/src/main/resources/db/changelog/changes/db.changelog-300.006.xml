@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- KTI Module: Add CASCADE DELETE to foreign keys referencing kti_round -->
+
+    <changeSet id="300.006-1" author="claude">
+        <comment>Add CASCADE DELETE to kti_assignment.round_id foreign key</comment>
+        <dropForeignKeyConstraint baseTableName="kti_assignment" constraintName="fk_kti_assignment_round"/>
+        <addForeignKeyConstraint baseTableName="kti_assignment" baseColumnNames="round_id"
+                                 constraintName="fk_kti_assignment_round"
+                                 referencedTableName="kti_round" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

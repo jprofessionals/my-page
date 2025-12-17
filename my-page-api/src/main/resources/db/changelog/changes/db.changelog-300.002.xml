@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="300.002-1" author="claude">
+        <comment>Extend user.icon column to TEXT to support long Flowcase image URLs</comment>
+        <modifyDataType
+                tableName="user"
+                columnName="icon"
+                newDataType="TEXT"/>
+    </changeSet>
+
+</databaseChangeLog>

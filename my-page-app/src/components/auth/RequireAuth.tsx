@@ -9,12 +9,16 @@ function RequireAuth({ children }: PropsWithChildren) {
   const { isAuthenticated, authenticate, userFetchStatus } = useAuthContext()
   const signInDivRef = useRef<HTMLDivElement | null>(null)
   const [useTestUser, setUseTestUser] = useState(false)
+  const [testUserId, setTestUserId] = useState<string>('1')
+  const [isMounted, setIsMounted] = useState(false)
 
   // In development, check if test user is set
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      const testUserId = localStorage.getItem('testUserId')
-      setUseTestUser(!!testUserId)
+    setIsMounted(true)
+    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+      const storedId = localStorage.getItem('testUserId')
+      setTestUserId(storedId || '1')
+      setUseTestUser(!!storedId)
     }
   }, [])
 
@@ -72,29 +76,32 @@ function RequireAuth({ children }: PropsWithChildren) {
           <div className="text-center max-w-md">
             <h2 className="text-xl mb-4">🧪 Development Mode</h2>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-              <label className="block text-sm font-medium mb-2">
-                Test som bruker:
-              </label>
-              <select
-                className="w-full p-2 border rounded"
-                value={localStorage.getItem('testUserId') || '1'}
-                onChange={(e) => {
-                  localStorage.setItem('testUserId', e.target.value)
-                  window.location.reload()
-                }}
-              >
-                <option value="1">Steinar Hansen (Admin)</option>
-                <option value="2">Ola Nordmann</option>
-                <option value="3">Kari Hansen</option>
-                <option value="4">Per Olsen</option>
-                <option value="5">Anne Johansen</option>
-              </select>
-              <p className="text-xs text-gray-600 mt-2">
-                Velg en test-bruker for å teste uten Google-pålogging.
-                Fungerer kun i lokal utviklingsmodus.
-              </p>
-            </div>
+            {isMounted && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <label className="block text-sm font-medium mb-2">
+                  Test som bruker:
+                </label>
+                <select
+                  className="w-full p-2 border rounded"
+                  value={testUserId}
+                  onChange={(e) => {
+                    localStorage.setItem('testUserId', e.target.value)
+                    setTestUserId(e.target.value)
+                    window.location.reload()
+                  }}
+                >
+                  <option value="1">Steinar Hansen (Admin)</option>
+                  <option value="2">Ola Nordmann</option>
+                  <option value="3">Kari Hansen</option>
+                  <option value="4">Per Olsen</option>
+                  <option value="5">Anne Johansen</option>
+                </select>
+                <p className="text-xs text-gray-600 mt-2">
+                  Velg en test-bruker for å teste uten Google-pålogging.
+                  Fungerer kun i lokal utviklingsmodus.
+                </p>
+              </div>
+            )}
 
             <div className="pt-4 border-t">
               <p className="mb-2">Eller logg inn med Google:</p>
