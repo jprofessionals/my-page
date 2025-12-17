@@ -52,18 +52,26 @@ export default function Utlysninger() {
   const activeJobPostings = useMemo(() => {
     const priorityCutoff = new Date(now.getTime() - ASAP_PRIORITY_DAYS * 24 * 60 * 60 * 1000)
 
-    // Helper to check if ASAP posting is still in priority period
+    // Helper to check if ASAP posting is still in priority period (sorted to top)
     const isAsapPriority = (jobPosting: JobPostingType) => {
       if (!jobPosting.urgent) return false
       if (!jobPosting.created_date) return true // If no created_date, keep at top
       return new Date(jobPosting.created_date) >= priorityCutoff
     }
 
+    // Helper to check if ASAP posting has expired (after 5 days)
+    const isAsapExpired = (jobPosting: JobPostingType) => {
+      if (!jobPosting.urgent) return false
+      if (!jobPosting.created_date) return false // If no created_date, don't expire
+      return new Date(jobPosting.created_date) < priorityCutoff
+    }
+
     return (
       jobPostings
         ?.filter((jobPosting) => {
           if (jobPosting.urgent) {
-            return true
+            // ASAP postings expire after 5 days
+            return !isAsapExpired(jobPosting)
           } else {
             return jobPosting.deadline && new Date(jobPosting.deadline) >= now
           }
@@ -98,11 +106,15 @@ export default function Utlysninger() {
   }, [jobPostings, now, ASAP_PRIORITY_DAYS])
 
   const pastJobPostings = useMemo(() => {
+    const expiryCutoff = new Date(now.getTime() - ASAP_PRIORITY_DAYS * 24 * 60 * 60 * 1000)
+
     return (
       jobPostings
         ?.filter((jobPosting) => {
           if (jobPosting.urgent) {
-            return false
+            // ASAP postings go to past after 5 days
+            if (!jobPosting.created_date) return false
+            return new Date(jobPosting.created_date) < expiryCutoff
           }
           if (jobPosting.deadline) {
             return new Date(jobPosting.deadline) < now
@@ -119,7 +131,7 @@ export default function Utlysninger() {
           return bVal - aVal
         }) || []
     )
-  }, [jobPostings, now])
+  }, [jobPostings, now, ASAP_PRIORITY_DAYS])
 
   const openModal = () => {
     setIsModalOpen(true)

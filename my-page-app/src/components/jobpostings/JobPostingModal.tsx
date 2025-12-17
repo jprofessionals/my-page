@@ -152,6 +152,17 @@ export const JobPostingModal = ({
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
   })
 
+  // Check if deadline is more than 6 months in the future
+  const deadlineWarning = useMemo(() => {
+    if (!deadline) return null
+    const deadlineDate = DateTime.fromISO(deadline)
+    const sixMonthsFromNow = DateTime.now().plus({ months: 6 })
+    if (deadlineDate > sixMonthsFromNow) {
+      return `Fristen er satt til ${deadlineDate.toFormat('dd.MM.yyyy')} - er du sikker på at årstallet er riktig?`
+    }
+    return null
+  }, [deadline])
+
   // Keyword to tag mappings - suggests these tag names when keywords are found
   const keywordToTagSuggestions: Record<string, string[]> = {
     // Backend keywords -> suggest these tags
@@ -670,6 +681,11 @@ export const JobPostingModal = ({
                       ))}
                     </select>
                   </div>
+                  {deadlineWarning && (
+                    <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm">
+                      ⚠️ {deadlineWarning}
+                    </div>
+                  )}
                 </div>
               )}
               <div className="mb-4">
