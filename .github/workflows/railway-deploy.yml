@@ -78,7 +78,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Railway CLI
-        run: bash <(curl -fsSL cli.new)
+        run: npm install -g @railway/cli
 
       - name: Deploy API to Railway
         run: railway up --service ${{ vars.RAILWAY_API_SERVICE_NAME || 'my-page-api' }}
@@ -95,7 +95,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Railway CLI
-        run: bash <(curl -fsSL cli.new)
+        run: npm install -g @railway/cli
 
       - name: Deploy App to Railway
         run: railway up --service ${{ vars.RAILWAY_APP_SERVICE_NAME || 'my-page-app' }}
@@ -112,7 +112,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Railway CLI
-        run: bash <(curl -fsSL cli.new)
+        run: npm install -g @railway/cli
 
       - name: Deploy API to Railway Production
         run: railway up --service ${{ vars.RAILWAY_API_SERVICE_NAME || 'my-page-api' }}
@@ -128,7 +128,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Railway CLI
-        run: bash <(curl -fsSL cli.new)
+        run: npm install -g @railway/cli
 
       - name: Deploy App to Railway Production
         run: railway up --service ${{ vars.RAILWAY_APP_SERVICE_NAME || 'my-page-app' }}
