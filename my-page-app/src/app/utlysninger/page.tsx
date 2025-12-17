@@ -121,6 +121,13 @@ export default function Utlysninger() {
           }
           return true
         })
+        .map((jobPosting) => {
+          // Remove urgent flag from expired ASAP postings so they display normally
+          if (jobPosting.urgent) {
+            return { ...jobPosting, urgent: false }
+          }
+          return jobPosting
+        })
         .sort((a, b) => {
           const aVal = a.deadline
             ? new Date(a.deadline).getTime()
