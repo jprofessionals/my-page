@@ -11,6 +11,7 @@ import no.jpro.mypageapi.repository.JobPostingRepository
 import no.jpro.mypageapi.repository.NotificationTaskRepository
 import no.jpro.mypageapi.repository.TagRepository
 import no.jpro.mypageapi.service.slack.SlackService
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,6 +26,7 @@ class JobPostingService(
     private val slackService: SlackService,
     @Value("\${slack.utlysning.channel}") private var channel: String,
 ) {
+    private val logger = LoggerFactory.getLogger(JobPostingService::class.java)
 
     @Transactional
     fun createJobPosting(
@@ -66,10 +68,15 @@ class JobPostingService(
         notificationTaskRepository.save(NotificationTask(jobPostingId = newJobPosting.id))
 
         if (notify) {
-            slackService.postJobPosting(
-                channel,
-                newJobPosting,
-            )
+            try {
+                slackService.postJobPosting(
+                    channel,
+                    newJobPosting,
+                )
+            } catch (e: Exception) {
+                logger.error("Failed to send Slack notification for job posting ${newJobPosting.id}: ${e.message}")
+                // Don't fail the entire operation if Slack notification fails
+            }
         }
 
         return newJobPosting

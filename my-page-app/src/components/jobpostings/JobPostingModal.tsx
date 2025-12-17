@@ -322,7 +322,7 @@ export const JobPostingModal = ({
       customer: customer,
       urgent: isUrgent,
       hidden: isHidden,
-      deadline: deadline,
+      deadline: deadline || undefined,  // Send undefined instead of empty string
       description: description,
       links: links,
       tags: tags,
