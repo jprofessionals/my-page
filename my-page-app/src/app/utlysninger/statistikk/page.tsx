@@ -232,10 +232,10 @@ export default function StatistikkPage() {
         {/* Legend/Summary */}
         <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4">
           {Object.entries(CATEGORY_LABELS).map(([key, label]) => {
-            const total = chartData.reduce(
-              (sum, item) => sum + ((item as Record<string, number>)[key] || 0),
-              0
-            )
+            const total = chartData.reduce((sum, item) => {
+              const value = item[key as keyof typeof item]
+              return sum + (typeof value === 'number' ? value : 0)
+            }, 0)
             return (
               <div
                 key={key}
