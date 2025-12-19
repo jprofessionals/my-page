@@ -12,6 +12,7 @@ import CustomerFilter from '@/components/jobpostings/CustomerFilter'
 import DateFilter from '@/components/jobpostings/DateFilter'
 import { Dayjs } from 'dayjs'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
 
@@ -171,7 +172,15 @@ export default function Utlysninger() {
       <div className="container mx-auto px-4 py-8">
         {/* Header with title and action button */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Utlysninger</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-bold text-gray-900">Utlysninger</h1>
+            <Link
+              href="/utlysninger/statistikk"
+              className="text-blue-600 hover:text-blue-800 text-sm"
+            >
+              Se statistikk &rarr;
+            </Link>
+          </div>
           {user?.admin && (
             <button
               onClick={openModal}

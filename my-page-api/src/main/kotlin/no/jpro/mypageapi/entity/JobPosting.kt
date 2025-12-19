@@ -31,6 +31,14 @@ enum class JobPostingSource {
     OTHER                    // Annet
 }
 
+enum class TechCategory {
+    JAVA_KOTLIN,    // Java/Kotlin
+    DOTNET,         // .NET
+    DATA_ANALYTICS, // Data og analyse
+    FRONTEND,       // Frontend
+    OTHER           // Annet
+}
+
 @Entity
 @Table(name = "job_posting")
 class JobPosting(
@@ -78,6 +86,10 @@ class JobPosting(
 
     @Column(name = "intermediary")
     var intermediary: String? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tech_category")
+    var techCategory: TechCategory? = null,
 
     @ManyToMany
     @JoinTable(

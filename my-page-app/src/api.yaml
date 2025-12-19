@@ -300,6 +300,42 @@ paths:
           description: Not found
         '500':
           description: Internal server error
+  /job-postings/statistics:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostingStatistics
+      summary: Get job posting statistics
+      description: Returns statistics about job postings grouped by tech category and month
+      responses:
+        '200':
+          description: Statistics data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostingStatistics'
+        '500':
+          description: Internal server error
+  /job-postings/categorize:
+    post:
+      tags:
+        - JobPosting
+      operationId: categorizeJobPostings
+      summary: Categorize uncategorized job postings
+      description: Uses AI to categorize all job postings that don't have a tech category yet
+      responses:
+        '200':
+          description: Number of categorized job postings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categorizedCount:
+                    type: integer
+                    description: Number of job postings that were categorized
+        '500':
+          description: Internal server error
   /me:
     get:
       tags:
@@ -2641,6 +2677,46 @@ components:
       description: List of job postings
       items:
         $ref: '#/components/schemas/JobPosting'
+    JobPostingStatistics:
+      type: object
+      description: Statistics about job postings by category and month
+      properties:
+        monthlyData:
+          type: array
+          items:
+            type: object
+            properties:
+              month:
+                type: string
+                description: Month in YYYY-MM format
+                example: "2024-06"
+              javaKotlin:
+                type: integer
+                description: Number of Java/Kotlin job postings
+              dotnet:
+                type: integer
+                description: Number of .NET job postings
+              dataAnalytics:
+                type: integer
+                description: Number of Data/Analytics job postings
+              frontend:
+                type: integer
+                description: Number of Frontend job postings
+              other:
+                type: integer
+                description: Number of other job postings
+        uncategorizedCount:
+          type: integer
+          description: Number of job postings that have not been categorized yet
+    TechCategory:
+      type: string
+      description: Technology category for job postings
+      enum:
+        - JAVA_KOTLIN
+        - DOTNET
+        - DATA_ANALYTICS
+        - FRONTEND
+        - OTHER
     Tag:
       type: object
       description: A tag that describes e.g. a technology or method used in the project

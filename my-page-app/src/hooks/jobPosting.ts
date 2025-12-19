@@ -1,4 +1,5 @@
 import {
+  categorizeJobPostings,
   createJobPosting,
   deleteJobPosting,
   deleteJobPostingFile,
@@ -6,6 +7,7 @@ import {
   getJobPostingCustomers,
   getJobPostingFiles,
   getJobPostings,
+  getJobPostingStatistics,
   getJobPostingTags,
   JobPosting,
   JobPostingFiles,
@@ -277,6 +279,38 @@ export const useNotifyJobPosting = () => {
         path: {
           id: id,
         },
+      })
+    },
+  })
+}
+
+const jobPostingStatisticsCacheName = 'job-posting-statistics'
+
+export const useJobPostingStatistics = () => {
+  const { userFetchStatus } = useAuthContext()
+
+  const fetchStatistics = async () => {
+    return await getJobPostingStatistics({})
+  }
+
+  return useQuery({
+    queryKey: [jobPostingStatisticsCacheName],
+    queryFn: fetchStatistics,
+    select: (result) => result.data,
+    enabled: userFetchStatus === 'fetched',
+  })
+}
+
+export const useCategorizeJobPostings = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async () => {
+      return await categorizeJobPostings({})
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [jobPostingStatisticsCacheName],
       })
     },
   })

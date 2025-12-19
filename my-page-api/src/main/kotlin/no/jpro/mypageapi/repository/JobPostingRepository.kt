@@ -1,6 +1,7 @@
 package no.jpro.mypageapi.repository
 
 import no.jpro.mypageapi.entity.JobPosting
+import no.jpro.mypageapi.entity.TechCategory
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -9,6 +10,10 @@ import java.time.OffsetDateTime
 
 @Repository
 interface JobPostingRepository : JpaRepository<JobPosting, Long> {
+
+    fun findByTechCategoryIsNull(): List<JobPosting>
+
+    fun findByTechCategoryIsNotNull(): List<JobPosting>
 
     @Query("""
         SELECT jp

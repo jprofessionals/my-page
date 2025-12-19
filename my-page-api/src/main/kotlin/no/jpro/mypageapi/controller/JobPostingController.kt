@@ -2,13 +2,18 @@ package no.jpro.mypageapi.controller
 
 import no.jpro.mypageapi.api.JobPostingApiDelegate
 import no.jpro.mypageapi.config.RequiresAdmin
+import no.jpro.mypageapi.model.CategorizeJobPostings200Response
 import no.jpro.mypageapi.model.Customer
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.model.JobPostingFile
 import no.jpro.mypageapi.model.JobPostingSource
+import no.jpro.mypageapi.model.JobPostingStatistics
+import no.jpro.mypageapi.model.JobPostingStatisticsMonthlyDataInner
 import no.jpro.mypageapi.model.Tag
+import no.jpro.mypageapi.service.JobPostingCategorizationService
 import no.jpro.mypageapi.service.JobPostingFilesService
 import no.jpro.mypageapi.service.JobPostingService
+import no.jpro.mypageapi.service.JobPostingStatisticsService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -20,6 +25,8 @@ import java.time.OffsetDateTime
 class JobPostingController(
     private val jobPostingService: JobPostingService,
     private val jobPostingFilesService: JobPostingFilesService,
+    private val jobPostingStatisticsService: JobPostingStatisticsService,
+    private val jobPostingCategorizationService: JobPostingCategorizationService,
 ) : JobPostingApiDelegate {
 
     @RequiresAdmin
@@ -221,6 +228,33 @@ class JobPostingController(
                     .toUri()
             )
             .build()
+    }
+
+    override fun getJobPostingStatistics(): ResponseEntity<JobPostingStatistics> {
+        val stats = jobPostingStatisticsService.getStatistics()
+
+        val dto = JobPostingStatistics(
+            monthlyData = stats.monthlyData.map { monthly ->
+                JobPostingStatisticsMonthlyDataInner(
+                    month = monthly.month,
+                    javaKotlin = monthly.javaKotlin,
+                    dotnet = monthly.dotnet,
+                    dataAnalytics = monthly.dataAnalytics,
+                    frontend = monthly.frontend,
+                    other = monthly.other
+                )
+            },
+            uncategorizedCount = stats.uncategorizedCount
+        )
+
+        return ResponseEntity.ok(dto)
+    }
+
+    @RequiresAdmin
+    override fun categorizeJobPostings(): ResponseEntity<CategorizeJobPostings200Response> {
+        val count = jobPostingCategorizationService.categorizeAllUncategorized()
+
+        return ResponseEntity.ok(CategorizeJobPostings200Response(categorizedCount = count))
     }
 
 }
