@@ -210,6 +210,7 @@ export default function StatistikkPage() {
               <button
                 onClick={() => {
                   if (window.confirm('Er du sikker på at du vil rekategorisere alle utlysninger? Dette vil nullstille alle eksisterende kategorier og kjøre AI-kategorisering på nytt.')) {
+                    setIsPollingStatus(true)
                     recategorizeAll()
                   }
                 }}
