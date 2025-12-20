@@ -79,6 +79,7 @@ export default function StatistikkPage() {
     useRecategorizeAllJobPostings()
   const [showLast12Months, setShowLast12Months] = useState(false)
   const [isPollingStatus, setIsPollingStatus] = useState(false)
+  const [wasEverRunning, setWasEverRunning] = useState(false)
   const { data: categorizationStatus } = useCategorizationStatus(isPollingStatus)
 
   // Drill-down state
@@ -127,17 +128,26 @@ export default function StatistikkPage() {
   useEffect(() => {
     if (isCategorizing || isRecategorizing) {
       setIsPollingStatus(true)
+      setWasEverRunning(false) // Reset when starting new categorization
     }
   }, [isCategorizing, isRecategorizing])
 
-  // Stop polling and refresh statistics when categorization is done
+  // Track when categorization actually starts running
   useEffect(() => {
-    if (isPollingStatus && categorizationStatus && !categorizationStatus.isRunning) {
+    if (categorizationStatus?.isRunning) {
+      setWasEverRunning(true)
+    }
+  }, [categorizationStatus?.isRunning])
+
+  // Stop polling only when categorization was running and has now stopped
+  useEffect(() => {
+    if (isPollingStatus && wasEverRunning && categorizationStatus && !categorizationStatus.isRunning) {
       setIsPollingStatus(false)
+      setWasEverRunning(false)
       // Refresh statistics to show updated data
       queryClient.invalidateQueries({ queryKey: ['job-posting-statistics'] })
     }
-  }, [categorizationStatus, isPollingStatus, queryClient])
+  }, [categorizationStatus, isPollingStatus, wasEverRunning, queryClient])
 
   const isCategorizationRunning = isCategorizing || isRecategorizing || categorizationStatus?.isRunning
 
