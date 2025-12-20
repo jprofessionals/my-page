@@ -269,11 +269,40 @@ export default function StatistikkPage() {
                   allowDecimals={false}
                 />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  content={({ active, payload }) => {
+                    if (!active || !payload || payload.length === 0) return null
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const data = payload[0]?.payload as any
+                    const month = data?.month
+                    return (
+                      <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
+                        <p className="font-semibold text-gray-800 mb-2 border-b pb-2">
+                          {formatMonth(month)}
+                        </p>
+                        <div className="space-y-1">
+                          {Object.entries(CATEGORY_LABELS).map(([key, label]) => {
+                            const value = data?.[key] ?? 0
+                            const color = CATEGORY_COLORS[key as keyof typeof CATEGORY_COLORS]
+                            return (
+                              <button
+                                key={key}
+                                onClick={() => handleDataPointClick(key, month)}
+                                className="flex items-center justify-between w-full px-2 py-1 rounded hover:bg-gray-100 transition-colors text-left"
+                              >
+                                <span className="flex items-center gap-2">
+                                  <span
+                                    className="w-3 h-3 rounded-full"
+                                    style={{ backgroundColor: color }}
+                                  />
+                                  <span className="text-sm text-gray-700">{label}</span>
+                                </span>
+                                <span className="text-sm font-medium text-gray-900">{value}</span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
                   }}
                 />
                 <Legend />
