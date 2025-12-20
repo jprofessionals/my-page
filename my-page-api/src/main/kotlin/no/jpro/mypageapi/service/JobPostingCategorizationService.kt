@@ -11,6 +11,7 @@ import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -71,7 +72,15 @@ class JobPostingCategorizationService(
         )
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun resetAllCategories(): Int {
+        val allJobPostings = jobPostingRepository.findAll()
+        logger.info("Resetting tech categories for ${allJobPostings.size} job postings")
+        allJobPostings.forEach { it.techCategory = null }
+        jobPostingRepository.saveAll(allJobPostings)
+        return allJobPostings.size
+    }
+
     fun recategorizeAll(): Map<String, Any> {
         if (isRunning.get()) {
             return mapOf(
@@ -83,17 +92,11 @@ class JobPostingCategorizationService(
             )
         }
 
-        // Reset all tech categories
-        val allJobPostings = jobPostingRepository.findAll()
-        logger.info("Resetting tech categories for ${allJobPostings.size} job postings")
-        allJobPostings.forEach { it.techCategory = null }
-        jobPostingRepository.saveAll(allJobPostings)
+        // Reset all tech categories first
+        val count = resetAllCategories()
+        logger.info("Reset $count job postings, now starting categorization")
 
-        // Start categorization
-        total = allJobPostings.size
-        progress.set(0)
-
-        if (total == 0) {
+        if (count == 0) {
             return mapOf(
                 "isRunning" to false,
                 "started" to false,
@@ -103,16 +106,8 @@ class JobPostingCategorizationService(
             )
         }
 
-        // Start async categorization
-        categorizeAsync(allJobPostings)
-
-        return mapOf(
-            "isRunning" to true,
-            "started" to true,
-            "message" to "Startet rekategorisering av $total utlysninger",
-            "progress" to 0,
-            "total" to total
-        )
+        // Use startCategorization which properly handles @Async
+        return startCategorization()
     }
 
     @Async

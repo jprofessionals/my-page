@@ -315,14 +315,28 @@ class JobPostingController(
 
     @RequiresAdmin
     override fun recategorizeAllJobPostings(): ResponseEntity<CategorizationStatus> {
-        val result = jobPostingCategorizationService.recategorizeAll()
+        // First reset all categories (in separate transaction via proxy)
+        val count = jobPostingCategorizationService.resetAllCategories()
+
+        if (count == 0) {
+            return ResponseEntity.ok(CategorizationStatus(
+                isRunning = false,
+                progress = 0,
+                total = 0,
+                started = false,
+                message = "Ingen utlysninger funnet"
+            ))
+        }
+
+        // Then start categorization (will find all as uncategorized now)
+        val result = jobPostingCategorizationService.startCategorization()
 
         return ResponseEntity.ok(CategorizationStatus(
             isRunning = result["isRunning"] as Boolean,
             progress = result["progress"] as Int,
             total = result["total"] as Int,
             started = result["started"] as? Boolean,
-            message = result["message"] as? String
+            message = "Startet rekategorisering av $count utlysninger"
         ))
     }
 
