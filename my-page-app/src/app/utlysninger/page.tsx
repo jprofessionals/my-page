@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AddJobPostingModal } from '@/components/jobpostings/AddJobPostingModal'
 import { Customer, JobPosting as JobPostingType, Tags } from '@/data/types'
 import { useJobPostings, usePostJobPosting } from '@/hooks/jobPosting'
@@ -26,6 +26,7 @@ export default function Utlysninger() {
   const [showPastPostings, setShowPastPostings] = useState(false)
 
   const id = searchParams?.get('id')
+  const idNumber = id ? parseInt(id, 10) : null
   const { data: jobPostings } = useJobPostings(
     customer ? [customer.name] : null,
     selectedFromDate ? selectedFromDate.toISOString() : null,
@@ -145,6 +146,13 @@ export default function Utlysninger() {
         }) || []
     )
   }, [jobPostings, now, ASAP_PRIORITY_DAYS])
+
+  // Auto-expand past postings section if linked posting is in that list
+  useEffect(() => {
+    if (idNumber && pastJobPostings.some((p) => p.id === idNumber)) {
+      setShowPastPostings(true)
+    }
+  }, [idNumber, pastJobPostings])
 
   const openModal = () => {
     setIsModalOpen(true)
