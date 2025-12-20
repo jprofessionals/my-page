@@ -37,6 +37,26 @@ const CATEGORY_LABELS = {
   other: 'Annet',
 }
 
+const formatMonth = (month: string) => {
+  if (!month) return ''
+  const [year, monthNum] = month.split('-')
+  const monthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Okt',
+    'Nov',
+    'Des',
+  ]
+  return `${monthNames[parseInt(monthNum) - 1]} ${year.slice(2)}`
+}
+
 export default function StatistikkPage() {
   const { user } = useAuthContext()
   const queryClient = useQueryClient()
@@ -80,26 +100,6 @@ export default function StatistikkPage() {
       monthLabel: formatMonth(item.month || ''),
     }))
   }, [statistics, showLast12Months])
-
-  const formatMonth = (month: string) => {
-    if (!month) return ''
-    const [year, monthNum] = month.split('-')
-    const monthNames = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'Mai',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Okt',
-      'Nov',
-      'Des',
-    ]
-    return `${monthNames[parseInt(monthNum) - 1]} ${year.slice(2)}`
-  }
 
   if (isLoading) {
     return (
