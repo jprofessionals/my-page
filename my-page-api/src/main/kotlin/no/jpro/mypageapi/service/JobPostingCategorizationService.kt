@@ -113,23 +113,49 @@ class JobPostingCategorizationService(
     @Async
     fun categorizeAsync(uncategorized: List<JobPosting>) {
         isRunning.set(true)
-        logger.info("Starting async categorization of ${uncategorized.size} job postings")
+        logger.info("=== STARTING CATEGORIZATION OF ${uncategorized.size} JOB POSTINGS ===")
+
+        var successCount = 0
+        var failCount = 0
+        val failedIds = mutableListOf<Long>()
 
         try {
             for (jobPosting in uncategorized) {
                 try {
                     val category = categorizeJobPosting(jobPosting)
                     saveCategory(jobPosting.id, category)
+                    successCount++
                     progress.incrementAndGet()
-                    logger.info("Categorized job posting ${jobPosting.id} as $category (${progress.get()}/$total)")
+                    // Only log every 10th to reduce noise
+                    if (progress.get() % 10 == 0) {
+                        logger.info("Progress: ${progress.get()}/$total (success: $successCount, failed: $failCount)")
+                    }
+                    // Small delay to avoid rate limiting
+                    Thread.sleep(100)
                 } catch (e: Exception) {
-                    logger.error("Failed to categorize job posting ${jobPosting.id}: ${e.message}")
-                    progress.incrementAndGet() // Still count as processed
+                    logger.warn("Failed job posting ${jobPosting.id}, retrying once...")
+                    // Retry once after a short delay
+                    try {
+                        Thread.sleep(2000)
+                        val category = categorizeJobPosting(jobPosting)
+                        saveCategory(jobPosting.id, category)
+                        successCount++
+                        logger.info("Retry succeeded for job posting ${jobPosting.id}")
+                    } catch (retryException: Exception) {
+                        failCount++
+                        failedIds.add(jobPosting.id)
+                        logger.error("Failed to categorize job posting ${jobPosting.id} after retry: ${retryException.message}")
+                    }
+                    progress.incrementAndGet()
                 }
             }
         } finally {
             isRunning.set(false)
-            logger.info("Finished categorization. Processed ${progress.get()} of $total")
+            logger.info("=== CATEGORIZATION COMPLETE ===")
+            logger.info("Total: $total, Success: $successCount, Failed: $failCount")
+            if (failedIds.isNotEmpty()) {
+                logger.info("Failed job posting IDs: $failedIds")
+            }
         }
     }
 
