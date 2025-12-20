@@ -226,6 +226,35 @@ export default function StatistikkPage() {
           </div>
         </div>
 
+        {/* Progress indicator */}
+        {isCategorizationRunning && categorizationStatus && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-blue-800 font-medium">
+                Kategoriserer utlysninger med AI...
+              </p>
+              <p className="text-blue-600 text-sm">
+                {categorizationStatus.progress} av {categorizationStatus.total}
+              </p>
+            </div>
+            <div className="w-full bg-blue-200 rounded-full h-3">
+              <div
+                className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                style={{
+                  width: (categorizationStatus.total ?? 0) > 0
+                    ? `${((categorizationStatus.progress ?? 0) / (categorizationStatus.total ?? 1)) * 100}%`
+                    : '0%'
+                }}
+              />
+            </div>
+            <p className="text-blue-600 text-xs mt-2">
+              {(categorizationStatus.total ?? 0) > 0
+                ? `${Math.round(((categorizationStatus.progress ?? 0) / (categorizationStatus.total ?? 1)) * 100)}% fullført`
+                : 'Starter...'}
+            </p>
+          </div>
+        )}
+
         {/* Uncategorized warning */}
         {statistics?.uncategorizedCount !== undefined && statistics.uncategorizedCount > 0 && (
           <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
