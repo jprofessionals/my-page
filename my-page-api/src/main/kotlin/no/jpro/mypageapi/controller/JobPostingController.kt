@@ -2,7 +2,7 @@ package no.jpro.mypageapi.controller
 
 import no.jpro.mypageapi.api.JobPostingApiDelegate
 import no.jpro.mypageapi.config.RequiresAdmin
-import no.jpro.mypageapi.model.CategorizeJobPostings200Response
+import no.jpro.mypageapi.model.CategorizationStatus
 import no.jpro.mypageapi.model.Customer
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.model.JobPostingFile
@@ -251,10 +251,26 @@ class JobPostingController(
     }
 
     @RequiresAdmin
-    override fun categorizeJobPostings(): ResponseEntity<CategorizeJobPostings200Response> {
-        val count = jobPostingCategorizationService.categorizeAllUncategorized()
+    override fun categorizeJobPostings(): ResponseEntity<CategorizationStatus> {
+        val result = jobPostingCategorizationService.startCategorization()
 
-        return ResponseEntity.ok(CategorizeJobPostings200Response(categorizedCount = count))
+        return ResponseEntity.ok(CategorizationStatus(
+            isRunning = result["isRunning"] as Boolean,
+            progress = result["progress"] as Int,
+            total = result["total"] as Int,
+            started = result["started"] as? Boolean,
+            message = result["message"] as? String
+        ))
+    }
+
+    override fun getCategorizationStatus(): ResponseEntity<CategorizationStatus> {
+        val status = jobPostingCategorizationService.getStatus()
+
+        return ResponseEntity.ok(CategorizationStatus(
+            isRunning = status["isRunning"] as Boolean,
+            progress = status["progress"] as Int,
+            total = status["total"] as Int
+        ))
     }
 
 }

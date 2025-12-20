@@ -4,6 +4,7 @@ import {
   deleteJobPosting,
   deleteJobPostingFile,
   FileUpload,
+  getCategorizationStatus,
   getJobPostingCustomers,
   getJobPostingFiles,
   getJobPostings,
@@ -312,6 +313,28 @@ export const useCategorizeJobPostings = () => {
       await queryClient.invalidateQueries({
         queryKey: [jobPostingStatisticsCacheName],
       })
+    },
+  })
+}
+
+const categorizationStatusCacheName = 'categorization-status'
+
+export const useCategorizationStatus = (enabled: boolean) => {
+  const { userFetchStatus } = useAuthContext()
+
+  const fetchStatus = async () => {
+    return await getCategorizationStatus({})
+  }
+
+  return useQuery({
+    queryKey: [categorizationStatusCacheName],
+    queryFn: fetchStatus,
+    select: (result) => result.data,
+    enabled: userFetchStatus === 'fetched' && enabled,
+    refetchInterval: (query) => {
+      // Poll every 2 seconds while categorization is running
+      const data = query.state.data
+      return data && 'isRunning' in data && data.isRunning ? 2000 : false
     },
   })
 }

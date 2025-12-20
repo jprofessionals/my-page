@@ -321,19 +321,30 @@ paths:
       tags:
         - JobPosting
       operationId: categorizeJobPostings
-      summary: Categorize uncategorized job postings
-      description: Uses AI to categorize all job postings that don't have a tech category yet
+      summary: Start categorization of job postings
+      description: Starts async AI categorization of all job postings that don't have a tech category yet
       responses:
         '200':
-          description: Number of categorized job postings
+          description: Categorization status
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  categorizedCount:
-                    type: integer
-                    description: Number of job postings that were categorized
+                $ref: '#/components/schemas/CategorizationStatus'
+        '500':
+          description: Internal server error
+    get:
+      tags:
+        - JobPosting
+      operationId: getCategorizationStatus
+      summary: Get categorization status
+      description: Returns the current status of the categorization process
+      responses:
+        '200':
+          description: Categorization status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategorizationStatus'
         '500':
           description: Internal server error
   /me:
@@ -2717,6 +2728,25 @@ components:
         - DATA_ANALYTICS
         - FRONTEND
         - OTHER
+    CategorizationStatus:
+      type: object
+      description: Status of the AI categorization process
+      properties:
+        isRunning:
+          type: boolean
+          description: Whether categorization is currently in progress
+        progress:
+          type: integer
+          description: Number of job postings processed so far
+        total:
+          type: integer
+          description: Total number of job postings to categorize
+        started:
+          type: boolean
+          description: Whether categorization was started (only in POST response)
+        message:
+          type: string
+          description: Status message
     Tag:
       type: object
       description: A tag that describes e.g. a technology or method used in the project

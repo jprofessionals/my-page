@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   LineChart,
   Line,
@@ -14,9 +14,11 @@ import {
 import RequireAuth from '@/components/auth/RequireAuth'
 import {
   useCategorizeJobPostings,
+  useCategorizationStatus,
   useJobPostingStatistics,
 } from '@/hooks/jobPosting'
 import { useAuthContext } from '@/providers/AuthProvider'
+import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 
 const CATEGORY_COLORS = {
@@ -37,10 +39,31 @@ const CATEGORY_LABELS = {
 
 export default function StatistikkPage() {
   const { user } = useAuthContext()
+  const queryClient = useQueryClient()
   const { data: statistics, isLoading } = useJobPostingStatistics()
   const { mutate: categorize, isPending: isCategorizing } =
     useCategorizeJobPostings()
   const [showLast12Months, setShowLast12Months] = useState(false)
+  const [isPollingStatus, setIsPollingStatus] = useState(false)
+  const { data: categorizationStatus } = useCategorizationStatus(isPollingStatus)
+
+  // Start polling when categorization is started
+  useEffect(() => {
+    if (isCategorizing) {
+      setIsPollingStatus(true)
+    }
+  }, [isCategorizing])
+
+  // Stop polling and refresh statistics when categorization is done
+  useEffect(() => {
+    if (isPollingStatus && categorizationStatus && !categorizationStatus.isRunning) {
+      setIsPollingStatus(false)
+      // Refresh statistics to show updated data
+      queryClient.invalidateQueries({ queryKey: ['job-posting-statistics'] })
+    }
+  }, [categorizationStatus, isPollingStatus, queryClient])
+
+  const isCategorizationRunning = isCategorizing || categorizationStatus?.isRunning
 
   const chartData = useMemo(() => {
     if (!statistics?.monthlyData) return []
@@ -117,11 +140,13 @@ export default function StatistikkPage() {
             {user?.admin && statistics?.uncategorizedCount !== undefined && statistics.uncategorizedCount > 0 && (
               <button
                 onClick={() => categorize()}
-                disabled={isCategorizing}
+                disabled={isCategorizationRunning}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors text-sm"
               >
-                {isCategorizing
-                  ? 'Kategoriserer...'
+                {isCategorizationRunning
+                  ? categorizationStatus
+                    ? `Kategoriserer... (${categorizationStatus.progress}/${categorizationStatus.total})`
+                    : 'Starter kategorisering...'
                   : `Kategoriser ${statistics.uncategorizedCount} ukategoriserte`}
               </button>
             )}

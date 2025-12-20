@@ -11,6 +11,7 @@ import org.springframework.integration.jdbc.lock.JdbcLockRegistry
 import org.springframework.integration.jdbc.lock.LockRepository
 import org.springframework.integration.support.locks.LockRegistry
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -25,6 +26,7 @@ import javax.sql.DataSource
 @EnableTransactionManagement
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
+@EnableAsync
 class ApplicationConfig(
     private val environment: Environment,
     private val userRepository: UserRepository,
@@ -50,7 +52,8 @@ class ApplicationConfig(
                 "/task/**","/task/drawPendingBookings",
                 "/task/auto/drawPendingBookings",
                 "/task/notifyUpcomingBookings",
-                "/job/generate-notifications"
+                "/job/generate-notifications",
+                "/kti/survey/**"  // Public KTI survey endpoints (no auth required)
             )
 
             // Add development-only endpoints if in local/h2 profile

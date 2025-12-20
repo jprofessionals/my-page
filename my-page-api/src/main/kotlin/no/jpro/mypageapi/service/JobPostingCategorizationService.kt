@@ -9,8 +9,11 @@ import no.jpro.mypageapi.entity.TechCategory
 import no.jpro.mypageapi.repository.JobPostingRepository
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 @Service
 class JobPostingCategorizationService(
@@ -18,6 +21,85 @@ class JobPostingCategorizationService(
     private val openAIConsumer: OpenAIConsumer
 ) {
     private val logger = LoggerFactory.getLogger(JobPostingCategorizationService::class.java)
+
+    private val isRunning = AtomicBoolean(false)
+    private val progress = AtomicInteger(0)
+    private var total = 0
+
+    fun getStatus(): Map<String, Any> {
+        return mapOf(
+            "isRunning" to isRunning.get(),
+            "progress" to progress.get(),
+            "total" to total
+        )
+    }
+
+    fun startCategorization(): Map<String, Any> {
+        if (isRunning.get()) {
+            return mapOf(
+                "isRunning" to true,
+                "started" to false,
+                "message" to "Kategorisering pågår allerede",
+                "progress" to progress.get(),
+                "total" to total
+            )
+        }
+
+        val uncategorized = jobPostingRepository.findByTechCategoryIsNull()
+        total = uncategorized.size
+        progress.set(0)
+
+        if (total == 0) {
+            return mapOf(
+                "isRunning" to false,
+                "started" to false,
+                "message" to "Ingen ukategoriserte utlysninger funnet",
+                "progress" to 0,
+                "total" to 0
+            )
+        }
+
+        // Start async categorization
+        categorizeAsync(uncategorized)
+
+        return mapOf(
+            "isRunning" to true,
+            "started" to true,
+            "message" to "Startet kategorisering av $total utlysninger",
+            "progress" to 0,
+            "total" to total
+        )
+    }
+
+    @Async
+    fun categorizeAsync(uncategorized: List<JobPosting>) {
+        isRunning.set(true)
+        logger.info("Starting async categorization of ${uncategorized.size} job postings")
+
+        try {
+            for (jobPosting in uncategorized) {
+                try {
+                    val category = categorizeJobPosting(jobPosting)
+                    saveCategory(jobPosting.id, category)
+                    progress.incrementAndGet()
+                    logger.info("Categorized job posting ${jobPosting.id} as $category (${progress.get()}/$total)")
+                } catch (e: Exception) {
+                    logger.error("Failed to categorize job posting ${jobPosting.id}: ${e.message}")
+                    progress.incrementAndGet() // Still count as processed
+                }
+            }
+        } finally {
+            isRunning.set(false)
+            logger.info("Finished categorization. Processed ${progress.get()} of $total")
+        }
+    }
+
+    @Transactional
+    fun saveCategory(jobPostingId: Long, category: TechCategory) {
+        val jobPosting = jobPostingRepository.findById(jobPostingId).orElse(null) ?: return
+        jobPosting.techCategory = category
+        jobPostingRepository.save(jobPosting)
+    }
 
     @Transactional
     fun categorizeAllUncategorized(): Int {
