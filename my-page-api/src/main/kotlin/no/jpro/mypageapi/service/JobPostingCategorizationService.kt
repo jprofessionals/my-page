@@ -131,11 +131,17 @@ class JobPostingCategorizationService(
         val prompt = """
             Kategoriser denne utlysningen i EN av følgende kategorier basert på tittel og beskrivelse:
 
-            - JAVA_KOTLIN: Utlysninger som primært handler om Java, Kotlin, Spring Boot, eller JVM-basert utvikling
-            - DOTNET: Utlysninger som primært handler om .NET, C#, ASP.NET, eller Microsoft-basert backend-utvikling
-            - DATA_ANALYTICS: Utlysninger som primært handler om data engineering, dataanalyse, BI, datavitenskap, ETL, datawarehousing, Power BI, machine learning
-            - FRONTEND: Utlysninger som primært handler om frontend-utvikling, React, Angular, Vue, JavaScript/TypeScript UI-arbeid
-            - OTHER: Utlysninger som ikke passer i noen av de andre kategoriene (DevOps, arkitektur, testing, prosjektledelse, etc.)
+            - JAVA_KOTLIN: Utlysninger der backend-teknologien er Java, Kotlin, Spring Boot, eller JVM-basert. Inkluderer fullstack-roller med Java/Kotlin backend. Merk: Kotlin brukt til Android/mobilutvikling hører IKKE her.
+            - DOTNET: Utlysninger der backend-teknologien er .NET, C#, ASP.NET, eller Microsoft-basert. Inkluderer fullstack-roller med .NET backend.
+            - DATA_ANALYTICS: Utlysninger som primært handler om data engineering, dataanalyse, BI, datavitenskap, ETL, datawarehousing, Power BI, machine learning.
+            - FRONTEND: Utlysninger som KUN handler om ren frontend/web-utvikling med React, Angular, Vue, JavaScript/TypeScript. Ingen backend-arbeid. React Native (mobilutvikling) hører IKKE her.
+            - OTHER: Utlysninger som ikke passer i noen av de andre kategoriene, inkludert: mobilutvikling (React Native, Flutter, iOS, Android), fullstack med Python/Node backend, DevOps, arkitektur, testing, prosjektledelse, etc.
+
+            Viktig veiledning for fullstack-roller:
+            - Fullstack med Java/Kotlin backend → JAVA_KOTLIN
+            - Fullstack med .NET backend → DOTNET
+            - Fullstack med Python/Node backend → OTHER
+            - Ren frontend uten backend → FRONTEND
 
             Tittel: ${jobPosting.title}
 
