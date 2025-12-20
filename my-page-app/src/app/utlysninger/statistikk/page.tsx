@@ -87,28 +87,32 @@ export default function StatistikkPage() {
     selectedMonth
   )
 
-  // Handler for clicking on a specific dot
-  const handleDotClick = (categoryKey: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (data: any) => {
-      const month = data?.payload?.month
-      if (month && CATEGORY_TO_TECH_CATEGORY[categoryKey]) {
-        setSelectedCategory(CATEGORY_TO_TECH_CATEGORY[categoryKey])
-        setSelectedMonth(month)
-        setSelectedCategoryLabel(CATEGORY_LABELS[categoryKey as keyof typeof CATEGORY_LABELS])
-      }
+  // Handler for clicking on a data point
+  const handleDataPointClick = (categoryKey: string, month: string) => {
+    if (month && CATEGORY_TO_TECH_CATEGORY[categoryKey]) {
+      setSelectedCategory(CATEGORY_TO_TECH_CATEGORY[categoryKey])
+      setSelectedMonth(month)
+      setSelectedCategoryLabel(CATEGORY_LABELS[categoryKey as keyof typeof CATEGORY_LABELS])
     }
   }
 
-  // Create clickable active dot for each category
-  const createClickableDot = (categoryKey: string, color: string) => ({
-    r: 8,
-    fill: color,
-    stroke: 'white',
-    strokeWidth: 2,
-    cursor: 'pointer',
-    onClick: handleDotClick(categoryKey),
-  })
+  // Create clickable active dot component for each category
+  // eslint-disable-next-line react/display-name, @typescript-eslint/no-explicit-any
+  const createClickableDot = (categoryKey: string, color: string) => (props: any) => {
+    const { cx, cy, payload } = props
+    return (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={8}
+        fill={color}
+        stroke="white"
+        strokeWidth={2}
+        style={{ cursor: 'pointer' }}
+        onClick={() => handleDataPointClick(categoryKey, payload?.month)}
+      />
+    )
+  }
 
   const closeDrillDown = () => {
     setSelectedCategory(null)
