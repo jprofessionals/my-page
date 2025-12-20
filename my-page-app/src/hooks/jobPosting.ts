@@ -14,6 +14,7 @@ import {
   JobPosting,
   JobPostingFiles,
   notifyJobPosting,
+  recategorizeAllJobPostings,
   TechCategory,
   updateJobPosting,
   uploadJobPostingFile,
@@ -310,6 +311,21 @@ export const useCategorizeJobPostings = () => {
   return useMutation({
     mutationFn: async () => {
       return await categorizeJobPostings({})
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [jobPostingStatisticsCacheName],
+      })
+    },
+  })
+}
+
+export const useRecategorizeAllJobPostings = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async () => {
+      return await recategorizeAllJobPostings({})
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({

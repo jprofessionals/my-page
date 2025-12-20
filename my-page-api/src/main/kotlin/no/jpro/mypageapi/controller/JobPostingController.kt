@@ -313,4 +313,17 @@ class JobPostingController(
         return ResponseEntity.ok(dto)
     }
 
+    @RequiresAdmin
+    override fun recategorizeAllJobPostings(): ResponseEntity<CategorizationStatus> {
+        val result = jobPostingCategorizationService.recategorizeAll()
+
+        return ResponseEntity.ok(CategorizationStatus(
+            isRunning = result["isRunning"] as Boolean,
+            progress = result["progress"] as Int,
+            total = result["total"] as Int,
+            started = result["started"] as? Boolean,
+            message = result["message"] as? String
+        ))
+    }
+
 }

@@ -376,6 +376,22 @@ paths:
                 $ref: '#/components/schemas/CategorizationStatus'
         '500':
           description: Internal server error
+  /job-postings/recategorize:
+    post:
+      tags:
+        - JobPosting
+      operationId: recategorizeAllJobPostings
+      summary: Recategorize all job postings
+      description: Resets all tech categories and starts async AI categorization of all job postings
+      responses:
+        '200':
+          description: Categorization status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategorizationStatus'
+        '500':
+          description: Internal server error
   /me:
     get:
       tags:

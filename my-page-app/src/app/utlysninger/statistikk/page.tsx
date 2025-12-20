@@ -17,6 +17,7 @@ import {
   useCategorizationStatus,
   useJobPostingsByCategory,
   useJobPostingStatistics,
+  useRecategorizeAllJobPostings,
 } from '@/hooks/jobPosting'
 import { TechCategory } from '@/data/types'
 import { useAuthContext } from '@/providers/AuthProvider'
@@ -74,6 +75,8 @@ export default function StatistikkPage() {
   const { data: statistics, isLoading } = useJobPostingStatistics()
   const { mutate: categorize, isPending: isCategorizing } =
     useCategorizeJobPostings()
+  const { mutate: recategorizeAll, isPending: isRecategorizing } =
+    useRecategorizeAllJobPostings()
   const [showLast12Months, setShowLast12Months] = useState(false)
   const [isPollingStatus, setIsPollingStatus] = useState(false)
   const { data: categorizationStatus } = useCategorizationStatus(isPollingStatus)
@@ -122,10 +125,10 @@ export default function StatistikkPage() {
 
   // Start polling when categorization is started
   useEffect(() => {
-    if (isCategorizing) {
+    if (isCategorizing || isRecategorizing) {
       setIsPollingStatus(true)
     }
-  }, [isCategorizing])
+  }, [isCategorizing, isRecategorizing])
 
   // Stop polling and refresh statistics when categorization is done
   useEffect(() => {
@@ -136,7 +139,7 @@ export default function StatistikkPage() {
     }
   }, [categorizationStatus, isPollingStatus, queryClient])
 
-  const isCategorizationRunning = isCategorizing || categorizationStatus?.isRunning
+  const isCategorizationRunning = isCategorizing || isRecategorizing || categorizationStatus?.isRunning
 
   const chartData = useMemo(() => {
     if (!statistics?.monthlyData) return []
@@ -201,6 +204,23 @@ export default function StatistikkPage() {
                     ? `Kategoriserer... (${categorizationStatus.progress}/${categorizationStatus.total})`
                     : 'Starter kategorisering...'
                   : `Kategoriser ${statistics.uncategorizedCount} ukategoriserte`}
+              </button>
+            )}
+            {user?.admin && (
+              <button
+                onClick={() => {
+                  if (window.confirm('Er du sikker på at du vil rekategorisere alle utlysninger? Dette vil nullstille alle eksisterende kategorier og kjøre AI-kategorisering på nytt.')) {
+                    recategorizeAll()
+                  }
+                }}
+                disabled={isCategorizationRunning}
+                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:bg-gray-400 transition-colors text-sm"
+              >
+                {isCategorizationRunning
+                  ? categorizationStatus
+                    ? `Kategoriserer... (${categorizationStatus.progress}/${categorizationStatus.total})`
+                    : 'Starter...'
+                  : 'Rekategoriser alle'}
               </button>
             )}
           </div>

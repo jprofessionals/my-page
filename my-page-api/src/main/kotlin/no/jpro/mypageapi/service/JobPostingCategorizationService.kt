@@ -71,6 +71,50 @@ class JobPostingCategorizationService(
         )
     }
 
+    @Transactional
+    fun recategorizeAll(): Map<String, Any> {
+        if (isRunning.get()) {
+            return mapOf(
+                "isRunning" to true,
+                "started" to false,
+                "message" to "Kategorisering pågår allerede",
+                "progress" to progress.get(),
+                "total" to total
+            )
+        }
+
+        // Reset all tech categories
+        val allJobPostings = jobPostingRepository.findAll()
+        logger.info("Resetting tech categories for ${allJobPostings.size} job postings")
+        allJobPostings.forEach { it.techCategory = null }
+        jobPostingRepository.saveAll(allJobPostings)
+
+        // Start categorization
+        total = allJobPostings.size
+        progress.set(0)
+
+        if (total == 0) {
+            return mapOf(
+                "isRunning" to false,
+                "started" to false,
+                "message" to "Ingen utlysninger funnet",
+                "progress" to 0,
+                "total" to 0
+            )
+        }
+
+        // Start async categorization
+        categorizeAsync(allJobPostings)
+
+        return mapOf(
+            "isRunning" to true,
+            "started" to true,
+            "message" to "Startet rekategorisering av $total utlysninger",
+            "progress" to 0,
+            "total" to total
+        )
+    }
+
     @Async
     fun categorizeAsync(uncategorized: List<JobPosting>) {
         isRunning.set(true)
