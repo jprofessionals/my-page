@@ -2,6 +2,7 @@ package no.jpro.mypageapi.controller
 
 import no.jpro.mypageapi.api.JobPostingApiDelegate
 import no.jpro.mypageapi.config.RequiresAdmin
+import org.slf4j.LoggerFactory
 import no.jpro.mypageapi.model.CategorizationStatus
 import no.jpro.mypageapi.model.Customer
 import no.jpro.mypageapi.model.JobPosting
@@ -29,6 +30,8 @@ class JobPostingController(
     private val jobPostingStatisticsService: JobPostingStatisticsService,
     private val jobPostingCategorizationService: JobPostingCategorizationService,
 ) : JobPostingApiDelegate {
+
+    private val logger = LoggerFactory.getLogger(JobPostingController::class.java)
 
     @RequiresAdmin
     override fun createJobPosting(
@@ -315,8 +318,11 @@ class JobPostingController(
 
     @RequiresAdmin
     override fun recategorizeAllJobPostings(): ResponseEntity<CategorizationStatus> {
+        logger.info("=== RECATEGORIZE ALL: Starting ===")
+
         // First reset all categories (in separate transaction via proxy)
         val count = jobPostingCategorizationService.resetAllCategories()
+        logger.info("=== RECATEGORIZE ALL: Reset $count job postings ===")
 
         if (count == 0) {
             return ResponseEntity.ok(CategorizationStatus(
@@ -330,11 +336,17 @@ class JobPostingController(
 
         // Then start categorization (will find all as uncategorized now)
         val result = jobPostingCategorizationService.startCategorization()
+        val foundTotal = result["total"] as Int
+        logger.info("=== RECATEGORIZE ALL: startCategorization found $foundTotal uncategorized (expected $count) ===")
+
+        if (foundTotal != count) {
+            logger.warn("=== DISCREPANCY: Reset $count but only found $foundTotal uncategorized! ===")
+        }
 
         return ResponseEntity.ok(CategorizationStatus(
             isRunning = result["isRunning"] as Boolean,
             progress = result["progress"] as Int,
-            total = result["total"] as Int,
+            total = foundTotal,
             started = result["started"] as? Boolean,
             message = "Startet rekategorisering av $count utlysninger"
         ))

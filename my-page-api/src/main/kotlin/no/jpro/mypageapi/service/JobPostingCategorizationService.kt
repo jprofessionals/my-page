@@ -46,7 +46,18 @@ class JobPostingCategorizationService(
             )
         }
 
+        // Log total count for comparison
+        val allCount = jobPostingRepository.count()
+        logger.info("Total job postings in database: $allCount")
+
         val uncategorized = jobPostingRepository.findByTechCategoryIsNull()
+        logger.info("Found ${uncategorized.size} uncategorized job postings (from findByTechCategoryIsNull)")
+
+        // Also verify with in-memory count
+        val allPostings = jobPostingRepository.findAll()
+        val nullCategoryCount = allPostings.count { it.techCategory == null }
+        logger.info("In-memory null category count: $nullCategoryCount (from findAll + filter)")
+
         total = uncategorized.size
         progress.set(0)
 
