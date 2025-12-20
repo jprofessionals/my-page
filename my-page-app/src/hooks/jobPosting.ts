@@ -349,11 +349,11 @@ export const useCategorizationStatus = (enabled: boolean) => {
     queryFn: fetchStatus,
     select: (result) => result.data,
     enabled: userFetchStatus === 'fetched' && enabled,
-    refetchInterval: (query) => {
-      // Poll every 2 seconds while categorization is running
-      const data = query.state.data
-      return data && 'isRunning' in data && data.isRunning ? 2000 : false
-    },
+    // Poll every 2 seconds while enabled (frontend controls when to stop)
+    refetchInterval: enabled ? 2000 : false,
+    // Don't use stale data
+    staleTime: 0,
+    gcTime: 0,
   })
 }
 
