@@ -8,11 +8,13 @@ import {
   getJobPostingCustomers,
   getJobPostingFiles,
   getJobPostings,
+  getJobPostingsByCategory,
   getJobPostingStatistics,
   getJobPostingTags,
   JobPosting,
   JobPostingFiles,
   notifyJobPosting,
+  TechCategory,
   updateJobPosting,
   uploadJobPostingFile,
 } from '@/data/types'
@@ -336,5 +338,31 @@ export const useCategorizationStatus = (enabled: boolean) => {
       const data = query.state.data
       return data && 'isRunning' in data && data.isRunning ? 2000 : false
     },
+  })
+}
+
+const jobPostingsByCategoryCacheName = 'job-postings-by-category'
+
+export const useJobPostingsByCategory = (
+  category: TechCategory | null,
+  month: string | null
+) => {
+  const { userFetchStatus } = useAuthContext()
+
+  const fetchJobPostings = async () => {
+    if (!category || !month) return { data: [] }
+    return await getJobPostingsByCategory({
+      query: {
+        category,
+        month,
+      },
+    })
+  }
+
+  return useQuery({
+    queryKey: [jobPostingsByCategoryCacheName, category, month],
+    queryFn: fetchJobPostings,
+    select: (result) => result.data,
+    enabled: userFetchStatus === 'fetched' && !!category && !!month,
   })
 }

@@ -15,8 +15,10 @@ import RequireAuth from '@/components/auth/RequireAuth'
 import {
   useCategorizeJobPostings,
   useCategorizationStatus,
+  useJobPostingsByCategory,
   useJobPostingStatistics,
 } from '@/hooks/jobPosting'
+import { TechCategory } from '@/data/types'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
@@ -35,6 +37,15 @@ const CATEGORY_LABELS = {
   dataAnalytics: 'Data og analyse',
   frontend: 'Frontend',
   other: 'Annet',
+}
+
+// Map from chart dataKey to TechCategory enum value
+const CATEGORY_TO_TECH_CATEGORY: Record<string, TechCategory> = {
+  javaKotlin: 'JAVA_KOTLIN',
+  dotnet: 'DOTNET',
+  dataAnalytics: 'DATA_ANALYTICS',
+  frontend: 'FRONTEND',
+  other: 'OTHER',
 }
 
 const formatMonth = (month: string) => {
@@ -66,6 +77,36 @@ export default function StatistikkPage() {
   const [showLast12Months, setShowLast12Months] = useState(false)
   const [isPollingStatus, setIsPollingStatus] = useState(false)
   const { data: categorizationStatus } = useCategorizationStatus(isPollingStatus)
+
+  // Drill-down state
+  const [selectedCategory, setSelectedCategory] = useState<TechCategory | null>(null)
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null)
+  const [selectedCategoryLabel, setSelectedCategoryLabel] = useState<string>('')
+  const { data: drillDownData, isLoading: isDrillDownLoading } = useJobPostingsByCategory(
+    selectedCategory,
+    selectedMonth
+  )
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChartClick = (data: any) => {
+    if (data?.activePayload && data.activePayload.length > 0) {
+      const payload = data.activePayload[0]
+      const categoryKey = payload.dataKey as keyof typeof CATEGORY_TO_TECH_CATEGORY
+      const month = payload.payload?.month
+
+      if (categoryKey && month && CATEGORY_TO_TECH_CATEGORY[categoryKey]) {
+        setSelectedCategory(CATEGORY_TO_TECH_CATEGORY[categoryKey])
+        setSelectedMonth(month)
+        setSelectedCategoryLabel(CATEGORY_LABELS[categoryKey as keyof typeof CATEGORY_LABELS])
+      }
+    }
+  }
+
+  const closeDrillDown = () => {
+    setSelectedCategory(null)
+    setSelectedMonth(null)
+    setSelectedCategoryLabel('')
+  }
 
   // Start polling when categorization is started
   useEffect(() => {
@@ -181,6 +222,8 @@ export default function StatistikkPage() {
               <LineChart
                 data={chartData}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                onClick={handleChartClick}
+                style={{ cursor: 'pointer' }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis
@@ -285,6 +328,67 @@ export default function StatistikkPage() {
           })}
         </div>
       </div>
+
+      {/* Drill-down Modal */}
+      {selectedCategory && selectedMonth && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    {selectedCategoryLabel} - {formatMonth(selectedMonth)}
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {drillDownData?.length || 0} utlysninger
+                  </p>
+                </div>
+                <button
+                  onClick={closeDrillDown}
+                  className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+                >
+                  &times;
+                </button>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[60vh]">
+              {isDrillDownLoading ? (
+                <p className="text-gray-500 text-center py-8">Laster utlysninger...</p>
+              ) : drillDownData && drillDownData.length > 0 ? (
+                <div className="space-y-4">
+                  {drillDownData.map((posting) => (
+                    <Link
+                      key={posting.id}
+                      href={`/utlysninger?id=${posting.id}`}
+                      onClick={closeDrillDown}
+                      className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{posting.title}</h3>
+                          <p className="text-sm text-gray-600 mt-1">{posting.customer?.name}</p>
+                        </div>
+                        {posting.urgent && (
+                          <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded">
+                            HASTER
+                          </span>
+                        )}
+                      </div>
+                      {posting.deadline && (
+                        <p className="text-xs text-gray-500 mt-2">
+                          Frist: {new Date(posting.deadline).toLocaleDateString('nb-NO')}
+                        </p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-8">Ingen utlysninger funnet</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </RequireAuth>
   )
 }

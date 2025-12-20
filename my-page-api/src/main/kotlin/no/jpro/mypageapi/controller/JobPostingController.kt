@@ -10,6 +10,7 @@ import no.jpro.mypageapi.model.JobPostingSource
 import no.jpro.mypageapi.model.JobPostingStatistics
 import no.jpro.mypageapi.model.JobPostingStatisticsMonthlyDataInner
 import no.jpro.mypageapi.model.Tag
+import no.jpro.mypageapi.model.TechCategory
 import no.jpro.mypageapi.service.JobPostingCategorizationService
 import no.jpro.mypageapi.service.JobPostingFilesService
 import no.jpro.mypageapi.service.JobPostingService
@@ -271,6 +272,41 @@ class JobPostingController(
             progress = status["progress"] as Int,
             total = status["total"] as Int
         ))
+    }
+
+    override fun getJobPostingsByCategory(
+        category: TechCategory,
+        month: String
+    ): ResponseEntity<List<JobPosting>> {
+        val entityCategory = no.jpro.mypageapi.entity.TechCategory.valueOf(category.value)
+        val entities = jobPostingStatisticsService.getJobPostingsByCategory(entityCategory, month)
+
+        val dto = entities.map {
+            JobPosting(
+                id = it.id,
+                title = it.title,
+                customer = Customer(
+                    id = it.customer.id,
+                    name = it.customer.name,
+                    exclusive = it.customer.exclusive
+                ),
+                urgent = it.urgent,
+                hidden = it.hidden,
+                deadline = it.deadline,
+                description = it.description ?: "",
+                tags = it.tags.map { tag ->
+                    Tag(id = tag.id, name = tag.name)
+                },
+                links = it.links.map { link -> URI(link) },
+                createdDate = it.createdDate,
+                updatedAt = it.updatedAt,
+                source = it.source?.let { src -> JobPostingSource.valueOf(src.name) },
+                estimatedHourlyRate = it.estimatedHourlyRate?.toDouble(),
+                location = it.location,
+                intermediary = it.intermediary
+            )
+        }
+        return ResponseEntity.ok(dto)
     }
 
 }

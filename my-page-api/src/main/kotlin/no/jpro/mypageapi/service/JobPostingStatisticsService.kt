@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.service
 
+import no.jpro.mypageapi.entity.JobPosting
 import no.jpro.mypageapi.entity.TechCategory
 import no.jpro.mypageapi.repository.JobPostingRepository
 import org.springframework.stereotype.Service
@@ -55,5 +56,17 @@ class JobPostingStatisticsService(
             monthlyData = monthlyStats,
             uncategorizedCount = uncategorizedCount
         )
+    }
+
+    fun getJobPostingsByCategory(category: TechCategory, month: String): List<JobPosting> {
+        val yearMonth = YearMonth.parse(month, monthFormatter)
+
+        return jobPostingRepository.findAll()
+            .filter { posting ->
+                posting.techCategory == category &&
+                posting.createdDate != null &&
+                YearMonth.from(posting.createdDate) == yearMonth
+            }
+            .sortedByDescending { it.createdDate }
     }
 }

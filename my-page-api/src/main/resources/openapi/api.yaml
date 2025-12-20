@@ -316,6 +316,35 @@ paths:
                 $ref: '#/components/schemas/JobPostingStatistics'
         '500':
           description: Internal server error
+  /job-postings/by-category:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostingsByCategory
+      summary: Get job postings by category and month
+      description: Returns job postings filtered by tech category and month (for drill-down)
+      parameters:
+        - in: query
+          name: category
+          required: true
+          schema:
+            $ref: '#/components/schemas/TechCategory'
+          description: The tech category to filter by
+        - in: query
+          name: month
+          required: true
+          schema:
+            type: string
+          description: The month in YYYY-MM format
+      responses:
+        '200':
+          description: Filtered job postings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostings'
+        '500':
+          description: Internal server error
   /job-postings/categorize:
     post:
       tags:
