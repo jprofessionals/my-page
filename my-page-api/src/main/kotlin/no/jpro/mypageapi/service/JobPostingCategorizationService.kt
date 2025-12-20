@@ -175,13 +175,15 @@ class JobPostingCategorizationService(
         val prompt = """
             Kategoriser denne utlysningen i EN av følgende kategorier basert på tittel og beskrivelse:
 
-            - JAVA_KOTLIN: Utlysninger der backend-teknologien er Java, Kotlin, Spring Boot, eller JVM-basert. Inkluderer fullstack-roller med Java/Kotlin backend. Merk: Kotlin brukt til Android/mobilutvikling hører IKKE her.
-            - DOTNET: Utlysninger der backend-teknologien er .NET, C#, ASP.NET, eller Microsoft-basert. Inkluderer fullstack-roller med .NET backend.
-            - DATA_ANALYTICS: Utlysninger som primært handler om data engineering, dataanalyse, BI, datavitenskap, ETL, datawarehousing, Power BI, machine learning.
-            - FRONTEND: Utlysninger som KUN handler om ren frontend/web-utvikling med React, Angular, Vue, JavaScript/TypeScript. Ingen backend-arbeid. React Native (mobilutvikling) hører IKKE her.
-            - OTHER: Utlysninger som ikke passer i noen av de andre kategoriene, inkludert: mobilutvikling (React Native, Flutter, iOS, Android), fullstack med Python/Node backend, DevOps, arkitektur, testing, prosjektledelse, etc.
+            - JAVA_KOTLIN: Backend-utvikling med Java og/eller Kotlin (også kun Kotlin uten Java). Inkluderer: Spring Boot, JVM-basert utvikling, Kafka, PostgreSQL/SQL-databaser med Java/Kotlin. Backend-utvikler roller som krever Kotlin er JAVA_KOTLIN. Merk: Kotlin til Android/mobilutvikling hører IKKE her.
+            - DOTNET: Backend-utvikling med .NET, C#, ASP.NET, eller Microsoft-teknologier. Inkluderer fullstack med .NET backend.
+            - DATA_ANALYTICS: Data engineering, dataanalyse, BI, datavitenskap, ETL, datawarehousing, Power BI, machine learning.
+            - FRONTEND: KUN ren frontend/web-utvikling med React, Angular, Vue, JavaScript/TypeScript. Ingen backend-arbeid. React Native (mobil) hører IKKE her.
+            - OTHER: Alt som ikke passer over: mobilutvikling (React Native, Flutter, iOS, Android), Python/Node backend, DevOps uten spesifikk backend, arkitektur, testing, prosjektledelse.
 
-            Viktig veiledning for fullstack-roller:
+            Viktige regler:
+            - Backend-utvikler med Kotlin → JAVA_KOTLIN (selv uten Java nevnt)
+            - Backend med Kafka + Kotlin/Java → JAVA_KOTLIN
             - Fullstack med Java/Kotlin backend → JAVA_KOTLIN
             - Fullstack med .NET backend → DOTNET
             - Fullstack med Python/Node backend → OTHER
