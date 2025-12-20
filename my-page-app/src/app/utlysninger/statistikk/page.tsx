@@ -87,20 +87,28 @@ export default function StatistikkPage() {
     selectedMonth
   )
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleChartClick = (data: any) => {
-    if (data?.activePayload && data.activePayload.length > 0) {
-      const payload = data.activePayload[0]
-      const categoryKey = payload.dataKey as keyof typeof CATEGORY_TO_TECH_CATEGORY
-      const month = payload.payload?.month
-
-      if (categoryKey && month && CATEGORY_TO_TECH_CATEGORY[categoryKey]) {
+  // Handler for clicking on a specific dot
+  const handleDotClick = (categoryKey: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (data: any) => {
+      const month = data?.payload?.month
+      if (month && CATEGORY_TO_TECH_CATEGORY[categoryKey]) {
         setSelectedCategory(CATEGORY_TO_TECH_CATEGORY[categoryKey])
         setSelectedMonth(month)
         setSelectedCategoryLabel(CATEGORY_LABELS[categoryKey as keyof typeof CATEGORY_LABELS])
       }
     }
   }
+
+  // Create clickable active dot for each category
+  const createClickableDot = (categoryKey: string, color: string) => ({
+    r: 8,
+    fill: color,
+    stroke: 'white',
+    strokeWidth: 2,
+    cursor: 'pointer',
+    onClick: handleDotClick(categoryKey),
+  })
 
   const closeDrillDown = () => {
     setSelectedCategory(null)
@@ -222,8 +230,6 @@ export default function StatistikkPage() {
               <LineChart
                 data={chartData}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                onClick={handleChartClick}
-                style={{ cursor: 'pointer' }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis
@@ -253,8 +259,8 @@ export default function StatistikkPage() {
                   name={CATEGORY_LABELS.javaKotlin}
                   stroke={CATEGORY_COLORS.javaKotlin}
                   strokeWidth={2}
-                  dot={{ fill: CATEGORY_COLORS.javaKotlin, strokeWidth: 0, r: 4 }}
-                  activeDot={{ r: 6 }}
+                  dot={{ fill: CATEGORY_COLORS.javaKotlin, strokeWidth: 0, r: 4, cursor: 'pointer' }}
+                  activeDot={createClickableDot('javaKotlin', CATEGORY_COLORS.javaKotlin)}
                 />
                 <Line
                   type="monotone"
@@ -262,8 +268,8 @@ export default function StatistikkPage() {
                   name={CATEGORY_LABELS.dotnet}
                   stroke={CATEGORY_COLORS.dotnet}
                   strokeWidth={2}
-                  dot={{ fill: CATEGORY_COLORS.dotnet, strokeWidth: 0, r: 4 }}
-                  activeDot={{ r: 6 }}
+                  dot={{ fill: CATEGORY_COLORS.dotnet, strokeWidth: 0, r: 4, cursor: 'pointer' }}
+                  activeDot={createClickableDot('dotnet', CATEGORY_COLORS.dotnet)}
                 />
                 <Line
                   type="monotone"
@@ -271,8 +277,8 @@ export default function StatistikkPage() {
                   name={CATEGORY_LABELS.dataAnalytics}
                   stroke={CATEGORY_COLORS.dataAnalytics}
                   strokeWidth={2}
-                  dot={{ fill: CATEGORY_COLORS.dataAnalytics, strokeWidth: 0, r: 4 }}
-                  activeDot={{ r: 6 }}
+                  dot={{ fill: CATEGORY_COLORS.dataAnalytics, strokeWidth: 0, r: 4, cursor: 'pointer' }}
+                  activeDot={createClickableDot('dataAnalytics', CATEGORY_COLORS.dataAnalytics)}
                 />
                 <Line
                   type="monotone"
@@ -280,8 +286,8 @@ export default function StatistikkPage() {
                   name={CATEGORY_LABELS.frontend}
                   stroke={CATEGORY_COLORS.frontend}
                   strokeWidth={2}
-                  dot={{ fill: CATEGORY_COLORS.frontend, strokeWidth: 0, r: 4 }}
-                  activeDot={{ r: 6 }}
+                  dot={{ fill: CATEGORY_COLORS.frontend, strokeWidth: 0, r: 4, cursor: 'pointer' }}
+                  activeDot={createClickableDot('frontend', CATEGORY_COLORS.frontend)}
                 />
                 <Line
                   type="monotone"
@@ -289,8 +295,8 @@ export default function StatistikkPage() {
                   name={CATEGORY_LABELS.other}
                   stroke={CATEGORY_COLORS.other}
                   strokeWidth={2}
-                  dot={{ fill: CATEGORY_COLORS.other, strokeWidth: 0, r: 4 }}
-                  activeDot={{ r: 6 }}
+                  dot={{ fill: CATEGORY_COLORS.other, strokeWidth: 0, r: 4, cursor: 'pointer' }}
+                  activeDot={createClickableDot('other', CATEGORY_COLORS.other)}
                 />
               </LineChart>
             </ResponsiveContainer>
