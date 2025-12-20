@@ -269,6 +269,8 @@ export default function StatistikkPage() {
                   allowDecimals={false}
                 />
                 <Tooltip
+                  trigger="click"
+                  wrapperStyle={{ pointerEvents: 'auto', zIndex: 100 }}
                   content={({ active, payload }) => {
                     if (!active || !payload || payload.length === 0) return null
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -277,7 +279,7 @@ export default function StatistikkPage() {
                     return (
                       <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
                         <p className="font-semibold text-gray-800 mb-2 border-b pb-2">
-                          {formatMonth(month)}
+                          {formatMonth(month)} <span className="text-xs text-gray-500 font-normal">(klikk for å velge)</span>
                         </p>
                         <div className="space-y-1">
                           {Object.entries(CATEGORY_LABELS).map(([key, label]) => {
