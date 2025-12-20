@@ -2748,6 +2748,18 @@ components:
         uncategorizedCount:
           type: integer
           description: Number of job postings that have not been categorized yet
+        totalCount:
+          type: integer
+          description: Total number of job postings in database
+        missingDateCount:
+          type: integer
+          description: Number of job postings without a date (createdDate or deadline)
+        oldestDate:
+          type: string
+          description: Oldest job posting date in YYYY-MM format
+        newestDate:
+          type: string
+          description: Newest job posting date in YYYY-MM format
     TechCategory:
       type: string
       description: Technology category for job postings

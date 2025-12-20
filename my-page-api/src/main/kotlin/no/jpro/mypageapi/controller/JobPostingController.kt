@@ -245,7 +245,11 @@ class JobPostingController(
                     other = monthly.other
                 )
             },
-            uncategorizedCount = stats.uncategorizedCount
+            uncategorizedCount = stats.uncategorizedCount,
+            totalCount = stats.totalCount,
+            missingDateCount = stats.missingDateCount,
+            oldestDate = stats.oldestDate,
+            newestDate = stats.newestDate
         )
 
         return ResponseEntity.ok(dto)

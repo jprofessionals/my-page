@@ -18,7 +18,11 @@ data class MonthlyStatistics(
 
 data class JobPostingStatisticsResult(
     val monthlyData: List<MonthlyStatistics>,
-    val uncategorizedCount: Int
+    val uncategorizedCount: Int,
+    val totalCount: Int = 0,
+    val missingDateCount: Int = 0,
+    val oldestDate: String? = null,
+    val newestDate: String? = null
 )
 
 @Service
@@ -36,6 +40,12 @@ class JobPostingStatisticsService(
     fun getStatistics(): JobPostingStatisticsResult {
         val allJobPostings = jobPostingRepository.findAll()
         val uncategorizedCount = allJobPostings.count { it.techCategory == null }
+        val missingDateCount = allJobPostings.count { getEffectiveDate(it) == null }
+
+        // Find date range of all postings (for debugging)
+        val allDates = allJobPostings.mapNotNull { getEffectiveDate(it) }
+        val oldestDate = allDates.minOrNull()?.let { monthFormatter.format(it) }
+        val newestDate = allDates.maxOrNull()?.let { monthFormatter.format(it) }
 
         // Group by month and category
         // Use createdDate if available, otherwise fall back to deadline
@@ -61,7 +71,11 @@ class JobPostingStatisticsService(
 
         return JobPostingStatisticsResult(
             monthlyData = monthlyStats,
-            uncategorizedCount = uncategorizedCount
+            uncategorizedCount = uncategorizedCount,
+            totalCount = allJobPostings.size,
+            missingDateCount = missingDateCount,
+            oldestDate = oldestDate,
+            newestDate = newestDate
         )
     }
 

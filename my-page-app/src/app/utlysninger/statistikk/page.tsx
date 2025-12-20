@@ -327,6 +327,20 @@ export default function StatistikkPage() {
             )
           })}
         </div>
+
+        {/* Debug info - data range */}
+        {user?.admin && statistics && (
+          <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
+            <h3 className="font-semibold mb-2">Database info:</h3>
+            <ul className="space-y-1">
+              <li>Totalt antall utlysninger: {statistics.totalCount}</li>
+              <li>Ukategoriserte: {statistics.uncategorizedCount}</li>
+              <li>Mangler dato: {statistics.missingDateCount}</li>
+              <li>Eldste dato: {statistics.oldestDate || 'N/A'}</li>
+              <li>Nyeste dato: {statistics.newestDate || 'N/A'}</li>
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* Drill-down Modal */}
