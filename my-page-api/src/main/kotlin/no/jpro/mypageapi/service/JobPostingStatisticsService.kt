@@ -27,14 +27,21 @@ class JobPostingStatisticsService(
 ) {
     private val monthFormatter = DateTimeFormatter.ofPattern("yyyy-MM")
 
+    /**
+     * Get the effective date for a job posting.
+     * Uses createdDate if available, otherwise falls back to deadline.
+     */
+    private fun getEffectiveDate(posting: JobPosting) = posting.createdDate ?: posting.deadline
+
     fun getStatistics(): JobPostingStatisticsResult {
         val allJobPostings = jobPostingRepository.findAll()
         val uncategorizedCount = allJobPostings.count { it.techCategory == null }
 
         // Group by month and category
+        // Use createdDate if available, otherwise fall back to deadline
         val monthlyStats = allJobPostings
-            .filter { it.createdDate != null && it.techCategory != null }
-            .groupBy { YearMonth.from(it.createdDate) }
+            .filter { getEffectiveDate(it) != null && it.techCategory != null }
+            .groupBy { YearMonth.from(getEffectiveDate(it)) }
             .mapValues { (_, postings) ->
                 postings.groupBy { it.techCategory }
                     .mapValues { it.value.size }
@@ -63,10 +70,11 @@ class JobPostingStatisticsService(
 
         return jobPostingRepository.findAll()
             .filter { posting ->
+                val effectiveDate = getEffectiveDate(posting)
                 posting.techCategory == category &&
-                posting.createdDate != null &&
-                YearMonth.from(posting.createdDate) == yearMonth
+                effectiveDate != null &&
+                YearMonth.from(effectiveDate) == yearMonth
             }
-            .sortedByDescending { it.createdDate }
+            .sortedByDescending { getEffectiveDate(it) }
     }
 }
