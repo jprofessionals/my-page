@@ -549,6 +549,7 @@ class SalesPipelineService(
         val wonThisYear: Int,
         val lostThisMonth: Int,
         val lostThisQuarter: Int,
+        val lostThisYear: Int,
         val createdThisMonth: Int,
         val createdThisQuarter: Int,
         val createdThisYear: Int,
@@ -558,6 +559,7 @@ class SalesPipelineService(
         val wonLastYear: Int,
         val lostLastMonth: Int,
         val lostLastQuarter: Int,
+        val lostLastYear: Int,
         val createdLastMonth: Int,
         val createdLastQuarter: Int,
         val createdLastYear: Int,
@@ -637,10 +639,12 @@ class SalesPipelineService(
         // Lost activities - current period (CLOSED_OTHER_WON is used for closed/lost)
         val lostThisMonth = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.CLOSED_OTHER_WON, startOfMonth).size
         val lostThisQuarter = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.CLOSED_OTHER_WON, startOfQuarter).size
+        val lostThisYear = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.CLOSED_OTHER_WON, startOfYear).size
 
         // Lost activities - previous period
         val lostLastMonth = salesActivityRepository.findByStatusAndClosedAtBetween(ActivityStatus.CLOSED_OTHER_WON, startOfLastMonth, endOfLastMonth).size
         val lostLastQuarter = salesActivityRepository.findByStatusAndClosedAtBetween(ActivityStatus.CLOSED_OTHER_WON, startOfLastQuarter, endOfLastQuarter).size
+        val lostLastYear = salesActivityRepository.findByStatusAndClosedAtBetween(ActivityStatus.CLOSED_OTHER_WON, startOfLastYear, endOfLastYear).size
 
         // Created activities - current period
         val createdThisMonth = salesActivityRepository.findCreatedSince(startOfMonth).size
@@ -779,6 +783,7 @@ class SalesPipelineService(
             wonThisYear = wonThisYear,
             lostThisMonth = lostThisMonth,
             lostThisQuarter = lostThisQuarter,
+            lostThisYear = lostThisYear,
             createdThisMonth = createdThisMonth,
             createdThisQuarter = createdThisQuarter,
             createdThisYear = createdThisYear,
@@ -787,6 +792,7 @@ class SalesPipelineService(
             wonLastYear = wonLastYear,
             lostLastMonth = lostLastMonth,
             lostLastQuarter = lostLastQuarter,
+            lostLastYear = lostLastYear,
             createdLastMonth = createdLastMonth,
             createdLastQuarter = createdLastQuarter,
             createdLastYear = createdLastYear,

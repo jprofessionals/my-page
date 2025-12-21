@@ -4071,6 +4071,9 @@ components:
         lostThisQuarter:
           type: integer
           description: Number of lost activities this quarter
+        lostThisYear:
+          type: integer
+          description: Number of lost activities this year
         # Current period - Created (job postings we responded to)
         createdThisMonth:
           type: integer
@@ -4098,6 +4101,9 @@ components:
         lostLastQuarter:
           type: integer
           description: Number of lost activities last quarter
+        lostLastYear:
+          type: integer
+          description: Number of lost activities last year
         # Previous period - Created
         createdLastMonth:
           type: integer
@@ -4163,6 +4169,7 @@ components:
         - wonThisYear
         - lostThisMonth
         - lostThisQuarter
+        - lostThisYear
         - createdThisMonth
         - createdThisQuarter
         - createdThisYear
@@ -4171,6 +4178,7 @@ components:
         - wonLastYear
         - lostLastMonth
         - lostLastQuarter
+        - lostLastYear
         - createdLastMonth
         - createdLastQuarter
         - createdLastYear
