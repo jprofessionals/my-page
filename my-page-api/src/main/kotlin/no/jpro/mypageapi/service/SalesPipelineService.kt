@@ -756,8 +756,10 @@ class SalesPipelineService(
         // Fetch all availability history for bench calculation
         val allHistoryEntries = availabilityHistoryRepository.findByChangedAtBetweenOrderByChangedAtAsc(startDate, now)
 
-        // Get all consultants who have availability records (on the board)
-        val consultantsOnBoard = consultantAvailabilityRepository.findAll().map { it.consultant.id!! }.toSet()
+        // Get all consultants who have availability records (on the board) and their current status
+        val allAvailabilities = consultantAvailabilityRepository.findAll()
+        val consultantsOnBoard = allAvailabilities.map { it.consultant.id!! }.toSet()
+        val currentAvailabilities = allAvailabilities.associate { it.consultant.id!! to it.status }
 
         // Build result for each month
         val result = mutableListOf<MonthlyTrendData>()
@@ -787,7 +789,8 @@ class SalesPipelineService(
                 consultantsOnBoard = consultantsOnBoard,
                 historyEntries = allHistoryEntries,
                 monthStart = monthStart,
-                monthEnd = monthEnd
+                monthEnd = monthEnd,
+                currentAvailabilities = currentAvailabilities
             )
 
             result.add(MonthlyTrendData(
@@ -811,7 +814,8 @@ class SalesPipelineService(
         consultantsOnBoard: Set<Long>,
         historyEntries: List<AvailabilityHistory>,
         monthStart: LocalDateTime,
-        monthEnd: LocalDateTime
+        monthEnd: LocalDateTime,
+        currentAvailabilities: Map<Long, AvailabilityStatus>
     ): Double {
         var totalBenchDays = 0
 
@@ -821,8 +825,9 @@ class SalesPipelineService(
                 .sortedBy { it.changedAt }
 
             // Find the initial status at the start of the month
-            // Default to OCCUPIED if no history - only count as "ledig" if we have actual data
+            // First check history, then fall back to current status (for consultants with no history yet)
             val statusAtMonthStart = availabilityHistoryRepository.findLatestStatusAsOf(consultantId, monthStart)?.toStatus
+                ?: currentAvailabilities[consultantId]
                 ?: AvailabilityStatus.OCCUPIED
 
             // Calculate days in bench status during this month
