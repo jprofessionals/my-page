@@ -31,4 +31,6 @@ interface AvailabilityHistoryRepository : JpaRepository<AvailabilityHistory, Lon
         LIMIT 1
     """)
     fun findLatestStatusAsOf(consultantId: Long, asOfDate: LocalDateTime): AvailabilityHistory?
+
+    fun findFirstByConsultantIdOrderByChangedAtAsc(consultantId: Long): AvailabilityHistory?
 }

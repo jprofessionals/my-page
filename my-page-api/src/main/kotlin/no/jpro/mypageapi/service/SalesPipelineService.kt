@@ -751,10 +751,18 @@ class SalesPipelineService(
         // Fetch all availability history for bench calculation
         val allHistoryEntries = availabilityHistoryRepository.findByChangedAtBetweenOrderByChangedAtAsc(startDate, now)
 
-        // Get all consultants who have availability records (on the board) and their current status
+        // Get all consultants who have availability records (on the board)
         val allAvailabilities = consultantAvailabilityRepository.findAll()
         val consultantsOnBoard = allAvailabilities.map { it.consultant.id!! }.toSet()
-        val currentAvailabilities = allAvailabilities.associate { it.consultant.id!! to it.status }
+
+        // Build a map of when each consultant became available (from availableFrom field or history)
+        val availableFromByConsultant = allAvailabilities.associate { availability ->
+            val consultantId = availability.consultant.id!!
+            // Use availableFrom if set, otherwise fall back to first history entry
+            val availableFromDate = availability.availableFrom?.atStartOfDay()
+                ?: availabilityHistoryRepository.findFirstByConsultantIdOrderByChangedAtAsc(consultantId)?.changedAt
+            consultantId to availableFromDate
+        }.filterValues { it != null }.mapValues { it.value!! }
 
         // Build result for each month
         val result = mutableListOf<MonthlyTrendData>()
@@ -785,7 +793,7 @@ class SalesPipelineService(
                 historyEntries = allHistoryEntries,
                 monthStart = monthStart,
                 monthEnd = monthEnd,
-                currentAvailabilities = currentAvailabilities
+                availableFromByConsultant = availableFromByConsultant
             )
 
             result.add(MonthlyTrendData(
@@ -810,7 +818,7 @@ class SalesPipelineService(
         historyEntries: List<AvailabilityHistory>,
         monthStart: LocalDateTime,
         monthEnd: LocalDateTime,
-        currentAvailabilities: Map<Long, AvailabilityStatus>
+        availableFromByConsultant: Map<Long, LocalDateTime>
     ): Double {
         var totalBenchDays = 0
 
@@ -819,18 +827,29 @@ class SalesPipelineService(
             val consultantHistory = historyEntries.filter { it.consultant.id == consultantId }
                 .sortedBy { it.changedAt }
 
-            // Find the initial status at the start of the month
-            // First check history, then fall back to current status (for consultants with no history yet)
-            val statusAtMonthStart = availabilityHistoryRepository.findLatestStatusAsOf(consultantId, monthStart)?.toStatus
-                ?: currentAvailabilities[consultantId]
-                ?: AvailabilityStatus.OCCUPIED
+            // Find when this consultant became available
+            val availableFromDate = availableFromByConsultant[consultantId]
+
+            // If we don't know when they became available, or it's after this month, skip
+            if (availableFromDate == null || availableFromDate >= monthEnd) {
+                continue
+            }
+
+            // Determine when to start counting for this month
+            // If they became available during this month, start from that date
+            val effectiveStart = if (availableFromDate > monthStart) availableFromDate else monthStart
+
+            // Find the initial status at the effective start from history
+            // Default to AVAILABLE if they have an availableFrom date (they were marked as available)
+            val statusAtStart = availabilityHistoryRepository.findLatestStatusAsOf(consultantId, effectiveStart)?.toStatus
+                ?: AvailabilityStatus.AVAILABLE
 
             // Calculate days in bench status during this month
-            var currentStatus = statusAtMonthStart
-            var periodStart = monthStart
+            var currentStatus = statusAtStart
+            var periodStart = effectiveStart
 
             for (entry in consultantHistory) {
-                if (entry.changedAt >= monthStart && entry.changedAt < monthEnd) {
+                if (entry.changedAt >= effectiveStart && entry.changedAt < monthEnd) {
                     // Calculate days from periodStart to this entry's changedAt
                     if (isBenchStatus(currentStatus)) {
                         val days = calculateWorkDays(periodStart, entry.changedAt)
