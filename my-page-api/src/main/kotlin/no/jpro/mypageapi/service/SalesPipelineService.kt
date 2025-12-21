@@ -713,8 +713,9 @@ class SalesPipelineService(
         val available = availabilities.count { it.status == AvailabilityStatus.AVAILABLE }
         val availableSoon = availabilities.count { it.status == AvailabilityStatus.AVAILABLE_SOON }
         val assigned = availabilities.count { it.status == AvailabilityStatus.ASSIGNED }
-        // Occupied = total minus those explicitly marked as available/soon/assigned
-        val occupied = totalConsultants - available - availableSoon - assigned
+        // Occupied = total minus those actually available or assigned (waiting to start)
+        // "availableSoon" are still occupied - they're just on the sales board being sold
+        val occupied = totalConsultants - available - assigned
         val availabilityStats = AvailabilityStatsData(
             totalConsultants = totalConsultants,
             available = available,
