@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="200.029.1" author="claude">
+        <comment>Add setting for total number of consultants</comment>
+        <insert tableName="settings">
+            <column name="setting_id" value="totalConsultants"/>
+            <column name="priority" valueNumeric="10"/>
+            <column name="description" value="Totalt antall konsulenter i firmaet"/>
+            <column name="setting_value" value="63"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

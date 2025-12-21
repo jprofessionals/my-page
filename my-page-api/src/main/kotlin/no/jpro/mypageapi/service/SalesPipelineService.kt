@@ -15,6 +15,7 @@ import no.jpro.mypageapi.repository.CustomerRepository
 import no.jpro.mypageapi.repository.JobPostingRepository
 import no.jpro.mypageapi.repository.SalesActivityRepository
 import no.jpro.mypageapi.repository.SalesStageHistoryRepository
+import no.jpro.mypageapi.repository.SettingsRepository
 import no.jpro.mypageapi.repository.UserRepository
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
@@ -31,6 +32,7 @@ class SalesPipelineService(
     private val salesActivityRepository: SalesActivityRepository,
     private val salesStageHistoryRepository: SalesStageHistoryRepository,
     private val jobPostingRepository: JobPostingRepository,
+    private val settingsRepository: SettingsRepository,
     private val userRepository: UserRepository,
     private val customerRepository: CustomerRepository
 ) {
@@ -705,10 +707,9 @@ class SalesPipelineService(
             activitiesWithReason.count { it.closedReason == reason }
         }
 
-        // Availability stats
-        // Total consultants = all enabled users with employee number, minus 5 admin staff
-        val totalEmployees = userRepository.countByEmployeeNumberIsNotNullAndEnabled(true).toInt()
-        val totalConsultants = (totalEmployees - 5).coerceAtLeast(0)
+        // Availability stats - read total consultants from settings (configurable in admin)
+        val totalConsultants = settingsRepository.findSettingBySettingId("totalConsultants")
+            ?.settingValue?.toIntOrNull() ?: 63
         val availabilities = consultantAvailabilityRepository.findAll()
         val available = availabilities.count { it.status == AvailabilityStatus.AVAILABLE }
         val availableSoon = availabilities.count { it.status == AvailabilityStatus.AVAILABLE_SOON }
