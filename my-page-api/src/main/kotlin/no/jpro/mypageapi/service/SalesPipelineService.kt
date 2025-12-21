@@ -497,9 +497,9 @@ class SalesPipelineService(
     }
 
     /**
-     * Remove a consultant from the sales pipeline entirely.
-     * Deletes all their sales activities and availability info.
-     * @return true if consultant had any data to delete, false if consultant was not in pipeline
+     * Remove a consultant from the sales pipeline board.
+     * Only removes their availability status - all activities are preserved for analytics.
+     * @return true if consultant was on the board, false if not
      */
     @Transactional
     fun removeConsultantFromPipeline(consultantId: Long): Boolean {
@@ -509,19 +509,14 @@ class SalesPipelineService(
             throw IllegalArgumentException("Consultant not found: $consultantId")
         }
 
-        // Delete all sales activities for the consultant
-        val activities = salesActivityRepository.findByConsultantId(consultantId)
-        if (activities.isNotEmpty()) {
-            salesActivityRepository.deleteAll(activities)
-        }
-
-        // Delete availability info
+        // Only remove availability info - preserve ALL activities for analytics
         val availability = consultantAvailabilityRepository.findByConsultantId(consultantId)
         if (availability != null) {
             consultantAvailabilityRepository.delete(availability)
+            return true
         }
 
-        return activities.isNotEmpty() || availability != null
+        return false
     }
 
     // ==================== Pipeline Board ====================
