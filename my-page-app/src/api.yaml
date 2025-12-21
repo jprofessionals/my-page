@@ -2549,6 +2549,13 @@ paths:
       operationId: getSalesPipelineAnalytics
       summary: Get analytics data for the sales pipeline
       description: Returns aggregated statistics and metrics for the sales pipeline including win rates, funnel data, and consultant performance
+      parameters:
+        - name: funnelMonths
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Number of months to include in funnel data (default is all time)
       responses:
         '200':
           description: Sales pipeline analytics data
@@ -4137,6 +4144,18 @@ components:
           items:
             $ref: '#/components/schemas/FunnelStageData'
           description: Funnel data showing how many activities reached each stage
+        funnelTotalJobPostings:
+          type: integer
+          description: Total job postings (utlysninger) in funnel period
+        funnelTotalCreated:
+          type: integer
+          description: Total activities created in funnel period (besvart)
+        funnelWonCount:
+          type: integer
+          description: Activities won in funnel period
+        funnelLostCount:
+          type: integer
+          description: Activities lost in funnel period
       required:
         - totalActiveActivities
         - wonThisMonth
@@ -4163,6 +4182,10 @@ components:
         - closedReasonStats
         - availabilityStats
         - funnelData
+        - funnelTotalJobPostings
+        - funnelTotalCreated
+        - funnelWonCount
+        - funnelLostCount
 
     StageCount:
       type: object

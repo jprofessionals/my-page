@@ -438,8 +438,8 @@ class SalesPipelineApiDelegateImpl(
 
     // ==================== Analytics ====================
 
-    override fun getSalesPipelineAnalytics(): ResponseEntity<SalesPipelineAnalytics> {
-        val analytics = salesPipelineService.getAnalytics()
+    override fun getSalesPipelineAnalytics(funnelMonths: Int?): ResponseEntity<SalesPipelineAnalytics> {
+        val analytics = salesPipelineService.getAnalytics(funnelMonths)
 
         val response = SalesPipelineAnalytics(
             totalActiveActivities = analytics.totalActiveActivities.toInt(),
@@ -504,7 +504,11 @@ class SalesPipelineApiDelegateImpl(
                     reached = stage.reached,
                     current = stage.current
                 )
-            }
+            },
+            funnelTotalJobPostings = analytics.funnelTotalJobPostings,
+            funnelTotalCreated = analytics.funnelTotalCreated,
+            funnelWonCount = analytics.funnelWonCount,
+            funnelLostCount = analytics.funnelLostCount
         )
 
         return ResponseEntity.ok(response)

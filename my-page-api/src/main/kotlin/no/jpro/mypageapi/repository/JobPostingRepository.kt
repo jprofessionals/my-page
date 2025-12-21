@@ -11,6 +11,8 @@ import java.time.OffsetDateTime
 @Repository
 interface JobPostingRepository : JpaRepository<JobPosting, Long> {
 
+    fun countByCreatedDateAfter(date: OffsetDateTime): Long
+
     fun findByTechCategoryIsNull(): List<JobPosting>
 
     fun findByTechCategoryIsNotNull(): List<JobPosting>

@@ -12,10 +12,13 @@ import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.AvailabilityHistoryRepository
 import no.jpro.mypageapi.repository.ConsultantAvailabilityRepository
 import no.jpro.mypageapi.repository.CustomerRepository
+import no.jpro.mypageapi.repository.JobPostingRepository
 import no.jpro.mypageapi.repository.SalesActivityRepository
 import no.jpro.mypageapi.repository.SalesStageHistoryRepository
 import no.jpro.mypageapi.repository.UserRepository
 import org.springframework.stereotype.Service
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -27,6 +30,7 @@ class SalesPipelineService(
     private val availabilityHistoryRepository: AvailabilityHistoryRepository,
     private val salesActivityRepository: SalesActivityRepository,
     private val salesStageHistoryRepository: SalesStageHistoryRepository,
+    private val jobPostingRepository: JobPostingRepository,
     private val userRepository: UserRepository,
     private val customerRepository: CustomerRepository
 ) {
@@ -563,7 +567,11 @@ class SalesPipelineService(
         val customerStats: List<CustomerStats>,
         val closedReasonStats: Map<ClosedReason, Int>,
         val availabilityStats: AvailabilityStatsData,
-        val funnelData: List<FunnelStageData>
+        val funnelData: List<FunnelStageData>,
+        val funnelTotalJobPostings: Int,
+        val funnelTotalCreated: Int,
+        val funnelWonCount: Int,
+        val funnelLostCount: Int
     )
 
     data class ConsultantStats(
@@ -594,7 +602,7 @@ class SalesPipelineService(
     )
 
     @Transactional(readOnly = true)
-    fun getAnalytics(): AnalyticsData {
+    fun getAnalytics(funnelMonths: Int? = null): AnalyticsData {
         val now = LocalDateTime.now()
 
         // Current period boundaries
@@ -706,8 +714,30 @@ class SalesPipelineService(
         )
 
         // Funnel data - count how many activities have REACHED each stage (not just current)
-        // We look at stage history to find all stages an activity has been in
+        // Filter by time period if funnelMonths is specified
+        val funnelCutoff = funnelMonths?.let {
+            now.minusMonths(it.toLong()).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
+        }
+
+        // Count job postings (utlysninger) in the funnel period
+        val funnelTotalJobPostings = if (funnelCutoff != null) {
+            val cutoffOffset = funnelCutoff.atOffset(ZoneOffset.UTC)
+            jobPostingRepository.countByCreatedDateAfter(cutoffOffset).toInt()
+        } else {
+            jobPostingRepository.count().toInt()
+        }
+
+        // Get activities within the funnel time period
+        val funnelActivities = if (funnelCutoff != null) {
+            salesActivityRepository.findCreatedSince(funnelCutoff)
+        } else {
+            salesActivityRepository.findAll()
+        }
+        val funnelActivityIds = funnelActivities.map { it.id }.toSet()
+
+        // Get stage history for activities in the funnel period
         val allStageHistory = salesStageHistoryRepository.findAll()
+            .filter { funnelActivityIds.contains(it.activity.id) }
         val stagesReachedByActivity = allStageHistory.groupBy { it.activity.id }
             .mapValues { (_, histories) -> histories.map { it.toStage }.toSet() }
 
@@ -718,11 +748,15 @@ class SalesPipelineService(
             SalesStage.INTERVIEW
         )
 
+        // Count won and lost in the funnel period
+        val funnelWonCount = funnelActivities.count { it.status == ActivityStatus.WON }
+        val funnelLostCount = funnelActivities.count { it.status == ActivityStatus.CLOSED_OTHER_WON }
+
         val funnelData = funnelStages.map { stage ->
             FunnelStageData(
                 stage = stage.name,
                 reached = stagesReachedByActivity.count { (_, stages) -> stages.contains(stage) },
-                current = activeActivities.count { it.currentStage == stage }
+                current = funnelActivities.count { it.status == ActivityStatus.ACTIVE && it.currentStage == stage }
             )
         }
 
@@ -751,7 +785,11 @@ class SalesPipelineService(
             customerStats = customerStats,
             closedReasonStats = closedReasonStats,
             availabilityStats = availabilityStats,
-            funnelData = funnelData
+            funnelData = funnelData,
+            funnelTotalJobPostings = funnelTotalJobPostings,
+            funnelTotalCreated = funnelActivities.size,
+            funnelWonCount = funnelWonCount,
+            funnelLostCount = funnelLostCount
         )
     }
 

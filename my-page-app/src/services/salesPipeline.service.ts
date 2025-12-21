@@ -160,9 +160,12 @@ export const salesPipelineService = {
 
   /**
    * Get analytics data for the sales pipeline
+   * @param funnelMonths - Optional number of months to filter funnel data (default is all time)
    */
-  async getAnalytics() {
-    const { data } = await getSalesPipelineAnalytics()
+  async getAnalytics(funnelMonths?: number) {
+    const { data } = await getSalesPipelineAnalytics({
+      query: funnelMonths ? { funnelMonths } : undefined,
+    })
     return data
   },
 

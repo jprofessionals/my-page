@@ -30,15 +30,25 @@ const CLOSED_REASON_LABELS: Record<string, string> = {
   OTHER: 'Annet',
 }
 
+const FUNNEL_PERIODS = [
+  { value: 1, label: 'Siste måned' },
+  { value: 3, label: 'Siste 3 mnd' },
+  { value: 4, label: 'Siste kvartal' },
+  { value: 6, label: 'Siste halvår' },
+  { value: 12, label: 'Siste år' },
+  { value: undefined, label: 'All tid' },
+] as const
+
 export default function SalesPipelineAnalyticsComponent() {
   const [analytics, setAnalytics] = useState<SalesPipelineAnalytics | null>(null)
   const [trends, setTrends] = useState<MonthlyTrendData[]>([])
   const [loading, setLoading] = useState(true)
   const [trendMonths, setTrendMonths] = useState(12)
+  const [funnelMonths, setFunnelMonths] = useState<number | undefined>(undefined)
 
   useEffect(() => {
     loadAnalytics()
-  }, [])
+  }, [funnelMonths])
 
   useEffect(() => {
     loadTrends()
@@ -47,7 +57,7 @@ export default function SalesPipelineAnalyticsComponent() {
   const loadAnalytics = async () => {
     setLoading(true)
     try {
-      const data = await salesPipelineService.getAnalytics()
+      const data = await salesPipelineService.getAnalytics(funnelMonths)
       setAnalytics(data ?? null)
     } catch (error) {
       console.error('Failed to load analytics:', error)
@@ -396,16 +406,29 @@ export default function SalesPipelineAnalyticsComponent() {
 
       {/* Pipeline Funnel */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Pipeline Funnel</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Pipeline Funnel</h2>
+          <select
+            className="select select-bordered select-sm"
+            value={funnelMonths ?? ''}
+            onChange={(e) => setFunnelMonths(e.target.value ? Number(e.target.value) : undefined)}
+          >
+            {FUNNEL_PERIODS.map((period) => (
+              <option key={period.label} value={period.value ?? ''}>
+                {period.label}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="bg-base-200 rounded-lg p-6">
           {/* Horizontal Funnel visualization - using backend funnelData with "reached" counts */}
           <div className="flex items-center gap-4">
-            {/* Starting count - total activities ever created */}
+            {/* Starting count - all job postings in period */}
             <div className="text-center flex-shrink-0">
-              <div className="text-2xl font-bold text-info">
-                {analytics.funnelData?.[0]?.reached || 0}
+              <div className="text-2xl font-bold text-gray-400">
+                {analytics.funnelTotalJobPostings}
               </div>
-              <div className="text-xs text-gray-500">Besvart</div>
+              <div className="text-xs text-gray-500">Utlysninger</div>
             </div>
 
             {/* Funnel stages - horizontal flow showing "reached" counts */}
@@ -421,6 +444,8 @@ export default function SalesPipelineAnalyticsComponent() {
 
                 return (analytics.funnelData || []).map((stage, index) => (
                   <div key={stage.stage} className="flex items-center flex-1">
+                    {/* Arrow before stage */}
+                    <div className="text-gray-400 px-1 flex-shrink-0">→</div>
                     {/* Stage box */}
                     <div
                       className={`${colors[index] || 'bg-gray-500'} rounded-lg p-3 flex-1 text-white text-center min-w-0`}
@@ -429,10 +454,6 @@ export default function SalesPipelineAnalyticsComponent() {
                       <div className="text-2xl font-bold">{stage.reached}</div>
                       <div className="text-xs truncate">{stageLabels[stage.stage] || stage.stage}</div>
                     </div>
-                    {/* Arrow between stages */}
-                    {index < (analytics.funnelData?.length || 0) - 1 && (
-                      <div className="text-gray-400 px-1 flex-shrink-0">→</div>
-                    )}
                   </div>
                 ))
               })()}
@@ -445,22 +466,20 @@ export default function SalesPipelineAnalyticsComponent() {
             <div className="flex gap-4 flex-shrink-0">
               <div className="text-center">
                 <div className="w-14 h-14 rounded-full bg-success/20 border-2 border-success flex items-center justify-center">
-                  <span className="text-xl font-bold text-success">{analytics.wonThisYear}</span>
+                  <span className="text-xl font-bold text-success">{analytics.funnelWonCount}</span>
                 </div>
                 <div className="text-xs text-success mt-1">Vunnet</div>
               </div>
               <div className="text-center">
                 <div className="w-14 h-14 rounded-full bg-error/20 border-2 border-error flex items-center justify-center">
-                  <span className="text-xl font-bold text-error">
-                    {analytics.closedReasonStats?.reduce((sum, r) => sum + r.count, 0) || 0}
-                  </span>
+                  <span className="text-xl font-bold text-error">{analytics.funnelLostCount}</span>
                 </div>
                 <div className="text-xs text-error mt-1">Tapt</div>
               </div>
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-4 text-center">
-            Antall som har nådd hver fase (all tid)
+            Antall som har nådd hver fase ({funnelMonths ? `siste ${funnelMonths} mnd` : 'all tid'})
           </p>
         </div>
       </div>
