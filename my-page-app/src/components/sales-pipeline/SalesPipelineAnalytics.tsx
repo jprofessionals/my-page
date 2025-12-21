@@ -19,17 +19,6 @@ import {
 } from '@/services/salesPipeline.service'
 import Link from 'next/link'
 
-const CLOSED_REASON_LABELS: Record<string, string> = {
-  REJECTED_BY_SUPPLIER: 'Avvist av leverandør',
-  REJECTED_BY_CUSTOMER: 'Avvist av kunde',
-  MISSING_REQUIREMENTS: 'Manglende krav',
-  OTHER_CANDIDATE_CHOSEN: 'Annen kandidat valgt',
-  ASSIGNMENT_CANCELLED: 'Oppdrag kansellert',
-  CONSULTANT_UNAVAILABLE: 'Konsulent utilgjengelig',
-  CONSULTANT_WON_OTHER: 'Konsulent vant annet',
-  OTHER: 'Annet',
-}
-
 const FUNNEL_PERIODS = [
   { value: 1, label: 'Siste måned' },
   { value: 3, label: 'Siste 3 mnd' },
@@ -566,27 +555,6 @@ export default function SalesPipelineAnalyticsComponent() {
         </div>
       </div>
 
-      {/* Closed Reasons */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Tapsårsaker</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {analytics.closedReasonStats
-            .filter((r) => r.count > 0)
-            .sort((a, b) => b.count - a.count)
-            .map((reason) => (
-              <div
-                key={reason.reason}
-                className="bg-base-200 rounded-lg p-3 flex justify-between items-center"
-              >
-                <span className="text-sm">{CLOSED_REASON_LABELS[reason.reason] || reason.reason}</span>
-                <span className="badge badge-error">{reason.count}</span>
-              </div>
-            ))}
-          {analytics.closedReasonStats.filter((r) => r.count > 0).length === 0 && (
-            <p className="text-gray-500 col-span-full">Ingen tapte prosesser ennå</p>
-          )}
-        </div>
-      </div>
 
     </div>
   )
