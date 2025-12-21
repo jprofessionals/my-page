@@ -241,8 +241,8 @@ export default function SalesPipelineAnalyticsComponent() {
               )}
             </div>
             <div>
-              <div className="text-2xl font-bold">{analytics.averageDaysToClose.toFixed(0)}</div>
-              <div className="text-xs text-gray-500">Dager til lukket</div>
+              <div className="text-2xl font-bold text-error">{analytics.lostThisYear}</div>
+              <div className="text-xs text-gray-500">Tapt</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-info">{analytics.createdThisYear}</div>
