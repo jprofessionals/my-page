@@ -93,6 +93,9 @@ class SalesActivity(
     @Column(name = "interview_date")
     var interviewDate: LocalDateTime? = null,
 
+    @Column(name = "actual_start_date")
+    var actualStartDate: LocalDate? = null,
+
     @OneToMany(mappedBy = "activity", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     var stageHistory: MutableList<SalesStageHistory> = mutableListOf()
 

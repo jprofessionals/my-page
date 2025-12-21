@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="add-actual-start-date-to-sales-activity" author="claude">
+        <addColumn tableName="sales_activity">
+            <column name="actual_start_date" type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <comment>Add actual_start_date for tracking when consultant actually starts after winning assignment</comment>
+    </changeSet>
+
+</databaseChangeLog>

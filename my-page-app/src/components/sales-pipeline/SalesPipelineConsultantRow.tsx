@@ -89,12 +89,14 @@ interface Props {
 const AVAILABILITY_LABELS: Record<AvailabilityStatus, string> = {
   AVAILABLE: 'Ledig nå',
   AVAILABLE_SOON: 'Blir ledig',
+  ASSIGNED: 'Tildelt',
   OCCUPIED: 'Opptatt',
 }
 
 const AVAILABILITY_COLORS: Record<AvailabilityStatus, string> = {
   AVAILABLE: 'badge-success',
   AVAILABLE_SOON: 'badge-warning',
+  ASSIGNED: 'badge-info',
   OCCUPIED: 'badge-error',
 }
 
@@ -196,6 +198,11 @@ export default function SalesPipelineConsultantRow({
                 {availability.status === 'AVAILABLE_SOON' && availability.availableFrom && (
                   <span className="text-xs text-gray-500">
                     {formatAvailableFrom(availability.availableFrom)}
+                  </span>
+                )}
+                {availability.status === 'ASSIGNED' && availability.availableFrom && (
+                  <span className="text-xs text-gray-500">
+                    Starter {formatAvailableFrom(availability.availableFrom)}
                   </span>
                 )}
               </div>

@@ -1,6 +1,7 @@
 package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.entity.ActivityStatus
+import no.jpro.mypageapi.entity.AvailabilityHistory
 import no.jpro.mypageapi.entity.AvailabilityStatus
 import no.jpro.mypageapi.entity.ClosedReason
 import no.jpro.mypageapi.entity.ConsultantAvailability
@@ -8,6 +9,7 @@ import no.jpro.mypageapi.entity.SalesActivity
 import no.jpro.mypageapi.entity.SalesStage
 import no.jpro.mypageapi.entity.SalesStageHistory
 import no.jpro.mypageapi.entity.User
+import no.jpro.mypageapi.repository.AvailabilityHistoryRepository
 import no.jpro.mypageapi.repository.ConsultantAvailabilityRepository
 import no.jpro.mypageapi.repository.CustomerRepository
 import no.jpro.mypageapi.repository.SalesActivityRepository
@@ -22,6 +24,7 @@ import java.time.temporal.ChronoUnit
 @Service
 class SalesPipelineService(
     private val consultantAvailabilityRepository: ConsultantAvailabilityRepository,
+    private val availabilityHistoryRepository: AvailabilityHistoryRepository,
     private val salesActivityRepository: SalesActivityRepository,
     private val salesStageHistoryRepository: SalesStageHistoryRepository,
     private val userRepository: UserRepository,
@@ -73,6 +76,18 @@ class SalesPipelineService(
             notes = notes,
             updatedBy = updatedBy
         )
+
+        // Log history if status changed
+        if (previousStatus != status) {
+            val historyEntry = AvailabilityHistory(
+                consultant = consultant,
+                fromStatus = previousStatus,
+                toStatus = status,
+                changedAt = LocalDateTime.now(),
+                changedBy = updatedBy
+            )
+            availabilityHistoryRepository.save(historyEntry)
+        }
 
         // If status changed to AVAILABLE, move consultant to bottom of AVAILABLE consultants
         if (status == AvailabilityStatus.AVAILABLE && previousStatus != AvailabilityStatus.AVAILABLE) {
@@ -159,15 +174,28 @@ class SalesPipelineService(
         val maxDisplayOrder = consultantAvailabilityRepository.findAllByOrderByDisplayOrderAsc()
             .maxOfOrNull { it.displayOrder } ?: -1
 
+        val initialStatus = status ?: AvailabilityStatus.AVAILABLE
         val availability = ConsultantAvailability(
             consultant = consultant,
-            status = status ?: AvailabilityStatus.AVAILABLE,
+            status = initialStatus,
             notes = notes,
             displayOrder = maxDisplayOrder + 1,
             updatedBy = addedBy
         )
 
-        return consultantAvailabilityRepository.save(availability)
+        val savedAvailability = consultantAvailabilityRepository.save(availability)
+
+        // Log initial status in history
+        val historyEntry = AvailabilityHistory(
+            consultant = consultant,
+            fromStatus = null,
+            toStatus = initialStatus,
+            changedAt = LocalDateTime.now(),
+            changedBy = addedBy
+        )
+        availabilityHistoryRepository.save(historyEntry)
+
+        return savedAvailability
     }
 
     // ==================== Sales Activities ====================
@@ -372,7 +400,7 @@ class SalesPipelineService(
     }
 
     @Transactional
-    fun markActivityWon(id: Long, changedBy: User): SalesActivity {
+    fun markActivityWon(id: Long, changedBy: User, actualStartDate: LocalDate? = null): SalesActivity {
         val activity = salesActivityRepository.findById(id)
             .orElseThrow { IllegalArgumentException("Activity not found: $id") }
 
@@ -384,6 +412,7 @@ class SalesPipelineService(
         activity.status = ActivityStatus.WON
         activity.closedAt = LocalDateTime.now()
         activity.updatedAt = LocalDateTime.now()
+        activity.actualStartDate = actualStartDate
 
         val savedActivity = salesActivityRepository.save(activity)
 
@@ -402,15 +431,35 @@ class SalesPipelineService(
             salesActivityRepository.save(otherActivity)
         }
 
-        // Update consultant availability to OCCUPIED if available
+        // Update consultant availability based on actualStartDate
         val availability = consultantAvailabilityRepository.findByConsultantId(activity.consultant.id!!)
         if (availability != null && availability.status != AvailabilityStatus.OCCUPIED) {
-            availability.status = AvailabilityStatus.OCCUPIED
+            val previousStatus = availability.status
+            val today = LocalDate.now()
+
+            // Determine new status: ASSIGNED if start date is in the future, OCCUPIED if today or past
+            val newStatus = if (actualStartDate != null && actualStartDate.isAfter(today)) {
+                AvailabilityStatus.ASSIGNED
+            } else {
+                AvailabilityStatus.OCCUPIED
+            }
+
+            availability.status = newStatus
             availability.currentCustomer = activity.customer
-            availability.availableFrom = null
+            availability.availableFrom = actualStartDate // Store the start date for scheduled job
             availability.updatedAt = LocalDateTime.now()
             availability.updatedBy = changedBy
             consultantAvailabilityRepository.save(availability)
+
+            // Log history for the status change
+            val historyEntry = AvailabilityHistory(
+                consultant = activity.consultant,
+                fromStatus = previousStatus,
+                toStatus = newStatus,
+                changedAt = LocalDateTime.now(),
+                changedBy = changedBy
+            )
+            availabilityHistoryRepository.save(historyEntry)
         }
 
         return savedActivity
@@ -493,11 +542,25 @@ class SalesPipelineService(
 
     data class AnalyticsData(
         val totalActiveActivities: Long,
+        // Current period
         val wonThisMonth: Int,
         val wonThisQuarter: Int,
         val wonThisYear: Int,
         val lostThisMonth: Int,
         val lostThisQuarter: Int,
+        val createdThisMonth: Int,
+        val createdThisQuarter: Int,
+        val createdThisYear: Int,
+        // Previous period (for comparison)
+        val wonLastMonth: Int,
+        val wonLastQuarter: Int,
+        val wonLastYear: Int,
+        val lostLastMonth: Int,
+        val lostLastQuarter: Int,
+        val createdLastMonth: Int,
+        val createdLastQuarter: Int,
+        val createdLastYear: Int,
+        // Other metrics
         val conversionRate: Double,
         val averageDaysToClose: Double,
         val activitiesByStage: Map<SalesStage, Int>,
@@ -524,27 +587,57 @@ class SalesPipelineService(
     data class AvailabilityStatsData(
         val available: Int,
         val availableSoon: Int,
+        val assigned: Int,
         val occupied: Int
     )
 
     @Transactional(readOnly = true)
     fun getAnalytics(): AnalyticsData {
         val now = LocalDateTime.now()
-        val startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0)
-        val startOfQuarter = now.withMonth(((now.monthValue - 1) / 3) * 3 + 1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0)
-        val startOfYear = now.withDayOfYear(1).withHour(0).withMinute(0).withSecond(0)
+
+        // Current period boundaries
+        val startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
+        val startOfQuarter = now.withMonth(((now.monthValue - 1) / 3) * 3 + 1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
+        val startOfYear = now.withDayOfYear(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
+
+        // Previous period boundaries
+        val startOfLastMonth = startOfMonth.minusMonths(1)
+        val endOfLastMonth = startOfMonth
+        val startOfLastQuarter = startOfQuarter.minusMonths(3)
+        val endOfLastQuarter = startOfQuarter
+        val startOfLastYear = startOfYear.minusYears(1)
+        val endOfLastYear = startOfYear
 
         // Active activities count
         val totalActiveActivities = salesActivityRepository.countByStatus(ActivityStatus.ACTIVE)
 
-        // Won activities
+        // Won activities - current period
         val wonThisMonth = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.WON, startOfMonth).size
         val wonThisQuarter = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.WON, startOfQuarter).size
         val wonThisYear = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.WON, startOfYear).size
 
-        // Lost activities (CLOSED_OTHER_WON is used for closed/lost)
+        // Won activities - previous period
+        val wonLastMonth = salesActivityRepository.findByStatusAndClosedAtBetween(ActivityStatus.WON, startOfLastMonth, endOfLastMonth).size
+        val wonLastQuarter = salesActivityRepository.findByStatusAndClosedAtBetween(ActivityStatus.WON, startOfLastQuarter, endOfLastQuarter).size
+        val wonLastYear = salesActivityRepository.findByStatusAndClosedAtBetween(ActivityStatus.WON, startOfLastYear, endOfLastYear).size
+
+        // Lost activities - current period (CLOSED_OTHER_WON is used for closed/lost)
         val lostThisMonth = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.CLOSED_OTHER_WON, startOfMonth).size
         val lostThisQuarter = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.CLOSED_OTHER_WON, startOfQuarter).size
+
+        // Lost activities - previous period
+        val lostLastMonth = salesActivityRepository.findByStatusAndClosedAtBetween(ActivityStatus.CLOSED_OTHER_WON, startOfLastMonth, endOfLastMonth).size
+        val lostLastQuarter = salesActivityRepository.findByStatusAndClosedAtBetween(ActivityStatus.CLOSED_OTHER_WON, startOfLastQuarter, endOfLastQuarter).size
+
+        // Created activities - current period
+        val createdThisMonth = salesActivityRepository.findCreatedSince(startOfMonth).size
+        val createdThisQuarter = salesActivityRepository.findCreatedSince(startOfQuarter).size
+        val createdThisYear = salesActivityRepository.findCreatedSince(startOfYear).size
+
+        // Created activities - previous period
+        val createdLastMonth = salesActivityRepository.findCreatedBetween(startOfLastMonth, endOfLastMonth).size
+        val createdLastQuarter = salesActivityRepository.findCreatedBetween(startOfLastQuarter, endOfLastQuarter).size
+        val createdLastYear = salesActivityRepository.findCreatedBetween(startOfLastYear, endOfLastYear).size
 
         // Conversion rate (won / (won + lost) for this year)
         val wonYearTotal = salesActivityRepository.findByStatusAndClosedAtAfter(ActivityStatus.WON, startOfYear).size
@@ -606,6 +699,7 @@ class SalesPipelineService(
         val availabilityStats = AvailabilityStatsData(
             available = availabilities.count { it.status == AvailabilityStatus.AVAILABLE },
             availableSoon = availabilities.count { it.status == AvailabilityStatus.AVAILABLE_SOON },
+            assigned = availabilities.count { it.status == AvailabilityStatus.ASSIGNED },
             occupied = availabilities.count { it.status == AvailabilityStatus.OCCUPIED }
         )
 
@@ -616,6 +710,17 @@ class SalesPipelineService(
             wonThisYear = wonThisYear,
             lostThisMonth = lostThisMonth,
             lostThisQuarter = lostThisQuarter,
+            createdThisMonth = createdThisMonth,
+            createdThisQuarter = createdThisQuarter,
+            createdThisYear = createdThisYear,
+            wonLastMonth = wonLastMonth,
+            wonLastQuarter = wonLastQuarter,
+            wonLastYear = wonLastYear,
+            lostLastMonth = lostLastMonth,
+            lostLastQuarter = lostLastQuarter,
+            createdLastMonth = createdLastMonth,
+            createdLastQuarter = createdLastQuarter,
+            createdLastYear = createdLastYear,
             conversionRate = conversionRate,
             averageDaysToClose = averageDaysToClose,
             activitiesByStage = activitiesByStage,
@@ -624,5 +729,138 @@ class SalesPipelineService(
             closedReasonStats = closedReasonStats,
             availabilityStats = availabilityStats
         )
+    }
+
+    // ==================== Monthly Trends ====================
+
+    data class MonthlyTrendData(
+        val month: String,      // Format: "2024-11"
+        val created: Int,       // Sales activities created (job postings we responded to)
+        val won: Int,           // Activities won
+        val lost: Int,          // Activities lost
+        val benchWeeks: Double  // Total bench time in work weeks
+    )
+
+    @Transactional(readOnly = true)
+    fun getMonthlyTrends(months: Int = 12): List<MonthlyTrendData> {
+        val now = LocalDateTime.now()
+        val startDate = now.minusMonths(months.toLong()).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
+
+        // Fetch all activities created since startDate
+        val allCreatedActivities = salesActivityRepository.findCreatedSince(startDate)
+
+        // Fetch won and lost activities
+        val wonActivities = salesActivityRepository.findClosedByStatusSince(ActivityStatus.WON, startDate)
+        val lostActivities = salesActivityRepository.findClosedByStatusSince(ActivityStatus.CLOSED_OTHER_WON, startDate)
+
+        // Fetch all availability history for bench calculation
+        val allHistoryEntries = availabilityHistoryRepository.findByChangedAtBetweenOrderByChangedAtAsc(startDate, now)
+
+        // Get all consultants who have availability records (on the board)
+        val consultantsOnBoard = consultantAvailabilityRepository.findAll().map { it.consultant.id!! }.toSet()
+
+        // Build result for each month
+        val result = mutableListOf<MonthlyTrendData>()
+
+        for (i in 0 until months) {
+            val monthStart = now.minusMonths((months - 1 - i).toLong()).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
+            val monthEnd = monthStart.plusMonths(1)
+            val monthStr = "${monthStart.year}-${monthStart.monthValue.toString().padStart(2, '0')}"
+
+            // Count created activities for this month
+            val createdCount = allCreatedActivities.count { activity ->
+                activity.createdAt >= monthStart && activity.createdAt < monthEnd
+            }
+
+            // Count won activities for this month
+            val wonCount = wonActivities.count { activity ->
+                activity.closedAt != null && activity.closedAt!! >= monthStart && activity.closedAt!! < monthEnd
+            }
+
+            // Count lost activities for this month
+            val lostCount = lostActivities.count { activity ->
+                activity.closedAt != null && activity.closedAt!! >= monthStart && activity.closedAt!! < monthEnd
+            }
+
+            // Calculate bench weeks for this month
+            val benchWeeks = calculateBenchWeeksForMonth(
+                consultantsOnBoard = consultantsOnBoard,
+                historyEntries = allHistoryEntries,
+                monthStart = monthStart,
+                monthEnd = monthEnd
+            )
+
+            result.add(MonthlyTrendData(
+                month = monthStr,
+                created = createdCount,
+                won = wonCount,
+                lost = lostCount,
+                benchWeeks = benchWeeks
+            ))
+        }
+
+        return result
+    }
+
+    /**
+     * Calculate total bench weeks for all consultants in a given month.
+     * A consultant is "on bench" when their status is AVAILABLE or ASSIGNED.
+     * Returns the total number of work weeks (days / 5).
+     */
+    private fun calculateBenchWeeksForMonth(
+        consultantsOnBoard: Set<Long>,
+        historyEntries: List<AvailabilityHistory>,
+        monthStart: LocalDateTime,
+        monthEnd: LocalDateTime
+    ): Double {
+        var totalBenchDays = 0
+
+        for (consultantId in consultantsOnBoard) {
+            // Get all history entries for this consultant
+            val consultantHistory = historyEntries.filter { it.consultant.id == consultantId }
+                .sortedBy { it.changedAt }
+
+            // Find the initial status at the start of the month
+            // Default to OCCUPIED if no history - only count as "ledig" if we have actual data
+            val statusAtMonthStart = availabilityHistoryRepository.findLatestStatusAsOf(consultantId, monthStart)?.toStatus
+                ?: AvailabilityStatus.OCCUPIED
+
+            // Calculate days in bench status during this month
+            var currentStatus = statusAtMonthStart
+            var periodStart = monthStart
+
+            for (entry in consultantHistory) {
+                if (entry.changedAt >= monthStart && entry.changedAt < monthEnd) {
+                    // Calculate days from periodStart to this entry's changedAt
+                    if (isBenchStatus(currentStatus)) {
+                        val days = calculateWorkDays(periodStart, entry.changedAt)
+                        totalBenchDays += days
+                    }
+                    currentStatus = entry.toStatus
+                    periodStart = entry.changedAt
+                }
+            }
+
+            // Calculate remaining days until month end
+            if (isBenchStatus(currentStatus)) {
+                val endDate = if (monthEnd > LocalDateTime.now()) LocalDateTime.now() else monthEnd
+                if (endDate > periodStart) {
+                    val days = calculateWorkDays(periodStart, endDate)
+                    totalBenchDays += days
+                }
+            }
+        }
+
+        // Convert days to weeks (5 work days per week)
+        return totalBenchDays / 5.0
+    }
+
+    private fun isBenchStatus(status: AvailabilityStatus): Boolean {
+        return status == AvailabilityStatus.AVAILABLE || status == AvailabilityStatus.ASSIGNED
+    }
+
+    private fun calculateWorkDays(from: LocalDateTime, to: LocalDateTime): Int {
+        // Simple calculation: total days (could be refined to exclude weekends)
+        return ChronoUnit.DAYS.between(from.toLocalDate(), to.toLocalDate()).toInt().coerceAtLeast(0)
     }
 }

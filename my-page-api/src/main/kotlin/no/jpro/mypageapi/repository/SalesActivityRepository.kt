@@ -40,4 +40,19 @@ interface SalesActivityRepository : JpaRepository<SalesActivity, Long> {
 
     @Query("SELECT sa FROM SalesActivity sa WHERE sa.closedReason IS NOT NULL")
     fun findAllWithClosedReason(): List<SalesActivity>
+
+    // Trend queries - created per month
+    @Query("SELECT sa FROM SalesActivity sa WHERE sa.createdAt >= :since")
+    fun findCreatedSince(since: LocalDateTime): List<SalesActivity>
+
+    // Trend queries - closed per month
+    @Query("SELECT sa FROM SalesActivity sa WHERE sa.status = :status AND sa.closedAt >= :since")
+    fun findClosedByStatusSince(status: ActivityStatus, since: LocalDateTime): List<SalesActivity>
+
+    // Period comparison queries
+    @Query("SELECT sa FROM SalesActivity sa WHERE sa.createdAt >= :from AND sa.createdAt < :to")
+    fun findCreatedBetween(from: LocalDateTime, to: LocalDateTime): List<SalesActivity>
+
+    @Query("SELECT sa FROM SalesActivity sa WHERE sa.status = :status AND sa.closedAt >= :from AND sa.closedAt < :to")
+    fun findByStatusAndClosedAtBetween(status: ActivityStatus, from: LocalDateTime, to: LocalDateTime): List<SalesActivity>
 }

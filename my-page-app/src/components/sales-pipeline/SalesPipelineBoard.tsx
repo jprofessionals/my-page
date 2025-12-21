@@ -33,6 +33,7 @@ import CreateActivityModal from './CreateActivityModal'
 import EditActivityModal from './EditActivityModal'
 import EditAvailabilityModal from './EditAvailabilityModal'
 import AddConsultantModal from './AddConsultantModal'
+import MarkAsWonModal from './MarkAsWonModal'
 import { useAuthContext } from '@/providers/AuthProvider'
 import { type ConsultantWithActivities } from '@/services/salesPipeline.service'
 import Link from 'next/link'
@@ -91,6 +92,7 @@ export default function SalesPipelineBoardComponent() {
   const [editingActivity, setEditingActivity] = useState<SalesActivity | null>(null)
   const [editingConsultant, setEditingConsultant] = useState<ConsultantWithActivities | null>(null)
   const [activeConsultantId, setActiveConsultantId] = useState<number | null>(null)
+  const [markAsWonActivity, setMarkAsWonActivity] = useState<SalesActivity | null>(null)
 
   const isAdmin = user?.admin ?? false
 
@@ -140,17 +142,13 @@ export default function SalesPipelineBoardComponent() {
     }
   }
 
-  const handleMarkAsWon = async (activityId: number) => {
-    if (!confirm('Er du sikker på at du vil markere denne som vunnet? Andre aktive prosesser for konsulenten vil bli lukket.')) {
-      return
-    }
-    try {
-      await salesPipelineService.markAsWon(activityId)
-      toast.success('Aktivitet markert som vunnet!')
-      loadBoard()
-    } catch (error) {
-      console.error('Failed to mark as won:', error)
-      toast.error('Kunne ikke markere som vunnet')
+  const handleMarkAsWon = (activityId: number) => {
+    // Find the activity from the board
+    const activity = board?.consultants
+      .flatMap((c) => c.activities)
+      .find((a) => a.id === activityId)
+    if (activity) {
+      setMarkAsWonActivity(activity)
     }
   }
 
@@ -501,6 +499,18 @@ export default function SalesPipelineBoardComponent() {
           consultant={editingConsultant}
           onClose={() => setEditingConsultant(null)}
           onUpdated={handleAvailabilityUpdated}
+        />
+      )}
+
+      {/* Mark as won modal */}
+      {markAsWonActivity && (
+        <MarkAsWonModal
+          activity={markAsWonActivity}
+          onClose={() => setMarkAsWonActivity(null)}
+          onSuccess={() => {
+            setMarkAsWonActivity(null)
+            loadBoard()
+          }}
         />
       )}
     </div>

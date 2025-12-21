@@ -17,6 +17,7 @@ import {
   getSalesActivitiesByCustomer,
   getSalesPipelineBoard,
   getSalesPipelineAnalytics,
+  getSalesPipelineTrends,
   getAllConsultantAvailability,
   getConsultantAvailability,
   updateConsultantAvailability,
@@ -32,6 +33,7 @@ import {
   type CloseActivity,
   type UpdateConsultantAvailability,
   type AddConsultantToBoardRequest,
+  type MarkActivityWonRequest,
   type ActivityStatus,
 } from '@/data/types/types.gen'
 import '@/services/openapi-client' // Ensure client is configured
@@ -103,10 +105,12 @@ export const salesPipelineService = {
   /**
    * Mark a sales activity as won
    * This will auto-close other active activities for the same consultant
+   * @param actualStartDate - Optional start date. If in future, sets status to ASSIGNED until that date.
    */
-  async markAsWon(id: number) {
+  async markAsWon(id: number, request?: MarkActivityWonRequest) {
     const { data } = await markSalesActivityWon({
       path: { id },
+      body: request,
     })
     return data
   },
@@ -159,6 +163,17 @@ export const salesPipelineService = {
    */
   async getAnalytics() {
     const { data } = await getSalesPipelineAnalytics()
+    return data
+  },
+
+  /**
+   * Get monthly trend data for the sales pipeline
+   * @param months - Number of months to return (default 12)
+   */
+  async getTrends(months = 12) {
+    const { data } = await getSalesPipelineTrends({
+      query: { months },
+    })
     return data
   },
 
@@ -252,6 +267,7 @@ export type {
   ClosedReasonCount,
   AvailabilityStats,
   FlowcaseConsultant,
+  MonthlyTrendData,
   SalesStage,
   ActivityStatus,
   AvailabilityStatus,
@@ -262,4 +278,5 @@ export type {
   CloseActivity,
   UpdateConsultantAvailability,
   AddConsultantToBoardRequest,
+  MarkActivityWonRequest,
 } from '@/data/types/types.gen'

@@ -330,6 +330,43 @@ Backend-kontrollere migreres fra tradisjonelle @RestController til OpenAPI deleg
 
 ---
 
+## 8. ⏳ UI-forbedringer (Frontend)
+**Status: PLANLAGT**
+
+Se detaljert plan i `UI_IMPROVEMENT_PLAN.md` for full oversikt.
+
+### Sprint 1: Quick Wins (2-3 timer)
+- [ ] 1.1 Fiks språk-attributt (`lang="no"`)
+- [ ] 1.2 Legg til fokus-indikatorer
+- [ ] 1.3 Forbedre ErrorPage komponent
+- [ ] 1.4 Legg til ARIA labels på ikoner
+
+### Sprint 2: Tilgjengelighet (1 uke)
+- [ ] 2.1 Implementer Skip Links
+- [ ] 2.2 Forbedre keyboard navigation
+- [ ] 2.3 Fargekontrast-testing og fikser
+- [ ] 2.4 Forbedre skjermleser-støtte
+- [ ] 2.5 Fokus management i modaler
+
+### Sprint 3: Konsistens & UX (1-1.5 uker)
+- [ ] 3.1 Standardiser ErrorPage styling
+- [ ] 3.2 Konverter SimpleModal til Tailwind
+- [ ] 3.3 Implementer skeleton loaders
+- [ ] 3.4 Forbedre form validering feedback
+- [ ] 3.5 Mobile experience forbedringer
+- [ ] 3.6 Design system dokumentasjon
+
+### Sprint 4: Testing & Dokumentasjon (3-5 dager)
+- [ ] 4.1 Tester for tilgjengelighet
+- [ ] 4.2 Tester for UI komponenter
+- [ ] 4.3 Integration tester for forms
+- [ ] 4.4 Oppdater dokumentasjon
+- [ ] 4.5 Performance audit
+
+**Se `UI_IMPROVEMENT_PLAN.md` for detaljer, estimater og prioriteringer.**
+
+---
+
 ## Notater
 
 ### Test User Authentication

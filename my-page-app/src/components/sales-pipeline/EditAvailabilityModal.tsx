@@ -17,6 +17,7 @@ interface Props {
 const AVAILABILITY_OPTIONS: { value: AvailabilityStatus; label: string; description: string }[] = [
   { value: 'AVAILABLE', label: 'Ledig nå', description: 'Konsulenten er tilgjengelig for nye oppdrag' },
   { value: 'AVAILABLE_SOON', label: 'Blir ledig', description: 'Konsulenten blir ledig på en gitt dato' },
+  { value: 'ASSIGNED', label: 'Tildelt', description: 'Konsulenten har vunnet oppdrag, venter på oppstart' },
   { value: 'OCCUPIED', label: 'Opptatt', description: 'Konsulenten er i et oppdrag og ikke tilgjengelig' },
 ]
 
@@ -38,11 +39,17 @@ export default function EditAvailabilityModal({ consultant, onClose, onUpdated }
       return
     }
 
+    if (formData.status === 'ASSIGNED' && !formData.availableFrom) {
+      toast.error('Du må velge oppstartsdato for tildelt status')
+      return
+    }
+
     setLoading(true)
     try {
+      const needsDate = formData.status === 'AVAILABLE_SOON' || formData.status === 'ASSIGNED'
       await salesPipelineService.updateAvailability(user.id!, {
         status: formData.status,
-        availableFrom: formData.status === 'AVAILABLE_SOON' ? formData.availableFrom : undefined,
+        availableFrom: needsDate ? formData.availableFrom : undefined,
         notes: formData.notes || undefined,
       })
       toast.success('Tilgjengelighet oppdatert!')
@@ -94,11 +101,13 @@ export default function EditAvailabilityModal({ consultant, onClose, onUpdated }
             </div>
           </div>
 
-          {/* Available from date (only shown for AVAILABLE_SOON) */}
-          {formData.status === 'AVAILABLE_SOON' && (
+          {/* Date field (shown for AVAILABLE_SOON and ASSIGNED) */}
+          {(formData.status === 'AVAILABLE_SOON' || formData.status === 'ASSIGNED') && (
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Ledig fra dato *</span>
+                <span className="label-text">
+                  {formData.status === 'AVAILABLE_SOON' ? 'Ledig fra dato *' : 'Oppstartsdato *'}
+                </span>
               </label>
               <input
                 type="date"

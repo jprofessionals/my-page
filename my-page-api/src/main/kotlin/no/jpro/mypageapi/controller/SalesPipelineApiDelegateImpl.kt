@@ -7,12 +7,14 @@ import no.jpro.mypageapi.entity.SalesStage
 import no.jpro.mypageapi.model.AddConsultantToBoardRequest
 import no.jpro.mypageapi.model.CloseActivity
 import no.jpro.mypageapi.model.AvailabilityStats
+import no.jpro.mypageapi.model.MonthlyTrendData
 import no.jpro.mypageapi.model.ClosedReasonCount
 import no.jpro.mypageapi.model.ConsultantActivityStats
 import no.jpro.mypageapi.model.ConsultantWithActivities
 import no.jpro.mypageapi.model.CreateSalesActivity
 import no.jpro.mypageapi.model.CustomerActivityStats
 import no.jpro.mypageapi.model.FlowcaseConsultant
+import no.jpro.mypageapi.model.MarkActivityWonRequest
 import no.jpro.mypageapi.model.ReorderConsultantsRequest
 import no.jpro.mypageapi.model.SalesPipelineAnalytics
 import no.jpro.mypageapi.model.SalesPipelineBoard
@@ -299,7 +301,10 @@ class SalesPipelineApiDelegateImpl(
         }
     }
 
-    override fun markSalesActivityWon(id: Long): ResponseEntity<SalesActivityModel> {
+    override fun markSalesActivityWon(
+        id: Long,
+        markActivityWonRequest: MarkActivityWonRequest?
+    ): ResponseEntity<SalesActivityModel> {
         val currentUser = authHelper.getCurrentUser(getTestUserId())
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
 
@@ -308,7 +313,11 @@ class SalesPipelineApiDelegateImpl(
         }
 
         try {
-            val activity = salesPipelineService.markActivityWon(id, currentUser)
+            val activity = salesPipelineService.markActivityWon(
+                id,
+                currentUser,
+                markActivityWonRequest?.actualStartDate
+            )
             return ResponseEntity.ok(salesPipelineMapper.toSalesActivityModel(activity))
         } catch (e: IllegalArgumentException) {
             return ResponseEntity.notFound().build()
@@ -433,11 +442,25 @@ class SalesPipelineApiDelegateImpl(
 
         val response = SalesPipelineAnalytics(
             totalActiveActivities = analytics.totalActiveActivities.toInt(),
+            // Current period
             wonThisMonth = analytics.wonThisMonth,
             wonThisQuarter = analytics.wonThisQuarter,
             wonThisYear = analytics.wonThisYear,
             lostThisMonth = analytics.lostThisMonth,
             lostThisQuarter = analytics.lostThisQuarter,
+            createdThisMonth = analytics.createdThisMonth,
+            createdThisQuarter = analytics.createdThisQuarter,
+            createdThisYear = analytics.createdThisYear,
+            // Previous period
+            wonLastMonth = analytics.wonLastMonth,
+            wonLastQuarter = analytics.wonLastQuarter,
+            wonLastYear = analytics.wonLastYear,
+            lostLastMonth = analytics.lostLastMonth,
+            lostLastQuarter = analytics.lostLastQuarter,
+            createdLastMonth = analytics.createdLastMonth,
+            createdLastQuarter = analytics.createdLastQuarter,
+            createdLastYear = analytics.createdLastYear,
+            // Metrics
             conversionRate = analytics.conversionRate,
             averageDaysToClose = analytics.averageDaysToClose,
             activitiesByStage = analytics.activitiesByStage.map { (stage, count) ->
@@ -471,9 +494,26 @@ class SalesPipelineApiDelegateImpl(
             availabilityStats = AvailabilityStats(
                 available = analytics.availabilityStats.available,
                 availableSoon = analytics.availabilityStats.availableSoon,
+                assigned = analytics.availabilityStats.assigned,
                 occupied = analytics.availabilityStats.occupied
             )
         )
+
+        return ResponseEntity.ok(response)
+    }
+
+    override fun getSalesPipelineTrends(months: Int): ResponseEntity<List<MonthlyTrendData>> {
+        val trendsData = salesPipelineService.getMonthlyTrends(months)
+
+        val response = trendsData.map { trend ->
+            MonthlyTrendData(
+                month = trend.month,
+                created = trend.created,
+                won = trend.won,
+                lost = trend.lost,
+                benchWeeks = trend.benchWeeks
+            )
+        }
 
         return ResponseEntity.ok(response)
     }

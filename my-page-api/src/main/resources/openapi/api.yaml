@@ -2330,6 +2330,11 @@ paths:
           schema:
             type: integer
             format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkActivityWonRequest'
       responses:
         '200':
           description: Updated sales activity
@@ -2551,6 +2556,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SalesPipelineAnalytics'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /sales-activities/analytics/trends:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesPipelineTrends
+      summary: Get monthly trend data for the sales pipeline
+      description: Returns monthly statistics for created, won, and lost activities, plus bench time (ukeverk ledig)
+      parameters:
+        - name: months
+          in: query
+          required: false
+          description: Number of months to return (default 12)
+          schema:
+            type: integer
+            default: 12
+      responses:
+        '200':
+          description: Monthly trend data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MonthlyTrendData'
         '401':
           description: Unauthorized
         '500':
@@ -3617,8 +3651,8 @@ components:
 
     AvailabilityStatus:
       type: string
-      enum: [AVAILABLE, AVAILABLE_SOON, OCCUPIED]
-      description: Consultant availability status
+      enum: [AVAILABLE, AVAILABLE_SOON, ASSIGNED, OCCUPIED]
+      description: Consultant availability status (ASSIGNED = har vunnet oppdrag, venter på oppstart)
 
     ActivityStatus:
       type: string
@@ -3790,6 +3824,11 @@ components:
           format: date-time
           nullable: true
           description: Date and time of the interview
+        actualStartDate:
+          type: string
+          format: date
+          nullable: true
+          description: Actual start date when consultant starts the assignment (set when marking as won)
       required:
         - id
         - consultant
@@ -3962,6 +4001,15 @@ components:
       required:
         - reason
 
+    MarkActivityWonRequest:
+      type: object
+      properties:
+        actualStartDate:
+          type: string
+          format: date
+          nullable: true
+          description: When the consultant actually starts the assignment. If not provided, status becomes OCCUPIED immediately. If provided, status becomes ASSIGNED until the start date.
+
     ConsultantWithActivities:
       type: object
       properties:
@@ -3999,6 +4047,7 @@ components:
         totalActiveActivities:
           type: integer
           description: Total number of active (non-closed) sales activities
+        # Current period - Won
         wonThisMonth:
           type: integer
           description: Number of won activities this month
@@ -4008,12 +4057,50 @@ components:
         wonThisYear:
           type: integer
           description: Number of won activities this year
+        # Current period - Lost
         lostThisMonth:
           type: integer
           description: Number of lost activities this month
         lostThisQuarter:
           type: integer
           description: Number of lost activities this quarter
+        # Current period - Created (job postings we responded to)
+        createdThisMonth:
+          type: integer
+          description: Number of activities created this month
+        createdThisQuarter:
+          type: integer
+          description: Number of activities created this quarter
+        createdThisYear:
+          type: integer
+          description: Number of activities created this year
+        # Previous period - Won (for comparison)
+        wonLastMonth:
+          type: integer
+          description: Number of won activities last month
+        wonLastQuarter:
+          type: integer
+          description: Number of won activities last quarter
+        wonLastYear:
+          type: integer
+          description: Number of won activities last year
+        # Previous period - Lost
+        lostLastMonth:
+          type: integer
+          description: Number of lost activities last month
+        lostLastQuarter:
+          type: integer
+          description: Number of lost activities last quarter
+        # Previous period - Created
+        createdLastMonth:
+          type: integer
+          description: Number of activities created last month
+        createdLastQuarter:
+          type: integer
+          description: Number of activities created last quarter
+        createdLastYear:
+          type: integer
+          description: Number of activities created last year
         conversionRate:
           type: number
           format: double
@@ -4052,6 +4139,17 @@ components:
         - wonThisYear
         - lostThisMonth
         - lostThisQuarter
+        - createdThisMonth
+        - createdThisQuarter
+        - createdThisYear
+        - wonLastMonth
+        - wonLastQuarter
+        - wonLastYear
+        - lostLastMonth
+        - lostLastQuarter
+        - createdLastMonth
+        - createdLastQuarter
+        - createdLastYear
         - conversionRate
         - averageDaysToClose
         - activitiesByStage
@@ -4126,10 +4224,41 @@ components:
         availableSoon:
           type: integer
           description: Number of consultants available soon
+        assigned:
+          type: integer
+          description: Number of consultants who won but not started
         occupied:
           type: integer
           description: Number of consultants occupied
       required:
         - available
         - availableSoon
+        - assigned
         - occupied
+
+    MonthlyTrendData:
+      type: object
+      properties:
+        month:
+          type: string
+          description: Month in format YYYY-MM
+          example: "2024-11"
+        created:
+          type: integer
+          description: Number of sales activities created this month (job postings we responded to)
+        won:
+          type: integer
+          description: Number of activities won this month
+        lost:
+          type: integer
+          description: Number of activities lost this month
+        benchWeeks:
+          type: number
+          format: double
+          description: Total bench time in work weeks (ukeverk ledig). Based on days consultants were AVAILABLE or ASSIGNED.
+      required:
+        - month
+        - created
+        - won
+        - lost
+        - benchWeeks

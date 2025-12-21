@@ -10,6 +10,7 @@ interface UserRepository : JpaRepository<User, Long> {
     fun findUserBySub(sub: String): User?
     fun findUserByEmailAndSubIsNull(email: String): User?
     fun findUserByEmail(email: String): User?
+    fun findUserByEmailIgnoreCase(email: String): User?
     fun findUserByName(name: String): User?
     fun findByEnabled(enabled: Boolean): List<User>
 }
