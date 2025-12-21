@@ -493,6 +493,7 @@ class SalesPipelineApiDelegateImpl(
                 )
             },
             availabilityStats = AvailabilityStats(
+                totalConsultants = analytics.availabilityStats.totalConsultants,
                 available = analytics.availabilityStats.available,
                 availableSoon = analytics.availabilityStats.availableSoon,
                 assigned = analytics.availabilityStats.assigned,

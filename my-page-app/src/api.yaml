@@ -4264,6 +4264,9 @@ components:
     AvailabilityStats:
       type: object
       properties:
+        totalConsultants:
+          type: integer
+          description: Total number of consultants in the company
         available:
           type: integer
           description: Number of consultants currently available
@@ -4275,8 +4278,9 @@ components:
           description: Number of consultants who won but not started
         occupied:
           type: integer
-          description: Number of consultants occupied
+          description: Number of consultants occupied (total minus available/soon/assigned)
       required:
+        - totalConsultants
         - available
         - availableSoon
         - assigned

@@ -13,4 +13,5 @@ interface UserRepository : JpaRepository<User, Long> {
     fun findUserByEmailIgnoreCase(email: String): User?
     fun findUserByName(name: String): User?
     fun findByEnabled(enabled: Boolean): List<User>
+    fun countByEmployeeNumberIsNotNullAndEnabled(enabled: Boolean): Long
 }

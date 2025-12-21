@@ -589,6 +589,7 @@ class SalesPipelineService(
     )
 
     data class AvailabilityStatsData(
+        val totalConsultants: Int,
         val available: Int,
         val availableSoon: Int,
         val assigned: Int,
@@ -705,12 +706,21 @@ class SalesPipelineService(
         }
 
         // Availability stats
+        // Total consultants = all enabled users with employee number, minus 5 admin staff
+        val totalEmployees = userRepository.countByEmployeeNumberIsNotNullAndEnabled(true).toInt()
+        val totalConsultants = (totalEmployees - 5).coerceAtLeast(0)
         val availabilities = consultantAvailabilityRepository.findAll()
+        val available = availabilities.count { it.status == AvailabilityStatus.AVAILABLE }
+        val availableSoon = availabilities.count { it.status == AvailabilityStatus.AVAILABLE_SOON }
+        val assigned = availabilities.count { it.status == AvailabilityStatus.ASSIGNED }
+        // Occupied = total minus those explicitly marked as available/soon/assigned
+        val occupied = totalConsultants - available - availableSoon - assigned
         val availabilityStats = AvailabilityStatsData(
-            available = availabilities.count { it.status == AvailabilityStatus.AVAILABLE },
-            availableSoon = availabilities.count { it.status == AvailabilityStatus.AVAILABLE_SOON },
-            assigned = availabilities.count { it.status == AvailabilityStatus.ASSIGNED },
-            occupied = availabilities.count { it.status == AvailabilityStatus.OCCUPIED }
+            totalConsultants = totalConsultants,
+            available = available,
+            availableSoon = availableSoon,
+            assigned = assigned,
+            occupied = occupied.coerceAtLeast(0) // Ensure non-negative
         )
 
         // Funnel data - count how many activities have REACHED each stage (not just current)
