@@ -259,8 +259,8 @@ export default function SalesPipelineAnalyticsComponent() {
 
       {/* Availability Stats */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Konsulent-tilgjengelighet</h2>
-        <div className="grid grid-cols-4 gap-4">
+        <h2 className="text-xl font-semibold mb-4">Konsulent-tilgjengelighet ({analytics.availabilityStats.totalConsultants} totalt)</h2>
+        <div className="grid grid-cols-3 gap-4">
           <div className="stat bg-success/10 border border-success/30 rounded-lg p-4">
             <div className="stat-title text-success">Ledige nå</div>
             <div className="stat-value text-success">{analytics.availabilityStats.available}</div>
@@ -268,14 +268,14 @@ export default function SalesPipelineAnalyticsComponent() {
           <div className="stat bg-warning/10 border border-warning/30 rounded-lg p-4">
             <div className="stat-title text-warning">Blir ledige</div>
             <div className="stat-value text-warning">{analytics.availabilityStats.availableSoon}</div>
-          </div>
-          <div className="stat bg-info/10 border border-info/30 rounded-lg p-4">
-            <div className="stat-title text-info">Tildelt</div>
-            <div className="stat-value text-info">{analytics.availabilityStats.assigned}</div>
+            <div className="stat-desc text-warning/70">På salgstavla</div>
           </div>
           <div className="stat bg-error/10 border border-error/30 rounded-lg p-4">
             <div className="stat-title text-error">Opptatt</div>
             <div className="stat-value text-error">{analytics.availabilityStats.occupied}</div>
+            {analytics.availabilityStats.assigned > 0 && (
+              <div className="stat-desc text-info">{analytics.availabilityStats.assigned} venter på oppstart</div>
+            )}
           </div>
         </div>
       </div>
