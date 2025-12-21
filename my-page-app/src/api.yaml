@@ -4132,6 +4132,11 @@ components:
         availabilityStats:
           $ref: '#/components/schemas/AvailabilityStats'
           description: Overview of consultant availability
+        funnelData:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStageData'
+          description: Funnel data showing how many activities reached each stage
       required:
         - totalActiveActivities
         - wonThisMonth
@@ -4157,6 +4162,7 @@ components:
         - customerStats
         - closedReasonStats
         - availabilityStats
+        - funnelData
 
     StageCount:
       type: object
@@ -4168,6 +4174,23 @@ components:
       required:
         - stage
         - count
+
+    FunnelStageData:
+      type: object
+      properties:
+        stage:
+          type: string
+          description: Stage name
+        reached:
+          type: integer
+          description: Number of activities that have reached this stage (passed through)
+        current:
+          type: integer
+          description: Number of activities currently at this stage
+      required:
+        - stage
+        - reached
+        - current
 
     ConsultantActivityStats:
       type: object

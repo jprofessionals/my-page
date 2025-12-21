@@ -562,7 +562,8 @@ class SalesPipelineService(
         val consultantStats: List<ConsultantStats>,
         val customerStats: List<CustomerStats>,
         val closedReasonStats: Map<ClosedReason, Int>,
-        val availabilityStats: AvailabilityStatsData
+        val availabilityStats: AvailabilityStatsData,
+        val funnelData: List<FunnelStageData>
     )
 
     data class ConsultantStats(
@@ -584,6 +585,12 @@ class SalesPipelineService(
         val availableSoon: Int,
         val assigned: Int,
         val occupied: Int
+    )
+
+    data class FunnelStageData(
+        val stage: String,
+        val reached: Int,  // How many activities have reached this stage
+        val current: Int   // How many are currently at this stage
     )
 
     @Transactional(readOnly = true)
@@ -698,6 +705,27 @@ class SalesPipelineService(
             occupied = availabilities.count { it.status == AvailabilityStatus.OCCUPIED }
         )
 
+        // Funnel data - count how many activities have REACHED each stage (not just current)
+        // We look at stage history to find all stages an activity has been in
+        val allStageHistory = salesStageHistoryRepository.findAll()
+        val stagesReachedByActivity = allStageHistory.groupBy { it.activity.id }
+            .mapValues { (_, histories) -> histories.map { it.toStage }.toSet() }
+
+        val funnelStages = listOf(
+            SalesStage.INTERESTED,
+            SalesStage.SENT_TO_SUPPLIER,
+            SalesStage.SENT_TO_CUSTOMER,
+            SalesStage.INTERVIEW
+        )
+
+        val funnelData = funnelStages.map { stage ->
+            FunnelStageData(
+                stage = stage.name,
+                reached = stagesReachedByActivity.count { (_, stages) -> stages.contains(stage) },
+                current = activeActivities.count { it.currentStage == stage }
+            )
+        }
+
         return AnalyticsData(
             totalActiveActivities = totalActiveActivities,
             wonThisMonth = wonThisMonth,
@@ -722,7 +750,8 @@ class SalesPipelineService(
             consultantStats = consultantStats,
             customerStats = customerStats,
             closedReasonStats = closedReasonStats,
-            availabilityStats = availabilityStats
+            availabilityStats = availabilityStats,
+            funnelData = funnelData
         )
     }
 

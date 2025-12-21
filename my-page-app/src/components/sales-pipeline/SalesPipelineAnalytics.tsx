@@ -15,7 +15,6 @@ import {
 import {
   salesPipelineService,
   type SalesPipelineAnalytics,
-  type SalesActivity,
   type MonthlyTrendData,
 } from '@/services/salesPipeline.service'
 import Link from 'next/link'
@@ -31,29 +30,14 @@ const CLOSED_REASON_LABELS: Record<string, string> = {
   OTHER: 'Annet',
 }
 
-// Funnel period options
-const FUNNEL_PERIODS = [
-  { value: 1, label: 'Siste måned' },
-  { value: 3, label: 'Siste 3 mnd' },
-  { value: 4, label: 'Siste kvartal' },
-  { value: 6, label: 'Siste halvår' },
-  { value: 12, label: 'Siste år' },
-]
-
-// Funnel stages in order (excluding LOST which is shown separately)
-const FUNNEL_STAGES = ['INTERESTED', 'SENT_TO_SUPPLIER', 'SENT_TO_CUSTOMER', 'INTERVIEW'] as const
-
 export default function SalesPipelineAnalyticsComponent() {
   const [analytics, setAnalytics] = useState<SalesPipelineAnalytics | null>(null)
-  const [allActivities, setAllActivities] = useState<SalesActivity[]>([])
   const [trends, setTrends] = useState<MonthlyTrendData[]>([])
   const [loading, setLoading] = useState(true)
   const [trendMonths, setTrendMonths] = useState(12)
-  const [funnelMonths, setFunnelMonths] = useState(3) // Default 3 months
 
   useEffect(() => {
     loadAnalytics()
-    loadAllActivities()
   }, [])
 
   useEffect(() => {
@@ -81,49 +65,6 @@ export default function SalesPipelineAnalyticsComponent() {
       console.error('Failed to load trends:', error)
     }
   }
-
-  const loadAllActivities = async () => {
-    try {
-      // Fetch all activities (including inactive to see full funnel)
-      const data = await salesPipelineService.getActivities()
-      setAllActivities(data ?? [])
-    } catch (error) {
-      console.error('Failed to load activities:', error)
-    }
-  }
-
-  // Calculate funnel data based on selected period
-  const getFunnelData = () => {
-    const cutoffDate = new Date()
-    cutoffDate.setMonth(cutoffDate.getMonth() - funnelMonths)
-
-    // Filter activities created within the period
-    const filteredActivities = allActivities.filter((activity) => {
-      const createdAt = new Date(activity.createdAt)
-      return createdAt >= cutoffDate
-    })
-
-    // Count by current stage for active activities
-    const stageCounts: Record<string, number> = {}
-    FUNNEL_STAGES.forEach((stage) => {
-      stageCounts[stage] = filteredActivities.filter(
-        (a) => a.status === 'ACTIVE' && a.currentStage === stage
-      ).length
-    })
-
-    // Count won and lost
-    const wonCount = filteredActivities.filter((a) => a.status === 'WON').length
-    const lostCount = filteredActivities.filter(
-      (a) => a.status === 'CLOSED_OTHER_WON'
-    ).length
-
-    // Total created in period
-    const totalCreated = filteredActivities.length
-
-    return { stageCounts, wonCount, lostCount, totalCreated }
-  }
-
-  const funnelData = getFunnelData()
 
   // Format month label (e.g., "2024-11" -> "Nov 24")
   const formatMonth = (month: string) => {
@@ -455,49 +396,41 @@ export default function SalesPipelineAnalyticsComponent() {
 
       {/* Pipeline Funnel */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Pipeline Funnel</h2>
-          <select
-            className="select select-bordered select-sm"
-            value={funnelMonths}
-            onChange={(e) => setFunnelMonths(Number(e.target.value))}
-          >
-            {FUNNEL_PERIODS.map((period) => (
-              <option key={period.value} value={period.value}>
-                {period.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <h2 className="text-xl font-semibold mb-4">Pipeline Funnel</h2>
         <div className="bg-base-200 rounded-lg p-6">
-          {/* Horizontal Funnel visualization */}
+          {/* Horizontal Funnel visualization - using backend funnelData with "reached" counts */}
           <div className="flex items-center gap-4">
-            {/* Starting count */}
+            {/* Starting count - total activities ever created */}
             <div className="text-center flex-shrink-0">
-              <div className="text-2xl font-bold text-info">{funnelData.totalCreated}</div>
+              <div className="text-2xl font-bold text-info">
+                {analytics.funnelData?.[0]?.reached || 0}
+              </div>
               <div className="text-xs text-gray-500">Besvart</div>
             </div>
 
-            {/* Funnel stages - horizontal flow */}
+            {/* Funnel stages - horizontal flow showing "reached" counts */}
             <div className="flex-1 flex items-center">
               {(() => {
-                const stages = [
-                  { key: 'INTERESTED', label: 'Interessert', count: funnelData.stageCounts['INTERESTED'] || 0 },
-                  { key: 'SENT_TO_SUPPLIER', label: 'Til leverandør', count: funnelData.stageCounts['SENT_TO_SUPPLIER'] || 0 },
-                  { key: 'SENT_TO_CUSTOMER', label: 'Til kunde', count: funnelData.stageCounts['SENT_TO_CUSTOMER'] || 0 },
-                  { key: 'INTERVIEW', label: 'Intervju', count: funnelData.stageCounts['INTERVIEW'] || 0 },
-                ]
+                const stageLabels: Record<string, string> = {
+                  INTERESTED: 'Interessert',
+                  SENT_TO_SUPPLIER: 'Til leverandør',
+                  SENT_TO_CUSTOMER: 'Til kunde',
+                  INTERVIEW: 'Intervju',
+                }
                 const colors = ['bg-blue-500', 'bg-blue-400', 'bg-cyan-500', 'bg-indigo-400']
 
-                return stages.map((stage, index) => (
-                  <div key={stage.key} className="flex items-center flex-1">
+                return (analytics.funnelData || []).map((stage, index) => (
+                  <div key={stage.stage} className="flex items-center flex-1">
                     {/* Stage box */}
-                    <div className={`${colors[index]} rounded-lg p-3 flex-1 text-white text-center min-w-0`}>
-                      <div className="text-2xl font-bold">{stage.count}</div>
-                      <div className="text-xs truncate">{stage.label}</div>
+                    <div
+                      className={`${colors[index] || 'bg-gray-500'} rounded-lg p-3 flex-1 text-white text-center min-w-0`}
+                      title={`${stage.reached} har nådd denne fasen, ${stage.current} er her nå`}
+                    >
+                      <div className="text-2xl font-bold">{stage.reached}</div>
+                      <div className="text-xs truncate">{stageLabels[stage.stage] || stage.stage}</div>
                     </div>
                     {/* Arrow between stages */}
-                    {index < stages.length - 1 && (
+                    {index < (analytics.funnelData?.length || 0) - 1 && (
                       <div className="text-gray-400 px-1 flex-shrink-0">→</div>
                     )}
                   </div>
@@ -512,20 +445,22 @@ export default function SalesPipelineAnalyticsComponent() {
             <div className="flex gap-4 flex-shrink-0">
               <div className="text-center">
                 <div className="w-14 h-14 rounded-full bg-success/20 border-2 border-success flex items-center justify-center">
-                  <span className="text-xl font-bold text-success">{funnelData.wonCount}</span>
+                  <span className="text-xl font-bold text-success">{analytics.wonThisYear}</span>
                 </div>
                 <div className="text-xs text-success mt-1">Vunnet</div>
               </div>
               <div className="text-center">
                 <div className="w-14 h-14 rounded-full bg-error/20 border-2 border-error flex items-center justify-center">
-                  <span className="text-xl font-bold text-error">{funnelData.lostCount}</span>
+                  <span className="text-xl font-bold text-error">
+                    {analytics.closedReasonStats?.reduce((sum, r) => sum + r.count, 0) || 0}
+                  </span>
                 </div>
                 <div className="text-xs text-error mt-1">Tapt</div>
               </div>
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-4 text-center">
-            Viser aktiviteter opprettet i valgt periode
+            Antall som har nådd hver fase (all tid)
           </p>
         </div>
       </div>

@@ -14,6 +14,7 @@ import no.jpro.mypageapi.model.ConsultantWithActivities
 import no.jpro.mypageapi.model.CreateSalesActivity
 import no.jpro.mypageapi.model.CustomerActivityStats
 import no.jpro.mypageapi.model.FlowcaseConsultant
+import no.jpro.mypageapi.model.FunnelStageData
 import no.jpro.mypageapi.model.MarkActivityWonRequest
 import no.jpro.mypageapi.model.ReorderConsultantsRequest
 import no.jpro.mypageapi.model.SalesPipelineAnalytics
@@ -496,7 +497,14 @@ class SalesPipelineApiDelegateImpl(
                 availableSoon = analytics.availabilityStats.availableSoon,
                 assigned = analytics.availabilityStats.assigned,
                 occupied = analytics.availabilityStats.occupied
-            )
+            ),
+            funnelData = analytics.funnelData.map { stage ->
+                FunnelStageData(
+                    stage = stage.stage,
+                    reached = stage.reached,
+                    current = stage.current
+                )
+            }
         )
 
         return ResponseEntity.ok(response)
