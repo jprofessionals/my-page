@@ -30,6 +30,8 @@ const CATEGORY_COLORS = {
   dataAnalytics: '#0891b2', // cyan-600
   frontend: '#16a34a', // green-600
   other: '#6b7280', // gray-500
+  total: '#1f2937', // gray-800
+  trend: '#1f2937', // gray-800 (same as total, but dashed)
 }
 
 const CATEGORY_LABELS = {
@@ -78,6 +80,7 @@ export default function StatistikkPage() {
   const { mutate: recategorizeAll, isPending: isRecategorizing } =
     useRecategorizeAllJobPostings()
   const [showLast12Months, setShowLast12Months] = useState(false)
+  const [showTotalAndTrend, setShowTotalAndTrend] = useState(true)
   const [isPollingStatus, setIsPollingStatus] = useState(false)
   const [wasEverRunning, setWasEverRunning] = useState(false)
   const { data: categorizationStatus } = useCategorizationStatus(isPollingStatus)
@@ -160,11 +163,26 @@ export default function StatistikkPage() {
       data = data.slice(-12)
     }
 
-    return data.map((item) => ({
+    // First pass: add total
+    const dataWithTotal = data.map((item) => ({
       ...item,
-      // Format month for display (2024-06 -> Jun 24)
+      total: (item.javaKotlin ?? 0) + (item.dotnet ?? 0) + (item.dataAnalytics ?? 0) + (item.frontend ?? 0) + (item.other ?? 0),
       monthLabel: formatMonth(item.month || ''),
     }))
+
+    // Second pass: calculate 3-month moving average
+    return dataWithTotal.map((item, index) => {
+      let movingAvg: number | null = null
+      if (index >= 2) {
+        // We have at least 3 data points
+        const sum = dataWithTotal[index].total + dataWithTotal[index - 1].total + dataWithTotal[index - 2].total
+        movingAvg = Math.round((sum / 3) * 10) / 10 // Round to 1 decimal
+      }
+      return {
+        ...item,
+        movingAvg,
+      }
+    })
   }, [statistics, showLast12Months])
 
   if (isLoading) {
@@ -201,7 +219,16 @@ export default function StatistikkPage() {
                 onChange={(e) => setShowLast12Months(e.target.checked)}
                 className="rounded border-gray-300"
               />
-              Vis kun siste 12 måneder
+              Siste 12 mnd
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={showTotalAndTrend}
+                onChange={(e) => setShowTotalAndTrend(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              Vis total og trend
             </label>
             {user?.admin && statistics?.uncategorizedCount !== undefined && statistics.uncategorizedCount > 0 && (
               <button
@@ -344,6 +371,18 @@ export default function StatistikkPage() {
                               </button>
                             )
                           })}
+                          {showTotalAndTrend && (
+                            <div className="flex items-center justify-between w-full px-2 py-1 border-t border-gray-200 mt-1 pt-1">
+                              <span className="flex items-center gap-2">
+                                <span
+                                  className="w-3 h-3 rounded-full"
+                                  style={{ backgroundColor: CATEGORY_COLORS.total }}
+                                />
+                                <span className="text-sm font-semibold text-gray-700">Total</span>
+                              </span>
+                              <span className="text-sm font-bold text-gray-900">{data?.total ?? 0}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )
@@ -395,13 +434,36 @@ export default function StatistikkPage() {
                   dot={{ fill: CATEGORY_COLORS.other, strokeWidth: 0, r: 4, cursor: 'pointer' }}
                   activeDot={createClickableDot('other', CATEGORY_COLORS.other)}
                 />
+                {showTotalAndTrend && (
+                  <Line
+                    type="monotone"
+                    dataKey="total"
+                    name="Total"
+                    stroke={CATEGORY_COLORS.total}
+                    strokeWidth={3}
+                    dot={{ fill: CATEGORY_COLORS.total, strokeWidth: 0, r: 4 }}
+                    activeDot={{ r: 6, fill: CATEGORY_COLORS.total }}
+                  />
+                )}
+                {showTotalAndTrend && (
+                  <Line
+                    type="monotone"
+                    dataKey="movingAvg"
+                    name="Trend (3 mnd snitt)"
+                    stroke={CATEGORY_COLORS.trend}
+                    strokeWidth={2}
+                    strokeDasharray="8 4"
+                    dot={false}
+                    connectNulls={false}
+                  />
+                )}
               </LineChart>
             </ResponsiveContainer>
           )}
         </div>
 
         {/* Legend/Summary */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-6 gap-4">
           {Object.entries(CATEGORY_LABELS).map(([key, label]) => {
             const total = chartData.reduce((sum, item) => {
               const value = item[key as keyof typeof item]
@@ -429,6 +491,16 @@ export default function StatistikkPage() {
               </div>
             )
           })}
+          <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 text-white">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-3 h-3 rounded-full bg-white" />
+              <span className="text-sm font-medium">Total</span>
+            </div>
+            <p className="text-2xl font-bold">
+              {chartData.reduce((sum, item) => sum + (item.total ?? 0), 0)}
+            </p>
+            <p className="text-xs text-gray-300">totalt</p>
+          </div>
         </div>
 
         {/* Debug info - data range */}
