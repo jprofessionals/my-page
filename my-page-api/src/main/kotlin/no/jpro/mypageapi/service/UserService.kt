@@ -60,7 +60,7 @@ class UserService(
         val userByEmail = userRepository.findUserByEmail(email)
         val userByEmployeeNumber = userRepository.findUserByEmployeeNumber(employeeNumber)
 
-        if (userByEmail != null && userByEmail.employeeNumber != employeeNumber) {
+        if (userByEmail?.employeeNumber != null && userByEmail.employeeNumber != employeeNumber) {
             throw IllegalStateException("User with email $email already exists with a different employee number")
         }
 
@@ -70,8 +70,8 @@ class UserService(
 
         val user = userByEmail ?: userByEmployeeNumber
 
-        if (user != null) {
-            val budgets = budgetService.getBudgets(user.employeeNumber!!)
+        if (user?.employeeNumber != null) {
+            val budgets = budgetService.getBudgets(user.employeeNumber)
             if (budgets.isNotEmpty()) {
                 throw IllegalStateException("User already exists with an existing budget")
             }

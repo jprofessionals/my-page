@@ -142,4 +142,23 @@ class UserServiceTest @Autowired constructor(
         // This should not throw because budgets is empty
         userService.createUserWithBudgets("test@example.com", 123, LocalDate.now())
     }
+
+    @Test
+    fun `createUserWithBudgets should succeed when user exists with employeeNumber = null`() {
+        userRepository.save(User(
+            email = "test@example.com",
+            employeeNumber = null,
+            budgets = emptyList(),
+            name = "Test User",
+            givenName = "Test",
+            familyName = "User"
+        ))
+
+        // This should succeed and update the employee number
+        val result = userService.createUserWithBudgets("test@example.com", 123, LocalDate.now())
+        
+        assertEquals(123, result.employeeNumber)
+        val updatedUser = userRepository.findUserByEmail("test@example.com")
+        assertEquals(123, updatedUser?.employeeNumber)
+    }
 }
