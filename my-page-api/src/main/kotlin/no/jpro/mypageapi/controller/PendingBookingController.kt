@@ -83,8 +83,7 @@ class PendingBookingController(
         token: JwtAuthenticationToken,
         @Valid @RequestBody bookingRequest: CreatePendingBookingDTO,
     ): ResponseEntity<String> {
-        val user =
-            userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val user = userService.getValidUserBySub(token.getSub())
         pendingBookingService.createPendingBooking(bookingRequest, user, false)
         return ResponseEntity("A new booking has been successfully created", HttpStatus.CREATED)
     }
@@ -172,8 +171,7 @@ class PendingBookingController(
         if (pendingBooking === null) {
             return ResponseEntity(HttpStatus.NOT_FOUND)
         }
-        val user =
-            userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val user = userService.getValidUserBySub(token.getSub())
         if (!userPermittedToEditBooking(pendingBooking, user)) {
             return ResponseEntity(HttpStatus.FORBIDDEN)
         }
@@ -190,8 +188,7 @@ class PendingBookingController(
         @Valid @RequestBody editBookingRequest: UpdateBookingDTO,
     ): ResponseEntity<String> {
         val bookingToEdit = pendingBookingService.getPendingBooking(pendingBookingId) ?: return ResponseEntity.notFound().build()
-        val user =
-            userService.getUserBySub(token.getSub()) ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val user = userService.getValidUserBySub(token.getSub())
 
         if (!userPermittedToEditBooking(bookingToEdit, user)) {
             return ResponseEntity(HttpStatus.FORBIDDEN)

@@ -40,8 +40,9 @@ class UserApiDelegateImpl(
         // Handle JWT authentication (both production and test mode)
         if (authentication is JwtAuthenticationToken) {
             val jwt = authentication.credentials as Jwt
-            val userEntity = userService.getOrCreateUser(jwt)
-            return ResponseEntity.ok(userMapper.toUserModel(userEntity))
+            val userDTO = userService.getOrCreateUser(jwt)
+            val userModel = userMapper.toUserModel(userDTO)
+            return ResponseEntity.ok(userModel)
         }
 
         // For local development without authentication, return 401
@@ -57,10 +58,10 @@ class UserApiDelegateImpl(
 
     override fun updateUser(updateUserRequest: UpdateUserRequest): ResponseEntity<Unit> {
         if (updateUserRequest.isAdmin != null) {
-            userService.updateAdmin(updateUserRequest.email!!, updateUserRequest.isAdmin!!)
+            userService.updateAdmin(updateUserRequest.email!!, updateUserRequest.isAdmin)
         }
         if (updateUserRequest.isActive != null) {
-            userService.updateActive(updateUserRequest.email!!, updateUserRequest.isActive!!)
+            userService.updateActive(updateUserRequest.email!!, updateUserRequest.isActive)
         }
         return ResponseEntity.ok().build()
     }

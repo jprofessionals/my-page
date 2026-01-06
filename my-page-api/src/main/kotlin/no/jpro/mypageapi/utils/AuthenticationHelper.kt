@@ -62,7 +62,7 @@ class AuthenticationHelper(
         val authentication = SecurityContextHolder.getContext().authentication
         if (authentication is JwtAuthenticationToken) {
             val sub = authentication.getSub()
-            return userService.getUserBySub(sub)
+            return userService.getValidUserBySub(sub)
         }
 
         return null

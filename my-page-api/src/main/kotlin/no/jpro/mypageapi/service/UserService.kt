@@ -1,6 +1,7 @@
 package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.controller.InvalidUserSubException
+import no.jpro.mypageapi.controller.UserNotFoundException
 import no.jpro.mypageapi.dto.UserDTO
 import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.extensions.getEmail
@@ -82,14 +83,14 @@ class UserService(
 
     @Transactional
     fun updateAdmin(email: String, isAdmin: Boolean): User {
-        val user = userRepository.findUserByEmail(email)
-        return userRepository.save(user!!.copy(admin = isAdmin))
+        val user = getValidUserByEmail(email)
+        return userRepository.save(user.copy(admin = isAdmin))
     }
 
     @Transactional
     fun updateActive(email: String, isActive: Boolean): User {
-        val user = userRepository.findUserByEmail(email)
-        return userRepository.save(user!!.copy(enabled = isActive))
+        val user = getValidUserByEmail(email)
+        return userRepository.save(user.copy(enabled = isActive))
     }
 
     fun findUserByEmailAndConnect(jwt: Jwt): User? {
@@ -107,16 +108,15 @@ class UserService(
 
     fun getUserByEmail(email: String) = userRepository.findUserByEmail(email)
 
-    @Deprecated("Use getValidUserBySub (and then rename it")
-    // TODO: he service should throw the exception which should be mapped to the http code instead of handling this
-    // in the controller for each case
-    fun getUserBySub(userSub: String) = userRepository.findUserBySub(userSub)
+    fun getValidUserByEmail(email: String): User {
+        return userRepository.findUserByEmail(email) ?: throw UserNotFoundException("User with email $email not found")
+    }
 
     fun getValidUserBySub(userSub: String?): User {
         if (userSub == null) {
             throw InvalidUserSubException("User sub cannot be null")
         }
-        return userRepository.findUserBySub(userSub) ?: throw InvalidUserSubException("No user found for sub: $userSub")
+        return userRepository.findUserBySub(userSub) ?: throw UserNotFoundException("No user found for sub: $userSub")
     }
 
     @Transactional(readOnly = true)

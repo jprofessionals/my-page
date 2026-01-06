@@ -43,6 +43,14 @@ class GlobalExceptionHandler {
         return responseEntity
     }
 
+    @ExceptionHandler(UserNotFoundException::class)
+    @ResponseBody
+    fun myCustomException(e: UserNotFoundException): ResponseEntity<String> {
+        logger.error("UserNotFoundException: ${e.message}", e)
+        val responseEntity = ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+        return responseEntity
+    }
+
     @ExceptionHandler(Exception::class)
     @ResponseBody
     fun handleGenericException(e: Exception): ResponseEntity<String> {
@@ -55,3 +63,4 @@ class GlobalExceptionHandler {
 
 class MyPageRestException(val httpStatus: HttpStatus, override val message: String?) : RuntimeException() {}
 class InvalidUserSubException(message: String) : RuntimeException(message)
+class UserNotFoundException(message: String) : RuntimeException(message)
