@@ -54,6 +54,19 @@ class UserService(
         return userRepository.save(updatedUser)
     }
 
+    /**
+     * Creates user with budgets; throws on duplicate
+     */
+    @Transactional
+    fun createUserWithBudgets(email: String, employeeNumber: Int, budgetStartDate: LocalDate): User {
+        if (userRepository.findUserByEmail(email) != null ||
+            userRepository.findUserByEmployeeNumber(employeeNumber) != null) {
+            throw IllegalStateException("User with this email or employee number already exists")
+        }
+
+        return initializeNewEmployee(email, employeeNumber, budgetStartDate)
+    }
+
     @Transactional
     fun getOrCreateUser(jwt: Jwt): UserDTO {
         val user =

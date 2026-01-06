@@ -1,6 +1,7 @@
 package no.jpro.mypageapi.controller
 
 import no.jpro.mypageapi.api.UserApiDelegate
+import no.jpro.mypageapi.model.NewEmployee
 import no.jpro.mypageapi.model.UpdateUserRequest
 import no.jpro.mypageapi.model.User
 import no.jpro.mypageapi.service.UserService
@@ -62,5 +63,14 @@ class UserApiDelegateImpl(
             userService.updateActive(updateUserRequest.email!!, updateUserRequest.isActive!!)
         }
         return ResponseEntity.ok().build()
+    }
+
+    override fun createUser(newEmployee: NewEmployee): ResponseEntity<User> {
+        val user = userService.createUserWithBudgets(
+            email = newEmployee.email,
+            employeeNumber = newEmployee.employeeNumber,
+            budgetStartDate = newEmployee.budgetStartDate,
+        )
+        return ResponseEntity.status(201).body(userMapper.toUserModel(user))
     }
 }

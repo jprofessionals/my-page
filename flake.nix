@@ -23,7 +23,7 @@
 
         # Frontend dependencies
         nodejs = pkgs.nodejs_20;
-        npm = pkgs.nodePackages.npm;
+        pnpm = pkgs.nodePackages.pnpm;
 
         # Infrastructure dependencies
         terraform = pkgs.terraform;
@@ -39,6 +39,7 @@
         ];
 
         isAarch64Darwin = (system == "aarch64-darwin");
+        isLinux = pkgs.stdenv.isLinux;
 
       in
       {
@@ -51,7 +52,7 @@
 
             # Frontend
             nodejs
-            npm
+            pnpm
 
             # Infrastructure
             terraform
@@ -77,13 +78,13 @@
             echo "- Maven: $(mvn --version | head -n 1)"
             echo "- Kotlin: $(kotlin -version 2>&1)"
             echo "- Node.js: $(node --version)"
-            echo "- npm: $(npm --version)"
+            echo "- pnpm: $(pnpm --version)"
             echo "- Terraform: $(terraform version | head -n 1)"
             echo "- Google Cloud SDK: $(gcloud --version | head -n 1)"
             echo ""
             echo "Quick start:"
             echo "- Backend: cd my-page-api && mvn spring-boot:run"
-            echo "- Frontend: cd my-page-app && npm install && npm run dev"
+            echo "- Frontend: cd my-page-app && pnpm install && pnpm run dev"
             echo "- Infrastructure: cd infrastructure && terraform init"
             echo ""
 
@@ -138,6 +139,51 @@
               return 0
             }
 
+            ${pkgs.lib.optionalString isLinux ''
+            check_podman() {
+              if ! command -v podman &>/dev/null; then
+                return 0
+              fi
+
+              echo "Validating Podman/Testcontainers setup (rootless)..."
+              local sock="/run/user/$(id -u)/podman/podman.sock"
+              local missing=0
+
+              if [ -S "$sock" ]; then
+                if [ ! -r "$sock" ]; then
+                  echo "❌ Podman socket exists but is not readable: $sock"
+                  missing=1
+                fi
+              else
+                echo "❌ Podman socket not found at $sock"
+                echo "  Start the podman service (e.g. 'podman system service --time=0 &' or your distro's unit)"
+                missing=1
+              fi
+
+              if [ -z "$DOCKER_HOST" ] || [ -z "$TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE" ]; then
+                echo "❌ Missing env for Testcontainers with Podman"
+                echo "  export DOCKER_HOST=unix://$sock"
+                echo "  export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=$sock"
+                missing=1
+              fi
+
+              local tprops_project="$PWD/.testcontainers.properties"
+              local tprops_home="$HOME/.testcontainers.properties"
+              if [ ! -f "$tprops_project" ] && [ ! -f "$tprops_home" ]; then
+                echo "❌ .testcontainers.properties not found (project root or \$HOME). Add:"
+                echo "  docker.client.strategy=org.testcontainers.dockerclient.UnixSocketClientProviderStrategy"
+                echo "  docker.host=unix://$sock"
+                echo "  (Needed because /var/run/docker.sock may point to root-owned Podman sockets.)"
+                missing=1
+              fi
+
+              if [ $missing -eq 0 ]; then
+                echo "Podman/Testcontainers validated successfully"
+              fi
+              return $missing
+            }
+            ''}
+
             # Run validation check
             if ! check_docker; then
               echo "For Colima on Apple Silicon, fix all errors above and verify:"
@@ -148,6 +194,11 @@
             else
               echo "Docker environment validated successfully"
             fi
+
+            ${pkgs.lib.optionalString isLinux ''
+            # Run podman/Testcontainers guidance (does not fail the shell)
+            check_podman || true
+            ''}
           '';
 
           # Environment variables
@@ -157,7 +208,7 @@
 
         # Provide packages individually if needed
         packages = {
-          inherit jdk maven kotlin nodejs npm terraform google-cloud-sdk;
+          inherit jdk maven kotlin nodejs pnpm terraform google-cloud-sdk;
         };
       });
 }
