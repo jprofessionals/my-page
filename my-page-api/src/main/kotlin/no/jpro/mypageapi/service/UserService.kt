@@ -55,14 +55,26 @@ class UserService(
         return userRepository.save(updatedUser)
     }
 
-    /**
-     * Creates user with budgets; throws on duplicate
-     */
     @Transactional
     fun createUserWithBudgets(email: String, employeeNumber: Int, budgetStartDate: LocalDate): User {
-        if (userRepository.findUserByEmail(email) != null ||
-            userRepository.findUserByEmployeeNumber(employeeNumber) != null) {
-            throw IllegalStateException("User with this email or employee number already exists")
+        val userByEmail = userRepository.findUserByEmail(email)
+        val userByEmployeeNumber = userRepository.findUserByEmployeeNumber(employeeNumber)
+
+        if (userByEmail != null && userByEmail.employeeNumber != employeeNumber) {
+            throw IllegalStateException("User with email $email already exists with a different employee number")
+        }
+
+        if (userByEmployeeNumber != null && userByEmployeeNumber.email != email) {
+            throw IllegalStateException("User with employee number $employeeNumber already exists with a different email")
+        }
+
+        val user = userByEmail ?: userByEmployeeNumber
+
+        if (user != null) {
+            val budgets = budgetService.getBudgets(user.employeeNumber!!)
+            if (budgets.isNotEmpty()) {
+                throw IllegalStateException("User already exists with an existing budget")
+            }
         }
 
         return initializeNewEmployee(email, employeeNumber, budgetStartDate)
