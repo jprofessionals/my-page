@@ -392,39 +392,48 @@ export default function ImportTab() {
 
           {/* Field mapping */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            {preview.requiredFields?.map((field: KtuImportField) => (
-              <div key={field.key} className="space-y-1">
-                <label className="block text-sm font-medium text-gray-700">
-                  {field.label}
-                  {field.required && <span className="text-red-500 ml-1">*</span>}
-                </label>
-                <select
-                  value={columnMapping[field.key] ?? ''}
-                  onChange={(e) =>
-                    handleMappingChange(
-                      field.key,
-                      e.target.value === '' ? null : parseInt(e.target.value)
-                    )
-                  }
-                  className={`w-full border rounded-lg px-3 py-2 text-sm ${
-                    field.required && columnMapping[field.key] === null
-                      ? 'border-red-300 bg-red-50'
-                      : columnMapping[field.key] === null
-                        ? 'border-gray-300 bg-gray-50 text-gray-500'
-                        : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">
-                    {field.required ? '-- Velg kolonne (påkrevd) --' : '-- Finnes ikke i CSV --'}
-                  </option>
-                  {preview.columns.map((col, idx) => (
-                    <option key={idx} value={idx}>
-                      {idx}: {col || `(tom header)`}
+            {preview.requiredFields?.map((field: KtuImportField) => {
+              const selectedIdx = columnMapping[field.key]
+              const selectedColName = selectedIdx !== null ? preview.columns[selectedIdx] : null
+              return (
+                <div key={field.key} className="space-y-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {field.label}
+                    {field.required && <span className="text-red-500 ml-1">*</span>}
+                  </label>
+                  <select
+                    value={columnMapping[field.key] ?? ''}
+                    onChange={(e) =>
+                      handleMappingChange(
+                        field.key,
+                        e.target.value === '' ? null : parseInt(e.target.value)
+                      )
+                    }
+                    className={`w-full border rounded-lg px-3 py-2 text-sm ${
+                      field.required && columnMapping[field.key] === null
+                        ? 'border-red-300 bg-red-50'
+                        : columnMapping[field.key] === null
+                          ? 'border-gray-300 bg-gray-50 text-gray-500'
+                          : 'border-green-300 bg-green-50'
+                    }`}
+                  >
+                    <option value="">
+                      {field.required ? '-- Velg kolonne (påkrevd) --' : '-- Finnes ikke i CSV --'}
                     </option>
-                  ))}
-                </select>
-              </div>
-            ))}
+                    {preview.columns.map((col, idx) => (
+                      <option key={idx} value={idx}>
+                        [{idx}] {col || `(tom header)`}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedColName && (
+                    <p className="text-xs text-green-700 break-words">
+                      → {selectedColName}
+                    </p>
+                  )}
+                </div>
+              )
+            })}
           </div>
 
           <label className="flex items-center gap-2 mb-4">
