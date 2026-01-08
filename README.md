@@ -8,6 +8,7 @@ my-page is the internal employee portal for JProfessionals, a Norwegian IT consu
 - **Cabin Booking & Lottery** - Book the company cabin and participate in biannual lottery draws (winter/summer) with a fair snake-draft allocation algorithm
 - **Sales Pipeline** - Kanban-style board for tracking consultant availability and sales activities with drag-and-drop functionality
 - **Job Postings** - Create, manage, and browse internal job postings with customer and tag filtering
+- **KTU (Customer Satisfaction Survey)** - Annual customer satisfaction surveys with email invitations, response tracking, trend analysis, and public results page
 - **Budget Calculator** - Personal budget and salary calculation tools
 
 The application uses Google OAuth for authentication, ensuring only JProfessionals employees can access the portal.
@@ -53,6 +54,40 @@ npm run dev
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8080/api
 - Swagger UI: http://localhost:8080/api/swagger-ui/index.html
+- Public KTU Results: http://localhost:3000/ktu/resultater
+
+## Public Pages
+
+### KTU Results Page
+
+The KTU results page (`/ktu/resultater`) is publicly accessible without authentication and displays customer satisfaction trends over time.
+
+**Embedding on external sites:**
+
+The results page supports query parameters for embedding on external websites:
+
+| Parameter | Description |
+|-----------|-------------|
+| `embed=true` | Hides header and footer for clean embedding |
+| `columns=2` | Displays charts in 2 columns instead of 1 |
+| `hideResponseRate=true` | Hides the response rate chart |
+
+**Examples:**
+```
+/ktu/resultater?embed=true
+/ktu/resultater?columns=2
+/ktu/resultater?embed=true&columns=2&hideResponseRate=true
+```
+
+**Embedding with iframe:**
+```html
+<iframe
+  src="https://minside.jpro.no/ktu/resultater?embed=true&columns=2"
+  width="100%"
+  height="800"
+  frameborder="0">
+</iframe>
+```
 
 ## Tech Stack
 
