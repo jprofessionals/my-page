@@ -426,9 +426,9 @@ export default function ImportTab() {
                       </option>
                     ))}
                   </select>
-                  {selectedColName && (
+                  {selectedIdx !== null && (
                     <p className="text-xs text-green-700 break-words">
-                      → {selectedColName}
+                      → {selectedColName || '(tom header)'}
                     </p>
                   )}
                 </div>
