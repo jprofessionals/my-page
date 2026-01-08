@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="300.007.001" author="claude">
+        <comment>Rename KTI tables to KTU (Kundetilfredshetsundersøkelse)</comment>
+
+        <!-- Rename tables from kti_ to ktu_ -->
+        <renameTable oldTableName="kti_round" newTableName="ktu_round"/>
+        <renameTable oldTableName="kti_question" newTableName="ktu_question"/>
+        <renameTable oldTableName="kti_round_question" newTableName="ktu_round_question"/>
+        <renameTable oldTableName="kti_customer_organization" newTableName="ktu_customer_organization"/>
+        <renameTable oldTableName="kti_customer_contact" newTableName="ktu_customer_contact"/>
+        <renameTable oldTableName="kti_consultant_alias" newTableName="ktu_consultant_alias"/>
+        <renameTable oldTableName="kti_assignment" newTableName="ktu_assignment"/>
+        <renameTable oldTableName="kti_invitation" newTableName="ktu_invitation"/>
+        <renameTable oldTableName="kti_response" newTableName="ktu_response"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,4 +1,75 @@
-# TODO - Refactoring Tasks
+# TODO - Aktive oppgaver
+
+---
+
+## KTU Survey Appearance Configuration (PÅGÅR)
+
+Gjør spørreskjema-utseendet konfigurerbart per runde (år).
+
+### Implementeringsstatus
+
+- [x] **Fase 1: Datamodell**
+  - [x] Opprett KtuColorTheme entity
+  - [x] Legg til appearance-felter på KtuRound
+  - [x] Lag Liquibase migrasjon med seed data
+
+- [x] **Fase 2: API**
+  - [x] Oppdater OpenAPI spec med schemas
+  - [x] Legg til tema-endpoints
+  - [x] Legg til logo-endpoints
+  - [x] Kjør `mvn compile`
+
+- [x] **Fase 3: Backend services**
+  - [x] Implementer KtuColorThemeService
+  - [x] Implementer KtuLogoService
+  - [x] Oppdater KtuService med appearance
+  - [x] Oppdater KtuPublicSurveyService
+  - [x] Oppdater KtuApiDelegateImpl
+
+- [x] **Fase 4: Frontend admin**
+  - [x] Kjør `npm run build:openapi`
+  - [x] Lag AppearanceTab komponent
+  - [x] Lag ColorThemeModal (integrert i AppearanceTab)
+  - [x] Integrer i SurveyDetailView
+  - [x] Oppdater ktu.service.ts
+
+- [x] **Fase 5: Frontend public survey**
+  - [x] Oppdater [token].tsx med dynamisk styling
+  - [x] Håndter alle konfigurerbare tekster
+
+- [ ] **Fase 6: Testing**
+  - [ ] Test DRAFT-status validering
+  - [ ] Test alle fargetemaer
+  - [ ] Test logo-opplasting
+
+### Oversikt
+
+| Krav | Løsning |
+|------|---------|
+| Logo | Filopplasting til GCS, lagres som URL på runden |
+| Farger | Dynamiske temaer i database (kan legges til av admin) |
+| Tekster | Alle konfigurerbare: intro, instruksjoner, rating-labels, takk-melding, kommentar-label |
+
+### Filer som endres
+
+**Backend:**
+- `entity/ktu/KtuColorTheme.kt` - ny entity
+- `entity/ktu/KtuRound.kt` - nye felter
+- `db.changelog-300.008.xml` - migrasjon
+- `openapi/api.yaml` - schemas/endpoints
+- `service/KtuColorThemeService.kt` - ny
+- `service/KtuLogoService.kt` - ny
+- `repository/KtuRepositories.kt` - ny repository
+
+**Frontend:**
+- `components/ktu/admin/AppearanceTab.tsx` - ny
+- `components/ktu/admin/ColorThemeModal.tsx` - ny
+- `components/ktu/admin/SurveyDetailView.tsx` - ny tab
+- `pages/ktu/survey/[token].tsx` - dynamisk styling
+
+---
+
+# Fullførte oppgaver
 
 ## 1. ✅ Repository refactoring
 - [x] Flytte fra én stor repository til separate repository-filer

@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- KTI Module: Customer Satisfaction Survey Tables -->
+
+    <changeSet id="300.001-1" author="JProfessionals">
+        <comment>Create kti_round table for survey rounds</comment>
+        <createTable tableName="kti_round">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="year" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="open_date" type="DATE">
+                <constraints nullable="true"/>
+            </column>
+            <column name="close_date" type="DATE">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_by_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="kti_round" baseColumnNames="created_by_id"
+                                 constraintName="fk_kti_round_created_by"
+                                 referencedTableName="user" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="300.001-2" author="JProfessionals">
+        <comment>Create kti_customer_organization table</comment>
+        <createTable tableName="kti_customer_organization">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organization_number" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="300.001-3" author="JProfessionals">
+        <comment>Create kti_customer_contact table</comment>
+        <createTable tableName="kti_customer_contact">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="phone" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="organization_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="opted_out" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="opted_out_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="kti_customer_contact" baseColumnNames="organization_id"
+                                 constraintName="fk_kti_contact_organization"
+                                 referencedTableName="kti_customer_organization" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="300.001-4" author="JProfessionals">
+        <comment>Create kti_question table</comment>
+        <createTable tableName="kti_question">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="text_no" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text_en" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="question_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="required" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="300.001-5" author="JProfessionals">
+        <comment>Create kti_assignment table for consultant-contact assignments per round</comment>
+        <createTable tableName="kti_assignment">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="round_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="consultant_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contact_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notes" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_by_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="kti_assignment" baseColumnNames="round_id"
+                                 constraintName="fk_kti_assignment_round"
+                                 referencedTableName="kti_round" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="kti_assignment" baseColumnNames="consultant_id"
+                                 constraintName="fk_kti_assignment_consultant"
+                                 referencedTableName="user" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="kti_assignment" baseColumnNames="contact_id"
+                                 constraintName="fk_kti_assignment_contact"
+                                 referencedTableName="kti_customer_contact" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="kti_assignment" baseColumnNames="created_by_id"
+                                 constraintName="fk_kti_assignment_created_by"
+                                 referencedTableName="user" referencedColumnNames="id"/>
+        <addUniqueConstraint tableName="kti_assignment" columnNames="round_id, consultant_id, contact_id"
+                             constraintName="uk_kti_assignment_round_consultant_contact"/>
+    </changeSet>
+
+    <changeSet id="300.001-6" author="JProfessionals">
+        <comment>Create kti_invitation table for survey invitations with unique tokens</comment>
+        <createTable tableName="kti_invitation">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="assignment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="token" type="VARCHAR(64)">
+                <constraints nullable="true" unique="true"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sent_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="opened_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="responded_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="reminder_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="kti_invitation" baseColumnNames="assignment_id"
+                                 constraintName="fk_kti_invitation_assignment"
+                                 referencedTableName="kti_assignment" referencedColumnNames="id"/>
+        <createIndex tableName="kti_invitation" indexName="idx_kti_invitation_token">
+            <column name="token"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="300.001-7" author="JProfessionals">
+        <comment>Create kti_response table for survey responses</comment>
+        <createTable tableName="kti_response">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="invitation_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="question_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating_value" type="INT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="text_value" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="kti_response" baseColumnNames="invitation_id"
+                                 constraintName="fk_kti_response_invitation"
+                                 referencedTableName="kti_invitation" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="kti_response" baseColumnNames="question_id"
+                                 constraintName="fk_kti_response_question"
+                                 referencedTableName="kti_question" referencedColumnNames="id"/>
+        <addUniqueConstraint tableName="kti_response" columnNames="invitation_id, question_id"
+                             constraintName="uk_kti_response_invitation_question"/>
+    </changeSet>
+
+    <changeSet id="300.001-8" author="JProfessionals">
+        <comment>Insert default KTI questions based on existing SurveyMonkey form</comment>
+        <insert tableName="kti_question">
+            <column name="code" value="Q1_WORK"/>
+            <column name="text_no" value="Hvor godt fornøyd er du med det utførte arbeidet til konsulenten?"/>
+            <column name="text_en" value="How satisfied are you with the work performed by the consultant?"/>
+            <column name="question_type" value="RATING_1_6"/>
+            <column name="category" value="DELIVERY"/>
+            <column name="display_order" value="1"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="true"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q1_WORK_COMMENT"/>
+            <column name="text_no" value="Kommentar til utført arbeid"/>
+            <column name="text_en" value="Comment on performed work"/>
+            <column name="question_type" value="FREE_TEXT"/>
+            <column name="category" value="DELIVERY"/>
+            <column name="display_order" value="2"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="false"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q2_COMPETENCE"/>
+            <column name="text_no" value="Har konsulenten den nødvendige kompetansen for arbeidet dere trenger utført?"/>
+            <column name="text_en" value="Does the consultant have the necessary competence for the work you need done?"/>
+            <column name="question_type" value="RATING_1_6"/>
+            <column name="category" value="COMPETENCE"/>
+            <column name="display_order" value="3"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="true"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q2_COMPETENCE_COMMENT"/>
+            <column name="text_no" value="Kommentar / Er det kompetanse du savner?"/>
+            <column name="text_en" value="Comment / Is there any competence you are missing?"/>
+            <column name="question_type" value="FREE_TEXT"/>
+            <column name="category" value="COMPETENCE"/>
+            <column name="display_order" value="4"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="false"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q3_KNOWLEDGE_SHARING"/>
+            <column name="text_no" value="Hvor godt fornøyd er du med konsulentens bidrag til kompetansedeling innad i ditt team?"/>
+            <column name="text_en" value="How satisfied are you with the consultant's contribution to knowledge sharing within your team?"/>
+            <column name="question_type" value="RATING_1_6"/>
+            <column name="category" value="KNOWLEDGE_SHARING"/>
+            <column name="display_order" value="5"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="true"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q3_KNOWLEDGE_SHARING_COMMENT"/>
+            <column name="text_no" value="Kommentar til kompetansedeling"/>
+            <column name="text_en" value="Comment on knowledge sharing"/>
+            <column name="question_type" value="FREE_TEXT"/>
+            <column name="category" value="KNOWLEDGE_SHARING"/>
+            <column name="display_order" value="6"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="false"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q4_COLLABORATION"/>
+            <column name="text_no" value="Hvor godt fornøyd er du med det generelle samarbeidet og kommunikasjonen med konsulenten?"/>
+            <column name="text_en" value="How satisfied are you with the general collaboration and communication with the consultant?"/>
+            <column name="question_type" value="RATING_1_6"/>
+            <column name="category" value="COLLABORATION"/>
+            <column name="display_order" value="7"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="true"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q4_COLLABORATION_COMMENT"/>
+            <column name="text_no" value="Kommentar til samarbeid"/>
+            <column name="text_en" value="Comment on collaboration"/>
+            <column name="question_type" value="FREE_TEXT"/>
+            <column name="category" value="COLLABORATION"/>
+            <column name="display_order" value="8"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="false"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q5_JPRO_FOLLOWUP"/>
+            <column name="text_no" value="Hvor godt fornøyd er du med oppfølgingen fra, og samarbeidet med, JProfessionals AS?"/>
+            <column name="text_en" value="How satisfied are you with the follow-up from, and collaboration with, JProfessionals AS?"/>
+            <column name="question_type" value="RATING_1_6"/>
+            <column name="category" value="JPRO_FOLLOWUP"/>
+            <column name="display_order" value="9"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="false"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q5_JPRO_FOLLOWUP_COMMENT"/>
+            <column name="text_no" value="Kommentar til JPro-oppfølging"/>
+            <column name="text_en" value="Comment on JPro follow-up"/>
+            <column name="question_type" value="FREE_TEXT"/>
+            <column name="category" value="JPRO_FOLLOWUP"/>
+            <column name="display_order" value="10"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="false"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q6_VALUE"/>
+            <column name="text_no" value="I hvor stor grad synes du at kostnaden for konsulenten er verdt nytten de tilfører?"/>
+            <column name="text_en" value="To what extent do you think the cost of the consultant is worth the value they provide?"/>
+            <column name="question_type" value="RATING_1_6"/>
+            <column name="category" value="VALUE"/>
+            <column name="display_order" value="11"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="true"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q6_VALUE_COMMENT"/>
+            <column name="text_no" value="Kommentar til kost/nytte"/>
+            <column name="text_en" value="Comment on cost/value"/>
+            <column name="question_type" value="FREE_TEXT"/>
+            <column name="category" value="VALUE"/>
+            <column name="display_order" value="12"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="false"/>
+        </insert>
+        <insert tableName="kti_question">
+            <column name="code" value="Q7_ADDITIONAL"/>
+            <column name="text_no" value="Er det ytterligere områder eller tjenester du ser behov for bistand til?"/>
+            <column name="text_en" value="Are there additional areas or services you need assistance with?"/>
+            <column name="question_type" value="FREE_TEXT"/>
+            <column name="category" value="ADDITIONAL"/>
+            <column name="display_order" value="13"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="required" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

@@ -10,12 +10,22 @@ import '@fontsource/roboto/700.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import NavBar from '@/components/navbar/NavBar'
 import { useState } from 'react'
+import { useRouter } from 'next/router'
+
+// Routes that should not show the navigation bar (public pages)
+const publicRoutes = ['/ktu/survey/', '/ktu/resultater']
 
 export default function App({
   Component,
   pageProps: { ...pageProps },
 }: AppProps) {
   const [queryClient] = useState(() => new QueryClient())
+  const router = useRouter()
+
+  // Check if current route is a public route (no nav bar)
+  const isPublicRoute = publicRoutes.some((route) =>
+    router.pathname.startsWith(route)
+  )
 
   return (
     <>
@@ -29,12 +39,18 @@ export default function App({
         theme="colored"
       />
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <main data-theme="jpro">
-            <NavBar />
-            <Component {...pageProps} />
-          </main>
-        </AuthProvider>
+        {isPublicRoute ? (
+          // Public routes: no auth provider or nav bar
+          <Component {...pageProps} />
+        ) : (
+          // Protected routes: with auth provider and nav bar
+          <AuthProvider>
+            <main data-theme="jpro">
+              <NavBar />
+              <Component {...pageProps} />
+            </main>
+          </AuthProvider>
+        )}
       </QueryClientProvider>
     </>
   )

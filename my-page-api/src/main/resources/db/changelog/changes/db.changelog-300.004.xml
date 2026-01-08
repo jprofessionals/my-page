@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="300.004-1" author="claude">
+        <comment>Make user_id nullable in kti_consultant_alias to support "ignore" aliases for former employees</comment>
+
+        <!-- Drop the existing foreign key constraint -->
+        <dropForeignKeyConstraint
+                baseTableName="kti_consultant_alias"
+                constraintName="fk_consultant_alias_user"/>
+
+        <!-- Make user_id nullable -->
+        <modifyDataType
+                tableName="kti_consultant_alias"
+                columnName="user_id"
+                newDataType="BIGINT"/>
+
+        <dropNotNullConstraint
+                tableName="kti_consultant_alias"
+                columnName="user_id"
+                columnDataType="BIGINT"/>
+
+        <!-- Re-add the foreign key constraint (will only check when user_id is not null) -->
+        <addForeignKeyConstraint
+                baseTableName="kti_consultant_alias"
+                baseColumnNames="user_id"
+                referencedTableName="user"
+                referencedColumnNames="id"
+                constraintName="fk_consultant_alias_user"/>
+    </changeSet>
+
+</databaseChangeLog>

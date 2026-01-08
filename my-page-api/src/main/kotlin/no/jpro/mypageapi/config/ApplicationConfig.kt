@@ -53,7 +53,9 @@ class ApplicationConfig(
                 "/task/auto/drawPendingBookings",
                 "/task/notifyUpcomingBookings",
                 "/job/generate-notifications",
-                "/kti/survey/**"  // Public KTI survey endpoints (no auth required)
+// KTU public survey endpoints (accessed via token, not authentication)
+                "/ktu/survey/**",
+                "/ktu/public/**"
             )
 
             // Add development-only endpoints if in local/h2 profile
@@ -64,6 +66,7 @@ class ApplicationConfig(
                     "/booking", "/booking/**",
                     "/user", "/user/**",
                     "/image", "/image/**",
+                    "/ktu/logos/**",
                     "/sales-activities", "/sales-activities/**",
                     "/sales-pipeline", "/sales-pipeline/**",
                     "/flowcase", "/flowcase/**",

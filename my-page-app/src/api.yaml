@@ -2597,6 +2597,1983 @@ paths:
         '500':
           description: Internal server error
 
+  # KTU (Customer Satisfaction Survey) Endpoints
+
+  /ktu/color-themes:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuColorThemes
+      summary: Get all color themes
+      description: Returns all available color themes for KTU surveys
+      responses:
+        '200':
+          description: List of color themes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuColorTheme'
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - Ktu
+      operationId: createKtuColorTheme
+      summary: Create a new color theme
+      description: Creates a new color theme. Requires admin access.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtuColorTheme'
+      responses:
+        '201':
+          description: Color theme created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuColorTheme'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+
+  /ktu/color-themes/{themeId}:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuColorTheme
+      summary: Get a color theme by ID
+      parameters:
+        - name: themeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Color theme
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuColorTheme'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Theme not found
+    put:
+      tags:
+        - Ktu
+      operationId: updateKtuColorTheme
+      summary: Update a color theme
+      description: Updates a color theme. Requires admin access.
+      parameters:
+        - name: themeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtuColorTheme'
+      responses:
+        '200':
+          description: Color theme updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuColorTheme'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Theme not found
+    delete:
+      tags:
+        - Ktu
+      operationId: deleteKtuColorTheme
+      summary: Delete a color theme
+      description: Deletes a color theme. Requires admin access. Cannot delete if in use.
+      parameters:
+        - name: themeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Color theme deleted successfully
+        '400':
+          description: Cannot delete - theme is in use
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Theme not found
+
+  /ktu/rounds:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuRounds
+      summary: Get all KTU survey rounds
+      description: Returns all KTU survey rounds, optionally filtered by status
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/KtuRoundStatus'
+      responses:
+        '200':
+          description: List of KTU rounds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuRound'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Ktu
+      operationId: createKtuRound
+      summary: Create a new KTU survey round
+      description: Creates a new KTU survey round. Requires admin access.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtuRound'
+      responses:
+        '201':
+          description: KTU round created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuRound'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuRound
+      summary: Get a KTU round by ID
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: KTU round details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuRound'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - Ktu
+      operationId: updateKtuRound
+      summary: Update a KTU round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtuRound'
+      responses:
+        '200':
+          description: KTU round updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuRound'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+        - Ktu
+      operationId: deleteKtuRound
+      summary: Delete a KTU round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: KTU round deleted successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/logo:
+    post:
+      tags:
+        - Ktu
+      operationId: uploadKtuRoundLogo
+      summary: Upload a logo for a KTU round
+      description: Uploads a logo image for the survey. Only allowed when round is in DRAFT status.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Logo image file (PNG, JPG, SVG)
+              required:
+                - file
+      responses:
+        '200':
+          description: Logo uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuRound'
+        '400':
+          description: Invalid file type or round not in DRAFT status
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+    delete:
+      tags:
+        - Ktu
+      operationId: deleteKtuRoundLogo
+      summary: Delete the logo for a KTU round
+      description: Deletes the logo for a survey. Only allowed when round is in DRAFT status.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Logo deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuRound'
+        '400':
+          description: Round not in DRAFT status
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+
+  /ktu/organizations:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuOrganizations
+      summary: Get all customer organizations
+      parameters:
+        - name: activeOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: List of customer organizations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuCustomerOrganization'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Ktu
+      operationId: createKtuOrganization
+      summary: Create a customer organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtuOrganization'
+      responses:
+        '201':
+          description: Organization created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuCustomerOrganization'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /ktu/organizations/{organizationId}:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuOrganization
+      summary: Get a customer organization by ID
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Organization details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuCustomerOrganization'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Organization not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - Ktu
+      operationId: updateKtuOrganization
+      summary: Update a customer organization
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtuOrganization'
+      responses:
+        '200':
+          description: Organization updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuCustomerOrganization'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Organization not found
+        '500':
+          description: Internal server error
+
+  /ktu/contacts:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuContacts
+      summary: Get all customer contacts
+      parameters:
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: Filter by organization ID
+        - name: activeOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: List of customer contacts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuCustomerContact'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Ktu
+      operationId: createKtuContact
+      summary: Create a customer contact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtuContact'
+      responses:
+        '201':
+          description: Contact created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuCustomerContact'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /ktu/contacts/{contactId}:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuContact
+      summary: Get a customer contact by ID
+      parameters:
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Contact details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuCustomerContact'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Contact not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - Ktu
+      operationId: updateKtuContact
+      summary: Update a customer contact
+      parameters:
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtuContact'
+      responses:
+        '200':
+          description: Contact updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuCustomerContact'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Contact not found
+        '500':
+          description: Internal server error
+
+  /ktu/questions:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuQuestions
+      summary: Get all KTU questions
+      parameters:
+        - name: activeOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: List of questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuQuestion'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Ktu
+      operationId: createKtuQuestion
+      summary: Create a new KTU question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtuQuestion'
+      responses:
+        '201':
+          description: Question created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuQuestion'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /ktu/questions/{questionId}:
+    put:
+      tags:
+        - Ktu
+      operationId: updateKtuQuestion
+      summary: Update a KTU question
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtuQuestion'
+      responses:
+        '200':
+          description: Question updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuQuestion'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Question not found
+        '500':
+          description: Internal server error
+
+  /ktu/import/preview:
+    post:
+      tags:
+        - Ktu
+      operationId: previewKtuCsv
+      summary: Preview CSV file for import
+      description: |
+        Upload a CSV file and get a preview of columns and sample rows.
+        This allows the user to map columns to fields before importing.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to preview
+              required:
+                - file
+      responses:
+        '200':
+          description: CSV preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuCsvPreview'
+        '400':
+          description: Bad request - invalid CSV format
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /ktu/import/historical:
+    post:
+      tags:
+        - Ktu
+      operationId: importHistoricalKtu
+      summary: Import historical KTU data from CSV
+      description: |
+        Import historical KTU responses from a CSV file.
+        Use dryRun=true to validate without importing.
+        Column mapping specifies which CSV columns map to which fields.
+      parameters:
+        - name: dryRun
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: If true, only validate without importing
+        - name: skipUnmatchedConsultants
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Skip rows where consultant name doesn't match any user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to import
+                columnMapping:
+                  type: string
+                  description: JSON string with column mapping (e.g. {"date":0,"customer":1,...})
+              required:
+                - file
+      responses:
+        '200':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuImportResult'
+        '400':
+          description: Bad request - invalid CSV format
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /ktu/import/contacts/preview:
+    post:
+      tags:
+        - Ktu
+      operationId: previewContactsCsv
+      summary: Preview contacts CSV file
+      description: |
+        Upload a CSV file to preview columns and sample data for contact import.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to preview
+              required:
+                - file
+      responses:
+        '200':
+          description: CSV preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuContactsCsvPreview'
+        '400':
+          description: Bad request - invalid CSV format
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /ktu/import/contacts:
+    post:
+      tags:
+        - Ktu
+      operationId: importContacts
+      summary: Import contacts from CSV
+      description: |
+        Import consultant-contact relationships from a CSV file.
+        Creates organizations, contacts, and optionally assignments.
+      parameters:
+        - name: dryRun
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: If true, only validate without importing
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Year to link contacts to (creates assignments for this year's round)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to import
+                columnMapping:
+                  type: string
+                  description: JSON string with column mapping
+              required:
+                - file
+      responses:
+        '200':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuContactsImportResult'
+        '400':
+          description: Bad request - invalid CSV format
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/questions:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuRoundQuestions
+      summary: Get questions for a round
+      description: Returns all questions configured for a specific round, including their order and active status
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: activeOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: If true, only return active questions
+      responses:
+        '200':
+          description: List of round questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuRoundQuestion'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Ktu
+      operationId: addKtuRoundQuestion
+      summary: Add a question to a round
+      description: Adds an existing question to a round's question set
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddKtuRoundQuestion'
+      responses:
+        '201':
+          description: Question added to round
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuRoundQuestion'
+        '400':
+          description: Bad request - question already in round
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round or question not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/questions/{questionId}:
+    put:
+      tags:
+        - Ktu
+      operationId: updateKtuRoundQuestion
+      summary: Update a round question
+      description: Update the display order or active status of a question in a round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtuRoundQuestion'
+      responses:
+        '200':
+          description: Round question updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuRoundQuestion'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round question not found
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+        - Ktu
+      operationId: removeKtuRoundQuestion
+      summary: Remove a question from a round
+      description: Removes a question from a round's question set. Does not delete the question itself.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Question removed from round
+        '400':
+          description: Cannot remove - responses exist for this question
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round question not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/questions/copy-from/{sourceRoundId}:
+    post:
+      tags:
+        - Ktu
+      operationId: copyKtuRoundQuestions
+      summary: Copy questions from another round
+      description: Copies all questions from a source round to this round. Useful when setting up a new survey year.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The target round to copy questions to
+        - name: sourceRoundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The source round to copy questions from
+      responses:
+        '200':
+          description: Questions copied successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuRoundQuestion'
+        '400':
+          description: Target round already has questions
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/questions/init-from-template:
+    post:
+      tags:
+        - Ktu
+      operationId: initKtuRoundQuestionsFromTemplate
+      summary: Initialize round questions from global question template
+      description: Adds all active global questions to this round. Typically used for the first round or to reset.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Questions initialized successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuRoundQuestion'
+        '400':
+          description: Round already has questions
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/assignments:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuAssignments
+      summary: Get assignments for a round
+      description: Returns all consultant-contact assignments for a specific round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of assignments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuAssignment'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Ktu
+      operationId: createKtuAssignment
+      summary: Create an assignment
+      description: Assign a consultant to a customer contact for a round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtuAssignment'
+      responses:
+        '201':
+          description: Assignment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuAssignment'
+        '400':
+          description: Bad request - assignment already exists or invalid data
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round, consultant or contact not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/assignments/{assignmentId}:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuAssignment
+      summary: Get an assignment
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: assignmentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Assignment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuAssignment'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Assignment not found
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+        - Ktu
+      operationId: deleteKtuAssignment
+      summary: Delete an assignment
+      description: Remove a consultant-contact assignment. Only allowed if no invitations have been sent.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: assignmentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Assignment deleted
+        '400':
+          description: Cannot delete - invitations already sent
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Assignment not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/invitations:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuInvitations
+      summary: Get invitations for a round
+      description: Returns all invitations for a specific round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/KtuInvitationStatus'
+          description: Filter by invitation status
+      responses:
+        '200':
+          description: List of invitations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuInvitation'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/invitations/send:
+    post:
+      tags:
+        - Ktu
+      operationId: sendKtuInvitations
+      summary: Send invitations
+      description: |
+        Generate tokens and send email invitations to all contacts with assignments
+        that don't already have a pending/sent invitation.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Send result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuSendInvitationsResult'
+        '400':
+          description: Round not in OPEN status
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/invitations/remind:
+    post:
+      tags:
+        - Ktu
+      operationId: sendKtuReminders
+      summary: Send reminders
+      description: Send reminder emails to contacts who haven't responded yet
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Reminder result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuSendRemindersResult'
+        '400':
+          description: Round not in OPEN status
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/email-preview:
+    get:
+      tags:
+        - Ktu
+      operationId: previewKtuEmail
+      summary: Preview email template
+      description: Returns rendered HTML preview of invitation or reminder email
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [invitation, reminder]
+          description: Type of email to preview
+      responses:
+        '200':
+          description: HTML email preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuEmailPreview'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/test-survey:
+    post:
+      tags:
+        - Ktu
+      operationId: createKtuTestSurvey
+      summary: Create a test survey invitation
+      description: Creates a test invitation for testing the survey flow. Optionally sends email to specified address.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtuTestSurvey'
+      responses:
+        '200':
+          description: Test survey created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuTestSurveyResult'
+        '400':
+          description: Invalid request - round must be OPEN or DRAFT
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /ktu/consultants:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuConsultants
+      summary: Get available consultants
+      description: Returns list of users who can be assigned as consultants
+      responses:
+        '200':
+          description: List of consultants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuConsultant'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /ktu/sync-users:
+    post:
+      tags:
+        - Ktu
+      operationId: syncUsersFromFlowcase
+      summary: Sync users from Flowcase
+      description: |
+        Fetches all consultants from Flowcase and creates/updates users in the database.
+        This ensures the user table has all consultants for KTU import matching.
+      responses:
+        '200':
+          description: Sync result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSyncResult'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /ktu/consultant-aliases:
+    get:
+      tags:
+        - Ktu
+      operationId: getConsultantAliases
+      summary: Get all consultant name aliases
+      description: Returns all configured consultant name aliases used for import matching
+      responses:
+        '200':
+          description: List of aliases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsultantAlias'
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - Ktu
+      operationId: createConsultantAlias
+      summary: Create a consultant name alias
+      description: Maps an alternative name (e.g., old name) to a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConsultantAliasRequest'
+      responses:
+        '201':
+          description: Alias created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultantAlias'
+        '400':
+          description: Bad request - alias already exists or user not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+
+  /ktu/consultant-aliases/{aliasId}:
+    delete:
+      tags:
+        - Ktu
+      operationId: deleteConsultantAlias
+      summary: Delete a consultant alias
+      parameters:
+        - name: aliasId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Alias deleted
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Alias not found
+
+  /ktu/users:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuUsers
+      summary: Get all users for consultant mapping
+      description: Returns all enabled users that can be mapped to consultants
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuUser'
+        '401':
+          description: Unauthorized
+
+  /ktu/rounds/{roundId}/statistics:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuRoundStatistics
+      summary: Get statistics for a KTU round
+      description: Returns aggregated statistics for the specified round including response rates, averages, and breakdowns
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Round statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuRoundStatistics'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Round not found
+
+  /ktu/rounds/{roundId}/responses:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuRoundResponses
+      summary: Get all responses for a KTU round
+      description: Returns all individual responses for the specified round with consultant and organization info
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of responses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuResponseSummary'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Round not found
+
+  /ktu/rounds/{roundId}/statistics/by-consultant:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuStatisticsByConsultant
+      summary: Get statistics grouped by consultant
+      description: Returns KTU statistics broken down by consultant for the specified round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Statistics by consultant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuConsultantStatistics'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Round not found
+
+  /ktu/trends:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuCompanyTrends
+      summary: Get company-wide trend statistics
+      description: Returns historical trend statistics across all years including per-question averages
+      responses:
+        '200':
+          description: Company trend statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuCompanyTrendStatistics'
+        '401':
+          description: Unauthorized
+
+  /ktu/trends/consultants:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuConsultantsTrends
+      summary: Get consultant trend statistics across years
+      description: Returns statistics for all consultants across all years
+      responses:
+        '200':
+          description: Consultant trend statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuConsultantYearlyStats'
+        '401':
+          description: Unauthorized
+
+  # Consultant's own KTU results (self-service)
+  /ktu/me/statistics:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuMyStatistics
+      summary: Get current consultant's own KTU statistics
+      description: Returns aggregated KTU statistics for the currently logged-in consultant across all rounds
+      responses:
+        '200':
+          description: Consultant's own statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuConsultantOwnStatistics'
+        '401':
+          description: Unauthorized
+        '404':
+          description: No statistics found for current user
+
+  /ktu/me/trends:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuMyTrends
+      summary: Get current consultant's trend statistics
+      description: Returns historical trend statistics for the currently logged-in consultant
+      responses:
+        '200':
+          description: Consultant's trend statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuConsultantYearlyStats'
+        '401':
+          description: Unauthorized
+        '404':
+          description: No statistics found for current user
+
+  /ktu/me/responses:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuMyResponses
+      summary: Get current consultant's KTU responses
+      description: Returns all KTU feedback responses for the currently logged-in consultant with full details about who gave the feedback
+      parameters:
+        - name: roundId
+          in: query
+          required: false
+          description: Optional round ID to filter responses
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of consultant's responses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuResponseSummary'
+        '401':
+          description: Unauthorized
+
+  # Admin endpoints for viewing any consultant's KTU data
+  /ktu/admin/consultants/{consultantId}/statistics:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuConsultantStatisticsAdmin
+      summary: Get a consultant's KTU statistics (admin)
+      description: Returns KTU statistics for a specific consultant. Admin only.
+      parameters:
+        - name: consultantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Consultant statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuConsultantOwnStatistics'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Consultant not found
+
+  /ktu/admin/consultants/{consultantId}/trends:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuConsultantTrendsAdmin
+      summary: Get a consultant's KTU trends (admin)
+      description: Returns historical trend statistics for a specific consultant. Admin only.
+      parameters:
+        - name: consultantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Consultant trend statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuConsultantYearlyStats'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Consultant not found
+
+  /ktu/admin/consultants/{consultantId}/responses:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuConsultantResponsesAdmin
+      summary: Get a consultant's KTU responses (admin)
+      description: Returns all KTU feedback responses for a specific consultant. Admin only.
+      parameters:
+        - name: consultantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: roundId
+          in: query
+          required: false
+          description: Optional round ID to filter responses
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of consultant's responses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuResponseSummary'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Consultant not found
+
+  /ktu/responses/{responseId}:
+    put:
+      tags:
+        - Ktu
+      operationId: updateKtuResponse
+      summary: Update a KTU response
+      description: Update rating or text value for a specific response (admin only)
+      parameters:
+        - name: responseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtuResponse'
+      responses:
+        '200':
+          description: Response updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuQuestionResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Response not found
+    delete:
+      tags:
+        - Ktu
+      operationId: deleteKtuResponse
+      summary: Delete a KTU response
+      description: Delete a specific response (admin only)
+      parameters:
+        - name: responseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Response deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Response not found
+
+  /ktu/invitations/{invitationId}:
+    put:
+      tags:
+        - Ktu
+      operationId: updateKtuInvitation
+      summary: Update a KTU invitation
+      description: Update status and dates for a specific invitation (admin only)
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtuInvitation'
+      responses:
+        '200':
+          description: Invitation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuInvitation'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Invitation not found
+    delete:
+      tags:
+        - Ktu
+      operationId: deleteKtuInvitation
+      summary: Delete a KTU invitation
+      description: Delete a specific invitation and all its responses (admin only)
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Invitation deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Invitation not found
+
+  # Public survey endpoints (no authentication required)
+  /ktu/survey/{token}:
+    get:
+      tags:
+        - KtuPublic
+      operationId: getPublicSurvey
+      summary: Get survey for respondent
+      description: Get survey information and questions for a respondent using their unique token. No authentication required.
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Survey information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicSurveyData'
+        '404':
+          description: Survey not found or expired
+        '410':
+          description: Survey already completed
+
+  /ktu/survey/{token}/responses:
+    post:
+      tags:
+        - KtuPublic
+      operationId: submitPublicSurveyResponses
+      summary: Submit survey responses
+      description: Submit responses for a survey. No authentication required.
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitSurveyResponses'
+      responses:
+        '201':
+          description: Responses submitted successfully
+        '400':
+          description: Invalid responses
+        '404':
+          description: Survey not found or expired
+        '409':
+          description: Survey already completed
+
+  /ktu/public/company-trends:
+    get:
+      tags:
+        - KtuPublic
+      operationId: getPublicCompanyTrends
+      summary: Get public company KTU trends
+      description: Get company-wide KTU trend statistics. No authentication required. Intended for public display.
+      security: []
+      responses:
+        '200':
+          description: Company trend statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuCompanyTrendStatistics'
+
 components:
   schemas:
     Customer:
@@ -4320,3 +6297,1531 @@ components:
         - won
         - lost
         - benchWeeks
+    # KTU (Customer Satisfaction Survey) Schemas
+
+    KtuRoundStatus:
+      type: string
+      enum:
+        - DRAFT
+        - OPEN
+        - CLOSED
+      description: Status of a KTU survey round
+
+    KtuColorTheme:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          description: Display name of the theme
+        headerBgColor:
+          type: string
+          description: Background color for header (hex format)
+        primaryColor:
+          type: string
+          description: Primary/accent color for buttons etc (hex format)
+        accentBgColor:
+          type: string
+          description: Background color for accent boxes (hex format)
+        isDefault:
+          type: boolean
+          description: Whether this is the default theme
+      required:
+        - id
+        - name
+        - headerBgColor
+        - primaryColor
+        - accentBgColor
+
+    CreateKtuColorTheme:
+      type: object
+      properties:
+        name:
+          type: string
+        headerBgColor:
+          type: string
+        primaryColor:
+          type: string
+        accentBgColor:
+          type: string
+        isDefault:
+          type: boolean
+      required:
+        - name
+        - headerBgColor
+        - primaryColor
+        - accentBgColor
+
+    UpdateKtuColorTheme:
+      type: object
+      properties:
+        name:
+          type: string
+        headerBgColor:
+          type: string
+        primaryColor:
+          type: string
+        accentBgColor:
+          type: string
+        isDefault:
+          type: boolean
+
+    KtuQuestionType:
+      type: string
+      enum:
+        - RATING_1_6
+        - FREE_TEXT
+      description: Type of KTU question
+
+    KtuRound:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        year:
+          type: integer
+        status:
+          $ref: '#/components/schemas/KtuRoundStatus'
+        openDate:
+          type: string
+          format: date
+        closeDate:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        # Appearance configuration
+        logoUrl:
+          type: string
+          description: URL to custom logo for this survey
+        colorTheme:
+          $ref: '#/components/schemas/KtuColorTheme'
+        introText:
+          type: string
+          description: Welcome/intro text shown at top of survey
+        instructionText:
+          type: string
+          description: Instructions shown before questions
+        ratingLabelLow:
+          type: string
+          description: Label for low rating (e.g., "1 - Very dissatisfied")
+        ratingLabelHigh:
+          type: string
+          description: Label for high rating (e.g., "6 - Very satisfied")
+        thankYouTitle:
+          type: string
+          description: Thank you page title
+        thankYouMessage:
+          type: string
+          description: Thank you page message
+        commentFieldLabel:
+          type: string
+          description: Label for comment/text input fields
+        # Import statistics
+        manualSentCount:
+          type: integer
+          description: Manual count of sent invitations for imported surveys (used when invitations aren't tracked individually)
+      required:
+        - id
+        - name
+        - year
+        - status
+
+    CreateKtuRound:
+      type: object
+      properties:
+        name:
+          type: string
+        year:
+          type: integer
+        openDate:
+          type: string
+          format: date
+        closeDate:
+          type: string
+          format: date
+      required:
+        - name
+        - year
+
+    UpdateKtuRound:
+      type: object
+      properties:
+        name:
+          type: string
+        openDate:
+          type: string
+          format: date
+        closeDate:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/KtuRoundStatus'
+        # Appearance configuration
+        colorThemeId:
+          type: integer
+          format: int64
+          description: ID of the color theme to use
+        introText:
+          type: string
+          description: Welcome/intro text shown at top of survey
+        instructionText:
+          type: string
+          description: Instructions shown before questions
+        ratingLabelLow:
+          type: string
+          description: Label for low rating
+        ratingLabelHigh:
+          type: string
+          description: Label for high rating
+        thankYouTitle:
+          type: string
+          description: Thank you page title
+        thankYouMessage:
+          type: string
+          description: Thank you page message
+        commentFieldLabel:
+          type: string
+          description: Label for comment/text input fields
+        # Import statistics
+        manualSentCount:
+          type: integer
+          description: Manual count of sent invitations for imported surveys
+
+    CreateKtuTestSurvey:
+      type: object
+      description: Request to create a test survey invitation
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address to send the test invitation to. If not provided, no email is sent but the survey URL is returned.
+        consultantName:
+          type: string
+          description: Name to use for the consultant in the test. Defaults to 'Test Konsulent'.
+        contactName:
+          type: string
+          description: Name to use for the customer contact in the test. Defaults to 'Test Kontakt'.
+        organizationName:
+          type: string
+          description: Name to use for the organization in the test. Defaults to 'Test Kunde AS'.
+
+    KtuTestSurveyResult:
+      type: object
+      properties:
+        surveyUrl:
+          type: string
+          description: The full URL to access the test survey
+        token:
+          type: string
+          description: The invitation token used in the URL
+        emailSent:
+          type: boolean
+          description: Whether an email was sent (true if email address was provided)
+        emailSentTo:
+          type: string
+          description: The email address the invitation was sent to (if applicable)
+        expiresAt:
+          type: string
+          format: date-time
+          description: When this test invitation will expire
+      required:
+        - surveyUrl
+        - token
+        - emailSent
+
+    KtuCustomerOrganization:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        organizationNumber:
+          type: string
+        active:
+          type: boolean
+        contactCount:
+          type: integer
+          description: Number of contacts in this organization
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - active
+
+    CreateKtuOrganization:
+      type: object
+      properties:
+        name:
+          type: string
+        organizationNumber:
+          type: string
+      required:
+        - name
+
+    UpdateKtuOrganization:
+      type: object
+      properties:
+        name:
+          type: string
+        organizationNumber:
+          type: string
+        active:
+          type: boolean
+
+    KtuCustomerContact:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        title:
+          type: string
+        organizationId:
+          type: integer
+          format: int64
+        organizationName:
+          type: string
+        active:
+          type: boolean
+        optedOut:
+          type: boolean
+        optedOutAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - organizationId
+        - active
+        - optedOut
+
+    CreateKtuContact:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        title:
+          type: string
+        organizationId:
+          type: integer
+          format: int64
+      required:
+        - name
+        - organizationId
+
+    UpdateKtuContact:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        title:
+          type: string
+        organizationId:
+          type: integer
+          format: int64
+        active:
+          type: boolean
+        optedOut:
+          type: boolean
+
+    KtuQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        textNo:
+          type: string
+        textEn:
+          type: string
+        questionType:
+          $ref: '#/components/schemas/KtuQuestionType'
+        category:
+          type: string
+        displayOrder:
+          type: integer
+        active:
+          type: boolean
+        required:
+          type: boolean
+      required:
+        - id
+        - code
+        - textNo
+        - questionType
+        - category
+        - displayOrder
+        - active
+        - required
+
+    CreateKtuQuestion:
+      type: object
+      description: Request to create a new KTU question
+      properties:
+        code:
+          type: string
+          description: Unique code for the question (e.g., Q14, CUSTOM1)
+        textNo:
+          type: string
+          description: Question text in Norwegian
+        textEn:
+          type: string
+          description: Question text in English (optional)
+        questionType:
+          $ref: '#/components/schemas/KtuQuestionType'
+        category:
+          type: string
+          description: Question category (e.g., Leveranse, Kommunikasjon)
+        displayOrder:
+          type: integer
+          description: Display order in the survey
+        required:
+          type: boolean
+          default: true
+          description: Whether the question is required
+      required:
+        - code
+        - textNo
+        - questionType
+        - category
+        - displayOrder
+
+    UpdateKtuQuestion:
+      type: object
+      description: Request to update a KTU question
+      properties:
+        code:
+          type: string
+        textNo:
+          type: string
+        textEn:
+          type: string
+        questionType:
+          $ref: '#/components/schemas/KtuQuestionType'
+        category:
+          type: string
+        displayOrder:
+          type: integer
+        active:
+          type: boolean
+        required:
+          type: boolean
+
+    KtuRoundQuestion:
+      type: object
+      description: A question configured for a specific round
+      properties:
+        id:
+          type: integer
+          format: int64
+        roundId:
+          type: integer
+          format: int64
+        question:
+          $ref: '#/components/schemas/KtuQuestion'
+        displayOrder:
+          type: integer
+        active:
+          type: boolean
+        commentFieldLabel:
+          type: string
+          description: Custom label for the comment field placeholder (overrides round-level default)
+        customTextNo:
+          type: string
+          description: Custom question text in Norwegian (overrides question.textNo)
+        requiredOverride:
+          type: boolean
+          description: Override for required field. If null, uses question.required. Allows making a required question optional for this round.
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - roundId
+        - question
+        - displayOrder
+        - active
+
+    AddKtuRoundQuestion:
+      type: object
+      description: Request to add a question to a round
+      properties:
+        questionId:
+          type: integer
+          format: int64
+        displayOrder:
+          type: integer
+        active:
+          type: boolean
+          default: true
+      required:
+        - questionId
+        - displayOrder
+
+    UpdateKtuRoundQuestion:
+      type: object
+      description: Request to update a round question
+      properties:
+        displayOrder:
+          type: integer
+        active:
+          type: boolean
+        commentFieldLabel:
+          type: string
+          description: Custom label for the comment field placeholder
+        customTextNo:
+          type: string
+          description: Custom question text in Norwegian (overrides question.textNo)
+        requiredOverride:
+          type: boolean
+          description: Override for required field. Set to false to make a required question optional for this round. Set to null to restore default.
+
+    KtuImportResult:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          description: Whether the import data is valid
+        dryRun:
+          type: boolean
+          description: Whether this was a dry run (no data imported)
+        totalRows:
+          type: integer
+          description: Total number of rows in CSV
+        validRows:
+          type: integer
+          description: Number of valid rows
+        importedResponses:
+          type: integer
+          description: Number of responses imported (0 if dry run)
+        skippedRows:
+          type: integer
+          description: Number of rows skipped
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtuImportError'
+        newOrganizations:
+          type: integer
+          description: Number of new organizations to create/created
+        newContacts:
+          type: integer
+          description: Number of new contacts to create/created
+        roundsToCreate:
+          type: array
+          items:
+            type: string
+          description: Years for which rounds will be created
+        createdRounds:
+          type: integer
+          description: Number of rounds created (0 if dry run)
+        unmatchedConsultants:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnmatchedConsultant'
+          description: Consultants that could not be matched to users, with suggestions
+      required:
+        - valid
+        - dryRun
+        - totalRows
+        - validRows
+
+    UnmatchedConsultant:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The consultant name from CSV that wasn't matched
+        rowCount:
+          type: integer
+          description: Number of rows with this consultant name
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SuggestedMatch'
+          description: Suggested user matches
+      required:
+        - name
+        - rowCount
+        - suggestions
+
+    SuggestedMatch:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        userName:
+          type: string
+        similarity:
+          type: number
+          format: double
+          description: Similarity score (0.0 to 1.0)
+      required:
+        - userId
+        - userName
+        - similarity
+
+    KtuImportError:
+      type: object
+      properties:
+        row:
+          type: integer
+          description: Row number in CSV (1-indexed)
+        field:
+          type: string
+          description: Field name with error
+        value:
+          type: string
+          description: Value that caused the error
+        error:
+          type: string
+          description: Error message in Norwegian
+      required:
+        - row
+        - field
+        - error
+
+    KtuContactsCsvPreview:
+      type: object
+      properties:
+        columns:
+          type: array
+          items:
+            type: string
+          description: Column headers from the CSV file
+        sampleRows:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+          description: Sample data rows
+        totalRows:
+          type: integer
+          description: Total number of data rows
+        delimiter:
+          type: string
+          description: Detected delimiter (comma, semicolon, or TAB)
+        requiredFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtuImportField'
+          description: Fields that need to be mapped
+      required:
+        - columns
+        - sampleRows
+        - totalRows
+        - delimiter
+        - requiredFields
+
+    KtuContactsImportResult:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          description: Whether the import data is valid
+        dryRun:
+          type: boolean
+          description: Whether this was a dry run
+        totalRows:
+          type: integer
+          description: Total number of rows in CSV
+        validRows:
+          type: integer
+          description: Number of valid rows
+        skippedRows:
+          type: integer
+          description: Number of rows skipped
+        createdOrganizations:
+          type: integer
+          description: Number of organizations created
+        createdContacts:
+          type: integer
+          description: Number of contacts created
+        updatedContacts:
+          type: integer
+          description: Number of contacts updated
+        createdAssignments:
+          type: integer
+          description: Number of assignments created (consultant-contact links per round)
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtuImportError'
+        unmatchedConsultants:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnmatchedConsultant'
+      required:
+        - valid
+        - dryRun
+        - totalRows
+        - validRows
+
+    KtuCsvPreview:
+      type: object
+      properties:
+        columns:
+          type: array
+          items:
+            type: string
+          description: Column headers from the CSV file
+        sampleRows:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+          description: Sample data rows (first 3 rows after header)
+        totalRows:
+          type: integer
+          description: Total number of data rows in the file
+        delimiter:
+          type: string
+          description: Detected delimiter (semicolon or comma)
+        requiredFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtuImportField'
+          description: List of fields that need to be mapped
+      required:
+        - columns
+        - sampleRows
+        - totalRows
+        - delimiter
+        - requiredFields
+
+    KtuImportField:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Internal field key used in mapping
+        label:
+          type: string
+          description: Human-readable label in Norwegian
+        required:
+          type: boolean
+          description: Whether this field is required
+        type:
+          type: string
+          enum: [DATE, TEXT, RATING, COMMENT]
+          description: Field type for validation
+      required:
+        - key
+        - label
+        - required
+        - type
+
+    KtuInvitationStatus:
+      type: string
+      enum:
+        - PENDING
+        - SENT
+        - OPENED
+        - RESPONDED
+        - EXPIRED
+
+    KtuAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        roundId:
+          type: integer
+          format: int64
+        consultant:
+          $ref: '#/components/schemas/KtuConsultant'
+        contact:
+          $ref: '#/components/schemas/KtuCustomerContact'
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        hasInvitation:
+          type: boolean
+          description: Whether an invitation has been created for this assignment
+      required:
+        - id
+        - roundId
+        - consultant
+        - contact
+        - createdAt
+        - hasInvitation
+
+    CreateKtuAssignment:
+      type: object
+      properties:
+        consultantId:
+          type: integer
+          format: int64
+          description: ID of the user to assign as consultant
+        contactId:
+          type: integer
+          format: int64
+          description: ID of the customer contact
+        notes:
+          type: string
+          description: Optional notes about the assignment
+      required:
+        - consultantId
+        - contactId
+
+    KtuInvitation:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        assignmentId:
+          type: integer
+          format: int64
+        consultant:
+          $ref: '#/components/schemas/KtuConsultant'
+        contact:
+          $ref: '#/components/schemas/KtuCustomerContact'
+        organization:
+          $ref: '#/components/schemas/KtuCustomerOrganization'
+        status:
+          $ref: '#/components/schemas/KtuInvitationStatus'
+        sentAt:
+          type: string
+          format: date-time
+        openedAt:
+          type: string
+          format: date-time
+        respondedAt:
+          type: string
+          format: date-time
+        reminderCount:
+          type: integer
+        expiresAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - assignmentId
+        - consultant
+        - contact
+        - organization
+        - status
+        - reminderCount
+        - createdAt
+
+    UpdateKtuInvitation:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/KtuInvitationStatus'
+        sentAt:
+          type: string
+          format: date-time
+        openedAt:
+          type: string
+          format: date-time
+        respondedAt:
+          type: string
+          format: date-time
+      description: All fields are optional. Only provided fields will be updated.
+
+    UpdateKtuResponse:
+      type: object
+      properties:
+        ratingValue:
+          type: integer
+          minimum: 1
+          maximum: 6
+          description: Rating value (1-6) for rating questions
+        textValue:
+          type: string
+          description: Text response for free-text questions or comments
+      description: Update rating or text value for a response. Both fields are optional.
+
+    # Public survey schemas (for respondents)
+    SurveyAppearance:
+      type: object
+      description: Appearance configuration for public survey
+      properties:
+        logoUrl:
+          type: string
+          description: URL to custom logo
+        headerBgColor:
+          type: string
+          description: Header background color (hex)
+        primaryColor:
+          type: string
+          description: Primary/accent color (hex)
+        accentBgColor:
+          type: string
+          description: Accent box background color (hex)
+        introText:
+          type: string
+          description: Welcome/intro text
+        instructionText:
+          type: string
+          description: Instructions before questions
+        ratingLabelLow:
+          type: string
+          description: Label for rating 1
+        ratingLabelHigh:
+          type: string
+          description: Label for rating 6
+        thankYouTitle:
+          type: string
+          description: Thank you page title
+        thankYouMessage:
+          type: string
+          description: Thank you page message
+        commentFieldLabel:
+          type: string
+          description: Label for text input fields
+      required:
+        - headerBgColor
+        - primaryColor
+        - accentBgColor
+
+    PublicSurveyData:
+      type: object
+      properties:
+        surveyName:
+          type: string
+          description: Name of the survey round
+        year:
+          type: integer
+          description: Year of the survey
+        consultantName:
+          type: string
+          description: Name of the consultant being evaluated
+        organizationName:
+          type: string
+          description: Name of the customer organization
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicSurveyQuestion'
+        alreadyResponded:
+          type: boolean
+          description: Whether the survey has already been completed
+        appearance:
+          $ref: '#/components/schemas/SurveyAppearance'
+      required:
+        - surveyName
+        - year
+        - consultantName
+        - organizationName
+        - questions
+        - alreadyResponded
+        - appearance
+
+    PublicSurveyQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Question ID
+        code:
+          type: string
+          description: Question code
+        text:
+          type: string
+          description: Question text (in Norwegian)
+        questionType:
+          $ref: '#/components/schemas/KtuQuestionType'
+        category:
+          type: string
+          description: Question category
+        displayOrder:
+          type: integer
+          description: Order in which to display the question
+        required:
+          type: boolean
+          description: Whether the question is required
+        commentFieldLabel:
+          type: string
+          description: Custom placeholder text for comment/text input field (for FREE_TEXT questions)
+      required:
+        - id
+        - code
+        - text
+        - questionType
+        - category
+        - displayOrder
+        - required
+
+    SubmitSurveyResponses:
+      type: object
+      properties:
+        responses:
+          type: array
+          items:
+            $ref: '#/components/schemas/SurveyResponseItem'
+      required:
+        - responses
+
+    SurveyResponseItem:
+      type: object
+      properties:
+        questionId:
+          type: integer
+          format: int64
+          description: ID of the question being answered
+        ratingValue:
+          type: integer
+          minimum: 1
+          maximum: 6
+          description: Rating value (1-6) for RATING type questions
+        textValue:
+          type: string
+          description: Text response for FREE_TEXT type questions
+      required:
+        - questionId
+
+    KtuConsultant:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+      required:
+        - id
+        - name
+
+    UserSyncResult:
+      type: object
+      properties:
+        totalFromFlowcase:
+          type: integer
+          description: Total users fetched from Flowcase
+        created:
+          type: integer
+          description: Number of new users created
+        updated:
+          type: integer
+          description: Number of existing users updated
+        skipped:
+          type: integer
+          description: Number of users skipped (already up to date)
+        errors:
+          type: array
+          items:
+            type: string
+          description: Error messages if any
+
+    ConsultantAlias:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        aliasName:
+          type: string
+          description: The alternative/old name
+        userId:
+          type: integer
+          format: int64
+          nullable: true
+          description: The user ID (null if this is an ignored/former employee)
+        userName:
+          type: string
+          nullable: true
+          description: The current user name (null if this is an ignored/former employee)
+        ignored:
+          type: boolean
+          description: True if this alias is for a former employee whose rows should be skipped
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - aliasName
+        - ignored
+
+    CreateConsultantAliasRequest:
+      type: object
+      properties:
+        aliasName:
+          type: string
+          description: The alternative name to map (e.g., old name or former employee name)
+        userId:
+          type: integer
+          format: int64
+          nullable: true
+          description: The user ID to map to (omit or null to create an ignore alias for former employees)
+      required:
+        - aliasName
+
+    KtuUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+      required:
+        - id
+        - name
+
+    KtuSendInvitationsResult:
+      type: object
+      properties:
+        sentCount:
+          type: integer
+          description: Number of invitations sent
+        skippedCount:
+          type: integer
+          description: Number of assignments skipped (already have invitation or no email)
+        errors:
+          type: array
+          items:
+            type: string
+          description: Error messages for failed sends
+      required:
+        - sentCount
+        - skippedCount
+        - errors
+
+    KtuSendRemindersResult:
+      type: object
+      properties:
+        sentCount:
+          type: integer
+          description: Number of reminders sent
+        skippedCount:
+          type: integer
+          description: Number of invitations skipped (already responded or no email)
+        errors:
+          type: array
+          items:
+            type: string
+          description: Error messages for failed sends
+      required:
+        - sentCount
+        - skippedCount
+        - errors
+
+    KtuEmailPreview:
+      type: object
+      properties:
+        subject:
+          type: string
+          description: Email subject line
+        html:
+          type: string
+          description: Rendered HTML content of the email
+        type:
+          type: string
+          enum: [invitation, reminder]
+          description: Type of email being previewed
+      required:
+        - subject
+        - html
+        - type
+
+    KtuRoundStatistics:
+      type: object
+      properties:
+        roundId:
+          type: integer
+          format: int64
+        roundName:
+          type: string
+        totalInvitations:
+          type: integer
+          description: Total number of invitations sent
+        totalResponses:
+          type: integer
+          description: Total number of completed responses
+        responseRate:
+          type: number
+          format: double
+          description: Response rate as percentage (0-100)
+        averageScore:
+          type: number
+          format: double
+          description: Average score across all rating questions (1-6 scale)
+        consultantCount:
+          type: integer
+          description: Number of consultants with at least one response
+        organizationCount:
+          type: integer
+          description: Number of organizations that responded
+        scoreDistribution:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Distribution of scores (key is score 1-6, value is count)
+        invitationsByStatus:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Count of invitations by status (PENDING, SENT, OPENED, RESPONDED, EXPIRED)
+        questionStatistics:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtuQuestionStatistics'
+          description: Statistics per question
+      required:
+        - roundId
+        - roundName
+        - totalInvitations
+        - totalResponses
+        - responseRate
+        - consultantCount
+        - organizationCount
+
+    KtuQuestionStatistics:
+      type: object
+      properties:
+        questionId:
+          type: integer
+          format: int64
+        questionCode:
+          type: string
+        questionText:
+          type: string
+        averageScore:
+          type: number
+          format: double
+        responseCount:
+          type: integer
+        scoreDistribution:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Distribution of scores for this question (key is score 1-6, value is count)
+      required:
+        - questionId
+        - questionCode
+        - questionText
+        - responseCount
+
+    KtuResponseSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        roundId:
+          type: integer
+          format: int64
+          description: The survey round ID
+        roundName:
+          type: string
+          description: The survey round name
+        year:
+          type: integer
+          description: The year of the survey round
+        consultantId:
+          type: integer
+          format: int64
+        consultantName:
+          type: string
+        organizationId:
+          type: integer
+          format: int64
+        organizationName:
+          type: string
+        contactId:
+          type: integer
+          format: int64
+        contactName:
+          type: string
+        contactEmail:
+          type: string
+        averageScore:
+          type: number
+          format: double
+          description: Average score for this response (across all rating questions)
+        respondedAt:
+          type: string
+          format: date-time
+        questionResponses:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtuQuestionResponse'
+      required:
+        - id
+        - consultantName
+        - organizationName
+        - contactName
+
+    KtuQuestionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The response record ID (used for updates/deletes)
+        questionId:
+          type: integer
+          format: int64
+        questionCode:
+          type: string
+        questionText:
+          type: string
+        questionType:
+          $ref: '#/components/schemas/KtuQuestionType'
+        ratingValue:
+          type: integer
+          description: Rating value (1-6) for rating questions
+        textValue:
+          type: string
+          description: Text response for free-text questions
+      required:
+        - id
+        - questionId
+        - questionCode
+        - questionText
+        - questionType
+
+    KtuConsultantStatistics:
+      type: object
+      properties:
+        consultantId:
+          type: integer
+          format: int64
+        consultantName:
+          type: string
+        responseCount:
+          type: integer
+          description: Number of responses for this consultant
+        averageScore:
+          type: number
+          format: double
+          description: Average score across all rating questions
+        organizationCount:
+          type: integer
+          description: Number of unique organizations that responded
+        scoreDistribution:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Distribution of scores for this consultant
+      required:
+        - consultantId
+        - consultantName
+        - responseCount
+        - organizationCount
+
+    KtuYearlyStatistics:
+      type: object
+      properties:
+        year:
+          type: integer
+        roundId:
+          type: integer
+          format: int64
+        roundName:
+          type: string
+        totalResponses:
+          type: integer
+        responseRate:
+          type: number
+          format: double
+        averageScore:
+          type: number
+          format: double
+        consultantCount:
+          type: integer
+        organizationCount:
+          type: integer
+      required:
+        - year
+        - roundId
+        - roundName
+        - totalResponses
+        - responseRate
+        - consultantCount
+        - organizationCount
+
+    KtuQuestionTrend:
+      type: object
+      properties:
+        questionId:
+          type: integer
+          format: int64
+        questionCode:
+          type: string
+        questionText:
+          type: string
+        yearlyAverages:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+          description: Map of year to average score
+        yearlyResponseCounts:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Map of year to number of responses
+      required:
+        - questionId
+        - questionCode
+        - questionText
+        - yearlyAverages
+
+    KtuCompanyTrendStatistics:
+      type: object
+      properties:
+        yearlyStatistics:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtuYearlyStatistics'
+        questionTrends:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtuQuestionTrend'
+        overallTrend:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+          description: Map of year to overall average score
+      required:
+        - yearlyStatistics
+        - questionTrends
+        - overallTrend
+
+    KtuConsultantYearData:
+      type: object
+      properties:
+        responseCount:
+          type: integer
+        averageScore:
+          type: number
+          format: double
+        organizationCount:
+          type: integer
+      required:
+        - responseCount
+        - organizationCount
+
+    KtuConsultantYearlyStats:
+      type: object
+      properties:
+        consultantId:
+          type: integer
+          format: int64
+        consultantName:
+          type: string
+        email:
+          type: string
+        yearlyData:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/KtuConsultantYearData'
+          description: Map of year to consultant data for that year
+      required:
+        - consultantId
+        - consultantName
+        - yearlyData
+
+    KtuConsultantOwnStatistics:
+      type: object
+      description: Statistics for a consultant's own KTU results
+      properties:
+        totalResponses:
+          type: integer
+          description: Total number of feedback responses received across all rounds
+        averageScore:
+          type: number
+          format: double
+          description: Overall average score across all rounds
+        roundsParticipated:
+          type: integer
+          description: Number of rounds the consultant has received feedback in
+        currentYearStats:
+          $ref: '#/components/schemas/KtuConsultantYearData'
+          description: Statistics for the current year (may be null if no data)
+        previousYearStats:
+          $ref: '#/components/schemas/KtuConsultantYearData'
+          description: Statistics for the previous year (may be null if no data)
+        questionAverages:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtuQuestionAverage'
+          description: Average score per question across all rounds
+      required:
+        - totalResponses
+        - roundsParticipated
+        - questionAverages
+
+    KtuQuestionAverage:
+      type: object
+      description: Average score for a specific question across all responses
+      properties:
+        questionId:
+          type: integer
+          format: int64
+        questionCode:
+          type: string
+        questionText:
+          type: string
+        category:
+          type: string
+          description: Question category for grouping
+        averageScore:
+          type: number
+          format: double
+        responseCount:
+          type: integer
+          description: Number of responses for this question
+      required:
+        - questionId
+        - questionCode
+        - questionText
+        - responseCount

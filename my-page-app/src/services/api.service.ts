@@ -47,7 +47,11 @@ import {
   type CreateInformationNotice,
   type Setting,
 } from '@/data/types/types.gen'
-import '@/services/openapi-client' // Ensure client is configured
+
+// Conditionally import openapi-client only in browser environment
+if (typeof window !== 'undefined') {
+  import('@/services/openapi-client')
+}
 
 export const API_URL = '/api/'
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- KTU Module: Add per-question customization fields to ktu_round_question -->
+
+    <changeSet id="300.009-1" author="claude">
+        <comment>Add comment_field_label column to ktu_round_question for per-question customization of comment field placeholder text</comment>
+        <addColumn tableName="ktu_round_question">
+            <column name="comment_field_label" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="300.009-2" author="claude">
+        <comment>Add custom_text_no column to ktu_round_question for per-question customization of question text</comment>
+        <addColumn tableName="ktu_round_question">
+            <column name="custom_text_no" type="VARCHAR(500)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
