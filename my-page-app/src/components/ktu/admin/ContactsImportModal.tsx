@@ -227,23 +227,35 @@ export default function ContactsImportModal({ onClose, onImportComplete }: Props
 
               {/* Mapping */}
               <div className="grid grid-cols-2 gap-4">
-                {preview.requiredFields?.map((field: KtuImportField) => (
-                  <div key={field.key}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {field.label} {field.required && <span className="text-red-500">*</span>}
-                    </label>
-                    <select
-                      value={columnMapping[field.key] ?? ''}
-                      onChange={(e) => handleMappingChange(field.key, e.target.value === '' ? null : parseInt(e.target.value))}
-                      className="w-full border rounded px-3 py-2 text-sm"
-                    >
-                      <option value="">{field.required ? '-- Velg --' : '-- Ingen --'}</option>
-                      {preview.columns.map((col, idx) => (
-                        <option key={idx} value={idx}>{idx}: {col || '(tom)'}</option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
+                {preview.requiredFields?.map((field: KtuImportField) => {
+                  const selectedIdx = columnMapping[field.key]
+                  const hasSelection = typeof selectedIdx === 'number'
+                  const selectedColName = hasSelection ? preview.columns[selectedIdx] : null
+                  return (
+                    <div key={field.key}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {field.label} {field.required && <span className="text-red-500">*</span>}
+                      </label>
+                      {hasSelection && (
+                        <p className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded break-words mb-1">
+                          {selectedColName || '(tom header)'}
+                        </p>
+                      )}
+                      <select
+                        value={columnMapping[field.key] ?? ''}
+                        onChange={(e) => handleMappingChange(field.key, e.target.value === '' ? null : parseInt(e.target.value))}
+                        className={`w-full border rounded px-3 py-2 text-sm ${
+                          hasSelection ? 'border-green-300 bg-green-50' : ''
+                        }`}
+                      >
+                        <option value="">{field.required ? '-- Velg --' : '-- Ingen --'}</option>
+                        {preview.columns.map((col, idx) => (
+                          <option key={idx} value={idx}>[{idx}] {col || '(tom)'}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )
+                })}
               </div>
 
               {/* Year input */}

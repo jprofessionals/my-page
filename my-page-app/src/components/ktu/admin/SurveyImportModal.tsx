@@ -245,25 +245,39 @@ export default function SurveyImportModal({ onClose, onImportComplete }: Props) 
 
               {/* Mapping */}
               <div className="grid grid-cols-3 gap-3">
-                {preview.requiredFields?.map((field: KtuImportField) => (
-                  <div key={field.key}>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      {field.label} {field.required && <span className="text-red-500">*</span>}
-                    </label>
-                    <select
-                      value={columnMapping[field.key] ?? ''}
-                      onChange={(e) => handleMappingChange(field.key, e.target.value === '' ? null : parseInt(e.target.value))}
-                      className={`w-full border rounded px-2 py-1 text-sm ${
-                        field.required && columnMapping[field.key] === null ? 'border-red-300 bg-red-50' : ''
-                      }`}
-                    >
-                      <option value="">{field.required ? '-- Velg --' : '-- Ingen --'}</option>
-                      {preview.columns.map((col, idx) => (
-                        <option key={idx} value={idx}>{idx}: {col?.substring(0, 20) || '(tom)'}</option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
+                {preview.requiredFields?.map((field: KtuImportField) => {
+                  const selectedIdx = columnMapping[field.key]
+                  const hasSelection = typeof selectedIdx === 'number'
+                  const selectedColName = hasSelection ? preview.columns[selectedIdx] : null
+                  return (
+                    <div key={field.key}>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        {field.label} {field.required && <span className="text-red-500">*</span>}
+                      </label>
+                      {hasSelection && (
+                        <p className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded break-words mb-1">
+                          {selectedColName || '(tom header)'}
+                        </p>
+                      )}
+                      <select
+                        value={columnMapping[field.key] ?? ''}
+                        onChange={(e) => handleMappingChange(field.key, e.target.value === '' ? null : parseInt(e.target.value))}
+                        className={`w-full border rounded px-2 py-1 text-sm ${
+                          field.required && !hasSelection
+                            ? 'border-red-300 bg-red-50'
+                            : hasSelection
+                              ? 'border-green-300 bg-green-50'
+                              : ''
+                        }`}
+                      >
+                        <option value="">{field.required ? '-- Velg --' : '-- Ingen --'}</option>
+                        {preview.columns.map((col, idx) => (
+                          <option key={idx} value={idx}>[{idx}] {col || '(tom)'}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )
+                })}
               </div>
 
               <label className="flex items-center gap-2 text-sm">
