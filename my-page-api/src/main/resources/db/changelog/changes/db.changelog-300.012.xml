@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="update-jpro-theme-to-white-header" author="claude">
+        <comment>Update JPro Oransje theme to use white header for logo visibility</comment>
+        <update tableName="ktu_color_theme">
+            <column name="header_bg_color" value="#ffffff"/>
+            <where>name = 'JPro Oransje'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

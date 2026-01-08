@@ -29,6 +29,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'cvpartner-images.s3.eu-west-1.amazonaws.com',
+      },
     ],
   },
 }

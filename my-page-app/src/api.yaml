@@ -2464,53 +2464,180 @@ paths:
         '500':
           description: Internal server error
 
-  # KTI (Customer Satisfaction Survey) Endpoints
+  # KTU (Customer Satisfaction Survey) Endpoints
 
-  /kti/rounds:
+  /ktu/color-themes:
     get:
       tags:
-        - Kti
-      operationId: getKtiRounds
-      summary: Get all KTI survey rounds
-      description: Returns all KTI survey rounds, optionally filtered by status
-      parameters:
-        - name: status
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/KtiRoundStatus'
+        - Ktu
+      operationId: getKtuColorThemes
+      summary: Get all color themes
+      description: Returns all available color themes for KTU surveys
       responses:
         '200':
-          description: List of KTI rounds
+          description: List of color themes
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiRound'
+                  $ref: '#/components/schemas/KtuColorTheme'
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - Ktu
+      operationId: createKtuColorTheme
+      summary: Create a new color theme
+      description: Creates a new color theme. Requires admin access.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtuColorTheme'
+      responses:
+        '201':
+          description: Color theme created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuColorTheme'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+
+  /ktu/color-themes/{themeId}:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuColorTheme
+      summary: Get a color theme by ID
+      parameters:
+        - name: themeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Color theme
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuColorTheme'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Theme not found
+    put:
+      tags:
+        - Ktu
+      operationId: updateKtuColorTheme
+      summary: Update a color theme
+      description: Updates a color theme. Requires admin access.
+      parameters:
+        - name: themeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtuColorTheme'
+      responses:
+        '200':
+          description: Color theme updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuColorTheme'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Theme not found
+    delete:
+      tags:
+        - Ktu
+      operationId: deleteKtuColorTheme
+      summary: Delete a color theme
+      description: Deletes a color theme. Requires admin access. Cannot delete if in use.
+      parameters:
+        - name: themeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Color theme deleted successfully
+        '400':
+          description: Cannot delete - theme is in use
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Theme not found
+
+  /ktu/rounds:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuRounds
+      summary: Get all KTU survey rounds
+      description: Returns all KTU survey rounds, optionally filtered by status
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/KtuRoundStatus'
+      responses:
+        '200':
+          description: List of KTU rounds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtuRound'
         '401':
           description: Unauthorized
         '500':
           description: Internal server error
     post:
       tags:
-        - Kti
-      operationId: createKtiRound
-      summary: Create a new KTI survey round
-      description: Creates a new KTI survey round. Requires admin access.
+        - Ktu
+      operationId: createKtuRound
+      summary: Create a new KTU survey round
+      description: Creates a new KTU survey round. Requires admin access.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateKtiRound'
+              $ref: '#/components/schemas/CreateKtuRound'
       responses:
         '201':
-          description: KTI round created successfully
+          description: KTU round created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiRound'
+                $ref: '#/components/schemas/KtuRound'
         '400':
           description: Bad request
         '401':
@@ -2520,12 +2647,12 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/rounds/{roundId}:
+  /ktu/rounds/{roundId}:
     get:
       tags:
-        - Kti
-      operationId: getKtiRound
-      summary: Get a KTI round by ID
+        - Ktu
+      operationId: getKtuRound
+      summary: Get a KTU round by ID
       parameters:
         - name: roundId
           in: path
@@ -2535,11 +2662,11 @@ paths:
             format: int64
       responses:
         '200':
-          description: KTI round details
+          description: KTU round details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiRound'
+                $ref: '#/components/schemas/KtuRound'
         '401':
           description: Unauthorized
         '404':
@@ -2548,9 +2675,9 @@ paths:
           description: Internal server error
     put:
       tags:
-        - Kti
-      operationId: updateKtiRound
-      summary: Update a KTI round
+        - Ktu
+      operationId: updateKtuRound
+      summary: Update a KTU round
       parameters:
         - name: roundId
           in: path
@@ -2563,14 +2690,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateKtiRound'
+              $ref: '#/components/schemas/UpdateKtuRound'
       responses:
         '200':
-          description: KTI round updated successfully
+          description: KTU round updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiRound'
+                $ref: '#/components/schemas/KtuRound'
         '400':
           description: Bad request
         '401':
@@ -2583,9 +2710,9 @@ paths:
           description: Internal server error
     delete:
       tags:
-        - Kti
-      operationId: deleteKtiRound
-      summary: Delete a KTI round
+        - Ktu
+      operationId: deleteKtuRound
+      summary: Delete a KTU round
       parameters:
         - name: roundId
           in: path
@@ -2595,7 +2722,7 @@ paths:
             format: int64
       responses:
         '204':
-          description: KTI round deleted successfully
+          description: KTU round deleted successfully
         '401':
           description: Unauthorized
         '403':
@@ -2605,11 +2732,82 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/organizations:
+  /ktu/rounds/{roundId}/logo:
+    post:
+      tags:
+        - Ktu
+      operationId: uploadKtuRoundLogo
+      summary: Upload a logo for a KTU round
+      description: Uploads a logo image for the survey. Only allowed when round is in DRAFT status.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Logo image file (PNG, JPG, SVG)
+              required:
+                - file
+      responses:
+        '200':
+          description: Logo uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuRound'
+        '400':
+          description: Invalid file type or round not in DRAFT status
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+    delete:
+      tags:
+        - Ktu
+      operationId: deleteKtuRoundLogo
+      summary: Delete the logo for a KTU round
+      description: Deletes the logo for a survey. Only allowed when round is in DRAFT status.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Logo deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuRound'
+        '400':
+          description: Round not in DRAFT status
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+
+  /ktu/organizations:
     get:
       tags:
-        - Kti
-      operationId: getKtiOrganizations
+        - Ktu
+      operationId: getKtuOrganizations
       summary: Get all customer organizations
       parameters:
         - name: activeOnly
@@ -2626,29 +2824,29 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiCustomerOrganization'
+                  $ref: '#/components/schemas/KtuCustomerOrganization'
         '401':
           description: Unauthorized
         '500':
           description: Internal server error
     post:
       tags:
-        - Kti
-      operationId: createKtiOrganization
+        - Ktu
+      operationId: createKtuOrganization
       summary: Create a customer organization
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateKtiOrganization'
+              $ref: '#/components/schemas/CreateKtuOrganization'
       responses:
         '201':
           description: Organization created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiCustomerOrganization'
+                $ref: '#/components/schemas/KtuCustomerOrganization'
         '400':
           description: Bad request
         '401':
@@ -2658,11 +2856,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/organizations/{organizationId}:
+  /ktu/organizations/{organizationId}:
     get:
       tags:
-        - Kti
-      operationId: getKtiOrganization
+        - Ktu
+      operationId: getKtuOrganization
       summary: Get a customer organization by ID
       parameters:
         - name: organizationId
@@ -2677,7 +2875,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiCustomerOrganization'
+                $ref: '#/components/schemas/KtuCustomerOrganization'
         '401':
           description: Unauthorized
         '404':
@@ -2686,8 +2884,8 @@ paths:
           description: Internal server error
     put:
       tags:
-        - Kti
-      operationId: updateKtiOrganization
+        - Ktu
+      operationId: updateKtuOrganization
       summary: Update a customer organization
       parameters:
         - name: organizationId
@@ -2701,14 +2899,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateKtiOrganization'
+              $ref: '#/components/schemas/UpdateKtuOrganization'
       responses:
         '200':
           description: Organization updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiCustomerOrganization'
+                $ref: '#/components/schemas/KtuCustomerOrganization'
         '400':
           description: Bad request
         '401':
@@ -2720,11 +2918,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/contacts:
+  /ktu/contacts:
     get:
       tags:
-        - Kti
-      operationId: getKtiContacts
+        - Ktu
+      operationId: getKtuContacts
       summary: Get all customer contacts
       parameters:
         - name: organizationId
@@ -2748,29 +2946,29 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiCustomerContact'
+                  $ref: '#/components/schemas/KtuCustomerContact'
         '401':
           description: Unauthorized
         '500':
           description: Internal server error
     post:
       tags:
-        - Kti
-      operationId: createKtiContact
+        - Ktu
+      operationId: createKtuContact
       summary: Create a customer contact
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateKtiContact'
+              $ref: '#/components/schemas/CreateKtuContact'
       responses:
         '201':
           description: Contact created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiCustomerContact'
+                $ref: '#/components/schemas/KtuCustomerContact'
         '400':
           description: Bad request
         '401':
@@ -2780,11 +2978,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/contacts/{contactId}:
+  /ktu/contacts/{contactId}:
     get:
       tags:
-        - Kti
-      operationId: getKtiContact
+        - Ktu
+      operationId: getKtuContact
       summary: Get a customer contact by ID
       parameters:
         - name: contactId
@@ -2799,7 +2997,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiCustomerContact'
+                $ref: '#/components/schemas/KtuCustomerContact'
         '401':
           description: Unauthorized
         '404':
@@ -2808,8 +3006,8 @@ paths:
           description: Internal server error
     put:
       tags:
-        - Kti
-      operationId: updateKtiContact
+        - Ktu
+      operationId: updateKtuContact
       summary: Update a customer contact
       parameters:
         - name: contactId
@@ -2823,14 +3021,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateKtiContact'
+              $ref: '#/components/schemas/UpdateKtuContact'
       responses:
         '200':
           description: Contact updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiCustomerContact'
+                $ref: '#/components/schemas/KtuCustomerContact'
         '400':
           description: Bad request
         '401':
@@ -2842,12 +3040,12 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/questions:
+  /ktu/questions:
     get:
       tags:
-        - Kti
-      operationId: getKtiQuestions
-      summary: Get all KTI questions
+        - Ktu
+      operationId: getKtuQuestions
+      summary: Get all KTU questions
       parameters:
         - name: activeOnly
           in: query
@@ -2863,29 +3061,29 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiQuestion'
+                  $ref: '#/components/schemas/KtuQuestion'
         '401':
           description: Unauthorized
         '500':
           description: Internal server error
     post:
       tags:
-        - Kti
-      operationId: createKtiQuestion
-      summary: Create a new KTI question
+        - Ktu
+      operationId: createKtuQuestion
+      summary: Create a new KTU question
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateKtiQuestion'
+              $ref: '#/components/schemas/CreateKtuQuestion'
       responses:
         '201':
           description: Question created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiQuestion'
+                $ref: '#/components/schemas/KtuQuestion'
         '400':
           description: Bad request
         '401':
@@ -2895,12 +3093,12 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/questions/{questionId}:
+  /ktu/questions/{questionId}:
     put:
       tags:
-        - Kti
-      operationId: updateKtiQuestion
-      summary: Update a KTI question
+        - Ktu
+      operationId: updateKtuQuestion
+      summary: Update a KTU question
       parameters:
         - name: questionId
           in: path
@@ -2913,14 +3111,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateKtiQuestion'
+              $ref: '#/components/schemas/UpdateKtuQuestion'
       responses:
         '200':
           description: Question updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiQuestion'
+                $ref: '#/components/schemas/KtuQuestion'
         '400':
           description: Bad request
         '401':
@@ -2932,11 +3130,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/import/preview:
+  /ktu/import/preview:
     post:
       tags:
-        - Kti
-      operationId: previewKtiCsv
+        - Ktu
+      operationId: previewKtuCsv
       summary: Preview CSV file for import
       description: |
         Upload a CSV file and get a preview of columns and sample rows.
@@ -2960,7 +3158,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiCsvPreview'
+                $ref: '#/components/schemas/KtuCsvPreview'
         '400':
           description: Bad request - invalid CSV format
         '401':
@@ -2970,14 +3168,14 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/import/historical:
+  /ktu/import/historical:
     post:
       tags:
-        - Kti
-      operationId: importHistoricalKti
-      summary: Import historical KTI data from CSV
+        - Ktu
+      operationId: importHistoricalKtu
+      summary: Import historical KTU data from CSV
       description: |
-        Import historical KTI responses from a CSV file.
+        Import historical KTU responses from a CSV file.
         Use dryRun=true to validate without importing.
         Column mapping specifies which CSV columns map to which fields.
       parameters:
@@ -3017,7 +3215,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiImportResult'
+                $ref: '#/components/schemas/KtuImportResult'
         '400':
           description: Bad request - invalid CSV format
         '401':
@@ -3027,10 +3225,10 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/import/contacts/preview:
+  /ktu/import/contacts/preview:
     post:
       tags:
-        - Kti
+        - Ktu
       operationId: previewContactsCsv
       summary: Preview contacts CSV file
       description: |
@@ -3054,7 +3252,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiContactsCsvPreview'
+                $ref: '#/components/schemas/KtuContactsCsvPreview'
         '400':
           description: Bad request - invalid CSV format
         '401':
@@ -3064,10 +3262,10 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/import/contacts:
+  /ktu/import/contacts:
     post:
       tags:
-        - Kti
+        - Ktu
       operationId: importContacts
       summary: Import contacts from CSV
       description: |
@@ -3109,7 +3307,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiContactsImportResult'
+                $ref: '#/components/schemas/KtuContactsImportResult'
         '400':
           description: Bad request - invalid CSV format
         '401':
@@ -3119,11 +3317,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/rounds/{roundId}/questions:
+  /ktu/rounds/{roundId}/questions:
     get:
       tags:
-        - Kti
-      operationId: getKtiRoundQuestions
+        - Ktu
+      operationId: getKtuRoundQuestions
       summary: Get questions for a round
       description: Returns all questions configured for a specific round, including their order and active status
       parameters:
@@ -3148,7 +3346,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiRoundQuestion'
+                  $ref: '#/components/schemas/KtuRoundQuestion'
         '401':
           description: Unauthorized
         '403':
@@ -3159,8 +3357,8 @@ paths:
           description: Internal server error
     post:
       tags:
-        - Kti
-      operationId: addKtiRoundQuestion
+        - Ktu
+      operationId: addKtuRoundQuestion
       summary: Add a question to a round
       description: Adds an existing question to a round's question set
       parameters:
@@ -3175,14 +3373,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddKtiRoundQuestion'
+              $ref: '#/components/schemas/AddKtuRoundQuestion'
       responses:
         '201':
           description: Question added to round
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiRoundQuestion'
+                $ref: '#/components/schemas/KtuRoundQuestion'
         '400':
           description: Bad request - question already in round
         '401':
@@ -3194,11 +3392,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/rounds/{roundId}/questions/{questionId}:
+  /ktu/rounds/{roundId}/questions/{questionId}:
     put:
       tags:
-        - Kti
-      operationId: updateKtiRoundQuestion
+        - Ktu
+      operationId: updateKtuRoundQuestion
       summary: Update a round question
       description: Update the display order or active status of a question in a round
       parameters:
@@ -3219,14 +3417,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateKtiRoundQuestion'
+              $ref: '#/components/schemas/UpdateKtuRoundQuestion'
       responses:
         '200':
           description: Round question updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiRoundQuestion'
+                $ref: '#/components/schemas/KtuRoundQuestion'
         '401':
           description: Unauthorized
         '403':
@@ -3237,8 +3435,8 @@ paths:
           description: Internal server error
     delete:
       tags:
-        - Kti
-      operationId: removeKtiRoundQuestion
+        - Ktu
+      operationId: removeKtuRoundQuestion
       summary: Remove a question from a round
       description: Removes a question from a round's question set. Does not delete the question itself.
       parameters:
@@ -3268,11 +3466,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/rounds/{roundId}/questions/copy-from/{sourceRoundId}:
+  /ktu/rounds/{roundId}/questions/copy-from/{sourceRoundId}:
     post:
       tags:
-        - Kti
-      operationId: copyKtiRoundQuestions
+        - Ktu
+      operationId: copyKtuRoundQuestions
       summary: Copy questions from another round
       description: Copies all questions from a source round to this round. Useful when setting up a new survey year.
       parameters:
@@ -3298,7 +3496,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiRoundQuestion'
+                  $ref: '#/components/schemas/KtuRoundQuestion'
         '400':
           description: Target round already has questions
         '401':
@@ -3310,11 +3508,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/rounds/{roundId}/questions/init-from-template:
+  /ktu/rounds/{roundId}/questions/init-from-template:
     post:
       tags:
-        - Kti
-      operationId: initKtiRoundQuestionsFromTemplate
+        - Ktu
+      operationId: initKtuRoundQuestionsFromTemplate
       summary: Initialize round questions from global question template
       description: Adds all active global questions to this round. Typically used for the first round or to reset.
       parameters:
@@ -3332,7 +3530,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiRoundQuestion'
+                  $ref: '#/components/schemas/KtuRoundQuestion'
         '400':
           description: Round already has questions
         '401':
@@ -3344,11 +3542,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/rounds/{roundId}/assignments:
+  /ktu/rounds/{roundId}/assignments:
     get:
       tags:
-        - Kti
-      operationId: getKtiAssignments
+        - Ktu
+      operationId: getKtuAssignments
       summary: Get assignments for a round
       description: Returns all consultant-contact assignments for a specific round
       parameters:
@@ -3366,7 +3564,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiAssignment'
+                  $ref: '#/components/schemas/KtuAssignment'
         '401':
           description: Unauthorized
         '403':
@@ -3377,8 +3575,8 @@ paths:
           description: Internal server error
     post:
       tags:
-        - Kti
-      operationId: createKtiAssignment
+        - Ktu
+      operationId: createKtuAssignment
       summary: Create an assignment
       description: Assign a consultant to a customer contact for a round
       parameters:
@@ -3393,14 +3591,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateKtiAssignment'
+              $ref: '#/components/schemas/CreateKtuAssignment'
       responses:
         '201':
           description: Assignment created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiAssignment'
+                $ref: '#/components/schemas/KtuAssignment'
         '400':
           description: Bad request - assignment already exists or invalid data
         '401':
@@ -3412,11 +3610,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/rounds/{roundId}/assignments/{assignmentId}:
+  /ktu/rounds/{roundId}/assignments/{assignmentId}:
     get:
       tags:
-        - Kti
-      operationId: getKtiAssignment
+        - Ktu
+      operationId: getKtuAssignment
       summary: Get an assignment
       parameters:
         - name: roundId
@@ -3437,7 +3635,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiAssignment'
+                $ref: '#/components/schemas/KtuAssignment'
         '401':
           description: Unauthorized
         '404':
@@ -3446,8 +3644,8 @@ paths:
           description: Internal server error
     delete:
       tags:
-        - Kti
-      operationId: deleteKtiAssignment
+        - Ktu
+      operationId: deleteKtuAssignment
       summary: Delete an assignment
       description: Remove a consultant-contact assignment. Only allowed if no invitations have been sent.
       parameters:
@@ -3477,11 +3675,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/rounds/{roundId}/invitations:
+  /ktu/rounds/{roundId}/invitations:
     get:
       tags:
-        - Kti
-      operationId: getKtiInvitations
+        - Ktu
+      operationId: getKtuInvitations
       summary: Get invitations for a round
       description: Returns all invitations for a specific round
       parameters:
@@ -3495,7 +3693,7 @@ paths:
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/KtiInvitationStatus'
+            $ref: '#/components/schemas/KtuInvitationStatus'
           description: Filter by invitation status
       responses:
         '200':
@@ -3505,7 +3703,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiInvitation'
+                  $ref: '#/components/schemas/KtuInvitation'
         '401':
           description: Unauthorized
         '403':
@@ -3515,11 +3713,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/rounds/{roundId}/invitations/send:
+  /ktu/rounds/{roundId}/invitations/send:
     post:
       tags:
-        - Kti
-      operationId: sendKtiInvitations
+        - Ktu
+      operationId: sendKtuInvitations
       summary: Send invitations
       description: |
         Generate tokens and send email invitations to all contacts with assignments
@@ -3537,7 +3735,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiSendInvitationsResult'
+                $ref: '#/components/schemas/KtuSendInvitationsResult'
         '400':
           description: Round not in OPEN status
         '401':
@@ -3549,11 +3747,11 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/rounds/{roundId}/invitations/remind:
+  /ktu/rounds/{roundId}/invitations/remind:
     post:
       tags:
-        - Kti
-      operationId: sendKtiReminders
+        - Ktu
+      operationId: sendKtuReminders
       summary: Send reminders
       description: Send reminder emails to contacts who haven't responded yet
       parameters:
@@ -3569,7 +3767,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiSendRemindersResult'
+                $ref: '#/components/schemas/KtuSendRemindersResult'
         '400':
           description: Round not in OPEN status
         '401':
@@ -3581,11 +3779,86 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/consultants:
+  /ktu/rounds/{roundId}/email-preview:
     get:
       tags:
-        - Kti
-      operationId: getKtiConsultants
+        - Ktu
+      operationId: previewKtuEmail
+      summary: Preview email template
+      description: Returns rendered HTML preview of invitation or reminder email
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [invitation, reminder]
+          description: Type of email to preview
+      responses:
+        '200':
+          description: HTML email preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuEmailPreview'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /ktu/rounds/{roundId}/test-survey:
+    post:
+      tags:
+        - Ktu
+      operationId: createKtuTestSurvey
+      summary: Create a test survey invitation
+      description: Creates a test invitation for testing the survey flow. Optionally sends email to specified address.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtuTestSurvey'
+      responses:
+        '200':
+          description: Test survey created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuTestSurveyResult'
+        '400':
+          description: Invalid request - round must be OPEN or DRAFT
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /ktu/consultants:
+    get:
+      tags:
+        - Ktu
+      operationId: getKtuConsultants
       summary: Get available consultants
       description: Returns list of users who can be assigned as consultants
       responses:
@@ -3596,7 +3869,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiConsultant'
+                  $ref: '#/components/schemas/KtuConsultant'
         '401':
           description: Unauthorized
         '403':
@@ -3604,15 +3877,15 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/sync-users:
+  /ktu/sync-users:
     post:
       tags:
-        - Kti
+        - Ktu
       operationId: syncUsersFromFlowcase
       summary: Sync users from Flowcase
       description: |
         Fetches all consultants from Flowcase and creates/updates users in the database.
-        This ensures the user table has all consultants for KTI import matching.
+        This ensures the user table has all consultants for KTU import matching.
       responses:
         '200':
           description: Sync result
@@ -3627,10 +3900,10 @@ paths:
         '500':
           description: Internal server error
 
-  /kti/consultant-aliases:
+  /ktu/consultant-aliases:
     get:
       tags:
-        - Kti
+        - Ktu
       operationId: getConsultantAliases
       summary: Get all consultant name aliases
       description: Returns all configured consultant name aliases used for import matching
@@ -3647,7 +3920,7 @@ paths:
           description: Unauthorized
     post:
       tags:
-        - Kti
+        - Ktu
       operationId: createConsultantAlias
       summary: Create a consultant name alias
       description: Maps an alternative name (e.g., old name) to a user
@@ -3671,10 +3944,10 @@ paths:
         '403':
           description: Forbidden - admin access required
 
-  /kti/consultant-aliases/{aliasId}:
+  /ktu/consultant-aliases/{aliasId}:
     delete:
       tags:
-        - Kti
+        - Ktu
       operationId: deleteConsultantAlias
       summary: Delete a consultant alias
       parameters:
@@ -3694,11 +3967,11 @@ paths:
         '404':
           description: Alias not found
 
-  /kti/users:
+  /ktu/users:
     get:
       tags:
-        - Kti
-      operationId: getKtiUsers
+        - Ktu
+      operationId: getKtuUsers
       summary: Get all users for consultant mapping
       description: Returns all enabled users that can be mapped to consultants
       responses:
@@ -3709,16 +3982,16 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiUser'
+                  $ref: '#/components/schemas/KtuUser'
         '401':
           description: Unauthorized
 
-  /kti/rounds/{roundId}/statistics:
+  /ktu/rounds/{roundId}/statistics:
     get:
       tags:
-        - Kti
-      operationId: getKtiRoundStatistics
-      summary: Get statistics for a KTI round
+        - Ktu
+      operationId: getKtuRoundStatistics
+      summary: Get statistics for a KTU round
       description: Returns aggregated statistics for the specified round including response rates, averages, and breakdowns
       parameters:
         - name: roundId
@@ -3733,18 +4006,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiRoundStatistics'
+                $ref: '#/components/schemas/KtuRoundStatistics'
         '401':
           description: Unauthorized
         '404':
           description: Round not found
 
-  /kti/rounds/{roundId}/responses:
+  /ktu/rounds/{roundId}/responses:
     get:
       tags:
-        - Kti
-      operationId: getKtiRoundResponses
-      summary: Get all responses for a KTI round
+        - Ktu
+      operationId: getKtuRoundResponses
+      summary: Get all responses for a KTU round
       description: Returns all individual responses for the specified round with consultant and organization info
       parameters:
         - name: roundId
@@ -3761,19 +4034,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiResponseSummary'
+                  $ref: '#/components/schemas/KtuResponseSummary'
         '401':
           description: Unauthorized
         '404':
           description: Round not found
 
-  /kti/rounds/{roundId}/statistics/by-consultant:
+  /ktu/rounds/{roundId}/statistics/by-consultant:
     get:
       tags:
-        - Kti
-      operationId: getKtiStatisticsByConsultant
+        - Ktu
+      operationId: getKtuStatisticsByConsultant
       summary: Get statistics grouped by consultant
-      description: Returns KTI statistics broken down by consultant for the specified round
+      description: Returns KTU statistics broken down by consultant for the specified round
       parameters:
         - name: roundId
           in: path
@@ -3789,17 +4062,17 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiConsultantStatistics'
+                  $ref: '#/components/schemas/KtuConsultantStatistics'
         '401':
           description: Unauthorized
         '404':
           description: Round not found
 
-  /kti/trends:
+  /ktu/trends:
     get:
       tags:
-        - Kti
-      operationId: getKtiCompanyTrends
+        - Ktu
+      operationId: getKtuCompanyTrends
       summary: Get company-wide trend statistics
       description: Returns historical trend statistics across all years including per-question averages
       responses:
@@ -3808,15 +4081,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiCompanyTrendStatistics'
+                $ref: '#/components/schemas/KtuCompanyTrendStatistics'
         '401':
           description: Unauthorized
 
-  /kti/trends/consultants:
+  /ktu/trends/consultants:
     get:
       tags:
-        - Kti
-      operationId: getKtiConsultantsTrends
+        - Ktu
+      operationId: getKtuConsultantsTrends
       summary: Get consultant trend statistics across years
       description: Returns statistics for all consultants across all years
       responses:
@@ -3827,35 +4100,35 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiConsultantYearlyStats'
+                  $ref: '#/components/schemas/KtuConsultantYearlyStats'
         '401':
           description: Unauthorized
 
-  # Consultant's own KTI results (self-service)
-  /kti/me/statistics:
+  # Consultant's own KTU results (self-service)
+  /ktu/me/statistics:
     get:
       tags:
-        - Kti
-      operationId: getKtiMyStatistics
-      summary: Get current consultant's own KTI statistics
-      description: Returns aggregated KTI statistics for the currently logged-in consultant across all rounds
+        - Ktu
+      operationId: getKtuMyStatistics
+      summary: Get current consultant's own KTU statistics
+      description: Returns aggregated KTU statistics for the currently logged-in consultant across all rounds
       responses:
         '200':
           description: Consultant's own statistics
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiConsultantOwnStatistics'
+                $ref: '#/components/schemas/KtuConsultantOwnStatistics'
         '401':
           description: Unauthorized
         '404':
           description: No statistics found for current user
 
-  /kti/me/trends:
+  /ktu/me/trends:
     get:
       tags:
-        - Kti
-      operationId: getKtiMyTrends
+        - Ktu
+      operationId: getKtuMyTrends
       summary: Get current consultant's trend statistics
       description: Returns historical trend statistics for the currently logged-in consultant
       responses:
@@ -3864,19 +4137,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiConsultantYearlyStats'
+                $ref: '#/components/schemas/KtuConsultantYearlyStats'
         '401':
           description: Unauthorized
         '404':
           description: No statistics found for current user
 
-  /kti/me/responses:
+  /ktu/me/responses:
     get:
       tags:
-        - Kti
-      operationId: getKtiMyResponses
-      summary: Get current consultant's KTI responses
-      description: Returns all KTI feedback responses for the currently logged-in consultant with full details about who gave the feedback
+        - Ktu
+      operationId: getKtuMyResponses
+      summary: Get current consultant's KTU responses
+      description: Returns all KTU feedback responses for the currently logged-in consultant with full details about who gave the feedback
       parameters:
         - name: roundId
           in: query
@@ -3893,18 +4166,18 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiResponseSummary'
+                  $ref: '#/components/schemas/KtuResponseSummary'
         '401':
           description: Unauthorized
 
-  # Admin endpoints for viewing any consultant's KTI data
-  /kti/admin/consultants/{consultantId}/statistics:
+  # Admin endpoints for viewing any consultant's KTU data
+  /ktu/admin/consultants/{consultantId}/statistics:
     get:
       tags:
-        - Kti
-      operationId: getKtiConsultantStatisticsAdmin
-      summary: Get a consultant's KTI statistics (admin)
-      description: Returns KTI statistics for a specific consultant. Admin only.
+        - Ktu
+      operationId: getKtuConsultantStatisticsAdmin
+      summary: Get a consultant's KTU statistics (admin)
+      description: Returns KTU statistics for a specific consultant. Admin only.
       parameters:
         - name: consultantId
           in: path
@@ -3918,7 +4191,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiConsultantOwnStatistics'
+                $ref: '#/components/schemas/KtuConsultantOwnStatistics'
         '401':
           description: Unauthorized
         '403':
@@ -3926,12 +4199,12 @@ paths:
         '404':
           description: Consultant not found
 
-  /kti/admin/consultants/{consultantId}/trends:
+  /ktu/admin/consultants/{consultantId}/trends:
     get:
       tags:
-        - Kti
-      operationId: getKtiConsultantTrendsAdmin
-      summary: Get a consultant's KTI trends (admin)
+        - Ktu
+      operationId: getKtuConsultantTrendsAdmin
+      summary: Get a consultant's KTU trends (admin)
       description: Returns historical trend statistics for a specific consultant. Admin only.
       parameters:
         - name: consultantId
@@ -3946,7 +4219,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiConsultantYearlyStats'
+                $ref: '#/components/schemas/KtuConsultantYearlyStats'
         '401':
           description: Unauthorized
         '403':
@@ -3954,13 +4227,13 @@ paths:
         '404':
           description: Consultant not found
 
-  /kti/admin/consultants/{consultantId}/responses:
+  /ktu/admin/consultants/{consultantId}/responses:
     get:
       tags:
-        - Kti
-      operationId: getKtiConsultantResponsesAdmin
-      summary: Get a consultant's KTI responses (admin)
-      description: Returns all KTI feedback responses for a specific consultant. Admin only.
+        - Ktu
+      operationId: getKtuConsultantResponsesAdmin
+      summary: Get a consultant's KTU responses (admin)
+      description: Returns all KTU feedback responses for a specific consultant. Admin only.
       parameters:
         - name: consultantId
           in: path
@@ -3983,7 +4256,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/KtiResponseSummary'
+                  $ref: '#/components/schemas/KtuResponseSummary'
         '401':
           description: Unauthorized
         '403':
@@ -3991,12 +4264,12 @@ paths:
         '404':
           description: Consultant not found
 
-  /kti/responses/{responseId}:
+  /ktu/responses/{responseId}:
     put:
       tags:
-        - Kti
-      operationId: updateKtiResponse
-      summary: Update a KTI response
+        - Ktu
+      operationId: updateKtuResponse
+      summary: Update a KTU response
       description: Update rating or text value for a specific response (admin only)
       parameters:
         - name: responseId
@@ -4010,23 +4283,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateKtiResponse'
+              $ref: '#/components/schemas/UpdateKtuResponse'
       responses:
         '200':
           description: Response updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiQuestionResponse'
+                $ref: '#/components/schemas/KtuQuestionResponse'
         '401':
           description: Unauthorized
         '404':
           description: Response not found
     delete:
       tags:
-        - Kti
-      operationId: deleteKtiResponse
-      summary: Delete a KTI response
+        - Ktu
+      operationId: deleteKtuResponse
+      summary: Delete a KTU response
       description: Delete a specific response (admin only)
       parameters:
         - name: responseId
@@ -4043,12 +4316,12 @@ paths:
         '404':
           description: Response not found
 
-  /kti/invitations/{invitationId}:
+  /ktu/invitations/{invitationId}:
     put:
       tags:
-        - Kti
-      operationId: updateKtiInvitation
-      summary: Update a KTI invitation
+        - Ktu
+      operationId: updateKtuInvitation
+      summary: Update a KTU invitation
       description: Update status and dates for a specific invitation (admin only)
       parameters:
         - name: invitationId
@@ -4062,23 +4335,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateKtiInvitation'
+              $ref: '#/components/schemas/UpdateKtuInvitation'
       responses:
         '200':
           description: Invitation updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KtiInvitation'
+                $ref: '#/components/schemas/KtuInvitation'
         '401':
           description: Unauthorized
         '404':
           description: Invitation not found
     delete:
       tags:
-        - Kti
-      operationId: deleteKtiInvitation
-      summary: Delete a KTI invitation
+        - Ktu
+      operationId: deleteKtuInvitation
+      summary: Delete a KTU invitation
       description: Delete a specific invitation and all its responses (admin only)
       parameters:
         - name: invitationId
@@ -4096,10 +4369,10 @@ paths:
           description: Invitation not found
 
   # Public survey endpoints (no authentication required)
-  /kti/survey/{token}:
+  /ktu/survey/{token}:
     get:
       tags:
-        - KtiPublic
+        - KtuPublic
       operationId: getPublicSurvey
       summary: Get survey for respondent
       description: Get survey information and questions for a respondent using their unique token. No authentication required.
@@ -4122,10 +4395,10 @@ paths:
         '410':
           description: Survey already completed
 
-  /kti/survey/{token}/responses:
+  /ktu/survey/{token}/responses:
     post:
       tags:
-        - KtiPublic
+        - KtuPublic
       operationId: submitPublicSurveyResponses
       summary: Submit survey responses
       description: Submit responses for a survey. No authentication required.
@@ -4151,6 +4424,22 @@ paths:
           description: Survey not found or expired
         '409':
           description: Survey already completed
+
+  /ktu/public/company-trends:
+    get:
+      tags:
+        - KtuPublic
+      operationId: getPublicCompanyTrends
+      summary: Get public company KTU trends
+      description: Get company-wide KTU trend statistics. No authentication required. Intended for public display.
+      security: []
+      responses:
+        '200':
+          description: Company trend statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtuCompanyTrendStatistics'
 
 components:
   schemas:
@@ -4228,7 +4517,7 @@ components:
         description:
           type: string
           description: The description of the job posting
-          example: "Skatteetaten leter etter en dyktig Kotlin-utvikler"
+          example: "Skatteetaten leter etter en dyktug Kotlin-utvikler"
         tags:
           $ref: '#/components/schemas/Tags'
         links:
@@ -5659,24 +5948,85 @@ components:
         - availableSoon
         - occupied
 
-    # KTI (Customer Satisfaction Survey) Schemas
+    # KTU (Customer Satisfaction Survey) Schemas
 
-    KtiRoundStatus:
+    KtuRoundStatus:
       type: string
       enum:
         - DRAFT
         - OPEN
         - CLOSED
-      description: Status of a KTI survey round
+      description: Status of a KTU survey round
 
-    KtiQuestionType:
+    KtuColorTheme:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          description: Display name of the theme
+        headerBgColor:
+          type: string
+          description: Background color for header (hex format)
+        primaryColor:
+          type: string
+          description: Primary/accent color for buttons etc (hex format)
+        accentBgColor:
+          type: string
+          description: Background color for accent boxes (hex format)
+        isDefault:
+          type: boolean
+          description: Whether this is the default theme
+      required:
+        - id
+        - name
+        - headerBgColor
+        - primaryColor
+        - accentBgColor
+
+    CreateKtuColorTheme:
+      type: object
+      properties:
+        name:
+          type: string
+        headerBgColor:
+          type: string
+        primaryColor:
+          type: string
+        accentBgColor:
+          type: string
+        isDefault:
+          type: boolean
+      required:
+        - name
+        - headerBgColor
+        - primaryColor
+        - accentBgColor
+
+    UpdateKtuColorTheme:
+      type: object
+      properties:
+        name:
+          type: string
+        headerBgColor:
+          type: string
+        primaryColor:
+          type: string
+        accentBgColor:
+          type: string
+        isDefault:
+          type: boolean
+
+    KtuQuestionType:
       type: string
       enum:
         - RATING_1_6
         - FREE_TEXT
-      description: Type of KTI question
+      description: Type of KTU question
 
-    KtiRound:
+    KtuRound:
       type: object
       properties:
         id:
@@ -5687,7 +6037,7 @@ components:
         year:
           type: integer
         status:
-          $ref: '#/components/schemas/KtiRoundStatus'
+          $ref: '#/components/schemas/KtuRoundStatus'
         openDate:
           type: string
           format: date
@@ -5700,13 +6050,44 @@ components:
         updatedAt:
           type: string
           format: date-time
+        # Appearance configuration
+        logoUrl:
+          type: string
+          description: URL to custom logo for this survey
+        colorTheme:
+          $ref: '#/components/schemas/KtuColorTheme'
+        introText:
+          type: string
+          description: Welcome/intro text shown at top of survey
+        instructionText:
+          type: string
+          description: Instructions shown before questions
+        ratingLabelLow:
+          type: string
+          description: Label for low rating (e.g., "1 - Very dissatisfied")
+        ratingLabelHigh:
+          type: string
+          description: Label for high rating (e.g., "6 - Very satisfied")
+        thankYouTitle:
+          type: string
+          description: Thank you page title
+        thankYouMessage:
+          type: string
+          description: Thank you page message
+        commentFieldLabel:
+          type: string
+          description: Label for comment/text input fields
+        # Import statistics
+        manualSentCount:
+          type: integer
+          description: Manual count of sent invitations for imported surveys (used when invitations aren't tracked individually)
       required:
         - id
         - name
         - year
         - status
 
-    CreateKtiRound:
+    CreateKtuRound:
       type: object
       properties:
         name:
@@ -5723,7 +6104,7 @@ components:
         - name
         - year
 
-    UpdateKtiRound:
+    UpdateKtuRound:
       type: object
       properties:
         name:
@@ -5735,9 +6116,81 @@ components:
           type: string
           format: date
         status:
-          $ref: '#/components/schemas/KtiRoundStatus'
+          $ref: '#/components/schemas/KtuRoundStatus'
+        # Appearance configuration
+        colorThemeId:
+          type: integer
+          format: int64
+          description: ID of the color theme to use
+        introText:
+          type: string
+          description: Welcome/intro text shown at top of survey
+        instructionText:
+          type: string
+          description: Instructions shown before questions
+        ratingLabelLow:
+          type: string
+          description: Label for low rating
+        ratingLabelHigh:
+          type: string
+          description: Label for high rating
+        thankYouTitle:
+          type: string
+          description: Thank you page title
+        thankYouMessage:
+          type: string
+          description: Thank you page message
+        commentFieldLabel:
+          type: string
+          description: Label for comment/text input fields
+        # Import statistics
+        manualSentCount:
+          type: integer
+          description: Manual count of sent invitations for imported surveys
 
-    KtiCustomerOrganization:
+    CreateKtuTestSurvey:
+      type: object
+      description: Request to create a test survey invitation
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address to send the test invitation to. If not provided, no email is sent but the survey URL is returned.
+        consultantName:
+          type: string
+          description: Name to use for the consultant in the test. Defaults to 'Test Konsulent'.
+        contactName:
+          type: string
+          description: Name to use for the customer contact in the test. Defaults to 'Test Kontakt'.
+        organizationName:
+          type: string
+          description: Name to use for the organization in the test. Defaults to 'Test Kunde AS'.
+
+    KtuTestSurveyResult:
+      type: object
+      properties:
+        surveyUrl:
+          type: string
+          description: The full URL to access the test survey
+        token:
+          type: string
+          description: The invitation token used in the URL
+        emailSent:
+          type: boolean
+          description: Whether an email was sent (true if email address was provided)
+        emailSentTo:
+          type: string
+          description: The email address the invitation was sent to (if applicable)
+        expiresAt:
+          type: string
+          format: date-time
+          description: When this test invitation will expire
+      required:
+        - surveyUrl
+        - token
+        - emailSent
+
+    KtuCustomerOrganization:
       type: object
       properties:
         id:
@@ -5763,7 +6216,7 @@ components:
         - name
         - active
 
-    CreateKtiOrganization:
+    CreateKtuOrganization:
       type: object
       properties:
         name:
@@ -5773,7 +6226,7 @@ components:
       required:
         - name
 
-    UpdateKtiOrganization:
+    UpdateKtuOrganization:
       type: object
       properties:
         name:
@@ -5783,7 +6236,7 @@ components:
         active:
           type: boolean
 
-    KtiCustomerContact:
+    KtuCustomerContact:
       type: object
       properties:
         id:
@@ -5822,7 +6275,7 @@ components:
         - active
         - optedOut
 
-    CreateKtiContact:
+    CreateKtuContact:
       type: object
       properties:
         name:
@@ -5840,7 +6293,7 @@ components:
         - name
         - organizationId
 
-    UpdateKtiContact:
+    UpdateKtuContact:
       type: object
       properties:
         name:
@@ -5859,7 +6312,7 @@ components:
         optedOut:
           type: boolean
 
-    KtiQuestion:
+    KtuQuestion:
       type: object
       properties:
         id:
@@ -5872,7 +6325,7 @@ components:
         textEn:
           type: string
         questionType:
-          $ref: '#/components/schemas/KtiQuestionType'
+          $ref: '#/components/schemas/KtuQuestionType'
         category:
           type: string
         displayOrder:
@@ -5891,9 +6344,9 @@ components:
         - active
         - required
 
-    CreateKtiQuestion:
+    CreateKtuQuestion:
       type: object
-      description: Request to create a new KTI question
+      description: Request to create a new KTU question
       properties:
         code:
           type: string
@@ -5905,7 +6358,7 @@ components:
           type: string
           description: Question text in English (optional)
         questionType:
-          $ref: '#/components/schemas/KtiQuestionType'
+          $ref: '#/components/schemas/KtuQuestionType'
         category:
           type: string
           description: Question category (e.g., Leveranse, Kommunikasjon)
@@ -5923,9 +6376,9 @@ components:
         - category
         - displayOrder
 
-    UpdateKtiQuestion:
+    UpdateKtuQuestion:
       type: object
-      description: Request to update a KTI question
+      description: Request to update a KTU question
       properties:
         code:
           type: string
@@ -5934,7 +6387,7 @@ components:
         textEn:
           type: string
         questionType:
-          $ref: '#/components/schemas/KtiQuestionType'
+          $ref: '#/components/schemas/KtuQuestionType'
         category:
           type: string
         displayOrder:
@@ -5944,7 +6397,7 @@ components:
         required:
           type: boolean
 
-    KtiRoundQuestion:
+    KtuRoundQuestion:
       type: object
       description: A question configured for a specific round
       properties:
@@ -5955,11 +6408,20 @@ components:
           type: integer
           format: int64
         question:
-          $ref: '#/components/schemas/KtiQuestion'
+          $ref: '#/components/schemas/KtuQuestion'
         displayOrder:
           type: integer
         active:
           type: boolean
+        commentFieldLabel:
+          type: string
+          description: Custom label for the comment field placeholder (overrides round-level default)
+        customTextNo:
+          type: string
+          description: Custom question text in Norwegian (overrides question.textNo)
+        requiredOverride:
+          type: boolean
+          description: Override for required field. If null, uses question.required. Allows making a required question optional for this round.
         createdAt:
           type: string
           format: date-time
@@ -5970,7 +6432,7 @@ components:
         - displayOrder
         - active
 
-    AddKtiRoundQuestion:
+    AddKtuRoundQuestion:
       type: object
       description: Request to add a question to a round
       properties:
@@ -5986,7 +6448,7 @@ components:
         - questionId
         - displayOrder
 
-    UpdateKtiRoundQuestion:
+    UpdateKtuRoundQuestion:
       type: object
       description: Request to update a round question
       properties:
@@ -5994,8 +6456,17 @@ components:
           type: integer
         active:
           type: boolean
+        commentFieldLabel:
+          type: string
+          description: Custom label for the comment field placeholder
+        customTextNo:
+          type: string
+          description: Custom question text in Norwegian (overrides question.textNo)
+        requiredOverride:
+          type: boolean
+          description: Override for required field. Set to false to make a required question optional for this round. Set to null to restore default.
 
-    KtiImportResult:
+    KtuImportResult:
       type: object
       properties:
         valid:
@@ -6019,7 +6490,7 @@ components:
         errors:
           type: array
           items:
-            $ref: '#/components/schemas/KtiImportError'
+            $ref: '#/components/schemas/KtuImportError'
         newOrganizations:
           type: integer
           description: Number of new organizations to create/created
@@ -6081,7 +6552,7 @@ components:
         - userName
         - similarity
 
-    KtiImportError:
+    KtuImportError:
       type: object
       properties:
         row:
@@ -6101,7 +6572,7 @@ components:
         - field
         - error
 
-    KtiContactsCsvPreview:
+    KtuContactsCsvPreview:
       type: object
       properties:
         columns:
@@ -6125,7 +6596,7 @@ components:
         requiredFields:
           type: array
           items:
-            $ref: '#/components/schemas/KtiImportField'
+            $ref: '#/components/schemas/KtuImportField'
           description: Fields that need to be mapped
       required:
         - columns
@@ -6134,7 +6605,7 @@ components:
         - delimiter
         - requiredFields
 
-    KtiContactsImportResult:
+    KtuContactsImportResult:
       type: object
       properties:
         valid:
@@ -6167,7 +6638,7 @@ components:
         errors:
           type: array
           items:
-            $ref: '#/components/schemas/KtiImportError'
+            $ref: '#/components/schemas/KtuImportError'
         unmatchedConsultants:
           type: array
           items:
@@ -6178,7 +6649,7 @@ components:
         - totalRows
         - validRows
 
-    KtiCsvPreview:
+    KtuCsvPreview:
       type: object
       properties:
         columns:
@@ -6202,7 +6673,7 @@ components:
         requiredFields:
           type: array
           items:
-            $ref: '#/components/schemas/KtiImportField'
+            $ref: '#/components/schemas/KtuImportField'
           description: List of fields that need to be mapped
       required:
         - columns
@@ -6211,7 +6682,7 @@ components:
         - delimiter
         - requiredFields
 
-    KtiImportField:
+    KtuImportField:
       type: object
       properties:
         key:
@@ -6233,7 +6704,7 @@ components:
         - required
         - type
 
-    KtiInvitationStatus:
+    KtuInvitationStatus:
       type: string
       enum:
         - PENDING
@@ -6242,7 +6713,7 @@ components:
         - RESPONDED
         - EXPIRED
 
-    KtiAssignment:
+    KtuAssignment:
       type: object
       properties:
         id:
@@ -6252,9 +6723,9 @@ components:
           type: integer
           format: int64
         consultant:
-          $ref: '#/components/schemas/KtiConsultant'
+          $ref: '#/components/schemas/KtuConsultant'
         contact:
-          $ref: '#/components/schemas/KtiCustomerContact'
+          $ref: '#/components/schemas/KtuCustomerContact'
         notes:
           type: string
         createdAt:
@@ -6271,7 +6742,7 @@ components:
         - createdAt
         - hasInvitation
 
-    CreateKtiAssignment:
+    CreateKtuAssignment:
       type: object
       properties:
         consultantId:
@@ -6289,7 +6760,7 @@ components:
         - consultantId
         - contactId
 
-    KtiInvitation:
+    KtuInvitation:
       type: object
       properties:
         id:
@@ -6299,13 +6770,13 @@ components:
           type: integer
           format: int64
         consultant:
-          $ref: '#/components/schemas/KtiConsultant'
+          $ref: '#/components/schemas/KtuConsultant'
         contact:
-          $ref: '#/components/schemas/KtiCustomerContact'
+          $ref: '#/components/schemas/KtuCustomerContact'
         organization:
-          $ref: '#/components/schemas/KtiCustomerOrganization'
+          $ref: '#/components/schemas/KtuCustomerOrganization'
         status:
-          $ref: '#/components/schemas/KtiInvitationStatus'
+          $ref: '#/components/schemas/KtuInvitationStatus'
         sentAt:
           type: string
           format: date-time
@@ -6333,11 +6804,11 @@ components:
         - reminderCount
         - createdAt
 
-    UpdateKtiInvitation:
+    UpdateKtuInvitation:
       type: object
       properties:
         status:
-          $ref: '#/components/schemas/KtiInvitationStatus'
+          $ref: '#/components/schemas/KtuInvitationStatus'
         sentAt:
           type: string
           format: date-time
@@ -6349,7 +6820,7 @@ components:
           format: date-time
       description: All fields are optional. Only provided fields will be updated.
 
-    UpdateKtiResponse:
+    UpdateKtuResponse:
       type: object
       properties:
         ratingValue:
@@ -6363,6 +6834,48 @@ components:
       description: Update rating or text value for a response. Both fields are optional.
 
     # Public survey schemas (for respondents)
+    SurveyAppearance:
+      type: object
+      description: Appearance configuration for public survey
+      properties:
+        logoUrl:
+          type: string
+          description: URL to custom logo
+        headerBgColor:
+          type: string
+          description: Header background color (hex)
+        primaryColor:
+          type: string
+          description: Primary/accent color (hex)
+        accentBgColor:
+          type: string
+          description: Accent box background color (hex)
+        introText:
+          type: string
+          description: Welcome/intro text
+        instructionText:
+          type: string
+          description: Instructions before questions
+        ratingLabelLow:
+          type: string
+          description: Label for rating 1
+        ratingLabelHigh:
+          type: string
+          description: Label for rating 6
+        thankYouTitle:
+          type: string
+          description: Thank you page title
+        thankYouMessage:
+          type: string
+          description: Thank you page message
+        commentFieldLabel:
+          type: string
+          description: Label for text input fields
+      required:
+        - headerBgColor
+        - primaryColor
+        - accentBgColor
+
     PublicSurveyData:
       type: object
       properties:
@@ -6385,6 +6898,8 @@ components:
         alreadyResponded:
           type: boolean
           description: Whether the survey has already been completed
+        appearance:
+          $ref: '#/components/schemas/SurveyAppearance'
       required:
         - surveyName
         - year
@@ -6392,6 +6907,7 @@ components:
         - organizationName
         - questions
         - alreadyResponded
+        - appearance
 
     PublicSurveyQuestion:
       type: object
@@ -6407,7 +6923,7 @@ components:
           type: string
           description: Question text (in Norwegian)
         questionType:
-          $ref: '#/components/schemas/KtiQuestionType'
+          $ref: '#/components/schemas/KtuQuestionType'
         category:
           type: string
           description: Question category
@@ -6417,6 +6933,9 @@ components:
         required:
           type: boolean
           description: Whether the question is required
+        commentFieldLabel:
+          type: string
+          description: Custom placeholder text for comment/text input field (for FREE_TEXT questions)
       required:
         - id
         - code
@@ -6454,7 +6973,7 @@ components:
       required:
         - questionId
 
-    KtiConsultant:
+    KtuConsultant:
       type: object
       properties:
         id:
@@ -6532,7 +7051,7 @@ components:
       required:
         - aliasName
 
-    KtiUser:
+    KtuUser:
       type: object
       properties:
         id:
@@ -6546,7 +7065,7 @@ components:
         - id
         - name
 
-    KtiSendInvitationsResult:
+    KtuSendInvitationsResult:
       type: object
       properties:
         sentCount:
@@ -6565,7 +7084,7 @@ components:
         - skippedCount
         - errors
 
-    KtiSendRemindersResult:
+    KtuSendRemindersResult:
       type: object
       properties:
         sentCount:
@@ -6584,7 +7103,25 @@ components:
         - skippedCount
         - errors
 
-    KtiRoundStatistics:
+    KtuEmailPreview:
+      type: object
+      properties:
+        subject:
+          type: string
+          description: Email subject line
+        html:
+          type: string
+          description: Rendered HTML content of the email
+        type:
+          type: string
+          enum: [invitation, reminder]
+          description: Type of email being previewed
+      required:
+        - subject
+        - html
+        - type
+
+    KtuRoundStatistics:
       type: object
       properties:
         roundId:
@@ -6625,7 +7162,7 @@ components:
         questionStatistics:
           type: array
           items:
-            $ref: '#/components/schemas/KtiQuestionStatistics'
+            $ref: '#/components/schemas/KtuQuestionStatistics'
           description: Statistics per question
       required:
         - roundId
@@ -6636,7 +7173,7 @@ components:
         - consultantCount
         - organizationCount
 
-    KtiQuestionStatistics:
+    KtuQuestionStatistics:
       type: object
       properties:
         questionId:
@@ -6662,12 +7199,22 @@ components:
         - questionText
         - responseCount
 
-    KtiResponseSummary:
+    KtuResponseSummary:
       type: object
       properties:
         id:
           type: integer
           format: int64
+        roundId:
+          type: integer
+          format: int64
+          description: The survey round ID
+        roundName:
+          type: string
+          description: The survey round name
+        year:
+          type: integer
+          description: The year of the survey round
         consultantId:
           type: integer
           format: int64
@@ -6695,14 +7242,14 @@ components:
         questionResponses:
           type: array
           items:
-            $ref: '#/components/schemas/KtiQuestionResponse'
+            $ref: '#/components/schemas/KtuQuestionResponse'
       required:
         - id
         - consultantName
         - organizationName
         - contactName
 
-    KtiQuestionResponse:
+    KtuQuestionResponse:
       type: object
       properties:
         id:
@@ -6717,7 +7264,7 @@ components:
         questionText:
           type: string
         questionType:
-          $ref: '#/components/schemas/KtiQuestionType'
+          $ref: '#/components/schemas/KtuQuestionType'
         ratingValue:
           type: integer
           description: Rating value (1-6) for rating questions
@@ -6731,7 +7278,7 @@ components:
         - questionText
         - questionType
 
-    KtiConsultantStatistics:
+    KtuConsultantStatistics:
       type: object
       properties:
         consultantId:
@@ -6760,7 +7307,7 @@ components:
         - responseCount
         - organizationCount
 
-    KtiYearlyStatistics:
+    KtuYearlyStatistics:
       type: object
       properties:
         year:
@@ -6791,7 +7338,7 @@ components:
         - consultantCount
         - organizationCount
 
-    KtiQuestionTrend:
+    KtuQuestionTrend:
       type: object
       properties:
         questionId:
@@ -6807,23 +7354,28 @@ components:
             type: number
             format: double
           description: Map of year to average score
+        yearlyResponseCounts:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Map of year to number of responses
       required:
         - questionId
         - questionCode
         - questionText
         - yearlyAverages
 
-    KtiCompanyTrendStatistics:
+    KtuCompanyTrendStatistics:
       type: object
       properties:
         yearlyStatistics:
           type: array
           items:
-            $ref: '#/components/schemas/KtiYearlyStatistics'
+            $ref: '#/components/schemas/KtuYearlyStatistics'
         questionTrends:
           type: array
           items:
-            $ref: '#/components/schemas/KtiQuestionTrend'
+            $ref: '#/components/schemas/KtuQuestionTrend'
         overallTrend:
           type: object
           additionalProperties:
@@ -6835,7 +7387,7 @@ components:
         - questionTrends
         - overallTrend
 
-    KtiConsultantYearData:
+    KtuConsultantYearData:
       type: object
       properties:
         responseCount:
@@ -6849,7 +7401,7 @@ components:
         - responseCount
         - organizationCount
 
-    KtiConsultantYearlyStats:
+    KtuConsultantYearlyStats:
       type: object
       properties:
         consultantId:
@@ -6862,16 +7414,16 @@ components:
         yearlyData:
           type: object
           additionalProperties:
-            $ref: '#/components/schemas/KtiConsultantYearData'
+            $ref: '#/components/schemas/KtuConsultantYearData'
           description: Map of year to consultant data for that year
       required:
         - consultantId
         - consultantName
         - yearlyData
 
-    KtiConsultantOwnStatistics:
+    KtuConsultantOwnStatistics:
       type: object
-      description: Statistics for a consultant's own KTI results
+      description: Statistics for a consultant's own KTU results
       properties:
         totalResponses:
           type: integer
@@ -6884,22 +7436,22 @@ components:
           type: integer
           description: Number of rounds the consultant has received feedback in
         currentYearStats:
-          $ref: '#/components/schemas/KtiConsultantYearData'
+          $ref: '#/components/schemas/KtuConsultantYearData'
           description: Statistics for the current year (may be null if no data)
         previousYearStats:
-          $ref: '#/components/schemas/KtiConsultantYearData'
+          $ref: '#/components/schemas/KtuConsultantYearData'
           description: Statistics for the previous year (may be null if no data)
         questionAverages:
           type: array
           items:
-            $ref: '#/components/schemas/KtiQuestionAverage'
+            $ref: '#/components/schemas/KtuQuestionAverage'
           description: Average score per question across all rounds
       required:
         - totalResponses
         - roundsParticipated
         - questionAverages
 
-    KtiQuestionAverage:
+    KtuQuestionAverage:
       type: object
       description: Average score for a specific question across all responses
       properties:

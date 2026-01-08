@@ -3,7 +3,7 @@
  *
  * Configures the auto-generated OpenAPI client with:
  * - Base URL
- * - Authentication headers (Bearer token or X-Test-User-Id)
+ * - Authentication headers (Bearer token, X-Test-User-Id, or X-Test-User-Email)
  * - Request/response interceptors
  * - Global 401 handling for session expiry
  */
@@ -25,7 +25,7 @@ export function dispatchSessionExpired() {
 
 /**
  * Get authentication headers for API requests
- * In development mode with test user, uses X-Test-User-Id header
+ * In development mode with test user, uses X-Test-User-Email or X-Test-User-Id header
  * Otherwise uses Bearer token from sessionStorage
  */
 function getAuthHeaders(): Record<string, string> {
@@ -39,7 +39,12 @@ function getAuthHeaders(): Record<string, string> {
   // Check for test user first (works in any environment if testUserId is set)
   const testUserId = localStorage.getItem('testUserId')
   if (testUserId) {
-    headers['X-Test-User-Id'] = testUserId
+    // testUserId can be either a numeric ID (legacy) or an email address
+    if (testUserId.includes('@')) {
+      headers['X-Test-User-Email'] = testUserId
+    } else {
+      headers['X-Test-User-Id'] = testUserId
+    }
     return headers // Return early, don't add Authorization header
   }
 

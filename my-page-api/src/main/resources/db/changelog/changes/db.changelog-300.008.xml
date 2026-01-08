@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- KTU Survey Appearance Configuration -->
+
+    <changeSet id="300.008.001" author="claude">
+        <comment>Create ktu_color_theme table for dynamic survey themes</comment>
+        <createTable tableName="ktu_color_theme">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="header_bg_color" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="primary_color" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="accent_bg_color" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_default" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="300.008.002" author="claude">
+        <comment>Insert default color themes</comment>
+        <insert tableName="ktu_color_theme">
+            <column name="name" value="JPro Oransje"/>
+            <column name="header_bg_color" value="#1a1a2e"/>
+            <column name="primary_color" value="#f97316"/>
+            <column name="accent_bg_color" value="#fff7ed"/>
+            <column name="is_default" valueBoolean="true"/>
+        </insert>
+        <insert tableName="ktu_color_theme">
+            <column name="name" value="Nøytral"/>
+            <column name="header_bg_color" value="#374151"/>
+            <column name="primary_color" value="#6b7280"/>
+            <column name="accent_bg_color" value="#f3f4f6"/>
+            <column name="is_default" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="300.008.003" author="claude">
+        <comment>Add appearance columns to ktu_round</comment>
+        <addColumn tableName="ktu_round">
+            <column name="logo_url" type="VARCHAR(500)"/>
+            <column name="color_theme_id" type="BIGINT"/>
+            <column name="intro_text" type="TEXT"/>
+            <column name="instruction_text" type="TEXT"/>
+            <column name="rating_label_low" type="VARCHAR(100)"/>
+            <column name="rating_label_high" type="VARCHAR(100)"/>
+            <column name="thank_you_title" type="VARCHAR(255)"/>
+            <column name="thank_you_message" type="TEXT"/>
+            <column name="comment_field_label" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="300.008.004" author="claude">
+        <comment>Add foreign key from ktu_round to ktu_color_theme</comment>
+        <addForeignKeyConstraint
+                baseTableName="ktu_round"
+                baseColumnNames="color_theme_id"
+                constraintName="fk_ktu_round_color_theme"
+                referencedTableName="ktu_color_theme"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

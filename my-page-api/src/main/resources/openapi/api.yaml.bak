@@ -1,0 +1,6926 @@
+openapi: 3.0.3
+info:
+  title: JPro My Page API
+  description: API for JPro My Page
+  version: 1.0.0
+paths:
+  /job-postings:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostings
+      summary: Get job postings
+      description: Returns the job postings added by admins. Allows filtering by different criteria.
+      parameters:
+        - in: query
+          name: customers
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          description: List of customers to filter
+        - in: query
+          name: from-date-time
+          required: false
+          schema:
+            type: string
+            format: date-time
+          style: form
+          explode: false
+          description: From which date-time to filter job postings
+        - in: query
+          name: hidden
+          required: false
+          schema:
+            type: boolean
+          description: Whether to get hidden job postings or not
+        - in: query
+          name: include-ids
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          description: IDs of job postings that will be retrieved regardless of other filters
+        - in: query
+          name: tags
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          description: List of tags to filter
+      responses:
+        '200':
+          description: A JSON array of job postings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostings'
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - JobPosting
+      operationId: createJobPosting
+      summary: Create job postings
+      description: Returns the job posting added.
+      parameters:
+        - in: query
+          name: notify
+          required: true
+          schema:
+            type: boolean
+            default: true
+          description: Indicates if the job posting should cause a notification
+      requestBody:
+        description: Job posting to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPosting'
+      responses:
+        '201':
+          description: The added job posting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /job-postings/customers:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostingCustomers
+      summary: Get job posting customers
+      description: Returns all the customers for job postings
+      responses:
+        '200':
+          description: A JSON array of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customers'
+        '500':
+          description: Internal server error
+  /job-postings/tags:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostingTags
+      summary: Get job posting tags
+      description: Returns all tags for job postings
+      responses:
+        '200':
+          description: A JSON array of tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tags'
+        '500':
+          description: Internal server error
+  /job-postings/{id}:
+    delete:
+      tags:
+        - JobPosting
+      operationId: deleteJobPosting
+      summary: Delete a job posting
+      description: Deletes a specific job posting by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the job posting to delete
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Job posting was deleted
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - JobPosting
+      operationId: updateJobPosting
+      summary: Update a job posting
+      description: Updates a specific job posting by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the job posting to update
+          schema:
+            type: integer
+            format: int64
+        - name: update-message
+          in: query
+          required: false
+          description: An optional update text which be used in notifications
+          schema:
+            type: string
+      requestBody:
+        description: Job posting data to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPosting'
+      responses:
+        '204':
+          description: Job posting was updated
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /job-postings/{id}/notify:
+    post:
+      tags:
+        - JobPosting
+      operationId: notifyJobPosting
+      summary: Resend job posting notification to Slack
+      description: Posts the job posting to the Slack utlysninger channel. Admin only.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the job posting to notify about
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Notification sent successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Job posting not found
+        '500':
+          description: Internal server error
+  /job-postings/{jobPostingId}/files:
+    get:
+      tags:
+        - JobPosting
+      operationId: getJobPostingFiles
+      summary: Get files for a job posting
+      description: Retrieves all files associated with a specific job posting.
+      parameters:
+        - name: jobPostingId
+          in: path
+          required: true
+          description: The ID of the job posting to get files for
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A JSON array of files
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostingFiles'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - JobPosting
+      operationId: uploadJobPostingFile
+      summary: Upload a file to a job posting
+      description: Uploads a file and associates it with a specific job posting.
+      parameters:
+        - name: jobPostingId
+          in: path
+          required: true
+          description: The ID of the job posting
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: File to be uploaded
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+      responses:
+        '201':
+          description: File uploaded successfully
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /job-postings/{jobPostingId}/files/{fileName}:
+    delete:
+      tags:
+        - JobPosting
+      operationId: deleteJobPostingFile
+      summary: Delete a job posting file
+      description: Deletes a specific job posting file by job posting ID and file name.
+      parameters:
+        - name: jobPostingId
+          in: path
+          required: true
+          description: The ID of the job posting
+          schema:
+            type: integer
+            format: int64
+        - name: fileName
+          in: path
+          required: true
+          description: The name of the file to be deleted
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Job posting file was deleted
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /me:
+    get:
+      tags:
+        - User
+      operationId: getMe
+      summary: Get current user
+      description: Returns the currently authenticated user
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+  /me/budgets:
+    get:
+      tags:
+        - Budget
+      operationId: getMyBudgets
+      summary: Get current user's budgets
+      description: Returns all budgets for the current user
+      responses:
+        '200':
+          description: List of budgets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Budget'
+  /me/bookings:
+    get:
+      tags:
+        - Booking
+      operationId: getMyBookings
+      summary: Get current user's bookings
+      description: Returns all bookings for the current user
+      responses:
+        '200':
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+  /me/pendingBookings:
+    get:
+      tags:
+        - PendingBooking
+      operationId: getMyPendingBookings
+      summary: Get current user's pending bookings
+      description: Returns all pending bookings for the current user
+      responses:
+        '200':
+          description: List of pending bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PendingBookingDTO'
+  /user:
+    get:
+      tags:
+        - User
+      operationId: getUsers
+      summary: Get users
+      description: Returns all users, optionally filtered by enabled status
+      parameters:
+        - in: query
+          name: isEnabled
+          required: false
+          schema:
+            type: boolean
+          description: Filter by enabled status
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    patch:
+      tags:
+        - User
+      operationId: updateUser
+      summary: Update user
+      description: Update user admin status or active status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                isAdmin:
+                  type: boolean
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          description: User updated
+    post:
+      tags:
+        - User
+      operationId: createUser
+      summary: Create a new employee
+      description: Initialize a new employee with budget start date (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewEmployee'
+      responses:
+        '201':
+          description: Employee created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+        '409':
+          description: User already exists
+  /booking:
+    get:
+      tags:
+        - Booking
+      operationId: getBookings
+      summary: Get bookings
+      description: Returns bookings within a date range
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+  /booking/apartment:
+    get:
+      tags:
+        - Booking
+      operationId: getApartments
+      summary: Get all apartments
+      description: Returns all available apartments
+      responses:
+        '200':
+          description: List of apartments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Apartment'
+  /booking/{bookingId}:
+    delete:
+      tags:
+        - Booking
+      operationId: deleteBooking
+      summary: Delete booking
+      description: Delete a booking by ID
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Booking deleted
+    patch:
+      tags:
+        - Booking
+      operationId: updateBooking
+      summary: Update booking
+      description: Update a booking by ID
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdate'
+      responses:
+        '200':
+          description: Booking updated
+  /booking/vacancy:
+    get:
+      tags:
+        - Booking
+      operationId: getBookingVacancies
+      summary: Get booking vacancies in a time period
+      parameters:
+        - in: query
+          name: startdate
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: enddate
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Map of apartment IDs to lists of available dates
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+                    format: date
+        '400':
+          description: Invalid date format
+  /booking/admin/{bookingId}:
+    delete:
+      tags:
+        - Booking
+      operationId: adminDeleteBooking
+      summary: Admin delete booking
+      description: Admin deletes a booking by ID
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Booking deleted
+        '404':
+          description: Booking not found
+    patch:
+      tags:
+        - Booking
+      operationId: adminUpdateBooking
+      summary: Admin update booking
+      description: Admin updates a booking by ID
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdate'
+      responses:
+        '200':
+          description: Booking updated
+        '400':
+          description: Bad request
+        '404':
+          description: Booking not found
+  /booking/admin/post:
+    post:
+      tags:
+        - Booking
+      operationId: adminCreateBooking
+      summary: Admin creates a booking for a user
+      description: Admin creates a new booking on behalf of a specific user
+      parameters:
+        - name: bookingOwnerName
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBooking'
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: User not found
+  /booking/admin/notify-upcoming:
+    post:
+      tags:
+        - Booking
+      operationId: notifyUpcomingBookings
+      summary: Send Slack notification about upcoming cabin bookings
+      description: |
+        Triggers a Slack notification to the cabin channel with information about
+        who has booked the cabins for the upcoming week. Admin only.
+      parameters:
+        - name: testMode
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: If true, sends the message as a DM to the requesting user instead of the cabin channel
+      responses:
+        '200':
+          description: Notification sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Result message from Slack
+        '403':
+          description: Not authorized (admin only)
+  /budget/{employeeNumber}:
+    get:
+      tags:
+        - Budget
+      operationId: getBudgetsForEmployee
+      summary: Get budgets for employee
+      description: Returns all budgets for a specific employee (admin only)
+      parameters:
+        - name: employeeNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of budgets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BudgetDetail'
+  /budget/{budgetId}/posts:
+    post:
+      tags:
+        - Budget
+      operationId: createBudgetPost
+      summary: Create budget post
+      description: Create a new post for a budget
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePost'
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Bad request
+        '403':
+          description: Forbidden
+  /budget/posts/{postId}:
+    delete:
+      tags:
+        - Budget
+      operationId: deleteBudgetPost
+      summary: Delete budget post
+      description: Delete a budget post by ID
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Post deleted
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    patch:
+      tags:
+        - Budget
+      operationId: updateBudgetPost
+      summary: Update budget post
+      description: Update an existing budget post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePost'
+      responses:
+        '200':
+          description: Post updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /cabin-lottery/current:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getCurrentDrawing
+      summary: Get current active drawing
+      description: Returns the current active drawing (excludes DRAFT status)
+      responses:
+        '200':
+          description: Current drawing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+  /cabin-lottery/drawings/{drawingId}:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getDrawing
+      summary: Get drawing details
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+  /cabin-lottery/drawings/{drawingId}/periods:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getDrawingPeriods
+      summary: Get all periods for a drawing
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of periods
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinPeriod'
+  /cabin-lottery/drawings/{drawingId}/wishes:
+    post:
+      tags:
+        - CabinLottery
+      operationId: submitWishes
+      summary: Submit wishes for a drawing
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkCreateWishes'
+      responses:
+        '200':
+          description: Wishes created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinWish'
+  /cabin-lottery/drawings/{drawingId}/my-wishes:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getMyWishes
+      summary: Get current user's wishes
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of wishes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinWish'
+  /cabin-lottery/drawings/{drawingId}/my-allocations:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getMyAllocations
+      summary: Get current user's allocations
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of allocations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinAllocation'
+  /cabin-lottery/drawings/{drawingId}/allocations:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getDrawingAllocations
+      summary: Get all allocations for a drawing
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: executionId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of allocations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinAllocation'
+  /cabin-lottery/apartments:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getLotteryApartments
+      summary: Get all apartments for lottery
+      responses:
+        '200':
+          description: List of apartments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Apartment'
+  /cabin-lottery/admin/drawings:
+    post:
+      tags:
+        - CabinLottery
+      operationId: createAdminDrawing
+      summary: Create a new cabin drawing (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                season:
+                  type: string
+              required:
+                - season
+      responses:
+        '200':
+          description: Drawing created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+    get:
+      tags:
+        - CabinLottery
+      operationId: getAllDrawings
+      summary: Get all drawings (admin only)
+      responses:
+        '200':
+          description: List of all drawings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinDrawing'
+  /cabin-lottery/admin/drawings/{drawingId}:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getAdminDrawing
+      summary: Get drawing by ID (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '404':
+          description: Drawing not found
+    delete:
+      tags:
+        - CabinLottery
+      operationId: deleteDrawing
+      summary: Delete a drawing (admin only, only if not drawn or published)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Drawing deleted
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/periods:
+    post:
+      tags:
+        - CabinLottery
+      operationId: createPeriod
+      summary: Add a period to a drawing (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePeriod'
+      responses:
+        '200':
+          description: Period created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinPeriod'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+    get:
+      tags:
+        - CabinLottery
+      operationId: getAdminPeriods
+      summary: Get all periods for a drawing (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of periods
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinPeriod'
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/periods/{periodId}:
+    put:
+      tags:
+        - CabinLottery
+      operationId: updatePeriod
+      summary: Update a period (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: periodId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePeriod'
+      responses:
+        '200':
+          description: Period updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinPeriod'
+        '400':
+          description: Bad request
+        '404':
+          description: Period not found
+    delete:
+      tags:
+        - CabinLottery
+      operationId: deletePeriod
+      summary: Delete a period (admin only, only if drawing is OPEN)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: periodId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Period deleted
+        '400':
+          description: Bad request
+        '404':
+          description: Period not found
+  /cabin-lottery/admin/drawings/{drawingId}/periods/bulk:
+    post:
+      tags:
+        - CabinLottery
+      operationId: bulkCreatePeriods
+      summary: Bulk create periods (admin only, Wednesday to Wednesday)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                descriptionTemplate:
+                  type: string
+              required:
+                - startDate
+                - endDate
+      responses:
+        '200':
+          description: Periods created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  periodsCreated:
+                    type: integer
+                  periods:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CabinPeriod'
+                required:
+                  - periodsCreated
+                  - periods
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/open:
+    post:
+      tags:
+        - CabinLottery
+      operationId: openDrawing
+      summary: Open a drawing (admin only, DRAFT -> OPEN, makes it visible to users)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing opened
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/revert-to-draft:
+    post:
+      tags:
+        - CabinLottery
+      operationId: revertToDraft
+      summary: Revert drawing to DRAFT (admin only, OPEN/LOCKED -> DRAFT)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing reverted to draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/revert-to-locked:
+    post:
+      tags:
+        - CabinLottery
+      operationId: revertToLocked
+      summary: Revert drawing to LOCKED (admin only, DRAWN -> LOCKED)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing reverted to locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/lock:
+    post:
+      tags:
+        - CabinLottery
+      operationId: lockDrawing
+      summary: Lock a drawing (admin only, no more wish changes allowed)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/unlock:
+    post:
+      tags:
+        - CabinLottery
+      operationId: unlockDrawing
+      summary: Unlock a drawing (admin only, allow wish changes again)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drawing unlocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/draw:
+    post:
+      tags:
+        - CabinLottery
+      operationId: performDrawing
+      summary: Perform the snake draft lottery (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: seed
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: Optional random seed for reproducibility
+      responses:
+        '200':
+          description: Drawing performed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DrawingResult'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/publish:
+    post:
+      tags:
+        - CabinLottery
+      operationId: publishDrawing
+      summary: Publish drawing results to users (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: executionId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The execution ID to publish
+      responses:
+        '200':
+          description: Drawing published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CabinDrawing'
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing or execution not found
+  /cabin-lottery/admin/drawings/{drawingId}/executions/{executionId}:
+    delete:
+      tags:
+        - CabinLottery
+      operationId: deleteExecution
+      summary: Delete an execution (admin only, only if drawing not published)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Execution deleted
+        '400':
+          description: Bad request
+        '404':
+          description: Execution not found
+  /cabin-lottery/admin/drawings/{drawingId}/wishes:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getAllWishes
+      summary: Get all wishes for a drawing (admin only)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of all wishes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinWish'
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/allocations:
+    get:
+      tags:
+        - CabinLottery
+      operationId: getAdminAllocations
+      summary: Get allocations for a drawing (admin only, published or latest execution)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: executionId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Optional execution ID, defaults to published or latest
+      responses:
+        '200':
+          description: List of allocations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CabinAllocation'
+        '404':
+          description: Drawing not found
+  /cabin-lottery/admin/drawings/{drawingId}/import:
+    post:
+      tags:
+        - CabinLottery
+      operationId: importWishes
+      summary: Import wishes from CSV file (admin only, Google Forms format)
+      parameters:
+        - name: drawingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        '200':
+          description: Wishes imported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalLines:
+                    type: integer
+                  successCount:
+                    type: integer
+                  errorCount:
+                    type: integer
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - totalLines
+                  - successCount
+                  - errorCount
+                  - errors
+        '400':
+          description: Bad request
+        '404':
+          description: Drawing not found
+  /informationNotice:
+    get:
+      tags:
+        - InformationNotice
+      operationId: getInformationNotices
+      summary: Get all information notices in a given period
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of information notices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InformationNotice'
+        '400':
+          description: Invalid date format
+    post:
+      tags:
+        - InformationNotice
+      operationId: createInformationNotice
+      summary: Create a new information notice (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInformationNotice'
+      responses:
+        '201':
+          description: Information notice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InformationNotice'
+        '400':
+          description: Bad request
+  /informationNotice/{infoNoticeId}:
+    patch:
+      tags:
+        - InformationNotice
+      operationId: updateInformationNotice
+      summary: Update an existing information notice (admin only)
+      parameters:
+        - name: infoNoticeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInformationNotice'
+      responses:
+        '200':
+          description: Information notice updated
+        '400':
+          description: Bad request
+        '404':
+          description: Information notice not found
+    delete:
+      tags:
+        - InformationNotice
+      operationId: deleteInformationNotice
+      summary: Delete an information notice (admin only)
+      parameters:
+        - name: infoNoticeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Information notice deleted
+        '404':
+          description: Information notice not found
+  /informationNotice/vacancy:
+    get:
+      tags:
+        - InformationNotice
+      operationId: getInformationNoticeVacancies
+      summary: Get information notice vacancies in a time period
+      parameters:
+        - in: query
+          name: startdate
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: enddate
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of vacant dates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: date
+        '400':
+          description: Invalid date format
+  /pendingBooking/pendingBookingInformation:
+    get:
+      tags:
+        - PendingBooking
+      operationId: getPendingBookingInformation
+      summary: Get the pending booking trains and the corresponding drawing periods
+      responses:
+        '200':
+          description: List of pending booking trains
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PendingBookingTrain'
+  /pendingBooking/pendingBookingWin:
+    post:
+      tags:
+        - PendingBooking
+      operationId: pickWinnerPendingBooking
+      summary: Pending booking becomes a booking
+      description: Converts pending bookings to actual bookings (lottery winner selection)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PendingBookingDTO'
+      responses:
+        '201':
+          description: New booking created
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad request
+  /pendingBooking/{pendingBookingId}:
+    delete:
+      tags:
+        - PendingBooking
+      operationId: deleteMyPendingBooking
+      summary: Delete a pending booking
+      description: Deletes a pending booking if the user has permission
+      parameters:
+        - name: pendingBookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Pending booking deleted successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Forbidden - User does not have permission to delete this pending booking
+        '404':
+          description: Pending booking not found
+  /pendingBooking/admin/{pendingBookingId}:
+    delete:
+      tags:
+        - PendingBooking
+      operationId: adminDeletePendingBooking
+      summary: Delete a pending booking (admin only)
+      description: Deletes any pending booking (requires admin privileges)
+      parameters:
+        - name: pendingBookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Pending booking deleted successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Pending booking not found
+    patch:
+      tags:
+        - PendingBooking
+      operationId: updatePendingBooking
+      summary: Update a pending booking
+      description: Updates a pending booking by ID
+      parameters:
+        - name: pendingBookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdate'
+      responses:
+        '200':
+          description: Pending booking updated
+        '400':
+          description: Bad request
+        '403':
+          description: Forbidden
+        '404':
+          description: Pending booking not found
+  /pendingBooking/pendingPost:
+    post:
+      tags:
+        - PendingBooking
+      operationId: createPendingBooking
+      summary: Create a new pending booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePendingBooking'
+      responses:
+        '201':
+          description: Pending booking created successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+  /pendingBooking/pendingPostForUser:
+    post:
+      tags:
+        - PendingBooking
+      operationId: createPendingBookingForUser
+      summary: Admin creates a pending booking for a user
+      description: Admin creates a new pending booking on behalf of a specific user
+      parameters:
+        - name: bookingOwnerName
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePendingBooking'
+      responses:
+        '201':
+          description: Pending booking created successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: User not found
+  /settings:
+    get:
+      tags:
+        - Settings
+      operationId: getSettings
+      summary: Get all settings
+      responses:
+        '200':
+          description: List of all settings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Setting'
+  /settings/{settingId}:
+    get:
+      tags:
+        - Settings
+      operationId: getSetting
+      summary: Get a specific setting by ID
+      parameters:
+        - name: settingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Setting found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Setting'
+        '404':
+          description: Setting not found
+    patch:
+      tags:
+        - Settings
+      operationId: updateSetting
+      summary: Update a setting (admin only)
+      parameters:
+        - name: settingId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Setting'
+      responses:
+        '200':
+          description: Setting updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Setting'
+        '404':
+          description: Setting not found
+  /admin/budgetSummary:
+    get:
+      tags:
+        - Admin
+      operationId: getBudgetSummary
+      summary: Get summary of all budgets per year (admin only)
+      responses:
+        '200':
+          description: List of budget summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BudgetSummary'
+  /image/{fileName}:
+    get:
+      tags:
+        - Image
+      operationId: getImage
+      summary: Get an image file
+      parameters:
+        - name: fileName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Image file
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Image not found
+  /subscription/{tag}:
+    post:
+      tags:
+        - Subscription
+      operationId: createSubscription
+      summary: Create a new subscription
+      description: Subscribe the authenticated user to a specific tag. Operation is idempotent.
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          description: The tag to subscribe to
+          schema:
+            type: string
+        - name: X-Test-User-Id
+          in: header
+          required: false
+          description: Test user ID for development mode
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Subscription created successfully
+          content:
+            '*/*':
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+      security:
+        - BearerAuth: []
+    delete:
+      tags:
+        - Subscription
+      operationId: deleteSubscription
+      summary: Delete a subscription
+      description: Unsubscribe the authenticated user from a specific tag.
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          description: The tag to unsubscribe from
+          schema:
+            type: string
+        - name: X-Test-User-Id
+          in: header
+          required: false
+          description: Test user ID for development mode
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Subscription deleted successfully
+          content:
+            '*/*':
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+      security:
+        - BearerAuth: []
+  /subscription/list:
+    get:
+      tags:
+        - Subscription
+      operationId: listSubscriptions
+      summary: List all subscriptions for the authenticated user
+      description: Returns all tag subscriptions for the currently authenticated user.
+      parameters:
+        - name: X-Test-User-Id
+          in: header
+          required: false
+          description: Test user ID for development mode
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+      security:
+        - BearerAuth: []
+
+  # Sales Pipeline - Flowcase Consultants
+  /flowcase/consultants:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getFlowcaseConsultants
+      summary: Get all consultants from Flowcase
+      description: Returns all active consultants from Flowcase (CVPartner)
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search query to filter consultants by name or email
+      responses:
+        '200':
+          description: List of consultants from Flowcase
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FlowcaseConsultant'
+        '500':
+          description: Internal server error
+
+  # Sales Pipeline - Consultant Availability
+  /consultants/availability:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getAllConsultantAvailability
+      summary: Get all consultants with their availability status
+      description: Returns all consultants with their current availability status (available, available soon, occupied)
+      responses:
+        '200':
+          description: List of consultant availability
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsultantAvailability'
+        '500':
+          description: Internal server error
+
+  /consultants/{userId}/availability:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getConsultantAvailability
+      summary: Get availability for a specific consultant
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Consultant availability
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultantAvailability'
+        '404':
+          description: Consultant not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - SalesPipeline
+      operationId: updateConsultantAvailability
+      summary: Update consultant availability
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConsultantAvailability'
+      responses:
+        '200':
+          description: Updated consultant availability
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultantAvailability'
+        '404':
+          description: Consultant not found
+        '500':
+          description: Internal server error
+
+  # Sales Pipeline - Sales Activities
+  /sales-activities:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesActivities
+      summary: Get all active sales activities
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ACTIVE, WON, CLOSED_OTHER_WON]
+          description: Filter by status (default ACTIVE)
+      responses:
+        '200':
+          description: List of sales activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesActivity'
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - SalesPipeline
+      operationId: createSalesActivity
+      summary: Create a new sales activity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSalesActivity'
+      responses:
+        '201':
+          description: Created sales activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivity'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /sales-activities/{id}:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesActivity
+      summary: Get a sales activity with history
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Sales activity with history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivityWithHistory'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - SalesPipeline
+      operationId: updateSalesActivity
+      summary: Update a sales activity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSalesActivity'
+      responses:
+        '200':
+          description: Updated sales activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivity'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+        - SalesPipeline
+      operationId: deleteSalesActivity
+      summary: Delete a sales activity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+
+  /sales-activities/{id}/stage:
+    put:
+      tags:
+        - SalesPipeline
+      operationId: updateSalesActivityStage
+      summary: Move sales activity to a new stage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStage'
+      responses:
+        '200':
+          description: Updated sales activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivity'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+
+  /sales-activities/{id}/won:
+    put:
+      tags:
+        - SalesPipeline
+      operationId: markSalesActivityWon
+      summary: Mark sales activity as won (closes other active activities for same consultant)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Updated sales activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivity'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+
+  /sales-activities/{id}/close:
+    put:
+      tags:
+        - SalesPipeline
+      operationId: closeSalesActivity
+      summary: Close a sales activity with a reason
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloseActivity'
+      responses:
+        '200':
+          description: Closed sales activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesActivity'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+
+  /sales-activities/by-consultant/{userId}:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesActivitiesByConsultant
+      summary: Get all sales activities for a consultant
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: includeInactive
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Include non-active (closed) activities
+      responses:
+        '200':
+          description: List of sales activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesActivity'
+        '500':
+          description: Internal server error
+
+  /sales-activities/by-customer/{customerId}:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesActivitiesByCustomer
+      summary: Get all sales activities for a customer
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: includeInactive
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Include non-active (closed) activities
+      responses:
+        '200':
+          description: List of sales activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesActivity'
+        '500':
+          description: Internal server error
+
+  /sales-pipeline/consultants:
+    post:
+      tags:
+        - SalesPipeline
+      operationId: addConsultantToBoard
+      summary: Add a consultant to the sales pipeline board
+      description: Adds a consultant to the board without requiring a sales activity. Creates availability record.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddConsultantToBoardRequest'
+      responses:
+        '201':
+          description: Consultant added to board successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultantAvailability'
+        '400':
+          description: Bad request - consultant already on board
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Consultant not found
+        '500':
+          description: Internal server error
+
+  /sales-pipeline/consultants/reorder:
+    put:
+      tags:
+        - SalesPipeline
+      operationId: reorderConsultants
+      summary: Reorder consultants on the sales pipeline board
+      description: Updates the display order of consultants. Only admins can reorder.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReorderConsultantsRequest'
+      responses:
+        '200':
+          description: Consultants reordered successfully
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /sales-activities/board:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesPipelineBoard
+      summary: Get the full sales pipeline board data
+      description: Returns all consultants with availability and their active sales activities, grouped for board display
+      responses:
+        '200':
+          description: Sales pipeline board data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesPipelineBoard'
+        '500':
+          description: Internal server error
+
+  /sales-activities/consultant/{userId}:
+    delete:
+      tags:
+        - SalesPipeline
+      operationId: removeConsultantFromPipeline
+      summary: Remove a consultant from the sales pipeline
+      description: Deletes all sales activities and availability info for a consultant. Used when a consultant leaves the company.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The user ID of the consultant to remove
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Consultant removed from pipeline successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Consultant not found
+        '500':
+          description: Internal server error
+
+  /sales-activities/analytics:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getSalesPipelineAnalytics
+      summary: Get analytics data for the sales pipeline
+      description: Returns aggregated statistics and metrics for the sales pipeline including win rates, funnel data, and consultant performance
+      responses:
+        '200':
+          description: Sales pipeline analytics data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesPipelineAnalytics'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  # KTI (Customer Satisfaction Survey) Endpoints
+
+  /kti/rounds:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiRounds
+      summary: Get all KTI survey rounds
+      description: Returns all KTI survey rounds, optionally filtered by status
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/KtiRoundStatus'
+      responses:
+        '200':
+          description: List of KTI rounds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiRound'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Kti
+      operationId: createKtiRound
+      summary: Create a new KTI survey round
+      description: Creates a new KTI survey round. Requires admin access.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtiRound'
+      responses:
+        '201':
+          description: KTI round created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiRound'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /kti/rounds/{roundId}:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiRound
+      summary: Get a KTI round by ID
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: KTI round details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiRound'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - Kti
+      operationId: updateKtiRound
+      summary: Update a KTI round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtiRound'
+      responses:
+        '200':
+          description: KTI round updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiRound'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+        - Kti
+      operationId: deleteKtiRound
+      summary: Delete a KTI round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: KTI round deleted successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /kti/organizations:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiOrganizations
+      summary: Get all customer organizations
+      parameters:
+        - name: activeOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: List of customer organizations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiCustomerOrganization'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Kti
+      operationId: createKtiOrganization
+      summary: Create a customer organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtiOrganization'
+      responses:
+        '201':
+          description: Organization created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiCustomerOrganization'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /kti/organizations/{organizationId}:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiOrganization
+      summary: Get a customer organization by ID
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Organization details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiCustomerOrganization'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Organization not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - Kti
+      operationId: updateKtiOrganization
+      summary: Update a customer organization
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtiOrganization'
+      responses:
+        '200':
+          description: Organization updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiCustomerOrganization'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Organization not found
+        '500':
+          description: Internal server error
+
+  /kti/contacts:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiContacts
+      summary: Get all customer contacts
+      parameters:
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: Filter by organization ID
+        - name: activeOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: List of customer contacts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiCustomerContact'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Kti
+      operationId: createKtiContact
+      summary: Create a customer contact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtiContact'
+      responses:
+        '201':
+          description: Contact created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiCustomerContact'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /kti/contacts/{contactId}:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiContact
+      summary: Get a customer contact by ID
+      parameters:
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Contact details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiCustomerContact'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Contact not found
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - Kti
+      operationId: updateKtiContact
+      summary: Update a customer contact
+      parameters:
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtiContact'
+      responses:
+        '200':
+          description: Contact updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiCustomerContact'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Contact not found
+        '500':
+          description: Internal server error
+
+  /kti/questions:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiQuestions
+      summary: Get all KTI questions
+      parameters:
+        - name: activeOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: List of questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiQuestion'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Kti
+      operationId: createKtiQuestion
+      summary: Create a new KTI question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtiQuestion'
+      responses:
+        '201':
+          description: Question created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiQuestion'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /kti/questions/{questionId}:
+    put:
+      tags:
+        - Kti
+      operationId: updateKtiQuestion
+      summary: Update a KTI question
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtiQuestion'
+      responses:
+        '200':
+          description: Question updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiQuestion'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Question not found
+        '500':
+          description: Internal server error
+
+  /kti/import/preview:
+    post:
+      tags:
+        - Kti
+      operationId: previewKtiCsv
+      summary: Preview CSV file for import
+      description: |
+        Upload a CSV file and get a preview of columns and sample rows.
+        This allows the user to map columns to fields before importing.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to preview
+              required:
+                - file
+      responses:
+        '200':
+          description: CSV preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiCsvPreview'
+        '400':
+          description: Bad request - invalid CSV format
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /kti/import/historical:
+    post:
+      tags:
+        - Kti
+      operationId: importHistoricalKti
+      summary: Import historical KTI data from CSV
+      description: |
+        Import historical KTI responses from a CSV file.
+        Use dryRun=true to validate without importing.
+        Column mapping specifies which CSV columns map to which fields.
+      parameters:
+        - name: dryRun
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: If true, only validate without importing
+        - name: skipUnmatchedConsultants
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Skip rows where consultant name doesn't match any user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to import
+                columnMapping:
+                  type: string
+                  description: JSON string with column mapping (e.g. {"date":0,"customer":1,...})
+              required:
+                - file
+      responses:
+        '200':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiImportResult'
+        '400':
+          description: Bad request - invalid CSV format
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /kti/import/contacts/preview:
+    post:
+      tags:
+        - Kti
+      operationId: previewContactsCsv
+      summary: Preview contacts CSV file
+      description: |
+        Upload a CSV file to preview columns and sample data for contact import.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to preview
+              required:
+                - file
+      responses:
+        '200':
+          description: CSV preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiContactsCsvPreview'
+        '400':
+          description: Bad request - invalid CSV format
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /kti/import/contacts:
+    post:
+      tags:
+        - Kti
+      operationId: importContacts
+      summary: Import contacts from CSV
+      description: |
+        Import consultant-contact relationships from a CSV file.
+        Creates organizations, contacts, and optionally assignments.
+      parameters:
+        - name: dryRun
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: If true, only validate without importing
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Year to link contacts to (creates assignments for this year's round)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to import
+                columnMapping:
+                  type: string
+                  description: JSON string with column mapping
+              required:
+                - file
+      responses:
+        '200':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiContactsImportResult'
+        '400':
+          description: Bad request - invalid CSV format
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /kti/rounds/{roundId}/questions:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiRoundQuestions
+      summary: Get questions for a round
+      description: Returns all questions configured for a specific round, including their order and active status
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: activeOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: If true, only return active questions
+      responses:
+        '200':
+          description: List of round questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiRoundQuestion'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Kti
+      operationId: addKtiRoundQuestion
+      summary: Add a question to a round
+      description: Adds an existing question to a round's question set
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddKtiRoundQuestion'
+      responses:
+        '201':
+          description: Question added to round
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiRoundQuestion'
+        '400':
+          description: Bad request - question already in round
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round or question not found
+        '500':
+          description: Internal server error
+
+  /kti/rounds/{roundId}/questions/{questionId}:
+    put:
+      tags:
+        - Kti
+      operationId: updateKtiRoundQuestion
+      summary: Update a round question
+      description: Update the display order or active status of a question in a round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtiRoundQuestion'
+      responses:
+        '200':
+          description: Round question updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiRoundQuestion'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round question not found
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+        - Kti
+      operationId: removeKtiRoundQuestion
+      summary: Remove a question from a round
+      description: Removes a question from a round's question set. Does not delete the question itself.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Question removed from round
+        '400':
+          description: Cannot remove - responses exist for this question
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round question not found
+        '500':
+          description: Internal server error
+
+  /kti/rounds/{roundId}/questions/copy-from/{sourceRoundId}:
+    post:
+      tags:
+        - Kti
+      operationId: copyKtiRoundQuestions
+      summary: Copy questions from another round
+      description: Copies all questions from a source round to this round. Useful when setting up a new survey year.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The target round to copy questions to
+        - name: sourceRoundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The source round to copy questions from
+      responses:
+        '200':
+          description: Questions copied successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiRoundQuestion'
+        '400':
+          description: Target round already has questions
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /kti/rounds/{roundId}/questions/init-from-template:
+    post:
+      tags:
+        - Kti
+      operationId: initKtiRoundQuestionsFromTemplate
+      summary: Initialize round questions from global question template
+      description: Adds all active global questions to this round. Typically used for the first round or to reset.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Questions initialized successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiRoundQuestion'
+        '400':
+          description: Round already has questions
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /kti/rounds/{roundId}/assignments:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiAssignments
+      summary: Get assignments for a round
+      description: Returns all consultant-contact assignments for a specific round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of assignments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiAssignment'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Kti
+      operationId: createKtiAssignment
+      summary: Create an assignment
+      description: Assign a consultant to a customer contact for a round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKtiAssignment'
+      responses:
+        '201':
+          description: Assignment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiAssignment'
+        '400':
+          description: Bad request - assignment already exists or invalid data
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round, consultant or contact not found
+        '500':
+          description: Internal server error
+
+  /kti/rounds/{roundId}/assignments/{assignmentId}:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiAssignment
+      summary: Get an assignment
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: assignmentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Assignment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiAssignment'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Assignment not found
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+        - Kti
+      operationId: deleteKtiAssignment
+      summary: Delete an assignment
+      description: Remove a consultant-contact assignment. Only allowed if no invitations have been sent.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: assignmentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Assignment deleted
+        '400':
+          description: Cannot delete - invitations already sent
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Assignment not found
+        '500':
+          description: Internal server error
+
+  /kti/rounds/{roundId}/invitations:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiInvitations
+      summary: Get invitations for a round
+      description: Returns all invitations for a specific round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/KtiInvitationStatus'
+          description: Filter by invitation status
+      responses:
+        '200':
+          description: List of invitations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiInvitation'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /kti/rounds/{roundId}/invitations/send:
+    post:
+      tags:
+        - Kti
+      operationId: sendKtiInvitations
+      summary: Send invitations
+      description: |
+        Generate tokens and send email invitations to all contacts with assignments
+        that don't already have a pending/sent invitation.
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Send result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiSendInvitationsResult'
+        '400':
+          description: Round not in OPEN status
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /kti/rounds/{roundId}/invitations/remind:
+    post:
+      tags:
+        - Kti
+      operationId: sendKtiReminders
+      summary: Send reminders
+      description: Send reminder emails to contacts who haven't responded yet
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Reminder result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiSendRemindersResult'
+        '400':
+          description: Round not in OPEN status
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Round not found
+        '500':
+          description: Internal server error
+
+  /kti/consultants:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiConsultants
+      summary: Get available consultants
+      description: Returns list of users who can be assigned as consultants
+      responses:
+        '200':
+          description: List of consultants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiConsultant'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /kti/sync-users:
+    post:
+      tags:
+        - Kti
+      operationId: syncUsersFromFlowcase
+      summary: Sync users from Flowcase
+      description: |
+        Fetches all consultants from Flowcase and creates/updates users in the database.
+        This ensures the user table has all consultants for KTI import matching.
+      responses:
+        '200':
+          description: Sync result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSyncResult'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '500':
+          description: Internal server error
+
+  /kti/consultant-aliases:
+    get:
+      tags:
+        - Kti
+      operationId: getConsultantAliases
+      summary: Get all consultant name aliases
+      description: Returns all configured consultant name aliases used for import matching
+      responses:
+        '200':
+          description: List of aliases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsultantAlias'
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - Kti
+      operationId: createConsultantAlias
+      summary: Create a consultant name alias
+      description: Maps an alternative name (e.g., old name) to a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConsultantAliasRequest'
+      responses:
+        '201':
+          description: Alias created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultantAlias'
+        '400':
+          description: Bad request - alias already exists or user not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+
+  /kti/consultant-aliases/{aliasId}:
+    delete:
+      tags:
+        - Kti
+      operationId: deleteConsultantAlias
+      summary: Delete a consultant alias
+      parameters:
+        - name: aliasId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Alias deleted
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Alias not found
+
+  /kti/users:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiUsers
+      summary: Get all users for consultant mapping
+      description: Returns all enabled users that can be mapped to consultants
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiUser'
+        '401':
+          description: Unauthorized
+
+  /kti/rounds/{roundId}/statistics:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiRoundStatistics
+      summary: Get statistics for a KTI round
+      description: Returns aggregated statistics for the specified round including response rates, averages, and breakdowns
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Round statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiRoundStatistics'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Round not found
+
+  /kti/rounds/{roundId}/responses:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiRoundResponses
+      summary: Get all responses for a KTI round
+      description: Returns all individual responses for the specified round with consultant and organization info
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of responses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiResponseSummary'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Round not found
+
+  /kti/rounds/{roundId}/statistics/by-consultant:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiStatisticsByConsultant
+      summary: Get statistics grouped by consultant
+      description: Returns KTI statistics broken down by consultant for the specified round
+      parameters:
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Statistics by consultant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiConsultantStatistics'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Round not found
+
+  /kti/trends:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiCompanyTrends
+      summary: Get company-wide trend statistics
+      description: Returns historical trend statistics across all years including per-question averages
+      responses:
+        '200':
+          description: Company trend statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiCompanyTrendStatistics'
+        '401':
+          description: Unauthorized
+
+  /kti/trends/consultants:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiConsultantsTrends
+      summary: Get consultant trend statistics across years
+      description: Returns statistics for all consultants across all years
+      responses:
+        '200':
+          description: Consultant trend statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiConsultantYearlyStats'
+        '401':
+          description: Unauthorized
+
+  # Consultant's own KTI results (self-service)
+  /kti/me/statistics:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiMyStatistics
+      summary: Get current consultant's own KTI statistics
+      description: Returns aggregated KTI statistics for the currently logged-in consultant across all rounds
+      responses:
+        '200':
+          description: Consultant's own statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiConsultantOwnStatistics'
+        '401':
+          description: Unauthorized
+        '404':
+          description: No statistics found for current user
+
+  /kti/me/trends:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiMyTrends
+      summary: Get current consultant's trend statistics
+      description: Returns historical trend statistics for the currently logged-in consultant
+      responses:
+        '200':
+          description: Consultant's trend statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiConsultantYearlyStats'
+        '401':
+          description: Unauthorized
+        '404':
+          description: No statistics found for current user
+
+  /kti/me/responses:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiMyResponses
+      summary: Get current consultant's KTI responses
+      description: Returns all KTI feedback responses for the currently logged-in consultant with full details about who gave the feedback
+      parameters:
+        - name: roundId
+          in: query
+          required: false
+          description: Optional round ID to filter responses
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of consultant's responses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiResponseSummary'
+        '401':
+          description: Unauthorized
+
+  # Admin endpoints for viewing any consultant's KTI data
+  /kti/admin/consultants/{consultantId}/statistics:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiConsultantStatisticsAdmin
+      summary: Get a consultant's KTI statistics (admin)
+      description: Returns KTI statistics for a specific consultant. Admin only.
+      parameters:
+        - name: consultantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Consultant statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiConsultantOwnStatistics'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Consultant not found
+
+  /kti/admin/consultants/{consultantId}/trends:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiConsultantTrendsAdmin
+      summary: Get a consultant's KTI trends (admin)
+      description: Returns historical trend statistics for a specific consultant. Admin only.
+      parameters:
+        - name: consultantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Consultant trend statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiConsultantYearlyStats'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Consultant not found
+
+  /kti/admin/consultants/{consultantId}/responses:
+    get:
+      tags:
+        - Kti
+      operationId: getKtiConsultantResponsesAdmin
+      summary: Get a consultant's KTI responses (admin)
+      description: Returns all KTI feedback responses for a specific consultant. Admin only.
+      parameters:
+        - name: consultantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: roundId
+          in: query
+          required: false
+          description: Optional round ID to filter responses
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of consultant's responses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KtiResponseSummary'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - admin access required
+        '404':
+          description: Consultant not found
+
+  /kti/responses/{responseId}:
+    put:
+      tags:
+        - Kti
+      operationId: updateKtiResponse
+      summary: Update a KTI response
+      description: Update rating or text value for a specific response (admin only)
+      parameters:
+        - name: responseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtiResponse'
+      responses:
+        '200':
+          description: Response updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiQuestionResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Response not found
+    delete:
+      tags:
+        - Kti
+      operationId: deleteKtiResponse
+      summary: Delete a KTI response
+      description: Delete a specific response (admin only)
+      parameters:
+        - name: responseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Response deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Response not found
+
+  /kti/invitations/{invitationId}:
+    put:
+      tags:
+        - Kti
+      operationId: updateKtiInvitation
+      summary: Update a KTI invitation
+      description: Update status and dates for a specific invitation (admin only)
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKtiInvitation'
+      responses:
+        '200':
+          description: Invitation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KtiInvitation'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Invitation not found
+    delete:
+      tags:
+        - Kti
+      operationId: deleteKtiInvitation
+      summary: Delete a KTI invitation
+      description: Delete a specific invitation and all its responses (admin only)
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Invitation deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Invitation not found
+
+  # Public survey endpoints (no authentication required)
+  /kti/survey/{token}:
+    get:
+      tags:
+        - KtiPublic
+      operationId: getPublicSurvey
+      summary: Get survey for respondent
+      description: Get survey information and questions for a respondent using their unique token. No authentication required.
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Survey information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicSurveyData'
+        '404':
+          description: Survey not found or expired
+        '410':
+          description: Survey already completed
+
+  /kti/survey/{token}/responses:
+    post:
+      tags:
+        - KtiPublic
+      operationId: submitPublicSurveyResponses
+      summary: Submit survey responses
+      description: Submit responses for a survey. No authentication required.
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitSurveyResponses'
+      responses:
+        '201':
+          description: Responses submitted successfully
+        '400':
+          description: Invalid responses
+        '404':
+          description: Survey not found or expired
+        '409':
+          description: Survey already completed
+
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          default: 0
+          description: The ID of the customer
+          example: 1
+        name:
+          type: string
+          description: The name of a customer
+          example: "Skatteetaten"
+        exclusive:
+          type: boolean
+          description: Whether the customer demands exclusive applications
+          default: false
+          example: true
+      required:
+        - id
+        - name
+        - exclusive
+    Customers:
+      type: array
+      description: A list of customers
+      items:
+        $ref: '#/components/schemas/Customer'
+    FileUpload:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: The filename
+          example: sample.pdf
+        content:
+          type: string
+          format: binary
+          description: The actual file content
+      required:
+        - filename
+        - content
+    JobPosting:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          default: 0
+          description: The ID of the job posting
+          example: 40
+        title:
+          type: string
+          description: The title of a job posting
+          example: "Software Engineer"
+        customer:
+          $ref: '#/components/schemas/Customer'
+        urgent:
+          type: boolean
+          description: Indicates if the job posting is urgent. If true, no deadline is required.
+          default: false
+          example: true
+        hidden:
+          type: boolean
+          description: Indicates if the job posting is hidden for employees but available to admins
+          default: false
+          example: false
+        deadline:
+          type: string
+          format: date-time
+          description: The deadline for submitting applications
+          example: "2024-10-09T12:00:00+02:00"
+        description:
+          type: string
+          description: The description of the job posting
+          example: "Skatteetaten leter etter en dyktig Kotlin-utvikler"
+        tags:
+          $ref: '#/components/schemas/Tags'
+        links:
+          type: array
+          description: A list of related links
+          items:
+            type: string
+            format: uri
+          example:
+            - "https://example.com/link1"
+            - "https://example.com/link2"
+        created_date:
+          type: string
+          format: date-time
+          description: The date the job posting was created
+          example: "2024-10-09T12:00:00+02:00"
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The date the job posting was last updated
+          example: "2024-10-10T14:30:00+02:00"
+        source:
+          $ref: '#/components/schemas/JobPostingSource'
+        estimated_hourly_rate:
+          type: number
+          format: double
+          nullable: true
+          description: Estimated hourly rate for the position
+          example: 1200
+        location:
+          type: string
+          nullable: true
+          description: Location of the position (e.g. Oslo, Remote, Hybrid)
+          example: "Oslo"
+        intermediary:
+          type: string
+          nullable: true
+          description: |
+            Name of the intermediary company when applicable:
+            - For BROKER: The broker company name
+            - For SUPPLIER: The supplier company name
+            - For FRAMEWORK_SUBCONTRACTOR: The company holding the framework agreement
+          example: "Experis"
+      required:
+        - id
+        - title
+        - customer
+        - description
+        - urgent
+        - hidden
+        - tags
+        - links
+    JobPostingSource:
+      type: string
+      enum:
+        - DIRECT
+        - BROKER
+        - SUPPLIER
+        - FRAMEWORK_DIRECT
+        - FRAMEWORK_SUBCONTRACTOR
+        - OTHER
+      description: |
+        Source of the job posting:
+        - DIRECT: Direkte fra kunde
+        - BROKER: Via megler
+        - SUPPLIER: Via leverandør
+        - FRAMEWORK_DIRECT: Rammeavtale (direkte)
+        - FRAMEWORK_SUBCONTRACTOR: Rammeavtale (underleverandør)
+        - OTHER: Annet
+    JobPostingFile:
+      type: object
+      properties:
+        blobId:
+          type: string
+          description: The unique ID of the blob
+          example: "abc123"
+        name:
+          type: string
+          description: File name
+          example: "utlysning.pdf"
+        url:
+          type: string
+          format: uri
+          description: URL of the file
+          example: "https://www.myfile.no/utlysning.pdf"
+      required:
+        - blobId
+        - name
+        - url
+    JobPostingFiles:
+      type: array
+      description: List of files
+      items:
+        $ref: '#/components/schemas/JobPostingFile'
+    JobPostings:
+      type: array
+      description: List of job postings
+      items:
+        $ref: '#/components/schemas/JobPosting'
+    Tag:
+      type: object
+      description: A tag that describes e.g. a technology or method used in the project
+      properties:
+        id:
+          type: integer
+          format: int64
+          default: 0
+          description: The ID of the tag
+          example: 101
+        name:
+          type: string
+          description: The name of the tag
+          example: "Kotlin"
+      required:
+        - id
+        - name
+    Tags:
+      type: array
+      description: List of tags
+      items:
+        $ref: '#/components/schemas/Tag'
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+        name:
+          type: string
+        givenName:
+          type: string
+        familyName:
+          type: string
+        icon:
+          type: string
+        nickName:
+          type: string
+        startDate:
+          type: string
+          format: date
+        admin:
+          type: boolean
+          default: false
+        employeeNumber:
+          type: integer
+        budgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Budget'
+    Budget:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        budgetType:
+          $ref: '#/components/schemas/BudgetType'
+        startDate:
+          type: string
+          format: date
+        startAmount:
+          type: number
+        hours:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hours'
+        balance:
+          type: number
+          readOnly: true
+          description: Calculated balance (startAmount + deposits - posts)
+        sumPosts:
+          type: number
+          readOnly: true
+          description: Sum of all posts
+        sumPostsCurrentYear:
+          type: number
+          readOnly: true
+          description: Sum of posts for current year
+        sumPostsLastTwelveMonths:
+          type: number
+          readOnly: true
+          description: Sum of posts for last 12 months
+        sumHours:
+          type: number
+          readOnly: true
+          description: Sum of all hours
+        sumHoursCurrentYear:
+          type: number
+          readOnly: true
+          description: Sum of hours for current year
+        sumHoursLastTwelveMonths:
+          type: number
+          readOnly: true
+          description: Sum of hours for last 12 months
+      required:
+        - posts
+        - budgetType
+        - startDate
+        - startAmount
+        - hours
+    Booking:
+      type: object
+      properties:
+        id:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        apartment:
+          $ref: '#/components/schemas/Apartment'
+        employeeName:
+          type: string
+        isPending:
+          type: boolean
+      required:
+        - id
+        - startDate
+        - endDate
+        - apartment
+    Apartment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        cabin_name:
+          type: string
+        sort_order:
+          type: integer
+      required:
+        - id
+        - cabin_name
+    BookingUpdate:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        apartmentId:
+          type: integer
+          format: int64
+    BudgetDetail:
+      type: object
+      description: Detailed budget information including posts
+      properties:
+        id:
+          type: integer
+          format: int64
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        budgetType:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+            name:
+              type: string
+            startAmount:
+              type: number
+        startDate:
+          type: string
+          format: date
+        startAmount:
+          type: number
+        hours:
+          type: array
+          items:
+            type: object
+      required:
+        - id
+        - posts
+        - budgetType
+        - startDate
+        - startAmount
+    CreatePost:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        amountIncMva:
+          type: number
+        amountExMva:
+          type: number
+        expense:
+          type: boolean
+      required:
+        - date
+        - amountIncMva
+        - amountExMva
+        - expense
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        amountIncMva:
+          type: number
+        amountExMva:
+          type: number
+        documentNumber:
+          type: string
+        dateOfPayment:
+          type: string
+          format: date
+        dateOfDeduction:
+          type: string
+          format: date
+        expense:
+          type: boolean
+        locked:
+          type: boolean
+        createdDate:
+          type: string
+          format: date-time
+        lastModifiedDate:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+      required:
+        - id
+        - date
+        - expense
+        - locked
+    UpdatePost:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        amountExMva:
+          type: number
+    CabinDrawing:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        season:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, OPEN, LOCKED, DRAWN, PUBLISHED]
+        createdAt:
+          type: string
+          format: date-time
+        lockedAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+        publishedExecutionId:
+          type: string
+          format: uuid
+        publishedBy:
+          type: integer
+          format: int64
+        publishedByName:
+          type: string
+        periods:
+          type: array
+          items:
+            $ref: '#/components/schemas/CabinPeriod'
+        executions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CabinDrawingExecution'
+        bookingWarnings:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - season
+        - status
+        - createdAt
+    CabinPeriod:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        description:
+          type: string
+        comment:
+          type: string
+        sortOrder:
+          type: integer
+      required:
+        - id
+        - startDate
+        - endDate
+        - description
+        - sortOrder
+    CreatePeriod:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        description:
+          type: string
+        comment:
+          type: string
+        sortOrder:
+          type: integer
+          default: 0
+      required:
+        - startDate
+        - endDate
+        - description
+    CabinWish:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: integer
+          format: int64
+        userName:
+          type: string
+        userEmail:
+          type: string
+        periodId:
+          type: string
+          format: uuid
+        periodDescription:
+          type: string
+        priority:
+          type: integer
+        desiredApartmentIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        desiredApartmentNames:
+          type: array
+          items:
+            type: string
+        comment:
+          type: string
+      required:
+        - id
+        - userId
+        - userName
+        - userEmail
+        - periodId
+        - periodDescription
+        - priority
+        - desiredApartmentIds
+        - desiredApartmentNames
+    CreateCabinWish:
+      type: object
+      properties:
+        periodId:
+          type: string
+          format: uuid
+        priority:
+          type: integer
+        desiredApartmentIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        comment:
+          type: string
+      required:
+        - periodId
+        - priority
+        - desiredApartmentIds
+    BulkCreateWishes:
+      type: object
+      properties:
+        wishes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateCabinWish'
+      required:
+        - wishes
+    CabinAllocation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        periodId:
+          type: string
+          format: uuid
+        periodDescription:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        apartmentId:
+          type: integer
+          format: int64
+        apartmentName:
+          type: string
+        apartmentSortOrder:
+          type: integer
+        userId:
+          type: integer
+          format: int64
+        userName:
+          type: string
+        userEmail:
+          type: string
+        allocationType:
+          type: string
+        comment:
+          type: string
+        allocatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - periodId
+        - periodDescription
+        - startDate
+        - endDate
+        - apartmentId
+        - apartmentName
+        - userId
+        - userName
+        - userEmail
+        - allocationType
+        - allocatedAt
+    CabinDrawingExecution:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        drawingId:
+          type: string
+          format: uuid
+        executedAt:
+          type: string
+          format: date-time
+        executedBy:
+          type: integer
+          format: int64
+        executedByName:
+          type: string
+        randomSeed:
+          type: integer
+          format: int64
+        auditLog:
+          type: array
+          items:
+            type: string
+        allocationCount:
+          type: integer
+      required:
+        - id
+        - drawingId
+        - executedAt
+        - executedBy
+        - allocationCount
+    DrawingResult:
+      type: object
+      properties:
+        drawingId:
+          type: string
+          format: uuid
+        executionId:
+          type: string
+          format: uuid
+        season:
+          type: string
+        drawnAt:
+          type: string
+          format: date-time
+        allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CabinAllocation'
+        statistics:
+          $ref: '#/components/schemas/DrawingStatistics'
+        auditLog:
+          type: array
+          items:
+            type: string
+      required:
+        - drawingId
+        - executionId
+        - season
+        - drawnAt
+        - allocations
+        - statistics
+        - auditLog
+    DrawingStatistics:
+      type: object
+      properties:
+        totalParticipants:
+          type: integer
+        participantsWithZeroAllocations:
+          type: integer
+        participantsWithOneAllocation:
+          type: integer
+        participantsWithTwoAllocations:
+          type: integer
+        totalAllocations:
+          type: integer
+        allocationsPerPeriod:
+          type: object
+          additionalProperties:
+            type: integer
+      required:
+        - totalParticipants
+        - participantsWithZeroAllocations
+        - participantsWithOneAllocation
+        - participantsWithTwoAllocations
+        - totalAllocations
+        - allocationsPerPeriod
+    PendingBookingTrain:
+      type: object
+      properties:
+        id:
+          type: string
+        apartment:
+          $ref: '#/components/schemas/Apartment'
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        drawingDate:
+          type: string
+          format: date
+        pendingBookings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PendingBookingDTO'
+      required:
+        - id
+        - apartment
+        - startDate
+        - endDate
+        - pendingBookings
+    PendingBookingDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        apartment:
+          $ref: '#/components/schemas/Apartment'
+        employeeName:
+          type: string
+        createdDate:
+          type: string
+          format: date
+      required:
+        - startDate
+        - endDate
+        - createdDate
+    InformationNotice:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        description:
+          type: string
+      required:
+        - startDate
+        - endDate
+        - description
+    CreateInformationNotice:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        description:
+          type: string
+      required:
+        - startDate
+        - endDate
+        - description
+    UpdateInformationNotice:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        description:
+          type: string
+      required:
+        - startDate
+        - endDate
+        - description
+    Setting:
+      type: object
+      properties:
+        settingId:
+          type: string
+        settingValue:
+          type: string
+        settingDescription:
+          type: string
+      required:
+        - settingId
+        - settingValue
+    Subscription:
+      type: object
+      properties:
+        tag:
+          type: string
+          description: The tag name the user is subscribed to
+      required:
+        - tag
+    BudgetSummary:
+      type: object
+      properties:
+        year:
+          type: integer
+        yearSummary:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetYearSummary'
+      required:
+        - year
+        - yearSummary
+    BudgetYearSummary:
+      type: object
+      properties:
+        budgetType:
+          $ref: '#/components/schemas/BudgetType'
+        sum:
+          type: number
+        hours:
+          type: number
+        balance:
+          type: number
+      required:
+        - sum
+        - hours
+        - balance
+    CreateBooking:
+      type: object
+      properties:
+        apartmentID:
+          type: integer
+          format: int64
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+      required:
+        - apartmentID
+        - startDate
+        - endDate
+    CreatePendingBooking:
+      type: object
+      properties:
+        apartmentID:
+          type: integer
+          format: int64
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+      required:
+        - apartmentID
+        - startDate
+        - endDate
+    NewEmployee:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        employeeNumber:
+          type: integer
+        budgetStartDate:
+          type: string
+          format: date
+      required:
+        - email
+        - employeeNumber
+        - budgetStartDate
+    BudgetType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        rollOver:
+          type: boolean
+        deposit:
+          type: number
+        intervalOfDepositInMonths:
+          type: integer
+          format: int64
+        startAmount:
+          type: number
+        allowTimeBalance:
+          type: boolean
+          default: false
+      required:
+        - id
+        - name
+        - rollOver
+        - deposit
+        - intervalOfDepositInMonths
+        - startAmount
+    Hours:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        hours:
+          type: number
+        createdBy:
+          type: string
+        dateOfUsage:
+          type: string
+          format: date
+      required:
+        - hours
+        - createdBy
+        - dateOfUsage
+
+    # Sales Pipeline Schemas
+    FlowcaseConsultant:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Flowcase user ID
+        email:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        imageUrl:
+          type: string
+          nullable: true
+      required:
+        - id
+
+    AvailabilityStatus:
+      type: string
+      enum: [AVAILABLE, AVAILABLE_SOON, OCCUPIED]
+      description: Consultant availability status
+
+    ActivityStatus:
+      type: string
+      enum: [ACTIVE, WON, CLOSED_OTHER_WON]
+      description: Sales activity status
+
+    SalesStage:
+      type: string
+      enum: [INTERESTED, SENT_TO_SUPPLIER, SENT_TO_CUSTOMER, INTERVIEW, LOST]
+      description: Stage in the sales process
+
+    ClosedReason:
+      type: string
+      enum: [REJECTED_BY_SUPPLIER, REJECTED_BY_CUSTOMER, MISSING_REQUIREMENTS, OTHER_CANDIDATE_CHOSEN, ASSIGNMENT_CANCELLED, CONSULTANT_UNAVAILABLE, CONSULTANT_WON_OTHER, OTHER]
+      description: Reason why a sales activity was closed
+
+    ConsultantAvailability:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        consultant:
+          $ref: '#/components/schemas/User'
+        status:
+          $ref: '#/components/schemas/AvailabilityStatus'
+        availableFrom:
+          type: string
+          format: date
+          nullable: true
+        currentCustomer:
+          $ref: '#/components/schemas/Customer'
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
+          nullable: true
+        displayOrder:
+          type: integer
+          description: Display order for sorting consultants on the board (lower = higher)
+      required:
+        - id
+        - consultant
+        - status
+        - updatedAt
+        - displayOrder
+
+    UpdateConsultantAvailability:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/AvailabilityStatus'
+        availableFrom:
+          type: string
+          format: date
+          nullable: true
+        currentCustomerId:
+          type: integer
+          format: int64
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+      required:
+        - status
+
+    ReorderConsultantsRequest:
+      type: object
+      properties:
+        consultantIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: List of consultant IDs in the desired display order
+      required:
+        - consultantIds
+
+    AddConsultantToBoardRequest:
+      type: object
+      properties:
+        consultantId:
+          type: integer
+          format: int64
+          description: The ID of the consultant to add (use this or flowcaseEmail)
+        flowcaseEmail:
+          type: string
+          description: The Flowcase email of the consultant to add (use this or consultantId)
+        availabilityStatus:
+          $ref: '#/components/schemas/AvailabilityStatus'
+        notes:
+          type: string
+          description: Optional notes about the consultant
+
+    SalesActivity:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        consultant:
+          $ref: '#/components/schemas/User'
+        customer:
+          $ref: '#/components/schemas/Customer'
+          nullable: true
+        customerName:
+          type: string
+          nullable: true
+          description: Free-text customer name (used when customer is not in the system)
+        supplierName:
+          type: string
+          nullable: true
+          description: Supplier/broker name (when we are subcontractor)
+        title:
+          type: string
+        currentStage:
+          $ref: '#/components/schemas/SalesStage'
+        status:
+          $ref: '#/components/schemas/ActivityStatus'
+        closedReason:
+          $ref: '#/components/schemas/ClosedReason'
+          nullable: true
+        closedReasonNote:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        maxPrice:
+          type: integer
+          nullable: true
+          description: Maximum hourly rate for the assignment
+        offeredPrice:
+          type: integer
+          nullable: true
+          description: Offered hourly rate for the assignment
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        createdBy:
+          $ref: '#/components/schemas/User'
+          nullable: true
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        expectedStartDate:
+          type: string
+          format: date
+          nullable: true
+        offerDeadline:
+          type: string
+          format: date-time
+          nullable: true
+          description: Deadline for submitting the offer (date and time)
+        offerDeadlineAsap:
+          type: boolean
+          description: If true, the offer deadline is ASAP (as soon as possible)
+        interviewDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date and time of the interview
+      required:
+        - id
+        - consultant
+        - title
+        - currentStage
+        - status
+        - createdAt
+        - updatedAt
+
+    SalesActivityWithHistory:
+      allOf:
+        - $ref: '#/components/schemas/SalesActivity'
+        - type: object
+          properties:
+            stageHistory:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesStageHistoryEntry'
+
+    SalesStageHistoryEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        fromStage:
+          $ref: '#/components/schemas/SalesStage'
+          nullable: true
+        toStage:
+          $ref: '#/components/schemas/SalesStage'
+        changedAt:
+          type: string
+          format: date-time
+        changedBy:
+          $ref: '#/components/schemas/User'
+          nullable: true
+        daysInPreviousStage:
+          type: integer
+          nullable: true
+      required:
+        - id
+        - toStage
+        - changedAt
+
+    CreateSalesActivity:
+      type: object
+      properties:
+        consultantId:
+          type: integer
+          format: int64
+          nullable: true
+          description: Internal consultant user ID (use either this or flowcaseEmail)
+        flowcaseEmail:
+          type: string
+          nullable: true
+          description: Flowcase consultant email (use either this or consultantId)
+        flowcaseName:
+          type: string
+          nullable: true
+          description: Flowcase consultant name (optional, used when creating from Flowcase)
+        customerId:
+          type: integer
+          format: int64
+          nullable: true
+        customerName:
+          type: string
+          nullable: true
+          description: Free-text customer name (used when customer is not in the system)
+        supplierName:
+          type: string
+          nullable: true
+          description: Supplier/broker name (when we are subcontractor)
+        title:
+          type: string
+        currentStage:
+          $ref: '#/components/schemas/SalesStage'
+        notes:
+          type: string
+          nullable: true
+        maxPrice:
+          type: integer
+          nullable: true
+          description: Maximum hourly rate for the assignment
+        offeredPrice:
+          type: integer
+          nullable: true
+          description: Offered hourly rate for the assignment
+        expectedStartDate:
+          type: string
+          format: date
+          nullable: true
+        offerDeadline:
+          type: string
+          format: date-time
+          nullable: true
+          description: Deadline for submitting the offer (date and time)
+        offerDeadlineAsap:
+          type: boolean
+          description: If true, the offer deadline is ASAP (as soon as possible)
+        interviewDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date and time of the interview
+      required:
+        - title
+
+    UpdateSalesActivity:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+          nullable: true
+        customerName:
+          type: string
+          nullable: true
+          description: Free-text customer name (used when customer is not in the system)
+        supplierName:
+          type: string
+          nullable: true
+          description: Supplier/broker name (when we are subcontractor)
+        title:
+          type: string
+        notes:
+          type: string
+          nullable: true
+        maxPrice:
+          type: integer
+          nullable: true
+          description: Maximum hourly rate for the assignment
+        offeredPrice:
+          type: integer
+          nullable: true
+          description: Offered hourly rate for the assignment
+        expectedStartDate:
+          type: string
+          format: date
+          nullable: true
+        offerDeadline:
+          type: string
+          format: date-time
+          nullable: true
+          description: Deadline for submitting the offer (date and time)
+        offerDeadlineAsap:
+          type: boolean
+          description: If true, the offer deadline is ASAP (as soon as possible)
+        interviewDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date and time of the interview
+
+    UpdateStage:
+      type: object
+      properties:
+        stage:
+          $ref: '#/components/schemas/SalesStage'
+      required:
+        - stage
+
+    CloseActivity:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/ClosedReason'
+        note:
+          type: string
+          nullable: true
+      required:
+        - reason
+
+    ConsultantWithActivities:
+      type: object
+      properties:
+        consultant:
+          $ref: '#/components/schemas/User'
+        availability:
+          $ref: '#/components/schemas/ConsultantAvailability'
+          nullable: true
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesActivity'
+      required:
+        - consultant
+        - activities
+
+    SalesPipelineBoard:
+      type: object
+      properties:
+        consultants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsultantWithActivities'
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesStage'
+      required:
+        - consultants
+        - stages
+
+    SalesPipelineAnalytics:
+      type: object
+      properties:
+        totalActiveActivities:
+          type: integer
+          description: Total number of active (non-closed) sales activities
+        wonThisMonth:
+          type: integer
+          description: Number of won activities this month
+        wonThisQuarter:
+          type: integer
+          description: Number of won activities this quarter
+        wonThisYear:
+          type: integer
+          description: Number of won activities this year
+        lostThisMonth:
+          type: integer
+          description: Number of lost activities this month
+        lostThisQuarter:
+          type: integer
+          description: Number of lost activities this quarter
+        conversionRate:
+          type: number
+          format: double
+          description: Win rate (won / (won + lost)) as percentage
+        averageDaysToClose:
+          type: number
+          format: double
+          description: Average number of days from creation to close (won or lost)
+        activitiesByStage:
+          type: array
+          items:
+            $ref: '#/components/schemas/StageCount'
+          description: Count of activities in each stage (funnel data)
+        consultantStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsultantActivityStats'
+          description: Statistics per consultant
+        customerStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerActivityStats'
+          description: Statistics per customer
+        closedReasonStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClosedReasonCount'
+          description: Count of activities by closed reason
+        availabilityStats:
+          $ref: '#/components/schemas/AvailabilityStats'
+          description: Overview of consultant availability
+      required:
+        - totalActiveActivities
+        - wonThisMonth
+        - wonThisQuarter
+        - wonThisYear
+        - lostThisMonth
+        - lostThisQuarter
+        - conversionRate
+        - averageDaysToClose
+        - activitiesByStage
+        - consultantStats
+        - customerStats
+        - closedReasonStats
+        - availabilityStats
+
+    StageCount:
+      type: object
+      properties:
+        stage:
+          $ref: '#/components/schemas/SalesStage'
+        count:
+          type: integer
+      required:
+        - stage
+        - count
+
+    ConsultantActivityStats:
+      type: object
+      properties:
+        consultant:
+          $ref: '#/components/schemas/User'
+        activeActivities:
+          type: integer
+        wonTotal:
+          type: integer
+        lostTotal:
+          type: integer
+      required:
+        - consultant
+        - activeActivities
+        - wonTotal
+        - lostTotal
+
+    CustomerActivityStats:
+      type: object
+      properties:
+        customerName:
+          type: string
+          description: Customer name (from customer entity or free text)
+        activeActivities:
+          type: integer
+        wonTotal:
+          type: integer
+        lostTotal:
+          type: integer
+      required:
+        - customerName
+        - activeActivities
+        - wonTotal
+        - lostTotal
+
+    ClosedReasonCount:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/ClosedReason'
+        count:
+          type: integer
+      required:
+        - reason
+        - count
+
+    AvailabilityStats:
+      type: object
+      properties:
+        available:
+          type: integer
+          description: Number of consultants currently available
+        availableSoon:
+          type: integer
+          description: Number of consultants available soon
+        occupied:
+          type: integer
+          description: Number of consultants occupied
+      required:
+        - available
+        - availableSoon
+        - occupied
+
+    # KTI (Customer Satisfaction Survey) Schemas
+
+    KtiRoundStatus:
+      type: string
+      enum:
+        - DRAFT
+        - OPEN
+        - CLOSED
+      description: Status of a KTI survey round
+
+    KtiQuestionType:
+      type: string
+      enum:
+        - RATING_1_6
+        - FREE_TEXT
+      description: Type of KTI question
+
+    KtiRound:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        year:
+          type: integer
+        status:
+          $ref: '#/components/schemas/KtiRoundStatus'
+        openDate:
+          type: string
+          format: date
+        closeDate:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - year
+        - status
+
+    CreateKtiRound:
+      type: object
+      properties:
+        name:
+          type: string
+        year:
+          type: integer
+        openDate:
+          type: string
+          format: date
+        closeDate:
+          type: string
+          format: date
+      required:
+        - name
+        - year
+
+    UpdateKtiRound:
+      type: object
+      properties:
+        name:
+          type: string
+        openDate:
+          type: string
+          format: date
+        closeDate:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/KtiRoundStatus'
+
+    KtiCustomerOrganization:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        organizationNumber:
+          type: string
+        active:
+          type: boolean
+        contactCount:
+          type: integer
+          description: Number of contacts in this organization
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - active
+
+    CreateKtiOrganization:
+      type: object
+      properties:
+        name:
+          type: string
+        organizationNumber:
+          type: string
+      required:
+        - name
+
+    UpdateKtiOrganization:
+      type: object
+      properties:
+        name:
+          type: string
+        organizationNumber:
+          type: string
+        active:
+          type: boolean
+
+    KtiCustomerContact:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        title:
+          type: string
+        organizationId:
+          type: integer
+          format: int64
+        organizationName:
+          type: string
+        active:
+          type: boolean
+        optedOut:
+          type: boolean
+        optedOutAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - organizationId
+        - active
+        - optedOut
+
+    CreateKtiContact:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        title:
+          type: string
+        organizationId:
+          type: integer
+          format: int64
+      required:
+        - name
+        - organizationId
+
+    UpdateKtiContact:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        title:
+          type: string
+        organizationId:
+          type: integer
+          format: int64
+        active:
+          type: boolean
+        optedOut:
+          type: boolean
+
+    KtiQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        textNo:
+          type: string
+        textEn:
+          type: string
+        questionType:
+          $ref: '#/components/schemas/KtiQuestionType'
+        category:
+          type: string
+        displayOrder:
+          type: integer
+        active:
+          type: boolean
+        required:
+          type: boolean
+      required:
+        - id
+        - code
+        - textNo
+        - questionType
+        - category
+        - displayOrder
+        - active
+        - required
+
+    CreateKtiQuestion:
+      type: object
+      description: Request to create a new KTI question
+      properties:
+        code:
+          type: string
+          description: Unique code for the question (e.g., Q14, CUSTOM1)
+        textNo:
+          type: string
+          description: Question text in Norwegian
+        textEn:
+          type: string
+          description: Question text in English (optional)
+        questionType:
+          $ref: '#/components/schemas/KtiQuestionType'
+        category:
+          type: string
+          description: Question category (e.g., Leveranse, Kommunikasjon)
+        displayOrder:
+          type: integer
+          description: Display order in the survey
+        required:
+          type: boolean
+          default: true
+          description: Whether the question is required
+      required:
+        - code
+        - textNo
+        - questionType
+        - category
+        - displayOrder
+
+    UpdateKtiQuestion:
+      type: object
+      description: Request to update a KTI question
+      properties:
+        code:
+          type: string
+        textNo:
+          type: string
+        textEn:
+          type: string
+        questionType:
+          $ref: '#/components/schemas/KtiQuestionType'
+        category:
+          type: string
+        displayOrder:
+          type: integer
+        active:
+          type: boolean
+        required:
+          type: boolean
+
+    KtiRoundQuestion:
+      type: object
+      description: A question configured for a specific round
+      properties:
+        id:
+          type: integer
+          format: int64
+        roundId:
+          type: integer
+          format: int64
+        question:
+          $ref: '#/components/schemas/KtiQuestion'
+        displayOrder:
+          type: integer
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - roundId
+        - question
+        - displayOrder
+        - active
+
+    AddKtiRoundQuestion:
+      type: object
+      description: Request to add a question to a round
+      properties:
+        questionId:
+          type: integer
+          format: int64
+        displayOrder:
+          type: integer
+        active:
+          type: boolean
+          default: true
+      required:
+        - questionId
+        - displayOrder
+
+    UpdateKtiRoundQuestion:
+      type: object
+      description: Request to update a round question
+      properties:
+        displayOrder:
+          type: integer
+        active:
+          type: boolean
+
+    KtiImportResult:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          description: Whether the import data is valid
+        dryRun:
+          type: boolean
+          description: Whether this was a dry run (no data imported)
+        totalRows:
+          type: integer
+          description: Total number of rows in CSV
+        validRows:
+          type: integer
+          description: Number of valid rows
+        importedResponses:
+          type: integer
+          description: Number of responses imported (0 if dry run)
+        skippedRows:
+          type: integer
+          description: Number of rows skipped
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtiImportError'
+        newOrganizations:
+          type: integer
+          description: Number of new organizations to create/created
+        newContacts:
+          type: integer
+          description: Number of new contacts to create/created
+        roundsToCreate:
+          type: array
+          items:
+            type: string
+          description: Years for which rounds will be created
+        createdRounds:
+          type: integer
+          description: Number of rounds created (0 if dry run)
+        unmatchedConsultants:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnmatchedConsultant'
+          description: Consultants that could not be matched to users, with suggestions
+      required:
+        - valid
+        - dryRun
+        - totalRows
+        - validRows
+
+    UnmatchedConsultant:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The consultant name from CSV that wasn't matched
+        rowCount:
+          type: integer
+          description: Number of rows with this consultant name
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SuggestedMatch'
+          description: Suggested user matches
+      required:
+        - name
+        - rowCount
+        - suggestions
+
+    SuggestedMatch:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        userName:
+          type: string
+        similarity:
+          type: number
+          format: double
+          description: Similarity score (0.0 to 1.0)
+      required:
+        - userId
+        - userName
+        - similarity
+
+    KtiImportError:
+      type: object
+      properties:
+        row:
+          type: integer
+          description: Row number in CSV (1-indexed)
+        field:
+          type: string
+          description: Field name with error
+        value:
+          type: string
+          description: Value that caused the error
+        error:
+          type: string
+          description: Error message in Norwegian
+      required:
+        - row
+        - field
+        - error
+
+    KtiContactsCsvPreview:
+      type: object
+      properties:
+        columns:
+          type: array
+          items:
+            type: string
+          description: Column headers from the CSV file
+        sampleRows:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+          description: Sample data rows
+        totalRows:
+          type: integer
+          description: Total number of data rows
+        delimiter:
+          type: string
+          description: Detected delimiter (comma, semicolon, or TAB)
+        requiredFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtiImportField'
+          description: Fields that need to be mapped
+      required:
+        - columns
+        - sampleRows
+        - totalRows
+        - delimiter
+        - requiredFields
+
+    KtiContactsImportResult:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          description: Whether the import data is valid
+        dryRun:
+          type: boolean
+          description: Whether this was a dry run
+        totalRows:
+          type: integer
+          description: Total number of rows in CSV
+        validRows:
+          type: integer
+          description: Number of valid rows
+        skippedRows:
+          type: integer
+          description: Number of rows skipped
+        createdOrganizations:
+          type: integer
+          description: Number of organizations created
+        createdContacts:
+          type: integer
+          description: Number of contacts created
+        updatedContacts:
+          type: integer
+          description: Number of contacts updated
+        createdAssignments:
+          type: integer
+          description: Number of assignments created (consultant-contact links per round)
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtiImportError'
+        unmatchedConsultants:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnmatchedConsultant'
+      required:
+        - valid
+        - dryRun
+        - totalRows
+        - validRows
+
+    KtiCsvPreview:
+      type: object
+      properties:
+        columns:
+          type: array
+          items:
+            type: string
+          description: Column headers from the CSV file
+        sampleRows:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+          description: Sample data rows (first 3 rows after header)
+        totalRows:
+          type: integer
+          description: Total number of data rows in the file
+        delimiter:
+          type: string
+          description: Detected delimiter (semicolon or comma)
+        requiredFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtiImportField'
+          description: List of fields that need to be mapped
+      required:
+        - columns
+        - sampleRows
+        - totalRows
+        - delimiter
+        - requiredFields
+
+    KtiImportField:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Internal field key used in mapping
+        label:
+          type: string
+          description: Human-readable label in Norwegian
+        required:
+          type: boolean
+          description: Whether this field is required
+        type:
+          type: string
+          enum: [DATE, TEXT, RATING, COMMENT]
+          description: Field type for validation
+      required:
+        - key
+        - label
+        - required
+        - type
+
+    KtiInvitationStatus:
+      type: string
+      enum:
+        - PENDING
+        - SENT
+        - OPENED
+        - RESPONDED
+        - EXPIRED
+
+    KtiAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        roundId:
+          type: integer
+          format: int64
+        consultant:
+          $ref: '#/components/schemas/KtiConsultant'
+        contact:
+          $ref: '#/components/schemas/KtiCustomerContact'
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        hasInvitation:
+          type: boolean
+          description: Whether an invitation has been created for this assignment
+      required:
+        - id
+        - roundId
+        - consultant
+        - contact
+        - createdAt
+        - hasInvitation
+
+    CreateKtiAssignment:
+      type: object
+      properties:
+        consultantId:
+          type: integer
+          format: int64
+          description: ID of the user to assign as consultant
+        contactId:
+          type: integer
+          format: int64
+          description: ID of the customer contact
+        notes:
+          type: string
+          description: Optional notes about the assignment
+      required:
+        - consultantId
+        - contactId
+
+    KtiInvitation:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        assignmentId:
+          type: integer
+          format: int64
+        consultant:
+          $ref: '#/components/schemas/KtiConsultant'
+        contact:
+          $ref: '#/components/schemas/KtiCustomerContact'
+        organization:
+          $ref: '#/components/schemas/KtiCustomerOrganization'
+        status:
+          $ref: '#/components/schemas/KtiInvitationStatus'
+        sentAt:
+          type: string
+          format: date-time
+        openedAt:
+          type: string
+          format: date-time
+        respondedAt:
+          type: string
+          format: date-time
+        reminderCount:
+          type: integer
+        expiresAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - assignmentId
+        - consultant
+        - contact
+        - organization
+        - status
+        - reminderCount
+        - createdAt
+
+    UpdateKtiInvitation:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/KtiInvitationStatus'
+        sentAt:
+          type: string
+          format: date-time
+        openedAt:
+          type: string
+          format: date-time
+        respondedAt:
+          type: string
+          format: date-time
+      description: All fields are optional. Only provided fields will be updated.
+
+    UpdateKtiResponse:
+      type: object
+      properties:
+        ratingValue:
+          type: integer
+          minimum: 1
+          maximum: 6
+          description: Rating value (1-6) for rating questions
+        textValue:
+          type: string
+          description: Text response for free-text questions or comments
+      description: Update rating or text value for a response. Both fields are optional.
+
+    # Public survey schemas (for respondents)
+    PublicSurveyData:
+      type: object
+      properties:
+        surveyName:
+          type: string
+          description: Name of the survey round
+        year:
+          type: integer
+          description: Year of the survey
+        consultantName:
+          type: string
+          description: Name of the consultant being evaluated
+        organizationName:
+          type: string
+          description: Name of the customer organization
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicSurveyQuestion'
+        alreadyResponded:
+          type: boolean
+          description: Whether the survey has already been completed
+      required:
+        - surveyName
+        - year
+        - consultantName
+        - organizationName
+        - questions
+        - alreadyResponded
+
+    PublicSurveyQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Question ID
+        code:
+          type: string
+          description: Question code
+        text:
+          type: string
+          description: Question text (in Norwegian)
+        questionType:
+          $ref: '#/components/schemas/KtiQuestionType'
+        category:
+          type: string
+          description: Question category
+        displayOrder:
+          type: integer
+          description: Order in which to display the question
+        required:
+          type: boolean
+          description: Whether the question is required
+      required:
+        - id
+        - code
+        - text
+        - questionType
+        - category
+        - displayOrder
+        - required
+
+    SubmitSurveyResponses:
+      type: object
+      properties:
+        responses:
+          type: array
+          items:
+            $ref: '#/components/schemas/SurveyResponseItem'
+      required:
+        - responses
+
+    SurveyResponseItem:
+      type: object
+      properties:
+        questionId:
+          type: integer
+          format: int64
+          description: ID of the question being answered
+        ratingValue:
+          type: integer
+          minimum: 1
+          maximum: 6
+          description: Rating value (1-6) for RATING type questions
+        textValue:
+          type: string
+          description: Text response for FREE_TEXT type questions
+      required:
+        - questionId
+
+    KtiConsultant:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+      required:
+        - id
+        - name
+
+    UserSyncResult:
+      type: object
+      properties:
+        totalFromFlowcase:
+          type: integer
+          description: Total users fetched from Flowcase
+        created:
+          type: integer
+          description: Number of new users created
+        updated:
+          type: integer
+          description: Number of existing users updated
+        skipped:
+          type: integer
+          description: Number of users skipped (already up to date)
+        errors:
+          type: array
+          items:
+            type: string
+          description: Error messages if any
+
+    ConsultantAlias:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        aliasName:
+          type: string
+          description: The alternative/old name
+        userId:
+          type: integer
+          format: int64
+          nullable: true
+          description: The user ID (null if this is an ignored/former employee)
+        userName:
+          type: string
+          nullable: true
+          description: The current user name (null if this is an ignored/former employee)
+        ignored:
+          type: boolean
+          description: True if this alias is for a former employee whose rows should be skipped
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - aliasName
+        - ignored
+
+    CreateConsultantAliasRequest:
+      type: object
+      properties:
+        aliasName:
+          type: string
+          description: The alternative name to map (e.g., old name or former employee name)
+        userId:
+          type: integer
+          format: int64
+          nullable: true
+          description: The user ID to map to (omit or null to create an ignore alias for former employees)
+      required:
+        - aliasName
+
+    KtiUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+      required:
+        - id
+        - name
+
+    KtiSendInvitationsResult:
+      type: object
+      properties:
+        sentCount:
+          type: integer
+          description: Number of invitations sent
+        skippedCount:
+          type: integer
+          description: Number of assignments skipped (already have invitation or no email)
+        errors:
+          type: array
+          items:
+            type: string
+          description: Error messages for failed sends
+      required:
+        - sentCount
+        - skippedCount
+        - errors
+
+    KtiSendRemindersResult:
+      type: object
+      properties:
+        sentCount:
+          type: integer
+          description: Number of reminders sent
+        skippedCount:
+          type: integer
+          description: Number of invitations skipped (already responded or no email)
+        errors:
+          type: array
+          items:
+            type: string
+          description: Error messages for failed sends
+      required:
+        - sentCount
+        - skippedCount
+        - errors
+
+    KtiRoundStatistics:
+      type: object
+      properties:
+        roundId:
+          type: integer
+          format: int64
+        roundName:
+          type: string
+        totalInvitations:
+          type: integer
+          description: Total number of invitations sent
+        totalResponses:
+          type: integer
+          description: Total number of completed responses
+        responseRate:
+          type: number
+          format: double
+          description: Response rate as percentage (0-100)
+        averageScore:
+          type: number
+          format: double
+          description: Average score across all rating questions (1-6 scale)
+        consultantCount:
+          type: integer
+          description: Number of consultants with at least one response
+        organizationCount:
+          type: integer
+          description: Number of organizations that responded
+        scoreDistribution:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Distribution of scores (key is score 1-6, value is count)
+        invitationsByStatus:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Count of invitations by status (PENDING, SENT, OPENED, RESPONDED, EXPIRED)
+        questionStatistics:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtiQuestionStatistics'
+          description: Statistics per question
+      required:
+        - roundId
+        - roundName
+        - totalInvitations
+        - totalResponses
+        - responseRate
+        - consultantCount
+        - organizationCount
+
+    KtiQuestionStatistics:
+      type: object
+      properties:
+        questionId:
+          type: integer
+          format: int64
+        questionCode:
+          type: string
+        questionText:
+          type: string
+        averageScore:
+          type: number
+          format: double
+        responseCount:
+          type: integer
+        scoreDistribution:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Distribution of scores for this question (key is score 1-6, value is count)
+      required:
+        - questionId
+        - questionCode
+        - questionText
+        - responseCount
+
+    KtiResponseSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        consultantId:
+          type: integer
+          format: int64
+        consultantName:
+          type: string
+        organizationId:
+          type: integer
+          format: int64
+        organizationName:
+          type: string
+        contactId:
+          type: integer
+          format: int64
+        contactName:
+          type: string
+        contactEmail:
+          type: string
+        averageScore:
+          type: number
+          format: double
+          description: Average score for this response (across all rating questions)
+        respondedAt:
+          type: string
+          format: date-time
+        questionResponses:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtiQuestionResponse'
+      required:
+        - id
+        - consultantName
+        - organizationName
+        - contactName
+
+    KtiQuestionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The response record ID (used for updates/deletes)
+        questionId:
+          type: integer
+          format: int64
+        questionCode:
+          type: string
+        questionText:
+          type: string
+        questionType:
+          $ref: '#/components/schemas/KtiQuestionType'
+        ratingValue:
+          type: integer
+          description: Rating value (1-6) for rating questions
+        textValue:
+          type: string
+          description: Text response for free-text questions
+      required:
+        - id
+        - questionId
+        - questionCode
+        - questionText
+        - questionType
+
+    KtiConsultantStatistics:
+      type: object
+      properties:
+        consultantId:
+          type: integer
+          format: int64
+        consultantName:
+          type: string
+        responseCount:
+          type: integer
+          description: Number of responses for this consultant
+        averageScore:
+          type: number
+          format: double
+          description: Average score across all rating questions
+        organizationCount:
+          type: integer
+          description: Number of unique organizations that responded
+        scoreDistribution:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Distribution of scores for this consultant
+      required:
+        - consultantId
+        - consultantName
+        - responseCount
+        - organizationCount
+
+    KtiYearlyStatistics:
+      type: object
+      properties:
+        year:
+          type: integer
+        roundId:
+          type: integer
+          format: int64
+        roundName:
+          type: string
+        totalResponses:
+          type: integer
+        responseRate:
+          type: number
+          format: double
+        averageScore:
+          type: number
+          format: double
+        consultantCount:
+          type: integer
+        organizationCount:
+          type: integer
+      required:
+        - year
+        - roundId
+        - roundName
+        - totalResponses
+        - responseRate
+        - consultantCount
+        - organizationCount
+
+    KtiQuestionTrend:
+      type: object
+      properties:
+        questionId:
+          type: integer
+          format: int64
+        questionCode:
+          type: string
+        questionText:
+          type: string
+        yearlyAverages:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+          description: Map of year to average score
+      required:
+        - questionId
+        - questionCode
+        - questionText
+        - yearlyAverages
+
+    KtiCompanyTrendStatistics:
+      type: object
+      properties:
+        yearlyStatistics:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtiYearlyStatistics'
+        questionTrends:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtiQuestionTrend'
+        overallTrend:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+          description: Map of year to overall average score
+      required:
+        - yearlyStatistics
+        - questionTrends
+        - overallTrend
+
+    KtiConsultantYearData:
+      type: object
+      properties:
+        responseCount:
+          type: integer
+        averageScore:
+          type: number
+          format: double
+        organizationCount:
+          type: integer
+      required:
+        - responseCount
+        - organizationCount
+
+    KtiConsultantYearlyStats:
+      type: object
+      properties:
+        consultantId:
+          type: integer
+          format: int64
+        consultantName:
+          type: string
+        email:
+          type: string
+        yearlyData:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/KtiConsultantYearData'
+          description: Map of year to consultant data for that year
+      required:
+        - consultantId
+        - consultantName
+        - yearlyData
+
+    KtiConsultantOwnStatistics:
+      type: object
+      description: Statistics for a consultant's own KTI results
+      properties:
+        totalResponses:
+          type: integer
+          description: Total number of feedback responses received across all rounds
+        averageScore:
+          type: number
+          format: double
+          description: Overall average score across all rounds
+        roundsParticipated:
+          type: integer
+          description: Number of rounds the consultant has received feedback in
+        currentYearStats:
+          $ref: '#/components/schemas/KtiConsultantYearData'
+          description: Statistics for the current year (may be null if no data)
+        previousYearStats:
+          $ref: '#/components/schemas/KtiConsultantYearData'
+          description: Statistics for the previous year (may be null if no data)
+        questionAverages:
+          type: array
+          items:
+            $ref: '#/components/schemas/KtiQuestionAverage'
+          description: Average score per question across all rounds
+      required:
+        - totalResponses
+        - roundsParticipated
+        - questionAverages
+
+    KtiQuestionAverage:
+      type: object
+      description: Average score for a specific question across all responses
+      properties:
+        questionId:
+          type: integer
+          format: int64
+        questionCode:
+          type: string
+        questionText:
+          type: string
+        category:
+          type: string
+          description: Question category for grouping
+        averageScore:
+          type: number
+          format: double
+        responseCount:
+          type: integer
+          description: Number of responses for this question
+      required:
+        - questionId
+        - questionCode
+        - questionText
+        - responseCount

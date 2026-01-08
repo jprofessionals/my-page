@@ -90,12 +90,15 @@ class UserSyncService(
                 // Truncate icon URL if too long (database column limit)
                 val safeIcon = flowcaseUser.imageUrl?.take(250)
 
+                // Don't overwrite Google profile pictures with CVPartner URLs
+                val hasGooglePicture = existingUser?.icon?.contains("googleusercontent.com") == true
+
                 if (existingUser != null) {
                     // Check if update is needed
                     if (existingUser.name != name) {
                         val updatedUser = existingUser.copy(
                             name = name,
-                            icon = safeIcon ?: existingUser.icon
+                            icon = if (hasGooglePicture) existingUser.icon else (safeIcon ?: existingUser.icon)
                         )
                         userSaveHelper.saveUser(updatedUser)
                         updated++

@@ -10,7 +10,12 @@ export default function authHeader(): Record<string, string> {
   if (process.env.NODE_ENV === 'development') {
     const testUserId = localStorage.getItem('testUserId')
     if (testUserId) {
-      headers['X-Test-User-Id'] = testUserId
+      // testUserId can be either a numeric ID (legacy) or an email address
+      if (testUserId.includes('@')) {
+        headers['X-Test-User-Email'] = testUserId
+      } else {
+        headers['X-Test-User-Id'] = testUserId
+      }
       return headers // Return early, don't add Authorization header
     }
   }
