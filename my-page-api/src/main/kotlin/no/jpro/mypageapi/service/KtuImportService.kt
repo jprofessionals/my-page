@@ -895,27 +895,47 @@ class KtuImportService(
         row: ParsedRow,
         questions: Map<String, KtuQuestion>
     ) {
-        // Rating questions
+        val invitationId = invitation.id ?: return
+
+        // Rating questions - upsert (update if exists, insert if not)
         for ((code, rating) in row.responses) {
             if (rating != null) {
                 val question = questions[code] ?: continue
-                responseRepository.save(KtuResponse(
-                    invitation = invitation,
-                    question = question,
-                    ratingValue = rating
-                ))
+                val questionId = question.id ?: continue
+
+                val existing = responseRepository.findByInvitationIdAndQuestionId(invitationId, questionId)
+                if (existing != null) {
+                    // Update existing response using copy()
+                    responseRepository.save(existing.copy(ratingValue = rating))
+                } else {
+                    // Create new response
+                    responseRepository.save(KtuResponse(
+                        invitation = invitation,
+                        question = question,
+                        ratingValue = rating
+                    ))
+                }
             }
         }
 
-        // Comment questions
+        // Comment questions - upsert (update if exists, insert if not)
         for ((code, comment) in row.comments) {
             if (comment != null) {
                 val question = questions[code] ?: continue
-                responseRepository.save(KtuResponse(
-                    invitation = invitation,
-                    question = question,
-                    textValue = comment
-                ))
+                val questionId = question.id ?: continue
+
+                val existing = responseRepository.findByInvitationIdAndQuestionId(invitationId, questionId)
+                if (existing != null) {
+                    // Update existing response using copy()
+                    responseRepository.save(existing.copy(textValue = comment))
+                } else {
+                    // Create new response
+                    responseRepository.save(KtuResponse(
+                        invitation = invitation,
+                        question = question,
+                        textValue = comment
+                    ))
+                }
             }
         }
     }

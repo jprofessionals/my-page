@@ -71,6 +71,7 @@ interface KtuInvitationRepository : JpaRepository<KtuInvitation, Long> {
 @Repository
 interface KtuResponseRepository : JpaRepository<KtuResponse, Long> {
     fun findByInvitationId(invitationId: Long): List<KtuResponse>
+    fun findByInvitationIdAndQuestionId(invitationId: Long, questionId: Long): KtuResponse?
 
     @Query("""
         SELECT r FROM KtuResponse r
