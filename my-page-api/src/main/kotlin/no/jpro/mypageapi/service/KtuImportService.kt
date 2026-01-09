@@ -593,18 +593,29 @@ class KtuImportService(
      * Try to parse date with multiple formats
      */
     private fun parseDate(dateStr: String): LocalDateTime? {
+        // Normalize the date string: trim and replace various unicode spaces with regular space
+        val normalized = dateStr.trim()
+            .replace('\u00A0', ' ')  // Non-breaking space
+            .replace('\u2007', ' ')  // Figure space
+            .replace('\u202F', ' ')  // Narrow no-break space
+            .replace(Regex("\\s+"), " ")  // Multiple spaces to single space
+
+        logger.debug("Parsing date: '$dateStr' -> normalized: '$normalized'")
+
         for (formatter in DATE_FORMATTERS) {
             try {
                 return try {
-                    LocalDateTime.parse(dateStr, formatter)
+                    LocalDateTime.parse(normalized, formatter)
                 } catch (e: Exception) {
                     // Try parsing as LocalDate and convert to LocalDateTime
-                    java.time.LocalDate.parse(dateStr, formatter).atStartOfDay()
+                    java.time.LocalDate.parse(normalized, formatter).atStartOfDay()
                 }
             } catch (e: Exception) {
                 // Continue trying other formats
             }
         }
+
+        logger.warn("Failed to parse date: '$dateStr' (normalized: '$normalized')")
         return null
     }
 
