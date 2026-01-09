@@ -139,6 +139,66 @@ class KtuImportService(
             DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.US)
         )
 
+        /**
+         * Parse CSV content into rows, properly handling quoted fields with newlines
+         */
+        fun parseCsvRows(content: String, delimiter: Char): List<List<String>> {
+            val rows = mutableListOf<List<String>>()
+            val currentRow = mutableListOf<String>()
+            val currentField = StringBuilder()
+            var inQuotes = false
+            var i = 0
+
+            while (i < content.length) {
+                val c = content[i]
+
+                when {
+                    c == '"' && !inQuotes -> {
+                        inQuotes = true
+                    }
+                    c == '"' && inQuotes -> {
+                        // Check for escaped quote (double quote)
+                        if (i + 1 < content.length && content[i + 1] == '"') {
+                            currentField.append('"')
+                            i++ // Skip the next quote
+                        } else {
+                            inQuotes = false
+                        }
+                    }
+                    c == delimiter && !inQuotes -> {
+                        currentRow.add(currentField.toString().trim())
+                        currentField.clear()
+                    }
+                    (c == '\n' || c == '\r') && !inQuotes -> {
+                        // End of row (skip \r in \r\n)
+                        if (c == '\r' && i + 1 < content.length && content[i + 1] == '\n') {
+                            i++
+                        }
+                        currentRow.add(currentField.toString().trim())
+                        if (currentRow.any { it.isNotEmpty() }) {
+                            rows.add(currentRow.toList())
+                        }
+                        currentRow.clear()
+                        currentField.clear()
+                    }
+                    else -> {
+                        currentField.append(c)
+                    }
+                }
+                i++
+            }
+
+            // Add last field and row if present
+            if (currentField.isNotEmpty() || currentRow.isNotEmpty()) {
+                currentRow.add(currentField.toString().trim())
+                if (currentRow.any { it.isNotEmpty() }) {
+                    rows.add(currentRow.toList())
+                }
+            }
+
+            return rows
+        }
+
         val REQUIRED_FIELDS = listOf(
             ImportField("date", "Dato", true, ImportFieldType.DATE),
             ImportField("customer", "Kunde/Organisasjon", true, ImportFieldType.TEXT),
@@ -278,10 +338,9 @@ class KtuImportService(
         }
 
         // Read entire file content for processing
-        val allLines = file.inputStream.bufferedReader(Charsets.UTF_8).readLines()
-        logger.info("Total lines in file: ${allLines.size}")
+        val fileContent = file.inputStream.bufferedReader(Charsets.UTF_8).readText()
 
-        if (allLines.isEmpty()) {
+        if (fileContent.isBlank()) {
             return ImportResult(
                 valid = false, dryRun = true, totalRows = 0, validRows = 0,
                 importedResponses = 0, skippedRows = 0,
@@ -291,34 +350,38 @@ class KtuImportService(
         }
 
         // Detect delimiter from first line (check tab, semicolon, comma in priority order)
-        val firstLine = allLines[0]
+        val firstLine = fileContent.lineSequence().first()
         val tabCount = firstLine.count { it == '\t' }
         val semiCount = firstLine.count { it == ';' }
         val commaCount = firstLine.count { it == ',' }
-        val delimiter = when {
-            tabCount > semiCount && tabCount > commaCount -> "\t"
-            semiCount > commaCount -> ";"
-            else -> ","
+        val delimiterChar = when {
+            tabCount > semiCount && tabCount > commaCount -> '\t'
+            semiCount > commaCount -> ';'
+            else -> ','
         }
-        logger.info("Detected delimiter: '${if (delimiter == "\t") "TAB" else delimiter}' (tab=$tabCount, semi=$semiCount, comma=$commaCount)")
+        logger.info("Detected delimiter: '${if (delimiterChar == '\t') "TAB" else delimiterChar}' (tab=$tabCount, semi=$semiCount, comma=$commaCount)")
 
-        // Log first few lines for debugging
-        allLines.take(3).forEachIndexed { idx, line ->
-            logger.info("Line $idx: ${line.take(100)}...")
+        // Parse CSV properly handling quoted fields with newlines
+        val csvRows = parseCsvRows(fileContent, delimiterChar)
+        logger.info("Total CSV rows (including header): ${csvRows.size}")
+
+        // Log first few rows for debugging
+        csvRows.take(3).forEachIndexed { idx, row ->
+            logger.info("Row $idx: ${row.take(4).joinToString(" | ") { it.take(30) }}...")
         }
 
         // Parse CSV (skip header)
-        for ((index, line) in allLines.withIndex()) {
+        for ((index, row) in csvRows.withIndex()) {
             val lineNumber = index + 1
             if (lineNumber == 1) continue // Skip header
 
             try {
-                val parsed = parseLineWithMapping(line, lineNumber, delimiter, mapping, errors)
+                val parsed = parseRowWithMapping(row, lineNumber, mapping, errors)
                 if (parsed != null) {
                     parsedRows.add(parsed)
                 }
             } catch (e: Exception) {
-                errors.add(ImportError(lineNumber, "line", line.take(50), "Kunne ikke parse linje: ${e.message}"))
+                errors.add(ImportError(lineNumber, "line", row.firstOrNull()?.take(50), "Kunne ikke parse rad: ${e.message}"))
             }
         }
 
@@ -544,6 +607,85 @@ class KtuImportService(
         val date = parseDate(dateStr)
         if (date == null) {
             errors.add(ImportError(rowNumber, "dato", dateStr, "Ugyldig datoformat"))
+            return null
+        }
+
+        val email = getCol(mapping.email)
+
+        // Parse ratings (0 means not answered)
+        val responses = mutableMapOf<String, Int?>()
+        val comments = mutableMapOf<String, String?>()
+
+        fun parseRating(index: Int?): Int? {
+            val value = getCol(index) ?: return null
+            if (value == "0") return null
+            return value.toIntOrNull()?.takeIf { it in 1..6 }
+        }
+
+        fun parseComment(index: Int?): String? {
+            return getCol(index)
+        }
+
+        responses["Q1_WORK"] = parseRating(mapping.q1Rating)
+        comments["Q1_WORK_COMMENT"] = parseComment(mapping.q1Comment)
+        responses["Q2_COMPETENCE"] = parseRating(mapping.q2Rating)
+        comments["Q2_COMPETENCE_COMMENT"] = parseComment(mapping.q2Comment)
+        responses["Q3_KNOWLEDGE_SHARING"] = parseRating(mapping.q3Rating)
+        comments["Q3_KNOWLEDGE_SHARING_COMMENT"] = parseComment(mapping.q3Comment)
+        responses["Q4_COLLABORATION"] = parseRating(mapping.q4Rating)
+        comments["Q4_COLLABORATION_COMMENT"] = parseComment(mapping.q4Comment)
+        responses["Q5_JPRO_FOLLOWUP"] = parseRating(mapping.q5Rating)
+        comments["Q5_JPRO_FOLLOWUP_COMMENT"] = parseComment(mapping.q5Comment)
+        responses["Q6_VALUE"] = parseRating(mapping.q6Rating)
+        comments["Q6_VALUE_COMMENT"] = parseComment(mapping.q6Comment)
+        comments["Q7_ADDITIONAL"] = parseComment(mapping.q7Comment)
+
+        return ParsedRow(
+            rowNumber = rowNumber,
+            date = date,
+            year = date.year,
+            customerName = customerName,
+            consultantName = consultantName,
+            contactEmail = email,
+            responses = responses,
+            comments = comments
+        )
+    }
+
+    /**
+     * Parse a pre-parsed CSV row (List<String>) with column mapping
+     */
+    private fun parseRowWithMapping(
+        columns: List<String>,
+        rowNumber: Int,
+        mapping: ColumnMapping,
+        errors: MutableList<ImportError>
+    ): ParsedRow? {
+        // Common empty value indicators
+        val emptyIndicators = setOf("-", "#I/T", "Not Answered", "N/A", "n/a", "")
+
+        // Helper to get column value safely, treating common empty indicators as null
+        fun getCol(index: Int?): String? = index?.let {
+            columns.getOrNull(it)?.takeIf { v ->
+                v.isNotBlank() && v !in emptyIndicators
+            }
+        }
+
+        // Parse required fields
+        val dateStr = getCol(mapping.date)
+        val customerName = getCol(mapping.customer)
+        val consultantName = getCol(mapping.consultant)
+
+        // Skip rows where ANY required field is empty or has "Not Answered" etc.
+        if (dateStr == null || customerName == null || consultantName == null) {
+            logger.debug("Skipping row $rowNumber: incomplete data (date=$dateStr, customer=$customerName, consultant=$consultantName)")
+            return null
+        }
+
+        // Validate date format
+        val date = parseDate(dateStr)
+        if (date == null) {
+            errors.add(ImportError(rowNumber, "dato", dateStr.take(50), "Ugyldig datoformat"))
             return null
         }
 
