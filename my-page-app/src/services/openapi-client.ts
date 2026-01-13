@@ -26,12 +26,12 @@ export function dispatchSessionExpired() {
 /**
  * Get authentication headers for API requests
  * In development mode with test user, uses X-Test-User-Email or X-Test-User-Id header
- * Otherwise uses Bearer token from sessionStorage
+ * Otherwise uses Bearer token from localStorage
  */
 function getAuthHeaders(): Record<string, string> {
   const headers: Record<string, string> = {}
 
-  // Only access localStorage/sessionStorage in browser environment
+  // Only access localStorage in browser environment
   if (typeof window === 'undefined') {
     return headers
   }
@@ -49,7 +49,7 @@ function getAuthHeaders(): Record<string, string> {
   }
 
   // Add Authorization header for real users
-  const userToken = sessionStorage.getItem('user_token')
+  const userToken = localStorage.getItem('user_token')
   if (userToken) {
     headers.Authorization = `Bearer ${userToken}`
   }
@@ -100,7 +100,7 @@ export function configureOpenAPIClient() {
       sessionExpiredDispatched = true
 
       // Clear the stored token
-      sessionStorage.removeItem('user_token')
+      localStorage.removeItem('user_token')
 
       // Dispatch event so AuthProvider can handle it
       dispatchSessionExpired()
