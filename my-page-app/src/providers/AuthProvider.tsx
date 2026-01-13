@@ -109,12 +109,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
 
     const exp = getTokenExpiration(token)
-    if (!exp) return
+    if (!exp) {
+      console.log('[Auth] Could not decode token expiration, skipping refresh scheduling')
+      return
+    }
 
     // Schedule refresh 5 minutes before expiration
     const refreshTime = exp - Date.now() - 5 * 60 * 1000
     if (refreshTime <= 0) {
       // Token already expired or expiring very soon, refresh now
+      console.log('[Auth] Token expiring soon, triggering immediate refresh')
       triggerTokenRefresh()
       return
     }
@@ -125,6 +129,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
       triggerTokenRefresh()
     }, refreshTime)
   }, [triggerTokenRefresh])
+
+  // Schedule token refresh when token changes (separate from login callback to avoid blocking)
+  useEffect(() => {
+    if (userToken && userToken !== 'test-user-token') {
+      // Use setTimeout to avoid blocking the login flow
+      const timeoutId = setTimeout(() => {
+        scheduleTokenRefresh(userToken)
+      }, 100)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [userToken, scheduleTokenRefresh])
 
   // Clean up timer on unmount
   useEffect(() => {
@@ -189,13 +204,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setUserToken(null)
         console.log('[Auth] Stored token expired, will need to re-authenticate')
       } else {
-        // Token still valid, schedule refresh
+        // Token still valid (refresh scheduling happens via separate useEffect)
         setUserToken(token)
-        scheduleTokenRefresh(token)
+        console.log('[Auth] Restored token from localStorage')
       }
     }
     setIsLoading(false)
-  }, [scheduleTokenRefresh])
+  }, []) // No dependencies - only runs on mount
 
   const isAuthenticated = !!userToken
 
@@ -282,11 +297,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
         prompt_parent_id: 'signInDiv',
         use_fedcm_for_prompt: true,
         callback: (response) => {
-          localStorage.setItem('user_token', response.credential)
-          setUserToken(response.credential)
-          setUserFetchStatus('init') // Reset status so user data is fetched
-          resetSessionExpiredFlag() // Allow future 401s to be handled
-          scheduleTokenRefresh(response.credential) // Schedule refresh before expiration
+          console.log('[Auth] Google callback received')
+          try {
+            localStorage.setItem('user_token', response.credential)
+            setUserToken(response.credential)
+            resetSessionExpiredFlag() // Allow future 401s to be handled
+            console.log('[Auth] Login successful, token stored')
+            // Note: Token refresh scheduling happens via separate useEffect
+          } catch (error) {
+            console.error('[Auth] Error in Google callback:', error)
+          }
         },
       })
       googleInitializedRef.current = true
