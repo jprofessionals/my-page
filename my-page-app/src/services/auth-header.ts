@@ -1,7 +1,7 @@
 export default function authHeader(): Record<string, string> {
   const headers: Record<string, string> = {}
 
-  // Only access localStorage/sessionStorage in browser environment
+  // Only access localStorage in browser environment
   if (typeof window === 'undefined') {
     return headers
   }
@@ -21,7 +21,7 @@ export default function authHeader(): Record<string, string> {
   }
 
   // Add Authorization header for real users
-  const user_token = sessionStorage.getItem('user_token')
+  const user_token = localStorage.getItem('user_token')
   if (user_token) {
     headers.Authorization = 'Bearer ' + user_token
   }

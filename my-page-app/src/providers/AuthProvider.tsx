@@ -4,8 +4,10 @@ import {
   createContext,
   MutableRefObject,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react'
 import { User } from '@/types'
@@ -19,6 +21,25 @@ import {
   SESSION_EXPIRED_EVENT,
   resetSessionExpiredFlag,
 } from '@/services/openapi-client'
+
+// Decode JWT token to get expiration time (without verifying signature)
+function getTokenExpiration(token: string): number | null {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+    const payload = JSON.parse(atob(parts[1]))
+    return payload.exp ? payload.exp * 1000 : null // Convert to milliseconds
+  } catch {
+    return null
+  }
+}
+
+// Check if token is expired or will expire soon (within 5 minutes)
+function isTokenExpiringSoon(token: string, bufferMs: number = 5 * 60 * 1000): boolean {
+  const exp = getTokenExpiration(token)
+  if (!exp) return true // If we can't decode, assume expired
+  return Date.now() + bufferMs >= exp
+}
 
 type UserFetchStatus =
   | 'init'
@@ -45,6 +66,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null)
   const [userToken, setUserToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const refreshTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const googleInitializedRef = useRef(false)
 
   const [userFetchStatus, setUserFetchStatus] =
     useState<UserFetchStatus>('init')
@@ -52,6 +75,64 @@ export function AuthProvider({ children }: PropsWithChildren) {
   // Configure OpenAPI client on mount (client-side only)
   useEffect(() => {
     configureOpenAPIClient()
+  }, [])
+
+  // Function to trigger silent token refresh via Google One Tap
+  const triggerTokenRefresh = useCallback(() => {
+    if (typeof window === 'undefined' || !window.google) return
+
+    const { googleClientId } = config()
+
+    // Re-initialize Google One Tap to get a fresh token
+    window.google.accounts.id.initialize({
+      client_id: googleClientId,
+      auto_select: true,
+      use_fedcm_for_prompt: true,
+      callback: (response) => {
+        localStorage.setItem('user_token', response.credential)
+        setUserToken(response.credential)
+        resetSessionExpiredFlag()
+        console.log('[Auth] Token refreshed silently')
+      },
+    })
+
+    // Prompt for silent refresh
+    window.google.accounts.id.prompt()
+  }, [])
+
+  // Schedule token refresh before expiration
+  const scheduleTokenRefresh = useCallback((token: string) => {
+    // Clear any existing timer
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current)
+      refreshTimerRef.current = null
+    }
+
+    const exp = getTokenExpiration(token)
+    if (!exp) return
+
+    // Schedule refresh 5 minutes before expiration
+    const refreshTime = exp - Date.now() - 5 * 60 * 1000
+    if (refreshTime <= 0) {
+      // Token already expired or expiring very soon, refresh now
+      triggerTokenRefresh()
+      return
+    }
+
+    console.log(`[Auth] Token refresh scheduled in ${Math.round(refreshTime / 1000 / 60)} minutes`)
+    refreshTimerRef.current = setTimeout(() => {
+      console.log('[Auth] Triggering scheduled token refresh')
+      triggerTokenRefresh()
+    }, refreshTime)
+  }, [triggerTokenRefresh])
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (refreshTimerRef.current) {
+        clearTimeout(refreshTimerRef.current)
+      }
+    }
   }, [])
 
   // Listen for session expired events from the API client
@@ -80,7 +161,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       return
     }
 
-    const token = sessionStorage.getItem('user_token')
+    const token = localStorage.getItem('user_token')
 
     // Check for test user (works in any environment if testUserId is set)
     const testUserId = localStorage.getItem('testUserId')
@@ -100,10 +181,21 @@ export function AuthProvider({ children }: PropsWithChildren) {
       return
     }
 
-    // Production mode - use real token
-    setUserToken(token)
+    // Production mode - check if token is still valid
+    if (token) {
+      if (isTokenExpiringSoon(token, 0)) {
+        // Token expired, clear it and trigger refresh
+        localStorage.removeItem('user_token')
+        setUserToken(null)
+        console.log('[Auth] Stored token expired, will need to re-authenticate')
+      } else {
+        // Token still valid, schedule refresh
+        setUserToken(token)
+        scheduleTokenRefresh(token)
+      }
+    }
     setIsLoading(false)
-  }, [])
+  }, [scheduleTokenRefresh])
 
   const isAuthenticated = !!userToken
 
@@ -151,7 +243,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       } catch (e) {
         // If authentication fails, clear the token
         if (e instanceof Error && e.message.includes('401')) {
-          sessionStorage.removeItem('user_token')
+          localStorage.removeItem('user_token')
           setUserToken(null)
         }
         setUserFetchStatus('fetchFailed')
@@ -165,7 +257,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const router = useRouter()
   const logout = () => {
-    sessionStorage.removeItem('user_token')
+    localStorage.removeItem('user_token')
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current)
+      refreshTimerRef.current = null
+    }
     setUserFetchStatus('signedOut')
     setUserToken(null)
     setUser(null)
@@ -186,12 +282,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
         prompt_parent_id: 'signInDiv',
         use_fedcm_for_prompt: true,
         callback: (response) => {
-          sessionStorage.setItem('user_token', response.credential)
+          localStorage.setItem('user_token', response.credential)
           setUserToken(response.credential)
           setUserFetchStatus('init') // Reset status so user data is fetched
           resetSessionExpiredFlag() // Allow future 401s to be handled
+          scheduleTokenRefresh(response.credential) // Schedule refresh before expiration
         },
       })
+      googleInitializedRef.current = true
 
       window.google.accounts.id.prompt(() => {
         const signInDiv = divElement.current

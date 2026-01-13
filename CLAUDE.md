@@ -17,37 +17,6 @@ My-Page is a monorepo containing a Spring Boot Kotlin backend API and Next.js Ty
 
 All user-facing text is in Norwegian. Validation messages, UI labels, and error messages use Norwegian.
 
-## Working Budget Constraints
-
-Hard limits on working set:
-- Max ~15,000 lines of code per work step
-- Assume 10–15 tokens per line, stay well under 150,000 tokens of code
-
-**NEVER:**
-- Open or analyze the "entire repo" in one step
-- Work on more than ~40 files simultaneously (unless they are very small config files)
-- Make large, broadly spread changes across many modules in one step
-
-**Fixed process for each task:**
-
-1. **PLANNING PHASE** (no code changes):
-    - Read only directories, filenames, and short excerpts as needed
-    - Identify which modules/packages are relevant
-    - Estimate number of files and scope (small, medium, large)
-    - If the change affects more than ~15,000 lines: create a plan that splits the task into subtasks
-
-2. **WORKING SET SELECTION:**
-    - Choose a limited set of files (typically 5–20, max ~40)
-    - Fetch only necessary context per file
-    - Stop and revise the plan if you need to read too many files
-
-3. **IMPLEMENTATION:**
-    - Work ONLY on files in the selected working set
-    - Don't add extra refactoring in other modules "while you're at it"
-    - Summarize the change when done, suggest next subtask if needed
-
-**Self-check:** If a task requires more than ~15,000 lines, say so and suggest how it can be split up.
-
 ## Development Environment Setup
 
 ### Using Nix (Recommended)
