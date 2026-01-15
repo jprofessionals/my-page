@@ -224,7 +224,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
         interviewDate,
         notes: newInterviewNotes || undefined,
       })
-      setInterviewRounds([...interviewRounds, round])
+      if (round) {
+        setInterviewRounds([...interviewRounds, round])
+      }
       setNewInterviewDate('')
       setNewInterviewTime('10:00')
       setNewInterviewNotes('')
