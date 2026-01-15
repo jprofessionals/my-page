@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="300.013-1" author="JProfessionals">
+        <comment>Create interview_round table to track multiple interview rounds per sales activity</comment>
+        <createTable tableName="interview_round">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="activity_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="round_number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="interview_date" type="DATETIME">
+                <constraints nullable="true"/>
+            </column>
+            <column name="notes" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+            baseTableName="interview_round"
+            baseColumnNames="activity_id"
+            constraintName="fk_interview_round_activity"
+            referencedTableName="sales_activity"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <createIndex tableName="interview_round" indexName="idx_interview_round_activity">
+            <column name="activity_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Migrate existing interview_date to interview_round table -->
+    <changeSet id="300.013-2" author="JProfessionals">
+        <comment>Migrate existing interview dates to interview_round table</comment>
+        <sql>
+            INSERT INTO interview_round (activity_id, round_number, interview_date, created_at)
+            SELECT id, 1, interview_date, COALESCE(updated_at, NOW())
+            FROM sales_activity
+            WHERE interview_date IS NOT NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

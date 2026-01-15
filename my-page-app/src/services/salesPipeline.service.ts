@@ -25,6 +25,10 @@ import {
   removeConsultantFromPipeline,
   reorderConsultants,
   addConsultantToBoard,
+  getInterviewRounds,
+  addInterviewRound,
+  updateInterviewRound,
+  deleteInterviewRound,
 } from '@/data/types/sdk.gen'
 import {
   type CreateSalesActivity,
@@ -35,6 +39,8 @@ import {
   type AddConsultantToBoardRequest,
   type MarkActivityWonRequest,
   type ActivityStatus,
+  type CreateInterviewRound,
+  type UpdateInterviewRound as UpdateInterviewRoundType,
 } from '@/data/types/types.gen'
 import '@/services/openapi-client' // Ensure client is configured
 
@@ -253,6 +259,49 @@ export const salesPipelineService = {
     })
     return data
   },
+
+  // ===== INTERVIEW ROUNDS =====
+
+  /**
+   * Get all interview rounds for a sales activity
+   */
+  async getInterviewRounds(activityId: number) {
+    const { data } = await getInterviewRounds({
+      path: { id: activityId },
+    })
+    return data
+  },
+
+  /**
+   * Add a new interview round to a sales activity
+   */
+  async addInterviewRound(activityId: number, round: CreateInterviewRound) {
+    const { data } = await addInterviewRound({
+      path: { id: activityId },
+      body: round,
+    })
+    return data
+  },
+
+  /**
+   * Update an existing interview round
+   */
+  async updateInterviewRound(activityId: number, roundId: number, updates: UpdateInterviewRoundType) {
+    const { data } = await updateInterviewRound({
+      path: { id: activityId, roundId },
+      body: updates,
+    })
+    return data
+  },
+
+  /**
+   * Delete an interview round
+   */
+  async deleteInterviewRound(activityId: number, roundId: number) {
+    await deleteInterviewRound({
+      path: { id: activityId, roundId },
+    })
+  },
 }
 
 // Re-export types for convenience
@@ -282,4 +331,7 @@ export type {
   UpdateConsultantAvailability,
   AddConsultantToBoardRequest,
   MarkActivityWonRequest,
+  InterviewRound,
+  CreateInterviewRound,
+  UpdateInterviewRound,
 } from '@/data/types/types.gen'

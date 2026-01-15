@@ -1,12 +1,20 @@
 package no.jpro.mypageapi.repository
 
 import no.jpro.mypageapi.entity.ActivityStatus
+import no.jpro.mypageapi.entity.InterviewRound
 import no.jpro.mypageapi.entity.SalesActivity
 import no.jpro.mypageapi.entity.SalesStage
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
+
+@Repository
+interface InterviewRoundRepository : JpaRepository<InterviewRound, Long> {
+    fun findByActivityIdOrderByRoundNumber(activityId: Long): List<InterviewRound>
+    fun findByActivityId(activityId: Long): List<InterviewRound>
+    fun countByActivityId(activityId: Long): Int
+}
 
 @Repository
 interface SalesActivityRepository : JpaRepository<SalesActivity, Long> {

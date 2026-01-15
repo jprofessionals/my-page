@@ -5,6 +5,7 @@ import no.jpro.mypageapi.entity.AvailabilityHistory
 import no.jpro.mypageapi.entity.AvailabilityStatus
 import no.jpro.mypageapi.entity.ClosedReason
 import no.jpro.mypageapi.entity.ConsultantAvailability
+import no.jpro.mypageapi.entity.InterviewRound
 import no.jpro.mypageapi.entity.SalesActivity
 import no.jpro.mypageapi.entity.SalesStage
 import no.jpro.mypageapi.entity.SalesStageHistory
@@ -12,6 +13,7 @@ import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.AvailabilityHistoryRepository
 import no.jpro.mypageapi.repository.ConsultantAvailabilityRepository
 import no.jpro.mypageapi.repository.CustomerRepository
+import no.jpro.mypageapi.repository.InterviewRoundRepository
 import no.jpro.mypageapi.repository.JobPostingRepository
 import no.jpro.mypageapi.repository.SalesActivityRepository
 import no.jpro.mypageapi.repository.SalesStageHistoryRepository
@@ -31,6 +33,7 @@ class SalesPipelineService(
     private val availabilityHistoryRepository: AvailabilityHistoryRepository,
     private val salesActivityRepository: SalesActivityRepository,
     private val salesStageHistoryRepository: SalesStageHistoryRepository,
+    private val interviewRoundRepository: InterviewRoundRepository,
     private val jobPostingRepository: JobPostingRepository,
     private val settingsRepository: SettingsRepository,
     private val userRepository: UserRepository,
@@ -500,6 +503,64 @@ class SalesPipelineService(
             .orElseThrow { IllegalArgumentException("Activity not found: $id") }
 
         salesActivityRepository.delete(activity)
+    }
+
+    // ==================== Interview Rounds ====================
+
+    @Transactional(readOnly = true)
+    fun getInterviewRounds(activityId: Long): List<InterviewRound> =
+        interviewRoundRepository.findByActivityIdOrderByRoundNumber(activityId)
+
+    @Transactional
+    fun addInterviewRound(
+        activityId: Long,
+        interviewDate: LocalDateTime?,
+        notes: String?
+    ): InterviewRound {
+        val activity = salesActivityRepository.findById(activityId)
+            .orElseThrow { IllegalArgumentException("Activity not found: $activityId") }
+
+        val nextRoundNumber = interviewRoundRepository.countByActivityId(activityId) + 1
+
+        val round = InterviewRound(
+            activity = activity,
+            roundNumber = nextRoundNumber,
+            interviewDate = interviewDate,
+            notes = notes
+        )
+
+        return interviewRoundRepository.save(round)
+    }
+
+    @Transactional
+    fun updateInterviewRound(
+        roundId: Long,
+        interviewDate: LocalDateTime?,
+        notes: String?
+    ): InterviewRound {
+        val round = interviewRoundRepository.findById(roundId)
+            .orElseThrow { IllegalArgumentException("Interview round not found: $roundId") }
+
+        round.interviewDate = interviewDate
+        round.notes = notes
+
+        return interviewRoundRepository.save(round)
+    }
+
+    @Transactional
+    fun deleteInterviewRound(roundId: Long) {
+        val round = interviewRoundRepository.findById(roundId)
+            .orElseThrow { IllegalArgumentException("Interview round not found: $roundId") }
+
+        val activityId = round.activity.id
+        interviewRoundRepository.delete(round)
+
+        // Re-number remaining rounds
+        val remainingRounds = interviewRoundRepository.findByActivityIdOrderByRoundNumber(activityId)
+        remainingRounds.forEachIndexed { index, r ->
+            r.roundNumber = index + 1
+        }
+        interviewRoundRepository.saveAll(remainingRounds)
     }
 
     /**

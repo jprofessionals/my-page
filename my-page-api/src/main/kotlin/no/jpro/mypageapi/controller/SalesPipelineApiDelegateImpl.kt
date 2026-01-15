@@ -6,6 +6,9 @@ import no.jpro.mypageapi.entity.ClosedReason
 import no.jpro.mypageapi.entity.SalesStage
 import no.jpro.mypageapi.model.AddConsultantToBoardRequest
 import no.jpro.mypageapi.model.CloseActivity
+import no.jpro.mypageapi.model.CreateInterviewRound
+import no.jpro.mypageapi.model.UpdateInterviewRound
+import no.jpro.mypageapi.model.InterviewRound as InterviewRoundModel
 import no.jpro.mypageapi.model.AvailabilityStats
 import no.jpro.mypageapi.model.MonthlyTrendData
 import no.jpro.mypageapi.model.ClosedReasonCount
@@ -359,6 +362,80 @@ class SalesPipelineApiDelegateImpl(
 
         try {
             salesPipelineService.deleteActivity(id)
+            return ResponseEntity.noContent().build()
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.notFound().build()
+        }
+    }
+
+    // ==================== Interview Rounds ====================
+
+    override fun getInterviewRounds(id: Long): ResponseEntity<List<InterviewRoundModel>> {
+        val activity = salesPipelineService.getSalesActivity(id)
+            ?: return ResponseEntity.notFound().build()
+
+        val rounds = salesPipelineService.getInterviewRounds(id)
+        return ResponseEntity.ok(rounds.map { salesPipelineMapper.toInterviewRoundModel(it) })
+    }
+
+    override fun addInterviewRound(
+        id: Long,
+        createInterviewRound: CreateInterviewRound
+    ): ResponseEntity<InterviewRoundModel> {
+        val currentUser = authHelper.getCurrentUser(getTestUserId())
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+
+        if (!currentUser.admin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        try {
+            val round = salesPipelineService.addInterviewRound(
+                activityId = id,
+                interviewDate = createInterviewRound.interviewDate?.toOsloLocalDateTime(),
+                notes = createInterviewRound.notes
+            )
+            return ResponseEntity.status(HttpStatus.CREATED)
+                .body(salesPipelineMapper.toInterviewRoundModel(round))
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.notFound().build()
+        }
+    }
+
+    override fun updateInterviewRound(
+        id: Long,
+        roundId: Long,
+        updateInterviewRound: UpdateInterviewRound
+    ): ResponseEntity<InterviewRoundModel> {
+        val currentUser = authHelper.getCurrentUser(getTestUserId())
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+
+        if (!currentUser.admin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        try {
+            val round = salesPipelineService.updateInterviewRound(
+                roundId = roundId,
+                interviewDate = updateInterviewRound.interviewDate?.toOsloLocalDateTime(),
+                notes = updateInterviewRound.notes
+            )
+            return ResponseEntity.ok(salesPipelineMapper.toInterviewRoundModel(round))
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.notFound().build()
+        }
+    }
+
+    override fun deleteInterviewRound(id: Long, roundId: Long): ResponseEntity<Unit> {
+        val currentUser = authHelper.getCurrentUser(getTestUserId())
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+
+        if (!currentUser.admin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        try {
+            salesPipelineService.deleteInterviewRound(roundId)
             return ResponseEntity.noContent().build()
         } catch (e: IllegalArgumentException) {
             return ResponseEntity.notFound().build()

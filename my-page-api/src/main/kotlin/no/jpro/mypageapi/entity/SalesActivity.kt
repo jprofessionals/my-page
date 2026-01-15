@@ -97,7 +97,10 @@ class SalesActivity(
     var actualStartDate: LocalDate? = null,
 
     @OneToMany(mappedBy = "activity", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-    var stageHistory: MutableList<SalesStageHistory> = mutableListOf()
+    var stageHistory: MutableList<SalesStageHistory> = mutableListOf(),
+
+    @OneToMany(mappedBy = "activity", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    var interviewRounds: MutableList<InterviewRound> = mutableListOf()
 
 ) {
     override fun equals(other: Any?): Boolean {

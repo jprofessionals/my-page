@@ -7,6 +7,7 @@ import {
   type SalesActivity,
   type SalesStage,
   type ClosedReason,
+  type InterviewRound,
 } from '@/services/salesPipeline.service'
 
 interface Props {
@@ -40,6 +41,13 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
   const [actualStartDate, setActualStartDate] = useState<string>(activity.expectedStartDate || '')
   const [closeReason, setCloseReason] = useState<ClosedReason>('OTHER_CANDIDATE_CHOSEN')
   const [closeReasonNote, setCloseReasonNote] = useState('')
+  const [interviewRounds, setInterviewRounds] = useState<InterviewRound[]>(
+    activity.interviewRounds || []
+  )
+  const [newInterviewDate, setNewInterviewDate] = useState('')
+  const [newInterviewTime, setNewInterviewTime] = useState('10:00')
+  const [newInterviewNotes, setNewInterviewNotes] = useState('')
+  const [addingRound, setAddingRound] = useState(false)
 
   // Parse datetime for form input (round to nearest 5 minutes)
   const parseDateTime = (dateTimeStr: string | undefined | null, defaultTime: string) => {
@@ -195,6 +203,51 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
       toast.error('Kunne ikke slette aktiviteten')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAddInterviewRound = async () => {
+    setAddingRound(true)
+    try {
+      let interviewDate: string | undefined = undefined
+      if (newInterviewDate) {
+        const dateTime = `${newInterviewDate}T${newInterviewTime || '10:00'}:00`
+        const date = new Date(dateTime)
+        const tzOffset = -date.getTimezoneOffset()
+        const tzHours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0')
+        const tzMins = (Math.abs(tzOffset) % 60).toString().padStart(2, '0')
+        const tzSign = tzOffset >= 0 ? '+' : '-'
+        interviewDate = `${newInterviewDate}T${newInterviewTime || '10:00'}:00${tzSign}${tzHours}:${tzMins}`
+      }
+
+      const round = await salesPipelineService.addInterviewRound(activity.id, {
+        interviewDate,
+        notes: newInterviewNotes || undefined,
+      })
+      setInterviewRounds([...interviewRounds, round])
+      setNewInterviewDate('')
+      setNewInterviewTime('10:00')
+      setNewInterviewNotes('')
+      toast.success('Intervjurunde lagt til')
+    } catch (error) {
+      console.error('Failed to add interview round:', error)
+      toast.error('Kunne ikke legge til intervjurunde')
+    } finally {
+      setAddingRound(false)
+    }
+  }
+
+  const handleDeleteInterviewRound = async (roundId: number) => {
+    if (!confirm('Er du sikker på at du vil slette denne intervjurunden?')) {
+      return
+    }
+    try {
+      await salesPipelineService.deleteInterviewRound(activity.id, roundId)
+      setInterviewRounds(interviewRounds.filter(r => r.id !== roundId))
+      toast.success('Intervjurunde slettet')
+    } catch (error) {
+      console.error('Failed to delete interview round:', error)
+      toast.error('Kunne ikke slette intervjurunde')
     }
   }
 
@@ -535,43 +588,93 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
               )}
             </div>
 
-            {/* Interview date */}
+            {/* Interview rounds */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Intervjudato</span>
+                <span className="label-text">Intervjurunder</span>
               </label>
-              <div className="flex gap-2">
-                <input
-                  type="date"
-                  className="input input-bordered flex-1"
-                  value={formData.interviewDate}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      interviewDate: e.target.value || '',
-                    })
-                  }
-                />
-                <select
-                  className="select select-bordered w-28"
-                  value={formData.interviewTime}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      interviewTime: e.target.value,
-                    })
-                  }
-                >
-                  {Array.from({ length: 24 * 12 }, (_, i) => {
-                    const hour = Math.floor(i / 12)
-                    const minute = (i % 12) * 5
-                    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
-                  }).map((time) => (
-                    <option key={time} value={time}>
-                      {time}
-                    </option>
+
+              {/* Existing interview rounds */}
+              {interviewRounds.length > 0 && (
+                <div className="space-y-2 mb-3">
+                  {interviewRounds.map((round) => (
+                    <div key={round.id} className="flex items-center gap-2 bg-base-200 p-2 rounded">
+                      <span className="badge badge-primary">#{round.roundNumber}</span>
+                      <span className="flex-1 text-sm">
+                        {round.interviewDate
+                          ? new Date(round.interviewDate).toLocaleDateString('nb-NO', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : 'Dato ikke satt'}
+                        {round.notes && (
+                          <span className="text-gray-500 ml-2">- {round.notes}</span>
+                        )}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-xs text-error"
+                        onClick={() => handleDeleteInterviewRound(round.id)}
+                        title="Slett intervjurunde"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   ))}
-                </select>
+                </div>
+              )}
+
+              {/* Add new interview round */}
+              <div className="bg-base-200 p-3 rounded space-y-2">
+                <div className="text-sm font-medium">
+                  Legg til intervjurunde #{interviewRounds.length + 1}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="date"
+                    className="input input-bordered input-sm flex-1"
+                    value={newInterviewDate}
+                    onChange={(e) => setNewInterviewDate(e.target.value)}
+                    placeholder="Dato"
+                  />
+                  <select
+                    className="select select-bordered select-sm w-24"
+                    value={newInterviewTime}
+                    onChange={(e) => setNewInterviewTime(e.target.value)}
+                  >
+                    {Array.from({ length: 24 * 4 }, (_, i) => {
+                      const hour = Math.floor(i / 4)
+                      const minute = (i % 4) * 15
+                      return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+                    }).map((time) => (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <input
+                  type="text"
+                  className="input input-bordered input-sm w-full"
+                  placeholder="Notater (valgfritt)"
+                  value={newInterviewNotes}
+                  onChange={(e) => setNewInterviewNotes(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline btn-primary w-full"
+                  onClick={handleAddInterviewRound}
+                  disabled={addingRound}
+                >
+                  {addingRound ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    '+ Legg til intervjurunde'
+                  )}
+                </button>
               </div>
             </div>
 

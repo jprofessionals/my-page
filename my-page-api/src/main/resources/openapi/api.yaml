@@ -2378,6 +2378,124 @@ paths:
         '500':
           description: Internal server error
 
+  /sales-activities/{id}/interview-rounds:
+    get:
+      tags:
+        - SalesPipeline
+      operationId: getInterviewRounds
+      summary: Get all interview rounds for a sales activity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of interview rounds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InterviewRound'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - SalesPipeline
+      operationId: addInterviewRound
+      summary: Add a new interview round to a sales activity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInterviewRound'
+      responses:
+        '201':
+          description: Created interview round
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterviewRound'
+        '404':
+          description: Activity not found
+        '500':
+          description: Internal server error
+
+  /sales-activities/{id}/interview-rounds/{roundId}:
+    put:
+      tags:
+        - SalesPipeline
+      operationId: updateInterviewRound
+      summary: Update an interview round
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInterviewRound'
+      responses:
+        '200':
+          description: Updated interview round
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterviewRound'
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+        - SalesPipeline
+      operationId: deleteInterviewRound
+      summary: Delete an interview round
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Interview round deleted
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+
   /sales-activities/by-consultant/{userId}:
     get:
       tags:
@@ -5807,7 +5925,12 @@ components:
           type: string
           format: date-time
           nullable: true
-          description: Date and time of the interview
+          description: Date and time of the interview (legacy, use interviewRounds for multiple rounds)
+        interviewRounds:
+          type: array
+          items:
+            $ref: '#/components/schemas/InterviewRound'
+          description: List of interview rounds for this activity
         actualStartDate:
           type: string
           format: date
@@ -5856,6 +5979,54 @@ components:
         - id
         - toStage
         - changedAt
+
+    InterviewRound:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        roundNumber:
+          type: integer
+          description: Interview round number (1, 2, 3, etc.)
+        interviewDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date and time of this interview round
+        notes:
+          type: string
+          nullable: true
+          description: Notes about this interview round
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - roundNumber
+        - createdAt
+
+    CreateInterviewRound:
+      type: object
+      properties:
+        interviewDate:
+          type: string
+          format: date-time
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    UpdateInterviewRound:
+      type: object
+      properties:
+        interviewDate:
+          type: string
+          format: date-time
+          nullable: true
+        notes:
+          type: string
+          nullable: true
 
     CreateSalesActivity:
       type: object

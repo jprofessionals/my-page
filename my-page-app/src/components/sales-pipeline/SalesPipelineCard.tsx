@@ -136,8 +136,35 @@ export default function SalesPipelineCard({
           </div>
         )}
 
-        {/* Interview date */}
-        {activity.interviewDate && (
+        {/* Interview rounds */}
+        {activity.interviewRounds && activity.interviewRounds.length > 0 && (
+          <div className="text-xs text-purple-600 font-medium">
+            {activity.interviewRounds.length === 1 ? (
+              activity.interviewRounds[0].interviewDate ? (
+                <>Intervju: {new Date(activity.interviewRounds[0].interviewDate).toLocaleDateString('nb-NO', {
+                  day: 'numeric',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}</>
+              ) : (
+                <>Intervju planlagt</>
+              )
+            ) : (
+              <>
+                Intervju #{activity.interviewRounds.length}
+                {activity.interviewRounds[activity.interviewRounds.length - 1].interviewDate && (
+                  <> - {new Date(activity.interviewRounds[activity.interviewRounds.length - 1].interviewDate).toLocaleDateString('nb-NO', {
+                    day: 'numeric',
+                    month: 'short',
+                  })}</>
+                )}
+              </>
+            )}
+          </div>
+        )}
+        {/* Legacy interview date (fallback if no rounds) */}
+        {(!activity.interviewRounds || activity.interviewRounds.length === 0) && activity.interviewDate && (
           <div className="text-xs text-purple-600 font-medium">
             Intervju: {new Date(activity.interviewDate).toLocaleDateString('nb-NO', {
               day: 'numeric',

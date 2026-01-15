@@ -1,10 +1,12 @@
 package no.jpro.mypageapi.utils.mapper
 
 import no.jpro.mypageapi.entity.ConsultantAvailability
+import no.jpro.mypageapi.entity.InterviewRound
 import no.jpro.mypageapi.entity.SalesActivity
 import no.jpro.mypageapi.entity.SalesStageHistory
 import org.springframework.stereotype.Service
 import no.jpro.mypageapi.model.ConsultantAvailability as ConsultantAvailabilityModel
+import no.jpro.mypageapi.model.InterviewRound as InterviewRoundModel
 import no.jpro.mypageapi.model.SalesActivity as SalesActivityModel
 import no.jpro.mypageapi.model.SalesActivityWithHistory as SalesActivityWithHistoryModel
 import no.jpro.mypageapi.model.SalesStageHistoryEntry as SalesStageHistoryEntryModel
@@ -58,6 +60,15 @@ class SalesPipelineMapper(
             daysInPreviousStage = entity.daysInPreviousStage
         )
 
+    fun toInterviewRoundModel(entity: InterviewRound): InterviewRoundModel =
+        InterviewRoundModel(
+            id = entity.id,
+            roundNumber = entity.roundNumber,
+            interviewDate = entity.interviewDate?.let { toOffsetDateTime(it) },
+            notes = entity.notes,
+            createdAt = toOffsetDateTime(entity.createdAt)
+        )
+
     fun toSalesActivityModel(entity: SalesActivity): SalesActivityModel =
         SalesActivityModel(
             id = entity.id,
@@ -81,6 +92,7 @@ class SalesPipelineMapper(
             offerDeadline = entity.offerDeadline?.let { toOffsetDateTime(it) },
             offerDeadlineAsap = entity.offerDeadlineAsap,
             interviewDate = entity.interviewDate?.let { toOffsetDateTime(it) },
+            interviewRounds = entity.interviewRounds.sortedBy { it.roundNumber }.map { toInterviewRoundModel(it) },
             actualStartDate = entity.actualStartDate
         )
 
@@ -107,6 +119,7 @@ class SalesPipelineMapper(
             offerDeadline = entity.offerDeadline?.let { toOffsetDateTime(it) },
             offerDeadlineAsap = entity.offerDeadlineAsap,
             interviewDate = entity.interviewDate?.let { toOffsetDateTime(it) },
+            interviewRounds = entity.interviewRounds.sortedBy { it.roundNumber }.map { toInterviewRoundModel(it) },
             actualStartDate = entity.actualStartDate,
             stageHistory = entity.stageHistory.map { toSalesStageHistoryEntryModel(it) }
         )
