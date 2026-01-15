@@ -153,12 +153,15 @@ export default function SalesPipelineCard({
             ) : (
               <>
                 Intervju #{activity.interviewRounds.length}
-                {activity.interviewRounds[activity.interviewRounds.length - 1].interviewDate && (
-                  <> - {new Date(activity.interviewRounds[activity.interviewRounds.length - 1].interviewDate).toLocaleDateString('nb-NO', {
-                    day: 'numeric',
-                    month: 'short',
-                  })}</>
-                )}
+                {(() => {
+                  const lastRound = activity.interviewRounds[activity.interviewRounds.length - 1]
+                  return lastRound.interviewDate ? (
+                    <> - {new Date(lastRound.interviewDate).toLocaleDateString('nb-NO', {
+                      day: 'numeric',
+                      month: 'short',
+                    })}</>
+                  ) : null
+                })()}
               </>
             )}
           </div>
