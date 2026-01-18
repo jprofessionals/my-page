@@ -2,7 +2,7 @@ package no.jpro.mypageapi.integration
 
 
 import no.jpro.mypageapi.entity.User
-import no.jpro.mypageapi.repository.UserRepository
+import no.jpro.mypageapi.repository.*
 import no.jpro.mypageapi.testutil.EntityFactory
 import no.jpro.mypageapi.testutil.HttpHeaderTestRestTemplate
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -28,6 +28,25 @@ abstract class IntegrationTestBase {
     @Autowired
     private lateinit var testRestTemplate: TestRestTemplate
 
+    // KTU repositories for cleanup (in correct order due to foreign keys)
+    @Autowired
+    private lateinit var ktuResponseRepository: KtuResponseRepository
+
+    @Autowired
+    private lateinit var ktuInvitationRepository: KtuInvitationRepository
+
+    @Autowired
+    private lateinit var ktuRoundQuestionRepository: KtuRoundQuestionRepository
+
+    @Autowired
+    private lateinit var ktuAssignmentRepository: KtuAssignmentRepository
+
+    @Autowired
+    private lateinit var ktuRoundRepository: KtuRoundRepository
+
+    @Autowired
+    private lateinit var ktuConsultantAliasRepository: KtuConsultantAliasRepository
+
     var mockOAuth2Server = MockOAuth2Server()
 
     lateinit var user: User
@@ -38,6 +57,14 @@ abstract class IntegrationTestBase {
     fun baseSetup() {
         mockOAuth2Server = MockOAuth2Server()
         mockOAuth2Server.start(8099)
+
+        // Clean up KTU data first (in correct order due to foreign key constraints)
+        ktuResponseRepository.deleteAll()
+        ktuInvitationRepository.deleteAll()
+        ktuRoundQuestionRepository.deleteAll()
+        ktuAssignmentRepository.deleteAll()
+        ktuRoundRepository.deleteAll()
+        ktuConsultantAliasRepository.deleteAll()
 
         userRepository.deleteAll()
         user = entityFactory.createUser(email = "test@test.no", employeeNumber = 12345)

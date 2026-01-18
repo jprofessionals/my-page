@@ -6,9 +6,7 @@ import no.jpro.mypageapi.config.MockApplicationConfig
 import no.jpro.mypageapi.entity.Budget
 import no.jpro.mypageapi.entity.BudgetType
 import no.jpro.mypageapi.entity.User
-import no.jpro.mypageapi.repository.BudgetRepository
-import no.jpro.mypageapi.repository.BudgetTypeRepository
-import no.jpro.mypageapi.repository.UserRepository
+import no.jpro.mypageapi.repository.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -35,7 +33,13 @@ class UserServiceTest @Autowired constructor(
     private val userService: UserService,
     private val userRepository: UserRepository,
     private val budgetRepository: BudgetRepository,
-    private val budgetTypeRepository: BudgetTypeRepository
+    private val budgetTypeRepository: BudgetTypeRepository,
+    private val ktuResponseRepository: KtuResponseRepository,
+    private val ktuInvitationRepository: KtuInvitationRepository,
+    private val ktuRoundQuestionRepository: KtuRoundQuestionRepository,
+    private val ktuAssignmentRepository: KtuAssignmentRepository,
+    private val ktuRoundRepository: KtuRoundRepository,
+    private val ktuConsultantAliasRepository: KtuConsultantAliasRepository
 ) {
 
     @MockitoBean
@@ -50,6 +54,13 @@ class UserServiceTest @Autowired constructor(
     @BeforeEach
     fun setup() {
         budgetRepository.deleteAll()
+        // Clean up KTU data first (in correct order due to foreign key constraints)
+        ktuResponseRepository.deleteAll()
+        ktuInvitationRepository.deleteAll()
+        ktuRoundQuestionRepository.deleteAll()
+        ktuAssignmentRepository.deleteAll()
+        ktuRoundRepository.deleteAll()
+        ktuConsultantAliasRepository.deleteAll()
         userRepository.deleteAll()
         budgetTypeRepository.deleteAll()
     }

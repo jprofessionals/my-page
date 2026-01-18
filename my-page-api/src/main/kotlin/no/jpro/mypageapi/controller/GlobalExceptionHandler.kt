@@ -2,6 +2,8 @@ package no.jpro.mypageapi.controller
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.authorization.AuthorizationDeniedException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
@@ -10,6 +12,20 @@ import org.springframework.web.bind.annotation.ResponseBody
 class GlobalExceptionHandler {
 
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
+
+    @ExceptionHandler(AuthorizationDeniedException::class)
+    @ResponseBody
+    fun handleAuthorizationDenied(e: AuthorizationDeniedException): ResponseEntity<String> {
+        logger.warn("Authorization denied: ${e.message}")
+        return ResponseEntity("Access denied", HttpStatus.FORBIDDEN)
+    }
+
+    @ExceptionHandler(AccessDeniedException::class)
+    @ResponseBody
+    fun handleAccessDenied(e: AccessDeniedException): ResponseEntity<String> {
+        logger.warn("Access denied: ${e.message}")
+        return ResponseEntity("Access denied", HttpStatus.FORBIDDEN)
+    }
 
     @ExceptionHandler(MyPageRestException::class)
     @ResponseBody

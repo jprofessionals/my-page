@@ -136,7 +136,7 @@ class KtuPublicSurveyTest(
 
             // Act
             val response = restClient(false)
-                .getForEntity<PublicSurveyData>("/ktu/public/survey/${invitation.token}")
+                .getForEntity<PublicSurveyData>("/ktu/survey/${invitation.token}")
 
             // Assert
             assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -151,7 +151,7 @@ class KtuPublicSurveyTest(
         fun `should return 404 for invalid token`() {
             // Act
             val response = restClient(false)
-                .getForEntity<String>("/ktu/public/survey/invalid-token")
+                .getForEntity<String>("/ktu/survey/invalid-token")
 
             // Assert
             assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
@@ -164,7 +164,7 @@ class KtuPublicSurveyTest(
 
             // Act
             val response = restClient(false)
-                .getForEntity<String>("/ktu/public/survey/${invitation.token}")
+                .getForEntity<String>("/ktu/survey/${invitation.token}")
 
             // Assert
             assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
@@ -180,7 +180,7 @@ class KtuPublicSurveyTest(
 
             // Act
             val response = restClient(false)
-                .getForEntity<PublicSurveyData>("/ktu/public/survey/${invitation.token}")
+                .getForEntity<PublicSurveyData>("/ktu/survey/${invitation.token}")
 
             // Assert - Should work for DRAFT rounds (allows testing)
             assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -196,7 +196,7 @@ class KtuPublicSurveyTest(
 
             // Act
             val response = restClient(false)
-                .getForEntity<String>("/ktu/public/survey/${invitation.token}")
+                .getForEntity<String>("/ktu/survey/${invitation.token}")
 
             // Assert - Should fail for CLOSED rounds
             assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
@@ -210,7 +210,7 @@ class KtuPublicSurveyTest(
 
             // Act
             val response = restClient(false)
-                .getForEntity<PublicSurveyData>("/ktu/public/survey/${invitation.token}")
+                .getForEntity<PublicSurveyData>("/ktu/survey/${invitation.token}")
 
             // Assert
             assertThat(response.statusCode).isEqualTo(HttpStatus.GONE)
@@ -238,7 +238,7 @@ class KtuPublicSurveyTest(
             // Act
             val response = restClient(false)
                 .postForEntity<String>(
-                    "/ktu/public/survey/${invitation.token}/responses",
+                    "/ktu/survey/${invitation.token}/responses",
                     submitRequest
                 )
 
@@ -269,7 +269,7 @@ class KtuPublicSurveyTest(
             // Act
             val response = restClient(false)
                 .postForEntity<String>(
-                    "/ktu/public/survey/${invitation.token}/responses",
+                    "/ktu/survey/${invitation.token}/responses",
                     submitRequest
                 )
 
@@ -295,7 +295,7 @@ class KtuPublicSurveyTest(
             // Act
             val response = restClient(false)
                 .postForEntity<String>(
-                    "/ktu/public/survey/${invitation.token}/responses",
+                    "/ktu/survey/${invitation.token}/responses",
                     submitRequest
                 )
 
@@ -320,7 +320,7 @@ class KtuPublicSurveyTest(
             // Act
             val response = restClient(false)
                 .postForEntity<String>(
-                    "/ktu/public/survey/${invitation.token}/responses",
+                    "/ktu/survey/${invitation.token}/responses",
                     submitRequest
                 )
 
@@ -349,7 +349,7 @@ class KtuPublicSurveyTest(
 
             // Act
             val response = restClient(false)
-                .getForEntity<PublicSurveyData>("/ktu/public/survey/${invitation.token}")
+                .getForEntity<PublicSurveyData>("/ktu/survey/${invitation.token}")
 
             // Assert
             assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
