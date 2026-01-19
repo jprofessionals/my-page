@@ -197,16 +197,20 @@ export const JobPosting = (jobPosting: JobPostingType) => {
             {/* Left side - title and customer */}
             <div className="flex flex-col items-start px-4 pb-3">
               <h2
-                className={`text-lg text-left font-semibold ${
+                className={`text-lg text-left font-semibold select-text cursor-text ${
                   jobPosting.hidden ? 'text-gray-400' : 'text-gray-900'
                 }`}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
               >
                 {jobPosting.title}
               </h2>
               <p
-                className={`text-sm text-left mt-0.5 ${
+                className={`text-sm text-left mt-0.5 select-text cursor-text ${
                   jobPosting.hidden ? 'text-gray-400' : 'text-gray-600'
                 }`}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
               >
                 {jobPosting.customer.name}
                 {jobPosting.customer.exclusive && (
