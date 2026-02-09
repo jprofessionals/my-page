@@ -414,6 +414,7 @@ export const JobPostingModal = ({
                           id: 0,
                           name: newInputValue,
                           exclusive: false,
+                          sector: 'UNKNOWN',
                         }
 
                         setCustomer(newCustomer)

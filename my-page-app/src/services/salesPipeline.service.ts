@@ -29,6 +29,10 @@ import {
   addInterviewRound,
   updateInterviewRound,
   deleteInterviewRound,
+  getEvaluationAnalytics,
+  getConsultantAnalytics,
+  getCompetencyBaseAnalytics,
+  getCustomerAnalytics,
 } from '@/data/types/sdk.gen'
 import {
   type CreateSalesActivity,
@@ -302,6 +306,49 @@ export const salesPipelineService = {
       path: { id: activityId, roundId },
     })
   },
+
+  // ===== DETAILED ANALYTICS =====
+
+  /**
+   * Get evaluation analytics (closed reason breakdown, match ratings, etc.)
+   * @param months - Optional number of months to filter (default all time)
+   */
+  async getEvaluationAnalytics(months?: number) {
+    const { data } = await getEvaluationAnalytics({
+      query: months ? { months } : undefined,
+    })
+    return data
+  },
+
+  /**
+   * Get detailed consultant analytics (per-consultant stats with activities)
+   */
+  async getConsultantAnalytics() {
+    const { data } = await getConsultantAnalytics()
+    return data
+  },
+
+  /**
+   * Get competency base analytics (availability, sector distribution, skill gaps)
+   * @param months - Optional number of months to filter (default all time)
+   */
+  async getCompetencyBaseAnalytics(months?: number) {
+    const { data } = await getCompetencyBaseAnalytics({
+      query: months ? { months } : undefined,
+    })
+    return data
+  },
+
+  /**
+   * Get customer analytics (customer stats, sector comparison, supplier stats)
+   * @param months - Optional number of months to filter (default all time)
+   */
+  async getCustomerAnalytics(months?: number) {
+    const { data } = await getCustomerAnalytics({
+      query: months ? { months } : undefined,
+    })
+    return data
+  },
 }
 
 // Re-export types for convenience
@@ -334,4 +381,21 @@ export type {
   InterviewRound,
   CreateInterviewRound,
   UpdateInterviewRound,
+  // Detailed analytics types
+  EvaluationAnalyticsReadable as EvaluationAnalytics,
+  ConsultantDetailedStatsReadable as ConsultantDetailedStats,
+  CompetencyBaseAnalyticsReadable as CompetencyBaseAnalytics,
+  CustomerAnalytics,
+  ClosedReasonByStage,
+  MatchRatingBucket,
+  CustomerExperienceEffect,
+  UpcomingAvailableConsultantReadable as UpcomingAvailableConsultant,
+  SectorDistribution,
+  TechCategoryCount,
+  SkillGapEntry,
+  TagGapEntry,
+  CustomerDetailedStats,
+  SupplierStats,
+  SourceStats,
+  CustomerSector,
 } from '@/data/types/types.gen'
