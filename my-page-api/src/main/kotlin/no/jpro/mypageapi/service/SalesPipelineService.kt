@@ -20,6 +20,7 @@ import no.jpro.mypageapi.repository.SalesActivityRepository
 import no.jpro.mypageapi.repository.SalesStageHistoryRepository
 import no.jpro.mypageapi.repository.SettingsRepository
 import no.jpro.mypageapi.repository.UserRepository
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -307,7 +308,8 @@ class SalesPipelineService(
         )
 
         jobPostingId?.let { jpId ->
-            activity.jobPosting = jobPostingRepository.findById(jpId).orElse(null)
+            activity.jobPosting = jobPostingRepository.findById(jpId)
+                .orElseThrow { EntityNotFoundException("JobPosting with id $jpId not found") }
         }
 
         val saved = salesActivityRepository.save(activity)
@@ -1342,9 +1344,10 @@ class SalesPipelineService(
         }.sortedByDescending { it.count }
 
         // 5. skillGap: count jobPostings by techCategory in period, count WON activities by techCategory
+        val osloZone = java.time.ZoneId.of("Europe/Oslo")
         val now = LocalDateTime.now()
         val periodStart = now.minusMonths(effectiveMonths.toLong())
-        val periodStartOffset = periodStart.atOffset(java.time.ZoneOffset.UTC)
+        val periodStartOffset = periodStart.atZone(osloZone).toOffsetDateTime()
 
         val allJobPostings = jobPostingRepository.findAll()
         val jobPostingsInPeriod = allJobPostings.filter { jp ->

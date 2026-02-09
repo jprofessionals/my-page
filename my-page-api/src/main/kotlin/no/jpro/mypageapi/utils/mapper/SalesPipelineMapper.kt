@@ -100,7 +100,9 @@ class SalesPipelineMapper(
             matchRating = entity.matchRating,
             evaluationNotes = entity.evaluationNotes,
             evaluationDocumentUrl = entity.evaluationDocumentUrl,
-            keyFactors = entity.keyFactors?.split(",")?.filter { it.isNotBlank() }?.map { KeyFactorModel.valueOf(it.trim()) },
+            keyFactors = entity.keyFactors?.split(",")?.filter { it.isNotBlank() }?.mapNotNull {
+                try { KeyFactorModel.valueOf(it.trim()) } catch (_: IllegalArgumentException) { null }
+            },
             jobPostingId = entity.jobPosting?.id
         )
 
@@ -132,7 +134,9 @@ class SalesPipelineMapper(
             matchRating = entity.matchRating,
             evaluationNotes = entity.evaluationNotes,
             evaluationDocumentUrl = entity.evaluationDocumentUrl,
-            keyFactors = entity.keyFactors?.split(",")?.filter { it.isNotBlank() }?.map { KeyFactorModel.valueOf(it.trim()) },
+            keyFactors = entity.keyFactors?.split(",")?.filter { it.isNotBlank() }?.mapNotNull {
+                try { KeyFactorModel.valueOf(it.trim()) } catch (_: IllegalArgumentException) { null }
+            },
             jobPostingId = entity.jobPosting?.id,
             stageHistory = entity.stageHistory.map { toSalesStageHistoryEntryModel(it) }
         )
