@@ -406,7 +406,7 @@ class JobPostingServiceTest {
         return JobPostingModel(
             id = 0L,
             title = title,
-            customer = CustomerModel(id = 0L, name = customerName),
+            customer = CustomerModel(id = 0L, name = customerName, sector = no.jpro.mypageapi.model.CustomerSector.UNKNOWN),
             urgent = false,
             hidden = false,
             description = "Test beskrivelse",

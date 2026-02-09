@@ -12,7 +12,7 @@ class ModelFactory {
     fun createJobPosting(tags: List<String>): JobPosting {
         return JobPosting(
             title = "title",
-            customer = Customer(name = "customer"),
+            customer = Customer(name = "customer", sector = no.jpro.mypageapi.model.CustomerSector.UNKNOWN),
             description = "description",
             urgent = false,
             hidden = false,
