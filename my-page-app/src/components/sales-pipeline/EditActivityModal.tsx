@@ -45,12 +45,20 @@ const KEY_FACTOR_OPTIONS: { value: KeyFactor; label: string }[] = [
   { value: 'OTHER', label: 'Annet' },
 ]
 
-export default function EditActivityModal({ activity, onClose, onUpdated }: Props) {
+export default function EditActivityModal({
+  activity,
+  onClose,
+  onUpdated,
+}: Props) {
   const [loading, setLoading] = useState(false)
   const [showCloseDialog, setShowCloseDialog] = useState(false)
   const [showWonDialog, setShowWonDialog] = useState(false)
-  const [actualStartDate, setActualStartDate] = useState<string>(activity.expectedStartDate || '')
-  const [closeReason, setCloseReason] = useState<ClosedReason>('OTHER_CANDIDATE_CHOSEN')
+  const [actualStartDate, setActualStartDate] = useState<string>(
+    activity.expectedStartDate || '',
+  )
+  const [closeReason, setCloseReason] = useState<ClosedReason>(
+    'OTHER_CANDIDATE_CHOSEN',
+  )
   const [closeReasonNote, setCloseReasonNote] = useState('')
   // Evaluation fields for won/close dialogs
   const [matchRating, setMatchRating] = useState<number | undefined>(undefined)
@@ -58,7 +66,7 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
   const [evaluationNotes, setEvaluationNotes] = useState('')
   const [evaluationDocumentUrl, setEvaluationDocumentUrl] = useState('')
   const [interviewRounds, setInterviewRounds] = useState<InterviewRound[]>(
-    activity.interviewRounds || []
+    activity.interviewRounds || [],
   )
   const [newInterviewDate, setNewInterviewDate] = useState('')
   const [newInterviewTime, setNewInterviewTime] = useState('10:00')
@@ -67,12 +75,17 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
 
   const toggleKeyFactor = (factor: KeyFactor) => {
     setKeyFactors((prev) =>
-      prev.includes(factor) ? prev.filter((f) => f !== factor) : [...prev, factor]
+      prev.includes(factor)
+        ? prev.filter((f) => f !== factor)
+        : [...prev, factor],
     )
   }
 
   // Parse datetime for form input (round to nearest 5 minutes)
-  const parseDateTime = (dateTimeStr: string | undefined | null, defaultTime: string) => {
+  const parseDateTime = (
+    dateTimeStr: string | undefined | null,
+    defaultTime: string,
+  ) => {
     if (!dateTimeStr) return { date: '', time: defaultTime }
     const dt = new Date(dateTimeStr)
     const date = dt.toISOString().split('T')[0]
@@ -86,8 +99,10 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
     return { date, time }
   }
 
-  const { date: initialDeadlineDate, time: initialDeadlineTime } = parseDateTime(activity.offerDeadline, '12:00')
-  const { date: initialInterviewDate, time: initialInterviewTime } = parseDateTime(activity.interviewDate, '10:00')
+  const { date: initialDeadlineDate, time: initialDeadlineTime } =
+    parseDateTime(activity.offerDeadline, '12:00')
+  const { date: initialInterviewDate, time: initialInterviewTime } =
+    parseDateTime(activity.interviewDate, '10:00')
 
   const [formData, setFormData] = useState({
     title: activity.title,
@@ -123,7 +138,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
         const date = new Date(dateTime)
         // Get timezone offset in minutes and convert to hours:minutes format
         const tzOffset = -date.getTimezoneOffset()
-        const tzHours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0')
+        const tzHours = Math.floor(Math.abs(tzOffset) / 60)
+          .toString()
+          .padStart(2, '0')
         const tzMins = (Math.abs(tzOffset) % 60).toString().padStart(2, '0')
         const tzSign = tzOffset >= 0 ? '+' : '-'
         offerDeadline = `${formData.offerDeadlineDate}T${formData.offerDeadlineTime || '12:00'}:00${tzSign}${tzHours}:${tzMins}`
@@ -135,7 +152,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
         const dateTime = `${formData.interviewDate}T${formData.interviewTime || '10:00'}:00`
         const date = new Date(dateTime)
         const tzOffset = -date.getTimezoneOffset()
-        const tzHours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0')
+        const tzHours = Math.floor(Math.abs(tzOffset) / 60)
+          .toString()
+          .padStart(2, '0')
         const tzMins = (Math.abs(tzOffset) % 60).toString().padStart(2, '0')
         const tzSign = tzOffset >= 0 ? '+' : '-'
         interviewDate = `${formData.interviewDate}T${formData.interviewTime || '10:00'}:00${tzSign}${tzHours}:${tzMins}`
@@ -157,7 +176,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
 
       // Update stage separately if it changed
       if (formData.currentStage !== activity.currentStage) {
-        await salesPipelineService.updateStage(activity.id, { stage: formData.currentStage })
+        await salesPipelineService.updateStage(activity.id, {
+          stage: formData.currentStage,
+        })
       }
 
       toast.success('Aktivitet oppdatert!')
@@ -184,7 +205,7 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
       const today = new Date().toISOString().split('T')[0]
       if (actualStartDate && actualStartDate > today) {
         toast.success(
-          `Aktivitet markert som vunnet! Konsulenten har status TILDELT frem til oppstart.`
+          `Aktivitet markert som vunnet! Konsulenten har status TILDELT frem til oppstart.`,
         )
       } else {
         toast.success('Aktivitet markert som vunnet!')
@@ -220,7 +241,11 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
   }
 
   const handleDelete = async () => {
-    if (!confirm('Er du sikker på at du vil slette denne aktiviteten? Dette kan ikke angres.')) {
+    if (
+      !confirm(
+        'Er du sikker på at du vil slette denne aktiviteten? Dette kan ikke angres.',
+      )
+    ) {
       return
     }
     setLoading(true)
@@ -244,7 +269,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
         const dateTime = `${newInterviewDate}T${newInterviewTime || '10:00'}:00`
         const date = new Date(dateTime)
         const tzOffset = -date.getTimezoneOffset()
-        const tzHours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0')
+        const tzHours = Math.floor(Math.abs(tzOffset) / 60)
+          .toString()
+          .padStart(2, '0')
         const tzMins = (Math.abs(tzOffset) % 60).toString().padStart(2, '0')
         const tzSign = tzOffset >= 0 ? '+' : '-'
         interviewDate = `${newInterviewDate}T${newInterviewTime || '10:00'}:00${tzSign}${tzHours}:${tzMins}`
@@ -275,7 +302,7 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
     }
     try {
       await salesPipelineService.deleteInterviewRound(activity.id, roundId)
-      setInterviewRounds(interviewRounds.filter(r => r.id !== roundId))
+      setInterviewRounds(interviewRounds.filter((r) => r.id !== roundId))
       toast.success('Intervjurunde slettet')
     } catch (error) {
       console.error('Failed to delete interview round:', error)
@@ -310,7 +337,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium">Når starter konsulenten?</span>
+                <span className="label-text font-medium">
+                  Når starter konsulenten?
+                </span>
               </label>
               <input
                 type="date"
@@ -320,15 +349,19 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
               />
               <label className="label">
                 <span className="label-text-alt text-gray-500">
-                  Hvis tom eller i dag/fortid: Status settes til OPPTATT umiddelbart.
+                  Hvis tom eller i dag/fortid: Status settes til OPPTATT
+                  umiddelbart.
                   <br />
-                  Hvis fremtidig dato: Status settes til TILDELT frem til oppstart.
+                  Hvis fremtidig dato: Status settes til TILDELT frem til
+                  oppstart.
                 </span>
               </label>
             </div>
 
             {/* Evaluation section */}
-            <div className="divider text-sm text-gray-500">Evaluering (valgfritt)</div>
+            <div className="divider text-sm text-gray-500">
+              Evaluering (valgfritt)
+            </div>
 
             {/* Match rating (1-5 stars) */}
             <div className="form-control">
@@ -345,27 +378,37 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
                         ? 'btn-warning text-warning-content'
                         : 'btn-ghost'
                     }`}
-                    onClick={() => setMatchRating(star === matchRating ? undefined : star)}
+                    onClick={() =>
+                      setMatchRating(star === matchRating ? undefined : star)
+                    }
                     title={`${star} av 5`}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
-                      fill={matchRating && star <= matchRating ? 'currentColor' : 'none'}
+                      fill={
+                        matchRating && star <= matchRating
+                          ? 'currentColor'
+                          : 'none'
+                      }
                       stroke="currentColor"
                       className="w-5 h-5"
                     >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth={matchRating && star <= matchRating ? 0 : 1.5}
+                        strokeWidth={
+                          matchRating && star <= matchRating ? 0 : 1.5
+                        }
                         d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
                       />
                     </svg>
                   </button>
                 ))}
                 {matchRating && (
-                  <span className="text-sm text-gray-500 ml-2 self-center">{matchRating}/5</span>
+                  <span className="text-sm text-gray-500 ml-2 self-center">
+                    {matchRating}/5
+                  </span>
                 )}
               </div>
             </div>
@@ -400,7 +443,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
             {/* Evaluation notes */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium">Evalueringsnotater</span>
+                <span className="label-text font-medium">
+                  Evalueringsnotater
+                </span>
               </label>
               <textarea
                 className="textarea textarea-bordered w-full"
@@ -439,7 +484,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
-              <span>Andre aktive prosesser for konsulenten vil bli lukket.</span>
+              <span>
+                Andre aktive prosesser for konsulenten vil bli lukket.
+              </span>
             </div>
 
             <div className="flex gap-2 justify-end">
@@ -499,7 +546,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
             </div>
 
             {/* Evaluation section */}
-            <div className="divider text-sm text-gray-500">Evaluering (valgfritt)</div>
+            <div className="divider text-sm text-gray-500">
+              Evaluering (valgfritt)
+            </div>
 
             {/* Match rating (1-5 stars) */}
             <div className="form-control">
@@ -516,27 +565,37 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
                         ? 'btn-warning text-warning-content'
                         : 'btn-ghost'
                     }`}
-                    onClick={() => setMatchRating(star === matchRating ? undefined : star)}
+                    onClick={() =>
+                      setMatchRating(star === matchRating ? undefined : star)
+                    }
                     title={`${star} av 5`}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
-                      fill={matchRating && star <= matchRating ? 'currentColor' : 'none'}
+                      fill={
+                        matchRating && star <= matchRating
+                          ? 'currentColor'
+                          : 'none'
+                      }
                       stroke="currentColor"
                       className="w-5 h-5"
                     >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth={matchRating && star <= matchRating ? 0 : 1.5}
+                        strokeWidth={
+                          matchRating && star <= matchRating ? 0 : 1.5
+                        }
                         d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
                       />
                     </svg>
                   </button>
                 ))}
                 {matchRating && (
-                  <span className="text-sm text-gray-500 ml-2 self-center">{matchRating}/5</span>
+                  <span className="text-sm text-gray-500 ml-2 self-center">
+                    {matchRating}/5
+                  </span>
                 )}
               </div>
             </div>
@@ -571,7 +630,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
             {/* Evaluation notes */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium">Evalueringsnotater</span>
+                <span className="label-text font-medium">
+                  Evalueringsnotater
+                </span>
               </label>
               <textarea
                 className="textarea textarea-bordered w-full"
@@ -628,7 +689,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
               <input
                 type="text"
                 className="input input-bordered w-full bg-base-200"
-                value={activity.consultant.name || activity.consultant.email || ''}
+                value={
+                  activity.consultant.name || activity.consultant.email || ''
+                }
                 disabled
               />
             </div>
@@ -643,7 +706,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
                 className="input input-bordered w-full"
                 placeholder="F.eks. 'Equinor', 'NAV', 'DNB'..."
                 value={formData.customerName}
-                onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, customerName: e.target.value })
+                }
               />
             </div>
 
@@ -651,14 +716,18 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Leverandør / Mellomledd</span>
-                <span className="label-text-alt text-gray-500">Hvis vi er underleverandør</span>
+                <span className="label-text-alt text-gray-500">
+                  Hvis vi er underleverandør
+                </span>
               </label>
               <input
                 type="text"
                 className="input input-bordered w-full"
                 placeholder="F.eks. 'Bouvet', 'Sopra Steria'..."
                 value={formData.supplierName}
-                onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, supplierName: e.target.value })
+                }
               />
             </div>
 
@@ -672,7 +741,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
                 className="input input-bordered w-full"
                 placeholder="F.eks. 'Prosjekt hos Kunde X'"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
                 required
               />
             </div>
@@ -686,7 +757,10 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
                 className="select select-bordered w-full"
                 value={formData.currentStage}
                 onChange={(e) =>
-                  setFormData({ ...formData, currentStage: e.target.value as SalesStage })
+                  setFormData({
+                    ...formData,
+                    currentStage: e.target.value as SalesStage,
+                  })
                 }
               >
                 {STAGE_OPTIONS.map((option) => (
@@ -711,7 +785,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      maxPrice: e.target.value ? Number(e.target.value) : undefined,
+                      maxPrice: e.target.value
+                        ? Number(e.target.value)
+                        : undefined,
                     })
                   }
                 />
@@ -728,7 +804,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      offeredPrice: e.target.value ? Number(e.target.value) : undefined,
+                      offeredPrice: e.target.value
+                        ? Number(e.target.value)
+                        : undefined,
                     })
                   }
                 />
@@ -827,20 +905,30 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
               {interviewRounds.length > 0 && (
                 <div className="space-y-2 mb-3">
                   {interviewRounds.map((round) => (
-                    <div key={round.id} className="flex items-center gap-2 bg-base-200 p-2 rounded">
-                      <span className="badge badge-primary">#{round.roundNumber}</span>
+                    <div
+                      key={round.id}
+                      className="flex items-center gap-2 bg-base-200 p-2 rounded"
+                    >
+                      <span className="badge badge-primary">
+                        #{round.roundNumber}
+                      </span>
                       <span className="flex-1 text-sm">
                         {round.interviewDate
-                          ? new Date(round.interviewDate).toLocaleDateString('nb-NO', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
+                          ? new Date(round.interviewDate).toLocaleDateString(
+                              'nb-NO',
+                              {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              },
+                            )
                           : 'Dato ikke satt'}
                         {round.notes && (
-                          <span className="text-gray-500 ml-2">- {round.notes}</span>
+                          <span className="text-gray-500 ml-2">
+                            - {round.notes}
+                          </span>
                         )}
                       </span>
                       <button
@@ -916,7 +1004,9 @@ export default function EditActivityModal({ activity, onClose, onUpdated }: Prop
                 className="textarea textarea-bordered w-full"
                 placeholder="Eventuelle notater..."
                 value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
                 rows={3}
               />
             </div>

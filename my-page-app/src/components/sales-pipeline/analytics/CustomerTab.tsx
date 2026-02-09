@@ -61,7 +61,14 @@ const SOURCE_LABELS: Record<string, string> = {
   OTHER: 'Annet',
 }
 
-type CustomerSortKey = 'name' | 'sector' | 'consultants' | 'active' | 'won' | 'lost' | 'winRate'
+type CustomerSortKey =
+  | 'name'
+  | 'sector'
+  | 'consultants'
+  | 'active'
+  | 'won'
+  | 'lost'
+  | 'winRate'
 type SupplierSortKey = 'name' | 'total' | 'won' | 'lost' | 'winRate'
 type SourceSortKey = 'source' | 'postings' | 'won' | 'lost' | 'winRate'
 type SortDir = 'asc' | 'desc'
@@ -118,12 +125,17 @@ export default function CustomerTab() {
   const [customerSortDir, setCustomerSortDir] = useState<SortDir>('desc')
 
   // Expanded customer row
-  const [expandedCustomerId, setExpandedCustomerId] = useState<number | null | 'null'>(null)
-  const [expandedActivities, setExpandedActivities] = useState<SalesActivityReadable[]>([])
+  const [expandedCustomerId, setExpandedCustomerId] = useState<
+    number | null | 'null'
+  >(null)
+  const [expandedActivities, setExpandedActivities] = useState<
+    SalesActivityReadable[]
+  >([])
   const [loadingActivities, setLoadingActivities] = useState(false)
 
   // Supplier table
-  const [supplierSortKey, setSupplierSortKey] = useState<SupplierSortKey>('total')
+  const [supplierSortKey, setSupplierSortKey] =
+    useState<SupplierSortKey>('total')
   const [supplierSortDir, setSupplierSortDir] = useState<SortDir>('desc')
 
   // Source table
@@ -165,7 +177,7 @@ export default function CustomerTab() {
         try {
           const activities = await salesPipelineService.getActivitiesByCustomer(
             customer.customerId,
-            true
+            true,
           )
           setExpandedActivities(activities ?? [])
         } catch (error) {
@@ -180,7 +192,7 @@ export default function CustomerTab() {
         setExpandedActivities([])
       }
     },
-    [expandedCustomerId]
+    [expandedCustomerId],
   )
 
   // ===== Customer table sorting =====
@@ -234,7 +246,7 @@ export default function CustomerTab() {
         setCustomerSortDir(key === 'name' ? 'asc' : 'desc')
       }
     },
-    [customerSortKey]
+    [customerSortKey],
   )
 
   const customerSortIndicator = (key: CustomerSortKey) => {
@@ -282,7 +294,7 @@ export default function CustomerTab() {
         setSupplierSortDir(key === 'name' ? 'asc' : 'desc')
       }
     },
-    [supplierSortKey]
+    [supplierSortKey],
   )
 
   const supplierSortIndicator = (key: SupplierSortKey) => {
@@ -330,7 +342,7 @@ export default function CustomerTab() {
         setSourceSortDir(key === 'source' ? 'asc' : 'desc')
       }
     },
-    [sourceSortKey]
+    [sourceSortKey],
   )
 
   const sourceSortIndicator = (key: SourceSortKey) => {
@@ -404,7 +416,8 @@ export default function CustomerTab() {
           />
           {searchQuery && (
             <span className="ml-3 text-sm text-gray-500">
-              {filteredAndSortedCustomers.length} av {analytics.customers.length} kunder
+              {filteredAndSortedCustomers.length} av{' '}
+              {analytics.customers.length} kunder
             </span>
           )}
         </div>
@@ -471,12 +484,22 @@ export default function CustomerTab() {
                           className={`cursor-pointer hover:bg-base-300 ${isExpanded ? 'bg-base-300/50' : ''}`}
                           onClick={() => handleExpandCustomer(customer)}
                         >
-                          <td className="font-medium">{customer.customerName}</td>
+                          <td className="font-medium">
+                            {customer.customerName}
+                          </td>
                           <td>{sectorBadge(customer.sector)}</td>
-                          <td className="text-right">{customer.currentConsultantCount}</td>
-                          <td className="text-right">{customer.activeActivities}</td>
-                          <td className="text-right text-success">{customer.wonTotal}</td>
-                          <td className="text-right text-error">{customer.lostTotal}</td>
+                          <td className="text-right">
+                            {customer.currentConsultantCount}
+                          </td>
+                          <td className="text-right">
+                            {customer.activeActivities}
+                          </td>
+                          <td className="text-right text-success">
+                            {customer.wonTotal}
+                          </td>
+                          <td className="text-right text-error">
+                            {customer.lostTotal}
+                          </td>
                           <td className="text-right">
                             {customer.wonTotal + customer.lostTotal > 0 ? (
                               <span className={winRateColor(customer.winRate)}>
@@ -504,14 +527,18 @@ export default function CustomerTab() {
                                     </div>
                                   </div>
                                   <div className="stat bg-base-200 rounded-lg p-3">
-                                    <div className="stat-title text-xs">Win Rate</div>
+                                    <div className="stat-title text-xs">
+                                      Win Rate
+                                    </div>
                                     <div className="stat-value text-lg text-primary">
-                                      {customer.wonTotal + customer.lostTotal > 0
+                                      {customer.wonTotal + customer.lostTotal >
+                                      0
                                         ? `${customer.winRate.toFixed(1)}%`
                                         : '-'}
                                     </div>
                                     <div className="stat-desc text-xs">
-                                      {customer.wonTotal}V / {customer.lostTotal}T
+                                      {customer.wonTotal}V /{' '}
+                                      {customer.lostTotal}T
                                     </div>
                                   </div>
                                   <div className="stat bg-base-200 rounded-lg p-3">
@@ -519,7 +546,9 @@ export default function CustomerTab() {
                                       Vanligste tapsårsak
                                     </div>
                                     <div className="stat-value text-sm">
-                                      {getClosedReasonLabel(customer.mostCommonLossReason)}
+                                      {getClosedReasonLabel(
+                                        customer.mostCommonLossReason,
+                                      )}
                                     </div>
                                   </div>
                                 </div>
@@ -532,7 +561,8 @@ export default function CustomerTab() {
                                 ) : expandedActivities.length > 0 ? (
                                   <div>
                                     <h3 className="font-semibold mb-3">
-                                      Aktivitetshistorikk ({expandedActivities.length})
+                                      Aktivitetshistorikk (
+                                      {expandedActivities.length})
                                     </h3>
                                     <div className="overflow-x-auto">
                                       <table className="table table-xs">
@@ -540,37 +570,50 @@ export default function CustomerTab() {
                                           <tr>
                                             <th>Konsulent</th>
                                             <th>Tittel</th>
-                                            <th className="text-center">Utfall</th>
+                                            <th className="text-center">
+                                              Utfall
+                                            </th>
                                             <th>Tapsårsak</th>
                                           </tr>
                                         </thead>
                                         <tbody>
-                                          {expandedActivities.map((activity) => (
-                                            <tr key={activity.id}>
-                                              <td>{activity.consultant?.name || '-'}</td>
-                                              <td className="max-w-xs truncate">
-                                                {activity.title}
-                                              </td>
-                                              <td className="text-center">
-                                                {activity.status === 'WON' ||
-                                                activity.status === 'CLOSED_OTHER_WON' ? (
-                                                  outcomeBadge(activity.status)
-                                                ) : activity.status === 'ACTIVE' ? (
-                                                  <span
-                                                    className="text-info font-bold"
-                                                    title="Pågående"
-                                                  >
-                                                    &#8226;
-                                                  </span>
-                                                ) : (
-                                                  outcomeBadge('LOST')
-                                                )}
-                                              </td>
-                                              <td>
-                                                {getClosedReasonLabel(activity.closedReason)}
-                                              </td>
-                                            </tr>
-                                          ))}
+                                          {expandedActivities.map(
+                                            (activity) => (
+                                              <tr key={activity.id}>
+                                                <td>
+                                                  {activity.consultant?.name ||
+                                                    '-'}
+                                                </td>
+                                                <td className="max-w-xs truncate">
+                                                  {activity.title}
+                                                </td>
+                                                <td className="text-center">
+                                                  {activity.status === 'WON' ||
+                                                  activity.status ===
+                                                    'CLOSED_OTHER_WON' ? (
+                                                    outcomeBadge(
+                                                      activity.status,
+                                                    )
+                                                  ) : activity.status ===
+                                                    'ACTIVE' ? (
+                                                    <span
+                                                      className="text-info font-bold"
+                                                      title="Pågående"
+                                                    >
+                                                      &#8226;
+                                                    </span>
+                                                  ) : (
+                                                    outcomeBadge('LOST')
+                                                  )}
+                                                </td>
+                                                <td>
+                                                  {getClosedReasonLabel(
+                                                    activity.closedReason,
+                                                  )}
+                                                </td>
+                                              </tr>
+                                            ),
+                                          )}
                                         </tbody>
                                       </table>
                                     </div>
@@ -624,7 +667,8 @@ export default function CustomerTab() {
                       <td className="font-medium">
                         {sectorBadge(s.sector as CustomerSector)}
                         <span className="ml-2">
-                          {SECTOR_LABELS[s.sector as CustomerSector] || s.sector}
+                          {SECTOR_LABELS[s.sector as CustomerSector] ||
+                            s.sector}
                         </span>
                       </td>
                       <td className="text-right">{s.customerCount}</td>
@@ -644,7 +688,9 @@ export default function CustomerTab() {
 
       {/* Section 3: Leverandør/mellomledd-analyse */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Leverandør/mellomledd-analyse</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Leverandør/mellomledd-analyse
+        </h2>
         <div className="bg-base-200 rounded-lg p-4">
           {sortedSuppliers.length > 0 ? (
             <div className="overflow-x-auto">
@@ -688,8 +734,12 @@ export default function CustomerTab() {
                     <tr key={supplier.supplierName}>
                       <td className="font-medium">{supplier.supplierName}</td>
                       <td className="text-right">{supplier.totalActivities}</td>
-                      <td className="text-right text-success">{supplier.wonTotal}</td>
-                      <td className="text-right text-error">{supplier.lostTotal}</td>
+                      <td className="text-right text-success">
+                        {supplier.wonTotal}
+                      </td>
+                      <td className="text-right text-error">
+                        {supplier.lostTotal}
+                      </td>
                       <td className="text-right">
                         {supplier.wonTotal + supplier.lostTotal > 0 ? (
                           <span className={winRateColor(supplier.winRate)}>
@@ -740,10 +790,21 @@ export default function CustomerTab() {
                     tickFormatter={(v) => `${v}%`}
                   />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none' }}
-                    formatter={(value) => [`${Number(value).toFixed(1)}%`, 'Win Rate']}
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: 'none',
+                    }}
+                    formatter={(value) => [
+                      `${Number(value).toFixed(1)}%`,
+                      'Win Rate',
+                    ]}
                   />
-                  <Bar dataKey="winRate" name="Win Rate" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="winRate"
+                    name="Win Rate"
+                    fill="#8b5cf6"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </>
@@ -796,10 +857,16 @@ export default function CustomerTab() {
                 <tbody>
                   {sortedSources.map((source) => (
                     <tr key={source.source}>
-                      <td className="font-medium">{getSourceLabel(source.source)}</td>
+                      <td className="font-medium">
+                        {getSourceLabel(source.source)}
+                      </td>
                       <td className="text-right">{source.totalJobPostings}</td>
-                      <td className="text-right text-success">{source.wonActivities}</td>
-                      <td className="text-right text-error">{source.lostActivities}</td>
+                      <td className="text-right text-success">
+                        {source.wonActivities}
+                      </td>
+                      <td className="text-right text-error">
+                        {source.lostActivities}
+                      </td>
                       <td className="text-right">
                         {source.wonActivities + source.lostActivities > 0 ? (
                           <span className={winRateColor(source.winRate)}>

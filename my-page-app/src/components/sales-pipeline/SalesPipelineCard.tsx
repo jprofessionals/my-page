@@ -56,7 +56,9 @@ export default function SalesPipelineCard({
   const daysInStage = () => {
     const updatedAt = new Date(activity.updatedAt)
     const now = new Date()
-    const diff = Math.floor((now.getTime() - updatedAt.getTime()) / (1000 * 60 * 60 * 24))
+    const diff = Math.floor(
+      (now.getTime() - updatedAt.getTime()) / (1000 * 60 * 60 * 24),
+    )
     return diff
   }
 
@@ -120,7 +122,8 @@ export default function SalesPipelineCard({
         )}
         {!activity.offerDeadlineAsap && activity.offerDeadline && (
           <div className="text-xs text-orange-600">
-            Frist: {new Date(activity.offerDeadline).toLocaleDateString('nb-NO', {
+            Frist:{' '}
+            {new Date(activity.offerDeadline).toLocaleDateString('nb-NO', {
               day: 'numeric',
               month: 'short',
               hour: '2-digit',
@@ -132,7 +135,8 @@ export default function SalesPipelineCard({
         {/* Expected start date */}
         {activity.expectedStartDate && (
           <div className="text-xs text-gray-500">
-            Start: {new Date(activity.expectedStartDate).toLocaleDateString('nb-NO')}
+            Start:{' '}
+            {new Date(activity.expectedStartDate).toLocaleDateString('nb-NO')}
           </div>
         )}
 
@@ -141,12 +145,17 @@ export default function SalesPipelineCard({
           <div className="text-xs text-purple-600 font-medium">
             {activity.interviewRounds.length === 1 ? (
               activity.interviewRounds[0].interviewDate ? (
-                <>Intervju: {new Date(activity.interviewRounds[0].interviewDate).toLocaleDateString('nb-NO', {
-                  day: 'numeric',
-                  month: 'short',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}</>
+                <>
+                  Intervju:{' '}
+                  {new Date(
+                    activity.interviewRounds[0].interviewDate,
+                  ).toLocaleDateString('nb-NO', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </>
               ) : (
                 <>Intervju planlagt</>
               )
@@ -154,12 +163,22 @@ export default function SalesPipelineCard({
               <>
                 Intervju #{activity.interviewRounds.length}
                 {(() => {
-                  const lastRound = activity.interviewRounds[activity.interviewRounds.length - 1]
+                  const lastRound =
+                    activity.interviewRounds[
+                      activity.interviewRounds.length - 1
+                    ]
                   return lastRound.interviewDate ? (
-                    <> - {new Date(lastRound.interviewDate).toLocaleDateString('nb-NO', {
-                      day: 'numeric',
-                      month: 'short',
-                    })}</>
+                    <>
+                      {' '}
+                      -{' '}
+                      {new Date(lastRound.interviewDate).toLocaleDateString(
+                        'nb-NO',
+                        {
+                          day: 'numeric',
+                          month: 'short',
+                        },
+                      )}
+                    </>
                   ) : null
                 })()}
               </>
@@ -167,16 +186,18 @@ export default function SalesPipelineCard({
           </div>
         )}
         {/* Legacy interview date (fallback if no rounds) */}
-        {(!activity.interviewRounds || activity.interviewRounds.length === 0) && activity.interviewDate && (
-          <div className="text-xs text-purple-600 font-medium">
-            Intervju: {new Date(activity.interviewDate).toLocaleDateString('nb-NO', {
-              day: 'numeric',
-              month: 'short',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </div>
-        )}
+        {(!activity.interviewRounds || activity.interviewRounds.length === 0) &&
+          activity.interviewDate && (
+            <div className="text-xs text-purple-600 font-medium">
+              Intervju:{' '}
+              {new Date(activity.interviewDate).toLocaleDateString('nb-NO', {
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </div>
+          )}
 
         {/* Admin actions */}
         {isAdmin && showActions && (
@@ -234,7 +255,9 @@ export default function SalesPipelineCard({
                 e.target.value = '' // Reset dropdown
               }}
             >
-              <option value="" disabled>Avslutt...</option>
+              <option value="" disabled>
+                Avslutt...
+              </option>
               <option value="won">Vunnet</option>
               <option value="lost">Tapt</option>
               <option value="cancelled">Kansellert</option>

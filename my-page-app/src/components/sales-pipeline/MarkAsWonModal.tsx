@@ -2,7 +2,11 @@
 
 import { useState } from 'react'
 import { toast } from 'react-toastify'
-import { salesPipelineService, type SalesActivity, type KeyFactor } from '@/services/salesPipeline.service'
+import {
+  salesPipelineService,
+  type SalesActivity,
+  type KeyFactor,
+} from '@/services/salesPipeline.service'
 
 const KEY_FACTOR_OPTIONS: { value: KeyFactor; label: string }[] = [
   { value: 'PRICE', label: 'Pris' },
@@ -20,10 +24,14 @@ interface Props {
   onSuccess: () => void
 }
 
-export default function MarkAsWonModal({ activity, onClose, onSuccess }: Props) {
+export default function MarkAsWonModal({
+  activity,
+  onClose,
+  onSuccess,
+}: Props) {
   const [loading, setLoading] = useState(false)
   const [actualStartDate, setActualStartDate] = useState<string>(
-    activity.expectedStartDate || ''
+    activity.expectedStartDate || '',
   )
   const [matchRating, setMatchRating] = useState<number | undefined>(undefined)
   const [keyFactors, setKeyFactors] = useState<KeyFactor[]>([])
@@ -32,7 +40,9 @@ export default function MarkAsWonModal({ activity, onClose, onSuccess }: Props) 
 
   const toggleKeyFactor = (factor: KeyFactor) => {
     setKeyFactors((prev) =>
-      prev.includes(factor) ? prev.filter((f) => f !== factor) : [...prev, factor]
+      prev.includes(factor)
+        ? prev.filter((f) => f !== factor)
+        : [...prev, factor],
     )
   }
 
@@ -52,7 +62,7 @@ export default function MarkAsWonModal({ activity, onClose, onSuccess }: Props) 
       const today = new Date().toISOString().split('T')[0]
       if (actualStartDate && actualStartDate > today) {
         toast.success(
-          `Aktivitet markert som vunnet! Konsulenten har status TILDELT frem til ${formatDate(actualStartDate)}.`
+          `Aktivitet markert som vunnet! Konsulenten har status TILDELT frem til ${formatDate(actualStartDate)}.`,
         )
       } else {
         toast.success('Aktivitet markert som vunnet!')
@@ -76,8 +86,10 @@ export default function MarkAsWonModal({ activity, onClose, onSuccess }: Props) 
     })
   }
 
-  const consultantName = activity.consultant.name || activity.consultant.email || 'Konsulent'
-  const customerName = activity.customerName || activity.customer?.name || 'ukjent kunde'
+  const consultantName =
+    activity.consultant.name || activity.consultant.email || 'Konsulent'
+  const customerName =
+    activity.customerName || activity.customer?.name || 'ukjent kunde'
 
   return (
     <div className="modal modal-open">
@@ -100,16 +112,16 @@ export default function MarkAsWonModal({ activity, onClose, onSuccess }: Props) 
           </svg>
           <div>
             <p className="font-semibold">{consultantName}</p>
-            <p className="text-sm">
-              Vant oppdrag hos {customerName}
-            </p>
+            <p className="text-sm">Vant oppdrag hos {customerName}</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="form-control">
             <label className="label">
-              <span className="label-text font-medium">Når starter konsulenten?</span>
+              <span className="label-text font-medium">
+                Når starter konsulenten?
+              </span>
             </label>
             <input
               type="date"
@@ -119,15 +131,19 @@ export default function MarkAsWonModal({ activity, onClose, onSuccess }: Props) 
             />
             <label className="label">
               <span className="label-text-alt text-gray-500">
-                Hvis tom eller i dag/fortid: Status settes til OPPTATT umiddelbart.
+                Hvis tom eller i dag/fortid: Status settes til OPPTATT
+                umiddelbart.
                 <br />
-                Hvis fremtidig dato: Status settes til TILDELT frem til oppstart.
+                Hvis fremtidig dato: Status settes til TILDELT frem til
+                oppstart.
               </span>
             </label>
           </div>
 
           {/* Evaluation section */}
-          <div className="divider text-sm text-gray-500">Evaluering (valgfritt)</div>
+          <div className="divider text-sm text-gray-500">
+            Evaluering (valgfritt)
+          </div>
 
           {/* Match rating (1-5 stars) */}
           <div className="form-control">
@@ -144,13 +160,19 @@ export default function MarkAsWonModal({ activity, onClose, onSuccess }: Props) 
                       ? 'btn-warning text-warning-content'
                       : 'btn-ghost'
                   }`}
-                  onClick={() => setMatchRating(star === matchRating ? undefined : star)}
+                  onClick={() =>
+                    setMatchRating(star === matchRating ? undefined : star)
+                  }
                   title={`${star} av 5`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    fill={matchRating && star <= matchRating ? 'currentColor' : 'none'}
+                    fill={
+                      matchRating && star <= matchRating
+                        ? 'currentColor'
+                        : 'none'
+                    }
                     stroke="currentColor"
                     className="w-5 h-5"
                   >
@@ -164,7 +186,9 @@ export default function MarkAsWonModal({ activity, onClose, onSuccess }: Props) 
                 </button>
               ))}
               {matchRating && (
-                <span className="text-sm text-gray-500 ml-2 self-center">{matchRating}/5</span>
+                <span className="text-sm text-gray-500 ml-2 self-center">
+                  {matchRating}/5
+                </span>
               )}
             </div>
           </div>

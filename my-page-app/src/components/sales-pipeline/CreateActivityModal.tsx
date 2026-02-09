@@ -66,7 +66,7 @@ function ConsultantPicker({
       switch (e.key) {
         case 'ArrowDown':
           setHighlightedIndex((prev) =>
-            Math.min(prev + 1, filteredConsultants.length - 1)
+            Math.min(prev + 1, filteredConsultants.length - 1),
           )
           e.preventDefault()
           break
@@ -88,13 +88,15 @@ function ConsultantPicker({
           break
       }
     },
-    [isOpen, filteredConsultants, highlightedIndex, onSelect]
+    [isOpen, filteredConsultants, highlightedIndex, onSelect],
   )
 
   // Scroll highlighted item into view
   useEffect(() => {
     if (listRef.current && isOpen) {
-      const highlightedElement = listRef.current.children[highlightedIndex] as HTMLElement
+      const highlightedElement = listRef.current.children[
+        highlightedIndex
+      ] as HTMLElement
       if (highlightedElement) {
         highlightedElement.scrollIntoView({ block: 'nearest' })
       }
@@ -185,7 +187,9 @@ function ConsultantPicker({
                 <div className="flex flex-col">
                   <span className="font-medium">{consultant.name}</span>
                   {consultant.email && (
-                    <span className="text-xs text-gray-500">{consultant.email}</span>
+                    <span className="text-xs text-gray-500">
+                      {consultant.email}
+                    </span>
                   )}
                 </div>
               </li>
@@ -197,11 +201,17 @@ function ConsultantPicker({
   )
 }
 
-export default function CreateActivityModal({ onClose, onCreated, jobPostingId }: Props) {
+export default function CreateActivityModal({
+  onClose,
+  onCreated,
+  jobPostingId,
+}: Props) {
   const [loading, setLoading] = useState(false)
   const [consultants, setConsultants] = useState<FlowcaseConsultant[]>([])
   const [loadingData, setLoadingData] = useState(true)
-  const [selectedConsultantId, setSelectedConsultantId] = useState<string | null>(null)
+  const [selectedConsultantId, setSelectedConsultantId] = useState<
+    string | null
+  >(null)
 
   const [formData, setFormData] = useState({
     consultantId: undefined as number | undefined,
@@ -227,7 +237,8 @@ export default function CreateActivityModal({ onClose, onCreated, jobPostingId }
   const loadFormData = async () => {
     setLoadingData(true)
     try {
-      const consultantsData = await salesPipelineService.getFlowcaseConsultants()
+      const consultantsData =
+        await salesPipelineService.getFlowcaseConsultants()
       setConsultants(consultantsData ?? [])
     } catch (error) {
       console.error('Failed to load form data:', error)
@@ -264,7 +275,9 @@ export default function CreateActivityModal({ onClose, onCreated, jobPostingId }
     setLoading(true)
     try {
       // Find the selected consultant to get their email for lookup
-      const selectedConsultant = consultants.find(c => c.id === selectedConsultantId)
+      const selectedConsultant = consultants.find(
+        (c) => c.id === selectedConsultantId,
+      )
 
       if (!selectedConsultant?.email) {
         toast.error('Konsulenten mangler e-post')
@@ -280,7 +293,9 @@ export default function CreateActivityModal({ onClose, onCreated, jobPostingId }
         const date = new Date(dateTime)
         // Get timezone offset in minutes and convert to hours:minutes format
         const tzOffset = -date.getTimezoneOffset()
-        const tzHours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0')
+        const tzHours = Math.floor(Math.abs(tzOffset) / 60)
+          .toString()
+          .padStart(2, '0')
         const tzMins = (Math.abs(tzOffset) % 60).toString().padStart(2, '0')
         const tzSign = tzOffset >= 0 ? '+' : '-'
         offerDeadline = `${formData.offerDeadlineDate}T${formData.offerDeadlineTime || '12:00'}:00${tzSign}${tzHours}:${tzMins}`
@@ -292,7 +307,9 @@ export default function CreateActivityModal({ onClose, onCreated, jobPostingId }
         const dateTime = `${formData.interviewDate}T${formData.interviewTime || '10:00'}:00`
         const date = new Date(dateTime)
         const tzOffset = -date.getTimezoneOffset()
-        const tzHours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0')
+        const tzHours = Math.floor(Math.abs(tzOffset) / 60)
+          .toString()
+          .padStart(2, '0')
         const tzMins = (Math.abs(tzOffset) % 60).toString().padStart(2, '0')
         const tzSign = tzOffset >= 0 ? '+' : '-'
         interviewDate = `${formData.interviewDate}T${formData.interviewTime || '10:00'}:00${tzSign}${tzHours}:${tzMins}`
@@ -370,7 +387,9 @@ export default function CreateActivityModal({ onClose, onCreated, jobPostingId }
               className="input input-bordered w-full"
               placeholder="F.eks. 'Equinor', 'NAV', 'DNB'..."
               value={formData.customerName || ''}
-              onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, customerName: e.target.value })
+              }
             />
           </div>
 
@@ -378,14 +397,18 @@ export default function CreateActivityModal({ onClose, onCreated, jobPostingId }
           <div className="form-control">
             <label className="label">
               <span className="label-text">Leverandør / Mellomledd</span>
-              <span className="label-text-alt text-gray-500">Hvis vi er underleverandør</span>
+              <span className="label-text-alt text-gray-500">
+                Hvis vi er underleverandør
+              </span>
             </label>
             <input
               type="text"
               className="input input-bordered w-full"
               placeholder="F.eks. 'Bouvet', 'Sopra Steria'..."
               value={formData.supplierName || ''}
-              onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, supplierName: e.target.value })
+              }
             />
           </div>
 
@@ -399,7 +422,9 @@ export default function CreateActivityModal({ onClose, onCreated, jobPostingId }
               className="input input-bordered w-full"
               placeholder="F.eks. 'Prosjekt hos Kunde X'"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               required
             />
           </div>
@@ -413,7 +438,10 @@ export default function CreateActivityModal({ onClose, onCreated, jobPostingId }
               className="select select-bordered w-full"
               value={formData.currentStage}
               onChange={(e) =>
-                setFormData({ ...formData, currentStage: e.target.value as SalesStage })
+                setFormData({
+                  ...formData,
+                  currentStage: e.target.value as SalesStage,
+                })
               }
             >
               {STAGE_OPTIONS.map((option) => (
@@ -438,7 +466,9 @@ export default function CreateActivityModal({ onClose, onCreated, jobPostingId }
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    maxPrice: e.target.value ? Number(e.target.value) : undefined,
+                    maxPrice: e.target.value
+                      ? Number(e.target.value)
+                      : undefined,
                   })
                 }
               />
@@ -455,7 +485,9 @@ export default function CreateActivityModal({ onClose, onCreated, jobPostingId }
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    offeredPrice: e.target.value ? Number(e.target.value) : undefined,
+                    offeredPrice: e.target.value
+                      ? Number(e.target.value)
+                      : undefined,
                   })
                 }
               />
@@ -593,7 +625,9 @@ export default function CreateActivityModal({ onClose, onCreated, jobPostingId }
               className="textarea textarea-bordered w-full"
               placeholder="Eventuelle notater..."
               value={formData.notes || ''}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
               rows={3}
             />
           </div>

@@ -72,7 +72,7 @@ const customCollisionDetection: CollisionDetection = (args) => {
   if (isActivityDrag && collisions.length > 0) {
     // When dragging an activity, prioritize stage droppables over consultant sortables
     const stageCollision = collisions.find((collision) =>
-      isStageCellId(collision.id)
+      isStageCellId(collision.id),
     )
     if (stageCollision) {
       return [stageCollision]
@@ -88,11 +88,19 @@ export default function SalesPipelineBoardComponent() {
   const [loading, setLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showAddConsultantModal, setShowAddConsultantModal] = useState(false)
-  const [activeActivity, setActiveActivity] = useState<SalesActivity | null>(null)
-  const [editingActivity, setEditingActivity] = useState<SalesActivity | null>(null)
-  const [editingConsultant, setEditingConsultant] = useState<ConsultantWithActivities | null>(null)
-  const [activeConsultantId, setActiveConsultantId] = useState<number | null>(null)
-  const [markAsWonActivity, setMarkAsWonActivity] = useState<SalesActivity | null>(null)
+  const [activeActivity, setActiveActivity] = useState<SalesActivity | null>(
+    null,
+  )
+  const [editingActivity, setEditingActivity] = useState<SalesActivity | null>(
+    null,
+  )
+  const [editingConsultant, setEditingConsultant] =
+    useState<ConsultantWithActivities | null>(null)
+  const [activeConsultantId, setActiveConsultantId] = useState<number | null>(
+    null,
+  )
+  const [markAsWonActivity, setMarkAsWonActivity] =
+    useState<SalesActivity | null>(null)
 
   const isAdmin = user?.admin ?? false
 
@@ -105,7 +113,7 @@ export default function SalesPipelineBoardComponent() {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   )
 
   useEffect(() => {
@@ -131,7 +139,10 @@ export default function SalesPipelineBoardComponent() {
     }
   }
 
-  const handleStageChange = async (activityId: number, newStage: SalesStage) => {
+  const handleStageChange = async (
+    activityId: number,
+    newStage: SalesStage,
+  ) => {
     try {
       await salesPipelineService.updateStage(activityId, { stage: newStage })
       toast.success('Steg oppdatert')
@@ -152,7 +163,10 @@ export default function SalesPipelineBoardComponent() {
     }
   }
 
-  const handleCloseActivity = async (activityId: number, reason: ClosedReason) => {
+  const handleCloseActivity = async (
+    activityId: number,
+    reason: ClosedReason,
+  ) => {
     const reasonLabels: Record<ClosedReason, string> = {
       REJECTED_BY_SUPPLIER: 'avvist av leverandør',
       REJECTED_BY_CUSTOMER: 'avvist av kunde',
@@ -178,7 +192,11 @@ export default function SalesPipelineBoardComponent() {
   }
 
   const handleRemoveConsultant = async (consultantId: number) => {
-    if (!confirm('Er du sikker på at du vil fjerne denne konsulenten fra salgstavlen? Alle salgsaktiviteter og tilgjengelighetsinfo vil bli slettet.')) {
+    if (
+      !confirm(
+        'Er du sikker på at du vil fjerne denne konsulenten fra salgstavlen? Alle salgsaktiviteter og tilgjengelighetsinfo vil bli slettet.',
+      )
+    ) {
       return
     }
     try {
@@ -266,10 +284,10 @@ export default function SalesPipelineBoardComponent() {
       if (activeConsultantId === overConsultantId || !board) return
 
       const oldIndex = board.consultants.findIndex(
-        (c) => c.consultant.id === activeConsultantId
+        (c) => c.consultant.id === activeConsultantId,
       )
       const newIndex = board.consultants.findIndex(
-        (c) => c.consultant.id === overConsultantId
+        (c) => c.consultant.id === overConsultantId,
       )
 
       if (oldIndex === -1 || newIndex === -1) return
@@ -313,7 +331,7 @@ export default function SalesPipelineBoardComponent() {
         consultants: board.consultants.map((c) => ({
           ...c,
           activities: c.activities.map((a) =>
-            a.id === activityId ? { ...a, currentStage: newStage } : a
+            a.id === activityId ? { ...a, currentStage: newStage } : a,
           ),
         })),
       }
@@ -358,7 +376,10 @@ export default function SalesPipelineBoardComponent() {
             </span>
           )}
           {isAdmin && (
-            <Link href="/salgstavle-analytics" className="btn btn-outline btn-sm">
+            <Link
+              href="/salgstavle-analytics"
+              className="btn btn-outline btn-sm"
+            >
               📊 Analytics
             </Link>
           )}
@@ -399,19 +420,25 @@ export default function SalesPipelineBoardComponent() {
                   <th
                     key={stage}
                     className={`min-w-[200px] text-center bg-base-200 ${
-                      index < STAGE_ORDER.length - 1 ? 'border-r-2 border-base-300' : ''
+                      index < STAGE_ORDER.length - 1
+                        ? 'border-r-2 border-base-300'
+                        : ''
                     }`}
                   >
                     <div className="flex flex-col items-center gap-1">
                       <span>{STAGE_LABELS[stage]}</span>
-                      <span className="text-xs font-normal opacity-60">Steg {index + 1}</span>
+                      <span className="text-xs font-normal opacity-60">
+                        Steg {index + 1}
+                      </span>
                     </div>
                   </th>
                 ))}
               </tr>
             </thead>
             <SortableContext
-              items={board.consultants.map((c) => `consultant-${c.consultant.id}`)}
+              items={board.consultants.map(
+                (c) => `consultant-${c.consultant.id}`,
+              )}
               strategy={verticalListSortingStrategy}
             >
               <tbody>
@@ -434,7 +461,10 @@ export default function SalesPipelineBoardComponent() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={STAGE_ORDER.length + 1} className="text-center py-8 text-gray-500">
+                    <td
+                      colSpan={STAGE_ORDER.length + 1}
+                      className="text-center py-8 text-gray-500"
+                    >
                       Ingen aktive salgsaktiviteter
                     </td>
                   </tr>
@@ -461,7 +491,9 @@ export default function SalesPipelineBoardComponent() {
           ) : activeConsultantId ? (
             <div className="bg-base-100 p-3 rounded shadow-lg opacity-80 border">
               <span className="font-semibold">
-                {board.consultants.find((c) => c.consultant.id === activeConsultantId)?.consultant.name || 'Konsulent'}
+                {board.consultants.find(
+                  (c) => c.consultant.id === activeConsultantId,
+                )?.consultant.name || 'Konsulent'}
               </span>
             </div>
           ) : null}

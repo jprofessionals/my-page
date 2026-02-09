@@ -92,7 +92,10 @@ function getMonthsForPeriod(value: number | undefined): number | undefined {
 function renderStars(rating: number | null | undefined, max = 5): string {
   if (rating == null) return '-'
   const full = Math.round(rating)
-  return '\u2605'.repeat(Math.min(full, max)) + '\u2606'.repeat(Math.max(max - full, 0))
+  return (
+    '\u2605'.repeat(Math.min(full, max)) +
+    '\u2606'.repeat(Math.max(max - full, 0))
+  )
 }
 
 function renderStarsNumeric(rating: number | null | undefined): string {
@@ -100,7 +103,10 @@ function renderStarsNumeric(rating: number | null | undefined): string {
   return `${rating.toFixed(1)} / 5`
 }
 
-function daysBetween(start: string, end: string | null | undefined): number | null {
+function daysBetween(
+  start: string,
+  end: string | null | undefined,
+): number | null {
   if (!end) return null
   const s = new Date(start).getTime()
   const e = new Date(end).getTime()
@@ -129,7 +135,9 @@ export default function EvaluationTab() {
   const [expandedReason, setExpandedReason] = useState<string | null>(null)
 
   // Section 6: drill-down state
-  const [outcomeFilter, setOutcomeFilter] = useState<'all' | 'won' | 'lost'>('all')
+  const [outcomeFilter, setOutcomeFilter] = useState<'all' | 'won' | 'lost'>(
+    'all',
+  )
   const [sortKey, setSortKey] = useState<SortKey>('duration')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [expandedRow, setExpandedRow] = useState<number | null>(null)
@@ -170,7 +178,8 @@ export default function EvaluationTab() {
   const expandedReasonActivities = useMemo(() => {
     if (!analytics || !expandedReason) return []
     return analytics.closedActivities.filter(
-      (a) => a.status === 'CLOSED_OTHER_WON' && a.closedReason === expandedReason
+      (a) =>
+        a.status === 'CLOSED_OTHER_WON' && a.closedReason === expandedReason,
     )
   }, [analytics, expandedReason])
 
@@ -185,13 +194,15 @@ export default function EvaluationTab() {
   }, [analytics])
 
   const customerExpWinRates = useMemo(() => {
-    if (!analytics?.customerExperienceEffect) return { withExp: null, withoutExp: null }
+    if (!analytics?.customerExperienceEffect)
+      return { withExp: null, withoutExp: null }
     const e = analytics.customerExperienceEffect
     const withTotal = e.withExperienceWon + e.withExperienceLost
     const withoutTotal = e.withoutExperienceWon + e.withoutExperienceLost
     return {
       withExp: withTotal > 0 ? (e.withExperienceWon / withTotal) * 100 : null,
-      withoutExp: withoutTotal > 0 ? (e.withoutExperienceWon / withoutTotal) * 100 : null,
+      withoutExp:
+        withoutTotal > 0 ? (e.withoutExperienceWon / withoutTotal) * 100 : null,
       withExpWon: e.withExperienceWon,
       withExpLost: e.withExperienceLost,
       withExpTotal: withTotal,
@@ -219,7 +230,9 @@ export default function EvaluationTab() {
           cmp = (a.consultant.name || '').localeCompare(b.consultant.name || '')
           break
         case 'customer':
-          cmp = getCustomerDisplayName(a).localeCompare(getCustomerDisplayName(b))
+          cmp = getCustomerDisplayName(a).localeCompare(
+            getCustomerDisplayName(b),
+          )
           break
         case 'title':
           cmp = a.title.localeCompare(b.title)
@@ -255,7 +268,7 @@ export default function EvaluationTab() {
         setSortDir('desc')
       }
     },
-    [sortKey]
+    [sortKey],
   )
 
   const sortIndicator = (key: SortKey) => {
@@ -290,7 +303,9 @@ export default function EvaluationTab() {
         <select
           className="select select-bordered select-sm"
           value={periodValue ?? ''}
-          onChange={(e) => setPeriodValue(e.target.value ? Number(e.target.value) : undefined)}
+          onChange={(e) =>
+            setPeriodValue(e.target.value ? Number(e.target.value) : undefined)
+          }
         >
           {PERIOD_OPTIONS.map((opt) => (
             <option key={opt.label} value={opt.value ?? ''}>
@@ -306,10 +321,22 @@ export default function EvaluationTab() {
         <div className="bg-base-200 rounded-lg p-4">
           {lossChartData.length > 0 ? (
             <>
-              <ResponsiveContainer width="100%" height={Math.max(200, lossChartData.length * 48)}>
-                <BarChart data={lossChartData} layout="vertical" margin={{ left: 20, right: 20 }}>
+              <ResponsiveContainer
+                width="100%"
+                height={Math.max(200, lossChartData.length * 48)}
+              >
+                <BarChart
+                  data={lossChartData}
+                  layout="vertical"
+                  margin={{ left: 20, right: 20 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis type="number" stroke="#9ca3af" fontSize={12} allowDecimals={false} />
+                  <XAxis
+                    type="number"
+                    stroke="#9ca3af"
+                    fontSize={12}
+                    allowDecimals={false}
+                  />
                   <YAxis
                     type="category"
                     dataKey="label"
@@ -319,7 +346,10 @@ export default function EvaluationTab() {
                     tick={{ fill: '#9ca3af' }}
                   />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none' }}
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: 'none',
+                    }}
                     formatter={(value) => [value, 'Antall']}
                   />
                   <Bar
@@ -331,7 +361,7 @@ export default function EvaluationTab() {
                       const item = lossChartData[index]
                       if (item) {
                         setExpandedReason(
-                          expandedReason === item.reason ? null : item.reason
+                          expandedReason === item.reason ? null : item.reason,
                         )
                       }
                     }}
@@ -340,7 +370,11 @@ export default function EvaluationTab() {
                       <Cell
                         key={entry.reason}
                         fill={BAR_COLORS[index % BAR_COLORS.length]}
-                        opacity={expandedReason && expandedReason !== entry.reason ? 0.4 : 1}
+                        opacity={
+                          expandedReason && expandedReason !== entry.reason
+                            ? 0.4
+                            : 1
+                        }
                       />
                     ))}
                   </Bar>
@@ -387,7 +421,9 @@ export default function EvaluationTab() {
                         <td>{a.consultant.name || '-'}</td>
                         <td>{getCustomerDisplayName(a)}</td>
                         <td>{a.title}</td>
-                        <td className="max-w-xs truncate">{a.closedReasonNote || '-'}</td>
+                        <td className="max-w-xs truncate">
+                          {a.closedReasonNote || '-'}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -416,7 +452,9 @@ export default function EvaluationTab() {
                   {analytics.closedReasonByStage.map((stage) => {
                     const topReason =
                       stage.reasons.length > 0
-                        ? stage.reasons.reduce((a, b) => (b.count > a.count ? b : a))
+                        ? stage.reasons.reduce((a, b) =>
+                            b.count > a.count ? b : a,
+                          )
                         : null
                     return (
                       <tr key={stage.stage}>
@@ -448,7 +486,9 @@ export default function EvaluationTab() {
         <h2 className="text-xl font-semibold mb-4">Match-kvalitet</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div className="stat bg-success/10 border border-success/30 rounded-lg p-4">
-            <div className="stat-title text-success">Snitt match-rating (Vunnet)</div>
+            <div className="stat-title text-success">
+              Snitt match-rating (Vunnet)
+            </div>
             <div className="stat-value text-success text-2xl">
               {analytics.avgMatchRatingWon != null
                 ? renderStars(analytics.avgMatchRatingWon)
@@ -459,7 +499,9 @@ export default function EvaluationTab() {
             </div>
           </div>
           <div className="stat bg-error/10 border border-error/30 rounded-lg p-4">
-            <div className="stat-title text-error">Snitt match-rating (Tapt)</div>
+            <div className="stat-title text-error">
+              Snitt match-rating (Tapt)
+            </div>
             <div className="stat-value text-error text-2xl">
               {analytics.avgMatchRatingLost != null
                 ? renderStars(analytics.avgMatchRatingLost)
@@ -481,10 +523,18 @@ export default function EvaluationTab() {
                   <XAxis dataKey="rating" stroke="#9ca3af" fontSize={12} />
                   <YAxis stroke="#9ca3af" fontSize={12} allowDecimals={false} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none' }}
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: 'none',
+                    }}
                   />
                   <Legend />
-                  <Bar dataKey="wonCount" name="Vunnet" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="wonCount"
+                    name="Vunnet"
+                    fill="#22c55e"
+                    radius={[4, 4, 0, 0]}
+                  />
                   <Bar
                     dataKey="lostCount"
                     name="Tapt"
@@ -510,7 +560,8 @@ export default function EvaluationTab() {
         <h2 className="text-xl font-semibold mb-4">Kundeerfaring-effekt</h2>
         <div className="bg-base-200 rounded-lg p-4">
           {analytics.customerExperienceEffect &&
-          (customerExpWinRates.withExp != null || customerExpWinRates.withoutExp != null) ? (
+          (customerExpWinRates.withExp != null ||
+            customerExpWinRates.withoutExp != null) ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="stat bg-base-300 rounded-lg p-4">
                 <div className="stat-title">Med kundeerfaring</div>
@@ -562,14 +613,24 @@ export default function EvaluationTab() {
               className={`join-item btn btn-sm ${outcomeFilter === 'won' ? 'btn-active' : ''}`}
               onClick={() => setOutcomeFilter('won')}
             >
-              Vunnet ({analytics.closedActivities.filter((a) => a.status === 'WON').length})
+              Vunnet (
+              {
+                analytics.closedActivities.filter((a) => a.status === 'WON')
+                  .length
+              }
+              )
             </button>
             <button
               className={`join-item btn btn-sm ${outcomeFilter === 'lost' ? 'btn-active' : ''}`}
               onClick={() => setOutcomeFilter('lost')}
             >
               Tapt (
-              {analytics.closedActivities.filter((a) => a.status === 'CLOSED_OTHER_WON').length})
+              {
+                analytics.closedActivities.filter(
+                  (a) => a.status === 'CLOSED_OTHER_WON',
+                ).length
+              }
+              )
             </button>
           </div>
         </div>
@@ -626,21 +687,29 @@ export default function EvaluationTab() {
                 </thead>
                 <tbody>
                   {filteredActivities.map((activity) => {
-                    const duration = daysBetween(activity.createdAt, activity.closedAt)
+                    const duration = daysBetween(
+                      activity.createdAt,
+                      activity.closedAt,
+                    )
                     const isExpanded = expandedRow === activity.id
                     return (
                       <Fragment key={activity.id}>
                         <tr
                           className="cursor-pointer hover:bg-base-300"
-                          onClick={() => setExpandedRow(isExpanded ? null : activity.id)}
+                          onClick={() =>
+                            setExpandedRow(isExpanded ? null : activity.id)
+                          }
                         >
                           <td>{activity.consultant.name || '-'}</td>
                           <td>{getCustomerDisplayName(activity)}</td>
-                          <td className="max-w-xs truncate">{activity.title}</td>
+                          <td className="max-w-xs truncate">
+                            {activity.title}
+                          </td>
                           <td>{statusBadge(activity.status)}</td>
                           <td>
                             {activity.closedReason
-                              ? CLOSED_REASON_LABELS[activity.closedReason] || activity.closedReason
+                              ? CLOSED_REASON_LABELS[activity.closedReason] ||
+                                activity.closedReason
                               : '-'}
                           </td>
                           <td title={renderStarsNumeric(activity.matchRating)}>
@@ -659,7 +728,9 @@ export default function EvaluationTab() {
                                     <span className="font-semibold text-sm">
                                       Evalueringsnotater:{' '}
                                     </span>
-                                    <span className="text-sm">{activity.evaluationNotes}</span>
+                                    <span className="text-sm">
+                                      {activity.evaluationNotes}
+                                    </span>
                                   </div>
                                 )}
                                 {activity.closedReasonNote && (
@@ -667,12 +738,16 @@ export default function EvaluationTab() {
                                     <span className="font-semibold text-sm">
                                       Tapsnotat:{' '}
                                     </span>
-                                    <span className="text-sm">{activity.closedReasonNote}</span>
+                                    <span className="text-sm">
+                                      {activity.closedReasonNote}
+                                    </span>
                                   </div>
                                 )}
                                 {activity.evaluationDocumentUrl && (
                                   <div>
-                                    <span className="font-semibold text-sm">Dokument: </span>
+                                    <span className="font-semibold text-sm">
+                                      Dokument:{' '}
+                                    </span>
                                     <a
                                       href={activity.evaluationDocumentUrl}
                                       target="_blank"
@@ -683,23 +758,24 @@ export default function EvaluationTab() {
                                     </a>
                                   </div>
                                 )}
-                                {activity.keyFactors && activity.keyFactors.length > 0 && (
-                                  <div>
-                                    <span className="font-semibold text-sm">
-                                      Nøkkelfaktorer:{' '}
-                                    </span>
-                                    <div className="flex flex-wrap gap-1 mt-1">
-                                      {activity.keyFactors.map((kf) => (
-                                        <span
-                                          key={kf}
-                                          className="badge badge-outline badge-sm"
-                                        >
-                                          {KEY_FACTOR_LABELS[kf] || kf}
-                                        </span>
-                                      ))}
+                                {activity.keyFactors &&
+                                  activity.keyFactors.length > 0 && (
+                                    <div>
+                                      <span className="font-semibold text-sm">
+                                        Nøkkelfaktorer:{' '}
+                                      </span>
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                        {activity.keyFactors.map((kf) => (
+                                          <span
+                                            key={kf}
+                                            className="badge badge-outline badge-sm"
+                                          >
+                                            {KEY_FACTOR_LABELS[kf] || kf}
+                                          </span>
+                                        ))}
+                                      </div>
                                     </div>
-                                  </div>
-                                )}
+                                  )}
                                 {!activity.evaluationNotes &&
                                   !activity.closedReasonNote &&
                                   !activity.evaluationDocumentUrl &&

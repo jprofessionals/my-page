@@ -28,11 +28,15 @@ const FUNNEL_PERIODS = [
 ] as const
 
 export default function OverviewTab() {
-  const [analytics, setAnalytics] = useState<SalesPipelineAnalytics | null>(null)
+  const [analytics, setAnalytics] = useState<SalesPipelineAnalytics | null>(
+    null,
+  )
   const [trends, setTrends] = useState<MonthlyTrendData[]>([])
   const [loading, setLoading] = useState(true)
   const [trendMonths, setTrendMonths] = useState(12)
-  const [funnelMonths, setFunnelMonths] = useState<number | undefined>(undefined)
+  const [funnelMonths, setFunnelMonths] = useState<number | undefined>(
+    undefined,
+  )
 
   useEffect(() => {
     loadAnalytics()
@@ -66,7 +70,20 @@ export default function OverviewTab() {
 
   const formatMonth = (month: string) => {
     const [year, monthNum] = month.split('-')
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des']
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des',
+    ]
     return `${monthNames[parseInt(monthNum) - 1]} ${year.slice(2)}`
   }
 
@@ -103,7 +120,9 @@ export default function OverviewTab() {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <div className="stat bg-base-200 rounded-lg p-4">
           <div className="stat-title">Aktive prosesser</div>
-          <div className="stat-value text-primary">{analytics.totalActiveActivities}</div>
+          <div className="stat-value text-primary">
+            {analytics.totalActiveActivities}
+          </div>
           <div className="stat-desc">Pågående salgsaktiviteter</div>
         </div>
 
@@ -112,10 +131,17 @@ export default function OverviewTab() {
           <div className="stat-value text-success">{analytics.wonThisYear}</div>
           <div className="stat-desc">
             {(() => {
-              const change = formatChange(analytics.wonThisYear, analytics.wonLastYear)
+              const change = formatChange(
+                analytics.wonThisYear,
+                analytics.wonLastYear,
+              )
               if (change) {
                 return (
-                  <span className={change.isPositive ? 'text-success' : 'text-error'}>
+                  <span
+                    className={
+                      change.isPositive ? 'text-success' : 'text-error'
+                    }
+                  >
                     {change.text} år
                   </span>
                 )
@@ -127,13 +153,22 @@ export default function OverviewTab() {
 
         <div className="stat bg-base-200 rounded-lg p-4">
           <div className="stat-title">Besvart i år</div>
-          <div className="stat-value text-info">{analytics.createdThisYear}</div>
+          <div className="stat-value text-info">
+            {analytics.createdThisYear}
+          </div>
           <div className="stat-desc">
             {(() => {
-              const change = formatChange(analytics.createdThisYear, analytics.createdLastYear)
+              const change = formatChange(
+                analytics.createdThisYear,
+                analytics.createdLastYear,
+              )
               if (change) {
                 return (
-                  <span className={change.isPositive ? 'text-success' : 'text-error'}>
+                  <span
+                    className={
+                      change.isPositive ? 'text-success' : 'text-error'
+                    }
+                  >
                     {change.text} år
                   </span>
                 )
@@ -145,13 +180,17 @@ export default function OverviewTab() {
 
         <div className="stat bg-base-200 rounded-lg p-4">
           <div className="stat-title">Win Rate</div>
-          <div className="stat-value text-info">{analytics.conversionRate.toFixed(1)}%</div>
+          <div className="stat-value text-info">
+            {analytics.conversionRate.toFixed(1)}%
+          </div>
           <div className="stat-desc">Vunnet / (Vunnet + Tapt)</div>
         </div>
 
         <div className="stat bg-base-200 rounded-lg p-4">
           <div className="stat-title">Snitt dager til lukking</div>
-          <div className="stat-value text-warning">{analytics.averageDaysToClose}</div>
+          <div className="stat-value text-warning">
+            {analytics.averageDaysToClose}
+          </div>
           <div className="stat-desc">Fra opprettet til avsluttet</div>
         </div>
       </div>
@@ -159,21 +198,28 @@ export default function OverviewTab() {
       {/* Availability Stats */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">
-          Konsulent-tilgjengelighet ({analytics.availabilityStats.totalConsultants} totalt)
+          Konsulent-tilgjengelighet (
+          {analytics.availabilityStats.totalConsultants} totalt)
         </h2>
         <div className="grid grid-cols-3 gap-4">
           <div className="stat bg-success/10 border border-success/30 rounded-lg p-4">
             <div className="stat-title text-success">Ledige nå</div>
-            <div className="stat-value text-success">{analytics.availabilityStats.available}</div>
+            <div className="stat-value text-success">
+              {analytics.availabilityStats.available}
+            </div>
           </div>
           <div className="stat bg-warning/10 border border-warning/30 rounded-lg p-4">
             <div className="stat-title text-warning">Blir ledige</div>
-            <div className="stat-value text-warning">{analytics.availabilityStats.availableSoon}</div>
+            <div className="stat-value text-warning">
+              {analytics.availabilityStats.availableSoon}
+            </div>
             <div className="stat-desc text-warning/70">På salgstavla</div>
           </div>
           <div className="stat bg-error/10 border border-error/30 rounded-lg p-4">
             <div className="stat-title text-error">Opptatt</div>
-            <div className="stat-value text-error">{analytics.availabilityStats.occupied}</div>
+            <div className="stat-value text-error">
+              {analytics.availabilityStats.occupied}
+            </div>
             {analytics.availabilityStats.assigned > 0 && (
               <div className="stat-desc text-info">
                 {analytics.availabilityStats.assigned} venter på oppstart
@@ -216,7 +262,10 @@ export default function OverviewTab() {
                   <Tooltip
                     labelFormatter={formatMonth}
                     formatter={(value) => [Number(value).toFixed(1), 'Ukeverk']}
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none' }}
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: 'none',
+                    }}
                   />
                   <Legend />
                   <Line
@@ -255,7 +304,10 @@ export default function OverviewTab() {
                   <YAxis stroke="#9ca3af" fontSize={12} />
                   <Tooltip
                     labelFormatter={formatMonth}
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none' }}
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: 'none',
+                    }}
                   />
                   <Legend />
                   <Line
@@ -303,7 +355,11 @@ export default function OverviewTab() {
           <select
             className="select select-bordered select-sm"
             value={funnelMonths ?? ''}
-            onChange={(e) => setFunnelMonths(e.target.value ? Number(e.target.value) : undefined)}
+            onChange={(e) =>
+              setFunnelMonths(
+                e.target.value ? Number(e.target.value) : undefined,
+              )
+            }
           >
             {FUNNEL_PERIODS.map((period) => (
               <option key={period.label} value={period.value ?? ''}>
@@ -331,11 +387,18 @@ export default function OverviewTab() {
                   SENT_TO_CUSTOMER: 'Til kunde',
                   INTERVIEW: 'Intervju',
                 }
-                const colors = ['bg-blue-500', 'bg-blue-400', 'bg-cyan-500', 'bg-indigo-400']
+                const colors = [
+                  'bg-blue-500',
+                  'bg-blue-400',
+                  'bg-cyan-500',
+                  'bg-indigo-400',
+                ]
 
                 return (analytics.funnelData || []).map((stage, index) => (
                   <div key={stage.stage} className="flex items-center flex-1">
-                    <div className="text-gray-400 px-1 flex-shrink-0">&rarr;</div>
+                    <div className="text-gray-400 px-1 flex-shrink-0">
+                      &rarr;
+                    </div>
                     <div
                       className={`${colors[index] || 'bg-gray-500'} rounded-lg p-3 flex-1 text-white text-center min-w-0`}
                       title={`${stage.reached} har nådd denne fasen, ${stage.current} er her nå`}
@@ -357,20 +420,25 @@ export default function OverviewTab() {
             <div className="flex gap-4 flex-shrink-0">
               <div className="text-center">
                 <div className="w-14 h-14 rounded-full bg-success/20 border-2 border-success flex items-center justify-center">
-                  <span className="text-xl font-bold text-success">{analytics.funnelWonCount}</span>
+                  <span className="text-xl font-bold text-success">
+                    {analytics.funnelWonCount}
+                  </span>
                 </div>
                 <div className="text-xs text-success mt-1">Vunnet</div>
               </div>
               <div className="text-center">
                 <div className="w-14 h-14 rounded-full bg-error/20 border-2 border-error flex items-center justify-center">
-                  <span className="text-xl font-bold text-error">{analytics.funnelLostCount}</span>
+                  <span className="text-xl font-bold text-error">
+                    {analytics.funnelLostCount}
+                  </span>
                 </div>
                 <div className="text-xs text-error mt-1">Tapt</div>
               </div>
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-4 text-center">
-            Antall som har nådd hver fase ({funnelMonths ? `siste ${funnelMonths} mnd` : 'all tid'})
+            Antall som har nådd hver fase (
+            {funnelMonths ? `siste ${funnelMonths} mnd` : 'all tid'})
           </p>
         </div>
       </div>

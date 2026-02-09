@@ -77,7 +77,9 @@ function getTechLabel(category: string): string {
 // ===== Component =====
 
 export default function CompetencyBaseTab() {
-  const [analytics, setAnalytics] = useState<CompetencyBaseAnalytics | null>(null)
+  const [analytics, setAnalytics] = useState<CompetencyBaseAnalytics | null>(
+    null,
+  )
   const [loading, setLoading] = useState(true)
   const [months, setMonths] = useState<number>(12)
 
@@ -169,7 +171,7 @@ export default function CompetencyBaseTab() {
         setTagSortDir('desc')
       }
     },
-    [tagSortKey]
+    [tagSortKey],
   )
 
   const tagSortIndicator = (key: TagSortKey) => {
@@ -222,19 +224,27 @@ export default function CompetencyBaseTab() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="stat bg-base-200 rounded-lg p-4">
             <div className="stat-title">Totalt ansatte</div>
-            <div className="stat-value text-primary">{availabilityStats.totalConsultants}</div>
+            <div className="stat-value text-primary">
+              {availabilityStats.totalConsultants}
+            </div>
             <div className="stat-desc">Konsulenter i selskapet</div>
           </div>
 
           <div className="stat bg-success/10 border border-success/30 rounded-lg p-4">
             <div className="stat-title text-success">Ledig nå</div>
-            <div className="stat-value text-success">{availabilityStats.available}</div>
-            <div className="stat-desc text-success/70">Tilgjengelig for oppdrag</div>
+            <div className="stat-value text-success">
+              {availabilityStats.available}
+            </div>
+            <div className="stat-desc text-success/70">
+              Tilgjengelig for oppdrag
+            </div>
           </div>
 
           <div className="stat bg-warning/10 border border-warning/30 rounded-lg p-4">
             <div className="stat-title text-warning">Blir ledige</div>
-            <div className="stat-value text-warning">{availabilityStats.availableSoon}</div>
+            <div className="stat-value text-warning">
+              {availabilityStats.availableSoon}
+            </div>
             <div className="stat-desc text-warning/70">
               {availabilityStats.assigned > 0
                 ? `+ ${availabilityStats.assigned} venter på oppstart`
@@ -244,7 +254,9 @@ export default function CompetencyBaseTab() {
 
           <div className="stat bg-error/10 border border-error/30 rounded-lg p-4">
             <div className="stat-title text-error">Opptatt</div>
-            <div className="stat-value text-error">{availabilityStats.occupied}</div>
+            <div className="stat-value text-error">
+              {availabilityStats.occupied}
+            </div>
             <div className="stat-desc text-error/70">I pågående oppdrag</div>
           </div>
         </div>
@@ -252,7 +264,9 @@ export default function CompetencyBaseTab() {
 
       {/* Section 2: Kommende ledige konsulenter */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Kommende ledige konsulenter</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Kommende ledige konsulenter
+        </h2>
         <div className="bg-base-200 rounded-lg p-4">
           {analytics.upcomingAvailable.length > 0 ? (
             <div className="overflow-x-auto">
@@ -273,7 +287,9 @@ export default function CompetencyBaseTab() {
                     })
                     .map((c) => (
                       <tr key={c.consultant.id}>
-                        <td className="font-medium">{c.consultant.name || '-'}</td>
+                        <td className="font-medium">
+                          {c.consultant.name || '-'}
+                        </td>
                         <td>{formatDate(c.availableFrom)}</td>
                         <td>{c.currentCustomer || '-'}</td>
                       </tr>
@@ -295,7 +311,8 @@ export default function CompetencyBaseTab() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Donut chart */}
           <div className="bg-base-200 rounded-lg p-4">
-            {sectorChartData.length > 0 && sectorChartData.some((s) => s.value > 0) ? (
+            {sectorChartData.length > 0 &&
+            sectorChartData.some((s) => s.value > 0) ? (
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -317,7 +334,10 @@ export default function CompetencyBaseTab() {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none' }}
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: 'none',
+                    }}
                     formatter={(value) => [value, 'Konsulenter']}
                   />
                   <Legend />
@@ -350,10 +370,12 @@ export default function CompetencyBaseTab() {
                             className="inline-block w-3 h-3 rounded-full mr-2"
                             style={{
                               backgroundColor:
-                                SECTOR_COLORS[s.sector as CustomerSector] || '#6b7280',
+                                SECTOR_COLORS[s.sector as CustomerSector] ||
+                                '#6b7280',
                             }}
                           />
-                          {SECTOR_LABELS[s.sector as CustomerSector] || s.sector}
+                          {SECTOR_LABELS[s.sector as CustomerSector] ||
+                            s.sector}
                         </td>
                         <td>{s.customerCount}</td>
                         <td>{s.consultantCount}</td>
@@ -383,10 +405,18 @@ export default function CompetencyBaseTab() {
                   <XAxis dataKey="category" stroke="#9ca3af" fontSize={12} />
                   <YAxis stroke="#9ca3af" fontSize={12} allowDecimals={false} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none' }}
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: 'none',
+                    }}
                     formatter={(value) => [value, 'Konsulenter']}
                   />
-                  <Bar dataKey="count" name="Konsulenter" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="count"
+                    name="Konsulenter"
+                    fill="#8b5cf6"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
               <p className="text-xs text-gray-500 mt-2">
@@ -413,7 +443,10 @@ export default function CompetencyBaseTab() {
                   <XAxis dataKey="category" stroke="#9ca3af" fontSize={12} />
                   <YAxis stroke="#9ca3af" fontSize={12} allowDecimals={false} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none' }}
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: 'none',
+                    }}
                   />
                   <Legend />
                   <Bar
@@ -431,8 +464,8 @@ export default function CompetencyBaseTab() {
                 </BarChart>
               </ResponsiveContainer>
               <p className="text-xs text-gray-500 mt-2">
-                Gapet mellom blå (etterspørsel) og grønn (vunnet) viser hvor vi mangler
-                kapasitet/kompetanse
+                Gapet mellom blå (etterspørsel) og grønn (vunnet) viser hvor vi
+                mangler kapasitet/kompetanse
               </p>
 
               {/* Skill gap table */}
@@ -510,7 +543,9 @@ export default function CompetencyBaseTab() {
                       <td className="font-medium">{tag.tagName}</td>
                       <td>{tag.demanded}</td>
                       <td>{tag.won}</td>
-                      <td className={hitRateColor(tag.hitRate)}>{tag.hitRate.toFixed(1)}%</td>
+                      <td className={hitRateColor(tag.hitRate)}>
+                        {tag.hitRate.toFixed(1)}%
+                      </td>
                     </tr>
                   ))}
                 </tbody>

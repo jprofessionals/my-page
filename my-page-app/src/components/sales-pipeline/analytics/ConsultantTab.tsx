@@ -6,7 +6,11 @@ import {
   salesPipelineService,
   type ConsultantDetailedStats,
 } from '@/services/salesPipeline.service'
-import type { SalesActivityReadable, AvailabilityStatus, SalesStage } from '@/data/types/types.gen'
+import type {
+  SalesActivityReadable,
+  AvailabilityStatus,
+  SalesStage,
+} from '@/data/types/types.gen'
 
 // ===== Constants =====
 
@@ -31,7 +35,10 @@ const KEY_FACTOR_LABELS: Record<string, string> = {
   OTHER: 'Annet',
 }
 
-const AVAILABILITY_CONFIG: Record<string, { label: string; className: string }> = {
+const AVAILABILITY_CONFIG: Record<
+  string,
+  { label: string; className: string }
+> = {
   AVAILABLE: { label: 'Ledig', className: 'badge-success' },
   AVAILABLE_SOON: { label: 'Blir ledig', className: 'badge-warning' },
   ASSIGNED: { label: 'Tildelt', className: 'badge-info' },
@@ -40,13 +47,33 @@ const AVAILABILITY_CONFIG: Record<string, { label: string; className: string }> 
 
 const STAGE_CONFIG: Record<string, { label: string; className: string }> = {
   INTERESTED: { label: 'Interessert', className: 'bg-blue-500 text-white' },
-  SENT_TO_SUPPLIER: { label: 'Til leverandør', className: 'bg-cyan-500 text-white' },
-  SENT_TO_CUSTOMER: { label: 'Til kunde', className: 'bg-indigo-500 text-white' },
+  SENT_TO_SUPPLIER: {
+    label: 'Til leverandør',
+    className: 'bg-cyan-500 text-white',
+  },
+  SENT_TO_CUSTOMER: {
+    label: 'Til kunde',
+    className: 'bg-indigo-500 text-white',
+  },
   INTERVIEW: { label: 'Intervju', className: 'bg-purple-500 text-white' },
 }
 
-type MainSortKey = 'name' | 'status' | 'active' | 'won' | 'lost' | 'winRate' | 'avgDays'
-type HistorySortKey = 'customer' | 'title' | 'status' | 'reason' | 'match' | 'duration' | 'price'
+type MainSortKey =
+  | 'name'
+  | 'status'
+  | 'active'
+  | 'won'
+  | 'lost'
+  | 'winRate'
+  | 'avgDays'
+type HistorySortKey =
+  | 'customer'
+  | 'title'
+  | 'status'
+  | 'reason'
+  | 'match'
+  | 'duration'
+  | 'price'
 type SortDir = 'asc' | 'desc'
 
 // ===== Helpers =====
@@ -54,7 +81,10 @@ type SortDir = 'asc' | 'desc'
 function renderStars(rating: number | null | undefined, max = 5): string {
   if (rating == null) return '-'
   const full = Math.round(rating)
-  return '\u2605'.repeat(Math.min(full, max)) + '\u2606'.repeat(Math.max(max - full, 0))
+  return (
+    '\u2605'.repeat(Math.min(full, max)) +
+    '\u2606'.repeat(Math.max(max - full, 0))
+  )
 }
 
 function renderStarsNumeric(rating: number | null | undefined): string {
@@ -62,7 +92,10 @@ function renderStarsNumeric(rating: number | null | undefined): string {
   return `${rating.toFixed(1)} / 5`
 }
 
-function daysBetween(start: string, end: string | null | undefined): number | null {
+function daysBetween(
+  start: string,
+  end: string | null | undefined,
+): number | null {
   if (!end) return null
   const s = new Date(start).getTime()
   const e = new Date(end).getTime()
@@ -92,7 +125,9 @@ function availabilityBadge(status: AvailabilityStatus | undefined | null) {
   if (!config) {
     return <span className="badge badge-ghost badge-sm">Ukjent</span>
   }
-  return <span className={`badge ${config.className} badge-sm`}>{config.label}</span>
+  return (
+    <span className={`badge ${config.className} badge-sm`}>{config.label}</span>
+  )
 }
 
 function stageBadge(stage: SalesStage) {
@@ -100,7 +135,9 @@ function stageBadge(stage: SalesStage) {
   if (!config) {
     return <span className="badge badge-ghost badge-sm">{stage}</span>
   }
-  return <span className={`badge badge-sm ${config.className}`}>{config.label}</span>
+  return (
+    <span className={`badge badge-sm ${config.className}`}>{config.label}</span>
+  )
 }
 
 function outcomeBadge(status: string) {
@@ -130,14 +167,19 @@ export default function ConsultantTab() {
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
   // Expanded row
-  const [expandedConsultantId, setExpandedConsultantId] = useState<number | null>(null)
+  const [expandedConsultantId, setExpandedConsultantId] = useState<
+    number | null
+  >(null)
 
   // History table sort (per expanded consultant)
-  const [historySortKey, setHistorySortKey] = useState<HistorySortKey>('duration')
+  const [historySortKey, setHistorySortKey] =
+    useState<HistorySortKey>('duration')
   const [historySortDir, setHistorySortDir] = useState<SortDir>('desc')
 
   // History row expansion for evaluation details
-  const [expandedHistoryId, setExpandedHistoryId] = useState<number | null>(null)
+  const [expandedHistoryId, setExpandedHistoryId] = useState<number | null>(
+    null,
+  )
 
   useEffect(() => {
     loadData()
@@ -164,7 +206,9 @@ export default function ConsultantTab() {
     // Filter by search query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim()
-      result = result.filter((c) => (c.consultant.name || '').toLowerCase().includes(q))
+      result = result.filter((c) =>
+        (c.consultant.name || '').toLowerCase().includes(q),
+      )
     }
 
     // Sort
@@ -175,7 +219,9 @@ export default function ConsultantTab() {
           cmp = (a.consultant.name || '').localeCompare(b.consultant.name || '')
           break
         case 'status':
-          cmp = (a.availabilityStatus || '').localeCompare(b.availabilityStatus || '')
+          cmp = (a.availabilityStatus || '').localeCompare(
+            b.availabilityStatus || '',
+          )
           break
         case 'active':
           cmp = a.activeActivities - b.activeActivities
@@ -208,7 +254,7 @@ export default function ConsultantTab() {
         setSortDir(key === 'name' ? 'asc' : 'desc')
       }
     },
-    [sortKey]
+    [sortKey],
   )
 
   const mainSortIndicator = (key: MainSortKey) => {
@@ -225,7 +271,7 @@ export default function ConsultantTab() {
         setHistorySortDir('desc')
       }
     },
-    [historySortKey]
+    [historySortKey],
   )
 
   const historySortIndicator = (key: HistorySortKey) => {
@@ -234,23 +280,32 @@ export default function ConsultantTab() {
   }
 
   // Helper to get active/closed activities for a consultant
-  const getActiveActivities = (stats: ConsultantDetailedStats): SalesActivityReadable[] => {
+  const getActiveActivities = (
+    stats: ConsultantDetailedStats,
+  ): SalesActivityReadable[] => {
     return stats.activities.filter((a) => a.status === 'ACTIVE')
   }
 
-  const getClosedActivities = (stats: ConsultantDetailedStats): SalesActivityReadable[] => {
-    return stats.activities
-      .filter((a) => a.status === 'WON' || a.status === 'CLOSED_OTHER_WON')
+  const getClosedActivities = (
+    stats: ConsultantDetailedStats,
+  ): SalesActivityReadable[] => {
+    return stats.activities.filter(
+      (a) => a.status === 'WON' || a.status === 'CLOSED_OTHER_WON',
+    )
   }
 
-  const getSortedClosedActivities = (stats: ConsultantDetailedStats): SalesActivityReadable[] => {
+  const getSortedClosedActivities = (
+    stats: ConsultantDetailedStats,
+  ): SalesActivityReadable[] => {
     const closed = getClosedActivities(stats)
 
     closed.sort((a, b) => {
       let cmp = 0
       switch (historySortKey) {
         case 'customer':
-          cmp = getCustomerDisplayName(a).localeCompare(getCustomerDisplayName(b))
+          cmp = getCustomerDisplayName(a).localeCompare(
+            getCustomerDisplayName(b),
+          )
           break
         case 'title':
           cmp = a.title.localeCompare(b.title)
@@ -282,7 +337,9 @@ export default function ConsultantTab() {
 
   const getPreviousCustomers = (stats: ConsultantDetailedStats): string[] => {
     const wonActivities = stats.activities.filter((a) => a.status === 'WON')
-    const customerNames = wonActivities.map((a) => getCustomerDisplayName(a)).filter((n) => n !== '-')
+    const customerNames = wonActivities
+      .map((a) => getCustomerDisplayName(a))
+      .filter((n) => n !== '-')
     return [...new Set(customerNames)]
   }
 
@@ -377,7 +434,8 @@ export default function ConsultantTab() {
               </thead>
               <tbody>
                 {filteredAndSorted.map((stats) => {
-                  const isExpanded = expandedConsultantId === stats.consultant.id
+                  const isExpanded =
+                    expandedConsultantId === stats.consultant.id
                   const activeActivities = getActiveActivities(stats)
                   const closedActivities = getSortedClosedActivities(stats)
                   const previousCustomers = getPreviousCustomers(stats)
@@ -388,21 +446,31 @@ export default function ConsultantTab() {
                       <tr
                         className={`cursor-pointer hover:bg-base-300 ${isExpanded ? 'bg-base-300/50' : ''}`}
                         onClick={() =>
-                          setExpandedConsultantId(isExpanded ? null : (stats.consultant.id ?? null))
+                          setExpandedConsultantId(
+                            isExpanded ? null : (stats.consultant.id ?? null),
+                          )
                         }
                       >
-                        <td className="font-medium">{stats.consultant.name || '-'}</td>
+                        <td className="font-medium">
+                          {stats.consultant.name || '-'}
+                        </td>
                         <td>{availabilityBadge(stats.availabilityStatus)}</td>
                         <td className="text-right">{stats.activeActivities}</td>
-                        <td className="text-right text-success">{stats.wonTotal}</td>
-                        <td className="text-right text-error">{stats.lostTotal}</td>
+                        <td className="text-right text-success">
+                          {stats.wonTotal}
+                        </td>
+                        <td className="text-right text-error">
+                          {stats.lostTotal}
+                        </td>
                         <td className="text-right">
                           {stats.wonTotal + stats.lostTotal > 0
                             ? `${stats.winRate.toFixed(1)}%`
                             : '-'}
                         </td>
                         <td className="text-right">
-                          {stats.avgDaysToClose > 0 ? stats.avgDaysToClose : '-'}
+                          {stats.avgDaysToClose > 0
+                            ? stats.avgDaysToClose
+                            : '-'}
                         </td>
                       </tr>
 
@@ -413,10 +481,14 @@ export default function ConsultantTab() {
                             <div className="p-4 space-y-6">
                               {/* Summary section */}
                               <div>
-                                <h3 className="font-semibold mb-3">Oppsummering</h3>
+                                <h3 className="font-semibold mb-3">
+                                  Oppsummering
+                                </h3>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                   <div className="stat bg-base-200 rounded-lg p-3">
-                                    <div className="stat-title text-xs">Win Rate</div>
+                                    <div className="stat-title text-xs">
+                                      Win Rate
+                                    </div>
                                     <div className="stat-value text-lg text-primary">
                                       {stats.wonTotal + stats.lostTotal > 0
                                         ? `${stats.winRate.toFixed(1)}%`
@@ -428,10 +500,14 @@ export default function ConsultantTab() {
                                   </div>
 
                                   <div className="stat bg-base-200 rounded-lg p-3">
-                                    <div className="stat-title text-xs">Snitt match-rating</div>
+                                    <div className="stat-title text-xs">
+                                      Snitt match-rating
+                                    </div>
                                     <div
                                       className="stat-value text-lg text-warning"
-                                      title={renderStarsNumeric(stats.avgMatchRating)}
+                                      title={renderStarsNumeric(
+                                        stats.avgMatchRating,
+                                      )}
                                     >
                                       {renderStars(stats.avgMatchRating)}
                                     </div>
@@ -441,17 +517,22 @@ export default function ConsultantTab() {
                                   </div>
 
                                   <div className="stat bg-base-200 rounded-lg p-3">
-                                    <div className="stat-title text-xs">Vanligste tapsårsak</div>
+                                    <div className="stat-title text-xs">
+                                      Vanligste tapsårsak
+                                    </div>
                                     <div className="stat-value text-sm">
                                       {stats.mostCommonLossReason
-                                        ? CLOSED_REASON_LABELS[stats.mostCommonLossReason] ||
-                                          stats.mostCommonLossReason
+                                        ? CLOSED_REASON_LABELS[
+                                            stats.mostCommonLossReason
+                                          ] || stats.mostCommonLossReason
                                         : '-'}
                                     </div>
                                   </div>
 
                                   <div className="stat bg-base-200 rounded-lg p-3">
-                                    <div className="stat-title text-xs">Tidligere kunder</div>
+                                    <div className="stat-title text-xs">
+                                      Tidligere kunder
+                                    </div>
                                     <div className="stat-value text-sm">
                                       {previousCustomers.length > 0
                                         ? previousCustomers.join(', ')
@@ -474,21 +555,35 @@ export default function ConsultantTab() {
                                           <th>Kunde</th>
                                           <th>Tittel</th>
                                           <th>Fase</th>
-                                          <th className="text-right">Dager i prosess</th>
-                                          <th className="text-right">Tilbudt pris</th>
+                                          <th className="text-right">
+                                            Dager i prosess
+                                          </th>
+                                          <th className="text-right">
+                                            Tilbudt pris
+                                          </th>
                                         </tr>
                                       </thead>
                                       <tbody>
                                         {activeActivities.map((activity) => (
                                           <tr key={activity.id}>
-                                            <td>{getCustomerDisplayName(activity)}</td>
-                                            <td className="max-w-xs truncate">{activity.title}</td>
-                                            <td>{stageBadge(activity.currentStage)}</td>
+                                            <td>
+                                              {getCustomerDisplayName(activity)}
+                                            </td>
+                                            <td className="max-w-xs truncate">
+                                              {activity.title}
+                                            </td>
+                                            <td>
+                                              {stageBadge(
+                                                activity.currentStage,
+                                              )}
+                                            </td>
                                             <td className="text-right">
                                               {daysSince(activity.createdAt)}
                                             </td>
                                             <td className="text-right">
-                                              {formatPrice(activity.offeredPrice)}
+                                              {formatPrice(
+                                                activity.offeredPrice,
+                                              )}
                                             </td>
                                           </tr>
                                         ))}
@@ -510,43 +605,62 @@ export default function ConsultantTab() {
                                         <tr>
                                           <th
                                             className="cursor-pointer hover:text-primary"
-                                            onClick={() => handleHistorySort('customer')}
+                                            onClick={() =>
+                                              handleHistorySort('customer')
+                                            }
                                           >
-                                            Kunde{historySortIndicator('customer')}
+                                            Kunde
+                                            {historySortIndicator('customer')}
                                           </th>
                                           <th
                                             className="cursor-pointer hover:text-primary"
-                                            onClick={() => handleHistorySort('title')}
+                                            onClick={() =>
+                                              handleHistorySort('title')
+                                            }
                                           >
-                                            Tittel{historySortIndicator('title')}
+                                            Tittel
+                                            {historySortIndicator('title')}
                                           </th>
                                           <th
                                             className="cursor-pointer hover:text-primary text-center"
-                                            onClick={() => handleHistorySort('status')}
+                                            onClick={() =>
+                                              handleHistorySort('status')
+                                            }
                                           >
-                                            Utfall{historySortIndicator('status')}
+                                            Utfall
+                                            {historySortIndicator('status')}
                                           </th>
                                           <th
                                             className="cursor-pointer hover:text-primary"
-                                            onClick={() => handleHistorySort('reason')}
+                                            onClick={() =>
+                                              handleHistorySort('reason')
+                                            }
                                           >
-                                            Tapsårsak{historySortIndicator('reason')}
+                                            Tapsårsak
+                                            {historySortIndicator('reason')}
                                           </th>
                                           <th
                                             className="cursor-pointer hover:text-primary"
-                                            onClick={() => handleHistorySort('match')}
+                                            onClick={() =>
+                                              handleHistorySort('match')
+                                            }
                                           >
                                             Match{historySortIndicator('match')}
                                           </th>
                                           <th
                                             className="cursor-pointer hover:text-primary text-right"
-                                            onClick={() => handleHistorySort('duration')}
+                                            onClick={() =>
+                                              handleHistorySort('duration')
+                                            }
                                           >
-                                            Varighet (dager){historySortIndicator('duration')}
+                                            Varighet (dager)
+                                            {historySortIndicator('duration')}
                                           </th>
                                           <th
                                             className="cursor-pointer hover:text-primary text-right"
-                                            onClick={() => handleHistorySort('price')}
+                                            onClick={() =>
+                                              handleHistorySort('price')
+                                            }
                                           >
                                             Pris{historySortIndicator('price')}
                                           </th>
@@ -556,9 +670,10 @@ export default function ConsultantTab() {
                                         {closedActivities.map((activity) => {
                                           const duration = daysBetween(
                                             activity.createdAt,
-                                            activity.closedAt
+                                            activity.closedAt,
                                           )
-                                          const isHistoryExpanded = expandedHistoryId === activity.id
+                                          const isHistoryExpanded =
+                                            expandedHistoryId === activity.id
 
                                           return (
                                             <Fragment key={activity.id}>
@@ -566,33 +681,52 @@ export default function ConsultantTab() {
                                                 className="cursor-pointer hover:bg-base-300"
                                                 onClick={() =>
                                                   setExpandedHistoryId(
-                                                    isHistoryExpanded ? null : activity.id
+                                                    isHistoryExpanded
+                                                      ? null
+                                                      : activity.id,
                                                   )
                                                 }
                                               >
-                                                <td>{getCustomerDisplayName(activity)}</td>
+                                                <td>
+                                                  {getCustomerDisplayName(
+                                                    activity,
+                                                  )}
+                                                </td>
                                                 <td className="max-w-xs truncate">
                                                   {activity.title}
                                                 </td>
                                                 <td className="text-center">
-                                                  {outcomeBadge(activity.status)}
+                                                  {outcomeBadge(
+                                                    activity.status,
+                                                  )}
                                                 </td>
                                                 <td>
                                                   {activity.closedReason
-                                                    ? CLOSED_REASON_LABELS[activity.closedReason] ||
-                                                      activity.closedReason
+                                                    ? CLOSED_REASON_LABELS[
+                                                        activity.closedReason
+                                                      ] || activity.closedReason
                                                     : '-'}
                                                 </td>
-                                                <td title={renderStarsNumeric(activity.matchRating)}>
+                                                <td
+                                                  title={renderStarsNumeric(
+                                                    activity.matchRating,
+                                                  )}
+                                                >
                                                   {activity.matchRating != null
-                                                    ? renderStars(activity.matchRating)
+                                                    ? renderStars(
+                                                        activity.matchRating,
+                                                      )
                                                     : '-'}
                                                 </td>
                                                 <td className="text-right">
-                                                  {duration != null ? duration : '-'}
+                                                  {duration != null
+                                                    ? duration
+                                                    : '-'}
                                                 </td>
                                                 <td className="text-right">
-                                                  {formatPrice(activity.offeredPrice)}
+                                                  {formatPrice(
+                                                    activity.offeredPrice,
+                                                  )}
                                                 </td>
                                               </tr>
 
@@ -607,7 +741,9 @@ export default function ConsultantTab() {
                                                             Evalueringsnotater:{' '}
                                                           </span>
                                                           <span className="text-sm">
-                                                            {activity.evaluationNotes}
+                                                            {
+                                                              activity.evaluationNotes
+                                                            }
                                                           </span>
                                                         </div>
                                                       )}
@@ -617,7 +753,9 @@ export default function ConsultantTab() {
                                                             Tapsnotat:{' '}
                                                           </span>
                                                           <span className="text-sm">
-                                                            {activity.closedReasonNote}
+                                                            {
+                                                              activity.closedReasonNote
+                                                            }
                                                           </span>
                                                         </div>
                                                       )}
@@ -627,30 +765,39 @@ export default function ConsultantTab() {
                                                             Dokument:{' '}
                                                           </span>
                                                           <a
-                                                            href={activity.evaluationDocumentUrl}
+                                                            href={
+                                                              activity.evaluationDocumentUrl
+                                                            }
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="link link-primary text-sm"
                                                           >
-                                                            {activity.evaluationDocumentUrl}
+                                                            {
+                                                              activity.evaluationDocumentUrl
+                                                            }
                                                           </a>
                                                         </div>
                                                       )}
                                                       {activity.keyFactors &&
-                                                        activity.keyFactors.length > 0 && (
+                                                        activity.keyFactors
+                                                          .length > 0 && (
                                                           <div>
                                                             <span className="font-semibold text-sm">
                                                               Nøkkelfaktorer:{' '}
                                                             </span>
                                                             <div className="flex flex-wrap gap-1 mt-1">
-                                                              {activity.keyFactors.map((kf) => (
-                                                                <span
-                                                                  key={kf}
-                                                                  className="badge badge-outline badge-sm"
-                                                                >
-                                                                  {KEY_FACTOR_LABELS[kf] || kf}
-                                                                </span>
-                                                              ))}
+                                                              {activity.keyFactors.map(
+                                                                (kf) => (
+                                                                  <span
+                                                                    key={kf}
+                                                                    className="badge badge-outline badge-sm"
+                                                                  >
+                                                                    {KEY_FACTOR_LABELS[
+                                                                      kf
+                                                                    ] || kf}
+                                                                  </span>
+                                                                ),
+                                                              )}
                                                             </div>
                                                           </div>
                                                         )}
@@ -658,9 +805,12 @@ export default function ConsultantTab() {
                                                         !activity.closedReasonNote &&
                                                         !activity.evaluationDocumentUrl &&
                                                         (!activity.keyFactors ||
-                                                          activity.keyFactors.length === 0) && (
+                                                          activity.keyFactors
+                                                            .length === 0) && (
                                                           <p className="text-sm text-gray-500">
-                                                            Ingen evalueringsdetaljer registrert
+                                                            Ingen
+                                                            evalueringsdetaljer
+                                                            registrert
                                                           </p>
                                                         )}
                                                     </div>
@@ -676,7 +826,8 @@ export default function ConsultantTab() {
                                 </div>
                               ) : (
                                 <div className="text-sm text-gray-500">
-                                  Ingen avsluttede aktiviteter for denne konsulenten
+                                  Ingen avsluttede aktiviteter for denne
+                                  konsulenten
                                 </div>
                               )}
                             </div>

@@ -213,7 +213,10 @@ export const salesPipelineService = {
   /**
    * Update availability status for a consultant
    */
-  async updateAvailability(userId: number, availability: UpdateConsultantAvailability) {
+  async updateAvailability(
+    userId: number,
+    availability: UpdateConsultantAvailability,
+  ) {
     const { data } = await updateConsultantAvailability({
       path: { userId },
       body: availability,
@@ -290,7 +293,11 @@ export const salesPipelineService = {
   /**
    * Update an existing interview round
    */
-  async updateInterviewRound(activityId: number, roundId: number, updates: UpdateInterviewRoundType) {
+  async updateInterviewRound(
+    activityId: number,
+    roundId: number,
+    updates: UpdateInterviewRoundType,
+  ) {
     const { data } = await updateInterviewRound({
       path: { id: activityId, roundId },
       body: updates,

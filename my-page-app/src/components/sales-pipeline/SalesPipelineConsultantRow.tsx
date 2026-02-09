@@ -135,10 +135,13 @@ export default function SalesPipelineConsultantRow({
   }
 
   // Group activities by stage
-  const activitiesByStage = stages.reduce((acc, stage) => {
-    acc[stage] = activities.filter((a) => a.currentStage === stage)
-    return acc
-  }, {} as Record<SalesStage, SalesActivity[]>)
+  const activitiesByStage = stages.reduce(
+    (acc, stage) => {
+      acc[stage] = activities.filter((a) => a.currentStage === stage)
+      return acc
+    },
+    {} as Record<SalesStage, SalesActivity[]>,
+  )
 
   const formatAvailableFrom = (date: string | null | undefined) => {
     if (!date) return ''
@@ -157,7 +160,9 @@ export default function SalesPipelineConsultantRow({
       className={`border-b-2 border-base-300 ${rowBgClass}`}
     >
       {/* Consultant info column (sticky) */}
-      <td className={`sticky left-0 z-10 border-r-2 border-base-300 p-3 ${rowBgClass}`}>
+      <td
+        className={`sticky left-0 z-10 border-r-2 border-base-300 p-3 ${rowBgClass}`}
+      >
         <div className="flex items-start gap-2">
           {/* Drag handle */}
           {isAdmin && (
@@ -192,19 +197,23 @@ export default function SalesPipelineConsultantRow({
             <span className="font-semibold">{user.name || user.email}</span>
             {availability ? (
               <div className="flex items-center gap-2">
-                <span className={`badge badge-sm ${AVAILABILITY_COLORS[availability.status]}`}>
+                <span
+                  className={`badge badge-sm ${AVAILABILITY_COLORS[availability.status]}`}
+                >
                   {AVAILABILITY_LABELS[availability.status]}
                 </span>
-                {availability.status === 'AVAILABLE_SOON' && availability.availableFrom && (
-                  <span className="text-xs text-gray-500">
-                    {formatAvailableFrom(availability.availableFrom)}
-                  </span>
-                )}
-                {availability.status === 'ASSIGNED' && availability.availableFrom && (
-                  <span className="text-xs text-gray-500">
-                    Starter {formatAvailableFrom(availability.availableFrom)}
-                  </span>
-                )}
+                {availability.status === 'AVAILABLE_SOON' &&
+                  availability.availableFrom && (
+                    <span className="text-xs text-gray-500">
+                      {formatAvailableFrom(availability.availableFrom)}
+                    </span>
+                  )}
+                {availability.status === 'ASSIGNED' &&
+                  availability.availableFrom && (
+                    <span className="text-xs text-gray-500">
+                      Starter {formatAvailableFrom(availability.availableFrom)}
+                    </span>
+                  )}
               </div>
             ) : (
               <span className="text-xs text-gray-400">Ingen status satt</span>
