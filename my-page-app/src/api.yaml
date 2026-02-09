@@ -2715,6 +2715,101 @@ paths:
         '500':
           description: Internal server error
 
+  /sales-pipeline/analytics/evaluations:
+    get:
+      operationId: getEvaluationAnalytics
+      summary: Get evaluation/win-loss analytics
+      tags:
+        - sales-pipeline
+      parameters:
+        - name: months
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Filter to last N months (null for all time)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationAnalytics'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /sales-pipeline/analytics/consultants:
+    get:
+      operationId: getConsultantAnalytics
+      summary: Get detailed consultant analytics with drill-down
+      tags:
+        - sales-pipeline
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsultantDetailedStats'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /sales-pipeline/analytics/competency-base:
+    get:
+      operationId: getCompetencyBaseAnalytics
+      summary: Get competency base analytics (capacity, skill gap, sector distribution)
+      tags:
+        - sales-pipeline
+      parameters:
+        - name: months
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Period for skill gap analysis (default 12)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompetencyBaseAnalytics'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /sales-pipeline/analytics/customers:
+    get:
+      operationId: getCustomerAnalytics
+      summary: Get detailed customer analytics
+      tags:
+        - sales-pipeline
+      parameters:
+        - name: months
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Filter to last N months (null for all time)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerAnalytics'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
   # KTU (Customer Satisfaction Survey) Endpoints
 
   /ktu/color-themes:
@@ -4706,16 +4801,20 @@ components:
         name:
           type: string
           description: The name of a customer
-          example: "Skatteetaten"
+          example: 'Skatteetaten'
         exclusive:
           type: boolean
           description: Whether the customer demands exclusive applications
           default: false
           example: true
+        sector:
+          $ref: '#/components/schemas/CustomerSector'
+          description: Customer sector (public/private)
       required:
         - id
         - name
         - exclusive
+        - sector
     Customers:
       type: array
       description: A list of customers
@@ -4747,7 +4846,7 @@ components:
         title:
           type: string
           description: The title of a job posting
-          example: "Software Engineer"
+          example: 'Software Engineer'
         customer:
           $ref: '#/components/schemas/Customer'
         urgent:
@@ -4764,11 +4863,11 @@ components:
           type: string
           format: date-time
           description: The deadline for submitting applications
-          example: "2024-10-09T12:00:00+02:00"
+          example: '2024-10-09T12:00:00+02:00'
         description:
           type: string
           description: The description of the job posting
-          example: "Skatteetaten leter etter en dyktig Kotlin-utvikler"
+          example: 'Skatteetaten leter etter en dyktig Kotlin-utvikler'
         tags:
           $ref: '#/components/schemas/Tags'
         links:
@@ -4778,19 +4877,19 @@ components:
             type: string
             format: uri
           example:
-            - "https://example.com/link1"
-            - "https://example.com/link2"
+            - 'https://example.com/link1'
+            - 'https://example.com/link2'
         created_date:
           type: string
           format: date-time
           description: The date the job posting was created
-          example: "2024-10-09T12:00:00+02:00"
+          example: '2024-10-09T12:00:00+02:00'
         updated_at:
           type: string
           format: date-time
           nullable: true
           description: The date the job posting was last updated
-          example: "2024-10-10T14:30:00+02:00"
+          example: '2024-10-10T14:30:00+02:00'
         source:
           $ref: '#/components/schemas/JobPostingSource'
         estimated_hourly_rate:
@@ -4803,7 +4902,7 @@ components:
           type: string
           nullable: true
           description: Location of the position (e.g. Oslo, Remote, Hybrid)
-          example: "Oslo"
+          example: 'Oslo'
         intermediary:
           type: string
           nullable: true
@@ -4812,7 +4911,7 @@ components:
             - For BROKER: The broker company name
             - For SUPPLIER: The supplier company name
             - For FRAMEWORK_SUBCONTRACTOR: The company holding the framework agreement
-          example: "Experis"
+          example: 'Experis'
       required:
         - id
         - title
@@ -4845,16 +4944,16 @@ components:
         blobId:
           type: string
           description: The unique ID of the blob
-          example: "abc123"
+          example: 'abc123'
         name:
           type: string
           description: File name
-          example: "utlysning.pdf"
+          example: 'utlysning.pdf'
         url:
           type: string
           format: uri
           description: URL of the file
-          example: "https://www.myfile.no/utlysning.pdf"
+          example: 'https://www.myfile.no/utlysning.pdf'
       required:
         - blobId
         - name
@@ -4881,7 +4980,7 @@ components:
               month:
                 type: string
                 description: Month in YYYY-MM format
-                example: "2024-06"
+                example: '2024-06'
               javaKotlin:
                 type: integer
                 description: Number of Java/Kotlin job postings
@@ -4953,7 +5052,7 @@ components:
         name:
           type: string
           description: The name of the tag
-          example: "Kotlin"
+          example: 'Kotlin'
       required:
         - id
         - name
@@ -5768,8 +5867,38 @@ components:
 
     ClosedReason:
       type: string
-      enum: [REJECTED_BY_SUPPLIER, REJECTED_BY_CUSTOMER, MISSING_REQUIREMENTS, OTHER_CANDIDATE_CHOSEN, ASSIGNMENT_CANCELLED, CONSULTANT_UNAVAILABLE, CONSULTANT_WON_OTHER, OTHER]
+      enum:
+        [
+          REJECTED_BY_SUPPLIER,
+          REJECTED_BY_CUSTOMER,
+          MISSING_REQUIREMENTS,
+          OTHER_CANDIDATE_CHOSEN,
+          ASSIGNMENT_CANCELLED,
+          CONSULTANT_UNAVAILABLE,
+          CONSULTANT_WON_OTHER,
+          OTHER,
+        ]
       description: Reason why a sales activity was closed
+
+    CustomerSector:
+      type: string
+      enum:
+        - PUBLIC
+        - PRIVATE
+        - UNKNOWN
+      description: Customer sector classification
+
+    KeyFactor:
+      type: string
+      enum:
+        - PRICE
+        - EXPERIENCE
+        - AVAILABILITY
+        - CUSTOMER_FIT
+        - TECHNICAL_MATCH
+        - REFERENCES
+        - OTHER
+      description: Key factor that influenced the outcome
 
     ConsultantAvailability:
       type: object
@@ -5936,6 +6065,31 @@ components:
           format: date
           nullable: true
           description: Actual start date when consultant starts the assignment (set when marking as won)
+        matchRating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+          description: How well the CV matched the requirements (1-5)
+        evaluationNotes:
+          type: string
+          nullable: true
+          description: Free-text evaluation notes about what was decisive
+        evaluationDocumentUrl:
+          type: string
+          nullable: true
+          description: URL to evaluation/feedback document from customer
+        keyFactors:
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyFactor'
+          nullable: true
+          description: Key factors that influenced the outcome
+        jobPostingId:
+          type: integer
+          format: int64
+          nullable: true
+          description: ID of the related job posting
       required:
         - id
         - consultant
@@ -6088,6 +6242,11 @@ components:
           format: date-time
           nullable: true
           description: Date and time of the interview
+        jobPostingId:
+          type: integer
+          format: int64
+          nullable: true
+          description: ID of the job posting this activity was created from
       required:
         - title
 
@@ -6153,6 +6312,26 @@ components:
         note:
           type: string
           nullable: true
+        matchRating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+          description: How well the CV matched the requirements (1-5)
+        evaluationNotes:
+          type: string
+          nullable: true
+          description: Free-text evaluation notes
+        evaluationDocumentUrl:
+          type: string
+          nullable: true
+          description: URL to evaluation/feedback document
+        keyFactors:
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyFactor'
+          nullable: true
+          description: Key factors that influenced the outcome
       required:
         - reason
 
@@ -6164,6 +6343,26 @@ components:
           format: date
           nullable: true
           description: When the consultant actually starts the assignment. If not provided, status becomes OCCUPIED immediately. If provided, status becomes ASSIGNED until the start date.
+        matchRating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+          description: How well the CV matched the requirements (1-5)
+        evaluationNotes:
+          type: string
+          nullable: true
+          description: Free-text evaluation notes
+        evaluationDocumentUrl:
+          type: string
+          nullable: true
+          description: URL to evaluation/feedback document
+        keyFactors:
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyFactor'
+          nullable: true
+          description: Key factors that influenced winning
 
     ConsultantWithActivities:
       type: object
@@ -6448,7 +6647,7 @@ components:
         month:
           type: string
           description: Month in format YYYY-MM
-          example: "2024-11"
+          example: '2024-11'
         created:
           type: integer
           description: Number of sales activities created this month (job postings we responded to)
@@ -6468,6 +6667,340 @@ components:
         - won
         - lost
         - benchWeeks
+
+    EvaluationAnalytics:
+      type: object
+      properties:
+        closedReasonBreakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClosedReasonCount'
+        closedReasonByStage:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClosedReasonByStage'
+        avgMatchRatingWon:
+          type: number
+          format: double
+          nullable: true
+        avgMatchRatingLost:
+          type: number
+          format: double
+          nullable: true
+        matchRatingDistribution:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchRatingBucket'
+        customerExperienceEffect:
+          $ref: '#/components/schemas/CustomerExperienceEffect'
+        closedActivities:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesActivity'
+      required:
+        - closedReasonBreakdown
+        - closedReasonByStage
+        - closedActivities
+
+    ClosedReasonByStage:
+      type: object
+      properties:
+        stage:
+          type: string
+        count:
+          type: integer
+        reasons:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClosedReasonCount'
+      required:
+        - stage
+        - count
+        - reasons
+
+    MatchRatingBucket:
+      type: object
+      properties:
+        rating:
+          type: integer
+        wonCount:
+          type: integer
+        lostCount:
+          type: integer
+      required:
+        - rating
+        - wonCount
+        - lostCount
+
+    CustomerExperienceEffect:
+      type: object
+      properties:
+        withExperienceWon:
+          type: integer
+        withExperienceLost:
+          type: integer
+        withoutExperienceWon:
+          type: integer
+        withoutExperienceLost:
+          type: integer
+      required:
+        - withExperienceWon
+        - withExperienceLost
+        - withoutExperienceWon
+        - withoutExperienceLost
+
+    ConsultantDetailedStats:
+      type: object
+      properties:
+        consultant:
+          $ref: '#/components/schemas/User'
+        availabilityStatus:
+          $ref: '#/components/schemas/AvailabilityStatus'
+          nullable: true
+        activeActivities:
+          type: integer
+        wonTotal:
+          type: integer
+        lostTotal:
+          type: integer
+        winRate:
+          type: number
+          format: double
+        avgMatchRating:
+          type: number
+          format: double
+          nullable: true
+        avgDaysToClose:
+          type: number
+          format: double
+        mostCommonLossReason:
+          $ref: '#/components/schemas/ClosedReason'
+          nullable: true
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesActivity'
+      required:
+        - consultant
+        - activeActivities
+        - wonTotal
+        - lostTotal
+        - winRate
+        - avgDaysToClose
+        - activities
+
+    CompetencyBaseAnalytics:
+      type: object
+      properties:
+        availabilityStats:
+          $ref: '#/components/schemas/AvailabilityStats'
+        upcomingAvailable:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpcomingAvailableConsultant'
+        sectorDistribution:
+          type: array
+          items:
+            $ref: '#/components/schemas/SectorDistribution'
+        techCategoryDistribution:
+          type: array
+          items:
+            $ref: '#/components/schemas/TechCategoryCount'
+        skillGap:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillGapEntry'
+        tagAnalysis:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagGapEntry'
+      required:
+        - availabilityStats
+        - upcomingAvailable
+        - sectorDistribution
+        - techCategoryDistribution
+        - skillGap
+        - tagAnalysis
+
+    UpcomingAvailableConsultant:
+      type: object
+      properties:
+        consultant:
+          $ref: '#/components/schemas/User'
+        availableFrom:
+          type: string
+          format: date
+          nullable: true
+        currentCustomer:
+          type: string
+          nullable: true
+      required:
+        - consultant
+
+    SectorDistribution:
+      type: object
+      properties:
+        sector:
+          $ref: '#/components/schemas/CustomerSector'
+        customerCount:
+          type: integer
+        consultantCount:
+          type: integer
+      required:
+        - sector
+        - customerCount
+        - consultantCount
+
+    TechCategoryCount:
+      type: object
+      properties:
+        techCategory:
+          type: string
+        count:
+          type: integer
+      required:
+        - techCategory
+        - count
+
+    SkillGapEntry:
+      type: object
+      properties:
+        techCategory:
+          type: string
+        demanded:
+          type: integer
+          description: Number of job postings with this category
+        won:
+          type: integer
+          description: Number of won activities linked to postings with this category
+        hitRate:
+          type: number
+          format: double
+      required:
+        - techCategory
+        - demanded
+        - won
+        - hitRate
+
+    TagGapEntry:
+      type: object
+      properties:
+        tagName:
+          type: string
+        demanded:
+          type: integer
+        won:
+          type: integer
+        hitRate:
+          type: number
+          format: double
+      required:
+        - tagName
+        - demanded
+        - won
+        - hitRate
+
+    CustomerDetailedStats:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+          nullable: true
+        customerName:
+          type: string
+        sector:
+          $ref: '#/components/schemas/CustomerSector'
+          nullable: true
+        currentConsultantCount:
+          type: integer
+        activeActivities:
+          type: integer
+        wonTotal:
+          type: integer
+        lostTotal:
+          type: integer
+        winRate:
+          type: number
+          format: double
+        mostCommonLossReason:
+          $ref: '#/components/schemas/ClosedReason'
+          nullable: true
+      required:
+        - customerName
+        - currentConsultantCount
+        - activeActivities
+        - wonTotal
+        - lostTotal
+        - winRate
+
+    SupplierStats:
+      type: object
+      properties:
+        supplierName:
+          type: string
+        totalActivities:
+          type: integer
+        wonTotal:
+          type: integer
+        lostTotal:
+          type: integer
+        winRate:
+          type: number
+          format: double
+      required:
+        - supplierName
+        - totalActivities
+        - wonTotal
+        - lostTotal
+        - winRate
+
+    SourceStats:
+      type: object
+      properties:
+        source:
+          type: string
+        totalJobPostings:
+          type: integer
+        wonActivities:
+          type: integer
+        lostActivities:
+          type: integer
+        winRate:
+          type: number
+          format: double
+      required:
+        - source
+        - totalJobPostings
+        - wonActivities
+        - lostActivities
+        - winRate
+
+    CustomerAnalytics:
+      type: object
+      properties:
+        customers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerDetailedStats'
+        sectorComparison:
+          type: array
+          items:
+            $ref: '#/components/schemas/SectorDistribution'
+        supplierStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupplierStats'
+        sourceStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceStats'
+      required:
+        - customers
+        - sectorComparison
+        - supplierStats
+        - sourceStats
+
     # KTU (Customer Satisfaction Survey) Schemas
 
     KtuRoundStatus:

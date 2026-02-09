@@ -31,7 +31,8 @@ export default function SalesPipelineColumn({
       <div className="p-3 border-b border-base-300">
         <h3 className="font-semibold text-center">{label}</h3>
         <div className="text-xs text-gray-500 text-center">
-          {activities.length} {activities.length === 1 ? 'aktivitet' : 'aktiviteter'}
+          {activities.length}{' '}
+          {activities.length === 1 ? 'aktivitet' : 'aktiviteter'}
         </div>
       </div>
 

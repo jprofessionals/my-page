@@ -2,6 +2,7 @@
 
 import {
   Customer,
+  CustomerSector,
   JobPosting as JobPostingType,
   JobPostingFiles as JobPostingFilesType,
   JobPostingSource,
@@ -71,6 +72,9 @@ export const JobPostingModal = ({
   const [title, setTitle] = useState(jobPosting ? jobPosting.title : '')
   const [customer, setCustomer] = useState<Customer | null>(
     jobPosting ? jobPosting.customer : null,
+  )
+  const [customerSector, setCustomerSector] = useState<CustomerSector>(
+    jobPosting?.customer?.sector ?? 'UNKNOWN',
   )
   const [isUrgent, setIsUrgent] = useState(
     jobPosting ? jobPosting.urgent : false,
@@ -166,99 +170,99 @@ export const JobPostingModal = ({
   // Keyword to tag mappings - suggests these tag names when keywords are found
   const keywordToTagSuggestions: Record<string, string[]> = {
     // Backend keywords -> suggest these tags
-    'api': ['Backend'],
-    'rest': ['Backend'],
-    'graphql': ['Backend'],
-    'server': ['Backend'],
-    'mikrotjenester': ['Backend'],
-    'microservices': ['Backend'],
-    'integrasjon': ['Backend'],
+    api: ['Backend'],
+    rest: ['Backend'],
+    graphql: ['Backend'],
+    server: ['Backend'],
+    mikrotjenester: ['Backend'],
+    microservices: ['Backend'],
+    integrasjon: ['Backend'],
     // Frontend keywords
-    'ui': ['Frontend'],
-    'ux': ['Frontend'],
-    'css': ['Frontend'],
-    'html': ['Frontend'],
-    'brukergrensesnitt': ['Frontend'],
-    'react': ['Frontend', 'JavaScript'],
-    'angular': ['Frontend', 'JavaScript'],
-    'vue': ['Frontend', 'JavaScript'],
-    'javascript': ['Frontend', 'JavaScript'],
-    'typescript': ['Frontend', 'JavaScript'],
+    ui: ['Frontend'],
+    ux: ['Frontend'],
+    css: ['Frontend'],
+    html: ['Frontend'],
+    brukergrensesnitt: ['Frontend'],
+    react: ['Frontend', 'JavaScript'],
+    angular: ['Frontend', 'JavaScript'],
+    vue: ['Frontend', 'JavaScript'],
+    javascript: ['Frontend', 'JavaScript'],
+    typescript: ['Frontend', 'JavaScript'],
     // Fullstack
-    'fullstack': ['Fullstack'],
+    fullstack: ['Fullstack'],
     'full-stack': ['Fullstack'],
     'full stack': ['Fullstack'],
     // Data
-    'database': ['Data'],
-    'sql': ['Data'],
-    'etl': ['Data'],
-    'datawarehouse': ['Data'],
-    'datalake': ['Data'],
-    'dataplattform': ['Data'],
+    database: ['Data'],
+    sql: ['Data'],
+    etl: ['Data'],
+    datawarehouse: ['Data'],
+    datalake: ['Data'],
+    dataplattform: ['Data'],
     // Analyse
-    'analyse': ['Analyse'],
-    'analytics': ['Analyse'],
-    'bi': ['Analyse'],
+    analyse: ['Analyse'],
+    analytics: ['Analyse'],
+    bi: ['Analyse'],
     'business intelligence': ['Analyse'],
-    'rapportering': ['Analyse'],
-    'dashboard': ['Analyse'],
+    rapportering: ['Analyse'],
+    dashboard: ['Analyse'],
     'power bi': ['Analyse'],
-    'tableau': ['Analyse'],
+    tableau: ['Analyse'],
     // Java/Kotlin
-    'java': ['Java'],
-    'spring': ['Java', 'Backend'],
+    java: ['Java'],
+    spring: ['Java', 'Backend'],
     'spring boot': ['Java', 'Backend'],
-    'maven': ['Java'],
-    'gradle': ['Java', 'Kotlin'],
-    'hibernate': ['Java', 'Backend'],
-    'kotlin': ['Kotlin', 'Java'],
-    'ktor': ['Kotlin', 'Backend'],
+    maven: ['Java'],
+    gradle: ['Java', 'Kotlin'],
+    hibernate: ['Java', 'Backend'],
+    kotlin: ['Kotlin', 'Java'],
+    ktor: ['Kotlin', 'Backend'],
     // .NET
     '.net': ['.NET'],
-    'dotnet': ['.NET'],
+    dotnet: ['.NET'],
     'c#': ['.NET'],
-    'csharp': ['.NET'],
+    csharp: ['.NET'],
     'asp.net': ['.NET', 'Backend'],
-    'blazor': ['.NET', 'Frontend'],
+    blazor: ['.NET', 'Frontend'],
     'entity framework': ['.NET', 'Backend'],
     // Python
-    'python': ['Python'],
-    'django': ['Python', 'Backend'],
-    'flask': ['Python', 'Backend'],
-    'fastapi': ['Python', 'Backend'],
+    python: ['Python'],
+    django: ['Python', 'Backend'],
+    flask: ['Python', 'Backend'],
+    fastapi: ['Python', 'Backend'],
     // Cloud
-    'azure': ['Azure', 'Sky'],
-    'aws': ['AWS', 'Sky'],
-    'amazon': ['AWS', 'Sky'],
-    'gcp': ['GCP', 'Sky'],
+    azure: ['Azure', 'Sky'],
+    aws: ['AWS', 'Sky'],
+    amazon: ['AWS', 'Sky'],
+    gcp: ['GCP', 'Sky'],
     'google cloud': ['GCP', 'Sky'],
     // DevOps
-    'devops': ['DevOps'],
+    devops: ['DevOps'],
     'ci/cd': ['DevOps'],
-    'jenkins': ['DevOps'],
+    jenkins: ['DevOps'],
     'github actions': ['DevOps'],
-    'gitlab': ['DevOps'],
-    'terraform': ['DevOps', 'Sky'],
-    'kubernetes': ['DevOps', 'Sky'],
-    'k8s': ['DevOps', 'Sky'],
-    'docker': ['DevOps'],
+    gitlab: ['DevOps'],
+    terraform: ['DevOps', 'Sky'],
+    kubernetes: ['DevOps', 'Sky'],
+    k8s: ['DevOps', 'Sky'],
+    docker: ['DevOps'],
     // Andre
-    'arkitekt': ['Arkitekt'],
-    'architect': ['Arkitekt'],
-    'arkitektur': ['Arkitekt'],
-    'løsningsarkitekt': ['Arkitekt'],
-    'sikkerhet': ['Sikkerhet'],
-    'security': ['Sikkerhet'],
-    'mobil': ['Mobil'],
-    'mobile': ['Mobil'],
-    'ios': ['Mobil'],
-    'android': ['Mobil', 'Kotlin'],
-    'app': ['Mobil'],
-    'test': ['Test'],
-    'qa': ['Test'],
-    'testing': ['Test'],
-    'agile': ['Agile'],
-    'scrum': ['Agile'],
+    arkitekt: ['Arkitekt'],
+    architect: ['Arkitekt'],
+    arkitektur: ['Arkitekt'],
+    løsningsarkitekt: ['Arkitekt'],
+    sikkerhet: ['Sikkerhet'],
+    security: ['Sikkerhet'],
+    mobil: ['Mobil'],
+    mobile: ['Mobil'],
+    ios: ['Mobil'],
+    android: ['Mobil', 'Kotlin'],
+    app: ['Mobil'],
+    test: ['Test'],
+    qa: ['Test'],
+    testing: ['Test'],
+    agile: ['Agile'],
+    scrum: ['Agile'],
   }
 
   // Suggest tags based on title and description content
@@ -300,7 +304,7 @@ export const JobPostingModal = ({
 
       // Check if tag exists in tagOptions (use existing tag with its ID)
       const existingTag = tagOptions?.find(
-        (t) => t.name.toLowerCase() === lowerName
+        (t) => t.name.toLowerCase() === lowerName,
       )
 
       if (existingTag) {
@@ -327,13 +331,18 @@ export const JobPostingModal = ({
       return
     }
 
+    const customerWithSector: Customer = {
+      ...customer,
+      sector: customerSector,
+    }
+
     const newOrUpdatedJobPosting: JobPostingType = {
       id: id,
       title: title,
-      customer: customer,
+      customer: customerWithSector,
       urgent: isUrgent,
       hidden: isHidden,
-      deadline: deadline || undefined,  // Send undefined instead of empty string
+      deadline: deadline || undefined, // Send undefined instead of empty string
       description: description,
       links: links,
       tags: tags,
@@ -402,6 +411,9 @@ export const JobPostingModal = ({
                   value={customer}
                   onChange={(event, newValue: Customer | null) => {
                     setCustomer(newValue)
+                    if (newValue) {
+                      setCustomerSector(newValue.sector ?? 'UNKNOWN')
+                    }
                   }}
                   onInputChange={(event, newInputValue, reason) => {
                     if (reason === 'input') {
@@ -414,6 +426,7 @@ export const JobPostingModal = ({
                           id: 0,
                           name: newInputValue,
                           exclusive: false,
+                          sector: customerSector,
                         }
 
                         setCustomer(newCustomer)
@@ -431,6 +444,47 @@ export const JobPostingModal = ({
                   )}
                 />
               </div>
+              <div className="mb-4">
+                <Autocomplete
+                  options={[
+                    { value: 'PUBLIC' as CustomerSector, label: 'Offentlig' },
+                    { value: 'PRIVATE' as CustomerSector, label: 'Privat' },
+                    {
+                      value: 'UNKNOWN' as CustomerSector,
+                      label: 'Ikke klassifisert',
+                    },
+                  ]}
+                  getOptionLabel={(option) => option.label}
+                  value={
+                    customerSector === 'PUBLIC'
+                      ? {
+                          value: 'PUBLIC' as CustomerSector,
+                          label: 'Offentlig',
+                        }
+                      : customerSector === 'PRIVATE'
+                        ? {
+                            value: 'PRIVATE' as CustomerSector,
+                            label: 'Privat',
+                          }
+                        : {
+                            value: 'UNKNOWN' as CustomerSector,
+                            label: 'Ikke klassifisert',
+                          }
+                  }
+                  onChange={(event, newValue) => {
+                    const newSector = newValue ? newValue.value : 'UNKNOWN'
+                    setCustomerSector(newSector)
+                    if (customer) {
+                      setCustomer({ ...customer, sector: newSector })
+                    }
+                  }}
+                  disableClearable
+                  disablePortal
+                  renderInput={(params) => (
+                    <TextField {...params} label="Sektor" variant="outlined" />
+                  )}
+                />
+              </div>
 
               {/* New analytics fields */}
               <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -439,8 +493,14 @@ export const JobPostingModal = ({
                     { value: 'DIRECT', label: 'Direkte fra kunde' },
                     { value: 'BROKER', label: 'Via megler' },
                     { value: 'SUPPLIER', label: 'Via leverandør' },
-                    { value: 'FRAMEWORK_DIRECT', label: 'Rammeavtale (direkte)' },
-                    { value: 'FRAMEWORK_SUBCONTRACTOR', label: 'Rammeavtale (underleverandør)' },
+                    {
+                      value: 'FRAMEWORK_DIRECT',
+                      label: 'Rammeavtale (direkte)',
+                    },
+                    {
+                      value: 'FRAMEWORK_SUBCONTRACTOR',
+                      label: 'Rammeavtale (underleverandør)',
+                    },
                     { value: 'OTHER', label: 'Annet' },
                   ]}
                   getOptionLabel={(option) => option.label}
@@ -472,9 +532,11 @@ export const JobPostingModal = ({
                     // Clear intermediary when changing source
                     if (
                       !newValue ||
-                      !['BROKER', 'SUPPLIER', 'FRAMEWORK_SUBCONTRACTOR'].includes(
-                        newValue.value,
-                      )
+                      ![
+                        'BROKER',
+                        'SUPPLIER',
+                        'FRAMEWORK_SUBCONTRACTOR',
+                      ].includes(newValue.value)
                     ) {
                       setIntermediary('')
                     }
@@ -651,7 +713,9 @@ export const JobPostingModal = ({
               )}
               {isUrgent ? null : (
                 <div className="mb-4">
-                  <label className="block text-gray-700">Frist (valgfritt)</label>
+                  <label className="block text-gray-700">
+                    Frist (valgfritt)
+                  </label>
                   <div className="flex gap-2 mt-1">
                     <input
                       type="date"

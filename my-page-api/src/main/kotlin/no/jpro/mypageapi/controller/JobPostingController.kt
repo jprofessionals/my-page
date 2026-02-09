@@ -5,6 +5,7 @@ import no.jpro.mypageapi.config.RequiresAdmin
 import org.slf4j.LoggerFactory
 import no.jpro.mypageapi.model.CategorizationStatus
 import no.jpro.mypageapi.model.Customer
+import no.jpro.mypageapi.model.CustomerSector
 import no.jpro.mypageapi.model.JobPosting
 import no.jpro.mypageapi.model.JobPostingFile
 import no.jpro.mypageapi.model.JobPostingSource
@@ -46,6 +47,7 @@ class JobPostingController(
                 id = entity.customer.id,
                 name = entity.customer.name,
                 exclusive = entity.customer.exclusive,
+                sector = CustomerSector.valueOf(entity.customer.sector.name),
             ),
             urgent = entity.urgent,
             hidden = entity.hidden,
@@ -102,7 +104,8 @@ class JobPostingController(
                 Customer(
                     id = it.id,
                     name = it.name,
-                    exclusive = it.exclusive
+                    exclusive = it.exclusive,
+                    sector = CustomerSector.valueOf(it.sector.name)
                 )
             }
             .sortedBy {
@@ -159,7 +162,8 @@ class JobPostingController(
                 customer = Customer(
                     id = it.customer.id,
                     name = it.customer.name,
-                    exclusive = it.customer.exclusive
+                    exclusive = it.customer.exclusive,
+                    sector = CustomerSector.valueOf(it.customer.sector.name)
                 ),
                 urgent = it.urgent,
                 hidden = it.hidden,
@@ -295,7 +299,8 @@ class JobPostingController(
                 customer = Customer(
                     id = it.customer.id,
                     name = it.customer.name,
-                    exclusive = it.customer.exclusive
+                    exclusive = it.customer.exclusive,
+                    sector = CustomerSector.valueOf(it.customer.sector.name)
                 ),
                 urgent = it.urgent,
                 hidden = it.hidden,

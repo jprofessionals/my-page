@@ -326,3 +326,4 @@ Applikasjonen har et solid fundament med moderne teknologier og god komponentstr
 
 De fleste forbedringene er små og kan implementeres inkrementelt uten å påvirke eksisterende funksjonalitet.
 
+

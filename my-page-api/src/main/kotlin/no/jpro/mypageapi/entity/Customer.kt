@@ -3,6 +3,8 @@ package no.jpro.mypageapi.entity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -30,6 +32,10 @@ class Customer(
     @Column(nullable = true)
     @JdbcTypeCode(Types.TINYINT)
     var exclusive: Boolean = false,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var sector: CustomerSector = CustomerSector.UNKNOWN,
 
     @OneToMany(mappedBy = "customer", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var jobPostings: Set<JobPosting> = HashSet()

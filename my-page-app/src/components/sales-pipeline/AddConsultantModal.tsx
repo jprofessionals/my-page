@@ -64,7 +64,7 @@ function ConsultantPicker({
       switch (e.key) {
         case 'ArrowDown':
           setHighlightedIndex((prev) =>
-            Math.min(prev + 1, filteredConsultants.length - 1)
+            Math.min(prev + 1, filteredConsultants.length - 1),
           )
           e.preventDefault()
           break
@@ -86,13 +86,15 @@ function ConsultantPicker({
           break
       }
     },
-    [isOpen, filteredConsultants, highlightedIndex, onSelect]
+    [isOpen, filteredConsultants, highlightedIndex, onSelect],
   )
 
   // Scroll highlighted item into view
   useEffect(() => {
     if (listRef.current && isOpen) {
-      const highlightedElement = listRef.current.children[highlightedIndex] as HTMLElement
+      const highlightedElement = listRef.current.children[
+        highlightedIndex
+      ] as HTMLElement
       if (highlightedElement) {
         highlightedElement.scrollIntoView({ block: 'nearest' })
       }
@@ -183,7 +185,9 @@ function ConsultantPicker({
                 <div className="flex flex-col">
                   <span className="font-medium">{consultant.name}</span>
                   {consultant.email && (
-                    <span className="text-xs text-gray-500">{consultant.email}</span>
+                    <span className="text-xs text-gray-500">
+                      {consultant.email}
+                    </span>
                   )}
                 </div>
               </li>
@@ -199,7 +203,9 @@ export default function AddConsultantModal({ onClose, onAdded }: Props) {
   const [loading, setLoading] = useState(false)
   const [consultants, setConsultants] = useState<FlowcaseConsultant[]>([])
   const [loadingData, setLoadingData] = useState(true)
-  const [selectedConsultantId, setSelectedConsultantId] = useState<string | null>(null)
+  const [selectedConsultantId, setSelectedConsultantId] = useState<
+    string | null
+  >(null)
 
   const [formData, setFormData] = useState({
     availabilityStatus: 'AVAILABLE' as AvailabilityStatus,
@@ -213,7 +219,8 @@ export default function AddConsultantModal({ onClose, onAdded }: Props) {
   const loadFormData = async () => {
     setLoadingData(true)
     try {
-      const consultantsData = await salesPipelineService.getFlowcaseConsultants()
+      const consultantsData =
+        await salesPipelineService.getFlowcaseConsultants()
       setConsultants(consultantsData ?? [])
     } catch (error) {
       console.error('Failed to load form data:', error)
@@ -242,7 +249,9 @@ export default function AddConsultantModal({ onClose, onAdded }: Props) {
     setLoading(true)
     try {
       // Find the selected consultant to get their email for lookup
-      const selectedConsultant = consultants.find(c => c.id === selectedConsultantId)
+      const selectedConsultant = consultants.find(
+        (c) => c.id === selectedConsultantId,
+      )
 
       if (!selectedConsultant?.email) {
         toast.error('Konsulenten mangler e-post')
@@ -259,7 +268,9 @@ export default function AddConsultantModal({ onClose, onAdded }: Props) {
       onAdded()
     } catch (error) {
       console.error('Failed to add consultant:', error)
-      toast.error('Kunne ikke legge til konsulenten. Er konsulenten allerede på tavlen?')
+      toast.error(
+        'Kunne ikke legge til konsulenten. Er konsulenten allerede på tavlen?',
+      )
     } finally {
       setLoading(false)
     }
@@ -309,7 +320,10 @@ export default function AddConsultantModal({ onClose, onAdded }: Props) {
               className="select select-bordered w-full"
               value={formData.availabilityStatus}
               onChange={(e) =>
-                setFormData({ ...formData, availabilityStatus: e.target.value as AvailabilityStatus })
+                setFormData({
+                  ...formData,
+                  availabilityStatus: e.target.value as AvailabilityStatus,
+                })
               }
             >
               {AVAILABILITY_OPTIONS.map((option) => (
@@ -329,7 +343,9 @@ export default function AddConsultantModal({ onClose, onAdded }: Props) {
               className="textarea textarea-bordered w-full"
               placeholder="Eventuelle notater..."
               value={formData.notes || ''}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
               rows={3}
             />
           </div>
