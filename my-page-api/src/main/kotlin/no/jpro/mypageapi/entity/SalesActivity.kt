@@ -96,6 +96,22 @@ class SalesActivity(
     @Column(name = "actual_start_date")
     var actualStartDate: LocalDate? = null,
 
+    @Column(name = "match_rating")
+    var matchRating: Int? = null,
+
+    @Column(name = "evaluation_notes", columnDefinition = "TEXT")
+    var evaluationNotes: String? = null,
+
+    @Column(name = "evaluation_document_url", length = 1000)
+    var evaluationDocumentUrl: String? = null,
+
+    @Column(name = "key_factors", columnDefinition = "TEXT")
+    var keyFactors: String? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "job_posting_id")
+    var jobPosting: JobPosting? = null,
+
     @OneToMany(mappedBy = "activity", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     var stageHistory: MutableList<SalesStageHistory> = mutableListOf(),
 
