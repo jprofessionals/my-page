@@ -337,6 +337,7 @@ export default function CompetencyBaseTab() {
                     contentStyle={{
                       backgroundColor: '#1f2937',
                       border: 'none',
+                      color: '#f3f4f6',
                     }}
                     formatter={(value) => [value, 'Konsulenter']}
                   />
@@ -408,6 +409,7 @@ export default function CompetencyBaseTab() {
                     contentStyle={{
                       backgroundColor: '#1f2937',
                       border: 'none',
+                      color: '#f3f4f6',
                     }}
                     formatter={(value) => [value, 'Konsulenter']}
                   />
@@ -446,6 +448,7 @@ export default function CompetencyBaseTab() {
                     contentStyle={{
                       backgroundColor: '#1f2937',
                       border: 'none',
+                      color: '#f3f4f6',
                     }}
                   />
                   <Legend />

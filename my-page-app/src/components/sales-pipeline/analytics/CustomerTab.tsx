@@ -794,6 +794,7 @@ export default function CustomerTab() {
                     contentStyle={{
                       backgroundColor: '#1f2937',
                       border: 'none',
+                      color: '#f3f4f6',
                     }}
                     formatter={(value) => [
                       `${Number(value).toFixed(1)}%`,

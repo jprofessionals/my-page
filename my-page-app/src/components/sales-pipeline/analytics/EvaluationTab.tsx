@@ -350,6 +350,7 @@ export default function EvaluationTab() {
                     contentStyle={{
                       backgroundColor: '#1f2937',
                       border: 'none',
+                      color: '#f3f4f6',
                     }}
                     formatter={(value) => [value, 'Antall']}
                   />
@@ -527,6 +528,7 @@ export default function EvaluationTab() {
                     contentStyle={{
                       backgroundColor: '#1f2937',
                       border: 'none',
+                      color: '#f3f4f6',
                     }}
                   />
                   <Legend />

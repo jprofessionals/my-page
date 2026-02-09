@@ -265,6 +265,7 @@ export default function OverviewTab() {
                     contentStyle={{
                       backgroundColor: '#1f2937',
                       border: 'none',
+                      color: '#f3f4f6',
                     }}
                   />
                   <Legend />
@@ -307,6 +308,7 @@ export default function OverviewTab() {
                     contentStyle={{
                       backgroundColor: '#1f2937',
                       border: 'none',
+                      color: '#f3f4f6',
                     }}
                   />
                   <Legend />
