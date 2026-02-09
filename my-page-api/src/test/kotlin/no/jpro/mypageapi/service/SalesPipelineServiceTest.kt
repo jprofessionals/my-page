@@ -545,14 +545,14 @@ class SalesPipelineServiceTest {
             // Act
             val result = salesPipelineService.closeActivity(
                 id = 1L,
-                reason = ClosedReason.OTHER_CANDIDATE_CHOSEN,
+                reason = ClosedReason.LOST_AT_CUSTOMER,
                 reasonNote = "Tapt til konkurrent",
                 closedBy = closedBy
             )
 
             // Assert
             assertEquals(ActivityStatus.CLOSED_OTHER_WON, result.status)
-            assertEquals(ClosedReason.OTHER_CANDIDATE_CHOSEN, result.closedReason)
+            assertEquals(ClosedReason.LOST_AT_CUSTOMER, result.closedReason)
             assertEquals("Tapt til konkurrent", result.closedReasonNote)
             assertNotNull(result.closedAt)
         }
@@ -572,7 +572,7 @@ class SalesPipelineServiceTest {
             assertThrows(IllegalStateException::class.java) {
                 salesPipelineService.closeActivity(
                     id = 1L,
-                    reason = ClosedReason.OTHER_CANDIDATE_CHOSEN,
+                    reason = ClosedReason.LOST_AT_CUSTOMER,
                     reasonNote = null,
                     closedBy = closedBy
                 )

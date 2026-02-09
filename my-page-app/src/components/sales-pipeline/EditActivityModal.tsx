@@ -28,7 +28,8 @@ const CLOSED_REASON_OPTIONS: { value: ClosedReason; label: string }[] = [
   { value: 'REJECTED_BY_SUPPLIER', label: 'Avvist av leverandør' },
   { value: 'REJECTED_BY_CUSTOMER', label: 'Avvist av kunde' },
   { value: 'MISSING_REQUIREMENTS', label: 'Manglende krav' },
-  { value: 'OTHER_CANDIDATE_CHOSEN', label: 'Annen kandidat valgt' },
+  { value: 'LOST_AT_SUPPLIER', label: 'Tapt i leverandørvurdering' },
+  { value: 'LOST_AT_CUSTOMER', label: 'Tapt hos kunde' },
   { value: 'ASSIGNMENT_CANCELLED', label: 'Oppdrag kansellert' },
   { value: 'CONSULTANT_UNAVAILABLE', label: 'Konsulent utilgjengelig' },
   { value: 'CONSULTANT_WON_OTHER', label: 'Konsulent vant annet' },
@@ -57,7 +58,7 @@ export default function EditActivityModal({
     activity.expectedStartDate || '',
   )
   const [closeReason, setCloseReason] = useState<ClosedReason>(
-    'OTHER_CANDIDATE_CHOSEN',
+    'LOST_AT_CUSTOMER',
   )
   const [closeReasonNote, setCloseReasonNote] = useState('')
   // Evaluation fields for won/close dialogs

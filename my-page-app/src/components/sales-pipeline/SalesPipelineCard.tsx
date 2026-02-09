@@ -248,7 +248,7 @@ export default function SalesPipelineCard({
                 if (value === 'won') {
                   onMarkAsWon(activity.id)
                 } else if (value === 'lost' && onClose) {
-                  onClose(activity.id, 'OTHER_CANDIDATE_CHOSEN')
+                  onClose(activity.id, 'LOST_AT_CUSTOMER')
                 } else if (value === 'cancelled' && onClose) {
                   onClose(activity.id, 'ASSIGNMENT_CANCELLED')
                 }
