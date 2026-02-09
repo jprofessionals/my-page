@@ -15,6 +15,8 @@ import no.jpro.mypageapi.model.AvailabilityStatus as AvailabilityStatusModel
 import no.jpro.mypageapi.model.ActivityStatus as ActivityStatusModel
 import no.jpro.mypageapi.model.ClosedReason as ClosedReasonModel
 import no.jpro.mypageapi.model.SalesStage as SalesStageModel
+import no.jpro.mypageapi.model.CustomerSector as CustomerSectorModel
+import no.jpro.mypageapi.model.KeyFactor as KeyFactorModel
 import no.jpro.mypageapi.model.ConsultantWithActivities as ConsultantWithActivitiesModel
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -34,7 +36,8 @@ class SalesPipelineMapper(
     fun toCustomerModel(customer: no.jpro.mypageapi.entity.Customer): CustomerModel = CustomerModel(
         id = customer.id,
         name = customer.name,
-        exclusive = customer.exclusive
+        exclusive = customer.exclusive,
+        sector = CustomerSectorModel.valueOf(customer.sector.name)
     )
 
     fun toConsultantAvailabilityModel(entity: ConsultantAvailability): ConsultantAvailabilityModel =
@@ -93,7 +96,12 @@ class SalesPipelineMapper(
             offerDeadlineAsap = entity.offerDeadlineAsap,
             interviewDate = entity.interviewDate?.let { toOffsetDateTime(it) },
             interviewRounds = entity.interviewRounds.sortedBy { it.roundNumber }.map { toInterviewRoundModel(it) },
-            actualStartDate = entity.actualStartDate
+            actualStartDate = entity.actualStartDate,
+            matchRating = entity.matchRating,
+            evaluationNotes = entity.evaluationNotes,
+            evaluationDocumentUrl = entity.evaluationDocumentUrl,
+            keyFactors = entity.keyFactors?.split(",")?.filter { it.isNotBlank() }?.map { KeyFactorModel.valueOf(it.trim()) },
+            jobPostingId = entity.jobPosting?.id
         )
 
     fun toSalesActivityWithHistoryModel(entity: SalesActivity): SalesActivityWithHistoryModel =
@@ -121,6 +129,11 @@ class SalesPipelineMapper(
             interviewDate = entity.interviewDate?.let { toOffsetDateTime(it) },
             interviewRounds = entity.interviewRounds.sortedBy { it.roundNumber }.map { toInterviewRoundModel(it) },
             actualStartDate = entity.actualStartDate,
+            matchRating = entity.matchRating,
+            evaluationNotes = entity.evaluationNotes,
+            evaluationDocumentUrl = entity.evaluationDocumentUrl,
+            keyFactors = entity.keyFactors?.split(",")?.filter { it.isNotBlank() }?.map { KeyFactorModel.valueOf(it.trim()) },
+            jobPostingId = entity.jobPosting?.id,
             stageHistory = entity.stageHistory.map { toSalesStageHistoryEntryModel(it) }
         )
 
