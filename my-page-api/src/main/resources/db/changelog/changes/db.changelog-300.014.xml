@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="300.014-1" author="JProfessionals">
+        <comment>Add sector column to customer table</comment>
+        <addColumn tableName="customer">
+            <column name="sector" type="VARCHAR(20)" defaultValue="UNKNOWN">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="300.014-2" author="JProfessionals">
+        <comment>Add evaluation fields to sales_activity table</comment>
+        <addColumn tableName="sales_activity">
+            <column name="match_rating" type="INT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="evaluation_notes" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="evaluation_document_url" type="VARCHAR(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="key_factors" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="300.014-3" author="JProfessionals">
+        <comment>Add job_posting_id foreign key to sales_activity table</comment>
+        <addColumn tableName="sales_activity">
+            <column name="job_posting_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint
+            baseTableName="sales_activity"
+            baseColumnNames="job_posting_id"
+            constraintName="fk_sales_activity_job_posting"
+            referencedTableName="job_posting"
+            referencedColumnNames="id"
+            onDelete="SET NULL"/>
+        <createIndex tableName="sales_activity" indexName="idx_sales_activity_job_posting">
+            <column name="job_posting_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
