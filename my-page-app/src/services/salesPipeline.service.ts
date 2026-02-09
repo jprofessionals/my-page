@@ -398,4 +398,5 @@ export type {
   SupplierStats,
   SourceStats,
   CustomerSector,
+  KeyFactor,
 } from '@/data/types/types.gen'

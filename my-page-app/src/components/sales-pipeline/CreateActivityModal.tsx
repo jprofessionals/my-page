@@ -11,6 +11,7 @@ import {
 interface Props {
   onClose: () => void
   onCreated: () => void
+  jobPostingId?: number
 }
 
 const STAGE_OPTIONS: { value: SalesStage; label: string }[] = [
@@ -196,7 +197,7 @@ function ConsultantPicker({
   )
 }
 
-export default function CreateActivityModal({ onClose, onCreated }: Props) {
+export default function CreateActivityModal({ onClose, onCreated, jobPostingId }: Props) {
   const [loading, setLoading] = useState(false)
   const [consultants, setConsultants] = useState<FlowcaseConsultant[]>([])
   const [loadingData, setLoadingData] = useState(true)
@@ -312,6 +313,7 @@ export default function CreateActivityModal({ onClose, onCreated }: Props) {
         offerDeadline: offerDeadline,
         offerDeadlineAsap: formData.offerDeadlineAsap,
         interviewDate: interviewDate,
+        jobPostingId: jobPostingId || undefined,
       })
       toast.success('Aktivitet opprettet!')
       onCreated()

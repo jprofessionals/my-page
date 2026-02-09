@@ -2,6 +2,7 @@
 
 import {
   Customer,
+  CustomerSector,
   JobPosting as JobPostingType,
   JobPostingFiles as JobPostingFilesType,
   JobPostingSource,
@@ -71,6 +72,9 @@ export const JobPostingModal = ({
   const [title, setTitle] = useState(jobPosting ? jobPosting.title : '')
   const [customer, setCustomer] = useState<Customer | null>(
     jobPosting ? jobPosting.customer : null,
+  )
+  const [customerSector, setCustomerSector] = useState<CustomerSector>(
+    jobPosting?.customer?.sector ?? 'UNKNOWN',
   )
   const [isUrgent, setIsUrgent] = useState(
     jobPosting ? jobPosting.urgent : false,
@@ -327,10 +331,15 @@ export const JobPostingModal = ({
       return
     }
 
+    const customerWithSector: Customer = {
+      ...customer,
+      sector: customerSector,
+    }
+
     const newOrUpdatedJobPosting: JobPostingType = {
       id: id,
       title: title,
-      customer: customer,
+      customer: customerWithSector,
       urgent: isUrgent,
       hidden: isHidden,
       deadline: deadline || undefined,  // Send undefined instead of empty string
@@ -402,6 +411,9 @@ export const JobPostingModal = ({
                   value={customer}
                   onChange={(event, newValue: Customer | null) => {
                     setCustomer(newValue)
+                    if (newValue) {
+                      setCustomerSector(newValue.sector ?? 'UNKNOWN')
+                    }
                   }}
                   onInputChange={(event, newInputValue, reason) => {
                     if (reason === 'input') {
@@ -414,7 +426,7 @@ export const JobPostingModal = ({
                           id: 0,
                           name: newInputValue,
                           exclusive: false,
-                          sector: 'UNKNOWN',
+                          sector: customerSector,
                         }
 
                         setCustomer(newCustomer)
@@ -428,6 +440,39 @@ export const JobPostingModal = ({
                       label="Kunde"
                       variant="outlined"
                       required
+                    />
+                  )}
+                />
+              </div>
+              <div className="mb-4">
+                <Autocomplete
+                  options={[
+                    { value: 'PUBLIC' as CustomerSector, label: 'Offentlig' },
+                    { value: 'PRIVATE' as CustomerSector, label: 'Privat' },
+                    { value: 'UNKNOWN' as CustomerSector, label: 'Ikke klassifisert' },
+                  ]}
+                  getOptionLabel={(option) => option.label}
+                  value={
+                    customerSector === 'PUBLIC'
+                      ? { value: 'PUBLIC' as CustomerSector, label: 'Offentlig' }
+                      : customerSector === 'PRIVATE'
+                        ? { value: 'PRIVATE' as CustomerSector, label: 'Privat' }
+                        : { value: 'UNKNOWN' as CustomerSector, label: 'Ikke klassifisert' }
+                  }
+                  onChange={(event, newValue) => {
+                    const newSector = newValue ? newValue.value : 'UNKNOWN'
+                    setCustomerSector(newSector)
+                    if (customer) {
+                      setCustomer({ ...customer, sector: newSector })
+                    }
+                  }}
+                  disableClearable
+                  disablePortal
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Sektor"
+                      variant="outlined"
                     />
                   )}
                 />
