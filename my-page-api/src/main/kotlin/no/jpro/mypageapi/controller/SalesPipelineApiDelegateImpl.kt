@@ -6,8 +6,23 @@ import no.jpro.mypageapi.entity.ClosedReason
 import no.jpro.mypageapi.entity.SalesStage
 import no.jpro.mypageapi.model.AddConsultantToBoardRequest
 import no.jpro.mypageapi.model.CloseActivity
+import no.jpro.mypageapi.model.ClosedReasonByStage
+import no.jpro.mypageapi.model.CompetencyBaseAnalytics
+import no.jpro.mypageapi.model.ConsultantDetailedStats
 import no.jpro.mypageapi.model.CreateInterviewRound
+import no.jpro.mypageapi.model.CustomerAnalytics
+import no.jpro.mypageapi.model.CustomerDetailedStats
+import no.jpro.mypageapi.model.CustomerExperienceEffect
+import no.jpro.mypageapi.model.EvaluationAnalytics
+import no.jpro.mypageapi.model.MatchRatingBucket
+import no.jpro.mypageapi.model.SectorDistribution
+import no.jpro.mypageapi.model.SkillGapEntry
+import no.jpro.mypageapi.model.SourceStats
+import no.jpro.mypageapi.model.SupplierStats
+import no.jpro.mypageapi.model.TagGapEntry
+import no.jpro.mypageapi.model.TechCategoryCount
 import no.jpro.mypageapi.model.UpdateInterviewRound
+import no.jpro.mypageapi.model.UpcomingAvailableConsultant
 import no.jpro.mypageapi.model.InterviewRound as InterviewRoundModel
 import no.jpro.mypageapi.model.AvailabilityStats
 import no.jpro.mypageapi.model.MonthlyTrendData
@@ -620,6 +635,185 @@ class SalesPipelineApiDelegateImpl(
                 benchWeeks = trend.benchWeeks
             )
         }
+
+        return ResponseEntity.ok(response)
+    }
+
+    // ==================== Evaluation Analytics ====================
+
+    override fun getEvaluationAnalytics(months: Int?): ResponseEntity<EvaluationAnalytics> {
+        val data = salesPipelineService.getEvaluationAnalytics(months)
+
+        val response = EvaluationAnalytics(
+            closedReasonBreakdown = data.closedReasonBreakdown.map { (reason, count) ->
+                ClosedReasonCount(
+                    reason = ClosedReasonModel.valueOf(reason.name),
+                    count = count
+                )
+            },
+            closedReasonByStage = data.closedReasonByStage.map { (stage, reasons) ->
+                ClosedReasonByStage(
+                    stage = stage.name,
+                    count = reasons.values.sum(),
+                    reasons = reasons.map { (reason, count) ->
+                        ClosedReasonCount(
+                            reason = ClosedReasonModel.valueOf(reason.name),
+                            count = count
+                        )
+                    }
+                )
+            },
+            avgMatchRatingWon = data.avgMatchRatingWon,
+            avgMatchRatingLost = data.avgMatchRatingLost,
+            matchRatingDistribution = data.matchRatingDistribution.map { bucket ->
+                MatchRatingBucket(
+                    rating = bucket.rating,
+                    wonCount = bucket.wonCount,
+                    lostCount = bucket.lostCount
+                )
+            },
+            customerExperienceEffect = CustomerExperienceEffect(
+                withExperienceWon = data.customerExperienceEffect.withExperienceWon,
+                withExperienceLost = data.customerExperienceEffect.withExperienceLost,
+                withoutExperienceWon = data.customerExperienceEffect.withoutExperienceWon,
+                withoutExperienceLost = data.customerExperienceEffect.withoutExperienceLost
+            ),
+            closedActivities = data.closedActivities.map { salesPipelineMapper.toSalesActivityModel(it) }
+        )
+
+        return ResponseEntity.ok(response)
+    }
+
+    // ==================== Consultant Analytics ====================
+
+    override fun getConsultantAnalytics(): ResponseEntity<List<ConsultantDetailedStats>> {
+        val data = salesPipelineService.getConsultantAnalytics()
+
+        val response = data.map { stat ->
+            ConsultantDetailedStats(
+                consultant = salesPipelineMapper.userMapper.toUserModel(stat.consultant),
+                availabilityStatus = stat.availabilityStatus?.let {
+                    AvailabilityStatusModel.valueOf(it.name)
+                },
+                activeActivities = stat.activeActivities,
+                wonTotal = stat.wonTotal,
+                lostTotal = stat.lostTotal,
+                winRate = stat.winRate,
+                avgMatchRating = stat.avgMatchRating,
+                avgDaysToClose = stat.avgDaysToClose,
+                mostCommonLossReason = stat.mostCommonLossReason?.let {
+                    ClosedReasonModel.valueOf(it.name)
+                },
+                activities = stat.activities.map { salesPipelineMapper.toSalesActivityModel(it) }
+            )
+        }
+
+        return ResponseEntity.ok(response)
+    }
+
+    // ==================== Competency Base Analytics ====================
+
+    override fun getCompetencyBaseAnalytics(months: Int?): ResponseEntity<CompetencyBaseAnalytics> {
+        val data = salesPipelineService.getCompetencyBaseAnalytics(months)
+
+        val response = CompetencyBaseAnalytics(
+            availabilityStats = AvailabilityStats(
+                totalConsultants = data.availabilityStats.totalConsultants,
+                available = data.availabilityStats.available,
+                availableSoon = data.availabilityStats.availableSoon,
+                assigned = data.availabilityStats.assigned,
+                occupied = data.availabilityStats.occupied
+            ),
+            upcomingAvailable = data.upcomingAvailable.map { upcoming ->
+                UpcomingAvailableConsultant(
+                    consultant = salesPipelineMapper.userMapper.toUserModel(upcoming.consultant),
+                    availableFrom = upcoming.availableFrom,
+                    currentCustomer = upcoming.currentCustomerName
+                )
+            },
+            sectorDistribution = data.sectorDistribution.map { sector ->
+                SectorDistribution(
+                    sector = no.jpro.mypageapi.model.CustomerSector.valueOf(sector.sector.name),
+                    customerCount = sector.customerCount,
+                    consultantCount = sector.consultantCount
+                )
+            },
+            techCategoryDistribution = data.techCategoryDistribution.map { tech ->
+                TechCategoryCount(
+                    techCategory = tech.techCategory,
+                    count = tech.count
+                )
+            },
+            skillGap = data.skillGap.map { entry ->
+                SkillGapEntry(
+                    techCategory = entry.techCategory,
+                    demanded = entry.demanded,
+                    won = entry.won,
+                    hitRate = entry.hitRate
+                )
+            },
+            tagAnalysis = data.tagAnalysis.map { entry ->
+                TagGapEntry(
+                    tagName = entry.tagName,
+                    demanded = entry.demanded,
+                    won = entry.won,
+                    hitRate = entry.hitRate
+                )
+            }
+        )
+
+        return ResponseEntity.ok(response)
+    }
+
+    // ==================== Customer Analytics ====================
+
+    override fun getCustomerAnalytics(months: Int?): ResponseEntity<CustomerAnalytics> {
+        val data = salesPipelineService.getCustomerAnalytics(months)
+
+        val response = CustomerAnalytics(
+            customers = data.customers.map { customer ->
+                CustomerDetailedStats(
+                    customerId = customer.customerId,
+                    customerName = customer.customerName,
+                    sector = customer.sector?.let {
+                        no.jpro.mypageapi.model.CustomerSector.valueOf(it.name)
+                    },
+                    currentConsultantCount = customer.currentConsultantCount,
+                    activeActivities = customer.activeActivities,
+                    wonTotal = customer.wonTotal,
+                    lostTotal = customer.lostTotal,
+                    winRate = customer.winRate,
+                    mostCommonLossReason = customer.mostCommonLossReason?.let {
+                        ClosedReasonModel.valueOf(it.name)
+                    }
+                )
+            },
+            sectorComparison = data.sectorComparison.map { sector ->
+                SectorDistribution(
+                    sector = no.jpro.mypageapi.model.CustomerSector.valueOf(sector.sector.name),
+                    customerCount = sector.customerCount,
+                    consultantCount = sector.consultantCount
+                )
+            },
+            supplierStats = data.supplierStats.map { supplier ->
+                SupplierStats(
+                    supplierName = supplier.supplierName,
+                    totalActivities = supplier.totalActivities,
+                    wonTotal = supplier.wonTotal,
+                    lostTotal = supplier.lostTotal,
+                    winRate = supplier.winRate
+                )
+            },
+            sourceStats = data.sourceStats.map { source ->
+                SourceStats(
+                    source = source.source,
+                    totalJobPostings = source.totalJobPostings,
+                    wonActivities = source.wonActivities,
+                    lostActivities = source.lostActivities,
+                    winRate = source.winRate
+                )
+            }
+        )
 
         return ResponseEntity.ok(response)
     }

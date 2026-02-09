@@ -5,6 +5,7 @@ import no.jpro.mypageapi.entity.AvailabilityHistory
 import no.jpro.mypageapi.entity.AvailabilityStatus
 import no.jpro.mypageapi.entity.ClosedReason
 import no.jpro.mypageapi.entity.ConsultantAvailability
+import no.jpro.mypageapi.entity.CustomerSector
 import no.jpro.mypageapi.entity.InterviewRound
 import no.jpro.mypageapi.entity.SalesActivity
 import no.jpro.mypageapi.entity.SalesStage
@@ -1052,5 +1053,519 @@ class SalesPipelineService(
     private fun calculateWorkDays(from: LocalDateTime, to: LocalDateTime): Int {
         // Simple calculation: total days (could be refined to exclude weekends)
         return ChronoUnit.DAYS.between(from.toLocalDate(), to.toLocalDate()).toInt().coerceAtLeast(0)
+    }
+
+    // ==================== Evaluation Analytics ====================
+
+    data class EvaluationAnalyticsData(
+        val closedReasonBreakdown: Map<ClosedReason, Int>,
+        val closedReasonByStage: Map<SalesStage, Map<ClosedReason, Int>>,
+        val avgMatchRatingWon: Double?,
+        val avgMatchRatingLost: Double?,
+        val matchRatingDistribution: List<MatchRatingBucketData>,
+        val customerExperienceEffect: CustomerExperienceEffectData,
+        val closedActivities: List<SalesActivity>
+    )
+
+    data class MatchRatingBucketData(
+        val rating: Int,
+        val wonCount: Int,
+        val lostCount: Int
+    )
+
+    data class CustomerExperienceEffectData(
+        val withExperienceWon: Int,
+        val withExperienceLost: Int,
+        val withoutExperienceWon: Int,
+        val withoutExperienceLost: Int
+    )
+
+    @Transactional(readOnly = true)
+    fun getEvaluationAnalytics(months: Int?): EvaluationAnalyticsData {
+        val allActivities = salesActivityRepository.findAll()
+
+        // Get all closed activities (WON or CLOSED_OTHER_WON), optionally filtered by closedAt
+        val closedActivities = allActivities.filter { activity ->
+            (activity.status == ActivityStatus.WON || activity.status == ActivityStatus.CLOSED_OTHER_WON) &&
+                (months == null || activity.closedAt?.let {
+                    it.isAfter(LocalDateTime.now().minusMonths(months.toLong()))
+                } == true)
+        }
+
+        // closedReasonBreakdown: group by closedReason, count each
+        val closedReasonBreakdown = closedActivities
+            .filter { it.closedReason != null }
+            .groupBy { it.closedReason!! }
+            .mapValues { (_, activities) -> activities.size }
+
+        // closedReasonByStage: for lost activities, group by currentStage then by reason
+        val lostActivities = closedActivities.filter { it.status == ActivityStatus.CLOSED_OTHER_WON }
+        val closedReasonByStage = lostActivities
+            .groupBy { it.currentStage }
+            .mapValues { (_, activities) ->
+                activities.filter { it.closedReason != null }
+                    .groupBy { it.closedReason!! }
+                    .mapValues { (_, acts) -> acts.size }
+            }
+
+        // avgMatchRatingWon
+        val wonActivities = closedActivities.filter { it.status == ActivityStatus.WON }
+        val wonRatings = wonActivities.mapNotNull { it.matchRating }
+        val avgMatchRatingWon = if (wonRatings.isNotEmpty()) wonRatings.average() else null
+
+        // avgMatchRatingLost
+        val lostRatings = lostActivities.mapNotNull { it.matchRating }
+        val avgMatchRatingLost = if (lostRatings.isNotEmpty()) lostRatings.average() else null
+
+        // matchRatingDistribution: for ratings 1-5, count won and lost with that rating
+        val matchRatingDistribution = (1..5).map { rating ->
+            MatchRatingBucketData(
+                rating = rating,
+                wonCount = wonActivities.count { it.matchRating == rating },
+                lostCount = lostActivities.count { it.matchRating == rating }
+            )
+        }
+
+        // customerExperienceEffect
+        var withExperienceWon = 0
+        var withExperienceLost = 0
+        var withoutExperienceWon = 0
+        var withoutExperienceLost = 0
+
+        for (activity in closedActivities) {
+            val consultantId = activity.consultant.id!!
+            val customerKey = activity.customer?.id?.toString() ?: activity.customerName
+
+            // Check if consultant has any EARLIER WON activity for the same customer
+            val hasEarlierWon = if (customerKey != null) {
+                allActivities.any { other ->
+                    other.id != activity.id &&
+                        other.consultant.id == consultantId &&
+                        other.status == ActivityStatus.WON &&
+                        other.closedAt != null &&
+                        activity.closedAt != null &&
+                        other.closedAt!!.isBefore(activity.closedAt) &&
+                        (other.customer?.id?.toString() ?: other.customerName) == customerKey
+                }
+            } else false
+
+            when {
+                hasEarlierWon && activity.status == ActivityStatus.WON -> withExperienceWon++
+                hasEarlierWon && activity.status == ActivityStatus.CLOSED_OTHER_WON -> withExperienceLost++
+                !hasEarlierWon && activity.status == ActivityStatus.WON -> withoutExperienceWon++
+                !hasEarlierWon && activity.status == ActivityStatus.CLOSED_OTHER_WON -> withoutExperienceLost++
+            }
+        }
+
+        return EvaluationAnalyticsData(
+            closedReasonBreakdown = closedReasonBreakdown,
+            closedReasonByStage = closedReasonByStage,
+            avgMatchRatingWon = avgMatchRatingWon,
+            avgMatchRatingLost = avgMatchRatingLost,
+            matchRatingDistribution = matchRatingDistribution,
+            customerExperienceEffect = CustomerExperienceEffectData(
+                withExperienceWon = withExperienceWon,
+                withExperienceLost = withExperienceLost,
+                withoutExperienceWon = withoutExperienceWon,
+                withoutExperienceLost = withoutExperienceLost
+            ),
+            closedActivities = closedActivities
+        )
+    }
+
+    // ==================== Consultant Analytics ====================
+
+    data class ConsultantDetailedStatsData(
+        val consultant: User,
+        val availabilityStatus: AvailabilityStatus?,
+        val activeActivities: Int,
+        val wonTotal: Int,
+        val lostTotal: Int,
+        val winRate: Double,
+        val avgMatchRating: Double?,
+        val avgDaysToClose: Double,
+        val mostCommonLossReason: ClosedReason?,
+        val activities: List<SalesActivity>
+    )
+
+    @Transactional(readOnly = true)
+    fun getConsultantAnalytics(): List<ConsultantDetailedStatsData> {
+        val allActivities = salesActivityRepository.findAll()
+        val availabilities = consultantAvailabilityRepository.findAll()
+        val availabilityByConsultant = availabilities.associateBy { it.consultant.id!! }
+
+        return allActivities.groupBy { it.consultant }
+            .map { (consultant, activities) ->
+                val active = activities.count { it.status == ActivityStatus.ACTIVE }
+                val won = activities.count { it.status == ActivityStatus.WON }
+                val lost = activities.count { it.status == ActivityStatus.CLOSED_OTHER_WON }
+                val winRate = if (won + lost > 0) (won.toDouble() / (won + lost)) * 100 else 0.0
+
+                val ratings = activities.mapNotNull { it.matchRating }
+                val avgMatchRating = if (ratings.isNotEmpty()) ratings.average() else null
+
+                val closedWithDates = activities.filter { it.closedAt != null }
+                val avgDaysToClose = if (closedWithDates.isNotEmpty()) {
+                    closedWithDates.map { activity ->
+                        ChronoUnit.DAYS.between(activity.createdAt, activity.closedAt!!).toDouble()
+                    }.average()
+                } else 0.0
+
+                val lostActivities = activities.filter { it.status == ActivityStatus.CLOSED_OTHER_WON }
+                val mostCommonLossReason = lostActivities
+                    .mapNotNull { it.closedReason }
+                    .groupBy { it }
+                    .maxByOrNull { it.value.size }
+                    ?.key
+
+                val availability = availabilityByConsultant[consultant.id!!]
+
+                ConsultantDetailedStatsData(
+                    consultant = consultant,
+                    availabilityStatus = availability?.status,
+                    activeActivities = active,
+                    wonTotal = won,
+                    lostTotal = lost,
+                    winRate = winRate,
+                    avgMatchRating = avgMatchRating,
+                    avgDaysToClose = avgDaysToClose,
+                    mostCommonLossReason = mostCommonLossReason,
+                    activities = activities
+                )
+            }
+            .sortedByDescending { it.activeActivities }
+    }
+
+    // ==================== Competency Base Analytics ====================
+
+    data class CompetencyBaseAnalyticsData(
+        val availabilityStats: AvailabilityStatsData,
+        val upcomingAvailable: List<UpcomingAvailableData>,
+        val sectorDistribution: List<SectorDistributionData>,
+        val techCategoryDistribution: List<TechCategoryCountData>,
+        val skillGap: List<SkillGapEntryData>,
+        val tagAnalysis: List<TagGapEntryData>
+    )
+
+    data class UpcomingAvailableData(
+        val consultant: User,
+        val availableFrom: LocalDate?,
+        val currentCustomerName: String?
+    )
+
+    data class SectorDistributionData(
+        val sector: CustomerSector,
+        val customerCount: Int,
+        val consultantCount: Int
+    )
+
+    data class TechCategoryCountData(
+        val techCategory: String,
+        val count: Int
+    )
+
+    data class SkillGapEntryData(
+        val techCategory: String,
+        val demanded: Int,
+        val won: Int,
+        val hitRate: Double
+    )
+
+    data class TagGapEntryData(
+        val tagName: String,
+        val demanded: Int,
+        val won: Int,
+        val hitRate: Double
+    )
+
+    @Transactional(readOnly = true)
+    fun getCompetencyBaseAnalytics(months: Int?): CompetencyBaseAnalyticsData {
+        val effectiveMonths = months ?: 12
+
+        // 1. Reuse availability stats calculation (same as in getAnalytics)
+        val totalConsultants = settingsRepository.findSettingBySettingId("totalConsultants")
+            ?.settingValue?.toIntOrNull() ?: 63
+        val availabilities = consultantAvailabilityRepository.findAll()
+        val available = availabilities.count { it.status == AvailabilityStatus.AVAILABLE }
+        val availableSoon = availabilities.count { it.status == AvailabilityStatus.AVAILABLE_SOON }
+        val assigned = availabilities.count { it.status == AvailabilityStatus.ASSIGNED }
+        val occupied = totalConsultants - available
+        val availabilityStats = AvailabilityStatsData(
+            totalConsultants = totalConsultants,
+            available = available,
+            availableSoon = availableSoon,
+            assigned = assigned,
+            occupied = occupied.coerceAtLeast(0)
+        )
+
+        // 2. upcomingAvailable: AVAILABLE_SOON consultants sorted by availableFrom
+        val upcomingAvailable = availabilities
+            .filter { it.status == AvailabilityStatus.AVAILABLE_SOON }
+            .sortedBy { it.availableFrom }
+            .map { avail ->
+                UpcomingAvailableData(
+                    consultant = avail.consultant,
+                    availableFrom = avail.availableFrom,
+                    currentCustomerName = avail.currentCustomer?.name
+                )
+            }
+
+        // 3. sectorDistribution: group occupied consultants by customer.sector
+        val occupiedAvailabilities = availabilities.filter {
+            it.currentCustomer != null && (it.status == AvailabilityStatus.OCCUPIED || it.status == AvailabilityStatus.ASSIGNED)
+        }
+        val sectorDistribution = occupiedAvailabilities
+            .groupBy { it.currentCustomer!!.sector }
+            .map { (sector, avails) ->
+                val customers = avails.mapNotNull { it.currentCustomer }.distinctBy { it.id }
+                SectorDistributionData(
+                    sector = sector,
+                    customerCount = customers.size,
+                    consultantCount = avails.size
+                )
+            }
+
+        // 4. techCategoryDistribution: for occupied consultants, find most recent WON activity, get techCategory
+        val allActivities = salesActivityRepository.findAll()
+        val techCategoryCounts = mutableMapOf<String, Int>()
+        for (avail in occupiedAvailabilities) {
+            val consultantId = avail.consultant.id!!
+            val mostRecentWon = allActivities
+                .filter { it.consultant.id == consultantId && it.status == ActivityStatus.WON }
+                .maxByOrNull { it.closedAt ?: LocalDateTime.MIN }
+
+            val techCategory = mostRecentWon?.jobPosting?.techCategory?.name ?: "UNKNOWN"
+            techCategoryCounts[techCategory] = (techCategoryCounts[techCategory] ?: 0) + 1
+        }
+        val techCategoryDistribution = techCategoryCounts.map { (cat, count) ->
+            TechCategoryCountData(techCategory = cat, count = count)
+        }.sortedByDescending { it.count }
+
+        // 5. skillGap: count jobPostings by techCategory in period, count WON activities by techCategory
+        val now = LocalDateTime.now()
+        val periodStart = now.minusMonths(effectiveMonths.toLong())
+        val periodStartOffset = periodStart.atOffset(java.time.ZoneOffset.UTC)
+
+        val allJobPostings = jobPostingRepository.findAll()
+        val jobPostingsInPeriod = allJobPostings.filter { jp ->
+            jp.createdDate?.let { it.isAfter(periodStartOffset) || it.isEqual(periodStartOffset) } == true
+        }
+
+        val wonActivitiesInPeriod = allActivities.filter {
+            it.status == ActivityStatus.WON &&
+                it.closedAt != null &&
+                it.closedAt!!.isAfter(periodStart)
+        }
+
+        // Group job postings by tech category
+        val demandedByCategory = jobPostingsInPeriod
+            .groupBy { it.techCategory?.name ?: "UNKNOWN" }
+            .mapValues { (_, postings) -> postings.size }
+
+        // Group won activities by their jobPosting's tech category
+        val wonByCategory = wonActivitiesInPeriod
+            .filter { it.jobPosting != null }
+            .groupBy { it.jobPosting!!.techCategory?.name ?: "UNKNOWN" }
+            .mapValues { (_, acts) -> acts.size }
+
+        val allCategories = (demandedByCategory.keys + wonByCategory.keys).toSet()
+        val skillGap = allCategories.map { category ->
+            val demanded = demandedByCategory[category] ?: 0
+            val won = wonByCategory[category] ?: 0
+            val hitRate = if (demanded > 0) (won.toDouble() / demanded) * 100 else 0.0
+            SkillGapEntryData(
+                techCategory = category,
+                demanded = demanded,
+                won = won,
+                hitRate = hitRate
+            )
+        }.sortedByDescending { it.demanded }
+
+        // 6. tagAnalysis: similar but by tag name
+        val tagDemanded = mutableMapOf<String, Int>()
+        for (jp in jobPostingsInPeriod) {
+            for (tag in jp.tags) {
+                tagDemanded[tag.name] = (tagDemanded[tag.name] ?: 0) + 1
+            }
+        }
+
+        val tagWon = mutableMapOf<String, Int>()
+        for (activity in wonActivitiesInPeriod) {
+            activity.jobPosting?.let { jp ->
+                for (tag in jp.tags) {
+                    tagWon[tag.name] = (tagWon[tag.name] ?: 0) + 1
+                }
+            }
+        }
+
+        val tagAnalysis = tagDemanded.entries
+            .sortedByDescending { it.value }
+            .take(15)
+            .map { (tagName, demanded) ->
+                val won = tagWon[tagName] ?: 0
+                val hitRate = if (demanded > 0) (won.toDouble() / demanded) * 100 else 0.0
+                TagGapEntryData(
+                    tagName = tagName,
+                    demanded = demanded,
+                    won = won,
+                    hitRate = hitRate
+                )
+            }
+
+        return CompetencyBaseAnalyticsData(
+            availabilityStats = availabilityStats,
+            upcomingAvailable = upcomingAvailable,
+            sectorDistribution = sectorDistribution,
+            techCategoryDistribution = techCategoryDistribution,
+            skillGap = skillGap,
+            tagAnalysis = tagAnalysis
+        )
+    }
+
+    // ==================== Customer Analytics ====================
+
+    data class CustomerAnalyticsData(
+        val customers: List<CustomerDetailedStatsData>,
+        val sectorComparison: List<SectorDistributionData>,
+        val supplierStats: List<SupplierStatsData>,
+        val sourceStats: List<SourceStatsData>
+    )
+
+    data class CustomerDetailedStatsData(
+        val customerId: Long?,
+        val customerName: String,
+        val sector: CustomerSector?,
+        val currentConsultantCount: Int,
+        val activeActivities: Int,
+        val wonTotal: Int,
+        val lostTotal: Int,
+        val winRate: Double,
+        val mostCommonLossReason: ClosedReason?
+    )
+
+    data class SupplierStatsData(
+        val supplierName: String,
+        val totalActivities: Int,
+        val wonTotal: Int,
+        val lostTotal: Int,
+        val winRate: Double
+    )
+
+    data class SourceStatsData(
+        val source: String,
+        val totalJobPostings: Int,
+        val wonActivities: Int,
+        val lostActivities: Int,
+        val winRate: Double
+    )
+
+    @Transactional(readOnly = true)
+    fun getCustomerAnalytics(months: Int?): CustomerAnalyticsData {
+        val allActivities = salesActivityRepository.findAll()
+
+        // Optionally filter by createdAt within months
+        val activities = if (months != null) {
+            val cutoff = LocalDateTime.now().minusMonths(months.toLong())
+            allActivities.filter { it.createdAt.isAfter(cutoff) }
+        } else {
+            allActivities
+        }
+
+        val availabilities = consultantAvailabilityRepository.findAll()
+
+        // Group by customer (using customer entity or customerName)
+        val customerGroups = activities.groupBy { activity ->
+            activity.customer?.id?.toString() ?: activity.customerName ?: "Ukjent"
+        }
+
+        val customers = customerGroups.map { (customerKey, customerActivities) ->
+            val firstActivity = customerActivities.first()
+            val customer = firstActivity.customer
+            val customerName = customer?.name ?: firstActivity.customerName ?: "Ukjent"
+            val sector = customer?.sector
+
+            // currentConsultantCount from availabilities where currentCustomer matches
+            val currentConsultantCount = if (customer != null) {
+                availabilities.count { it.currentCustomer?.id == customer.id }
+            } else {
+                0
+            }
+
+            val active = customerActivities.count { it.status == ActivityStatus.ACTIVE }
+            val won = customerActivities.count { it.status == ActivityStatus.WON }
+            val lost = customerActivities.count { it.status == ActivityStatus.CLOSED_OTHER_WON }
+            val winRate = if (won + lost > 0) (won.toDouble() / (won + lost)) * 100 else 0.0
+
+            val mostCommonLossReason = customerActivities
+                .filter { it.status == ActivityStatus.CLOSED_OTHER_WON }
+                .mapNotNull { it.closedReason }
+                .groupBy { it }
+                .maxByOrNull { it.value.size }
+                ?.key
+
+            CustomerDetailedStatsData(
+                customerId = customer?.id,
+                customerName = customerName,
+                sector = sector,
+                currentConsultantCount = currentConsultantCount,
+                activeActivities = active,
+                wonTotal = won,
+                lostTotal = lost,
+                winRate = winRate,
+                mostCommonLossReason = mostCommonLossReason
+            )
+        }.sortedByDescending { it.activeActivities + it.wonTotal }
+
+        // sectorComparison: aggregate by sector
+        val sectorComparison = CustomerSector.entries.map { sector ->
+            val sectorCustomers = customers.filter { it.sector == sector }
+            SectorDistributionData(
+                sector = sector,
+                customerCount = sectorCustomers.size,
+                consultantCount = sectorCustomers.sumOf { it.currentConsultantCount }
+            )
+        }
+
+        // supplierStats: group activities by supplierName
+        val supplierStats = activities
+            .filter { !it.supplierName.isNullOrBlank() }
+            .groupBy { it.supplierName!! }
+            .map { (supplierName, supplierActivities) ->
+                val won = supplierActivities.count { it.status == ActivityStatus.WON }
+                val lost = supplierActivities.count { it.status == ActivityStatus.CLOSED_OTHER_WON }
+                val winRate = if (won + lost > 0) (won.toDouble() / (won + lost)) * 100 else 0.0
+                SupplierStatsData(
+                    supplierName = supplierName,
+                    totalActivities = supplierActivities.size,
+                    wonTotal = won,
+                    lostTotal = lost,
+                    winRate = winRate
+                )
+            }.sortedByDescending { it.totalActivities }
+
+        // sourceStats: for activities with jobPosting, group by jobPosting.source
+        val activitiesWithJobPosting = activities.filter { it.jobPosting != null }
+        val sourceStats = activitiesWithJobPosting
+            .groupBy { it.jobPosting!!.source?.name ?: "UNKNOWN" }
+            .map { (source, sourceActivities) ->
+                val jobPostingIds = sourceActivities.mapNotNull { it.jobPosting?.id }.distinct()
+                val won = sourceActivities.count { it.status == ActivityStatus.WON }
+                val lost = sourceActivities.count { it.status == ActivityStatus.CLOSED_OTHER_WON }
+                val winRate = if (won + lost > 0) (won.toDouble() / (won + lost)) * 100 else 0.0
+                SourceStatsData(
+                    source = source,
+                    totalJobPostings = jobPostingIds.size,
+                    wonActivities = won,
+                    lostActivities = lost,
+                    winRate = winRate
+                )
+            }.sortedByDescending { it.totalJobPostings }
+
+        return CustomerAnalyticsData(
+            customers = customers,
+            sectorComparison = sectorComparison,
+            supplierStats = supplierStats,
+            sourceStats = sourceStats
+        )
     }
 }
