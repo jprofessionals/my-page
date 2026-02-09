@@ -6080,6 +6080,16 @@ components:
           format: int64
           nullable: true
           description: ID of the related job posting
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the candidate was first submitted (moved to SENT_TO_SUPPLIER or SENT_TO_CUSTOMER)
+        submittedTo:
+          type: string
+          enum: [SUPPLIER, CUSTOMER]
+          nullable: true
+          description: Whether the candidate was first submitted to supplier or directly to customer
       required:
         - id
         - consultant

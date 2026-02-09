@@ -114,6 +114,17 @@ export default function SalesPipelineCard({
           {daysInStage()} dager i steget
         </div>
 
+        {/* Submitted date */}
+        {activity.submittedAt && (
+          <div className="text-xs text-teal-600">
+            Levert {activity.submittedTo === 'SUPPLIER' ? 'til leverandør' : 'til kunde'}:{' '}
+            {new Date(activity.submittedAt).toLocaleDateString('nb-NO', {
+              day: 'numeric',
+              month: 'short',
+            })}
+          </div>
+        )}
+
         {/* Offer deadline if set */}
         {activity.offerDeadlineAsap && (
           <div className="text-xs text-orange-600 font-semibold">

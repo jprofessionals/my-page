@@ -666,6 +666,7 @@ export default function EvaluationTab() {
                     >
                       Tittel{sortIndicator('title')}
                     </th>
+                    <th>Levert</th>
                     <th
                       className="cursor-pointer hover:text-primary"
                       onClick={() => handleSort('status')}
@@ -712,6 +713,16 @@ export default function EvaluationTab() {
                           <td className="max-w-xs truncate">
                             {activity.title}
                           </td>
+                          <td className="text-xs">
+                            {activity.submittedAt ? (
+                              <>
+                                {new Date(activity.submittedAt).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })}
+                                <span className="text-gray-500 ml-1">
+                                  ({activity.submittedTo === 'SUPPLIER' ? 'lev.' : 'kunde'})
+                                </span>
+                              </>
+                            ) : '-'}
+                          </td>
                           <td>{statusBadge(activity.status)}</td>
                           <td>
                             {activity.closedReason
@@ -728,7 +739,7 @@ export default function EvaluationTab() {
                         </tr>
                         {isExpanded && (
                           <tr className="bg-base-300/50">
-                            <td colSpan={7}>
+                            <td colSpan={8}>
                               <div className="p-3 space-y-2">
                                 {activity.evaluationNotes && (
                                   <div>

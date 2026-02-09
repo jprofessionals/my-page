@@ -3,6 +3,7 @@ package no.jpro.mypageapi.utils.mapper
 import no.jpro.mypageapi.entity.ConsultantAvailability
 import no.jpro.mypageapi.entity.InterviewRound
 import no.jpro.mypageapi.entity.SalesActivity
+import no.jpro.mypageapi.entity.SalesStage
 import no.jpro.mypageapi.entity.SalesStageHistory
 import org.springframework.stereotype.Service
 import no.jpro.mypageapi.model.ConsultantAvailability as ConsultantAvailabilityModel
@@ -32,6 +33,16 @@ class SalesPipelineMapper(
 
     private fun toOffsetDateTime(localDateTime: java.time.LocalDateTime): OffsetDateTime =
         localDateTime.atZone(OSLO_ZONE).toOffsetDateTime()
+
+    private data class SubmissionInfo(val submittedAt: OffsetDateTime, val isSupplier: Boolean)
+
+    private fun getSubmissionInfo(entity: SalesActivity): SubmissionInfo? {
+        val firstSubmission = entity.stageHistory
+            .filter { it.toStage == SalesStage.SENT_TO_SUPPLIER || it.toStage == SalesStage.SENT_TO_CUSTOMER }
+            .minByOrNull { it.changedAt }
+            ?: return null
+        return SubmissionInfo(toOffsetDateTime(firstSubmission.changedAt), firstSubmission.toStage == SalesStage.SENT_TO_SUPPLIER)
+    }
 
     fun toCustomerModel(customer: no.jpro.mypageapi.entity.Customer): CustomerModel = CustomerModel(
         id = customer.id,
@@ -72,8 +83,9 @@ class SalesPipelineMapper(
             createdAt = toOffsetDateTime(entity.createdAt)
         )
 
-    fun toSalesActivityModel(entity: SalesActivity): SalesActivityModel =
-        SalesActivityModel(
+    fun toSalesActivityModel(entity: SalesActivity): SalesActivityModel {
+        val submission = getSubmissionInfo(entity)
+        return SalesActivityModel(
             id = entity.id,
             consultant = userMapper.toUserModel(entity.consultant),
             customer = entity.customer?.let { toCustomerModel(it) },
@@ -97,6 +109,10 @@ class SalesPipelineMapper(
             interviewDate = entity.interviewDate?.let { toOffsetDateTime(it) },
             interviewRounds = entity.interviewRounds.sortedBy { it.roundNumber }.map { toInterviewRoundModel(it) },
             actualStartDate = entity.actualStartDate,
+            submittedAt = submission?.submittedAt,
+            submittedTo = submission?.let {
+                if (it.isSupplier) SalesActivityModel.SubmittedTo.SUPPLIER else SalesActivityModel.SubmittedTo.CUSTOMER
+            },
             matchRating = entity.matchRating,
             evaluationNotes = entity.evaluationNotes,
             evaluationDocumentUrl = entity.evaluationDocumentUrl,
@@ -105,9 +121,11 @@ class SalesPipelineMapper(
             },
             jobPostingId = entity.jobPosting?.id
         )
+    }
 
-    fun toSalesActivityWithHistoryModel(entity: SalesActivity): SalesActivityWithHistoryModel =
-        SalesActivityWithHistoryModel(
+    fun toSalesActivityWithHistoryModel(entity: SalesActivity): SalesActivityWithHistoryModel {
+        val submission = getSubmissionInfo(entity)
+        return SalesActivityWithHistoryModel(
             id = entity.id,
             consultant = userMapper.toUserModel(entity.consultant),
             customer = entity.customer?.let { toCustomerModel(it) },
@@ -131,6 +149,10 @@ class SalesPipelineMapper(
             interviewDate = entity.interviewDate?.let { toOffsetDateTime(it) },
             interviewRounds = entity.interviewRounds.sortedBy { it.roundNumber }.map { toInterviewRoundModel(it) },
             actualStartDate = entity.actualStartDate,
+            submittedAt = submission?.submittedAt,
+            submittedTo = submission?.let {
+                if (it.isSupplier) SalesActivityWithHistoryModel.SubmittedTo.SUPPLIER else SalesActivityWithHistoryModel.SubmittedTo.CUSTOMER
+            },
             matchRating = entity.matchRating,
             evaluationNotes = entity.evaluationNotes,
             evaluationDocumentUrl = entity.evaluationDocumentUrl,
@@ -140,6 +162,7 @@ class SalesPipelineMapper(
             jobPostingId = entity.jobPosting?.id,
             stageHistory = entity.stageHistory.map { toSalesStageHistoryEntryModel(it) }
         )
+    }
 
     fun toConsultantWithActivitiesModel(
         consultant: no.jpro.mypageapi.entity.User,

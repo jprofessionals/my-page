@@ -571,6 +571,7 @@ export default function CustomerTab() {
                                           <tr>
                                             <th>Konsulent</th>
                                             <th>Tittel</th>
+                                            <th>Levert</th>
                                             <th className="text-center">
                                               Utfall
                                             </th>
@@ -587,6 +588,16 @@ export default function CustomerTab() {
                                                 </td>
                                                 <td className="max-w-xs truncate">
                                                   {activity.title}
+                                                </td>
+                                                <td className="text-xs">
+                                                  {activity.submittedAt ? (
+                                                    <>
+                                                      {new Date(activity.submittedAt).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })}
+                                                      <span className="text-gray-500 ml-1">
+                                                        ({activity.submittedTo === 'SUPPLIER' ? 'lev.' : 'kunde'})
+                                                      </span>
+                                                    </>
+                                                  ) : '-'}
                                                 </td>
                                                 <td className="text-center">
                                                   {activity.status === 'WON' ||

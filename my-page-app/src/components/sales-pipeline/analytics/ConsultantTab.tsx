@@ -478,7 +478,7 @@ export default function ConsultantTab() {
                       {/* Expanded drill-down */}
                       {isExpanded && (
                         <tr>
-                          <td colSpan={7} className="bg-base-300/30 p-0">
+                          <td colSpan={8} className="bg-base-300/30 p-0">
                             <div className="p-4 space-y-6">
                               {/* Summary section */}
                               <div>
@@ -556,6 +556,7 @@ export default function ConsultantTab() {
                                           <th>Kunde</th>
                                           <th>Tittel</th>
                                           <th>Fase</th>
+                                          <th>Levert</th>
                                           <th className="text-right">
                                             Dager i prosess
                                           </th>
@@ -577,6 +578,16 @@ export default function ConsultantTab() {
                                               {stageBadge(
                                                 activity.currentStage,
                                               )}
+                                            </td>
+                                            <td className="text-xs">
+                                              {activity.submittedAt ? (
+                                                <>
+                                                  {new Date(activity.submittedAt).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })}
+                                                  <span className="text-gray-500 ml-1">
+                                                    ({activity.submittedTo === 'SUPPLIER' ? 'lev.' : 'kunde'})
+                                                  </span>
+                                                </>
+                                              ) : '-'}
                                             </td>
                                             <td className="text-right">
                                               {daysSince(activity.createdAt)}
@@ -734,7 +745,7 @@ export default function ConsultantTab() {
                                               {/* Evaluation details expansion */}
                                               {isHistoryExpanded && (
                                                 <tr className="bg-base-200/50">
-                                                  <td colSpan={7}>
+                                                  <td colSpan={8}>
                                                     <div className="p-3 space-y-2">
                                                       {activity.evaluationNotes && (
                                                         <div>
