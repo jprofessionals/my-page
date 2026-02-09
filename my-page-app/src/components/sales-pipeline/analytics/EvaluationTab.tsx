@@ -352,6 +352,8 @@ export default function EvaluationTab() {
                       border: 'none',
                       color: '#f3f4f6',
                     }}
+                    labelStyle={{ color: '#f3f4f6' }}
+                    itemStyle={{ color: '#f3f4f6' }}
                     formatter={(value) => [value, 'Antall']}
                   />
                   <Bar
@@ -530,6 +532,8 @@ export default function EvaluationTab() {
                       border: 'none',
                       color: '#f3f4f6',
                     }}
+                    labelStyle={{ color: '#f3f4f6' }}
+                    itemStyle={{ color: '#f3f4f6' }}
                   />
                   <Legend />
                   <Bar

@@ -796,6 +796,8 @@ export default function CustomerTab() {
                       border: 'none',
                       color: '#f3f4f6',
                     }}
+                    labelStyle={{ color: '#f3f4f6' }}
+                    itemStyle={{ color: '#f3f4f6' }}
                     formatter={(value) => [
                       `${Number(value).toFixed(1)}%`,
                       'Win Rate',

@@ -339,6 +339,8 @@ export default function CompetencyBaseTab() {
                       border: 'none',
                       color: '#f3f4f6',
                     }}
+                    labelStyle={{ color: '#f3f4f6' }}
+                    itemStyle={{ color: '#f3f4f6' }}
                     formatter={(value) => [value, 'Konsulenter']}
                   />
                   <Legend />
@@ -411,6 +413,8 @@ export default function CompetencyBaseTab() {
                       border: 'none',
                       color: '#f3f4f6',
                     }}
+                    labelStyle={{ color: '#f3f4f6' }}
+                    itemStyle={{ color: '#f3f4f6' }}
                     formatter={(value) => [value, 'Konsulenter']}
                   />
                   <Bar
@@ -450,6 +454,8 @@ export default function CompetencyBaseTab() {
                       border: 'none',
                       color: '#f3f4f6',
                     }}
+                    labelStyle={{ color: '#f3f4f6' }}
+                    itemStyle={{ color: '#f3f4f6' }}
                   />
                   <Legend />
                   <Bar

@@ -267,6 +267,8 @@ export default function OverviewTab() {
                       border: 'none',
                       color: '#f3f4f6',
                     }}
+                    labelStyle={{ color: '#f3f4f6' }}
+                    itemStyle={{ color: '#f3f4f6' }}
                   />
                   <Legend />
                   <Line
@@ -310,6 +312,8 @@ export default function OverviewTab() {
                       border: 'none',
                       color: '#f3f4f6',
                     }}
+                    labelStyle={{ color: '#f3f4f6' }}
+                    itemStyle={{ color: '#f3f4f6' }}
                   />
                   <Legend />
                   <Line
