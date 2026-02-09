@@ -1,5 +1,6 @@
 package no.jpro.mypageapi.controller
 
+import jakarta.persistence.EntityNotFoundException
 import no.jpro.mypageapi.api.SalesPipelineApiDelegate
 import no.jpro.mypageapi.entity.ActivityStatus
 import no.jpro.mypageapi.entity.ClosedReason
@@ -240,28 +241,36 @@ class SalesPipelineApiDelegateImpl(
             SalesStage.valueOf(it.name)
         } ?: SalesStage.INTERESTED
 
-        val activity = salesPipelineService.createSalesActivity(
-            consultantId = createSalesActivity.consultantId,
-            flowcaseEmail = createSalesActivity.flowcaseEmail,
-            flowcaseName = createSalesActivity.flowcaseName,
-            customerId = createSalesActivity.customerId,
-            customerName = createSalesActivity.customerName,
-            supplierName = createSalesActivity.supplierName,
-            title = createSalesActivity.title,
-            stage = stage,
-            notes = createSalesActivity.notes,
-            maxPrice = createSalesActivity.maxPrice,
-            offeredPrice = createSalesActivity.offeredPrice,
-            expectedStartDate = createSalesActivity.expectedStartDate,
-            offerDeadline = createSalesActivity.offerDeadline?.toOsloLocalDateTime(),
-            offerDeadlineAsap = createSalesActivity.offerDeadlineAsap,
-            interviewDate = createSalesActivity.interviewDate?.toOsloLocalDateTime(),
-            createdBy = currentUser,
-            jobPostingId = createSalesActivity.jobPostingId
-        )
+        try {
+            val activity = salesPipelineService.createSalesActivity(
+                consultantId = createSalesActivity.consultantId,
+                flowcaseEmail = createSalesActivity.flowcaseEmail,
+                flowcaseName = createSalesActivity.flowcaseName,
+                customerId = createSalesActivity.customerId,
+                customerName = createSalesActivity.customerName,
+                supplierName = createSalesActivity.supplierName,
+                title = createSalesActivity.title,
+                stage = stage,
+                notes = createSalesActivity.notes,
+                maxPrice = createSalesActivity.maxPrice,
+                offeredPrice = createSalesActivity.offeredPrice,
+                expectedStartDate = createSalesActivity.expectedStartDate,
+                offerDeadline = createSalesActivity.offerDeadline?.toOsloLocalDateTime(),
+                offerDeadlineAsap = createSalesActivity.offerDeadlineAsap,
+                interviewDate = createSalesActivity.interviewDate?.toOsloLocalDateTime(),
+                createdBy = currentUser,
+                jobPostingId = createSalesActivity.jobPostingId
+            )
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(salesPipelineMapper.toSalesActivityModel(activity))
+            return ResponseEntity.status(HttpStatus.CREATED)
+                .body(salesPipelineMapper.toSalesActivityModel(activity))
+        } catch (e: EntityNotFoundException) {
+            return ResponseEntity.notFound().build()
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.notFound().build()
+        } catch (e: IllegalStateException) {
+            return ResponseEntity.badRequest().build()
+        }
     }
 
     override fun updateSalesActivity(
