@@ -469,7 +469,7 @@ export default function ConsultantTab() {
                         </td>
                         <td className="text-right">
                           {stats.avgDaysToClose > 0
-                            ? stats.avgDaysToClose
+                            ? stats.avgDaysToClose.toFixed(1)
                             : '-'}
                         </td>
                       </tr>

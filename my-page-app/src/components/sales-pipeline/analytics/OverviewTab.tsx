@@ -189,7 +189,7 @@ export default function OverviewTab() {
         <div className="stat bg-base-200 rounded-lg p-4">
           <div className="stat-title">Snitt dager til lukking</div>
           <div className="stat-value text-warning">
-            {analytics.averageDaysToClose}
+            {analytics.averageDaysToClose.toFixed(1)}
           </div>
           <div className="stat-desc">Fra opprettet til avsluttet</div>
         </div>
