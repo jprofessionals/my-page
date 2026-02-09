@@ -254,7 +254,8 @@ class SalesPipelineService(
         offerDeadline: LocalDateTime?,
         offerDeadlineAsap: Boolean?,
         interviewDate: LocalDateTime?,
-        createdBy: User
+        createdBy: User,
+        jobPostingId: Long? = null
     ): SalesActivity {
         // Resolve consultant: either by ID or by Flowcase email
         val consultant = when {
@@ -303,6 +304,10 @@ class SalesPipelineService(
             interviewDate = interviewDate,
             createdBy = createdBy
         )
+
+        jobPostingId?.let { jpId ->
+            activity.jobPosting = jobPostingRepository.findById(jpId).orElse(null)
+        }
 
         val saved = salesActivityRepository.save(activity)
 
@@ -409,7 +414,15 @@ class SalesPipelineService(
     }
 
     @Transactional
-    fun markActivityWon(id: Long, changedBy: User, actualStartDate: LocalDate? = null): SalesActivity {
+    fun markActivityWon(
+        id: Long,
+        changedBy: User,
+        actualStartDate: LocalDate? = null,
+        matchRating: Int? = null,
+        evaluationNotes: String? = null,
+        evaluationDocumentUrl: String? = null,
+        keyFactors: String? = null
+    ): SalesActivity {
         val activity = salesActivityRepository.findById(id)
             .orElseThrow { IllegalArgumentException("Activity not found: $id") }
 
@@ -422,6 +435,10 @@ class SalesPipelineService(
         activity.closedAt = LocalDateTime.now()
         activity.updatedAt = LocalDateTime.now()
         activity.actualStartDate = actualStartDate
+        activity.matchRating = matchRating
+        activity.evaluationNotes = evaluationNotes
+        activity.evaluationDocumentUrl = evaluationDocumentUrl
+        activity.keyFactors = keyFactors
 
         val savedActivity = salesActivityRepository.save(activity)
 
@@ -479,7 +496,11 @@ class SalesPipelineService(
         id: Long,
         reason: ClosedReason,
         reasonNote: String?,
-        closedBy: User
+        closedBy: User,
+        matchRating: Int? = null,
+        evaluationNotes: String? = null,
+        evaluationDocumentUrl: String? = null,
+        keyFactors: String? = null
     ): SalesActivity {
         val activity = salesActivityRepository.findById(id)
             .orElseThrow { IllegalArgumentException("Activity not found: $id") }
@@ -491,6 +512,10 @@ class SalesPipelineService(
         activity.status = ActivityStatus.CLOSED_OTHER_WON // Using this as general closed state
         activity.closedReason = reason
         activity.closedReasonNote = reasonNote
+        activity.matchRating = matchRating
+        activity.evaluationNotes = evaluationNotes
+        activity.evaluationDocumentUrl = evaluationDocumentUrl
+        activity.keyFactors = keyFactors
         activity.closedAt = LocalDateTime.now()
         activity.updatedAt = LocalDateTime.now()
 

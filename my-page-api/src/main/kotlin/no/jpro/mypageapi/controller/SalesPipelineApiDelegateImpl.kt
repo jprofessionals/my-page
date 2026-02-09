@@ -241,7 +241,8 @@ class SalesPipelineApiDelegateImpl(
             offerDeadline = createSalesActivity.offerDeadline?.toOsloLocalDateTime(),
             offerDeadlineAsap = createSalesActivity.offerDeadlineAsap,
             interviewDate = createSalesActivity.interviewDate?.toOsloLocalDateTime(),
-            createdBy = currentUser
+            createdBy = currentUser,
+            jobPostingId = createSalesActivity.jobPostingId
         )
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -320,7 +321,11 @@ class SalesPipelineApiDelegateImpl(
             val activity = salesPipelineService.markActivityWon(
                 id,
                 currentUser,
-                markActivityWonRequest?.actualStartDate
+                markActivityWonRequest?.actualStartDate,
+                markActivityWonRequest?.matchRating,
+                markActivityWonRequest?.evaluationNotes,
+                markActivityWonRequest?.evaluationDocumentUrl,
+                markActivityWonRequest?.keyFactors?.joinToString(",") { it.name }
             )
             return ResponseEntity.ok(salesPipelineMapper.toSalesActivityModel(activity))
         } catch (e: IllegalArgumentException) {
@@ -343,7 +348,16 @@ class SalesPipelineApiDelegateImpl(
 
         try {
             val reason = ClosedReason.valueOf(closeActivity.reason.name)
-            val activity = salesPipelineService.closeActivity(id, reason, closeActivity.note, currentUser)
+            val activity = salesPipelineService.closeActivity(
+                id,
+                reason,
+                closeActivity.note,
+                currentUser,
+                closeActivity.matchRating,
+                closeActivity.evaluationNotes,
+                closeActivity.evaluationDocumentUrl,
+                closeActivity.keyFactors?.joinToString(",") { it.name }
+            )
             return ResponseEntity.ok(salesPipelineMapper.toSalesActivityModel(activity))
         } catch (e: IllegalArgumentException) {
             return ResponseEntity.notFound().build()
