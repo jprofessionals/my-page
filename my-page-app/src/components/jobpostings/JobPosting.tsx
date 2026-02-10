@@ -279,8 +279,8 @@ export const JobPosting = (jobPosting: JobPostingType) => {
                 </div>
               )}
 
-              {/* Hourly rate - if available and user is admin */}
-              {user?.admin && jobPosting.estimated_hourly_rate && (
+              {/* Hourly rate - if available */}
+              {jobPosting.estimated_hourly_rate && (
                 <div className="flex items-center gap-1.5 text-gray-600">
                   <FontAwesomeIcon
                     icon={faCoins}
