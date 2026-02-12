@@ -21,16 +21,18 @@ const STAGE_OPTIONS: { value: SalesStage; label: string }[] = [
   { value: 'INTERVIEW', label: 'Intervju' },
 ]
 
-// Searchable consultant picker component
+// Searchable multi-select consultant picker component
 function ConsultantPicker({
   consultants,
-  selectedId,
-  onSelect,
+  selectedIds,
+  onToggle,
+  onClearAll,
   loading,
 }: {
   consultants: FlowcaseConsultant[]
-  selectedId: string | null
-  onSelect: (consultant: FlowcaseConsultant | null) => void
+  selectedIds: Set<string>
+  onToggle: (consultant: FlowcaseConsultant) => void
+  onClearAll: () => void
   loading: boolean
 }) {
   const [search, setSearch] = useState('')
@@ -39,7 +41,7 @@ function ConsultantPicker({
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
 
-  const selectedConsultant = consultants.find((c) => c.id === selectedId)
+  const selectedConsultants = consultants.filter((c) => selectedIds.has(c.id))
 
   const filteredConsultants = consultants.filter((consultant) => {
     const searchLower = search.toLowerCase()
@@ -76,9 +78,7 @@ function ConsultantPicker({
           break
         case 'Enter':
           if (filteredConsultants[highlightedIndex]) {
-            onSelect(filteredConsultants[highlightedIndex])
-            setSearch('')
-            setIsOpen(false)
+            onToggle(filteredConsultants[highlightedIndex])
           }
           e.preventDefault()
           break
@@ -88,7 +88,7 @@ function ConsultantPicker({
           break
       }
     },
-    [isOpen, filteredConsultants, highlightedIndex, onSelect],
+    [isOpen, filteredConsultants, highlightedIndex, onToggle],
   )
 
   // Scroll highlighted item into view
@@ -105,23 +105,43 @@ function ConsultantPicker({
 
   return (
     <div className="relative">
+      {/* Selected consultants as badges */}
+      {selectedConsultants.length > 0 && (
+        <div className="flex flex-wrap gap-1 mb-2">
+          {selectedConsultants.map((c) => (
+            <span
+              key={c.id}
+              className="badge badge-primary gap-1 cursor-pointer"
+              onClick={() => onToggle(c)}
+            >
+              {c.name}
+              <span className="text-xs">✕</span>
+            </span>
+          ))}
+          <button
+            type="button"
+            className="badge badge-ghost gap-1 cursor-pointer"
+            onClick={onClearAll}
+          >
+            Fjern alle
+          </button>
+        </div>
+      )}
+
       <div className="flex gap-2">
         <div className="flex-1 relative">
           <input
             ref={inputRef}
             type="text"
             className="input input-bordered w-full"
-            placeholder={selectedConsultant ? '' : 'Søk etter konsulent...'}
-            value={isOpen ? search : selectedConsultant?.name || ''}
+            placeholder="Søk etter konsulent..."
+            value={search}
             onChange={(e) => {
               setSearch(e.target.value)
               if (!isOpen) setIsOpen(true)
             }}
             onFocus={() => {
               setIsOpen(true)
-              if (selectedConsultant) {
-                setSearch('')
-              }
             }}
             onBlur={() => {
               // Delay to allow click on list item
@@ -135,18 +155,6 @@ function ConsultantPicker({
             </div>
           )}
         </div>
-        {selectedConsultant && (
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            onClick={() => {
-              onSelect(null)
-              inputRef.current?.focus()
-            }}
-          >
-            ✕
-          </button>
-        )}
       </div>
 
       {isOpen && !loading && (
@@ -159,41 +167,48 @@ function ConsultantPicker({
               {search ? 'Ingen treff' : 'Ingen konsulenter funnet'}
             </li>
           ) : (
-            filteredConsultants.map((consultant, index) => (
-              <li
-                key={consultant.id}
-                className={`p-3 cursor-pointer hover:bg-base-200 flex items-center gap-3 ${
-                  index === highlightedIndex ? 'bg-base-200' : ''
-                } ${consultant.id === selectedId ? 'bg-primary/10' : ''}`}
-                onClick={() => {
-                  onSelect(consultant)
-                  setSearch('')
-                  setIsOpen(false)
-                }}
-              >
-                {consultant.imageUrl ? (
-                  <img
-                    src={consultant.imageUrl}
-                    alt=""
-                    className="w-8 h-8 rounded-full object-cover"
+            filteredConsultants.map((consultant, index) => {
+              const isSelected = selectedIds.has(consultant.id)
+              return (
+                <li
+                  key={consultant.id}
+                  className={`p-3 cursor-pointer hover:bg-base-200 flex items-center gap-3 ${
+                    index === highlightedIndex ? 'bg-base-200' : ''
+                  } ${isSelected ? 'bg-primary/10' : ''}`}
+                  onClick={() => {
+                    onToggle(consultant)
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    className="checkbox checkbox-sm checkbox-primary"
+                    checked={isSelected}
+                    readOnly
                   />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
-                    <span className="text-sm font-medium">
-                      {consultant.name?.charAt(0) || '?'}
-                    </span>
-                  </div>
-                )}
-                <div className="flex flex-col">
-                  <span className="font-medium">{consultant.name}</span>
-                  {consultant.email && (
-                    <span className="text-xs text-gray-500">
-                      {consultant.email}
-                    </span>
+                  {consultant.imageUrl ? (
+                    <img
+                      src={consultant.imageUrl}
+                      alt=""
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
+                      <span className="text-sm font-medium">
+                        {consultant.name?.charAt(0) || '?'}
+                      </span>
+                    </div>
                   )}
-                </div>
-              </li>
-            ))
+                  <div className="flex flex-col">
+                    <span className="font-medium">{consultant.name}</span>
+                    {consultant.email && (
+                      <span className="text-xs text-gray-500">
+                        {consultant.email}
+                      </span>
+                    )}
+                  </div>
+                </li>
+              )
+            })
           )}
         </ul>
       )}
@@ -209,9 +224,9 @@ export default function CreateActivityModal({
   const [loading, setLoading] = useState(false)
   const [consultants, setConsultants] = useState<FlowcaseConsultant[]>([])
   const [loadingData, setLoadingData] = useState(true)
-  const [selectedConsultantId, setSelectedConsultantId] = useState<
-    string | null
-  >(null)
+  const [selectedConsultantIds, setSelectedConsultantIds] = useState<
+    Set<string>
+  >(new Set())
 
   const [formData, setFormData] = useState({
     consultantId: undefined as number | undefined,
@@ -248,22 +263,23 @@ export default function CreateActivityModal({
     }
   }
 
-  const handleConsultantSelect = (consultant: FlowcaseConsultant | null) => {
-    if (consultant) {
-      setSelectedConsultantId(consultant.id)
-      // For now, we need to map Flowcase ID to internal user ID
-      // This might require a backend lookup, but for now we store the Flowcase ID
-      // and handle the mapping on the backend
-    } else {
-      setSelectedConsultantId(null)
-    }
+  const handleConsultantToggle = (consultant: FlowcaseConsultant) => {
+    setSelectedConsultantIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(consultant.id)) {
+        next.delete(consultant.id)
+      } else {
+        next.add(consultant.id)
+      }
+      return next
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!selectedConsultantId) {
-      toast.error('Du må velge en konsulent')
+    if (selectedConsultantIds.size === 0) {
+      toast.error('Du må velge minst én konsulent')
       return
     }
 
@@ -272,19 +288,18 @@ export default function CreateActivityModal({
       return
     }
 
+    // Validate all selected consultants have email
+    const selectedConsultants = consultants.filter((c) =>
+      selectedConsultantIds.has(c.id),
+    )
+    const missingEmail = selectedConsultants.find((c) => !c.email)
+    if (missingEmail) {
+      toast.error(`Konsulenten ${missingEmail.name || 'ukjent'} mangler e-post`)
+      return
+    }
+
     setLoading(true)
     try {
-      // Find the selected consultant to get their email for lookup
-      const selectedConsultant = consultants.find(
-        (c) => c.id === selectedConsultantId,
-      )
-
-      if (!selectedConsultant?.email) {
-        toast.error('Konsulenten mangler e-post')
-        setLoading(false)
-        return
-      }
-
       // Combine date and time for offerDeadline (if not ASAP)
       // Use ISO format with timezone offset to preserve local time
       let offerDeadline: string | undefined = undefined
@@ -315,28 +330,38 @@ export default function CreateActivityModal({
         interviewDate = `${formData.interviewDate}T${formData.interviewTime || '10:00'}:00${tzSign}${tzHours}:${tzMins}`
       }
 
-      // Create activity using flowcaseEmail - backend will find or create the user
-      await salesPipelineService.createActivity({
-        flowcaseEmail: selectedConsultant.email,
-        flowcaseName: selectedConsultant.name || undefined,
-        customerName: formData.customerName || undefined,
-        supplierName: formData.supplierName || undefined,
-        title: formData.title,
-        currentStage: formData.currentStage,
-        maxPrice: formData.maxPrice || undefined,
-        offeredPrice: formData.offeredPrice || undefined,
-        notes: formData.notes || undefined,
-        expectedStartDate: formData.expectedStartDate || undefined,
-        offerDeadline: offerDeadline,
-        offerDeadlineAsap: formData.offerDeadlineAsap,
-        interviewDate: interviewDate,
-        jobPostingId: jobPostingId || undefined,
-      })
-      toast.success('Aktivitet opprettet!')
+      // Create one activity per selected consultant
+      await Promise.all(
+        selectedConsultants.map((consultant) =>
+          salesPipelineService.createActivity({
+            flowcaseEmail: consultant.email!,
+            flowcaseName: consultant.name || undefined,
+            customerName: formData.customerName || undefined,
+            supplierName: formData.supplierName || undefined,
+            title: formData.title,
+            currentStage: formData.currentStage,
+            maxPrice: formData.maxPrice || undefined,
+            offeredPrice: formData.offeredPrice || undefined,
+            notes: formData.notes || undefined,
+            expectedStartDate: formData.expectedStartDate || undefined,
+            offerDeadline: offerDeadline,
+            offerDeadlineAsap: formData.offerDeadlineAsap,
+            interviewDate: interviewDate,
+            jobPostingId: jobPostingId || undefined,
+          }),
+        ),
+      )
+
+      const count = selectedConsultants.length
+      toast.success(
+        count === 1
+          ? 'Aktivitet opprettet!'
+          : `${count} aktiviteter opprettet!`,
+      )
       onCreated()
     } catch (error) {
       console.error('Failed to create activity:', error)
-      toast.error('Kunne ikke opprette aktiviteten')
+      toast.error('Kunne ikke opprette aktivitetene')
     } finally {
       setLoading(false)
     }
@@ -361,18 +386,21 @@ export default function CreateActivityModal({
         <h3 className="font-bold text-lg mb-4">Ny salgsaktivitet</h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Consultant picker (searchable) */}
+          {/* Consultant picker (searchable, multi-select) */}
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Konsulent *</span>
+              <span className="label-text">Konsulent(er) *</span>
               <span className="label-text-alt text-gray-500">
-                {consultants.length} konsulenter fra Flowcase
+                {selectedConsultantIds.size > 0
+                  ? `${selectedConsultantIds.size} valgt`
+                  : `${consultants.length} konsulenter fra Flowcase`}
               </span>
             </label>
             <ConsultantPicker
               consultants={consultants}
-              selectedId={selectedConsultantId}
-              onSelect={handleConsultantSelect}
+              selectedIds={selectedConsultantIds}
+              onToggle={handleConsultantToggle}
+              onClearAll={() => setSelectedConsultantIds(new Set())}
               loading={loadingData}
             />
           </div>
