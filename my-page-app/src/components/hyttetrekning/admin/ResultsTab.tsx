@@ -6,7 +6,11 @@ interface ResultsTabProps {
   auditLog?: string[]
 }
 
-export default function ResultsTab({ periods, allocations, auditLog = [] }: ResultsTabProps) {
+export default function ResultsTab({
+  periods,
+  allocations,
+  auditLog = [],
+}: ResultsTabProps) {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-6">Oversikt over tildelinger</h2>
@@ -33,7 +37,9 @@ export default function ResultsTab({ periods, allocations, auditLog = [] }: Resu
 
           {/* Resultater per periode */}
           <div>
-            <h3 className="font-medium text-lg mb-3">Tildelinger per periode</h3>
+            <h3 className="font-medium text-lg mb-3">
+              Tildelinger per periode
+            </h3>
             <div className="space-y-4">
               {periods.map((period) => {
                 const periodAllocs = allocations
@@ -45,10 +51,15 @@ export default function ResultsTab({ periods, allocations, auditLog = [] }: Resu
                     if (sortOrderA !== sortOrderB) {
                       return sortOrderA - sortOrderB
                     }
-                    return (a.apartmentName || '').localeCompare(b.apartmentName || '')
+                    return (a.apartmentName || '').localeCompare(
+                      b.apartmentName || '',
+                    )
                   })
                 return (
-                  <div key={period.id} className="border border-gray-200 rounded-lg p-4">
+                  <div
+                    key={period.id}
+                    className="border border-gray-200 rounded-lg p-4"
+                  >
                     <h4 className="font-medium mb-3">{period.description}</h4>
                     {periodAllocs.length === 0 ? (
                       <p className="text-sm text-gray-500">Ingen tildelinger</p>
@@ -59,8 +70,12 @@ export default function ResultsTab({ periods, allocations, auditLog = [] }: Resu
                             key={allocation.id}
                             className="flex justify-between items-center text-sm"
                           >
-                            <span className="font-medium">{allocation.apartmentName}</span>
-                            <span className="text-gray-600">{allocation.userName}</span>
+                            <span className="font-medium">
+                              {allocation.apartmentName}
+                            </span>
+                            <span className="text-gray-600">
+                              {allocation.userName}
+                            </span>
                           </div>
                         ))}
                       </div>

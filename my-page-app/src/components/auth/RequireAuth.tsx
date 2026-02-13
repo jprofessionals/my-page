@@ -15,7 +15,10 @@ function RequireAuth({ children }: PropsWithChildren) {
   // In development, check if test user is set
   useEffect(() => {
     setIsMounted(true)
-    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+    if (
+      process.env.NODE_ENV === 'development' &&
+      typeof window !== 'undefined'
+    ) {
       const storedId = localStorage.getItem('testUserId')
       setTestUserId(storedId || '1')
       setUseTestUser(!!storedId)
@@ -26,9 +29,7 @@ function RequireAuth({ children }: PropsWithChildren) {
   if (process.env.NODE_ENV === 'development' && useTestUser) {
     if (userFetchStatus === 'fetched') return <>{children}</>
     if (userFetchStatus === 'fetchingUser') {
-      return (
-        <p>Henter brukeropplysninger med test-bruker...</p>
-      )
+      return <p>Henter brukeropplysninger med test-bruker...</p>
     }
     if (userFetchStatus === 'fetchFailed' || userFetchStatus === 'init') {
       return (
@@ -51,8 +52,8 @@ function RequireAuth({ children }: PropsWithChildren) {
               Sesjonen har utløpt
             </h2>
             <p className="text-amber-700 mb-4">
-              Du har blitt logget ut. Dette kan skje etter en oppdatering av
-              Min Side eller hvis du har vært inaktiv en stund.
+              Du har blitt logget ut. Dette kan skje etter en oppdatering av Min
+              Side eller hvis du har vært inaktiv en stund.
             </p>
             <p className="text-amber-600 text-sm">
               Logg inn på nytt for å fortsette.

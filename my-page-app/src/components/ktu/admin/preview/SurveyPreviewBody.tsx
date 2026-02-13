@@ -60,7 +60,6 @@ interface SurveyPreviewBodyProps {
   disabled?: boolean
 }
 
-
 export default function SurveyPreviewBody({
   surveyName,
   year,
@@ -87,14 +86,16 @@ export default function SurveyPreviewBody({
 
   // Update ordered questions when props change
   useEffect(() => {
-    const sorted = [...questions].sort((a, b) => a.displayOrder - b.displayOrder)
+    const sorted = [...questions].sort(
+      (a, b) => a.displayOrder - b.displayOrder,
+    )
     setOrderedQuestions(sorted)
   }, [questions])
 
   // Get sortable IDs
   const questionIds = useMemo(
     () => orderedQuestions.map((rq) => `question-${rq.question.id}`),
-    [orderedQuestions]
+    [orderedQuestions],
   )
 
   // DnD sensors
@@ -106,7 +107,7 @@ export default function SurveyPreviewBody({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   )
 
   // Handle drag end
@@ -130,7 +131,11 @@ export default function SurveyPreviewBody({
   // Track which rating question is first (to show labels only on first)
   let firstRatingQuestionIndex = -1
   orderedQuestions.forEach((rq, idx) => {
-    if (rq.active && rq.question.questionType === 'RATING_1_6' && firstRatingQuestionIndex === -1) {
+    if (
+      rq.active &&
+      rq.question.questionType === 'RATING_1_6' &&
+      firstRatingQuestionIndex === -1
+    ) {
       firstRatingQuestionIndex = idx
     }
   })
@@ -190,7 +195,8 @@ export default function SurveyPreviewBody({
           textClassName="text-gray-600"
         />
         <p className="text-gray-500 mt-2">
-          Spørsmål merket med <span className="text-red-500">*</span> er obligatoriske.
+          Spørsmål merket med <span className="text-red-500">*</span> er
+          obligatoriske.
         </p>
       </div>
 
@@ -200,7 +206,10 @@ export default function SurveyPreviewBody({
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={questionIds} strategy={verticalListSortingStrategy}>
+        <SortableContext
+          items={questionIds}
+          strategy={verticalListSortingStrategy}
+        >
           <div className="space-y-4">
             {activeQuestions.map((rq) => {
               const isFirstRating =
@@ -208,7 +217,8 @@ export default function SurveyPreviewBody({
                 orderedQuestions.indexOf(rq) === firstRatingQuestionIndex
 
               // Use per-question label if set, otherwise use default
-              const questionCommentLabel = rq.commentFieldLabel || defaultCommentFieldLabel
+              const questionCommentLabel =
+                rq.commentFieldLabel || defaultCommentFieldLabel
 
               return (
                 <SortableQuestionItem
@@ -221,11 +231,17 @@ export default function SurveyPreviewBody({
                   ratingLabelHigh={ratingLabelHigh}
                   commentFieldLabel={questionCommentLabel}
                   primaryColor={primaryColor}
-                  onQuestionTextChange={(value) => onQuestionTextChange(rq.question.id, value)}
-                  onRequiredChange={(value) => onRequiredChange(rq.question.id, value)}
+                  onQuestionTextChange={(value) =>
+                    onQuestionTextChange(rq.question.id, value)
+                  }
+                  onRequiredChange={(value) =>
+                    onRequiredChange(rq.question.id, value)
+                  }
                   onRatingLabelLowChange={onRatingLabelLowChange}
                   onRatingLabelHighChange={onRatingLabelHighChange}
-                  onCommentFieldLabelChange={(value) => onCommentFieldLabelChange(rq.question.id, value)}
+                  onCommentFieldLabelChange={(value) =>
+                    onCommentFieldLabelChange(rq.question.id, value)
+                  }
                   disabled={disabled}
                   showRatingLabels={isFirstRating}
                 />
@@ -238,7 +254,8 @@ export default function SurveyPreviewBody({
       {activeQuestions.length === 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
           <p className="text-yellow-800">
-            Ingen aktive spørsmål. Legg til spørsmål i &quot;Spørsmål&quot;-fanen.
+            Ingen aktive spørsmål. Legg til spørsmål i
+            &quot;Spørsmål&quot;-fanen.
           </p>
         </div>
       )}

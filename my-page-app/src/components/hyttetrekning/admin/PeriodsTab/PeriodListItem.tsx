@@ -1,4 +1,8 @@
-import type { Period, PeriodFormState, DrawingStatus } from '@/types/cabinLottery.types'
+import type {
+  Period,
+  PeriodFormState,
+  DrawingStatus,
+} from '@/types/cabinLottery.types'
 import PeriodForm from './PeriodForm'
 
 interface PeriodListItemProps {
@@ -8,7 +12,10 @@ interface PeriodListItemProps {
   editForm: PeriodFormState
   onEdit: (period: Period) => void
   onDelete: (periodId: string) => Promise<void>
-  onUpdateFormField: (field: keyof PeriodFormState, value: string | number) => void
+  onUpdateFormField: (
+    field: keyof PeriodFormState,
+    value: string | number,
+  ) => void
   onSaveEdit: () => Promise<void>
   onCancelEdit: () => void
 }
@@ -49,11 +56,15 @@ export default function PeriodListItem({
             {new Date(period.endDate).toLocaleDateString('nb-NO')}
           </p>
           {period.comment && (
-            <p className="text-sm text-gray-600 mt-1 italic">{period.comment}</p>
+            <p className="text-sm text-gray-600 mt-1 italic">
+              {period.comment}
+            </p>
           )}
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-400">Sort: {period.sortOrder}</span>
+          <span className="text-xs text-gray-400">
+            Sort: {period.sortOrder}
+          </span>
           {(drawingStatus === 'DRAFT' || drawingStatus === 'OPEN') && (
             <>
               <button

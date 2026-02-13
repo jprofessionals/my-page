@@ -592,12 +592,27 @@ export default function CustomerTab() {
                                                 <td className="text-xs">
                                                   {activity.submittedAt ? (
                                                     <>
-                                                      {new Date(activity.submittedAt).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })}
+                                                      {new Date(
+                                                        activity.submittedAt,
+                                                      ).toLocaleDateString(
+                                                        'nb-NO',
+                                                        {
+                                                          day: 'numeric',
+                                                          month: 'short',
+                                                        },
+                                                      )}
                                                       <span className="text-gray-500 ml-1">
-                                                        ({activity.submittedTo === 'SUPPLIER' ? 'lev.' : 'kunde'})
+                                                        (
+                                                        {activity.submittedTo ===
+                                                        'SUPPLIER'
+                                                          ? 'lev.'
+                                                          : 'kunde'}
+                                                        )
                                                       </span>
                                                     </>
-                                                  ) : '-'}
+                                                  ) : (
+                                                    '-'
+                                                  )}
                                                 </td>
                                                 <td className="text-center">
                                                   {activity.status === 'WON' ||

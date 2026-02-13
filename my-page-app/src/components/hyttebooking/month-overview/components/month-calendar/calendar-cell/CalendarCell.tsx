@@ -1,9 +1,4 @@
-import {
-  Apartment,
-  Booking,
-  BookingPost,
-  User,
-} from '@/types'
+import { Apartment, Booking, BookingPost, User } from '@/types'
 import { PendingBookingTrain } from '@/data/types/types.gen'
 import React, { useMemo } from 'react'
 import { CalendarDay } from 'react-day-picker'

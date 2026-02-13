@@ -5,12 +5,19 @@
  * Use them to keep tests DRY and consistent.
  */
 
-import type { Drawing, Period, Wish, Allocation } from '@/types/cabinLottery.types'
+import type {
+  Drawing,
+  Period,
+  Wish,
+  Allocation,
+} from '@/types/cabinLottery.types'
 
 /**
  * Create a mock Drawing object
  */
-export const createMockDrawing = (overrides: Partial<Drawing> = {}): Drawing => ({
+export const createMockDrawing = (
+  overrides: Partial<Drawing> = {},
+): Drawing => ({
   id: 'test-drawing-id',
   season: 'Test Sommer 2025',
   status: 'DRAFT',
@@ -63,7 +70,9 @@ export const createMockWish = (overrides: Partial<Wish> = {}): Wish => ({
 /**
  * Create a mock Allocation object
  */
-export const createMockAllocation = (overrides: Partial<Allocation> = {}): Allocation => ({
+export const createMockAllocation = (
+  overrides: Partial<Allocation> = {},
+): Allocation => ({
   id: 'test-allocation-id',
   periodId: 'test-period-id',
   periodDescription: 'Påske',

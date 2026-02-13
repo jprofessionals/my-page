@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import ktuService, { KtuRound, KtuRoundStatus, CreateKtuRound, UpdateKtuRound } from '@/services/ktu.service'
+import ktuService, {
+  KtuRound,
+  KtuRoundStatus,
+  CreateKtuRound,
+  UpdateKtuRound,
+} from '@/services/ktu.service'
 import SurveyImportModal from './SurveyImportModal'
 
 interface Props {
@@ -92,9 +97,10 @@ export default function SurveysTab({ onSelectSurvey }: Props) {
   const handleDeleteSurvey = async (survey: KtuRound, e: React.MouseEvent) => {
     e.stopPropagation()
 
-    const warningMessage = survey.status === 'DRAFT'
-      ? 'Er du sikker på at du vil slette denne undersøkelsen?'
-      : `ADVARSEL: Denne undersøkelsen har status "${getStatusText(survey.status)}". Sletting vil fjerne alle tilknyttede data (invitasjoner, svar, etc.). Er du helt sikker?`
+    const warningMessage =
+      survey.status === 'DRAFT'
+        ? 'Er du sikker på at du vil slette denne undersøkelsen?'
+        : `ADVARSEL: Denne undersøkelsen har status "${getStatusText(survey.status)}". Sletting vil fjerne alle tilknyttede data (invitasjoner, svar, etc.). Er du helt sikker?`
 
     if (!confirm(warningMessage)) return
 
@@ -104,25 +110,35 @@ export default function SurveysTab({ onSelectSurvey }: Props) {
       loadSurveys()
     } catch (error) {
       console.error('Failed to delete survey:', error)
-      toast.error('Feil ved sletting av undersøkelse. Sjekk at alle tilknyttede data kan slettes.')
+      toast.error(
+        'Feil ved sletting av undersøkelse. Sjekk at alle tilknyttede data kan slettes.',
+      )
     }
   }
 
   const getStatusStyle = (status: KtuRoundStatus) => {
     switch (status) {
-      case 'DRAFT': return 'bg-gray-100 text-gray-700'
-      case 'OPEN': return 'bg-green-100 text-green-700'
-      case 'CLOSED': return 'bg-blue-100 text-blue-700'
-      default: return 'bg-gray-100 text-gray-700'
+      case 'DRAFT':
+        return 'bg-gray-100 text-gray-700'
+      case 'OPEN':
+        return 'bg-green-100 text-green-700'
+      case 'CLOSED':
+        return 'bg-blue-100 text-blue-700'
+      default:
+        return 'bg-gray-100 text-gray-700'
     }
   }
 
   const getStatusText = (status: KtuRoundStatus) => {
     switch (status) {
-      case 'DRAFT': return 'Utkast'
-      case 'OPEN': return 'Aktiv'
-      case 'CLOSED': return 'Avsluttet'
-      default: return status
+      case 'DRAFT':
+        return 'Utkast'
+      case 'OPEN':
+        return 'Aktiv'
+      case 'CLOSED':
+        return 'Avsluttet'
+      default:
+        return status
     }
   }
 
@@ -136,7 +152,9 @@ export default function SurveysTab({ onSelectSurvey }: Props) {
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Undersøkelser</h2>
-          <p className="text-sm text-gray-500">Administrer kundetilfredshetsundersøkelser</p>
+          <p className="text-sm text-gray-500">
+            Administrer kundetilfredshetsundersøkelser
+          </p>
         </div>
         <div className="flex gap-3">
           <button
@@ -157,8 +175,18 @@ export default function SurveysTab({ onSelectSurvey }: Props) {
       {/* Surveys list */}
       {surveys.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow">
-          <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          <svg
+            className="w-12 h-12 mx-auto mb-4 text-gray-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
           </svg>
           <p className="text-gray-500 mb-4">Ingen undersøkelser enna</p>
           <div className="flex justify-center gap-3">
@@ -207,13 +235,17 @@ export default function SurveysTab({ onSelectSurvey }: Props) {
                   onClick={() => onSelectSurvey?.(survey)}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{survey.name}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {survey.name}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {survey.year}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusStyle(survey.status)}`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusStyle(survey.status)}`}
+                    >
                       {getStatusText(survey.status)}
                     </span>
                   </td>
@@ -257,21 +289,32 @@ export default function SurveysTab({ onSelectSurvey }: Props) {
             <h2 className="text-xl font-bold mb-4">Ny undersøkelse</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Navn *
+                </label>
                 <input
                   type="text"
                   value={newSurvey.name}
-                  onChange={(e) => setNewSurvey({ ...newSurvey, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewSurvey({ ...newSurvey, name: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="f.eks. KTU Var 2025"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ar *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Ar *
+                </label>
                 <input
                   type="number"
                   value={newSurvey.year}
-                  onChange={(e) => setNewSurvey({ ...newSurvey, year: parseInt(e.target.value) })}
+                  onChange={(e) =>
+                    setNewSurvey({
+                      ...newSurvey,
+                      year: parseInt(e.target.value),
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   min="2020"
                   max="2030"
@@ -304,17 +347,22 @@ export default function SurveysTab({ onSelectSurvey }: Props) {
             <h2 className="text-xl font-bold mb-4">Rediger undersøkelse</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Navn *
+                </label>
                 <input
                   type="text"
                   value={editForm.name || ''}
-                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, name: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="f.eks. KTU Var 2025"
                 />
               </div>
               <div className="text-sm text-gray-500">
-                Ar: {editingSurvey.year} | Status: {getStatusText(editingSurvey.status)}
+                Ar: {editingSurvey.year} | Status:{' '}
+                {getStatusText(editingSurvey.status)}
               </div>
             </div>
             <div className="mt-6 flex justify-end space-x-3">

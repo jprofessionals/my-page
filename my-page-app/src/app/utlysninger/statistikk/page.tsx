@@ -83,43 +83,47 @@ export default function StatistikkPage() {
   const [showTotalAndTrend, setShowTotalAndTrend] = useState(true)
   const [isPollingStatus, setIsPollingStatus] = useState(false)
   const [wasEverRunning, setWasEverRunning] = useState(false)
-  const { data: categorizationStatus } = useCategorizationStatus(isPollingStatus)
+  const { data: categorizationStatus } =
+    useCategorizationStatus(isPollingStatus)
 
   // Drill-down state
-  const [selectedCategory, setSelectedCategory] = useState<TechCategory | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<TechCategory | null>(
+    null,
+  )
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null)
   const [selectedCategoryLabel, setSelectedCategoryLabel] = useState<string>('')
-  const { data: drillDownData, isLoading: isDrillDownLoading } = useJobPostingsByCategory(
-    selectedCategory,
-    selectedMonth
-  )
+  const { data: drillDownData, isLoading: isDrillDownLoading } =
+    useJobPostingsByCategory(selectedCategory, selectedMonth)
 
   // Handler for clicking on a data point
   const handleDataPointClick = (categoryKey: string, month: string) => {
     if (month && CATEGORY_TO_TECH_CATEGORY[categoryKey]) {
       setSelectedCategory(CATEGORY_TO_TECH_CATEGORY[categoryKey])
       setSelectedMonth(month)
-      setSelectedCategoryLabel(CATEGORY_LABELS[categoryKey as keyof typeof CATEGORY_LABELS])
+      setSelectedCategoryLabel(
+        CATEGORY_LABELS[categoryKey as keyof typeof CATEGORY_LABELS],
+      )
     }
   }
 
   // Create clickable active dot component for each category
   // eslint-disable-next-line react/display-name, @typescript-eslint/no-explicit-any
-  const createClickableDot = (categoryKey: string, color: string) => (props: any) => {
-    const { cx, cy, payload } = props
-    return (
-      <circle
-        cx={cx}
-        cy={cy}
-        r={8}
-        fill={color}
-        stroke="white"
-        strokeWidth={2}
-        style={{ cursor: 'pointer' }}
-        onClick={() => handleDataPointClick(categoryKey, payload?.month)}
-      />
-    )
-  }
+  const createClickableDot =
+    (categoryKey: string, color: string) => (props: any) => {
+      const { cx, cy, payload } = props
+      return (
+        <circle
+          cx={cx}
+          cy={cy}
+          r={8}
+          fill={color}
+          stroke="white"
+          strokeWidth={2}
+          style={{ cursor: 'pointer' }}
+          onClick={() => handleDataPointClick(categoryKey, payload?.month)}
+        />
+      )
+    }
 
   const closeDrillDown = () => {
     setSelectedCategory(null)
@@ -144,7 +148,12 @@ export default function StatistikkPage() {
 
   // Stop polling only when categorization was running and has now stopped
   useEffect(() => {
-    if (isPollingStatus && wasEverRunning && categorizationStatus && !categorizationStatus.isRunning) {
+    if (
+      isPollingStatus &&
+      wasEverRunning &&
+      categorizationStatus &&
+      !categorizationStatus.isRunning
+    ) {
       setIsPollingStatus(false)
       setWasEverRunning(false)
       // Refresh statistics to show updated data
@@ -152,7 +161,8 @@ export default function StatistikkPage() {
     }
   }, [categorizationStatus, isPollingStatus, wasEverRunning, queryClient])
 
-  const isCategorizationRunning = isCategorizing || isRecategorizing || categorizationStatus?.isRunning
+  const isCategorizationRunning =
+    isCategorizing || isRecategorizing || categorizationStatus?.isRunning
 
   const chartData = useMemo(() => {
     if (!statistics?.monthlyData) return []
@@ -166,7 +176,12 @@ export default function StatistikkPage() {
     // First pass: add total
     const dataWithTotal = data.map((item) => ({
       ...item,
-      total: (item.javaKotlin ?? 0) + (item.dotnet ?? 0) + (item.dataAnalytics ?? 0) + (item.frontend ?? 0) + (item.other ?? 0),
+      total:
+        (item.javaKotlin ?? 0) +
+        (item.dotnet ?? 0) +
+        (item.dataAnalytics ?? 0) +
+        (item.frontend ?? 0) +
+        (item.other ?? 0),
       monthLabel: formatMonth(item.month || ''),
     }))
 
@@ -175,7 +190,10 @@ export default function StatistikkPage() {
       let movingAvg: number | null = null
       if (index >= 2) {
         // We have at least 3 data points
-        const sum = dataWithTotal[index].total + dataWithTotal[index - 1].total + dataWithTotal[index - 2].total
+        const sum =
+          dataWithTotal[index].total +
+          dataWithTotal[index - 1].total +
+          dataWithTotal[index - 2].total
         movingAvg = Math.round((sum / 3) * 10) / 10 // Round to 1 decimal
       }
       return {
@@ -230,23 +248,29 @@ export default function StatistikkPage() {
               />
               Vis total og trend
             </label>
-            {user?.admin && statistics?.uncategorizedCount !== undefined && statistics.uncategorizedCount > 0 && (
-              <button
-                onClick={() => categorize()}
-                disabled={isCategorizationRunning}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors text-sm"
-              >
-                {isCategorizationRunning
-                  ? categorizationStatus
-                    ? `Kategoriserer... (${categorizationStatus.progress}/${categorizationStatus.total})`
-                    : 'Starter kategorisering...'
-                  : `Kategoriser ${statistics.uncategorizedCount} ukategoriserte`}
-              </button>
-            )}
+            {user?.admin &&
+              statistics?.uncategorizedCount !== undefined &&
+              statistics.uncategorizedCount > 0 && (
+                <button
+                  onClick={() => categorize()}
+                  disabled={isCategorizationRunning}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors text-sm"
+                >
+                  {isCategorizationRunning
+                    ? categorizationStatus
+                      ? `Kategoriserer... (${categorizationStatus.progress}/${categorizationStatus.total})`
+                      : 'Starter kategorisering...'
+                    : `Kategoriser ${statistics.uncategorizedCount} ukategoriserte`}
+                </button>
+              )}
             {user?.admin && (
               <button
                 onClick={() => {
-                  if (window.confirm('Er du sikker på at du vil rekategorisere alle utlysninger? Dette vil nullstille alle eksisterende kategorier og kjøre AI-kategorisering på nytt.')) {
+                  if (
+                    window.confirm(
+                      'Er du sikker på at du vil rekategorisere alle utlysninger? Dette vil nullstille alle eksisterende kategorier og kjøre AI-kategorisering på nytt.',
+                    )
+                  ) {
                     setIsPollingStatus(true)
                     recategorizeAll()
                   }
@@ -273,7 +297,8 @@ export default function StatistikkPage() {
               </p>
               {categorizationStatus && (
                 <p className="text-blue-600 text-sm">
-                  {categorizationStatus.progress ?? 0} av {categorizationStatus.total ?? '?'}
+                  {categorizationStatus.progress ?? 0} av{' '}
+                  {categorizationStatus.total ?? '?'}
                 </p>
               )}
             </div>
@@ -281,9 +306,11 @@ export default function StatistikkPage() {
               <div
                 className="bg-blue-600 h-3 rounded-full transition-all duration-300"
                 style={{
-                  width: categorizationStatus && (categorizationStatus.total ?? 0) > 0
-                    ? `${((categorizationStatus.progress ?? 0) / (categorizationStatus.total ?? 1)) * 100}%`
-                    : '0%'
+                  width:
+                    categorizationStatus &&
+                    (categorizationStatus.total ?? 0) > 0
+                      ? `${((categorizationStatus.progress ?? 0) / (categorizationStatus.total ?? 1)) * 100}%`
+                      : '0%',
                 }}
               />
             </div>
@@ -296,17 +323,18 @@ export default function StatistikkPage() {
         )}
 
         {/* Uncategorized warning */}
-        {statistics?.uncategorizedCount !== undefined && statistics.uncategorizedCount > 0 && (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-yellow-800">
-              {statistics.uncategorizedCount} utlysninger er ikke kategorisert
-              ennå.
-              {user?.admin
-                ? ' Klikk "Kategoriser" for å bruke AI til å kategorisere dem.'
-                : ' Be en administrator om å kjøre kategorisering.'}
-            </p>
-          </div>
-        )}
+        {statistics?.uncategorizedCount !== undefined &&
+          statistics.uncategorizedCount > 0 && (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-yellow-800">
+                {statistics.uncategorizedCount} utlysninger er ikke kategorisert
+                ennå.
+                {user?.admin
+                  ? ' Klikk "Kategoriser" for å bruke AI til å kategorisere dem.'
+                  : ' Be en administrator om å kjøre kategorisering.'}
+              </p>
+            </div>
+          )}
 
         {/* Chart */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
@@ -348,39 +376,59 @@ export default function StatistikkPage() {
                     return (
                       <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
                         <p className="font-semibold text-gray-800 mb-2 border-b pb-2">
-                          {formatMonth(month)} <span className="text-xs text-gray-500 font-normal">(klikk for å velge)</span>
+                          {formatMonth(month)}{' '}
+                          <span className="text-xs text-gray-500 font-normal">
+                            (klikk for å velge)
+                          </span>
                         </p>
                         <div className="space-y-1">
-                          {Object.entries(CATEGORY_LABELS).map(([key, label]) => {
-                            const value = data?.[key] ?? 0
-                            const color = CATEGORY_COLORS[key as keyof typeof CATEGORY_COLORS]
-                            return (
-                              <button
-                                key={key}
-                                onClick={() => handleDataPointClick(key, month)}
-                                className="flex items-center justify-between w-full px-2 py-1 rounded hover:bg-gray-100 transition-colors text-left"
-                              >
-                                <span className="flex items-center gap-2">
-                                  <span
-                                    className="w-3 h-3 rounded-full"
-                                    style={{ backgroundColor: color }}
-                                  />
-                                  <span className="text-sm text-gray-700">{label}</span>
-                                </span>
-                                <span className="text-sm font-medium text-gray-900">{value}</span>
-                              </button>
-                            )
-                          })}
+                          {Object.entries(CATEGORY_LABELS).map(
+                            ([key, label]) => {
+                              const value = data?.[key] ?? 0
+                              const color =
+                                CATEGORY_COLORS[
+                                  key as keyof typeof CATEGORY_COLORS
+                                ]
+                              return (
+                                <button
+                                  key={key}
+                                  onClick={() =>
+                                    handleDataPointClick(key, month)
+                                  }
+                                  className="flex items-center justify-between w-full px-2 py-1 rounded hover:bg-gray-100 transition-colors text-left"
+                                >
+                                  <span className="flex items-center gap-2">
+                                    <span
+                                      className="w-3 h-3 rounded-full"
+                                      style={{ backgroundColor: color }}
+                                    />
+                                    <span className="text-sm text-gray-700">
+                                      {label}
+                                    </span>
+                                  </span>
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {value}
+                                  </span>
+                                </button>
+                              )
+                            },
+                          )}
                           {showTotalAndTrend && (
                             <div className="flex items-center justify-between w-full px-2 py-1 border-t border-gray-200 mt-1 pt-1">
                               <span className="flex items-center gap-2">
                                 <span
                                   className="w-3 h-3 rounded-full"
-                                  style={{ backgroundColor: CATEGORY_COLORS.total }}
+                                  style={{
+                                    backgroundColor: CATEGORY_COLORS.total,
+                                  }}
                                 />
-                                <span className="text-sm font-semibold text-gray-700">Total</span>
+                                <span className="text-sm font-semibold text-gray-700">
+                                  Total
+                                </span>
                               </span>
-                              <span className="text-sm font-bold text-gray-900">{data?.total ?? 0}</span>
+                              <span className="text-sm font-bold text-gray-900">
+                                {data?.total ?? 0}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -395,8 +443,16 @@ export default function StatistikkPage() {
                   name={CATEGORY_LABELS.javaKotlin}
                   stroke={CATEGORY_COLORS.javaKotlin}
                   strokeWidth={2}
-                  dot={{ fill: CATEGORY_COLORS.javaKotlin, strokeWidth: 0, r: 4, cursor: 'pointer' }}
-                  activeDot={createClickableDot('javaKotlin', CATEGORY_COLORS.javaKotlin)}
+                  dot={{
+                    fill: CATEGORY_COLORS.javaKotlin,
+                    strokeWidth: 0,
+                    r: 4,
+                    cursor: 'pointer',
+                  }}
+                  activeDot={createClickableDot(
+                    'javaKotlin',
+                    CATEGORY_COLORS.javaKotlin,
+                  )}
                 />
                 <Line
                   type="monotone"
@@ -404,8 +460,16 @@ export default function StatistikkPage() {
                   name={CATEGORY_LABELS.dotnet}
                   stroke={CATEGORY_COLORS.dotnet}
                   strokeWidth={2}
-                  dot={{ fill: CATEGORY_COLORS.dotnet, strokeWidth: 0, r: 4, cursor: 'pointer' }}
-                  activeDot={createClickableDot('dotnet', CATEGORY_COLORS.dotnet)}
+                  dot={{
+                    fill: CATEGORY_COLORS.dotnet,
+                    strokeWidth: 0,
+                    r: 4,
+                    cursor: 'pointer',
+                  }}
+                  activeDot={createClickableDot(
+                    'dotnet',
+                    CATEGORY_COLORS.dotnet,
+                  )}
                 />
                 <Line
                   type="monotone"
@@ -413,8 +477,16 @@ export default function StatistikkPage() {
                   name={CATEGORY_LABELS.dataAnalytics}
                   stroke={CATEGORY_COLORS.dataAnalytics}
                   strokeWidth={2}
-                  dot={{ fill: CATEGORY_COLORS.dataAnalytics, strokeWidth: 0, r: 4, cursor: 'pointer' }}
-                  activeDot={createClickableDot('dataAnalytics', CATEGORY_COLORS.dataAnalytics)}
+                  dot={{
+                    fill: CATEGORY_COLORS.dataAnalytics,
+                    strokeWidth: 0,
+                    r: 4,
+                    cursor: 'pointer',
+                  }}
+                  activeDot={createClickableDot(
+                    'dataAnalytics',
+                    CATEGORY_COLORS.dataAnalytics,
+                  )}
                 />
                 <Line
                   type="monotone"
@@ -422,8 +494,16 @@ export default function StatistikkPage() {
                   name={CATEGORY_LABELS.frontend}
                   stroke={CATEGORY_COLORS.frontend}
                   strokeWidth={2}
-                  dot={{ fill: CATEGORY_COLORS.frontend, strokeWidth: 0, r: 4, cursor: 'pointer' }}
-                  activeDot={createClickableDot('frontend', CATEGORY_COLORS.frontend)}
+                  dot={{
+                    fill: CATEGORY_COLORS.frontend,
+                    strokeWidth: 0,
+                    r: 4,
+                    cursor: 'pointer',
+                  }}
+                  activeDot={createClickableDot(
+                    'frontend',
+                    CATEGORY_COLORS.frontend,
+                  )}
                 />
                 <Line
                   type="monotone"
@@ -431,7 +511,12 @@ export default function StatistikkPage() {
                   name={CATEGORY_LABELS.other}
                   stroke={CATEGORY_COLORS.other}
                   strokeWidth={2}
-                  dot={{ fill: CATEGORY_COLORS.other, strokeWidth: 0, r: 4, cursor: 'pointer' }}
+                  dot={{
+                    fill: CATEGORY_COLORS.other,
+                    strokeWidth: 0,
+                    r: 4,
+                    cursor: 'pointer',
+                  }}
                   activeDot={createClickableDot('other', CATEGORY_COLORS.other)}
                 />
                 {showTotalAndTrend && (
@@ -542,7 +627,9 @@ export default function StatistikkPage() {
             </div>
             <div className="p-6 overflow-y-auto max-h-[60vh]">
               {isDrillDownLoading ? (
-                <p className="text-gray-500 text-center py-8">Laster utlysninger...</p>
+                <p className="text-gray-500 text-center py-8">
+                  Laster utlysninger...
+                </p>
               ) : drillDownData && drillDownData.length > 0 ? (
                 <div className="space-y-4">
                   {drillDownData.map((posting) => (
@@ -554,8 +641,12 @@ export default function StatistikkPage() {
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="font-semibold text-gray-900">{posting.title}</h3>
-                          <p className="text-sm text-gray-600 mt-1">{posting.customer?.name}</p>
+                          <h3 className="font-semibold text-gray-900">
+                            {posting.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {posting.customer?.name}
+                          </p>
                         </div>
                         {posting.urgent && (
                           <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded">
@@ -565,14 +656,19 @@ export default function StatistikkPage() {
                       </div>
                       {posting.deadline && (
                         <p className="text-xs text-gray-500 mt-2">
-                          Frist: {new Date(posting.deadline).toLocaleDateString('nb-NO')}
+                          Frist:{' '}
+                          {new Date(posting.deadline).toLocaleDateString(
+                            'nb-NO',
+                          )}
                         </p>
                       )}
                     </Link>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">Ingen utlysninger funnet</p>
+                <p className="text-gray-500 text-center py-8">
+                  Ingen utlysninger funnet
+                </p>
               )}
             </div>
           </div>

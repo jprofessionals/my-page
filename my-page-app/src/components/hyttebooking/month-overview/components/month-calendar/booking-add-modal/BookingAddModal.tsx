@@ -1,10 +1,7 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import ApiService from '@/services/api.service'
 import { createPendingBooking } from '@/data/types/sdk.gen'
-import {
-  type Apartment,
-  type CreateBooking
-} from '@/data/types/types.gen'
+import { type Apartment, type CreateBooking } from '@/data/types/types.gen'
 import { type User } from '@/types'
 import '@/services/openapi-client'
 import { Button } from '@/components/ui/button'

@@ -227,7 +227,10 @@ const ktuService = {
     return createKtuOrganization({ body: data })
   },
 
-  updateOrganization: async (organizationId: number, data: UpdateKtuOrganization) => {
+  updateOrganization: async (
+    organizationId: number,
+    data: UpdateKtuOrganization,
+  ) => {
     return updateKtuOrganization({ path: { organizationId }, body: data })
   },
 
@@ -270,7 +273,11 @@ const ktuService = {
     return addKtuRoundQuestion({ path: { roundId }, body: data })
   },
 
-  updateRoundQuestion: async (roundId: number, questionId: number, data: UpdateKtuRoundQuestion) => {
+  updateRoundQuestion: async (
+    roundId: number,
+    questionId: number,
+    data: UpdateKtuRoundQuestion,
+  ) => {
     return updateKtuRoundQuestion({ path: { roundId, questionId }, body: data })
   },
 
@@ -278,7 +285,10 @@ const ktuService = {
     return removeKtuRoundQuestion({ path: { roundId, questionId } })
   },
 
-  copyRoundQuestionsFromRound: async (roundId: number, sourceRoundId: number) => {
+  copyRoundQuestionsFromRound: async (
+    roundId: number,
+    sourceRoundId: number,
+  ) => {
     return copyKtuRoundQuestions({ path: { roundId, sourceRoundId } })
   },
 
@@ -297,13 +307,15 @@ const ktuService = {
     file: File,
     dryRun: boolean = true,
     skipUnmatchedConsultants: boolean = false,
-    columnMapping?: Record<string, number | null>
+    columnMapping?: Record<string, number | null>,
   ) => {
     return importHistoricalKtu({
       query: { dryRun, skipUnmatchedConsultants },
       body: {
         file,
-        columnMapping: columnMapping ? JSON.stringify(columnMapping) : undefined,
+        columnMapping: columnMapping
+          ? JSON.stringify(columnMapping)
+          : undefined,
       },
     })
   },
@@ -432,8 +444,14 @@ const ktuService = {
     return getKtuConsultantTrendsAdmin({ path: { consultantId } })
   },
 
-  getConsultantResponsesAdmin: async (consultantId: number, roundId?: number) => {
-    return getKtuConsultantResponsesAdmin({ path: { consultantId }, query: { roundId } })
+  getConsultantResponsesAdmin: async (
+    consultantId: number,
+    roundId?: number,
+  ) => {
+    return getKtuConsultantResponsesAdmin({
+      path: { consultantId },
+      query: { roundId },
+    })
   },
 
   // Color Themes

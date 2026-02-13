@@ -44,12 +44,19 @@ export default function PreviewToolbar({
 
   const selectedTheme = colorThemes.find((t) => t.id === selectedThemeId)
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0]
     if (!file) return
 
     // Validate file type
-    const allowedTypes = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp']
+    const allowedTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/svg+xml',
+      'image/webp',
+    ]
     if (!allowedTypes.includes(file.type)) {
       alert('Ugyldig filtype. Tillatte typer: PNG, JPG, SVG, WebP')
       return
@@ -80,7 +87,9 @@ export default function PreviewToolbar({
           {/* Theme selector */}
           <div className="relative">
             <button
-              onClick={() => !disabled && setShowThemeDropdown(!showThemeDropdown)}
+              onClick={() =>
+                !disabled && setShowThemeDropdown(!showThemeDropdown)
+              }
               disabled={disabled}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
                 disabled
@@ -158,7 +167,9 @@ export default function PreviewToolbar({
                           style={{ backgroundColor: theme.accentBgColor }}
                         />
                       </div>
-                      <span className="text-sm flex-1 text-left">{theme.name}</span>
+                      <span className="text-sm flex-1 text-left">
+                        {theme.name}
+                      </span>
                       {selectedThemeId === theme.id && (
                         <svg
                           className="w-4 h-4 text-orange-500"

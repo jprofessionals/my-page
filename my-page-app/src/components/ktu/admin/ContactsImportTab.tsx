@@ -44,7 +44,9 @@ export default function ContactsImportTab() {
   const handleCreateAlias = async (aliasName: string, userId: number) => {
     setCreatingAlias(aliasName)
     try {
-      const response = await createConsultantAlias({ body: { aliasName, userId } })
+      const response = await createConsultantAlias({
+        body: { aliasName, userId },
+      })
       if (response.data) {
         toast.success(`Alias opprettet: "${aliasName}"`)
         if (file) {
@@ -117,7 +119,10 @@ export default function ContactsImportTab() {
     }
   }
 
-  const handleMappingChange = (fieldKey: string, columnIndex: number | null) => {
+  const handleMappingChange = (
+    fieldKey: string,
+    columnIndex: number | null,
+  ) => {
     setColumnMapping((prev) => ({
       ...prev,
       [fieldKey]: columnIndex,
@@ -178,7 +183,7 @@ export default function ContactsImportTab() {
       setResult(response.data || null)
       if (response.data && !response.data.dryRun) {
         toast.success(
-          `Import fullført! ${response.data.createdContacts ?? 0} kontakter opprettet, ${response.data.createdOrganizations ?? 0} organisasjoner.`
+          `Import fullført! ${response.data.createdContacts ?? 0} kontakter opprettet, ${response.data.createdOrganizations ?? 0} organisasjoner.`,
         )
       }
     } catch (error) {
@@ -200,9 +205,12 @@ export default function ContactsImportTab() {
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-medium text-blue-900 mb-2">Importere kontaktpersoner</h3>
+        <h3 className="font-medium text-blue-900 mb-2">
+          Importere kontaktpersoner
+        </h3>
         <p className="text-sm text-blue-800 mb-2">
-          Last opp en CSV-fil med kontaktpersoner og deres tilknytning til konsulenter/kunder.
+          Last opp en CSV-fil med kontaktpersoner og deres tilknytning til
+          konsulenter/kunder.
         </p>
         <p className="text-sm text-blue-700">
           Forventede kolonner: Konsulent, Kunde, Kontaktperson, E-post
@@ -256,19 +264,33 @@ export default function ContactsImportTab() {
             <table className="min-w-full text-xs border">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-2 py-1 border text-left text-gray-600">#</th>
+                  <th className="px-2 py-1 border text-left text-gray-600">
+                    #
+                  </th>
                   {preview.columns.map((col, idx) => (
-                    <th key={idx} className="px-2 py-1 border text-left text-gray-600">
-                      <div className="font-medium">{col || `(kolonne ${idx})`}</div>
-                      <div className="text-gray-400 font-normal">Index: {idx}</div>
+                    <th
+                      key={idx}
+                      className="px-2 py-1 border text-left text-gray-600"
+                    >
+                      <div className="font-medium">
+                        {col || `(kolonne ${idx})`}
+                      </div>
+                      <div className="text-gray-400 font-normal">
+                        Index: {idx}
+                      </div>
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {preview.sampleRows.map((row, rowIdx) => (
-                  <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-2 py-1 border text-gray-400">{rowIdx + 1}</td>
+                  <tr
+                    key={rowIdx}
+                    className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                  >
+                    <td className="px-2 py-1 border text-gray-400">
+                      {rowIdx + 1}
+                    </td>
                     {preview.columns.map((_, colIdx) => (
                       <td
                         key={colIdx}
@@ -288,14 +310,16 @@ export default function ContactsImportTab() {
               <div key={field.key} className="space-y-1">
                 <label className="block text-sm font-medium text-gray-700">
                   {field.label}
-                  {field.required && <span className="text-red-500 ml-1">*</span>}
+                  {field.required && (
+                    <span className="text-red-500 ml-1">*</span>
+                  )}
                 </label>
                 <select
                   value={columnMapping[field.key] ?? ''}
                   onChange={(e) =>
                     handleMappingChange(
                       field.key,
-                      e.target.value === '' ? null : parseInt(e.target.value)
+                      e.target.value === '' ? null : parseInt(e.target.value),
                     )
                   }
                   className={`w-full border rounded-lg px-3 py-2 text-sm ${
@@ -305,7 +329,9 @@ export default function ContactsImportTab() {
                   }`}
                 >
                   <option value="">
-                    {field.required ? '-- Velg kolonne --' : '-- Finnes ikke --'}
+                    {field.required
+                      ? '-- Velg kolonne --'
+                      : '-- Finnes ikke --'}
                   </option>
                   {preview.columns.map((col, idx) => (
                     <option key={idx} value={idx}>
@@ -325,7 +351,10 @@ export default function ContactsImportTab() {
             >
               {importing ? 'Validerer...' : 'Valider data'}
             </button>
-            <button onClick={handleReset} className="px-4 py-2 text-gray-600 hover:text-gray-800">
+            <button
+              onClick={handleReset}
+              className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            >
               Start på nytt
             </button>
           </div>
@@ -341,11 +370,15 @@ export default function ContactsImportTab() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-gray-50 rounded-lg p-3">
-              <div className="text-2xl font-bold text-gray-900">{result.totalRows}</div>
+              <div className="text-2xl font-bold text-gray-900">
+                {result.totalRows}
+              </div>
               <div className="text-sm text-gray-600">Totalt rader</div>
             </div>
             <div className="bg-green-50 rounded-lg p-3">
-              <div className="text-2xl font-bold text-green-700">{result.validRows}</div>
+              <div className="text-2xl font-bold text-green-700">
+                {result.validRows}
+              </div>
               <div className="text-sm text-green-600">Gyldige</div>
             </div>
             <div className="bg-blue-50 rounded-lg p-3">
@@ -365,7 +398,9 @@ export default function ContactsImportTab() {
           {/* Errors */}
           {result.errors && result.errors.length > 0 && (
             <div className="mb-6">
-              <h4 className="font-medium text-red-700 mb-2">Feil ({result.errors.length})</h4>
+              <h4 className="font-medium text-red-700 mb-2">
+                Feil ({result.errors.length})
+              </h4>
               <div className="max-h-40 overflow-y-auto">
                 <table className="min-w-full text-sm">
                   <thead className="bg-red-50">
@@ -376,13 +411,17 @@ export default function ContactsImportTab() {
                     </tr>
                   </thead>
                   <tbody>
-                    {result.errors.map((error: KtuImportError, index: number) => (
-                      <tr key={index}>
-                        <td className="px-3 py-2">{error.row}</td>
-                        <td className="px-3 py-2">{error.field}</td>
-                        <td className="px-3 py-2 text-red-700">{error.error}</td>
-                      </tr>
-                    ))}
+                    {result.errors.map(
+                      (error: KtuImportError, index: number) => (
+                        <tr key={index}>
+                          <td className="px-3 py-2">{error.row}</td>
+                          <td className="px-3 py-2">{error.field}</td>
+                          <td className="px-3 py-2 text-red-700">
+                            {error.error}
+                          </td>
+                        </tr>
+                      ),
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -390,88 +429,119 @@ export default function ContactsImportTab() {
           )}
 
           {/* Unmatched Consultants */}
-          {result.unmatchedConsultants && result.unmatchedConsultants.length > 0 && (
-            <div className="mb-6">
-              <h4 className="font-medium text-orange-700 mb-2">
-                Konsulenter som ikke ble funnet ({result.unmatchedConsultants.length})
-              </h4>
-              <p className="text-sm text-gray-600 mb-3">
-                Velg en bruker fra forslagene for å opprette et alias, velg manuelt fra listen, eller
-                klikk &quot;Ignorer&quot; for tidligere ansatte som ikke lenger er i systemet.
-              </p>
-              <div className="space-y-3">
-                {result.unmatchedConsultants.map((unmatched: UnmatchedConsultant) => (
-                  <div key={unmatched.name} className="bg-orange-50 rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <span className="font-medium text-gray-900">{unmatched.name}</span>
-                        <span className="text-sm text-gray-500 ml-2">
-                          ({unmatched.rowCount} rad{unmatched.rowCount !== 1 ? 'er' : ''})
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => handleIgnoreConsultant(unmatched.name)}
-                        disabled={creatingAlias === unmatched.name}
-                        className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 disabled:opacity-50"
-                        title="Marker som tidligere ansatt - rader med dette navnet vil bli ignorert"
+          {result.unmatchedConsultants &&
+            result.unmatchedConsultants.length > 0 && (
+              <div className="mb-6">
+                <h4 className="font-medium text-orange-700 mb-2">
+                  Konsulenter som ikke ble funnet (
+                  {result.unmatchedConsultants.length})
+                </h4>
+                <p className="text-sm text-gray-600 mb-3">
+                  Velg en bruker fra forslagene for å opprette et alias, velg
+                  manuelt fra listen, eller klikk &quot;Ignorer&quot; for
+                  tidligere ansatte som ikke lenger er i systemet.
+                </p>
+                <div className="space-y-3">
+                  {result.unmatchedConsultants.map(
+                    (unmatched: UnmatchedConsultant) => (
+                      <div
+                        key={unmatched.name}
+                        className="bg-orange-50 rounded-lg p-4"
                       >
-                        Ignorer (sluttet)
-                      </button>
-                    </div>
-                    {unmatched.suggestions && unmatched.suggestions.length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        <span className="text-sm text-gray-600">Forslag:</span>
-                        {unmatched.suggestions.map((suggestion: SuggestedMatch) => (
-                          <button
-                            key={suggestion.userId}
-                            onClick={() => handleCreateAlias(unmatched.name, suggestion.userId)}
-                            disabled={creatingAlias === unmatched.name}
-                            className="px-3 py-1 text-sm bg-white border border-orange-300 rounded-full hover:bg-orange-100 disabled:opacity-50"
-                          >
-                            {suggestion.userName}
-                            <span className="text-xs text-gray-400 ml-1">
-                              ({Math.round(suggestion.similarity * 100)}%)
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <span className="font-medium text-gray-900">
+                              {unmatched.name}
                             </span>
+                            <span className="text-sm text-gray-500 ml-2">
+                              ({unmatched.rowCount} rad
+                              {unmatched.rowCount !== 1 ? 'er' : ''})
+                            </span>
+                          </div>
+                          <button
+                            onClick={() =>
+                              handleIgnoreConsultant(unmatched.name)
+                            }
+                            disabled={creatingAlias === unmatched.name}
+                            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 disabled:opacity-50"
+                            title="Marker som tidligere ansatt - rader med dette navnet vil bli ignorert"
+                          >
+                            Ignorer (sluttet)
                           </button>
-                        ))}
+                        </div>
+                        {unmatched.suggestions &&
+                        unmatched.suggestions.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            <span className="text-sm text-gray-600">
+                              Forslag:
+                            </span>
+                            {unmatched.suggestions.map(
+                              (suggestion: SuggestedMatch) => (
+                                <button
+                                  key={suggestion.userId}
+                                  onClick={() =>
+                                    handleCreateAlias(
+                                      unmatched.name,
+                                      suggestion.userId,
+                                    )
+                                  }
+                                  disabled={creatingAlias === unmatched.name}
+                                  className="px-3 py-1 text-sm bg-white border border-orange-300 rounded-full hover:bg-orange-100 disabled:opacity-50"
+                                >
+                                  {suggestion.userName}
+                                  <span className="text-xs text-gray-400 ml-1">
+                                    ({Math.round(suggestion.similarity * 100)}%)
+                                  </span>
+                                </button>
+                              ),
+                            )}
+                          </div>
+                        ) : (
+                          <select
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                handleCreateAlias(
+                                  unmatched.name,
+                                  parseInt(e.target.value),
+                                )
+                              }
+                            }}
+                            disabled={creatingAlias === unmatched.name}
+                            className="text-sm border border-gray-300 rounded px-2 py-1"
+                            defaultValue=""
+                          >
+                            <option value="">Velg bruker manuelt...</option>
+                            {allUsers.map((user) => (
+                              <option key={user.id} value={user.id}>
+                                {user.name}
+                              </option>
+                            ))}
+                          </select>
+                        )}
                       </div>
-                    ) : (
-                      <select
-                        onChange={(e) => {
-                          if (e.target.value) {
-                            handleCreateAlias(unmatched.name, parseInt(e.target.value))
-                          }
-                        }}
-                        disabled={creatingAlias === unmatched.name}
-                        className="text-sm border border-gray-300 rounded px-2 py-1"
-                        defaultValue=""
-                      >
-                        <option value="">Velg bruker manuelt...</option>
-                        {allUsers.map((user) => (
-                          <option key={user.id} value={user.id}>
-                            {user.name}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-                ))}
+                    ),
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Actions */}
           <div className="flex items-center justify-between">
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${
-                result.valid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                result.valid
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
               }`}
             >
               {result.valid ? 'Klar for import' : 'Feil må løses'}
             </span>
 
             <div className="flex gap-3">
-              <button onClick={handleReset} className="px-4 py-2 text-gray-600 hover:text-gray-800">
+              <button
+                onClick={handleReset}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
                 Start på nytt
               </button>
               {result.dryRun && result.valid && (

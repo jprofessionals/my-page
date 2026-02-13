@@ -1,4 +1,9 @@
-import type { Period, PeriodFormState, BulkPeriodFormState, DrawingStatus } from '@/types/cabinLottery.types'
+import type {
+  Period,
+  PeriodFormState,
+  BulkPeriodFormState,
+  DrawingStatus,
+} from '@/types/cabinLottery.types'
 import PeriodForm from './PeriodForm'
 import BulkPeriodForm from './BulkPeriodForm'
 import PeriodListItem from './PeriodListItem'
@@ -14,9 +19,15 @@ interface PeriodsTabProps {
   editPeriod: PeriodFormState
   onTogglePeriodForm: () => void
   onToggleBulkPeriodForm: () => void
-  onUpdateNewPeriod: (field: keyof PeriodFormState, value: string | number) => void
+  onUpdateNewPeriod: (
+    field: keyof PeriodFormState,
+    value: string | number,
+  ) => void
   onUpdateBulkPeriod: (field: keyof BulkPeriodFormState, value: string) => void
-  onUpdateEditPeriod: (field: keyof PeriodFormState, value: string | number) => void
+  onUpdateEditPeriod: (
+    field: keyof PeriodFormState,
+    value: string | number,
+  ) => void
   onAddPeriod: () => Promise<void>
   onBulkAddPeriods: () => Promise<void>
   onEditPeriod: (period: Period) => void

@@ -73,35 +73,22 @@ describe('ResultsTab', () => {
 
   describe('Rendering', () => {
     it('should show "not drawn yet" message when no allocations', () => {
-      render(
-        <ResultsTab
-          periods={mockPeriods}
-          allocations={[]}
-        />
-      )
+      render(<ResultsTab periods={mockPeriods} allocations={[]} />)
 
-      expect(screen.getByText('Trekning ikke gjennomført ennå')).toBeInTheDocument()
+      expect(
+        screen.getByText('Trekning ikke gjennomført ennå'),
+      ).toBeInTheDocument()
     })
 
     it('should show results when allocations exist', () => {
-      render(
-        <ResultsTab
-          periods={mockPeriods}
-          allocations={mockAllocations}
-        />
-      )
+      render(<ResultsTab periods={mockPeriods} allocations={mockAllocations} />)
 
       expect(screen.getByText('Oversikt over tildelinger')).toBeInTheDocument()
       expect(screen.getByText('Tildelinger per periode')).toBeInTheDocument()
     })
 
     it('should not show audit log section when auditLog is empty', () => {
-      render(
-        <ResultsTab
-          periods={mockPeriods}
-          allocations={mockAllocations}
-        />
-      )
+      render(<ResultsTab periods={mockPeriods} allocations={mockAllocations} />)
 
       expect(screen.queryByText('Trekkingslogg')).not.toBeInTheDocument()
     })
@@ -112,23 +99,20 @@ describe('ResultsTab', () => {
           periods={mockPeriods}
           allocations={mockAllocations}
           auditLog={mockAuditLog}
-        />
+        />,
       )
 
       expect(screen.getByText('Trekkingslogg')).toBeInTheDocument()
-      expect(screen.getByText('=== SNAKE DRAFT TREKNING ===')).toBeInTheDocument()
+      expect(
+        screen.getByText('=== SNAKE DRAFT TREKNING ==='),
+      ).toBeInTheDocument()
       expect(screen.getByText('Seed: 42')).toBeInTheDocument()
     })
   })
 
   describe('Allocations Display', () => {
     it('should group allocations by period', () => {
-      render(
-        <ResultsTab
-          periods={mockPeriods}
-          allocations={mockAllocations}
-        />
-      )
+      render(<ResultsTab periods={mockPeriods} allocations={mockAllocations} />)
 
       // Should show period headers
       expect(screen.getByText('Påske')).toBeInTheDocument()
@@ -136,12 +120,7 @@ describe('ResultsTab', () => {
     })
 
     it('should show apartment and user for each allocation', () => {
-      render(
-        <ResultsTab
-          periods={mockPeriods}
-          allocations={mockAllocations}
-        />
-      )
+      render(<ResultsTab periods={mockPeriods} allocations={mockAllocations} />)
 
       expect(screen.getByText('Stor leilighet')).toBeInTheDocument()
       expect(screen.getByText('Ola Nordmann')).toBeInTheDocument()
@@ -154,7 +133,7 @@ describe('ResultsTab', () => {
         <ResultsTab
           periods={mockPeriods}
           allocations={[mockAllocations[0]]} // Only Påske has allocation
-        />
+        />,
       )
 
       // Vinterferie should show "Ingen tildelinger"
@@ -169,14 +148,13 @@ describe('ResultsTab', () => {
       ]
 
       const { container } = render(
-        <ResultsTab
-          periods={mockPeriods}
-          allocations={allocations}
-        />
+        <ResultsTab periods={mockPeriods} allocations={allocations} />,
       )
 
       const allocationElements = container.querySelectorAll('.font-medium')
-      const apartmentNames = Array.from(allocationElements).map(el => el.textContent)
+      const apartmentNames = Array.from(allocationElements).map(
+        (el) => el.textContent,
+      )
 
       // Should maintain order from data, not alphabetically sorted
       expect(apartmentNames).toContain('B Apartment')
@@ -191,17 +169,19 @@ describe('ResultsTab', () => {
           periods={mockPeriods}
           allocations={mockAllocations}
           auditLog={mockAuditLog}
-        />
+        />,
       )
 
       // Check for key audit log content (testing-library normalizes whitespace, so check for trimmed content)
-      mockAuditLog.forEach(line => {
+      mockAuditLog.forEach((line) => {
         const trimmedLine = line.trim()
         if (trimmedLine) {
           // Use regex matcher to handle whitespace variations
-          expect(screen.getByText((content, element) => {
-            return element?.textContent?.trim() === trimmedLine
-          })).toBeInTheDocument()
+          expect(
+            screen.getByText((content, element) => {
+              return element?.textContent?.trim() === trimmedLine
+            }),
+          ).toBeInTheDocument()
         }
       })
     })
@@ -212,7 +192,7 @@ describe('ResultsTab', () => {
           periods={mockPeriods}
           allocations={mockAllocations}
           auditLog={mockAuditLog}
-        />
+        />,
       )
 
       const auditLogContainer = container.querySelector('.font-mono')
@@ -227,7 +207,7 @@ describe('ResultsTab', () => {
           periods={mockPeriods}
           allocations={mockAllocations}
           auditLog={longAuditLog}
-        />
+        />,
       )
 
       const scrollableContainer = container.querySelector('.overflow-y-auto')
@@ -238,23 +218,13 @@ describe('ResultsTab', () => {
 
   describe('Edge Cases', () => {
     it('should handle undefined auditLog gracefully', () => {
-      render(
-        <ResultsTab
-          periods={mockPeriods}
-          allocations={mockAllocations}
-        />
-      )
+      render(<ResultsTab periods={mockPeriods} allocations={mockAllocations} />)
 
       expect(screen.queryByText('Trekkingslogg')).not.toBeInTheDocument()
     })
 
     it('should handle empty periods array', () => {
-      render(
-        <ResultsTab
-          periods={[]}
-          allocations={mockAllocations}
-        />
-      )
+      render(<ResultsTab periods={[]} allocations={mockAllocations} />)
 
       // Should not crash, component should render
       expect(screen.getByText('Oversikt over tildelinger')).toBeInTheDocument()
@@ -269,10 +239,7 @@ describe('ResultsTab', () => {
       ]
 
       render(
-        <ResultsTab
-          periods={mockPeriods}
-          allocations={orphanAllocations}
-        />
+        <ResultsTab periods={mockPeriods} allocations={orphanAllocations} />,
       )
 
       // Should render without crashing

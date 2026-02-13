@@ -13,7 +13,9 @@ import { toast } from 'react-toastify'
 import { Button } from '@/components/ui/button'
 
 function Hyttebooking() {
-  const [currentDrawing, setCurrentDrawing] = useState<{ status: string } | null>(null)
+  const [currentDrawing, setCurrentDrawing] = useState<{
+    status: string
+  } | null>(null)
   const [loadingDrawing, setLoadingDrawing] = useState(true)
   const [sendingNotification, setSendingNotification] = useState(false)
   const { user } = useAuthContext()
@@ -92,23 +94,39 @@ function Hyttebooking() {
           />
         </div>
 
-        {!loadingDrawing && currentDrawing && currentDrawing.status === 'OPEN' && (
-          <Link href="/hyttetrekning" className="block no-underline">
-            <div className="p-6 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
-              <div className="flex items-center justify-between text-white">
-                <div>
-                  <h2 className="text-2xl font-bold mb-2 text-white">Hyttetrekning</h2>
-                  <p className="text-lg text-white opacity-90">
-                    Meld dine ønsker for kommende periode og delta i trekningen
-                  </p>
+        {!loadingDrawing &&
+          currentDrawing &&
+          currentDrawing.status === 'OPEN' && (
+            <Link href="/hyttetrekning" className="block no-underline">
+              <div className="p-6 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+                <div className="flex items-center justify-between text-white">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-2 text-white">
+                      Hyttetrekning
+                    </h2>
+                    <p className="text-lg text-white opacity-90">
+                      Meld dine ønsker for kommende periode og delta i
+                      trekningen
+                    </p>
+                  </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-12 w-12 ml-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
               </div>
-            </div>
-          </Link>
-        )}
+            </Link>
+          )}
 
         <p>
           <span>
@@ -206,9 +224,12 @@ function Hyttebooking() {
             <AdminBooking />
             {user?.admin && (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">Admin: Slack-varsling</h3>
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                  Admin: Slack-varsling
+                </h3>
                 <p className="text-xs text-gray-500 mb-3">
-                  Ukesvarsel sendes automatisk hver tirsdag kl. 09:00. Bruk knappene under for å sende manuelt.
+                  Ukesvarsel sendes automatisk hver tirsdag kl. 09:00. Bruk
+                  knappene under for å sende manuelt.
                 </p>
                 <div className="flex gap-2">
                   <Button

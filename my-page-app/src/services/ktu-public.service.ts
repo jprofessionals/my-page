@@ -9,10 +9,7 @@ if (typeof window !== 'undefined') {
   import('@/services/openapi-client')
 }
 
-import {
-  getPublicSurvey,
-  submitPublicSurveyResponses,
-} from '@/data/types'
+import { getPublicSurvey, submitPublicSurveyResponses } from '@/data/types'
 import type {
   PublicSurveyData,
   PublicSurveyQuestion,

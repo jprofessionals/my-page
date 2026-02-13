@@ -13,10 +13,12 @@ export default function BulkPeriodForm({
 }: BulkPeriodFormProps) {
   return (
     <div className="bg-purple-50 p-4 rounded-lg mb-6 border-2 border-purple-200">
-      <h3 className="font-medium mb-3">Legg til flere perioder (onsdag til onsdag)</h3>
+      <h3 className="font-medium mb-3">
+        Legg til flere perioder (onsdag til onsdag)
+      </h3>
       <p className="text-sm text-gray-600 mb-4">
-        Alle perioder blir automatisk opprettet som uke-perioder fra onsdag til onsdag.
-        Beskrivelser genereres automatisk basert på datoene.
+        Alle perioder blir automatisk opprettet som uke-perioder fra onsdag til
+        onsdag. Beskrivelser genereres automatisk basert på datoene.
       </p>
       <div className="grid grid-cols-2 gap-4">
         <div>

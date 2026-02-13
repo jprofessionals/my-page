@@ -12,20 +12,23 @@ interface UserWishData {
 
 export default function WishesByUser({ wishes }: WishesByUserProps) {
   // Group wishes by user
-  const wishesByUser = wishes.reduce<Record<number, UserWishData>>((acc, wish) => {
-    if (!acc[wish.userId]) {
-      acc[wish.userId] = {
-        userName: wish.userName || 'Ukjent',
-        userEmail: wish.userEmail || '',
-        wishes: []
+  const wishesByUser = wishes.reduce<Record<number, UserWishData>>(
+    (acc, wish) => {
+      if (!acc[wish.userId]) {
+        acc[wish.userId] = {
+          userName: wish.userName || 'Ukjent',
+          userEmail: wish.userEmail || '',
+          wishes: [],
+        }
       }
-    }
-    acc[wish.userId].wishes.push(wish)
-    return acc
-  }, {})
+      acc[wish.userId].wishes.push(wish)
+      return acc
+    },
+    {},
+  )
 
   const users = Object.entries(wishesByUser).sort((a, b) =>
-    a[1].userName.localeCompare(b[1].userName)
+    a[1].userName.localeCompare(b[1].userName),
   )
 
   return (
@@ -48,8 +51,12 @@ export default function WishesByUser({ wishes }: WishesByUserProps) {
           {users.map(([userId, userData]) => (
             <tr key={userId} className="hover:bg-gray-50">
               <td className="px-4 py-3 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">{userData.userName}</div>
-                <div className="text-xs text-gray-500">{userData.userEmail}</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {userData.userName}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {userData.userEmail}
+                </div>
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                 {userData.wishes.length}
@@ -63,10 +70,17 @@ export default function WishesByUser({ wishes }: WishesByUserProps) {
                         <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-blue-700 font-semibold text-xs mr-2">
                           {wish.priority}
                         </span>
-                        <span className="font-medium text-gray-900">{wish.periodDescription}</span>
-                        <span className="text-gray-600"> → {wish.desiredApartmentNames.join(', ')}</span>
+                        <span className="font-medium text-gray-900">
+                          {wish.periodDescription}
+                        </span>
+                        <span className="text-gray-600">
+                          {' '}
+                          → {wish.desiredApartmentNames.join(', ')}
+                        </span>
                         {wish.comment && (
-                          <div className="ml-7 text-xs text-gray-500 italic mt-1">&ldquo;{wish.comment}&rdquo;</div>
+                          <div className="ml-7 text-xs text-gray-500 italic mt-1">
+                            &ldquo;{wish.comment}&rdquo;
+                          </div>
                         )}
                       </div>
                     ))}

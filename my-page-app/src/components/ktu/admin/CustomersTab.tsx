@@ -17,7 +17,8 @@ import ContactsImportModal from './ContactsImportModal'
 export default function CustomersTab() {
   const [customers, setCustomers] = useState<KtuCustomerOrganization[]>([])
   const [contacts, setContacts] = useState<KtuCustomerContact[]>([])
-  const [selectedCustomer, setSelectedCustomer] = useState<KtuCustomerOrganization | null>(null)
+  const [selectedCustomer, setSelectedCustomer] =
+    useState<KtuCustomerOrganization | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadingContacts, setLoadingContacts] = useState(false)
   const [showInactive, setShowInactive] = useState(false)
@@ -32,17 +33,29 @@ export default function CustomersTab() {
   const [showLinkModal, setShowLinkModal] = useState(false)
 
   // Link modal state
-  const [linkContact, setLinkContact] = useState<KtuCustomerContact | null>(null)
+  const [linkContact, setLinkContact] = useState<KtuCustomerContact | null>(
+    null,
+  )
   const [rounds, setRounds] = useState<KtuRound[]>([])
   const [consultants, setConsultants] = useState<KtuUser[]>([])
   const [selectedRoundId, setSelectedRoundId] = useState<number | null>(null)
-  const [selectedConsultantId, setSelectedConsultantId] = useState<number | null>(null)
+  const [selectedConsultantId, setSelectedConsultantId] = useState<
+    number | null
+  >(null)
 
   // Form state
-  const [newCustomer, setNewCustomer] = useState<CreateKtuOrganization>({ name: '' })
-  const [editCustomer, setEditCustomer] = useState<KtuCustomerOrganization | null>(null)
-  const [newContact, setNewContact] = useState<CreateKtuContact>({ name: '', organizationId: 0 })
-  const [editContact, setEditContact] = useState<KtuCustomerContact | null>(null)
+  const [newCustomer, setNewCustomer] = useState<CreateKtuOrganization>({
+    name: '',
+  })
+  const [editCustomer, setEditCustomer] =
+    useState<KtuCustomerOrganization | null>(null)
+  const [newContact, setNewContact] = useState<CreateKtuContact>({
+    name: '',
+    organizationId: 0,
+  })
+  const [editContact, setEditContact] = useState<KtuCustomerContact | null>(
+    null,
+  )
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -71,7 +84,10 @@ export default function CustomersTab() {
   const loadContacts = async (customerId: number) => {
     setLoadingContacts(true)
     try {
-      const response = await ktuService.getContacts(customerId, !showInactiveContacts)
+      const response = await ktuService.getContacts(
+        customerId,
+        !showInactiveContacts,
+      )
       setContacts(response.data || [])
     } catch (error) {
       console.error('Failed to load contacts:', error)
@@ -187,8 +203,15 @@ export default function CustomersTab() {
     setShowEditContactModal(true)
   }
 
-  const handleDeactivateCustomer = async (customer: KtuCustomerOrganization) => {
-    if (!confirm(`Er du sikker på at du vil deaktivere "${customer.name}"? Kunden vil ikke bli brukt i nye undersøkelser.`)) return
+  const handleDeactivateCustomer = async (
+    customer: KtuCustomerOrganization,
+  ) => {
+    if (
+      !confirm(
+        `Er du sikker på at du vil deaktivere "${customer.name}"? Kunden vil ikke bli brukt i nye undersøkelser.`,
+      )
+    )
+      return
     setSaving(true)
     try {
       await ktuService.updateOrganization(customer.id, {
@@ -211,7 +234,12 @@ export default function CustomersTab() {
   }
 
   const handleDeactivateContact = async (contact: KtuCustomerContact) => {
-    if (!confirm(`Er du sikker på at du vil deaktivere "${contact.name}"? Kontaktpersonen vil ikke bli brukt i nye undersøkelser.`)) return
+    if (
+      !confirm(
+        `Er du sikker på at du vil deaktivere "${contact.name}"? Kontaktpersonen vil ikke bli brukt i nye undersøkelser.`,
+      )
+    )
+      return
     setSaving(true)
     try {
       await ktuService.updateContact(contact.id, {
@@ -335,14 +363,19 @@ export default function CustomersTab() {
                     key={customer.id}
                     onClick={() => setSelectedCustomer(customer)}
                     className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
-                      selectedCustomer?.id === customer.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                      selectedCustomer?.id === customer.id
+                        ? 'bg-blue-50 border-l-4 border-blue-500'
+                        : ''
                     } ${!customer.active ? 'opacity-50' : ''}`}
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <div className="font-medium text-gray-900">{customer.name}</div>
+                        <div className="font-medium text-gray-900">
+                          {customer.name}
+                        </div>
                         <div className="text-sm text-gray-500">
-                          {customer.contactCount || 0} kontaktperson{customer.contactCount !== 1 ? 'er' : ''}
+                          {customer.contactCount || 0} kontaktperson
+                          {customer.contactCount !== 1 ? 'er' : ''}
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -354,8 +387,18 @@ export default function CustomersTab() {
                           className="text-gray-400 hover:text-blue-600"
                           title="Rediger"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                            />
                           </svg>
                         </button>
                         {customer.active && (
@@ -368,8 +411,18 @@ export default function CustomersTab() {
                             title="Deaktiver"
                             disabled={saving}
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
                             </svg>
                           </button>
                         )}
@@ -391,9 +444,12 @@ export default function CustomersTab() {
             <div className="p-4 border-b border-gray-200">
               <div className="flex justify-between items-center mb-2">
                 <div>
-                  <h3 className="font-semibold text-gray-900">{selectedCustomer.name}</h3>
+                  <h3 className="font-semibold text-gray-900">
+                    {selectedCustomer.name}
+                  </h3>
                   <p className="text-sm text-gray-500">
-                    {selectedCustomer.organizationNumber && `Org.nr: ${selectedCustomer.organizationNumber}`}
+                    {selectedCustomer.organizationNumber &&
+                      `Org.nr: ${selectedCustomer.organizationNumber}`}
                   </p>
                 </div>
                 <button
@@ -410,14 +466,18 @@ export default function CustomersTab() {
                   onChange={(e) => setShowInactiveContacts(e.target.checked)}
                   className="rounded"
                 />
-                <span className="text-gray-600">Vis inaktive kontaktpersoner</span>
+                <span className="text-gray-600">
+                  Vis inaktive kontaktpersoner
+                </span>
               </label>
             </div>
 
             {/* Contacts list */}
             <div className="p-4">
               {loadingContacts ? (
-                <div className="text-center py-4 text-gray-500">Laster kontaktpersoner...</div>
+                <div className="text-center py-4 text-gray-500">
+                  Laster kontaktpersoner...
+                </div>
               ) : contacts.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <p>Ingen kontaktpersoner registrert</p>
@@ -434,21 +494,31 @@ export default function CustomersTab() {
                     <div
                       key={contact.id}
                       className={`p-4 border rounded-lg ${
-                        !contact.active || contact.optedOut ? 'bg-gray-50 opacity-60' : 'bg-white'
+                        !contact.active || contact.optedOut
+                          ? 'bg-gray-50 opacity-60'
+                          : 'bg-white'
                       }`}
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <div className="font-medium text-gray-900">{contact.name}</div>
+                          <div className="font-medium text-gray-900">
+                            {contact.name}
+                          </div>
                           {contact.title && (
-                            <div className="text-sm text-gray-500">{contact.title}</div>
+                            <div className="text-sm text-gray-500">
+                              {contact.title}
+                            </div>
                           )}
                           <div className="mt-1 text-sm space-y-0.5">
                             {contact.email && (
-                              <div className="text-gray-600">{contact.email}</div>
+                              <div className="text-gray-600">
+                                {contact.email}
+                              </div>
                             )}
                             {contact.phone && (
-                              <div className="text-gray-600">{contact.phone}</div>
+                              <div className="text-gray-600">
+                                {contact.phone}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -471,8 +541,18 @@ export default function CustomersTab() {
                               className="text-gray-400 hover:text-green-600"
                               title="Knytt til undersøkelse"
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                                />
                               </svg>
                             </button>
                             <button
@@ -480,8 +560,18 @@ export default function CustomersTab() {
                               className="text-gray-400 hover:text-blue-600"
                               title="Rediger"
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                                />
                               </svg>
                             </button>
                             {contact.active && (
@@ -491,8 +581,18 @@ export default function CustomersTab() {
                                 title="Deaktiver"
                                 disabled={saving}
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
                                 </svg>
                               </button>
                             )}
@@ -507,8 +607,18 @@ export default function CustomersTab() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-            <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            <svg
+              className="w-12 h-12 mx-auto mb-4 text-gray-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
             </svg>
             <p>Velg en kunde fra listen for å se kontaktpersoner</p>
           </div>
@@ -522,31 +632,49 @@ export default function CustomersTab() {
             <h2 className="text-xl font-bold mb-4">Ny kunde</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Navn *
+                </label>
                 <input
                   type="text"
                   value={newCustomer.name}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewCustomer({ ...newCustomer, name: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="f.eks. Skatteetaten"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Org.nr (valgfritt)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Org.nr (valgfritt)
+                </label>
                 <input
                   type="text"
                   value={newCustomer.organizationNumber || ''}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, organizationNumber: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setNewCustomer({
+                      ...newCustomer,
+                      organizationNumber: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="f.eks. 974761076"
                 />
               </div>
             </div>
             <div className="mt-6 flex justify-end space-x-3">
-              <button onClick={() => setShowCreateCustomerModal(false)} className="px-4 py-2 text-gray-600 hover:text-gray-800">
+              <button
+                onClick={() => setShowCreateCustomerModal(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
                 Avbryt
               </button>
-              <button onClick={handleCreateCustomer} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+              <button
+                onClick={handleCreateCustomer}
+                disabled={saving}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
                 {saving ? 'Lagrer...' : 'Opprett'}
               </button>
             </div>
@@ -561,20 +689,31 @@ export default function CustomersTab() {
             <h2 className="text-xl font-bold mb-4">Rediger kunde</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Navn *
+                </label>
                 <input
                   type="text"
                   value={editCustomer.name}
-                  onChange={(e) => setEditCustomer({ ...editCustomer, name: e.target.value })}
+                  onChange={(e) =>
+                    setEditCustomer({ ...editCustomer, name: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Org.nr</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Org.nr
+                </label>
                 <input
                   type="text"
                   value={editCustomer.organizationNumber || ''}
-                  onChange={(e) => setEditCustomer({ ...editCustomer, organizationNumber: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setEditCustomer({
+                      ...editCustomer,
+                      organizationNumber: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
@@ -582,17 +721,32 @@ export default function CustomersTab() {
                 <input
                   type="checkbox"
                   checked={editCustomer.active}
-                  onChange={(e) => setEditCustomer({ ...editCustomer, active: e.target.checked })}
+                  onChange={(e) =>
+                    setEditCustomer({
+                      ...editCustomer,
+                      active: e.target.checked,
+                    })
+                  }
                   className="rounded"
                 />
                 <span className="text-sm text-gray-700">Aktiv</span>
               </label>
             </div>
             <div className="mt-6 flex justify-end space-x-3">
-              <button onClick={() => { setShowEditCustomerModal(false); setEditCustomer(null) }} className="px-4 py-2 text-gray-600 hover:text-gray-800">
+              <button
+                onClick={() => {
+                  setShowEditCustomerModal(false)
+                  setEditCustomer(null)
+                }}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
                 Avbryt
               </button>
-              <button onClick={handleUpdateCustomer} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+              <button
+                onClick={handleUpdateCustomer}
+                disabled={saving}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
                 {saving ? 'Lagrer...' : 'Lagre'}
               </button>
             </div>
@@ -605,54 +759,88 @@ export default function CustomersTab() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Ny kontaktperson</h2>
-            <p className="text-sm text-gray-500 mb-4">For {selectedCustomer?.name}</p>
+            <p className="text-sm text-gray-500 mb-4">
+              For {selectedCustomer?.name}
+            </p>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Navn *
+                </label>
                 <input
                   type="text"
                   value={newContact.name}
-                  onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewContact({ ...newContact, name: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="Ola Nordmann"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">E-post</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  E-post
+                </label>
                 <input
                   type="email"
                   value={newContact.email || ''}
-                  onChange={(e) => setNewContact({ ...newContact, email: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setNewContact({
+                      ...newContact,
+                      email: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="ola@example.com"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Telefon
+                </label>
                 <input
                   type="tel"
                   value={newContact.phone || ''}
-                  onChange={(e) => setNewContact({ ...newContact, phone: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setNewContact({
+                      ...newContact,
+                      phone: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="+47 123 45 678"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tittel/stilling</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tittel/stilling
+                </label>
                 <input
                   type="text"
                   value={newContact.title || ''}
-                  onChange={(e) => setNewContact({ ...newContact, title: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setNewContact({
+                      ...newContact,
+                      title: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="Prosjektleder"
                 />
               </div>
             </div>
             <div className="mt-6 flex justify-end space-x-3">
-              <button onClick={() => setShowCreateContactModal(false)} className="px-4 py-2 text-gray-600 hover:text-gray-800">
+              <button
+                onClick={() => setShowCreateContactModal(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
                 Avbryt
               </button>
-              <button onClick={handleCreateContact} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+              <button
+                onClick={handleCreateContact}
+                disabled={saving}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
                 {saving ? 'Lagrer...' : 'Opprett'}
               </button>
             </div>
@@ -667,38 +855,63 @@ export default function CustomersTab() {
             <h2 className="text-xl font-bold mb-4">Rediger kontaktperson</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Navn *
+                </label>
                 <input
                   type="text"
                   value={editContact.name}
-                  onChange={(e) => setEditContact({ ...editContact, name: e.target.value })}
+                  onChange={(e) =>
+                    setEditContact({ ...editContact, name: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">E-post</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  E-post
+                </label>
                 <input
                   type="email"
                   value={editContact.email || ''}
-                  onChange={(e) => setEditContact({ ...editContact, email: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setEditContact({
+                      ...editContact,
+                      email: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Telefon
+                </label>
                 <input
                   type="tel"
                   value={editContact.phone || ''}
-                  onChange={(e) => setEditContact({ ...editContact, phone: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setEditContact({
+                      ...editContact,
+                      phone: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tittel/stilling</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tittel/stilling
+                </label>
                 <input
                   type="text"
                   value={editContact.title || ''}
-                  onChange={(e) => setEditContact({ ...editContact, title: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setEditContact({
+                      ...editContact,
+                      title: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
@@ -707,7 +920,12 @@ export default function CustomersTab() {
                   <input
                     type="checkbox"
                     checked={editContact.active}
-                    onChange={(e) => setEditContact({ ...editContact, active: e.target.checked })}
+                    onChange={(e) =>
+                      setEditContact({
+                        ...editContact,
+                        active: e.target.checked,
+                      })
+                    }
                     className="rounded"
                   />
                   <span className="text-sm text-gray-700">Aktiv</span>
@@ -716,18 +934,35 @@ export default function CustomersTab() {
                   <input
                     type="checkbox"
                     checked={editContact.optedOut}
-                    onChange={(e) => setEditContact({ ...editContact, optedOut: e.target.checked })}
+                    onChange={(e) =>
+                      setEditContact({
+                        ...editContact,
+                        optedOut: e.target.checked,
+                      })
+                    }
                     className="rounded"
                   />
-                  <span className="text-sm text-gray-700">Har bedt om ikke motta undersøkelser (opt-out)</span>
+                  <span className="text-sm text-gray-700">
+                    Har bedt om ikke motta undersøkelser (opt-out)
+                  </span>
                 </label>
               </div>
             </div>
             <div className="mt-6 flex justify-end space-x-3">
-              <button onClick={() => { setShowEditContactModal(false); setEditContact(null) }} className="px-4 py-2 text-gray-600 hover:text-gray-800">
+              <button
+                onClick={() => {
+                  setShowEditContactModal(false)
+                  setEditContact(null)
+                }}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
                 Avbryt
               </button>
-              <button onClick={handleUpdateContact} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+              <button
+                onClick={handleUpdateContact}
+                disabled={saving}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
                 {saving ? 'Lagrer...' : 'Lagre'}
               </button>
             </div>
@@ -752,45 +987,67 @@ export default function CustomersTab() {
       {showLinkModal && linkContact && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Knytt kontakt til undersøkelse</h2>
+            <h2 className="text-xl font-bold mb-4">
+              Knytt kontakt til undersøkelse
+            </h2>
             <p className="text-sm text-gray-500 mb-4">
-              Kobler <strong>{linkContact.name}</strong> til en konsulent for en undersøkelse
+              Kobler <strong>{linkContact.name}</strong> til en konsulent for en
+              undersøkelse
             </p>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Undersøkelse (år) *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Undersøkelse (år) *
+                </label>
                 <select
                   value={selectedRoundId ?? ''}
-                  onChange={(e) => setSelectedRoundId(e.target.value ? parseInt(e.target.value) : null)}
+                  onChange={(e) =>
+                    setSelectedRoundId(
+                      e.target.value ? parseInt(e.target.value) : null,
+                    )
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
                   <option value="">-- Velg undersøkelse --</option>
-                  {rounds.sort((a, b) => b.year - a.year).map((round) => (
-                    <option key={round.id} value={round.id}>
-                      {round.name} ({round.year})
-                    </option>
-                  ))}
+                  {rounds
+                    .sort((a, b) => b.year - a.year)
+                    .map((round) => (
+                      <option key={round.id} value={round.id}>
+                        {round.name} ({round.year})
+                      </option>
+                    ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Konsulent *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Konsulent *
+                </label>
                 <select
                   value={selectedConsultantId ?? ''}
-                  onChange={(e) => setSelectedConsultantId(e.target.value ? parseInt(e.target.value) : null)}
+                  onChange={(e) =>
+                    setSelectedConsultantId(
+                      e.target.value ? parseInt(e.target.value) : null,
+                    )
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
                   <option value="">-- Velg konsulent --</option>
-                  {consultants.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.name}
-                    </option>
-                  ))}
+                  {consultants
+                    .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+                    .map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.name}
+                      </option>
+                    ))}
                 </select>
               </div>
             </div>
             <div className="mt-6 flex justify-end space-x-3">
               <button
-                onClick={() => { setShowLinkModal(false); setLinkContact(null) }}
+                onClick={() => {
+                  setShowLinkModal(false)
+                  setLinkContact(null)
+                }}
                 className="px-4 py-2 text-gray-600 hover:text-gray-800"
               >
                 Avbryt

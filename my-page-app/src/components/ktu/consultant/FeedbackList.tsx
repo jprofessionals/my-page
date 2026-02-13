@@ -77,9 +77,11 @@ export default function FeedbackList() {
 
   // Get text comments from a response
   const getComments = (response: KtuResponseSummary) => {
-    return response.questionResponses?.filter(
-      (qr) => qr.questionType === 'FREE_TEXT' && qr.textValue
-    ) ?? []
+    return (
+      response.questionResponses?.filter(
+        (qr) => qr.questionType === 'FREE_TEXT' && qr.textValue,
+      ) ?? []
+    )
   }
 
   if (loading) {
@@ -107,8 +109,12 @@ export default function FeedbackList() {
             d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
           />
         </svg>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Ingen tilbakemeldinger</h3>
-        <p className="text-gray-500">Du har ikke mottatt noen tilbakemeldinger enn.</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          Ingen tilbakemeldinger
+        </h3>
+        <p className="text-gray-500">
+          Du har ikke mottatt noen tilbakemeldinger enn.
+        </p>
       </div>
     )
   }
@@ -118,7 +124,10 @@ export default function FeedbackList() {
       {/* Header with year filter */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <h2 className="text-lg font-semibold text-gray-900">
-          {filteredResponses.length} {filteredResponses.length === 1 ? 'tilbakemelding' : 'tilbakemeldinger'}
+          {filteredResponses.length}{' '}
+          {filteredResponses.length === 1
+            ? 'tilbakemelding'
+            : 'tilbakemeldinger'}
           {selectedYear !== 'all' && ` fra ${selectedYear}`}
         </h2>
 
@@ -127,7 +136,11 @@ export default function FeedbackList() {
             <span className="text-sm text-gray-500">Filtrer:</span>
             <select
               value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+              onChange={(e) =>
+                setSelectedYear(
+                  e.target.value === 'all' ? 'all' : Number(e.target.value),
+                )
+              }
               className="text-sm border border-gray-300 rounded-md px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">Alle ({responses.length})</option>
@@ -147,7 +160,9 @@ export default function FeedbackList() {
           {/* Year header (only show if showing all years) */}
           {selectedYear === 'all' && availableYears.length > 1 && (
             <div className="flex items-center gap-3">
-              <h3 className="text-md font-semibold text-gray-700">{year || 'Ukjent'}</h3>
+              <h3 className="text-md font-semibold text-gray-700">
+                {year || 'Ukjent'}
+              </h3>
               <div className="flex-1 h-px bg-gray-200"></div>
               <span className="text-sm text-gray-400">{items.length} svar</span>
             </div>
@@ -166,21 +181,30 @@ export default function FeedbackList() {
                 >
                   {/* Header - Always visible */}
                   <button
-                    onClick={() => setExpandedId(expandedId === response.id ? null : response.id)}
+                    onClick={() =>
+                      setExpandedId(
+                        expandedId === response.id ? null : response.id,
+                      )
+                    }
                     className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex items-center gap-4">
                       {/* Organization initial */}
                       <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
                         <span className="text-lg font-bold text-blue-600">
-                          {response.organizationName?.charAt(0).toUpperCase() ?? '?'}
+                          {response.organizationName?.charAt(0).toUpperCase() ??
+                            '?'}
                         </span>
                       </div>
 
                       {/* Contact and organization info */}
                       <div className="text-left">
-                        <p className="font-medium text-gray-900">{response.contactName}</p>
-                        <p className="text-sm text-gray-500">{response.organizationName}</p>
+                        <p className="font-medium text-gray-900">
+                          {response.contactName}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {response.organizationName}
+                        </p>
                       </div>
                     </div>
 
@@ -188,17 +212,25 @@ export default function FeedbackList() {
                       {/* Comment indicator */}
                       {hasComments && (
                         <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">
-                          {comments.length} kommentar{comments.length > 1 ? 'er' : ''}
+                          {comments.length} kommentar
+                          {comments.length > 1 ? 'er' : ''}
                         </span>
                       )}
-                      <span className="text-sm text-gray-400">{formatDate(response.respondedAt)}</span>
+                      <span className="text-sm text-gray-400">
+                        {formatDate(response.respondedAt)}
+                      </span>
                       <svg
                         className={`w-5 h-5 text-gray-400 transition-transform ${expandedId === response.id ? 'rotate-180' : ''}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
                       </svg>
                     </div>
                   </button>
@@ -207,10 +239,17 @@ export default function FeedbackList() {
                   {hasComments && expandedId !== response.id && (
                     <div className="px-6 pb-4 pt-0 border-t border-gray-100">
                       {comments.slice(0, 1).map((qr) => (
-                        <div key={qr.id} className="bg-blue-50 rounded-lg p-3 mt-3">
-                          <p className="text-sm text-gray-600 italic line-clamp-2">&quot;{qr.textValue}&quot;</p>
+                        <div
+                          key={qr.id}
+                          className="bg-blue-50 rounded-lg p-3 mt-3"
+                        >
+                          <p className="text-sm text-gray-600 italic line-clamp-2">
+                            &quot;{qr.textValue}&quot;
+                          </p>
                           {comments.length > 1 && (
-                            <p className="text-xs text-blue-500 mt-1">+ {comments.length - 1} flere kommentarer</p>
+                            <p className="text-xs text-blue-500 mt-1">
+                              + {comments.length - 1} flere kommentarer
+                            </p>
                           )}
                         </div>
                       ))}
@@ -232,8 +271,13 @@ export default function FeedbackList() {
                         {response.questionResponses
                           ?.filter((qr) => qr.questionType === 'RATING_1_6')
                           .map((qr) => (
-                            <div key={qr.id} className="flex items-center justify-between py-2">
-                              <span className="text-sm text-gray-700">{qr.questionText}</span>
+                            <div
+                              key={qr.id}
+                              className="flex items-center justify-between py-2"
+                            >
+                              <span className="text-sm text-gray-700">
+                                {qr.questionText}
+                              </span>
                               <div className="flex items-center gap-2">
                                 {/* Visual rating bar */}
                                 <div className="flex gap-1">
@@ -248,7 +292,9 @@ export default function FeedbackList() {
                                     />
                                   ))}
                                 </div>
-                                <span className={`text-sm font-medium ${getScoreColor(qr.ratingValue)}`}>
+                                <span
+                                  className={`text-sm font-medium ${getScoreColor(qr.ratingValue)}`}
+                                >
                                   {qr.ratingValue ?? '-'}
                                 </span>
                               </div>
@@ -258,12 +304,21 @@ export default function FeedbackList() {
                         {/* Text responses / Comments */}
                         {comments.length > 0 && (
                           <div className="pt-2 border-t border-gray-100">
-                            <h4 className="text-sm font-medium text-gray-700 mb-3">Kommentarer</h4>
+                            <h4 className="text-sm font-medium text-gray-700 mb-3">
+                              Kommentarer
+                            </h4>
                             <div className="space-y-3">
                               {comments.map((qr) => (
-                                <div key={qr.id} className="bg-blue-50 rounded-lg p-3">
-                                  <p className="text-xs text-gray-500 mb-1">{qr.questionText}</p>
-                                  <p className="text-sm text-gray-700 italic">&quot;{qr.textValue}&quot;</p>
+                                <div
+                                  key={qr.id}
+                                  className="bg-blue-50 rounded-lg p-3"
+                                >
+                                  <p className="text-xs text-gray-500 mb-1">
+                                    {qr.questionText}
+                                  </p>
+                                  <p className="text-sm text-gray-700 italic">
+                                    &quot;{qr.textValue}&quot;
+                                  </p>
                                 </div>
                               ))}
                             </div>

@@ -93,7 +93,9 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Hyttetrekning - Admin</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Hyttetrekning - Admin
+          </h1>
           <p className="mt-2 text-gray-600">
             Administrer hyttetrekkinger (vinter/sommer)
           </p>
@@ -128,7 +130,8 @@ export default function AdminDashboard() {
 
           {drawings.length === 0 ? (
             <div className="px-6 py-12 text-center text-gray-500">
-              Ingen trekkinger funnet. Opprett en ny trekning for å komme i gang.
+              Ingen trekkinger funnet. Opprett en ny trekning for å komme i
+              gang.
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
@@ -136,7 +139,9 @@ export default function AdminDashboard() {
                 <div
                   key={drawing.id}
                   className="px-6 py-4 hover:bg-gray-50 cursor-pointer"
-                  onClick={() => router.push(`/admin/hyttetrekning/${drawing.id}`)}
+                  onClick={() =>
+                    router.push(`/admin/hyttetrekning/${drawing.id}`)
+                  }
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -146,14 +151,17 @@ export default function AdminDashboard() {
                         </h3>
                         <span
                           className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(
-                            drawing.status
+                            drawing.status,
                           )}`}
                         >
                           {getStatusText(drawing.status)}
                         </span>
                       </div>
                       <div className="mt-1 text-sm text-gray-500">
-                        Opprettet: {new Date(drawing.createdAt).toLocaleDateString('nb-NO')}
+                        Opprettet:{' '}
+                        {new Date(drawing.createdAt).toLocaleDateString(
+                          'nb-NO',
+                        )}
                         {drawing.periods && drawing.periods.length > 0 && (
                           <span className="ml-4">
                             {drawing.periods.length} periode(r)

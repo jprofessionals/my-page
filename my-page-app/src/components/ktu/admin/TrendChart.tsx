@@ -30,7 +30,10 @@ export default function TrendChart({
   showScaleHint = false,
 }: TrendChartProps) {
   // Filter out null values for rendering the line
-  const validData = data.filter((d) => d.value !== null) as { year: number; value: number }[]
+  const validData = data.filter((d) => d.value !== null) as {
+    year: number
+    value: number
+  }[]
 
   if (validData.length === 0) {
     return (
@@ -59,8 +62,10 @@ export default function TrendChart({
   const valueRange = maxValue - minValue
 
   // Scale functions
-  const xScale = (year: number) => padding.left + ((year - minYear) / yearRange) * chartWidth
-  const yScale = (value: number) => padding.top + chartHeight - ((value - minValue) / valueRange) * chartHeight
+  const xScale = (year: number) =>
+    padding.left + ((year - minYear) / yearRange) * chartWidth
+  const yScale = (value: number) =>
+    padding.top + chartHeight - ((value - minValue) / valueRange) * chartHeight
 
   // Generate path for the line
   const pathData = validData
@@ -73,8 +78,9 @@ export default function TrendChart({
 
   // Y-axis labels - generate based on min/max values
   const yAxisSteps = 5
-  const yAxisLabels = Array.from({ length: yAxisSteps + 1 }, (_, i) =>
-    minValue + (valueRange / yAxisSteps) * i
+  const yAxisLabels = Array.from(
+    { length: yAxisSteps + 1 },
+    (_, i) => minValue + (valueRange / yAxisSteps) * i,
   )
 
   // Format value for display
@@ -88,10 +94,16 @@ export default function TrendChart({
       <div className="flex justify-between items-start mb-2">
         <h3 className="text-sm font-medium text-gray-700">{title}</h3>
         {showScaleHint && (
-          <span className="text-xs text-gray-400 ml-2">Skala 1-6 (6 er best)</span>
+          <span className="text-xs text-gray-400 ml-2">
+            Skala 1-6 (6 er best)
+          </span>
         )}
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full" style={{ maxHeight: height }}>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="w-full"
+        style={{ maxHeight: height }}
+      >
         {/* Y-axis grid lines and labels */}
         {yAxisLabels.map((value) => {
           const y = yScale(value)
@@ -105,7 +117,12 @@ export default function TrendChart({
                 stroke="#E5E7EB"
                 strokeDasharray="4 2"
               />
-              <text x={padding.left - 8} y={y + 4} textAnchor="end" className="fill-gray-500 text-xs">
+              <text
+                x={padding.left - 8}
+                y={y + 4}
+                textAnchor="end"
+                className="fill-gray-500 text-xs"
+              >
                 {formatValue(value)}
               </text>
             </g>
@@ -129,7 +146,14 @@ export default function TrendChart({
         })}
 
         {/* Line */}
-        <path d={pathData} fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d={pathData}
+          fill="none"
+          stroke={color}
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
 
         {/* Dots and values */}
         {showDots &&
@@ -141,12 +165,23 @@ export default function TrendChart({
             return (
               <g key={d.year}>
                 <circle cx={x} cy={y} r={5} fill={color} />
-                <text x={x} y={y - 18} textAnchor="middle" className="fill-gray-700 text-xs font-medium">
+                <text
+                  x={x}
+                  y={y - 18}
+                  textAnchor="middle"
+                  className="fill-gray-700 text-xs font-medium"
+                >
                   {formatValue(d.value)}
                 </text>
                 {/* Show response count below the value */}
                 {typeof responseCount === 'number' && (
-                  <text x={x} y={y - 8} textAnchor="middle" className="fill-gray-400" style={{ fontSize: '9px' }}>
+                  <text
+                    x={x}
+                    y={y - 8}
+                    textAnchor="middle"
+                    className="fill-gray-400"
+                    style={{ fontSize: '9px' }}
+                  >
                     (n={responseCount})
                   </text>
                 )}
@@ -185,7 +220,10 @@ export function MultiLineTrendChart({
     return (
       <div className="bg-white rounded-lg shadow p-4">
         <h3 className="text-sm font-medium text-gray-700 mb-2">{title}</h3>
-        <div className="flex items-center justify-center text-gray-400" style={{ height }}>
+        <div
+          className="flex items-center justify-center text-gray-400"
+          style={{ height }}
+        >
           Ingen data
         </div>
       </div>
@@ -204,15 +242,21 @@ export function MultiLineTrendChart({
 
   const valueRange = maxValue - minValue
 
-  const xScale = (year: number) => padding.left + ((year - minYear) / yearRange) * chartWidth
-  const yScale = (value: number) => padding.top + chartHeight - ((value - minValue) / valueRange) * chartHeight
+  const xScale = (year: number) =>
+    padding.left + ((year - minYear) / yearRange) * chartWidth
+  const yScale = (value: number) =>
+    padding.top + chartHeight - ((value - minValue) / valueRange) * chartHeight
 
   const yAxisLabels = [1, 2, 3, 4, 5, 6]
 
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <h3 className="text-sm font-medium text-gray-700 mb-4">{title}</h3>
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full" style={{ maxHeight: height }}>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="w-full"
+        style={{ maxHeight: height }}
+      >
         {/* Y-axis grid lines and labels */}
         {yAxisLabels.map((value) => {
           const y = yScale(value)
@@ -226,7 +270,12 @@ export function MultiLineTrendChart({
                 stroke="#E5E7EB"
                 strokeDasharray="4 2"
               />
-              <text x={padding.left - 8} y={y + 4} textAnchor="end" className="fill-gray-500 text-xs">
+              <text
+                x={padding.left - 8}
+                y={y + 4}
+                textAnchor="end"
+                className="fill-gray-500 text-xs"
+              >
                 {value}
               </text>
             </g>
@@ -237,7 +286,13 @@ export function MultiLineTrendChart({
         {years.map((year) => {
           const x = xScale(year)
           return (
-            <text key={year} x={x} y={height - 40} textAnchor="middle" className="fill-gray-500 text-xs">
+            <text
+              key={year}
+              x={x}
+              y={height - 40}
+              textAnchor="middle"
+              className="fill-gray-500 text-xs"
+            >
               {year}
             </text>
           )
@@ -246,7 +301,9 @@ export function MultiLineTrendChart({
         {/* Lines for each series */}
         {series.map((s) => {
           const validPoints = data
-            .filter((d) => d.values[s.key] !== null && d.values[s.key] !== undefined)
+            .filter(
+              (d) => d.values[s.key] !== null && d.values[s.key] !== undefined,
+            )
             .map((d) => ({ year: d.year, value: d.values[s.key] as number }))
 
           if (validPoints.length < 2) return null
@@ -270,7 +327,13 @@ export function MultiLineTrendChart({
                 strokeLinejoin="round"
               />
               {validPoints.map((d) => (
-                <circle key={d.year} cx={xScale(d.year)} cy={yScale(d.value)} r={3} fill={s.color} />
+                <circle
+                  key={d.year}
+                  cx={xScale(d.year)}
+                  cy={yScale(d.value)}
+                  r={3}
+                  fill={s.color}
+                />
               ))}
             </g>
           )
@@ -281,7 +344,10 @@ export function MultiLineTrendChart({
       <div className="flex flex-wrap gap-4 mt-2 justify-center">
         {series.map((s) => (
           <div key={s.key} className="flex items-center gap-2 text-xs">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }}></div>
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: s.color }}
+            ></div>
             <span className="text-gray-600">{s.label}</span>
           </div>
         ))}

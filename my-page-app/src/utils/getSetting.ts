@@ -7,8 +7,6 @@ export default function getSetting(
   if (settings == null) {
     return undefined
   }
-  const setting = settings.find(
-    (element) => element.settingId === key,
-  )
+  const setting = settings.find((element) => element.settingId === key)
   return setting ? setting.settingValue : undefined
 }

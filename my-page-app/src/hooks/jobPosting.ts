@@ -361,7 +361,7 @@ const jobPostingsByCategoryCacheName = 'job-postings-by-category'
 
 export const useJobPostingsByCategory = (
   category: TechCategory | null,
-  month: string | null
+  month: string | null,
 ) => {
   const { userFetchStatus } = useAuthContext()
 

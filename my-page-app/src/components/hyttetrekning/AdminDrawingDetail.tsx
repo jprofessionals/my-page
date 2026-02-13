@@ -24,7 +24,11 @@ import DrawTab from './admin/DrawTab'
 import ResultsTab from './admin/ResultsTab'
 import ExecutionsTab from './admin/ExecutionsTab'
 
-export default function AdminDrawingDetail({ drawingId }: { drawingId: string }) {
+export default function AdminDrawingDetail({
+  drawingId,
+}: {
+  drawingId: string
+}) {
   const router = useRouter()
   const [drawing, setDrawing] = useState<Drawing | null>(null)
   const [periods, setPeriods] = useState<Period[]>([])
@@ -36,7 +40,9 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
 
   // Executions state
   const [executions, setExecutions] = useState<Execution[]>([])
-  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null)
+  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(
+    null,
+  )
 
   // Booking warnings (persistent across tab changes)
   const [bookingWarnings, setBookingWarnings] = useState<string[]>([])
@@ -74,7 +80,8 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
 
   // Wishes view mode
-  const [wishesViewMode, setWishesViewMode] = useState<WishesViewMode>('by-user')
+  const [wishesViewMode, setWishesViewMode] =
+    useState<WishesViewMode>('by-user')
 
   useEffect(() => {
     if (drawingId) {
@@ -97,24 +104,40 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       let executionIdToUse = selectedExecutionId
 
       // Load executions from drawing
-      if (drawingRes.data && drawingRes.data.executions && drawingRes.data.executions.length > 0) {
+      if (
+        drawingRes.data &&
+        drawingRes.data.executions &&
+        drawingRes.data.executions.length > 0
+      ) {
         setExecutions(drawingRes.data.executions)
         // Auto-select the most recent execution if none is selected
         if (!selectedExecutionId && drawingRes.data.executions.length > 0) {
-          const latestExecution = drawingRes.data.executions[drawingRes.data.executions.length - 1]
+          const latestExecution =
+            drawingRes.data.executions[drawingRes.data.executions.length - 1]
           executionIdToUse = latestExecution.id
           setSelectedExecutionId(latestExecution.id)
         }
       }
 
-      if (drawingRes.data && ['OPEN', 'LOCKED', 'DRAWN', 'PUBLISHED'].includes(drawingRes.data.status)) {
+      if (
+        drawingRes.data &&
+        ['OPEN', 'LOCKED', 'DRAWN', 'PUBLISHED'].includes(
+          drawingRes.data.status,
+        )
+      ) {
         const wishesRes = await cabinLotteryService.adminGetAllWishes(drawingId)
         setWishes(wishesRes.data ?? [])
       }
 
-      if (drawingRes.data && ['DRAWN', 'PUBLISHED'].includes(drawingRes.data.status)) {
+      if (
+        drawingRes.data &&
+        ['DRAWN', 'PUBLISHED'].includes(drawingRes.data.status)
+      ) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const allocsRes = await cabinLotteryService.adminGetAllocations(drawingId, executionIdToUse as any)
+        const allocsRes = await cabinLotteryService.adminGetAllocations(
+          drawingId,
+          executionIdToUse as any,
+        )
         setAllocations(allocsRes.data ?? [])
       }
     } catch (error) {
@@ -134,7 +157,13 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     try {
       await cabinLotteryService.adminAddPeriod(drawingId, newPeriod)
       setShowPeriodForm(false)
-      setNewPeriod({ startDate: '', endDate: '', description: '', comment: '', sortOrder: 0 })
+      setNewPeriod({
+        startDate: '',
+        endDate: '',
+        description: '',
+        comment: '',
+        sortOrder: 0,
+      })
       await loadData()
       toast.success('Periode lagt til!')
     } catch (error) {
@@ -155,15 +184,29 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
   }
 
   const handleUpdatePeriod = async (): Promise<void> => {
-    if (!editPeriod.startDate || !editPeriod.endDate || !editPeriod.description) {
+    if (
+      !editPeriod.startDate ||
+      !editPeriod.endDate ||
+      !editPeriod.description
+    ) {
       toast.warning('Vennligst fyll ut alle felt')
       return
     }
 
     try {
-      await cabinLotteryService.adminUpdatePeriod(drawingId, editingPeriodId!, editPeriod)
+      await cabinLotteryService.adminUpdatePeriod(
+        drawingId,
+        editingPeriodId!,
+        editPeriod,
+      )
       setEditingPeriodId(null)
-      setEditPeriod({ startDate: '', endDate: '', description: '', comment: '', sortOrder: 0 })
+      setEditPeriod({
+        startDate: '',
+        endDate: '',
+        description: '',
+        comment: '',
+        sortOrder: 0,
+      })
       await loadData()
       toast.success('Periode oppdatert!')
     } catch (error) {
@@ -174,7 +217,13 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
 
   const handleCancelEdit = (): void => {
     setEditingPeriodId(null)
-    setEditPeriod({ startDate: '', endDate: '', description: '', comment: '', sortOrder: 0 })
+    setEditPeriod({
+      startDate: '',
+      endDate: '',
+      description: '',
+      comment: '',
+      sortOrder: 0,
+    })
   }
 
   const handleDeletePeriod = async (periodId: string): Promise<void> => {
@@ -200,7 +249,7 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       const response = await cabinLotteryService.adminBulkCreatePeriods(
         drawingId,
         bulkPeriod.startDate,
-        bulkPeriod.endDate
+        bulkPeriod.endDate,
       )
       setShowBulkPeriodForm(false)
       setBulkPeriod({ startDate: '', endDate: '' })
@@ -239,7 +288,8 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
   }
 
   const handleOpenDrawing = async () => {
-    if (!confirm('Er du sikker på at du vil åpne trekningen for brukere?')) return
+    if (!confirm('Er du sikker på at du vil åpne trekningen for brukere?'))
+      return
 
     try {
       await cabinLotteryService.adminOpenDrawing(drawingId)
@@ -252,7 +302,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
   }
 
   const handleRevertToDraft = async () => {
-    if (!confirm('Er du sikker på at du vil sette trekningen tilbake til utkast?')) return
+    if (
+      !confirm('Er du sikker på at du vil sette trekningen tilbake til utkast?')
+    )
+      return
 
     try {
       await cabinLotteryService.adminRevertToDraft(drawingId)
@@ -265,7 +318,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
   }
 
   const handleRevertToLocked = async () => {
-    if (!confirm('Er du sikker på at du vil sette trekningen tilbake til låst?')) return
+    if (
+      !confirm('Er du sikker på at du vil sette trekningen tilbake til låst?')
+    )
+      return
 
     try {
       await cabinLotteryService.adminRevertToLocked(drawingId)
@@ -287,14 +343,21 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     setImportResult(null)
 
     try {
-      const response = await cabinLotteryService.adminImportWishes(drawingId, importFile)
+      const response = await cabinLotteryService.adminImportWishes(
+        drawingId,
+        importFile,
+      )
       setImportResult((response.data as unknown as ImportResult) ?? null)
       await loadData()
 
       if (response.data && response.data.errorCount === 0) {
-        toast.success(`Import vellykket! ${response.data.successCount} brukere importert.`)
+        toast.success(
+          `Import vellykket! ${response.data.successCount} brukere importert.`,
+        )
       } else if (response.data) {
-        toast.warning(`Import delvis vellykket. ${response.data.successCount} brukere importert, ${response.data.errorCount} feil.`)
+        toast.warning(
+          `Import delvis vellykket. ${response.data.successCount} brukere importert, ${response.data.errorCount} feil.`,
+        )
       }
     } catch (error) {
       console.error('Import failed:', error)
@@ -311,7 +374,10 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     try {
       const seed = drawSeed ? parseInt(drawSeed) : null
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await cabinLotteryService.adminPerformDraw(drawingId, seed as any)
+      const result = await cabinLotteryService.adminPerformDraw(
+        drawingId,
+        seed as any,
+      )
 
       // Lagre audit log og allocations fra resultatet
       if (result.data && result.data.auditLog) {
@@ -343,17 +409,30 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       return
     }
 
-    if (!confirm('Er du sikker på at du vil publisere? Dette oppretter faktiske bookings.')) return
+    if (
+      !confirm(
+        'Er du sikker på at du vil publisere? Dette oppretter faktiske bookings.',
+      )
+    )
+      return
 
     try {
-      const result = await cabinLotteryService.adminPublishDrawing(drawingId, executionId)
+      const result = await cabinLotteryService.adminPublishDrawing(
+        drawingId,
+        executionId,
+      )
       await loadData()
 
       // Check if there were any booking warnings
       console.log('Publish result:', result.data)
-      if (result?.data?.bookingWarnings && result.data.bookingWarnings.length > 0) {
+      if (
+        result?.data?.bookingWarnings &&
+        result.data.bookingWarnings.length > 0
+      ) {
         setBookingWarnings(result.data.bookingWarnings)
-        toast.warning(`Trekning publisert, men ${result.data.bookingWarnings.length} booking(s) feilet. Se advarsler under.`)
+        toast.warning(
+          `Trekning publisert, men ${result.data.bookingWarnings.length} booking(s) feilet. Se advarsler under.`,
+        )
       } else {
         setBookingWarnings([])
         toast.success('Trekning publisert! Alle bookings er opprettet.')
@@ -365,7 +444,12 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
   }
 
   const handleDeleteDrawing = async () => {
-    if (!confirm('Er du sikker på at du vil slette denne trekningen? Dette kan ikke angres.')) return
+    if (
+      !confirm(
+        'Er du sikker på at du vil slette denne trekningen? Dette kan ikke angres.',
+      )
+    )
+      return
 
     try {
       await cabinLotteryService.adminDeleteDrawing(drawingId)
@@ -373,7 +457,9 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
       toast.success('Trekning slettet')
     } catch (error) {
       console.error('Delete failed:', error)
-      toast.error('Feil ved sletting av trekning. Trekningen kan være gjennomført eller publisert.')
+      toast.error(
+        'Feil ved sletting av trekning. Trekningen kan være gjennomført eller publisert.',
+      )
     }
   }
 
@@ -387,15 +473,24 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
     setShowPeriodForm(false)
   }
 
-  const updateNewPeriod = (field: keyof PeriodFormState, value: string | number): void => {
+  const updateNewPeriod = (
+    field: keyof PeriodFormState,
+    value: string | number,
+  ): void => {
     setNewPeriod({ ...newPeriod, [field]: value })
   }
 
-  const updateBulkPeriod = (field: keyof BulkPeriodFormState, value: string): void => {
+  const updateBulkPeriod = (
+    field: keyof BulkPeriodFormState,
+    value: string,
+  ): void => {
     setBulkPeriod({ ...bulkPeriod, [field]: value })
   }
 
-  const updateEditPeriod = (field: keyof PeriodFormState, value: string | number): void => {
+  const updateEditPeriod = (
+    field: keyof PeriodFormState,
+    value: string | number,
+  ): void => {
     setEditPeriod({ ...editPeriod, [field]: value })
   }
 
@@ -443,7 +538,8 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
               </div>
               <div className="ml-3 flex-1">
                 <h3 className="text-sm font-medium text-yellow-800">
-                  Advarsler ved publisering ({bookingWarnings.length} booking(s) feilet)
+                  Advarsler ved publisering ({bookingWarnings.length} booking(s)
+                  feilet)
                 </h3>
                 <div className="mt-2 text-sm text-yellow-700">
                   <ul className="list-disc pl-5 space-y-1">
@@ -482,13 +578,32 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
           <div className="border-b border-gray-200">
             <nav className="flex -mb-px">
               {[
-                { id: 'periods' as const, label: 'Perioder', count: periods.length },
-                { id: 'wishes' as const, label: 'Ønsker', count: wishes.length },
+                {
+                  id: 'periods' as const,
+                  label: 'Perioder',
+                  count: periods.length,
+                },
+                {
+                  id: 'wishes' as const,
+                  label: 'Ønsker',
+                  count: wishes.length,
+                },
                 { id: 'draw' as const, label: 'Trekning', count: undefined },
-                { id: 'results' as const, label: 'Oversikt', count: allocations.length, showOnlyWhen: ['DRAWN', 'PUBLISHED'].includes(drawing.status) },
-                { id: 'executions' as const, label: 'Trekningshistorikk', count: executions.length },
+                {
+                  id: 'results' as const,
+                  label: 'Oversikt',
+                  count: allocations.length,
+                  showOnlyWhen: ['DRAWN', 'PUBLISHED'].includes(drawing.status),
+                },
+                {
+                  id: 'executions' as const,
+                  label: 'Trekningshistorikk',
+                  count: executions.length,
+                },
               ]
-                .filter((tab) => tab.showOnlyWhen === undefined || tab.showOnlyWhen)
+                .filter(
+                  (tab) => tab.showOnlyWhen === undefined || tab.showOnlyWhen,
+                )
                 .map((tab) => (
                   <button
                     key={tab.id}
@@ -501,7 +616,9 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
                   >
                     {tab.label}
                     {tab.count !== undefined && (
-                      <span className="ml-2 text-xs text-gray-400">({tab.count})</span>
+                      <span className="ml-2 text-xs text-gray-400">
+                        ({tab.count})
+                      </span>
                     )}
                   </button>
                 ))}

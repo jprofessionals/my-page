@@ -161,7 +161,9 @@ function Admin() {
     budget: BudgetYearSummary,
   ) => {
     if (budget) {
-      return Math.round(budget.hours) + (budget.hours === 1 ? ' time' : ' timer')
+      return (
+        Math.round(budget.hours) + (budget.hours === 1 ? ' time' : ' timer')
+      )
     } else {
       return '-'
     }
@@ -191,10 +193,10 @@ function Admin() {
       .then((responseSummary) => {
         // Map UserReadable to User by adding the 'loaded' field
         // Convert employeeNumber from number to string and cast to User[]
-        const users = (responseSummary.data || []).map(user => ({
+        const users = (responseSummary.data || []).map((user) => ({
           ...user,
           loaded: true,
-          employeeNumber: user.employeeNumber?.toString() ?? ''
+          employeeNumber: user.employeeNumber?.toString() ?? '',
         })) as unknown as User[]
         setUsers(users)
         extractListOfBudgets(users)
@@ -204,15 +206,19 @@ function Admin() {
           .then((disabledUsers) => {
             // Map UserReadable to User by adding the 'loaded' field
             // Convert employeeNumber from number to string and cast to User[]
-            const mappedDisabledUsers = (disabledUsers.data || []).map(user => ({
-              ...user,
-              loaded: true,
-              employeeNumber: user.employeeNumber?.toString() ?? ''
-            })) as unknown as User[]
+            const mappedDisabledUsers = (disabledUsers.data || []).map(
+              (user) => ({
+                ...user,
+                loaded: true,
+                employeeNumber: user.employeeNumber?.toString() ?? '',
+              }),
+            ) as unknown as User[]
             setDisabledUsers(mappedDisabledUsers)
           })
           .catch(() => {
-            toast.error('Klarte ikke laste deaktiverte brukere, prøv igjen senere')
+            toast.error(
+              'Klarte ikke laste deaktiverte brukere, prøv igjen senere',
+            )
           })
 
         apiService
@@ -236,49 +242,52 @@ function Admin() {
   if (!user?.admin) return null
 
   async function handleMakeAdmin() {
-      if (!newAdminUser) return;
-      try {
-        await apiService.toggleAdmin(newAdminUser.email, newAdminUser.isAdmin);
-        toast.success("Admin oppdatert");
-        refreshTable();
-        setNewAdminUser(undefined);
-      } catch {
-        toast.error("Feil ved oppdatering av admin-status");
-      }
+    if (!newAdminUser) return
+    try {
+      await apiService.toggleAdmin(newAdminUser.email, newAdminUser.isAdmin)
+      toast.success('Admin oppdatert')
+      refreshTable()
+      setNewAdminUser(undefined)
+    } catch {
+      toast.error('Feil ved oppdatering av admin-status')
+    }
   }
 
   async function handleDeactivateUser() {
-    if (!deactivateUser) return;
+    if (!deactivateUser) return
     try {
-      await apiService.toggleActive(deactivateUser.email, deactivateUser.isActive);
-      toast.success("Bruker deaktivert");
-      refreshTable();
-      setNewAdminUser(undefined);
+      await apiService.toggleActive(
+        deactivateUser.email,
+        deactivateUser.isActive,
+      )
+      toast.success('Bruker deaktivert')
+      refreshTable()
+      setNewAdminUser(undefined)
     } catch {
-      toast.error("Feil ved oppdatering av bruker");
+      toast.error('Feil ved oppdatering av bruker')
     }
   }
 
   async function handleActivateUser() {
-    if (!activateUser) return;
+    if (!activateUser) return
     try {
-      await apiService.toggleActive(activateUser.email, activateUser.isActive);
-      toast.success("Bruker aktivert");
-      refreshTable();
-      setNewAdminUser(undefined);
+      await apiService.toggleActive(activateUser.email, activateUser.isActive)
+      toast.success('Bruker aktivert')
+      refreshTable()
+      setNewAdminUser(undefined)
     } catch {
-      toast.error("Feil ved oppdatering av bruker");
+      toast.error('Feil ved oppdatering av bruker')
     }
   }
 
   // Handler to remove admin status
   async function handleRemoveAdmin(email: string) {
     try {
-      await apiService.toggleAdmin(email, false);
-      toast.success("Admin-status fjernet");
-      refreshTable();
+      await apiService.toggleAdmin(email, false)
+      toast.success('Admin-status fjernet')
+      refreshTable()
     } catch {
-      toast.error("Feil ved fjerning av admin-status");
+      toast.error('Feil ved fjerning av admin-status')
     }
   }
 
@@ -311,7 +320,13 @@ function Admin() {
               </div>
             </AccordionTrigger>
             <AccordionContent className="p-2 rounded-b-lg data-open:border-2">
-              <div>Viser budsjetter og forbruk for alle ansatte. <b>Kompetanse</b> og <b>Laptop & mobil</b> viser hvor mye ansatte har igjen på respektive budsjett, <b>Kompetanse(timer)</b> viser hvor mye som er forbrukt inneværende år mens <b>Hjemmekontor</b> og <b>Bruttotrekk</b> viser hvor mye som er brukt.</div>
+              <div>
+                Viser budsjetter og forbruk for alle ansatte. <b>Kompetanse</b>{' '}
+                og <b>Laptop & mobil</b> viser hvor mye ansatte har igjen på
+                respektive budsjett, <b>Kompetanse(timer)</b> viser hvor mye som
+                er forbrukt inneværende år mens <b>Hjemmekontor</b> og{' '}
+                <b>Bruttotrekk</b> viser hvor mye som er brukt.
+              </div>
               {/* Add text input field */}
               <div className="flex justify-between mt-4">
                 <div className="form-control">
@@ -344,92 +359,100 @@ function Admin() {
               </div>
               <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
                 <thead>
-                <tr className="text-base text-slate-900">
-                  <th className="rounded-tl-lg bg-slate-300">Brukere</th>
-                  {budgetTypes.map((budgetType) => (
+                  <tr className="text-base text-slate-900">
+                    <th className="rounded-tl-lg bg-slate-300">Brukere</th>
+                    {budgetTypes.map((budgetType) => (
+                      <th
+                        key={budgetType.id + '' + budgetType.balanceIsHours}
+                        className="bg-slate-300"
+                      >
+                        {budgetType.name}
+                      </th>
+                    ))}
                     <th
-                      key={budgetType.id + '' + budgetType.balanceIsHours}
-                      className="bg-slate-300"
-                    >
-                      {budgetType.name}
-                    </th>
-                  ))}
-                  <th key="action" className="px-6 rounded-tr-lg bg-slate-300" />
-                </tr>
+                      key="action"
+                      className="px-6 rounded-tr-lg bg-slate-300"
+                    />
+                  </tr>
                 </thead>
                 <tbody>
-                {users
-                  .filter((user) =>
-                    (user.budgets != undefined && user.budgets?.length > 0) &&
-                    (user.name
-                        ? user.name.toLowerCase()
-                        : user.email.toLowerCase()
-                    ).includes(filterValue.toLowerCase()),
-                  ) // Filter users by text input value
-                  .sort((a, b) => compareUsers(a, b))
-                  .map((userRow) => (
-                    <Fragment key={userRow.email}>
-                      <tr
-                        key={userRow.email}
-                        className={cn(
-                          userRow.email === expandedUser && 'active',
-                          'hover',
-                        )}
-                      >
-                        {/* pass event object to handleExpandUser */}
-                        <td key={userRow.email}>
-                          {userRow.name ? userRow.name : userRow.email}
-                        </td>
-                        {budgetTypes.map((budgetColumn) => (
-                          <td
-                            key={
-                              userRow.email +
-                              budgetColumn.id +
-                              '' +
-                              budgetColumn.balanceIsHours
-                            }
-                          >
-                            {getBudgetBalanceForType(
-                              userRow.budgets!,
-                              budgetColumn,
-                            )}
-                          </td>
-                        ))}
-                        <td
-                          onClick={() => handleExpandUser(userRow)}
-                          className="text-center cursor-pointer hover:brightness-90"
+                  {users
+                    .filter(
+                      (user) =>
+                        user.budgets != undefined &&
+                        user.budgets?.length > 0 &&
+                        (user.name
+                          ? user.name.toLowerCase()
+                          : user.email.toLowerCase()
+                        ).includes(filterValue.toLowerCase()),
+                    ) // Filter users by text input value
+                    .sort((a, b) => compareUsers(a, b))
+                    .map((userRow) => (
+                      <Fragment key={userRow.email}>
+                        <tr
+                          key={userRow.email}
+                          className={cn(
+                            userRow.email === expandedUser && 'active',
+                            'hover',
+                          )}
                         >
-                          <FontAwesomeIcon
-                            icon={faChevronCircleDown}
-                            size="xl"
-                            className={cn(
-                              userRow.email === expandedUser && 'rotate-180',
-                            )}
-                          />
-                        </td>
-                      </tr>
-                      {expandedUser === userRow.email ? (
-                        <tr key={`${userRow.email}-expanded`}>
-                          <td colSpan={budgetTypes.length + 2}>
-                            {/* +2 for brukere and expand button columns */}
-                            <span className="text-lg font-bold">
-                              {userRow.name}
-                            </span>
-                            <BudgetList
-                              type="list"
-                              budgets={userRow.budgets ?? []}
+                          {/* pass event object to handleExpandUser */}
+                          <td key={userRow.email}>
+                            {userRow.name ? userRow.name : userRow.email}
+                          </td>
+                          {budgetTypes.map((budgetColumn) => (
+                            <td
+                              key={
+                                userRow.email +
+                                budgetColumn.id +
+                                '' +
+                                budgetColumn.balanceIsHours
+                              }
+                            >
+                              {getBudgetBalanceForType(
+                                userRow.budgets!,
+                                budgetColumn,
+                              )}
+                            </td>
+                          ))}
+                          <td
+                            onClick={() => handleExpandUser(userRow)}
+                            className="text-center cursor-pointer hover:brightness-90"
+                          >
+                            <FontAwesomeIcon
+                              icon={faChevronCircleDown}
+                              size="xl"
+                              className={cn(
+                                userRow.email === expandedUser && 'rotate-180',
+                              )}
                             />
                           </td>
                         </tr>
-                      ) : null}
-                    </Fragment>
-                  ))}
+                        {expandedUser === userRow.email ? (
+                          <tr key={`${userRow.email}-expanded`}>
+                            <td colSpan={budgetTypes.length + 2}>
+                              {/* +2 for brukere and expand button columns */}
+                              <span className="text-lg font-bold">
+                                {userRow.name}
+                              </span>
+                              <BudgetList
+                                type="list"
+                                budgets={userRow.budgets ?? []}
+                              />
+                            </td>
+                          </tr>
+                        ) : null}
+                      </Fragment>
+                    ))}
                 </tbody>
               </table>
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="Oppsummering av kostnader" className="mb-4 border-none">
+          <AccordionItem
+            value="Oppsummering av kostnader"
+            className="mb-4 border-none"
+          >
             <AccordionTrigger
               className={cn(
                 'bg-orange-500 text-lg rounded-lg items-center px-3 gap-2 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none ',
@@ -445,49 +468,57 @@ function Admin() {
               </div>
             </AccordionTrigger>
             <AccordionContent className="p-2 rounded-b-lg data-open:border-2">
-              <span>Viser totalt forbruk per år og hvor mye som er utestående (for <b>Kompetanse</b> & <b>Laptop & mobil</b>). NB! Kompetansebudsjett nulles hvert år, mens Laptop & mobil fortsetter å akumulere.</span>
+              <span>
+                Viser totalt forbruk per år og hvor mye som er utestående (for{' '}
+                <b>Kompetanse</b> & <b>Laptop & mobil</b>). NB!
+                Kompetansebudsjett nulles hvert år, mens Laptop & mobil
+                fortsetter å akumulere.
+              </span>
               <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
                 <thead>
-                <tr className="text-base text-slate-900">
-                  <th className="rounded-tl-lg bg-slate-300">År</th>
-                  {budgetTypes.map((budgetType) => (
+                  <tr className="text-base text-slate-900">
+                    <th className="rounded-tl-lg bg-slate-300">År</th>
+                    {budgetTypes.map((budgetType) => (
+                      <th
+                        key={budgetType.id + '' + budgetType.balanceIsHours}
+                        className="bg-slate-300"
+                      >
+                        {budgetType.name}
+                      </th>
+                    ))}
                     <th
-                      key={budgetType.id + '' + budgetType.balanceIsHours}
-                      className="bg-slate-300"
-                    >
-                      {budgetType.name}
-                    </th>
-                  ))}
-                  <th key="action" className="px-6 rounded-tr-lg bg-slate-300" />
-                </tr>
+                      key="action"
+                      className="px-6 rounded-tr-lg bg-slate-300"
+                    />
+                  </tr>
                 </thead>
                 <tbody>
-                {budgetSummary
-                  .sort((a, b) => a.year - b.year)
-                  .map((budgetYearSummary) => (
-                    <Fragment key={budgetYearSummary.year}>
-                      <tr key={budgetYearSummary.year}>
-                        <td key={budgetYearSummary.year}>
-                          {budgetYearSummary.year}
-                        </td>
-                        {budgetTypes.map((budgetColumn) => (
-                          <td
-                            key={
-                              budgetYearSummary.year +
-                              budgetColumn.id +
-                              '' +
-                              budgetColumn.balanceIsHours
-                            }
-                          >
-                            {getBudgetBalanceForSummary(
-                              budgetYearSummary.yearSummary!,
-                              budgetColumn,
-                            )}
+                  {budgetSummary
+                    .sort((a, b) => a.year - b.year)
+                    .map((budgetYearSummary) => (
+                      <Fragment key={budgetYearSummary.year}>
+                        <tr key={budgetYearSummary.year}>
+                          <td key={budgetYearSummary.year}>
+                            {budgetYearSummary.year}
                           </td>
-                        ))}
-                      </tr>
-                    </Fragment>
-                  ))}
+                          {budgetTypes.map((budgetColumn) => (
+                            <td
+                              key={
+                                budgetYearSummary.year +
+                                budgetColumn.id +
+                                '' +
+                                budgetColumn.balanceIsHours
+                              }
+                            >
+                              {getBudgetBalanceForSummary(
+                                budgetYearSummary.yearSummary!,
+                                budgetColumn,
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                      </Fragment>
+                    ))}
                 </tbody>
               </table>
             </AccordionContent>
@@ -511,31 +542,32 @@ function Admin() {
             <AccordionContent className="p-2 rounded-b-lg data-open:border-2">
               <table className="table overflow-x-auto mt-4 shadow-xl table-xs border-slate-600">
                 <thead>
-                <tr className="text-base text-slate-900">
-                  <th className="w-3/4 rounded-tl-lg bg-slate-300">
-                    innstilling
-                  </th>
-                  <th className="w-1/4 rounded-tr-lg bg-slate-300">Verdi</th>
-                </tr>
+                  <tr className="text-base text-slate-900">
+                    <th className="w-3/4 rounded-tl-lg bg-slate-300">
+                      innstilling
+                    </th>
+                    <th className="w-1/4 rounded-tr-lg bg-slate-300">Verdi</th>
+                  </tr>
                 </thead>
                 <tbody>
-                {settings == null
-                  ? ''
-                  : settings
-                    .map((setting) => (
-                      <tr key={setting.settingId}>
-                        <td>{setting.settingDescription ?? setting.settingId}</td>
-                        <td>
-                          <input
-                            id={setting.settingId}
-                            type="text"
-                            className="input input-bordered"
-                            defaultValue={setting.settingValue}
-                            onChange={(e) => updateSetting(e)}
-                          />
-                        </td>
-                      </tr>
-                    ))}
+                  {settings == null
+                    ? ''
+                    : settings.map((setting) => (
+                        <tr key={setting.settingId}>
+                          <td>
+                            {setting.settingDescription ?? setting.settingId}
+                          </td>
+                          <td>
+                            <input
+                              id={setting.settingId}
+                              type="text"
+                              className="input input-bordered"
+                              defaultValue={setting.settingValue}
+                              onChange={(e) => updateSetting(e)}
+                            />
+                          </td>
+                        </tr>
+                      ))}
                 </tbody>
               </table>
             </AccordionContent>
@@ -558,30 +590,37 @@ function Admin() {
             </AccordionTrigger>
             <AccordionContent className="p-2 rounded-b-lg data-open:border-2">
               <ul className="mt-4 space-y-2">
-                {users.filter(user => user.admin).map(userRow => (
-                  <li key={userRow.email} className="flex items-center">
-                    <span>{userRow.name ?? userRow.email}</span>
-                    <button
-                      onClick={() => handleRemoveAdmin(userRow.email)}
-                      className="btn btn-secondary btn-sm ml-4"
-                    >
-                      Fjern admin
-                    </button>
-                  </li>
-                ))}
+                {users
+                  .filter((user) => user.admin)
+                  .map((userRow) => (
+                    <li key={userRow.email} className="flex items-center">
+                      <span>{userRow.name ?? userRow.email}</span>
+                      <button
+                        onClick={() => handleRemoveAdmin(userRow.email)}
+                        className="btn btn-secondary btn-sm ml-4"
+                      >
+                        Fjern admin
+                      </button>
+                    </li>
+                  ))}
               </ul>
               <div className="mt-4 flex items-center space-x-2">
                 <select
                   value={newAdminUser?.email || ''}
-                  onChange={(e) => setNewAdminUser({ email: e.target.value, isAdmin: true })}
+                  onChange={(e) =>
+                    setNewAdminUser({ email: e.target.value, isAdmin: true })
+                  }
                   className="select select-bordered"
                 >
                   <option value="">Velg bruker…</option>
-                  {users.filter(u => !u.admin).sort((a, b) => compareUsers(a, b)).map(u => (
-                    <option key={u.email} value={u.email}>
-                      {u.name ?? u.email}
-                    </option>
-                  ))}
+                  {users
+                    .filter((u) => !u.admin)
+                    .sort((a, b) => compareUsers(a, b))
+                    .map((u) => (
+                      <option key={u.email} value={u.email}>
+                        {u.name ?? u.email}
+                      </option>
+                    ))}
                 </select>
                 <button
                   onClick={handleMakeAdmin}
@@ -612,15 +651,19 @@ function Admin() {
               <div className="mt-4 flex items-center space-x-2">
                 <select
                   value={activateUser?.email || ''}
-                  onChange={(e) => setActivateUser({ email: e.target.value, isActive: true })}
+                  onChange={(e) =>
+                    setActivateUser({ email: e.target.value, isActive: true })
+                  }
                   className="select select-bordered"
                 >
                   <option value="">Velg bruker du vil aktivere</option>
-                  {disabledUsers.sort((a, b) => compareUsers(a, b)).map(u => (
-                    <option key={u.email} value={u.email}>
-                      {u.name ?? u.email}
-                    </option>
-                  ))}
+                  {disabledUsers
+                    .sort((a, b) => compareUsers(a, b))
+                    .map((u) => (
+                      <option key={u.email} value={u.email}>
+                        {u.name ?? u.email}
+                      </option>
+                    ))}
                 </select>
                 <button
                   onClick={handleActivateUser}
@@ -634,15 +677,23 @@ function Admin() {
               <div className="mt-4 flex items-center space-x-2">
                 <select
                   value={deactivateUser?.email || ''}
-                  onChange={(e) => setDeactivateUser({ email: e.target.value, isActive: false })}
+                  onChange={(e) =>
+                    setDeactivateUser({
+                      email: e.target.value,
+                      isActive: false,
+                    })
+                  }
                   className="select select-bordered"
                 >
                   <option value="">Velg bruker du vil deaktivere</option>
-                  {users.filter(u => !u.admin).sort((a, b) => compareUsers(a, b)).map(u => (
-                    <option key={u.email} value={u.email}>
-                      {u.name ?? u.email}
-                    </option>
-                  ))}
+                  {users
+                    .filter((u) => !u.admin)
+                    .sort((a, b) => compareUsers(a, b))
+                    .map((u) => (
+                      <option key={u.email} value={u.email}>
+                        {u.name ?? u.email}
+                      </option>
+                    ))}
                 </select>
                 <button
                   onClick={handleDeactivateUser}
@@ -655,11 +706,6 @@ function Admin() {
             </AccordionContent>
           </AccordionItem>
         </Accordions>
-
-
-
-
-
       </>
     )
   }

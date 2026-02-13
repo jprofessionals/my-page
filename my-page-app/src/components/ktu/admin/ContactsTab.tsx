@@ -11,15 +11,22 @@ import ktuService, {
 
 export default function ContactsTab() {
   const [contacts, setContacts] = useState<KtuCustomerContact[]>([])
-  const [organizations, setOrganizations] = useState<KtuCustomerOrganization[]>([])
+  const [organizations, setOrganizations] = useState<KtuCustomerOrganization[]>(
+    [],
+  )
   const [loading, setLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [creating, setCreating] = useState(false)
   const [showInactive, setShowInactive] = useState(false)
   const [filterOrgId, setFilterOrgId] = useState<number | undefined>(undefined)
-  const [newContact, setNewContact] = useState<CreateKtuContact>({ name: '', organizationId: 0 })
-  const [editContact, setEditContact] = useState<KtuCustomerContact | null>(null)
+  const [newContact, setNewContact] = useState<CreateKtuContact>({
+    name: '',
+    organizationId: 0,
+  })
+  const [editContact, setEditContact] = useState<KtuCustomerContact | null>(
+    null,
+  )
 
   useEffect(() => {
     loadOrganizations()
@@ -118,7 +125,11 @@ export default function ContactsTab() {
         <div className="flex gap-4 items-center">
           <select
             value={filterOrgId || ''}
-            onChange={(e) => setFilterOrgId(e.target.value ? parseInt(e.target.value) : undefined)}
+            onChange={(e) =>
+              setFilterOrgId(
+                e.target.value ? parseInt(e.target.value) : undefined,
+              )
+            }
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
           >
             <option value="">Alle organisasjoner</option>
@@ -189,8 +200,14 @@ export default function ContactsTab() {
                   className={`hover:bg-gray-50 ${!contact.active || contact.optedOut ? 'opacity-50' : ''}`}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{contact.name}</div>
-                    {contact.title && <div className="text-xs text-gray-500">{contact.title}</div>}
+                    <div className="text-sm font-medium text-gray-900">
+                      {contact.name}
+                    </div>
+                    {contact.title && (
+                      <div className="text-xs text-gray-500">
+                        {contact.title}
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {contact.organizationName}
@@ -210,7 +227,9 @@ export default function ContactsTab() {
                       )}
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          contact.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          contact.active
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
                         }`}
                       >
                         {contact.active ? 'Aktiv' : 'Inaktiv'}
@@ -239,21 +258,30 @@ export default function ContactsTab() {
             <h2 className="text-xl font-bold mb-4">Opprett ny kontakt</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Navn *
+                </label>
                 <input
                   type="text"
                   value={newContact.name}
-                  onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewContact({ ...newContact, name: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="f.eks. Ola Nordmann"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Organisasjon *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Organisasjon *
+                </label>
                 <select
                   value={newContact.organizationId || ''}
                   onChange={(e) =>
-                    setNewContact({ ...newContact, organizationId: parseInt(e.target.value) })
+                    setNewContact({
+                      ...newContact,
+                      organizationId: parseInt(e.target.value),
+                    })
                   }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
@@ -268,31 +296,52 @@ export default function ContactsTab() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">E-post</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  E-post
+                </label>
                 <input
                   type="email"
                   value={newContact.email || ''}
-                  onChange={(e) => setNewContact({ ...newContact, email: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setNewContact({
+                      ...newContact,
+                      email: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="ola@example.com"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Telefon
+                </label>
                 <input
                   type="tel"
                   value={newContact.phone || ''}
-                  onChange={(e) => setNewContact({ ...newContact, phone: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setNewContact({
+                      ...newContact,
+                      phone: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="+47 123 45 678"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tittel/stilling</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tittel/stilling
+                </label>
                 <input
                   type="text"
                   value={newContact.title || ''}
-                  onChange={(e) => setNewContact({ ...newContact, title: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setNewContact({
+                      ...newContact,
+                      title: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="f.eks. Prosjektleder"
                 />
@@ -324,20 +373,29 @@ export default function ContactsTab() {
             <h2 className="text-xl font-bold mb-4">Rediger kontakt</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Navn *
+                </label>
                 <input
                   type="text"
                   value={editContact.name}
-                  onChange={(e) => setEditContact({ ...editContact, name: e.target.value })}
+                  onChange={(e) =>
+                    setEditContact({ ...editContact, name: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Organisasjon *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Organisasjon *
+                </label>
                 <select
                   value={editContact.organizationId}
                   onChange={(e) =>
-                    setEditContact({ ...editContact, organizationId: parseInt(e.target.value) })
+                    setEditContact({
+                      ...editContact,
+                      organizationId: parseInt(e.target.value),
+                    })
                   }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
@@ -349,34 +407,49 @@ export default function ContactsTab() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">E-post</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  E-post
+                </label>
                 <input
                   type="email"
                   value={editContact.email || ''}
                   onChange={(e) =>
-                    setEditContact({ ...editContact, email: e.target.value || undefined })
+                    setEditContact({
+                      ...editContact,
+                      email: e.target.value || undefined,
+                    })
                   }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Telefon
+                </label>
                 <input
                   type="tel"
                   value={editContact.phone || ''}
                   onChange={(e) =>
-                    setEditContact({ ...editContact, phone: e.target.value || undefined })
+                    setEditContact({
+                      ...editContact,
+                      phone: e.target.value || undefined,
+                    })
                   }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tittel/stilling</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tittel/stilling
+                </label>
                 <input
                   type="text"
                   value={editContact.title || ''}
                   onChange={(e) =>
-                    setEditContact({ ...editContact, title: e.target.value || undefined })
+                    setEditContact({
+                      ...editContact,
+                      title: e.target.value || undefined,
+                    })
                   }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
@@ -386,7 +459,12 @@ export default function ContactsTab() {
                   <input
                     type="checkbox"
                     checked={editContact.active}
-                    onChange={(e) => setEditContact({ ...editContact, active: e.target.checked })}
+                    onChange={(e) =>
+                      setEditContact({
+                        ...editContact,
+                        active: e.target.checked,
+                      })
+                    }
                     className="rounded"
                   />
                   <span className="text-sm text-gray-700">Aktiv</span>
@@ -395,10 +473,17 @@ export default function ContactsTab() {
                   <input
                     type="checkbox"
                     checked={editContact.optedOut}
-                    onChange={(e) => setEditContact({ ...editContact, optedOut: e.target.checked })}
+                    onChange={(e) =>
+                      setEditContact({
+                        ...editContact,
+                        optedOut: e.target.checked,
+                      })
+                    }
                     className="rounded"
                   />
-                  <span className="text-sm text-gray-700">Har bedt om å ikke motta undersøkelser (opt-out)</span>
+                  <span className="text-sm text-gray-700">
+                    Har bedt om å ikke motta undersøkelser (opt-out)
+                  </span>
                 </label>
               </div>
             </div>

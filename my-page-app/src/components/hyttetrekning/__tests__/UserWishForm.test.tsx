@@ -40,7 +40,7 @@ describe('UserWishForm', () => {
     it('should show loading state initially', () => {
       // Setup mock to never resolve (simulate loading)
       vi.mocked(cabinLotteryService.getCurrentDrawing).mockImplementation(
-        () => new Promise(() => {})
+        () => new Promise(() => {}),
       )
 
       render(<UserWishForm />)
@@ -51,24 +51,36 @@ describe('UserWishForm', () => {
 
   describe('No Drawing State', () => {
     it('should show "no active drawing" message when drawing is null', async () => {
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: null })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: null,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
 
       render(<UserWishForm />)
 
       await waitFor(() => {
-        expect(screen.getByText('Ingen aktiv hyttetrekning for øyeblikket.')).toBeInTheDocument()
+        expect(
+          screen.getByText('Ingen aktiv hyttetrekning for øyeblikket.'),
+        ).toBeInTheDocument()
       })
     })
 
     it('should show "no active drawing" when status is DRAFT', async () => {
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: null })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: null,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
 
       render(<UserWishForm />)
 
       await waitFor(() => {
-        expect(screen.getByText('Ingen aktiv hyttetrekning for øyeblikket.')).toBeInTheDocument()
+        expect(
+          screen.getByText('Ingen aktiv hyttetrekning for øyeblikket.'),
+        ).toBeInTheDocument()
       })
     })
   })
@@ -80,8 +92,12 @@ describe('UserWishForm', () => {
       vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
         data: publishedDrawing,
       })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
       vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
 
       render(<UserWishForm />)
@@ -97,17 +113,31 @@ describe('UserWishForm', () => {
       const lockedDrawing = createMockDrawing({ status: 'LOCKED' })
       const mockWishes = createMockWishes()
 
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: lockedDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
-      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: mockWishes })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: lockedDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
+      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({
+        data: mockWishes,
+      })
 
       render(<UserWishForm />)
 
       await waitFor(() => {
         expect(screen.getByText('Dine registrerte ønsker')).toBeInTheDocument()
-        expect(screen.getByText('Trekningen er låst. Resultater vil bli publisert snart.')).toBeInTheDocument()
-        expect(screen.queryByText('Registrer dine ønsker')).not.toBeInTheDocument()
+        expect(
+          screen.getByText(
+            'Trekningen er låst. Resultater vil bli publisert snart.',
+          ),
+        ).toBeInTheDocument()
+        expect(
+          screen.queryByText('Registrer dine ønsker'),
+        ).not.toBeInTheDocument()
       })
     })
 
@@ -115,16 +145,26 @@ describe('UserWishForm', () => {
       const drawnDrawing = createMockDrawing({ status: 'DRAWN' })
       const mockWishes = createMockWishes()
 
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: drawnDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
-      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: mockWishes })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: drawnDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
+      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({
+        data: mockWishes,
+      })
 
       render(<UserWishForm />)
 
       await waitFor(() => {
         expect(screen.getByText('Dine registrerte ønsker')).toBeInTheDocument()
-        expect(screen.queryByText('Registrer dine ønsker')).not.toBeInTheDocument()
+        expect(
+          screen.queryByText('Registrer dine ønsker'),
+        ).not.toBeInTheDocument()
       })
     })
 
@@ -132,10 +172,18 @@ describe('UserWishForm', () => {
       const lockedDrawing = createMockDrawing({ status: 'LOCKED' })
       const mockWishes = createMockWishes()
 
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: lockedDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
-      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: mockWishes })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: lockedDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
+      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({
+        data: mockWishes,
+      })
 
       render(<UserWishForm />)
 
@@ -156,9 +204,15 @@ describe('UserWishForm', () => {
   describe('Open Status - Form Display', () => {
     beforeEach(() => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: openDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
       vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
     })
 
@@ -182,7 +236,9 @@ describe('UserWishForm', () => {
 
     it('should pre-populate form with existing wishes', async () => {
       const mockWishes = createMockWishes()
-      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: mockWishes })
+      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({
+        data: mockWishes,
+      })
 
       render(<UserWishForm />)
 
@@ -196,9 +252,15 @@ describe('UserWishForm', () => {
   describe('Add Wish', () => {
     beforeEach(() => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: openDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
       vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
     })
 
@@ -238,9 +300,15 @@ describe('UserWishForm', () => {
   describe('Remove Wish', () => {
     beforeEach(() => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: openDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
       vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
     })
 
@@ -268,9 +336,15 @@ describe('UserWishForm', () => {
   describe('Period Selection', () => {
     beforeEach(() => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: openDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
       vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
     })
 
@@ -321,9 +395,15 @@ describe('UserWishForm', () => {
   describe('Apartment Selection', () => {
     beforeEach(() => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: openDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
       vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
     })
 
@@ -403,7 +483,9 @@ describe('UserWishForm', () => {
       await user.click(checkbox2)
 
       // Should show priority order section
-      expect(screen.getByText('Valgte enheter i prioritert rekkefølge:')).toBeInTheDocument()
+      expect(
+        screen.getByText('Valgte enheter i prioritert rekkefølge:'),
+      ).toBeInTheDocument()
 
       // Should have up/down buttons
       const upButtons = screen.getAllByTitle('Flytt opp')
@@ -417,9 +499,15 @@ describe('UserWishForm', () => {
   describe('Form Validation', () => {
     beforeEach(() => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: openDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
       vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
     })
 
@@ -450,7 +538,7 @@ describe('UserWishForm', () => {
       await user.click(submitButton)
 
       expect(toast.warning).toHaveBeenCalledWith(
-        'Alle ønsker må ha en periode og minst én enhet valgt'
+        'Alle ønsker må ha en periode og minst én enhet valgt',
       )
     })
   })
@@ -458,11 +546,19 @@ describe('UserWishForm', () => {
   describe('Form Submission', () => {
     beforeEach(() => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: openDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
       vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
-      vi.mocked(cabinLotteryService.submitWishes).mockResolvedValue({ data: null })
+      vi.mocked(cabinLotteryService.submitWishes).mockResolvedValue({
+        data: null,
+      })
     })
 
     it('should submit wishes successfully', async () => {
@@ -497,7 +593,10 @@ describe('UserWishForm', () => {
 
       // Make submit take some time
       vi.mocked(cabinLotteryService.submitWishes).mockImplementation(
-        () => new Promise((resolve) => setTimeout(() => resolve({ data: null }), 100))
+        () =>
+          new Promise((resolve) =>
+            setTimeout(() => resolve({ data: null }), 100),
+          ),
       )
 
       render(<UserWishForm />)
@@ -526,7 +625,7 @@ describe('UserWishForm', () => {
       const user = userEvent.setup()
 
       vi.mocked(cabinLotteryService.submitWishes).mockRejectedValue(
-        new Error('Network error')
+        new Error('Network error'),
       )
 
       render(<UserWishForm />)
@@ -557,7 +656,10 @@ describe('UserWishForm', () => {
       const user = userEvent.setup()
 
       vi.mocked(cabinLotteryService.submitWishes).mockImplementation(
-        () => new Promise((resolve) => setTimeout(() => resolve({ data: null }), 100))
+        () =>
+          new Promise((resolve) =>
+            setTimeout(() => resolve({ data: null }), 100),
+          ),
       )
 
       render(<UserWishForm />)
@@ -586,16 +688,21 @@ describe('UserWishForm', () => {
   describe('Edge Cases', () => {
     it('should handle API error gracefully', async () => {
       vi.mocked(cabinLotteryService.getCurrentDrawing).mockRejectedValue(
-        new Error('API Error')
+        new Error('API Error'),
       )
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
 
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
       render(<UserWishForm />)
 
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith('Failed to load data:', expect.any(Error))
+        expect(consoleSpy).toHaveBeenCalledWith(
+          'Failed to load data:',
+          expect.any(Error),
+        )
       })
 
       consoleSpy.mockRestore()
@@ -603,11 +710,19 @@ describe('UserWishForm', () => {
 
     it('should handle undefined wishes data (401 unauthorized)', async () => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: openDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
       // Simulate 401 response with undefined data (empty body)
-      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: undefined })
+      vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({
+        data: undefined,
+      })
 
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
@@ -622,8 +737,10 @@ describe('UserWishForm', () => {
       expect(consoleSpy).not.toHaveBeenCalledWith(
         'Failed to load data:',
         expect.objectContaining({
-          message: expect.stringContaining("Cannot read properties of undefined (reading 'length')")
-        })
+          message: expect.stringContaining(
+            "Cannot read properties of undefined (reading 'length')",
+          ),
+        }),
       )
 
       consoleSpy.mockRestore()
@@ -631,8 +748,12 @@ describe('UserWishForm', () => {
 
     it('should handle empty periods array', async () => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: openDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
       vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: [] })
       vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
 
@@ -647,9 +768,15 @@ describe('UserWishForm', () => {
 
     it('should handle empty apartments array', async () => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: [] })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: openDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: [],
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
       vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
 
       render(<UserWishForm />)
@@ -665,9 +792,15 @@ describe('UserWishForm', () => {
   describe('Period Selection Logic', () => {
     beforeEach(() => {
       const openDrawing = createMockDrawing({ status: 'OPEN' })
-      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({ data: openDrawing })
-      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({ data: mockApartments })
-      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({ data: mockPeriods })
+      vi.mocked(cabinLotteryService.getCurrentDrawing).mockResolvedValue({
+        data: openDrawing,
+      })
+      vi.mocked(cabinLotteryService.getApartments).mockResolvedValue({
+        data: mockApartments,
+      })
+      vi.mocked(cabinLotteryService.getPeriods).mockResolvedValue({
+        data: mockPeriods,
+      })
       vi.mocked(cabinLotteryService.getMyWishes).mockResolvedValue({ data: [] })
     })
 
@@ -684,7 +817,9 @@ describe('UserWishForm', () => {
       const addButton = screen.getByText('Legg til ønske')
       await user.click(addButton)
 
-      const firstPeriodOption = screen.getAllByText(mockPeriods[0].description)[0]
+      const firstPeriodOption = screen.getAllByText(
+        mockPeriods[0].description,
+      )[0]
       expect(firstPeriodOption).toBeInTheDocument()
 
       // Add second wish
@@ -692,8 +827,8 @@ describe('UserWishForm', () => {
 
       // Check that we have two period selects
       const allSelects = screen.getAllByRole('combobox')
-      const periodSelects = allSelects.filter(select =>
-        select.previousElementSibling?.textContent === 'Periode'
+      const periodSelects = allSelects.filter(
+        (select) => select.previousElementSibling?.textContent === 'Periode',
       )
       expect(periodSelects.length).toBeGreaterThanOrEqual(2)
 
@@ -737,7 +872,11 @@ describe('UserWishForm', () => {
       })
 
       // Should show helpful message
-      expect(screen.getByText('Du har allerede lagt til ønsker for alle tilgjengelige perioder.')).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          'Du har allerede lagt til ønsker for alle tilgjengelige perioder.',
+        ),
+      ).toBeInTheDocument()
     })
 
     it('should allow selecting same period after removing wish', async () => {

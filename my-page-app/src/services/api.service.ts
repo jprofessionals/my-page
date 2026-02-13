@@ -163,7 +163,10 @@ const deleteBooking = async (bookingId: number) => {
   return { data }
 }
 
-const patchBooking = async (bookingId: number, updatedBooking: BookingUpdate) => {
+const patchBooking = async (
+  bookingId: number,
+  updatedBooking: BookingUpdate,
+) => {
   const { data } = await updateBookingSDK({
     path: { bookingId },
     body: updatedBooking,
@@ -208,7 +211,9 @@ const getAllPendingBookingTrainsForAllApartments = async () => {
   return data || []
 }
 
-const pickWinnerPendingBooking = async (pendingBookingList: PendingBookingDto[]) => {
+const pickWinnerPendingBooking = async (
+  pendingBookingList: PendingBookingDto[],
+) => {
   const { data } = await pickWinnerPendingBookingSDK({
     body: pendingBookingList,
   })
@@ -277,7 +282,10 @@ const createInfoNotice = async (infoNotice: CreateInformationNotice) => {
   return { data }
 }
 
-const getAllInfoNoticeVacancies = async (startDate: string, endDate: string) => {
+const getAllInfoNoticeVacancies = async (
+  startDate: string,
+  endDate: string,
+) => {
   const { data } = await getInformationNoticeVacanciesSDK({
     query: { startdate: startDate, enddate: endDate },
   })
@@ -304,7 +312,10 @@ const patchSetting = async (settingId: string, updatedSetting: Setting) => {
   return { data }
 }
 
-const adminPatchBooking = async (bookingId: number, updatedBooking: BookingUpdate) => {
+const adminPatchBooking = async (
+  bookingId: number,
+  updatedBooking: BookingUpdate,
+) => {
   const { data } = await adminUpdateBookingSDK({
     path: { bookingId },
     body: updatedBooking,
@@ -312,7 +323,10 @@ const adminPatchBooking = async (bookingId: number, updatedBooking: BookingUpdat
   return { data }
 }
 
-const patchPendingBooking = async (pendingBookingId: number, updatedBooking: BookingUpdate) => {
+const patchPendingBooking = async (
+  pendingBookingId: number,
+  updatedBooking: BookingUpdate,
+) => {
   const { data } = await updatePendingBookingSDK({
     path: { pendingBookingId },
     body: updatedBooking,

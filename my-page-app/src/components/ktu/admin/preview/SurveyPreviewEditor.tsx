@@ -23,21 +23,37 @@ interface Props {
 // Debounce delay for auto-save (ms)
 const AUTOSAVE_DELAY = 1500
 
-export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Props) {
+export default function SurveyPreviewEditor({
+  survey,
+  questions,
+  onUpdate,
+}: Props) {
   // Color themes
   const [colorThemes, setColorThemes] = useState<KtuColorTheme[]>([])
   const [loadingThemes, setLoadingThemes] = useState(true)
 
   // Local state for all editable fields
-  const [selectedThemeId, setSelectedThemeId] = useState<number | undefined>(survey.colorTheme?.id)
+  const [selectedThemeId, setSelectedThemeId] = useState<number | undefined>(
+    survey.colorTheme?.id,
+  )
   const [logoUrl, setLogoUrl] = useState<string | null>(survey.logoUrl || null)
   const [introText, setIntroText] = useState(survey.introText || '')
-  const [instructionText, setInstructionText] = useState(survey.instructionText || '')
-  const [ratingLabelLow, setRatingLabelLow] = useState(survey.ratingLabelLow || '')
-  const [ratingLabelHigh, setRatingLabelHigh] = useState(survey.ratingLabelHigh || '')
+  const [instructionText, setInstructionText] = useState(
+    survey.instructionText || '',
+  )
+  const [ratingLabelLow, setRatingLabelLow] = useState(
+    survey.ratingLabelLow || '',
+  )
+  const [ratingLabelHigh, setRatingLabelHigh] = useState(
+    survey.ratingLabelHigh || '',
+  )
   const [thankYouTitle, setThankYouTitle] = useState(survey.thankYouTitle || '')
-  const [thankYouMessage, setThankYouMessage] = useState(survey.thankYouMessage || '')
-  const [commentFieldLabel, setCommentFieldLabel] = useState(survey.commentFieldLabel || '')
+  const [thankYouMessage, setThankYouMessage] = useState(
+    survey.thankYouMessage || '',
+  )
+  const [commentFieldLabel, setCommentFieldLabel] = useState(
+    survey.commentFieldLabel || '',
+  )
 
   // UI state
   const [showThankYouPage, setShowThankYouPage] = useState(false)
@@ -109,7 +125,7 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
         setSaving(false)
       }
     },
-    [survey.id, isDraft, onUpdate]
+    [survey.id, isDraft, onUpdate],
   )
 
   // Debounced save for text fields
@@ -122,7 +138,7 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
         saveChanges(updates)
       }, AUTOSAVE_DELAY)
     },
-    [saveChanges]
+    [saveChanges],
   )
 
   // Cleanup timeout on unmount
@@ -188,7 +204,7 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
         setSaving(false)
       }
     },
-    [survey.id, isDraft, onUpdate]
+    [survey.id, isDraft, onUpdate],
   )
 
   // Per-question comment field label change handler
@@ -209,7 +225,7 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
         setSaving(false)
       }
     },
-    [survey.id, isDraft, onUpdate]
+    [survey.id, isDraft, onUpdate],
   )
 
   // Per-question required override handler
@@ -230,12 +246,14 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
         setSaving(false)
       }
     },
-    [survey.id, isDraft, onUpdate]
+    [survey.id, isDraft, onUpdate],
   )
 
   const handleLogoUpload = async (file: File) => {
     if (!isDraft) {
-      toast.warning('Logo kan kun lastes opp når undersøkelsen er i UTKAST-status')
+      toast.warning(
+        'Logo kan kun lastes opp når undersøkelsen er i UTKAST-status',
+      )
       return
     }
 
@@ -343,9 +361,12 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
             />
           </svg>
           <div>
-            <p className="font-medium text-yellow-800">Forhåndsvisning (kun lesing)</p>
+            <p className="font-medium text-yellow-800">
+              Forhåndsvisning (kun lesing)
+            </p>
             <p className="text-sm text-yellow-700">
-              Undersøkelsen er ikke lenger i UTKAST-status. Utseendet kan ikke endres.
+              Undersøkelsen er ikke lenger i UTKAST-status. Utseendet kan ikke
+              endres.
             </p>
           </div>
         </div>
@@ -428,7 +449,9 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
                 <input
                   type="text"
                   value={newTheme.name}
-                  onChange={(e) => setNewTheme({ ...newTheme, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewTheme({ ...newTheme, name: e.target.value })
+                  }
                   placeholder="f.eks. JPro Blå"
                   className="w-full px-3 py-2 border rounded-lg"
                 />
@@ -444,7 +467,10 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
                       type="color"
                       value={newTheme.headerBgColor}
                       onChange={(e) =>
-                        setNewTheme({ ...newTheme, headerBgColor: e.target.value })
+                        setNewTheme({
+                          ...newTheme,
+                          headerBgColor: e.target.value,
+                        })
                       }
                       className="w-10 h-10 rounded cursor-pointer"
                     />
@@ -452,7 +478,10 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
                       type="text"
                       value={newTheme.headerBgColor}
                       onChange={(e) =>
-                        setNewTheme({ ...newTheme, headerBgColor: e.target.value })
+                        setNewTheme({
+                          ...newTheme,
+                          headerBgColor: e.target.value,
+                        })
                       }
                       className="flex-1 px-2 py-1 border rounded text-xs"
                     />
@@ -468,7 +497,10 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
                       type="color"
                       value={newTheme.primaryColor}
                       onChange={(e) =>
-                        setNewTheme({ ...newTheme, primaryColor: e.target.value })
+                        setNewTheme({
+                          ...newTheme,
+                          primaryColor: e.target.value,
+                        })
                       }
                       className="w-10 h-10 rounded cursor-pointer"
                     />
@@ -476,7 +508,10 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
                       type="text"
                       value={newTheme.primaryColor}
                       onChange={(e) =>
-                        setNewTheme({ ...newTheme, primaryColor: e.target.value })
+                        setNewTheme({
+                          ...newTheme,
+                          primaryColor: e.target.value,
+                        })
                       }
                       className="flex-1 px-2 py-1 border rounded text-xs"
                     />
@@ -492,7 +527,10 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
                       type="color"
                       value={newTheme.accentBgColor}
                       onChange={(e) =>
-                        setNewTheme({ ...newTheme, accentBgColor: e.target.value })
+                        setNewTheme({
+                          ...newTheme,
+                          accentBgColor: e.target.value,
+                        })
                       }
                       className="w-10 h-10 rounded cursor-pointer"
                     />
@@ -500,7 +538,10 @@ export default function SurveyPreviewEditor({ survey, questions, onUpdate }: Pro
                       type="text"
                       value={newTheme.accentBgColor}
                       onChange={(e) =>
-                        setNewTheme({ ...newTheme, accentBgColor: e.target.value })
+                        setNewTheme({
+                          ...newTheme,
+                          accentBgColor: e.target.value,
+                        })
                       }
                       className="flex-1 px-2 py-1 border rounded text-xs"
                     />

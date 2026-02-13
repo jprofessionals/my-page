@@ -150,7 +150,10 @@ export const adminDeleteDrawing = async (drawingId: string) => {
   return { data }
 }
 
-export const adminAddPeriod = async (drawingId: string, period: CreatePeriodType) => {
+export const adminAddPeriod = async (
+  drawingId: string,
+  period: CreatePeriodType,
+) => {
   const { data } = await createPeriod({
     path: { drawingId },
     body: period,
@@ -165,7 +168,11 @@ export const adminGetPeriods = async (drawingId: string) => {
   return { data }
 }
 
-export const adminUpdatePeriod = async (drawingId: string, periodId: string, period: CreatePeriodType) => {
+export const adminUpdatePeriod = async (
+  drawingId: string,
+  periodId: string,
+  period: CreatePeriodType,
+) => {
   const { data } = await updatePeriod({
     path: { drawingId, periodId },
     body: period,
@@ -173,14 +180,21 @@ export const adminUpdatePeriod = async (drawingId: string, periodId: string, per
   return { data }
 }
 
-export const adminDeletePeriod = async (drawingId: string, periodId: string) => {
+export const adminDeletePeriod = async (
+  drawingId: string,
+  periodId: string,
+) => {
   const { data } = await deletePeriod({
     path: { drawingId, periodId },
   })
   return { data }
 }
 
-export const adminBulkCreatePeriods = async (drawingId: string, startDate: string, endDate: string) => {
+export const adminBulkCreatePeriods = async (
+  drawingId: string,
+  startDate: string,
+  endDate: string,
+) => {
   const { data } = await bulkCreatePeriods({
     path: { drawingId },
     body: { startDate, endDate },
@@ -223,7 +237,10 @@ export const adminRevertToLocked = async (drawingId: string) => {
   return { data }
 }
 
-export const adminPerformDraw = async (drawingId: string, seed: number | null = null) => {
+export const adminPerformDraw = async (
+  drawingId: string,
+  seed: number | null = null,
+) => {
   const { data } = await performDrawing({
     path: { drawingId },
     query: seed !== null ? { seed } : undefined,
@@ -231,7 +248,10 @@ export const adminPerformDraw = async (drawingId: string, seed: number | null = 
   return { data }
 }
 
-export const adminPublishDrawing = async (drawingId: string, executionId: string) => {
+export const adminPublishDrawing = async (
+  drawingId: string,
+  executionId: string,
+) => {
   const { data } = await publishDrawing({
     path: { drawingId },
     query: { executionId },
@@ -246,7 +266,10 @@ export const adminGetAllWishes = async (drawingId: string) => {
   return { data }
 }
 
-export const adminGetAllocations = async (drawingId: string, executionId: string | null = null) => {
+export const adminGetAllocations = async (
+  drawingId: string,
+  executionId: string | null = null,
+) => {
   const { data } = await getAdminAllocations({
     path: { drawingId },
     query: executionId ? { executionId } : undefined,
@@ -262,7 +285,10 @@ export const adminImportWishes = async (drawingId: string, file: File) => {
   return { data }
 }
 
-export const adminDeleteExecution = async (drawingId: string, executionId: string) => {
+export const adminDeleteExecution = async (
+  drawingId: string,
+  executionId: string,
+) => {
   const { data } = await deleteExecution({
     path: { drawingId, executionId },
   })
@@ -271,17 +297,26 @@ export const adminDeleteExecution = async (drawingId: string, executionId: strin
 
 // For backwards compatibility with axios-style responses
 const cabinLotteryServiceCompat = {
-  getCurrentDrawing: () => cabinLotteryService.getCurrentDrawing().then((data) => ({ data })),
-  getDrawing: (drawingId: string) => cabinLotteryService.getDrawing(drawingId).then((data) => ({ data })),
-  getPeriods: (drawingId: string) => cabinLotteryService.getPeriods(drawingId).then((data) => ({ data })),
+  getCurrentDrawing: () =>
+    cabinLotteryService.getCurrentDrawing().then((data) => ({ data })),
+  getDrawing: (drawingId: string) =>
+    cabinLotteryService.getDrawing(drawingId).then((data) => ({ data })),
+  getPeriods: (drawingId: string) =>
+    cabinLotteryService.getPeriods(drawingId).then((data) => ({ data })),
   submitWishes: (drawingId: string, wishes: CreateCabinWish[]) =>
-    cabinLotteryService.submitWishes(drawingId, wishes).then((data) => ({ data })),
-  getMyWishes: (drawingId: string) => cabinLotteryService.getMyWishes(drawingId).then((data) => ({ data })),
+    cabinLotteryService
+      .submitWishes(drawingId, wishes)
+      .then((data) => ({ data })),
+  getMyWishes: (drawingId: string) =>
+    cabinLotteryService.getMyWishes(drawingId).then((data) => ({ data })),
   getMyAllocations: (drawingId: string) =>
     cabinLotteryService.getMyAllocations(drawingId).then((data) => ({ data })),
   getAllAllocations: (drawingId: string, executionId?: string) =>
-    cabinLotteryService.getAllAllocations(drawingId, executionId).then((data) => ({ data })),
-  getApartments: () => cabinLotteryService.getApartments().then((data) => ({ data })),
+    cabinLotteryService
+      .getAllAllocations(drawingId, executionId)
+      .then((data) => ({ data })),
+  getApartments: () =>
+    cabinLotteryService.getApartments().then((data) => ({ data })),
   adminCreateDrawing,
   adminGetAllDrawings,
   adminGetDrawing,

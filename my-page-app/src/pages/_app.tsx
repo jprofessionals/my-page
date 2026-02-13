@@ -24,7 +24,7 @@ export default function App({
 
   // Check if current route is a public route (no nav bar)
   const isPublicRoute = publicRoutes.some((route) =>
-    router.pathname.startsWith(route)
+    router.pathname.startsWith(route),
   )
 
   return (

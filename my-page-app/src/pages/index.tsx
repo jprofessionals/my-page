@@ -14,12 +14,15 @@ import {
   Accordions,
   AccordionTrigger,
 } from '@/components/ui/bookingAccordion'
-import { faHotel, faTicket, IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import {
+  faHotel,
+  faTicket,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons'
 import cn from '@/utils/cn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { get } from 'radash'
-import BookingEditModal
-  from '@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-modal/BookingEditModal'
+import BookingEditModal from '@/components/hyttebooking/month-overview/components/month-calendar/booking-edit-modal/BookingEditModal'
 
 const BudgetList = dynamic(() => import('@/components/budget/BudgetList'), {
   ssr: false,
@@ -47,13 +50,12 @@ export default function HomePage() {
   const handleEditBookingCancelled = () => setEditBooking(undefined)
   const handleEditBookingSaved = async () => {
     setEditBooking(undefined)
-    refreshBookings();
+    refreshBookings()
   }
 
   const handleInitEditBooking = (booking: Booking) => {
-      setEditBooking(booking)
-    }
-
+    setEditBooking(booking)
+  }
 
   const refreshBookings = useCallback(async () => {
     setBookingLoadingStatus('loading')
@@ -124,7 +126,11 @@ export default function HomePage() {
   }
 
   const bookingConfig = get(bookingConfigs, 'default', bookingConfigs.default)
-  const pendingBookingConfig = get(bookingConfigs, 'pendingbookings', bookingConfigs.pendingbookings)
+  const pendingBookingConfig = get(
+    bookingConfigs,
+    'pendingbookings',
+    bookingConfigs.pendingbookings,
+  )
 
   return (
     <>
@@ -191,20 +197,32 @@ export default function HomePage() {
                             return (
                               <div key={booking.id} className="ml-10 mt-3 ">
                                 <p className={old ? 'old-booking' : ''}>
-                                  <span className='mr-1'>
-                                  Du {old ? 'hadde' : 'har reservert'}{' '}
-                                  <span
-                                    className={
-                                      cabinTextColorClasses[
-                                        booking.apartment.cabin_name
-                                      ]
-                                    }
-                                  >
-                                    {booking.apartment.cabin_name}
-                                  </span>{' '}
-                                  fra {formattedStartDate} til{' '}
-                                    {formattedEndDate}</span>
-                                  {old ? '' : <button className="btn btn-sm" onClick={() => handleInitEditBooking(booking)}>Rediger</button>}
+                                  <span className="mr-1">
+                                    Du {old ? 'hadde' : 'har reservert'}{' '}
+                                    <span
+                                      className={
+                                        cabinTextColorClasses[
+                                          booking.apartment.cabin_name
+                                        ]
+                                      }
+                                    >
+                                      {booking.apartment.cabin_name}
+                                    </span>{' '}
+                                    fra {formattedStartDate} til{' '}
+                                    {formattedEndDate}
+                                  </span>
+                                  {old ? (
+                                    ''
+                                  ) : (
+                                    <button
+                                      className="btn btn-sm"
+                                      onClick={() =>
+                                        handleInitEditBooking(booking)
+                                      }
+                                    >
+                                      Rediger
+                                    </button>
+                                  )}
                                 </p>
                                 {index !== bookings.length - 1 && (
                                   <hr className="mt-3" />
@@ -224,14 +242,18 @@ export default function HomePage() {
                 </div>
               ) : (
                 <p className="ml-4 prose">
-                  Du har ingen hyttereservasjoner. Se oversikt over ledige dager og reserver i kalenderen på firmahyttesiden.
+                  Du har ingen hyttereservasjoner. Se oversikt over ledige dager
+                  og reserver i kalenderen på firmahyttesiden.
                 </p>
               )}
 
               {pendingBookings.length > 0 ? (
                 <div className="px-4">
                   <Accordions type="multiple" className="mb-3 w-full">
-                    <AccordionItem value="pendingbookings" className="border-none">
+                    <AccordionItem
+                      value="pendingbookings"
+                      className="border-none"
+                    >
                       <AccordionTrigger
                         className={cn(
                           'text-sm rounded-lg items-center px-3 gap-2 self-start hover:brightness-90 focus:brightness-90 data-open:brightness-90 data-open:rounded-b-none ',
@@ -283,13 +305,14 @@ export default function HomePage() {
                                     className={
                                       cabinTextColorClasses[
                                         booking.apartment.cabin_name
-                                        ]
+                                      ]
                                     }
                                   >
                                     {booking.apartment.cabin_name}
                                   </span>{' '}
                                   fra {formattedStartDate} til{' '}
-                                  {formattedEndDate} - Se kalenderen på firmahyttesiden for informasjon om trekning
+                                  {formattedEndDate} - Se kalenderen på
+                                  firmahyttesiden for informasjon om trekning
                                 </p>
                                 {index !== bookings.length - 1 && (
                                   <hr className="mt-3" />
@@ -313,10 +336,7 @@ export default function HomePage() {
             loadingText="Laster inn ditt budsjett..."
           >
             {budgetLoadingStatus === 'completed' ? (
-              <BudgetList
-                type="tiles"
-                budgets={budgets}
-              />
+              <BudgetList type="tiles" budgets={budgets} />
             ) : (
               <ErrorPage errorText="Din bruker er autentisert, men vi klarte likevel ikke å hente ut dine budsjetter. Prøv igjen senere." />
             )}
@@ -341,7 +361,8 @@ export default function HomePage() {
               </a>
             </p>
             <p>
-              Kontakt Runar eller Steinar for å få rettigheter til å dytte kode til repoet.
+              Kontakt Runar eller Steinar for å få rettigheter til å dytte kode
+              til repoet.
             </p>
           </div>
         </div>

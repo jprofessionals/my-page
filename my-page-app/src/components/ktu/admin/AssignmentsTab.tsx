@@ -30,22 +30,32 @@ export default function AssignmentsTab() {
   const [responses, setResponses] = useState<KtuResponseSummary[]>([])
   const [consultants, setConsultants] = useState<KtuConsultant[]>([])
   const [contacts, setContacts] = useState<KtuCustomerContact[]>([])
-  const [organizations, setOrganizations] = useState<KtuCustomerOrganization[]>([])
+  const [organizations, setOrganizations] = useState<KtuCustomerOrganization[]>(
+    [],
+  )
   const [loadingDetails, setLoadingDetails] = useState(false)
   const [openOrgIds, setOpenOrgIds] = useState<Set<number>>(new Set())
-  const [manuallyAddedConsultants, setManuallyAddedConsultants] = useState<Map<number, Set<number>>>(new Map())
+  const [manuallyAddedConsultants, setManuallyAddedConsultants] = useState<
+    Map<number, Set<number>>
+  >(new Map())
 
   // Actions
   const [sendingInvitations, setSendingInvitations] = useState(false)
   const [sendingReminders, setSendingReminders] = useState(false)
-  const [invitationFilter, setInvitationFilter] = useState<'all' | KtuInvitationStatus>('all')
+  const [invitationFilter, setInvitationFilter] = useState<
+    'all' | KtuInvitationStatus
+  >('all')
 
   // Edit states
-  const [editingInvitation, setEditingInvitation] = useState<KtuInvitation | null>(null)
-  const [editInvitationStatus, setEditInvitationStatus] = useState<KtuInvitationStatus>('PENDING')
+  const [editingInvitation, setEditingInvitation] =
+    useState<KtuInvitation | null>(null)
+  const [editInvitationStatus, setEditInvitationStatus] =
+    useState<KtuInvitationStatus>('PENDING')
   const [updating, setUpdating] = useState(false)
-  const [selectedResponseDetail, setSelectedResponseDetail] = useState<KtuResponseSummary | null>(null)
-  const [editingResponse, setEditingResponse] = useState<KtuQuestionResponse | null>(null)
+  const [selectedResponseDetail, setSelectedResponseDetail] =
+    useState<KtuResponseSummary | null>(null)
+  const [editingResponse, setEditingResponse] =
+    useState<KtuQuestionResponse | null>(null)
   const [editRatingValue, setEditRatingValue] = useState<number | null>(null)
   const [editTextValue, setEditTextValue] = useState<string>('')
 
@@ -64,12 +74,13 @@ export default function AssignmentsTab() {
 
   const loadInitialData = async () => {
     try {
-      const [roundsRes, consultantsRes, contactsRes, orgsRes] = await Promise.all([
-        ktuService.getRounds(),
-        ktuService.getConsultants(),
-        ktuService.getContacts(),
-        ktuService.getOrganizations(),
-      ])
+      const [roundsRes, consultantsRes, contactsRes, orgsRes] =
+        await Promise.all([
+          ktuService.getRounds(),
+          ktuService.getConsultants(),
+          ktuService.getContacts(),
+          ktuService.getOrganizations(),
+        ])
 
       const sorted = (roundsRes.data || []).sort((a, b) => b.year - a.year)
       setSurveys(sorted)
@@ -78,7 +89,7 @@ export default function AssignmentsTab() {
       setOrganizations(orgsRes.data || [])
 
       // Auto-select first open survey
-      const openSurvey = sorted.find(s => s.status === 'OPEN')
+      const openSurvey = sorted.find((s) => s.status === 'OPEN')
       if (openSurvey) {
         setSelectedSurvey(openSurvey)
       } else if (sorted.length > 0) {
@@ -115,7 +126,12 @@ export default function AssignmentsTab() {
   // Invitation actions
   const handleSendInvitations = async () => {
     if (!selectedSurvey) return
-    if (!confirm('Vil du sende invitasjoner til alle tildelinger uten aktive invitasjoner?')) return
+    if (
+      !confirm(
+        'Vil du sende invitasjoner til alle tildelinger uten aktive invitasjoner?',
+      )
+    )
+      return
 
     setSendingInvitations(true)
     try {
@@ -177,7 +193,12 @@ export default function AssignmentsTab() {
   }
 
   const handleDeleteInvitation = async (invitationId: number) => {
-    if (!confirm('Er du sikker pa at du vil slette denne invitasjonen og alle tilhorende svar?')) return
+    if (
+      !confirm(
+        'Er du sikker pa at du vil slette denne invitasjonen og alle tilhorende svar?',
+      )
+    )
+      return
 
     try {
       await ktuService.deleteInvitation(invitationId)
@@ -192,7 +213,7 @@ export default function AssignmentsTab() {
 
   // Response handling
   const getResponseForInvitation = (invitationId: number) => {
-    return responses.find(r => r.id === invitationId)
+    return responses.find((r) => r.id === invitationId)
   }
 
   const openResponseDetail = (invitation: KtuInvitation) => {
@@ -244,41 +265,61 @@ export default function AssignmentsTab() {
   // Styling helpers
   const getStatusStyle = (status: KtuRoundStatus) => {
     switch (status) {
-      case 'DRAFT': return 'bg-gray-100 text-gray-700'
-      case 'OPEN': return 'bg-green-100 text-green-700'
-      case 'CLOSED': return 'bg-blue-100 text-blue-700'
-      default: return 'bg-gray-100 text-gray-700'
+      case 'DRAFT':
+        return 'bg-gray-100 text-gray-700'
+      case 'OPEN':
+        return 'bg-green-100 text-green-700'
+      case 'CLOSED':
+        return 'bg-blue-100 text-blue-700'
+      default:
+        return 'bg-gray-100 text-gray-700'
     }
   }
 
   const getStatusText = (status: KtuRoundStatus) => {
     switch (status) {
-      case 'DRAFT': return 'Utkast'
-      case 'OPEN': return 'Aktiv'
-      case 'CLOSED': return 'Avsluttet'
-      default: return status
+      case 'DRAFT':
+        return 'Utkast'
+      case 'OPEN':
+        return 'Aktiv'
+      case 'CLOSED':
+        return 'Avsluttet'
+      default:
+        return status
     }
   }
 
   const getInvitationStatusStyle = (status: KtuInvitationStatus) => {
     switch (status) {
-      case 'PENDING': return 'bg-gray-100 text-gray-700'
-      case 'SENT': return 'bg-blue-100 text-blue-700'
-      case 'OPENED': return 'bg-yellow-100 text-yellow-700'
-      case 'RESPONDED': return 'bg-green-100 text-green-700'
-      case 'EXPIRED': return 'bg-red-100 text-red-700'
-      default: return 'bg-gray-100 text-gray-700'
+      case 'PENDING':
+        return 'bg-gray-100 text-gray-700'
+      case 'SENT':
+        return 'bg-blue-100 text-blue-700'
+      case 'OPENED':
+        return 'bg-yellow-100 text-yellow-700'
+      case 'RESPONDED':
+        return 'bg-green-100 text-green-700'
+      case 'EXPIRED':
+        return 'bg-red-100 text-red-700'
+      default:
+        return 'bg-gray-100 text-gray-700'
     }
   }
 
   const getInvitationStatusText = (status: KtuInvitationStatus) => {
     switch (status) {
-      case 'PENDING': return 'Venter'
-      case 'SENT': return 'Sendt'
-      case 'OPENED': return 'Apnet'
-      case 'RESPONDED': return 'Besvart'
-      case 'EXPIRED': return 'Utlopt'
-      default: return status
+      case 'PENDING':
+        return 'Venter'
+      case 'SENT':
+        return 'Sendt'
+      case 'OPENED':
+        return 'Apnet'
+      case 'RESPONDED':
+        return 'Besvart'
+      case 'EXPIRED':
+        return 'Utlopt'
+      default:
+        return status
     }
   }
 
@@ -289,29 +330,37 @@ export default function AssignmentsTab() {
   }
 
   // Filtering
-  const filteredSurveys = filterStatus === 'all'
-    ? surveys
-    : surveys.filter(s => s.status === filterStatus)
+  const filteredSurveys =
+    filterStatus === 'all'
+      ? surveys
+      : surveys.filter((s) => s.status === filterStatus)
 
   // Build combined list: assignments with their invitations
-  const combinedList = assignments.map(assignment => {
-    const invitation = invitations.find(i => i.assignmentId === assignment.id)
+  const combinedList = assignments.map((assignment) => {
+    const invitation = invitations.find((i) => i.assignmentId === assignment.id)
     return { assignment, invitation }
   })
 
-  const filteredList = invitationFilter === 'all'
-    ? combinedList
-    : combinedList.filter(item => {
-        if (invitationFilter === 'PENDING') {
-          return !item.invitation || item.invitation.status === 'PENDING'
-        }
-        return item.invitation?.status === invitationFilter
-      })
+  const filteredList =
+    invitationFilter === 'all'
+      ? combinedList
+      : combinedList.filter((item) => {
+          if (invitationFilter === 'PENDING') {
+            return !item.invitation || item.invitation.status === 'PENDING'
+          }
+          return item.invitation?.status === invitationFilter
+        })
 
   // Stats
-  const respondedCount = invitations.filter(i => i.status === 'RESPONDED').length
-  const sentCount = invitations.filter(i => ['SENT', 'OPENED', 'RESPONDED'].includes(i.status)).length
-  const waitingCount = invitations.filter(i => ['SENT', 'OPENED'].includes(i.status)).length
+  const respondedCount = invitations.filter(
+    (i) => i.status === 'RESPONDED',
+  ).length
+  const sentCount = invitations.filter((i) =>
+    ['SENT', 'OPENED', 'RESPONDED'].includes(i.status),
+  ).length
+  const waitingCount = invitations.filter((i) =>
+    ['SENT', 'OPENED'].includes(i.status),
+  ).length
   const notSentCount = assignments.length - sentCount
 
   const isRoundOpen = selectedSurvey?.status === 'OPEN'
@@ -328,7 +377,9 @@ export default function AssignmentsTab() {
       <div className="w-1/4 min-w-[250px]">
         <div className="bg-white rounded-lg shadow">
           <div className="p-4 border-b">
-            <h2 className="text-lg font-semibold text-gray-900">Velg undersokelse</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Velg undersokelse
+            </h2>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
@@ -342,23 +393,31 @@ export default function AssignmentsTab() {
           </div>
           <div className="divide-y max-h-[500px] overflow-y-auto">
             {filteredSurveys.length === 0 ? (
-              <div className="p-4 text-gray-500 text-center">Ingen undersokelser</div>
+              <div className="p-4 text-gray-500 text-center">
+                Ingen undersokelser
+              </div>
             ) : (
               filteredSurveys.map((survey) => (
                 <button
                   key={survey.id}
                   onClick={() => setSelectedSurvey(survey)}
                   className={`w-full text-left p-4 hover:bg-gray-50 ${
-                    selectedSurvey?.id === survey.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                    selectedSurvey?.id === survey.id
+                      ? 'bg-blue-50 border-l-4 border-blue-500'
+                      : ''
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{survey.name}</span>
-                    <span className={`px-2 py-1 text-xs rounded-full ${getStatusStyle(survey.status)}`}>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${getStatusStyle(survey.status)}`}
+                    >
                       {getStatusText(survey.status)}
                     </span>
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">{survey.year}</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {survey.year}
+                  </div>
                 </button>
               ))
             )}
@@ -373,8 +432,12 @@ export default function AssignmentsTab() {
             {/* Survey info & actions */}
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-900">{selectedSurvey.name}</h2>
-                <span className={`px-3 py-1 text-sm rounded-full ${getStatusStyle(selectedSurvey.status)}`}>
+                <h2 className="text-xl font-bold text-gray-900">
+                  {selectedSurvey.name}
+                </h2>
+                <span
+                  className={`px-3 py-1 text-sm rounded-full ${getStatusStyle(selectedSurvey.status)}`}
+                >
                   {getStatusText(selectedSurvey.status)}
                 </span>
               </div>
@@ -386,20 +449,31 @@ export default function AssignmentsTab() {
                   {/* Stats */}
                   <div className="grid grid-cols-4 gap-4 mb-6">
                     <div className="bg-gray-50 rounded p-3">
-                      <div className="text-2xl font-bold text-gray-700">{assignments.length}</div>
+                      <div className="text-2xl font-bold text-gray-700">
+                        {assignments.length}
+                      </div>
                       <div className="text-sm text-gray-600">Tildelinger</div>
                     </div>
                     <div className="bg-blue-50 rounded p-3">
-                      <div className="text-2xl font-bold text-blue-700">{sentCount}</div>
+                      <div className="text-2xl font-bold text-blue-700">
+                        {sentCount}
+                      </div>
                       <div className="text-sm text-blue-600">Sendt</div>
                     </div>
                     <div className="bg-green-50 rounded p-3">
-                      <div className="text-2xl font-bold text-green-700">{respondedCount}</div>
+                      <div className="text-2xl font-bold text-green-700">
+                        {respondedCount}
+                      </div>
                       <div className="text-sm text-green-600">Besvart</div>
                     </div>
                     <div className="bg-purple-50 rounded p-3">
                       <div className="text-2xl font-bold text-purple-700">
-                        {assignments.length > 0 ? Math.round((respondedCount / assignments.length) * 100) : 0}%
+                        {assignments.length > 0
+                          ? Math.round(
+                              (respondedCount / assignments.length) * 100,
+                            )
+                          : 0}
+                        %
                       </div>
                       <div className="text-sm text-purple-600">Svarprosent</div>
                     </div>
@@ -414,14 +488,18 @@ export default function AssignmentsTab() {
                           disabled={sendingInvitations || notSentCount === 0}
                           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
                         >
-                          {sendingInvitations ? 'Sender...' : `Send invitasjoner (${notSentCount})`}
+                          {sendingInvitations
+                            ? 'Sender...'
+                            : `Send invitasjoner (${notSentCount})`}
                         </button>
                         <button
                           onClick={handleSendReminders}
                           disabled={sendingReminders || waitingCount === 0}
                           className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
                         >
-                          {sendingReminders ? 'Sender...' : `Send purring (${waitingCount})`}
+                          {sendingReminders
+                            ? 'Sender...'
+                            : `Send purring (${waitingCount})`}
                         </button>
                       </>
                     )}
@@ -430,7 +508,8 @@ export default function AssignmentsTab() {
                   {isRoundDraft && (
                     <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                       <p className="text-yellow-800">
-                        Undersokelsen er et utkast. Apne den for a sende invitasjoner.
+                        Undersokelsen er et utkast. Apne den for a sende
+                        invitasjoner.
                       </p>
                     </div>
                   )}
@@ -482,7 +561,9 @@ export default function AssignmentsTab() {
                     openOrgIds={openOrgIds}
                     onOpenOrgIdsChange={setOpenOrgIds}
                     manuallyAddedConsultants={manuallyAddedConsultants}
-                    onManuallyAddedConsultantsChange={setManuallyAddedConsultants}
+                    onManuallyAddedConsultantsChange={
+                      setManuallyAddedConsultants
+                    }
                   />
                 </div>
               ) : (
@@ -490,40 +571,84 @@ export default function AssignmentsTab() {
                   <div className="px-4 py-2 border-b">
                     <select
                       value={invitationFilter}
-                      onChange={(e) => setInvitationFilter(e.target.value as 'all' | KtuInvitationStatus)}
+                      onChange={(e) =>
+                        setInvitationFilter(
+                          e.target.value as 'all' | KtuInvitationStatus,
+                        )
+                      }
                       className="border rounded px-3 py-1 text-sm"
                     >
                       <option value="all">Alle ({assignments.length})</option>
-                      <option value="PENDING">Ikke sendt ({notSentCount})</option>
-                      <option value="SENT">Sendt ({invitations.filter(i => i.status === 'SENT').length})</option>
-                      <option value="OPENED">Apnet ({invitations.filter(i => i.status === 'OPENED').length})</option>
-                      <option value="RESPONDED">Besvart ({respondedCount})</option>
-                      <option value="EXPIRED">Utlopt ({invitations.filter(i => i.status === 'EXPIRED').length})</option>
+                      <option value="PENDING">
+                        Ikke sendt ({notSentCount})
+                      </option>
+                      <option value="SENT">
+                        Sendt (
+                        {invitations.filter((i) => i.status === 'SENT').length})
+                      </option>
+                      <option value="OPENED">
+                        Apnet (
+                        {
+                          invitations.filter((i) => i.status === 'OPENED')
+                            .length
+                        }
+                        )
+                      </option>
+                      <option value="RESPONDED">
+                        Besvart ({respondedCount})
+                      </option>
+                      <option value="EXPIRED">
+                        Utlopt (
+                        {
+                          invitations.filter((i) => i.status === 'EXPIRED')
+                            .length
+                        }
+                        )
+                      </option>
                     </select>
                   </div>
 
                   {assignments.length === 0 ? (
                     <div className="p-8 text-center text-gray-500">
                       <p>Ingen tildelinger for denne undersokelsen</p>
-                      <p className="text-sm mt-2">Bruk matrisevisningen for a legge til tildelinger.</p>
+                      <p className="text-sm mt-2">
+                        Bruk matrisevisningen for a legge til tildelinger.
+                      </p>
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Konsulent</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kunde</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kontakt</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sendt</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Besvart</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Handlinger</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Konsulent
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Kunde
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Kontakt
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Status
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Sendt
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Besvart
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Handlinger
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                           {filteredList.map(({ assignment, invitation }) => (
-                            <tr key={assignment.id} className="hover:bg-gray-50">
+                            <tr
+                              key={assignment.id}
+                              className="hover:bg-gray-50"
+                            >
                               <td className="px-4 py-3 text-sm font-medium text-gray-900">
                                 {assignment.consultant.name}
                               </td>
@@ -532,11 +657,15 @@ export default function AssignmentsTab() {
                               </td>
                               <td className="px-4 py-3 text-sm">
                                 <div>{assignment.contact.name}</div>
-                                <div className="text-xs text-gray-400">{assignment.contact.email}</div>
+                                <div className="text-xs text-gray-400">
+                                  {assignment.contact.email}
+                                </div>
                               </td>
                               <td className="px-4 py-3">
                                 {invitation ? (
-                                  <span className={`px-2 py-1 text-xs rounded-full ${getInvitationStatusStyle(invitation.status)}`}>
+                                  <span
+                                    className={`px-2 py-1 text-xs rounded-full ${getInvitationStatusStyle(invitation.status)}`}
+                                  >
                                     {getInvitationStatusText(invitation.status)}
                                   </span>
                                 ) : (
@@ -546,32 +675,64 @@ export default function AssignmentsTab() {
                                 )}
                               </td>
                               <td className="px-4 py-3 text-sm text-gray-500">
-                                {invitation?.sentAt ? new Date(invitation.sentAt).toLocaleDateString('nb-NO') : '-'}
+                                {invitation?.sentAt
+                                  ? new Date(
+                                      invitation.sentAt,
+                                    ).toLocaleDateString('nb-NO')
+                                  : '-'}
                               </td>
                               <td className="px-4 py-3 text-sm text-gray-500">
-                                {invitation?.respondedAt ? new Date(invitation.respondedAt).toLocaleDateString('nb-NO') : '-'}
+                                {invitation?.respondedAt
+                                  ? new Date(
+                                      invitation.respondedAt,
+                                    ).toLocaleDateString('nb-NO')
+                                  : '-'}
                               </td>
                               <td className="px-4 py-3 text-sm">
                                 <div className="flex gap-2">
                                   {invitation && (
                                     <>
                                       <button
-                                        onClick={() => openEditInvitation(invitation)}
+                                        onClick={() =>
+                                          openEditInvitation(invitation)
+                                        }
                                         className="text-blue-600 hover:text-blue-800"
                                         title="Rediger"
                                       >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        <svg
+                                          className="w-4 h-4"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                                          />
                                         </svg>
                                       </button>
                                       {invitation.status === 'RESPONDED' && (
                                         <button
-                                          onClick={() => openResponseDetail(invitation)}
+                                          onClick={() =>
+                                            openResponseDetail(invitation)
+                                          }
                                           className="text-green-600 hover:text-green-800"
                                           title="Se svar"
                                         >
-                                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                          <svg
+                                            className="w-4 h-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth={2}
+                                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                            />
                                           </svg>
                                         </button>
                                       )}
@@ -591,7 +752,9 @@ export default function AssignmentsTab() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow p-12 text-center text-gray-500">
-            <p className="text-lg">Velg en undersokelse for a administrere tildelinger</p>
+            <p className="text-lg">
+              Velg en undersokelse for a administrere tildelinger
+            </p>
           </div>
         )}
       </div>
@@ -604,17 +767,27 @@ export default function AssignmentsTab() {
             <div className="space-y-4">
               <div className="bg-gray-50 rounded p-3">
                 <div className="text-sm text-gray-500">Konsulent</div>
-                <div className="font-medium">{editingInvitation.consultant?.name || '-'}</div>
+                <div className="font-medium">
+                  {editingInvitation.consultant?.name || '-'}
+                </div>
               </div>
               <div className="bg-gray-50 rounded p-3">
                 <div className="text-sm text-gray-500">Kunde</div>
-                <div className="font-medium">{editingInvitation.organization?.name || '-'}</div>
+                <div className="font-medium">
+                  {editingInvitation.organization?.name || '-'}
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Status
+                </label>
                 <select
                   value={editInvitationStatus}
-                  onChange={(e) => setEditInvitationStatus(e.target.value as KtuInvitationStatus)}
+                  onChange={(e) =>
+                    setEditInvitationStatus(
+                      e.target.value as KtuInvitationStatus,
+                    )
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
                   <option value="PENDING">Venter</option>
@@ -633,7 +806,10 @@ export default function AssignmentsTab() {
                 Slett invitasjon
               </button>
               <div className="flex gap-3">
-                <button onClick={() => setEditingInvitation(null)} className="px-4 py-2 text-gray-600 hover:text-gray-800">
+                <button
+                  onClick={() => setEditingInvitation(null)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
                   Avbryt
                 </button>
                 <button
@@ -656,14 +832,30 @@ export default function AssignmentsTab() {
             <div className="p-6 border-b">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">Svardetaljer</h3>
+                  <h3 className="text-xl font-bold text-gray-900">
+                    Svardetaljer
+                  </h3>
                   <p className="text-gray-600 mt-1">
-                    {selectedResponseDetail.consultantName} - {selectedResponseDetail.organizationName}
+                    {selectedResponseDetail.consultantName} -{' '}
+                    {selectedResponseDetail.organizationName}
                   </p>
                 </div>
-                <button onClick={() => setSelectedResponseDetail(null)} className="text-gray-400 hover:text-gray-600">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <button
+                  onClick={() => setSelectedResponseDetail(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -673,43 +865,71 @@ export default function AssignmentsTab() {
               <div className="grid grid-cols-2 gap-4 mb-6 bg-gray-50 rounded-lg p-4">
                 <div>
                   <div className="text-sm text-gray-500">Kontaktperson</div>
-                  <div className="font-medium">{selectedResponseDetail.contactName}</div>
+                  <div className="font-medium">
+                    {selectedResponseDetail.contactName}
+                  </div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">Besvart</div>
                   <div className="font-medium">
                     {selectedResponseDetail.respondedAt
-                      ? new Date(selectedResponseDetail.respondedAt).toLocaleDateString('nb-NO')
+                      ? new Date(
+                          selectedResponseDetail.respondedAt,
+                        ).toLocaleDateString('nb-NO')
                       : '-'}
                   </div>
                 </div>
               </div>
 
-              <h4 className="font-semibold text-gray-900 mb-4">Svar pa sporsmal</h4>
-              {selectedResponseDetail.questionResponses && selectedResponseDetail.questionResponses.length > 0 ? (
+              <h4 className="font-semibold text-gray-900 mb-4">
+                Svar pa sporsmal
+              </h4>
+              {selectedResponseDetail.questionResponses &&
+              selectedResponseDetail.questionResponses.length > 0 ? (
                 <div className="space-y-4">
                   {selectedResponseDetail.questionResponses.map((qr, index) => (
-                    <div key={qr.id || qr.questionId || index} className="border rounded-lg p-4">
+                    <div
+                      key={qr.id || qr.questionId || index}
+                      className="border rounded-lg p-4"
+                    >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                          <div className="font-medium text-gray-900">{qr.questionText}</div>
+                          <div className="font-medium text-gray-900">
+                            {qr.questionText}
+                          </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {qr.questionType === 'RATING_1_6' && qr.ratingValue != null && (
-                            <span className={`px-3 py-1 text-lg font-bold rounded ${getScoreStyle(qr.ratingValue)}`}>
-                              {qr.ratingValue}
-                            </span>
-                          )}
-                          {qr.questionType === 'RATING_1_6' && qr.ratingValue == null && (
-                            <span className="px-3 py-1 text-lg font-bold rounded bg-gray-100 text-gray-400">-</span>
-                          )}
+                          {qr.questionType === 'RATING_1_6' &&
+                            qr.ratingValue != null && (
+                              <span
+                                className={`px-3 py-1 text-lg font-bold rounded ${getScoreStyle(qr.ratingValue)}`}
+                              >
+                                {qr.ratingValue}
+                              </span>
+                            )}
+                          {qr.questionType === 'RATING_1_6' &&
+                            qr.ratingValue == null && (
+                              <span className="px-3 py-1 text-lg font-bold rounded bg-gray-100 text-gray-400">
+                                -
+                              </span>
+                            )}
                           <button
                             onClick={() => openEditResponse(qr)}
                             className="text-blue-600 hover:text-blue-800 text-sm"
                             title="Rediger svar"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -745,11 +965,15 @@ export default function AssignmentsTab() {
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Rediger svar</h2>
             <div className="space-y-4">
-              <div className="font-medium text-gray-900 mb-3">{editingResponse.questionText}</div>
+              <div className="font-medium text-gray-900 mb-3">
+                {editingResponse.questionText}
+              </div>
 
               {editingResponse.questionType === 'RATING_1_6' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Score (1-6)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Score (1-6)
+                  </label>
                   <div className="flex gap-2">
                     {[1, 2, 3, 4, 5, 6].map((score) => (
                       <button
@@ -757,9 +981,11 @@ export default function AssignmentsTab() {
                         onClick={() => setEditRatingValue(score)}
                         className={`w-10 h-10 rounded-lg font-bold text-lg transition-colors ${
                           editRatingValue === score
-                            ? score >= 5 ? 'bg-green-600 text-white'
-                              : score >= 3 ? 'bg-yellow-500 text-white'
-                              : 'bg-red-600 text-white'
+                            ? score >= 5
+                              ? 'bg-green-600 text-white'
+                              : score >= 3
+                                ? 'bg-yellow-500 text-white'
+                                : 'bg-red-600 text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
@@ -772,7 +998,9 @@ export default function AssignmentsTab() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {editingResponse.questionType === 'FREE_TEXT' ? 'Svar' : 'Kommentar'}
+                  {editingResponse.questionType === 'FREE_TEXT'
+                    ? 'Svar'
+                    : 'Kommentar'}
                 </label>
                 <textarea
                   value={editTextValue}
@@ -785,13 +1013,18 @@ export default function AssignmentsTab() {
 
             <div className="mt-6 flex justify-between">
               <button
-                onClick={() => editingResponse.id && handleDeleteResponse(editingResponse.id)}
+                onClick={() =>
+                  editingResponse.id && handleDeleteResponse(editingResponse.id)
+                }
                 className="px-4 py-2 text-red-600 hover:text-red-800"
               >
                 Slett svar
               </button>
               <div className="flex gap-3">
-                <button onClick={() => setEditingResponse(null)} className="px-4 py-2 text-gray-600 hover:text-gray-800">
+                <button
+                  onClick={() => setEditingResponse(null)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
                   Avbryt
                 </button>
                 <button

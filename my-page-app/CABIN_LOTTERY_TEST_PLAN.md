@@ -1,9 +1,11 @@
 # Test Plan: Hyttetrekning Frontend
 
 ## Oversikt
+
 Dette dokumentet beskriver teststrategien for hyttetrekning-funksjonaliteten i frontend.
 
 ## Test Stack
+
 - **Test Framework**: Vitest
 - **React Testing**: @testing-library/react
 - **User Interaction**: @testing-library/user-event
@@ -35,6 +37,7 @@ src/components/hyttetrekning/
 ### Unit Tests
 
 **Rendering & Display**
+
 - [ ] Viser loading state når data lastes
 - [ ] Viser feilmelding hvis lasting feiler
 - [ ] Viser "ingen aktiv trekning" melding når status er DRAFT
@@ -43,6 +46,7 @@ src/components/hyttetrekning/
 - [ ] Viser eksisterende ønsker hvis brukeren har registrert noen
 
 **Form Validation**
+
 - [ ] Kan ikke legge til ønske uten å velge periode
 - [ ] Kan ikke legge til ønske uten å velge minst én leilighet
 - [ ] Kan ikke legge til mer enn 2 ønsker
@@ -50,6 +54,7 @@ src/components/hyttetrekning/
 - [ ] Viser feilmelding ved manglende data
 
 **User Interaction**
+
 - [ ] Kan velge periode fra dropdown
 - [ ] Kan velge multiple leiligheter med checkboxes
 - [ ] Leilighetene vises i riktig rekkefølge (sort_order)
@@ -58,6 +63,7 @@ src/components/hyttetrekning/
 - [ ] Kan endre prioritet (drag & drop eller knapper)
 
 **Form Submission**
+
 - [ ] Sender riktig data til API når skjema submittes
 - [ ] Viser success melding ved vellykket innsending
 - [ ] Viser feilmelding ved feil
@@ -65,6 +71,7 @@ src/components/hyttetrekning/
 - [ ] Disable submit-knapp mens sending pågår
 
 **Integration Tests**
+
 - [ ] Mock API kall og verifiser at UI oppdateres korrekt
 - [ ] Test full flow: velg periode → velg leiligheter → legg til → submit
 
@@ -77,11 +84,13 @@ src/components/hyttetrekning/
 ### Unit Tests
 
 **Navigation & Tabs**
+
 - [ ] Viser riktige tabs (Perioder, Ønsker, Trekning, Resultater)
 - [ ] Kan bytte mellom tabs
 - [ ] Viser riktig antall items i tab-badges
 
 **Drawing Header**
+
 - [ ] Viser sesong og status
 - [ ] Viser riktige action-knapper basert på status
 - [ ] DRAFT: Kan åpne, slette
@@ -91,12 +100,14 @@ src/components/hyttetrekning/
 - [ ] PUBLISHED: Ingen actions
 
 **State Management**
+
 - [ ] Laster periods, wishes, allocations korrekt
 - [ ] Håndterer loading state
 - [ ] Håndterer error state
 - [ ] Oppdaterer data etter actions (lock, draw, publish)
 
 **Integration Tests**
+
 - [ ] Mock API og test full flow fra DRAFT → PUBLISHED
 - [ ] Verifiser at modaler vises ved actions
 - [ ] Test error handling ved API feil
@@ -110,21 +121,25 @@ src/components/hyttetrekning/
 ### Unit Tests
 
 **Conditional Rendering**
+
 - [ ] Viser "må låses" melding hvis status !== LOCKED
 - [ ] Viser trekning-skjema hvis status === LOCKED
 
 **Seed Input**
+
 - [ ] Seed input er optional
 - [ ] Kan skrive inn seed-verdi
 - [ ] Viser hjelpetekst om seed
 
 **Draw Button**
+
 - [ ] Knapp er enabled når status = LOCKED
 - [ ] Knapp er disabled under trekning
 - [ ] Viser "Kjører trekning..." tekst under trekning
 - [ ] Kaller onPerformDraw med riktig seed
 
 **Integration Tests**
+
 - [ ] Mock trekning og verifiser UI-oppdateringer
 - [ ] Test med og uten seed
 
@@ -137,16 +152,19 @@ src/components/hyttetrekning/
 ### Unit Tests
 
 **Conditional Rendering**
+
 - [ ] Viser "ikke gjennomført" melding hvis ingen allocations
 - [ ] Viser audit log hvis tilgjengelig
 - [ ] Viser tildelinger per periode
 
 **Audit Log**
+
 - [ ] Viser audit log i monospace font
 - [ ] Audit log er scrollbar (max-height)
 - [ ] Viser alle linjer i audit log
 
 **Allocations Display**
+
 - [ ] Grupperer tildelinger per periode
 - [ ] Viser riktig leilighet og bruker for hver tildeling
 - [ ] Viser "Ingen tildelinger" hvis periode er tom
@@ -160,29 +178,34 @@ src/components/hyttetrekning/
 ### Unit Tests
 
 **Period List**
+
 - [ ] Viser alle perioder sortert etter sortOrder
 - [ ] Viser periode-info (dato, beskrivelse, kommentar)
 - [ ] Viser edit/delete knapper
 
 **Add Period Form**
+
 - [ ] Toggle form visibility
 - [ ] Validerer required fields (startDate, endDate, description)
 - [ ] Kan legge til ny periode
 - [ ] Lukker form etter vellykket add
 
 **Bulk Add Periods**
+
 - [ ] Toggle bulk form visibility
 - [ ] Validerer startDate og endDate
 - [ ] Genererer perioder basert på uke-intervaller
 - [ ] Viser antall perioder opprettet
 
 **Edit Period**
+
 - [ ] Viser edit-form når edit klikkes
 - [ ] Pre-populerer form med eksisterende data
 - [ ] Kan oppdatere periode
 - [ ] Kan kansellere editing
 
 **Delete Period**
+
 - [ ] Viser confirmation dialog
 - [ ] Sletter periode ved bekreftelse
 - [ ] Kansellerer ved avbryt
@@ -196,6 +219,7 @@ src/components/hyttetrekning/
 **Formål**: Teste visning av ønsker gruppert per bruker.
 
 **Unit Tests**
+
 - [ ] Grupperer ønsker per bruker
 - [ ] Sorterer brukere alfabetisk
 - [ ] Viser bruker navn og email
@@ -208,6 +232,7 @@ src/components/hyttetrekning/
 **Formål**: Teste visning av ønsker gruppert per periode.
 
 **Unit Tests**
+
 - [ ] Grupperer ønsker per periode
 - [ ] Sorterer perioder etter sortOrder
 - [ ] Viser periode-info
@@ -217,6 +242,7 @@ src/components/hyttetrekning/
 ### WishesTab.test.tsx (parent)
 
 **Unit Tests**
+
 - [ ] Toggle mellom "by-user" og "by-period" view
 - [ ] Viser riktig view basert på mode
 - [ ] Import functionality (hvis implementert)
@@ -230,12 +256,14 @@ src/components/hyttetrekning/
 ### Unit Tests
 
 **Drawing List**
+
 - [ ] Viser alle trekninger
 - [ ] Sorterer etter createdAt (nyeste først)
 - [ ] Viser status-badge med riktig farge
 - [ ] Viser antall perioder og ønsker
 
 **Create New Drawing**
+
 - [ ] Viser "Opprett ny" knapp
 - [ ] Åpner modal for å opprette trekning
 - [ ] Validerer sesong-navn
@@ -243,6 +271,7 @@ src/components/hyttetrekning/
 - [ ] Navigerer til ny trekning etter opprettelse
 
 **Navigation**
+
 - [ ] Klikk på trekning navigerer til detail-view
 
 ---
@@ -262,7 +291,7 @@ export const createMockDrawing = (overrides = {}) => ({
   status: 'DRAFT',
   createdAt: '2025-01-01T00:00:00Z',
   periods: [],
-  ...overrides
+  ...overrides,
 })
 
 export const createMockPeriod = (overrides = {}) => ({
@@ -271,14 +300,14 @@ export const createMockPeriod = (overrides = {}) => ({
   endDate: '2025-04-08',
   description: 'Påske',
   sortOrder: 1,
-  ...overrides
+  ...overrides,
 })
 
 export const createMockApartment = (overrides = {}) => ({
   id: 1,
   cabin_name: 'Stor leilighet',
   sort_order: 1,
-  ...overrides
+  ...overrides,
 })
 
 export const createMockWish = (overrides = {}) => ({
@@ -292,7 +321,7 @@ export const createMockWish = (overrides = {}) => ({
   desiredApartmentIds: [1, 2],
   desiredApartmentNames: ['Stor leilighet', 'Liten leilighet'],
   comment: '',
-  ...overrides
+  ...overrides,
 })
 
 export const createMockAllocation = (overrides = {}) => ({
@@ -306,7 +335,7 @@ export const createMockAllocation = (overrides = {}) => ({
   userEmail: 'test@example.com',
   allocationType: 'DRAWN',
   allocatedAt: '2025-01-01T00:00:00Z',
-  ...overrides
+  ...overrides,
 })
 ```
 
@@ -345,16 +374,19 @@ export const renderWithProviders = (ui: React.ReactElement) => {
 ## Prioritering
 
 ### Høy Prioritet (Critical Path)
+
 1. UserWishForm - brukerens hovedfunksjonalitet
 2. DrawTab - trekning må fungere
 3. ResultsTab - viktig for verifisering
 
 ### Middels Prioritet
+
 4. AdminDrawingDetail - state management
 5. PeriodsTab - data setup
 6. WishesTab - oversikt
 
 ### Lav Prioritet
+
 7. AdminDashboard - liste-visning
 
 ---
@@ -388,6 +420,7 @@ npm run test:coverage
 ## Neste Steg
 
 1. Installer manglende dependencies:
+
    ```bash
    npm install -D @testing-library/react @testing-library/user-event @testing-library/jest-dom jsdom
    ```

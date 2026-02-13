@@ -41,7 +41,9 @@ function KtuAdminDashboardContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">KTU - Kundetilfredshetsundersøkelse</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            KTU - Kundetilfredshetsundersøkelse
+          </h1>
           <p className="mt-2 text-gray-600">
             Administrer undersøkelser, kunder og se statistikk
           </p>
@@ -77,13 +79,16 @@ function KtuAdminDashboardContent() {
         {/* Tab Content */}
         <div>
           {activeTab === 'oversikt' && <DashboardTab />}
-          {activeTab === 'undersøkelser' && (
-            selectedSurvey ? (
-              <SurveyDetailView survey={selectedSurvey} onBack={handleBackToList} onUpdate={handleSurveyUpdate} />
+          {activeTab === 'undersøkelser' &&
+            (selectedSurvey ? (
+              <SurveyDetailView
+                survey={selectedSurvey}
+                onBack={handleBackToList}
+                onUpdate={handleSurveyUpdate}
+              />
             ) : (
               <SurveysTab onSelectSurvey={handleSelectSurvey} />
-            )
-          )}
+            ))}
           {activeTab === 'kunder' && <CustomersTab />}
         </div>
       </div>

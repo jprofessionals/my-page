@@ -104,12 +104,7 @@ const BudgetItem = ({ budget, type }: Props) => {
           {posts.length > 0 ? (
             posts
               .sort((a, b) => (a.date < b.date ? 1 : -1))
-              .map((post) => (
-                <Post
-                  key={post.id}
-                  post={post}
-                />
-              ))
+              .map((post) => <Post key={post.id} post={post} />)
           ) : (
             <span>Ingen historikk funnet</span>
           )}

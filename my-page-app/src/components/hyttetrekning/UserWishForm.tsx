@@ -10,7 +10,7 @@ import type {
   Period,
   Wish,
   Apartment,
-  WishFormState
+  WishFormState,
 } from '@/types/cabinLottery.types'
 
 export default function UserWishForm() {
@@ -32,7 +32,7 @@ export default function UserWishForm() {
     try {
       const [drawingRes, apartmentsRes] = await Promise.all([
         cabinLotteryService.getCurrentDrawing(),
-        cabinLotteryService.getApartments()
+        cabinLotteryService.getApartments(),
       ])
 
       if (!drawingRes.data) {
@@ -67,9 +67,9 @@ export default function UserWishForm() {
         if (hasDuplicates) {
           toast.warning(
             'Du har registrert flere ønsker på samme periode. ' +
-            'Dette kan gi uventet resultat i trekningen. ' +
-            'Vi anbefaler at du samler alle enheter for én periode i ett ønske.',
-            { autoClose: 10000 }
+              'Dette kan gi uventet resultat i trekningen. ' +
+              'Vi anbefaler at du samler alle enheter for én periode i ett ønske.',
+            { autoClose: 10000 },
           )
         }
 
@@ -87,8 +87,8 @@ export default function UserWishForm() {
 
   const addWish = (): void => {
     // Find first available period that's not already used
-    const usedPeriodIds = new Set(wishForm.map(w => w.periodId))
-    const availablePeriod = periods.find(p => !usedPeriodIds.has(p.id))
+    const usedPeriodIds = new Set(wishForm.map((w) => w.periodId))
+    const availablePeriod = periods.find((p) => !usedPeriodIds.has(p.id))
 
     setWishForm([
       ...wishForm,
@@ -103,11 +103,15 @@ export default function UserWishForm() {
 
   // Helper to check if all periods are used
   const allPeriodsUsed = (): boolean => {
-    const usedPeriodIds = new Set(wishForm.map(w => w.periodId))
+    const usedPeriodIds = new Set(wishForm.map((w) => w.periodId))
     return periods.length > 0 && usedPeriodIds.size >= periods.length
   }
 
-  const updateWish = (index: number, field: keyof WishFormState, value: unknown): void => {
+  const updateWish = (
+    index: number,
+    field: keyof WishFormState,
+    value: unknown,
+  ): void => {
     const updated = [...wishForm]
     updated[index] = { ...updated[index], [field]: value }
     setWishForm(updated)
@@ -135,7 +139,10 @@ export default function UserWishForm() {
     updateWish(wishIndex, 'apartmentIds', apartmentIds)
   }
 
-  const moveApartmentDown = (wishIndex: number, apartmentIndex: number): void => {
+  const moveApartmentDown = (
+    wishIndex: number,
+    apartmentIndex: number,
+  ): void => {
     const wish = wishForm[wishIndex]
     if (apartmentIndex === wish.apartmentIds.length - 1) return
     const apartmentIds = [...wish.apartmentIds]
@@ -174,8 +181,12 @@ export default function UserWishForm() {
       let errorMessage = 'Feil ved lagring av ønsker'
 
       if (error && typeof error === 'object') {
-        const err = error as { response?: { data?: { message?: string } }; message?: string }
-        errorMessage = err.response?.data?.message || err.message || errorMessage
+        const err = error as {
+          response?: { data?: { message?: string } }
+          message?: string
+        }
+        errorMessage =
+          err.response?.data?.message || err.message || errorMessage
       }
 
       toast.error(errorMessage)
@@ -196,8 +207,12 @@ export default function UserWishForm() {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Hyttetrekning</h1>
-          <p className="text-gray-600">Ingen aktiv hyttetrekning for øyeblikket.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            Hyttetrekning
+          </h1>
+          <p className="text-gray-600">
+            Ingen aktiv hyttetrekning for øyeblikket.
+          </p>
         </div>
       </div>
     )
@@ -205,7 +220,13 @@ export default function UserWishForm() {
 
   // Show results if published
   if (drawing.status === 'PUBLISHED') {
-    return <UserResults drawingId={drawing.id} season={drawing.season} periods={periods} />
+    return (
+      <UserResults
+        drawingId={drawing.id}
+        season={drawing.season}
+        periods={periods}
+      />
+    )
   }
 
   return (
@@ -217,9 +238,7 @@ export default function UserWishForm() {
             Status:{' '}
             <span
               className={`font-medium ${
-                drawing.status === 'OPEN'
-                  ? 'text-green-600'
-                  : 'text-yellow-600'
+                drawing.status === 'OPEN' ? 'text-green-600' : 'text-yellow-600'
               }`}
             >
               {drawing.status === 'OPEN' && 'Åpen for registrering'}
@@ -230,40 +249,54 @@ export default function UserWishForm() {
         </div>
 
         {/* Show wishes if locked/drawn */}
-        {['LOCKED', 'DRAWN'].includes(drawing.status) && myWishes.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-2xl font-semibold mb-4">Dine registrerte ønsker</h2>
-            <p className="text-yellow-600 mb-4">
-              Trekningen er låst. Resultater vil bli publisert snart.
-            </p>
-            <div className="space-y-3">
-              {myWishes.map((wish) => (
-                <div key={wish.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <span className="text-sm text-gray-500">Prioritet {wish.priority}</span>
-                      <h3 className="font-medium">{wish.periodDescription}</h3>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {wish.desiredApartmentNames.join(', ')}
-                      </p>
-                      {wish.comment && (
-                        <p className="text-sm text-gray-500 mt-1 italic">{wish.comment}</p>
-                      )}
+        {['LOCKED', 'DRAWN'].includes(drawing.status) &&
+          myWishes.length > 0 && (
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-2xl font-semibold mb-4">
+                Dine registrerte ønsker
+              </h2>
+              <p className="text-yellow-600 mb-4">
+                Trekningen er låst. Resultater vil bli publisert snart.
+              </p>
+              <div className="space-y-3">
+                {myWishes.map((wish) => (
+                  <div
+                    key={wish.id}
+                    className="border border-gray-200 rounded-lg p-4"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="text-sm text-gray-500">
+                          Prioritet {wish.priority}
+                        </span>
+                        <h3 className="font-medium">
+                          {wish.periodDescription}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {wish.desiredApartmentNames.join(', ')}
+                        </p>
+                        {wish.comment && (
+                          <p className="text-sm text-gray-500 mt-1 italic">
+                            {wish.comment}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Wish form (only if OPEN) */}
         {drawing.status === 'OPEN' && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-2xl font-semibold mb-4">Registrer dine ønsker</h2>
+            <h2 className="text-2xl font-semibold mb-4">
+              Registrer dine ønsker
+            </h2>
             <p className="text-gray-600 mb-6">
-              Velg perioder og enheter du ønsker, og ranger dem etter prioritet (1 = høyest).
-              Du kan få maksimalt 2 tildelinger.
+              Velg perioder og enheter du ønsker, og ranger dem etter prioritet
+              (1 = høyest). Du kan få maksimalt 2 tildelinger.
             </p>
 
             <div className="space-y-6">
@@ -295,119 +328,152 @@ export default function UserWishForm() {
                       </button>
                     </div>
 
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Periode</label>
-                      <select
-                        value={wish.periodId}
-                        onChange={(e) => updateWish(index, 'periodId', e.target.value)}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2"
-                      >
-                        {periods
-                          .filter((period) => {
-                            // Show period if it's the currently selected one OR if it's not used in other wishes
-                            const isCurrentlySelected = period.id === wish.periodId
-                            const isUsedInOtherWish = wishForm.some(
-                              (w, i) => i !== index && w.periodId === period.id
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Periode
+                        </label>
+                        <select
+                          value={wish.periodId}
+                          onChange={(e) =>
+                            updateWish(index, 'periodId', e.target.value)
+                          }
+                          className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        >
+                          {periods
+                            .filter((period) => {
+                              // Show period if it's the currently selected one OR if it's not used in other wishes
+                              const isCurrentlySelected =
+                                period.id === wish.periodId
+                              const isUsedInOtherWish = wishForm.some(
+                                (w, i) =>
+                                  i !== index && w.periodId === period.id,
+                              )
+                              return isCurrentlySelected || !isUsedInOtherWish
+                            })
+                            .map((period) => (
+                              <option key={period.id} value={period.id}>
+                                {period.description}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Prioritet
+                        </label>
+                        <input
+                          type="number"
+                          value={wish.priority}
+                          onChange={(e) =>
+                            updateWish(
+                              index,
+                              'priority',
+                              parseInt(e.target.value),
                             )
-                            return isCurrentlySelected || !isUsedInOtherWish
-                          })
-                          .map((period) => (
-                            <option key={period.id} value={period.id}>
-                              {period.description}
-                            </option>
-                          ))}
-                      </select>
+                          }
+                          min="1"
+                          className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-2">
+                        Ønskede enheter
+                      </label>
+                      <div className="space-y-2 mb-3">
+                        {apartments.map((apt) => (
+                          <label key={apt.id} className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={wish.apartmentIds.includes(apt.id)}
+                              onChange={() => toggleApartment(index, apt.id)}
+                              className="mr-2"
+                            />
+                            {apt.cabin_name}
+                          </label>
+                        ))}
+                      </div>
+
+                      {wish.apartmentIds.length > 0 && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                          <p className="text-sm font-medium text-blue-900 mb-2">
+                            Valgte enheter i prioritert rekkefølge:
+                          </p>
+                          <div className="space-y-2">
+                            {wish.apartmentIds.map((aptId, aptIndex) => {
+                              const apartment = apartments.find(
+                                (a) => a.id === aptId,
+                              )
+                              return (
+                                <div
+                                  key={aptId}
+                                  className="flex items-center justify-between bg-white rounded px-3 py-2"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-medium text-blue-600 bg-blue-100 rounded px-2 py-1">
+                                      {aptIndex + 1}
+                                    </span>
+                                    <span className="text-sm">
+                                      {apartment?.cabin_name}
+                                    </span>
+                                  </div>
+                                  <div className="flex gap-1">
+                                    <button
+                                      onClick={() =>
+                                        moveApartmentUp(index, aptIndex)
+                                      }
+                                      disabled={aptIndex === 0}
+                                      className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                                      title="Flytt opp"
+                                    >
+                                      ↑
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        moveApartmentDown(index, aptIndex)
+                                      }
+                                      disabled={
+                                        aptIndex ===
+                                        wish.apartmentIds.length - 1
+                                      }
+                                      className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                                      title="Flytt ned"
+                                    >
+                                      ↓
+                                    </button>
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                          <p className="text-xs text-gray-600 mt-2">
+                            <strong>Rekkefølgen bestemmer prioritet:</strong>{' '}
+                            Nr. 1 = mest foretrukket. Bruk ↑/↓ for å endre
+                            rekkefølgen. Hvis alle enheter er like greie, la dem
+                            stå som de er.
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2">Prioritet</label>
-                      <input
-                        type="number"
-                        value={wish.priority}
-                        onChange={(e) => updateWish(index, 'priority', parseInt(e.target.value))}
-                        min="1"
+                      <label className="block text-sm font-medium mb-2">
+                        Kommentar
+                      </label>
+                      <textarea
+                        value={wish.comment}
+                        onChange={(e) =>
+                          updateWish(index, 'comment', e.target.value)
+                        }
                         className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        rows={2}
+                        placeholder="Valgfri kommentar..."
                       />
                     </div>
                   </div>
-
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-2">Ønskede enheter</label>
-                    <div className="space-y-2 mb-3">
-                      {apartments.map((apt) => (
-                        <label key={apt.id} className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={wish.apartmentIds.includes(apt.id)}
-                            onChange={() => toggleApartment(index, apt.id)}
-                            className="mr-2"
-                          />
-                          {apt.cabin_name}
-                        </label>
-                      ))}
-                    </div>
-
-                    {wish.apartmentIds.length > 0 && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-                        <p className="text-sm font-medium text-blue-900 mb-2">
-                          Valgte enheter i prioritert rekkefølge:
-                        </p>
-                        <div className="space-y-2">
-                          {wish.apartmentIds.map((aptId, aptIndex) => {
-                            const apartment = apartments.find((a) => a.id === aptId)
-                            return (
-                              <div
-                                key={aptId}
-                                className="flex items-center justify-between bg-white rounded px-3 py-2"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs font-medium text-blue-600 bg-blue-100 rounded px-2 py-1">
-                                    {aptIndex + 1}
-                                  </span>
-                                  <span className="text-sm">{apartment?.cabin_name}</span>
-                                </div>
-                                <div className="flex gap-1">
-                                  <button
-                                    onClick={() => moveApartmentUp(index, aptIndex)}
-                                    disabled={aptIndex === 0}
-                                    className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                                    title="Flytt opp"
-                                  >
-                                    ↑
-                                  </button>
-                                  <button
-                                    onClick={() => moveApartmentDown(index, aptIndex)}
-                                    disabled={aptIndex === wish.apartmentIds.length - 1}
-                                    className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                                    title="Flytt ned"
-                                  >
-                                    ↓
-                                  </button>
-                                </div>
-                              </div>
-                            )
-                          })}
-                        </div>
-                        <p className="text-xs text-gray-600 mt-2">
-                          <strong>Rekkefølgen bestemmer prioritet:</strong> Nr. 1 = mest foretrukket.
-                          Bruk ↑/↓ for å endre rekkefølgen. Hvis alle enheter er like greie, la dem stå som de er.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Kommentar</label>
-                    <textarea
-                      value={wish.comment}
-                      onChange={(e) => updateWish(index, 'comment', e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
-                      rows={2}
-                      placeholder="Valgfri kommentar..."
-                    />
-                  </div>
-                </div>
                 )
               })}
             </div>
@@ -418,7 +484,9 @@ export default function UserWishForm() {
                   onClick={addWish}
                   disabled={allPeriodsUsed()}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  title={allPeriodsUsed() ? 'Alle perioder er allerede i bruk' : ''}
+                  title={
+                    allPeriodsUsed() ? 'Alle perioder er allerede i bruk' : ''
+                  }
                 >
                   Legg til ønske
                 </button>
@@ -434,7 +502,8 @@ export default function UserWishForm() {
 
               {allPeriodsUsed() && (
                 <p className="text-sm text-gray-600 mt-2">
-                  Du har allerede lagt til ønsker for alle tilgjengelige perioder.
+                  Du har allerede lagt til ønsker for alle tilgjengelige
+                  perioder.
                 </p>
               )}
             </div>

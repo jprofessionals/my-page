@@ -20,7 +20,10 @@ interface OrganizationAccordionProps {
   onAssignmentCreate: (consultantId: number, contactId: number) => Promise<void>
   onAssignmentDelete: (assignmentId: number) => Promise<void>
   onContactCreate: (orgId: number, name: string, email: string) => Promise<void>
-  onContactUpdate: (contactId: number, data: { name?: string; email?: string; active?: boolean }) => Promise<void>
+  onContactUpdate: (
+    contactId: number,
+    data: { name?: string; email?: string; active?: boolean },
+  ) => Promise<void>
   disabled: boolean
   isOpen: boolean
   onToggle: () => void
@@ -45,17 +48,17 @@ export default function OrganizationAccordion({
   manuallyAddedIds,
   onManuallyAddedIdsChange,
 }: OrganizationAccordionProps) {
-
   // Filter contacts for this organization
-  const orgContacts = useMemo(() =>
-    contacts.filter((c) => c.organizationId === organization.id),
-    [contacts, organization.id]
+  const orgContacts = useMemo(
+    () => contacts.filter((c) => c.organizationId === organization.id),
+    [contacts, organization.id],
   )
 
   // Filter assignments for this organization's contacts
-  const orgAssignments = useMemo(() =>
-    assignments.filter((a) => a.contact.organizationId === organization.id),
-    [assignments, organization.id]
+  const orgAssignments = useMemo(
+    () =>
+      assignments.filter((a) => a.contact.organizationId === organization.id),
+    [assignments, organization.id],
   )
 
   // Count statistics
@@ -93,7 +96,12 @@ export default function OrganizationAccordion({
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
           </svg>
 
           {/* Organization name */}
@@ -101,7 +109,8 @@ export default function OrganizationAccordion({
 
           {/* Contact count badge */}
           <span className="px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-600">
-            {orgContacts.length} {orgContacts.length === 1 ? 'kontakt' : 'kontakter'}
+            {orgContacts.length}{' '}
+            {orgContacts.length === 1 ? 'kontakt' : 'kontakter'}
           </span>
         </div>
 
@@ -114,7 +123,8 @@ export default function OrganizationAccordion({
               </span>
               {stats.sentOrResponded > 0 && (
                 <span className="text-blue-600">
-                  <span className="font-medium">{stats.sentOrResponded}</span> sendt
+                  <span className="font-medium">{stats.sentOrResponded}</span>{' '}
+                  sendt
                 </span>
               )}
               {stats.responded > 0 && (
@@ -142,7 +152,9 @@ export default function OrganizationAccordion({
             invitations={invitations}
             onAssignmentCreate={onAssignmentCreate}
             onAssignmentDelete={onAssignmentDelete}
-            onContactCreate={(name, email) => onContactCreate(organization.id, name, email)}
+            onContactCreate={(name, email) =>
+              onContactCreate(organization.id, name, email)
+            }
             onContactUpdate={onContactUpdate}
             disabled={disabled}
             manuallyAddedIds={manuallyAddedIds}

@@ -13,7 +13,9 @@ import type { KtuCompanyTrendStatistics } from '@/data/types'
 
 export default function KtuResultaterPage() {
   const router = useRouter()
-  const [trendData, setTrendData] = useState<KtuCompanyTrendStatistics | null>(null)
+  const [trendData, setTrendData] = useState<KtuCompanyTrendStatistics | null>(
+    null,
+  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -95,70 +97,77 @@ export default function KtuResultaterPage() {
           {!loading && !error && trendData && (
             <div className="space-y-8">
               {/* Response rate trend */}
-              {!hideResponseRate && trendData.yearlyStatistics && trendData.yearlyStatistics.length > 0 && (
-                <TrendChart
-                  data={trendData.yearlyStatistics
-                    .sort((a, b) => a.year - b.year)
-                    .map((ys) => ({
-                      year: ys.year,
-                      value: ys.responseRate,
-                      responseCount: ys.totalResponses,
-                    }))}
-                  title="Svarprosent over tid"
-                  color="#10B981"
-                  height={200}
-                  minValue={0}
-                  maxValue={100}
-                  valueSuffix="%"
-                />
-              )}
+              {!hideResponseRate &&
+                trendData.yearlyStatistics &&
+                trendData.yearlyStatistics.length > 0 && (
+                  <TrendChart
+                    data={trendData.yearlyStatistics
+                      .sort((a, b) => a.year - b.year)
+                      .map((ys) => ({
+                        year: ys.year,
+                        value: ys.responseRate,
+                        responseCount: ys.totalResponses,
+                      }))}
+                    title="Svarprosent over tid"
+                    color="#10B981"
+                    height={200}
+                    minValue={0}
+                    maxValue={100}
+                    valueSuffix="%"
+                  />
+                )}
 
               {/* Per-question trends */}
-              {trendData.questionTrends && trendData.questionTrends.length > 0 && (
-                <div className="space-y-4">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Score per spørsmål over tid
-                  </h2>
-                  <div
-                    className={
-                      columns === 2
-                        ? 'grid grid-cols-1 md:grid-cols-2 gap-4'
-                        : 'space-y-4'
-                    }
-                  >
-                    {trendData.questionTrends.map((qt) => {
-                      const responseCounts = qt.yearlyResponseCounts || {}
-                      const chartData = Object.entries(qt.yearlyAverages || {})
-                        .map(([yearStr, value]) => ({
-                          year: parseInt(yearStr),
-                          value: value ?? null,
-                          responseCount:
-                            responseCounts[yearStr] ??
-                            responseCounts[parseInt(yearStr) as unknown as string],
-                        }))
-                        .sort((a, b) => a.year - b.year)
+              {trendData.questionTrends &&
+                trendData.questionTrends.length > 0 && (
+                  <div className="space-y-4">
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Score per spørsmål over tid
+                    </h2>
+                    <div
+                      className={
+                        columns === 2
+                          ? 'grid grid-cols-1 md:grid-cols-2 gap-4'
+                          : 'space-y-4'
+                      }
+                    >
+                      {trendData.questionTrends.map((qt) => {
+                        const responseCounts = qt.yearlyResponseCounts || {}
+                        const chartData = Object.entries(
+                          qt.yearlyAverages || {},
+                        )
+                          .map(([yearStr, value]) => ({
+                            year: parseInt(yearStr),
+                            value: value ?? null,
+                            responseCount:
+                              responseCounts[yearStr] ??
+                              responseCounts[
+                                parseInt(yearStr) as unknown as string
+                              ],
+                          }))
+                          .sort((a, b) => a.year - b.year)
 
-                      return (
-                        <TrendChart
-                          key={qt.questionCode}
-                          data={chartData}
-                          title={qt.questionText}
-                          color="#3B82F6"
-                          height={180}
-                          showScaleHint
-                        />
-                      )
-                    })}
+                        return (
+                          <TrendChart
+                            key={qt.questionCode}
+                            data={chartData}
+                            title={qt.questionText}
+                            color="#3B82F6"
+                            height={180}
+                            showScaleHint
+                          />
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {/* Footer note - hidden in embed mode */}
               {!isEmbed && (
                 <div className="text-center text-sm text-gray-400 pt-8">
                   <p>
-                    JPro gjennomfører årlige kundetilfredshetsundersøkelser for å
-                    kontinuerlig forbedre våre tjenester.
+                    JPro gjennomfører årlige kundetilfredshetsundersøkelser for
+                    å kontinuerlig forbedre våre tjenester.
                   </p>
                 </div>
               )}

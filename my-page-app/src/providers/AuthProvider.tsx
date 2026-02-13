@@ -35,7 +35,10 @@ function getTokenExpiration(token: string): number | null {
 }
 
 // Check if token is expired or will expire soon (within 5 minutes)
-function isTokenExpiringSoon(token: string, bufferMs: number = 5 * 60 * 1000): boolean {
+function isTokenExpiringSoon(
+  token: string,
+  bufferMs: number = 5 * 60 * 1000,
+): boolean {
   const exp = getTokenExpiration(token)
   if (!exp) return true // If we can't decode, assume expired
   return Date.now() + bufferMs >= exp
@@ -101,34 +104,41 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, [])
 
   // Schedule token refresh before expiration
-  const scheduleTokenRefresh = useCallback((token: string) => {
-    // Clear any existing timer
-    if (refreshTimerRef.current) {
-      clearTimeout(refreshTimerRef.current)
-      refreshTimerRef.current = null
-    }
+  const scheduleTokenRefresh = useCallback(
+    (token: string) => {
+      // Clear any existing timer
+      if (refreshTimerRef.current) {
+        clearTimeout(refreshTimerRef.current)
+        refreshTimerRef.current = null
+      }
 
-    const exp = getTokenExpiration(token)
-    if (!exp) {
-      console.log('[Auth] Could not decode token expiration, skipping refresh scheduling')
-      return
-    }
+      const exp = getTokenExpiration(token)
+      if (!exp) {
+        console.log(
+          '[Auth] Could not decode token expiration, skipping refresh scheduling',
+        )
+        return
+      }
 
-    // Schedule refresh 5 minutes before expiration
-    const refreshTime = exp - Date.now() - 5 * 60 * 1000
-    if (refreshTime <= 0) {
-      // Token already expired or expiring very soon, refresh now
-      console.log('[Auth] Token expiring soon, triggering immediate refresh')
-      triggerTokenRefresh()
-      return
-    }
+      // Schedule refresh 5 minutes before expiration
+      const refreshTime = exp - Date.now() - 5 * 60 * 1000
+      if (refreshTime <= 0) {
+        // Token already expired or expiring very soon, refresh now
+        console.log('[Auth] Token expiring soon, triggering immediate refresh')
+        triggerTokenRefresh()
+        return
+      }
 
-    console.log(`[Auth] Token refresh scheduled in ${Math.round(refreshTime / 1000 / 60)} minutes`)
-    refreshTimerRef.current = setTimeout(() => {
-      console.log('[Auth] Triggering scheduled token refresh')
-      triggerTokenRefresh()
-    }, refreshTime)
-  }, [triggerTokenRefresh])
+      console.log(
+        `[Auth] Token refresh scheduled in ${Math.round(refreshTime / 1000 / 60)} minutes`,
+      )
+      refreshTimerRef.current = setTimeout(() => {
+        console.log('[Auth] Triggering scheduled token refresh')
+        triggerTokenRefresh()
+      }, refreshTime)
+    },
+    [triggerTokenRefresh],
+  )
 
   // Schedule token refresh when token changes (separate from login callback to avoid blocking)
   useEffect(() => {

@@ -48,12 +48,17 @@ export default function DrawingHeader({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{drawing.season}</h1>
-          <p className={`mt-2 text-lg font-medium ${getStatusColor(drawing.status)}`}>
+          <p
+            className={`mt-2 text-lg font-medium ${getStatusColor(drawing.status)}`}
+          >
             Status: {drawing.status}
           </p>
         </div>
         <div className="flex gap-3">
-          {(drawing.status === 'DRAFT' || drawing.status === 'OPEN' || drawing.status === 'LOCKED' || drawing.status === 'DRAWN') && (
+          {(drawing.status === 'DRAFT' ||
+            drawing.status === 'OPEN' ||
+            drawing.status === 'LOCKED' ||
+            drawing.status === 'DRAWN') && (
             <button
               onClick={onDeleteDrawing}
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"

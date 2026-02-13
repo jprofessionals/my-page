@@ -1,4 +1,9 @@
-import type { Wish, DrawingStatus, WishesViewMode, ImportResult } from '@/types/cabinLottery.types'
+import type {
+  Wish,
+  DrawingStatus,
+  WishesViewMode,
+  ImportResult,
+} from '@/types/cabinLottery.types'
 import WishesByUser from './WishesByUser'
 import WishesByPeriod from './WishesByPeriod'
 
@@ -25,7 +30,7 @@ export default function WishesTab({
   onSetImportFile,
   onImport,
 }: WishesTabProps) {
-  const uniqueUsersCount = new Set(wishes.map(w => w.userId)).size
+  const uniqueUsersCount = new Set(wishes.map((w) => w.userId)).size
 
   return (
     <div>
@@ -51,7 +56,9 @@ export default function WishesTab({
       </div>
 
       {importResult && (
-        <div className={`p-4 rounded-lg mb-6 ${importResult.errorCount === 0 ? 'bg-green-50' : 'bg-yellow-50'}`}>
+        <div
+          className={`p-4 rounded-lg mb-6 ${importResult.errorCount === 0 ? 'bg-green-50' : 'bg-yellow-50'}`}
+        >
           <p className="font-medium">Import resultat:</p>
           <p>Totalt linjer: {importResult.totalLines}</p>
           <p>Vellykkede: {importResult.successCount}</p>
@@ -67,7 +74,9 @@ export default function WishesTab({
         <div>
           <div className="flex justify-between items-center mb-6">
             <div className="text-sm text-gray-600">
-              <p>Totalt ønsker: {wishes.length} fra {uniqueUsersCount} brukere</p>
+              <p>
+                Totalt ønsker: {wishes.length} fra {uniqueUsersCount} brukere
+              </p>
             </div>
             <div className="flex gap-2">
               <button
@@ -93,13 +102,9 @@ export default function WishesTab({
             </div>
           </div>
 
-          {wishesViewMode === 'by-user' && (
-            <WishesByUser wishes={wishes} />
-          )}
+          {wishesViewMode === 'by-user' && <WishesByUser wishes={wishes} />}
 
-          {wishesViewMode === 'by-period' && (
-            <WishesByPeriod wishes={wishes} />
-          )}
+          {wishesViewMode === 'by-period' && <WishesByPeriod wishes={wishes} />}
         </div>
       )}
     </div>

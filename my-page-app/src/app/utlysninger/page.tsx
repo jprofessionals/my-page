@@ -43,7 +43,8 @@ export default function Utlysninger() {
   // ASAP postings are prioritized (sorted to top) only for 5 days after creation
   const ASAP_PRIORITY_DAYS = 5
 
-  const hasActiveFilters = tags.length > 0 || customer !== null || selectedFromDate !== null
+  const hasActiveFilters =
+    tags.length > 0 || customer !== null || selectedFromDate !== null
 
   const clearFilters = () => {
     setTags([])
@@ -52,7 +53,9 @@ export default function Utlysninger() {
   }
 
   const activeJobPostings = useMemo(() => {
-    const priorityCutoff = new Date(now.getTime() - ASAP_PRIORITY_DAYS * 24 * 60 * 60 * 1000)
+    const priorityCutoff = new Date(
+      now.getTime() - ASAP_PRIORITY_DAYS * 24 * 60 * 60 * 1000,
+    )
 
     // Helper to check if ASAP posting is still in priority period (sorted to top)
     const isAsapPriority = (jobPosting: JobPostingType) => {
@@ -84,8 +87,12 @@ export default function Utlysninger() {
 
           // Both are ASAP priority - sort by created_date (newest first)
           if (aIsAsapPriority && bIsAsapPriority) {
-            const aCreated = a.created_date ? new Date(a.created_date).getTime() : 0
-            const bCreated = b.created_date ? new Date(b.created_date).getTime() : 0
+            const aCreated = a.created_date
+              ? new Date(a.created_date).getTime()
+              : 0
+            const bCreated = b.created_date
+              ? new Date(b.created_date).getTime()
+              : 0
             return bCreated - aCreated
           }
 
@@ -97,18 +104,28 @@ export default function Utlysninger() {
 
           // Neither is ASAP priority - sort by deadline (or created_date for old ASAP)
           const aVal = a.urgent
-            ? (a.created_date ? new Date(a.created_date).getTime() : Number.MAX_SAFE_INTEGER)
-            : (a.deadline ? new Date(a.deadline).getTime() : Number.MAX_SAFE_INTEGER)
+            ? a.created_date
+              ? new Date(a.created_date).getTime()
+              : Number.MAX_SAFE_INTEGER
+            : a.deadline
+              ? new Date(a.deadline).getTime()
+              : Number.MAX_SAFE_INTEGER
           const bVal = b.urgent
-            ? (b.created_date ? new Date(b.created_date).getTime() : Number.MAX_SAFE_INTEGER)
-            : (b.deadline ? new Date(b.deadline).getTime() : Number.MAX_SAFE_INTEGER)
+            ? b.created_date
+              ? new Date(b.created_date).getTime()
+              : Number.MAX_SAFE_INTEGER
+            : b.deadline
+              ? new Date(b.deadline).getTime()
+              : Number.MAX_SAFE_INTEGER
           return aVal - bVal
         }) || []
     )
   }, [jobPostings, now, ASAP_PRIORITY_DAYS])
 
   const pastJobPostings = useMemo(() => {
-    const expiryCutoff = new Date(now.getTime() - ASAP_PRIORITY_DAYS * 24 * 60 * 60 * 1000)
+    const expiryCutoff = new Date(
+      now.getTime() - ASAP_PRIORITY_DAYS * 24 * 60 * 60 * 1000,
+    )
 
     return (
       jobPostings
@@ -205,7 +222,10 @@ export default function Utlysninger() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <TagFilter tags={tags} setTags={setTags} />
             <CustomerFilter customer={customer} setCustomer={setCustomer} />
-            <DateFilter value={selectedFromDate} onChange={setSelectedFromDate} />
+            <DateFilter
+              value={selectedFromDate}
+              onChange={setSelectedFromDate}
+            />
           </div>
           {hasActiveFilters && (
             <div className="mt-4 pt-4 border-t border-gray-200">
@@ -213,7 +233,10 @@ export default function Utlysninger() {
                 onClick={clearFilters}
                 className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
               >
-                <FontAwesomeIcon icon={faFilterCircleXmark} className="w-4 h-4" />
+                <FontAwesomeIcon
+                  icon={faFilterCircleXmark}
+                  className="w-4 h-4"
+                />
                 Nullstill filter
               </button>
             </div>

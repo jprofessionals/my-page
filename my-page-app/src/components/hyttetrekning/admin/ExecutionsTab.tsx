@@ -16,17 +16,20 @@ export default function ExecutionsTab({
   drawingStatus,
   onPublishExecution,
 }: ExecutionsTabProps) {
-  const [expandedExecutionId, setExpandedExecutionId] = useState<string | null>(null)
+  const [expandedExecutionId, setExpandedExecutionId] = useState<string | null>(
+    null,
+  )
   const [isPublishing, setIsPublishing] = useState(false)
 
   const sortedExecutions = [...executions].sort(
-    (a, b) => new Date(b.executedAt).getTime() - new Date(a.executedAt).getTime()
+    (a, b) =>
+      new Date(b.executedAt).getTime() - new Date(a.executedAt).getTime(),
   )
 
   const handlePublish = async (executionId: string) => {
     if (
       !confirm(
-        'Er du sikker på at du vil publisere denne trekningen? Dette vil gjøre resultatene synlige for brukerne.'
+        'Er du sikker på at du vil publisere denne trekningen? Dette vil gjøre resultatene synlige for brukerne.',
       )
     ) {
       return
@@ -51,7 +54,9 @@ export default function ExecutionsTab({
   }
 
   const toggleExpanded = (executionId: string) => {
-    setExpandedExecutionId(expandedExecutionId === executionId ? null : executionId)
+    setExpandedExecutionId(
+      expandedExecutionId === executionId ? null : executionId,
+    )
   }
 
   if (executions.length === 0) {
@@ -99,7 +104,8 @@ export default function ExecutionsTab({
                   <div className="text-sm text-gray-600 space-y-1">
                     <div>
                       <span className="font-medium">Utført av:</span>{' '}
-                      {execution.executedByName || `Bruker #${execution.executedBy}`}
+                      {execution.executedByName ||
+                        `Bruker #${execution.executedBy}`}
                     </div>
                     <div>
                       <span className="font-medium">Tildelinger:</span>{' '}
@@ -141,24 +147,30 @@ export default function ExecutionsTab({
                           : 'bg-green-600 text-white hover:bg-green-700'
                       } disabled:opacity-50`}
                     >
-                      {isPublishing ? 'Publiserer...' : isPublished ? 'Publisert' : 'Publiser'}
+                      {isPublishing
+                        ? 'Publiserer...'
+                        : isPublished
+                          ? 'Publisert'
+                          : 'Publiser'}
                     </button>
                   )}
                 </div>
               </div>
 
-              {isExpanded && execution.auditLog && execution.auditLog.length > 0 && (
-                <div className="mt-4 border-t border-gray-200 pt-4">
-                  <h4 className="font-medium text-sm mb-2">Trekkingslogg</h4>
-                  <div className="bg-gray-900 text-green-400 rounded p-4 font-mono text-xs overflow-x-auto max-h-96 overflow-y-auto">
-                    {execution.auditLog.map((line, index) => (
-                      <div key={index} className="whitespace-pre">
-                        {line}
-                      </div>
-                    ))}
+              {isExpanded &&
+                execution.auditLog &&
+                execution.auditLog.length > 0 && (
+                  <div className="mt-4 border-t border-gray-200 pt-4">
+                    <h4 className="font-medium text-sm mb-2">Trekkingslogg</h4>
+                    <div className="bg-gray-900 text-green-400 rounded p-4 font-mono text-xs overflow-x-auto max-h-96 overflow-y-auto">
+                      {execution.auditLog.map((line, index) => (
+                        <div key={index} className="whitespace-pre">
+                          {line}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           )
         })}

@@ -13,13 +13,13 @@ import ktuPublicService, {
 
 // Category translations from English to Norwegian
 const categoryTranslations: Record<string, string> = {
-  'DELIVERY': 'Leveranse',
-  'COMPETENCE': 'Kompetanse',
-  'COLLABORATION': 'Samarbeid',
-  'KNOWLEDGE_SHARING': 'Kunnskapsdeling',
-  'VALUE': 'Verdiskaping',
-  'JPRO_FOLLOWUP': 'Oppfølging fra JPro',
-  'ADDITIONAL': 'Tilleggsspørsmål',
+  DELIVERY: 'Leveranse',
+  COMPETENCE: 'Kompetanse',
+  COLLABORATION: 'Samarbeid',
+  KNOWLEDGE_SHARING: 'Kunnskapsdeling',
+  VALUE: 'Verdiskaping',
+  JPRO_FOLLOWUP: 'Oppfølging fra JPro',
+  ADDITIONAL: 'Tilleggsspørsmål',
 }
 
 const translateCategory = (category: string): string => {
@@ -41,7 +41,9 @@ export default function PublicSurveyPage() {
 
   const [state, setState] = useState<SurveyState>('loading')
   const [surveyData, setSurveyData] = useState<PublicSurveyData | null>(null)
-  const [responses, setResponses] = useState<Record<number, SurveyResponseItem>>({})
+  const [responses, setResponses] = useState<
+    Record<number, SurveyResponseItem>
+  >({})
   const [error, setError] = useState<string | null>(null)
 
   // Load survey data when token is available
@@ -167,10 +169,15 @@ export default function PublicSurveyPage() {
       acc[category].push(q)
       return acc
     },
-    {} as Record<string, PublicSurveyQuestion[]>
+    {} as Record<string, PublicSurveyQuestion[]>,
   )
 
-  const renderRatingScale = (question: PublicSurveyQuestion, labelLow: string, labelHigh: string, primaryColor: string) => {
+  const renderRatingScale = (
+    question: PublicSurveyQuestion,
+    labelLow: string,
+    labelHigh: string,
+    primaryColor: string,
+  ) => {
     const currentValue = responses[question.id]?.ratingValue
 
     return (
@@ -185,7 +192,11 @@ export default function PublicSurveyPage() {
               key={value}
               type="button"
               onClick={() => handleRatingChange(question.id, value)}
-              style={currentValue === value ? { backgroundColor: primaryColor } : undefined}
+              style={
+                currentValue === value
+                  ? { backgroundColor: primaryColor }
+                  : undefined
+              }
               className={`w-12 h-12 rounded-lg text-lg font-medium transition-all
                 ${
                   currentValue === value
@@ -202,7 +213,10 @@ export default function PublicSurveyPage() {
     )
   }
 
-  const renderTextInput = (question: PublicSurveyQuestion, placeholder: string) => {
+  const renderTextInput = (
+    question: PublicSurveyQuestion,
+    placeholder: string,
+  ) => {
     const currentValue = responses[question.id]?.textValue || ''
 
     return (
@@ -220,11 +234,18 @@ export default function PublicSurveyPage() {
   const appearance = surveyData?.appearance
   const ratingLabelLow = appearance?.ratingLabelLow || '1 - Svært misfornøyd'
   const ratingLabelHigh = appearance?.ratingLabelHigh || '6 - Svært fornøyd'
-  const instructionText = appearance?.instructionText || 'Vennligst vurder konsulentens arbeid på en skala fra 1 til 6, der 1 er svært misfornøyd og 6 er svært fornøyd.'
-  const thankYouTitle = appearance?.thankYouTitle || 'Takk for din tilbakemelding!'
-  const thankYouMessage = appearance?.thankYouMessage?.replace('{consultantName}', surveyData?.consultantName || '').replace('{organizationName}', surveyData?.organizationName || '')
-    || `Din vurdering av ${surveyData?.consultantName} fra ${surveyData?.organizationName} er nå registrert.`
-  const commentFieldLabel = appearance?.commentFieldLabel || 'Skriv din kommentar her...'
+  const instructionText =
+    appearance?.instructionText ||
+    'Vennligst vurder konsulentens arbeid på en skala fra 1 til 6, der 1 er svært misfornøyd og 6 er svært fornøyd.'
+  const thankYouTitle =
+    appearance?.thankYouTitle || 'Takk for din tilbakemelding!'
+  const thankYouMessage =
+    appearance?.thankYouMessage
+      ?.replace('{consultantName}', surveyData?.consultantName || '')
+      .replace('{organizationName}', surveyData?.organizationName || '') ||
+    `Din vurdering av ${surveyData?.consultantName} fra ${surveyData?.organizationName} er nå registrert.`
+  const commentFieldLabel =
+    appearance?.commentFieldLabel || 'Skriv din kommentar her...'
 
   // Loading state
   if (state === 'loading') {
@@ -262,7 +283,8 @@ export default function PublicSurveyPage() {
             Undersøkelsen ble ikke funnet
           </h1>
           <p className="text-gray-600">
-            Lenken kan være utløpt eller ugyldig. Vennligst kontakt avsender hvis du mener dette er en feil.
+            Lenken kan være utløpt eller ugyldig. Vennligst kontakt avsender
+            hvis du mener dette er en feil.
           </p>
         </div>
       </SurveyLayout>
@@ -287,7 +309,9 @@ export default function PublicSurveyPage() {
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Noe gikk galt</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+            Noe gikk galt
+          </h1>
           <p className="text-gray-600">{error || 'En uventet feil oppstod'}</p>
         </div>
       </SurveyLayout>
@@ -312,7 +336,9 @@ export default function PublicSurveyPage() {
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Du har allerede svart</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+            Du har allerede svart
+          </h1>
           <p className="text-gray-600">
             Takk for at du tok deg tid til å svare på denne undersøkelsen.
             {surveyData && (
@@ -345,7 +371,9 @@ export default function PublicSurveyPage() {
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">{thankYouTitle}</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">
+            {thankYouTitle}
+          </h1>
           <p className="text-lg text-gray-600 max-w-md mx-auto">
             {thankYouMessage}
           </p>
@@ -382,8 +410,12 @@ export default function PublicSurveyPage() {
       {/* Consultant info */}
       <div className="survey-accent-bg rounded-lg p-6 mb-8 text-center">
         <p className="text-gray-600 mb-1">Din tilbakemelding om</p>
-        <p className="text-xl font-semibold survey-primary-text">{surveyData?.consultantName}</p>
-        <p className="text-gray-500 text-sm mt-1">fra {surveyData?.organizationName}</p>
+        <p className="text-xl font-semibold survey-primary-text">
+          {surveyData?.consultantName}
+        </p>
+        <p className="text-gray-500 text-sm mt-1">
+          fra {surveyData?.organizationName}
+        </p>
       </div>
 
       {/* Error message */}
@@ -396,8 +428,8 @@ export default function PublicSurveyPage() {
       {/* Instructions */}
       <div className="bg-gray-50 rounded-lg p-4 mb-8 text-sm text-gray-600">
         <p>
-          {instructionText} Spørsmål merket med <span className="text-red-500">*</span> er
-          obligatoriske.
+          {instructionText} Spørsmål merket med{' '}
+          <span className="text-red-500">*</span> er obligatoriske.
         </p>
       </div>
 
@@ -413,7 +445,10 @@ export default function PublicSurveyPage() {
             <div key={category} className="mb-8">
               <h2
                 className="text-lg font-semibold mb-4 pb-2 border-b-2"
-                style={{ color: appearance?.primaryColor || '#f97316', borderBottomColor: appearance?.primaryColor || '#f97316' }}
+                style={{
+                  color: appearance?.primaryColor || '#f97316',
+                  borderBottomColor: appearance?.primaryColor || '#f97316',
+                }}
               >
                 {translateCategory(category)}
               </h2>
@@ -425,11 +460,21 @@ export default function PublicSurveyPage() {
                   >
                     <label className="block text-gray-800 font-medium mb-2">
                       {question.text}
-                      {question.required && <span className="text-red-500 ml-1">*</span>}
+                      {question.required && (
+                        <span className="text-red-500 ml-1">*</span>
+                      )}
                     </label>
                     {question.questionType === 'FREE_TEXT'
-                      ? renderTextInput(question, question.commentFieldLabel || commentFieldLabel)
-                      : renderRatingScale(question, ratingLabelLow, ratingLabelHigh, appearance?.primaryColor || '#f97316')}
+                      ? renderTextInput(
+                          question,
+                          question.commentFieldLabel || commentFieldLabel,
+                        )
+                      : renderRatingScale(
+                          question,
+                          ratingLabelLow,
+                          ratingLabelHigh,
+                          appearance?.primaryColor || '#f97316',
+                        )}
                   </div>
                 ))}
               </div>
@@ -441,7 +486,11 @@ export default function PublicSurveyPage() {
           <button
             type="submit"
             disabled={state === 'submitting' || !isFormValid()}
-            style={isFormValid() ? { backgroundColor: appearance?.primaryColor || '#f97316' } : undefined}
+            style={
+              isFormValid()
+                ? { backgroundColor: appearance?.primaryColor || '#f97316' }
+                : undefined
+            }
             className={`px-8 py-4 rounded-lg text-lg font-semibold transition-all
               ${
                 isFormValid()
@@ -499,7 +548,10 @@ function SurveyLayout({ children, appearance }: SurveyLayoutProps) {
       </Head>
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
         {/* Simple header with JPro logo or custom logo */}
-        <header style={{ backgroundColor: headerBgColor }} className="shadow-sm">
+        <header
+          style={{ backgroundColor: headerBgColor }}
+          className="shadow-sm"
+        >
           <div className="max-w-3xl mx-auto px-4 py-4">
             <div className="flex items-center justify-center gap-4">
               {appearance?.logoUrl ? (
@@ -519,7 +571,9 @@ function SurveyLayout({ children, appearance }: SurveyLayoutProps) {
                 />
               )}
               <span className="text-gray-400">|</span>
-              <span className="text-gray-600">Kundetilfredshetsundersøkelse</span>
+              <span className="text-gray-600">
+                Kundetilfredshetsundersøkelse
+              </span>
             </div>
           </div>
         </header>
@@ -538,10 +592,18 @@ function SurveyLayout({ children, appearance }: SurveyLayoutProps) {
 
       {/* Global styles for primary color */}
       <style jsx global>{`
-        .survey-primary-bg { background-color: ${primaryColor}; }
-        .survey-primary-bg:hover { background-color: ${adjustColor(primaryColor, -20)}; }
-        .survey-primary-text { color: ${primaryColor}; }
-        .survey-accent-bg { background-color: ${appearance?.accentBgColor || '#fff7ed'}; }
+        .survey-primary-bg {
+          background-color: ${primaryColor};
+        }
+        .survey-primary-bg:hover {
+          background-color: ${adjustColor(primaryColor, -20)};
+        }
+        .survey-primary-text {
+          color: ${primaryColor};
+        }
+        .survey-accent-bg {
+          background-color: ${appearance?.accentBgColor || '#fff7ed'};
+        }
       `}</style>
     </>
   )
@@ -551,7 +613,7 @@ function SurveyLayout({ children, appearance }: SurveyLayoutProps) {
 function adjustColor(hex: string, amount: number): string {
   const num = parseInt(hex.replace('#', ''), 16)
   const r = Math.min(255, Math.max(0, (num >> 16) + amount))
-  const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount))
-  const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount))
+  const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00ff) + amount))
+  const b = Math.min(255, Math.max(0, (num & 0x0000ff) + amount))
   return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
 }

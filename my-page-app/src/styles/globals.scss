@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "@tailwindcss/typography";
 
 @plugin "daisyui" {
@@ -27,7 +27,7 @@
   --color-success-content: oklch(37% 0.077 168.94);
   --color-warning: #d16512;
   --color-warning-content: oklch(41% 0.112 45.904);
-  --color-error: #DC2626;
+  --color-error: #dc2626;
   --color-error-content: oklch(27% 0.105 12.094);
   --color-nav: #2c2c2c;
   --color-hotel: #f6b26b;
@@ -73,8 +73,8 @@ button {
   cursor: pointer;
 }
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 .old-booking {

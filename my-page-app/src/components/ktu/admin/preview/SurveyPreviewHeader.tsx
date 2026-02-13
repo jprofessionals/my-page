@@ -24,11 +24,7 @@ export default function SurveyPreviewHeader({
         <div className="flex items-center justify-center gap-4">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={logoUrl}
-              alt="Logo"
-              className="h-12 object-contain"
-            />
+            <img src={logoUrl} alt="Logo" className="h-12 object-contain" />
           ) : (
             <Image
               src="/images/jpro-logo.svg"

@@ -3,29 +3,31 @@
 ## 📊 Current Status
 
 **Total TypeScript errors:** 174
+
 - `AdminDrawingDetail.tsx`: 95 errors
 - `UserWishForm.tsx`: 66 errors
 - `UserResults.tsx`: 13 errors
 
 ## 🔍 Error Breakdown by Type
 
-| Error Code | Count | Description | Solution |
-|------------|-------|-------------|----------|
-| **TS2339** | 104 | Property does not exist on type | Define proper interfaces |
-| **TS7006** | 26 | Parameter implicitly has 'any' type | Add type annotations |
-| **TS18046** | 14 | Variable is of type 'unknown' | Type assertions or narrowing |
-| **TS7053** | 11 | Index access has 'any' type | Define index signature |
-| **TS2571** | 6 | Object is of type 'unknown' | Type guards |
-| **TS2345** | 5 | Type mismatch in assignment | Fix type definitions |
-| **TS2322** | 4 | Type not assignable | Align types |
-| **TS7031** | 3 | Destructuring has 'any' type | Type destructured params |
-| **TS2698** | 1 | Spread operator error | Fix spread types |
+| Error Code  | Count | Description                         | Solution                     |
+| ----------- | ----- | ----------------------------------- | ---------------------------- |
+| **TS2339**  | 104   | Property does not exist on type     | Define proper interfaces     |
+| **TS7006**  | 26    | Parameter implicitly has 'any' type | Add type annotations         |
+| **TS18046** | 14    | Variable is of type 'unknown'       | Type assertions or narrowing |
+| **TS7053**  | 11    | Index access has 'any' type         | Define index signature       |
+| **TS2571**  | 6     | Object is of type 'unknown'         | Type guards                  |
+| **TS2345**  | 5     | Type mismatch in assignment         | Fix type definitions         |
+| **TS2322**  | 4     | Type not assignable                 | Align types                  |
+| **TS7031**  | 3     | Destructuring has 'any' type        | Type destructured params     |
+| **TS2698**  | 1     | Spread operator error               | Fix spread types             |
 
 ---
 
 ## 🎯 Root Cause Analysis
 
 ### Problem 1: Missing Type Definitions
+
 All useState hooks initialized without generic types:
 
 ```typescript
@@ -37,7 +39,9 @@ const [drawing, setDrawing] = useState<Drawing | null>(null)
 ```
 
 ### Problem 2: No Interface Definitions
+
 Data structures from API have no TypeScript interfaces:
+
 - `Drawing` (season, status, id, createdAt, etc.)
 - `Period` (id, startDate, endDate, description, sortOrder, comment)
 - `Wish` (id, userId, periodId, priority, desiredApartmentIds)
@@ -46,6 +50,7 @@ Data structures from API have no TypeScript interfaces:
 - `ImportResult` (totalLines, successCount, errorCount)
 
 ### Problem 3: Implicit Any Parameters
+
 Function parameters without types:
 
 ```typescript
@@ -172,6 +177,7 @@ export type ActiveTab = 'periods' | 'wishes' | 'results'
 **Estimated effort:** 2-3 hours
 
 #### Step 2.1: Import Types
+
 ```typescript
 import type {
   Drawing,
@@ -183,13 +189,14 @@ import type {
   DrawResult,
   ImportResult,
   WishesViewMode,
-  ActiveTab
+  ActiveTab,
 } from '@/types/cabinLottery.types'
 ```
 
 #### Step 2.2: Fix State Declarations (Lines 10-50)
 
 **Before:**
+
 ```typescript
 const [drawing, setDrawing] = useState(null)
 const [periods, setPeriods] = useState([])
@@ -199,6 +206,7 @@ const [activeTab, setActiveTab] = useState('periods')
 ```
 
 **After:**
+
 ```typescript
 const [drawing, setDrawing] = useState<Drawing | null>(null)
 const [periods, setPeriods] = useState<Period[]>([])
@@ -255,6 +263,7 @@ const handleEdit = (period: Period): void => { ... }
 ```
 
 **Functions to fix (estimated 15-20 functions):**
+
 - `handleCreatePeriod()`
 - `handleCreateBulkPeriods()`
 - `handleUpdatePeriod(periodId: string)`
@@ -312,6 +321,7 @@ Similar approach:
 4. Fix array methods
 
 **Key types needed:**
+
 ```typescript
 interface WishFormState {
   periodId: string
@@ -346,10 +356,10 @@ const nextConfig = {
 
   // ✅ Re-enable TypeScript and ESLint checking
   typescript: {
-    ignoreBuildErrors: false,  // Changed from true
+    ignoreBuildErrors: false, // Changed from true
   },
   eslint: {
-    ignoreDuringBuilds: false,  // Changed from true
+    ignoreDuringBuilds: false, // Changed from true
   },
 
   // ... rest of config
@@ -361,16 +371,19 @@ const nextConfig = {
 ## 🚀 Implementation Order
 
 ### Priority 1 (Must Do First)
+
 1. ✅ Create `src/types/cabinLottery.types.ts` with all interfaces
 2. ✅ Fix AdminDrawingDetail.tsx state declarations (lines 10-50)
 3. ✅ Fix AdminDrawingDetail.tsx function parameters
 
 ### Priority 2 (After Priority 1)
+
 4. ✅ Fix UserWishForm.tsx state declarations
 5. ✅ Fix UserWishForm.tsx function parameters
 6. ✅ Fix UserResults.tsx
 
 ### Priority 3 (Validation)
+
 7. ✅ Run `npx tsc --noEmit` - should show 0 errors
 8. ✅ Run `npm run lint` - should pass
 9. ✅ Re-enable TypeScript checking in next.config.js
@@ -422,14 +435,14 @@ After each phase:
 
 ## ⏱️ Estimated Total Time
 
-| Phase | Estimated Time |
-|-------|----------------|
-| Phase 1: Type definitions | 1 hour |
-| Phase 2: AdminDrawingDetail.tsx | 2-3 hours |
-| Phase 3: UserWishForm.tsx | 1-2 hours |
-| Phase 4: UserResults.tsx | 30 minutes |
-| Phase 5: Testing & validation | 1 hour |
-| **Total** | **5.5 - 7.5 hours** |
+| Phase                           | Estimated Time      |
+| ------------------------------- | ------------------- |
+| Phase 1: Type definitions       | 1 hour              |
+| Phase 2: AdminDrawingDetail.tsx | 2-3 hours           |
+| Phase 3: UserWishForm.tsx       | 1-2 hours           |
+| Phase 4: UserResults.tsx        | 30 minutes          |
+| Phase 5: Testing & validation   | 1 hour              |
+| **Total**                       | **5.5 - 7.5 hours** |
 
 ---
 
@@ -560,6 +573,7 @@ export default function AdminDrawingDetail({ drawingId }: { drawingId: string })
 ## ✅ Next Steps
 
 **Recommend starting with:**
+
 1. Create the types file (Phase 1)
 2. Fix AdminDrawingDetail.tsx state (Phase 2.2)
 3. Verify reduction in errors with `npx tsc --noEmit`

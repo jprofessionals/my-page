@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import ktuService, { KtuRound, KtuRoundStatus, CreateKtuRound, UpdateKtuRound } from '@/services/ktu.service'
+import ktuService, {
+  KtuRound,
+  KtuRoundStatus,
+  CreateKtuRound,
+  UpdateKtuRound,
+} from '@/services/ktu.service'
 
 export default function RoundsTab() {
   const [rounds, setRounds] = useState<KtuRound[]>([])
@@ -195,7 +200,11 @@ export default function RoundsTab() {
                       onClick={() => handleDeleteRound(round.id)}
                       className="text-red-600 hover:text-red-900 disabled:opacity-50"
                       disabled={round.status !== 'DRAFT'}
-                      title={round.status !== 'DRAFT' ? 'Kun DRAFT-runder kan slettes' : ''}
+                      title={
+                        round.status !== 'DRAFT'
+                          ? 'Kun DRAFT-runder kan slettes'
+                          : ''
+                      }
                     >
                       Slett
                     </button>
@@ -214,21 +223,29 @@ export default function RoundsTab() {
             <h2 className="text-xl font-bold mb-4">Opprett ny runde</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Navn
+                </label>
                 <input
                   type="text"
                   value={newRound.name}
-                  onChange={(e) => setNewRound({ ...newRound, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewRound({ ...newRound, name: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="f.eks. KTU 2025"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">År</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  År
+                </label>
                 <input
                   type="number"
                   value={newRound.year}
-                  onChange={(e) => setNewRound({ ...newRound, year: parseInt(e.target.value) })}
+                  onChange={(e) =>
+                    setNewRound({ ...newRound, year: parseInt(e.target.value) })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
@@ -239,7 +256,12 @@ export default function RoundsTab() {
                 <input
                   type="date"
                   value={newRound.openDate || ''}
-                  onChange={(e) => setNewRound({ ...newRound, openDate: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setNewRound({
+                      ...newRound,
+                      openDate: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
@@ -250,7 +272,12 @@ export default function RoundsTab() {
                 <input
                   type="date"
                   value={newRound.closeDate || ''}
-                  onChange={(e) => setNewRound({ ...newRound, closeDate: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setNewRound({
+                      ...newRound,
+                      closeDate: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
@@ -281,28 +308,46 @@ export default function RoundsTab() {
             <h2 className="text-xl font-bold mb-4">Rediger undersøkelse</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Navn
+                </label>
                 <input
                   type="text"
                   value={editRound.name}
-                  onChange={(e) => setEditRound({ ...editRound, name: e.target.value })}
+                  onChange={(e) =>
+                    setEditRound({ ...editRound, name: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">År</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  År
+                </label>
                 <input
                   type="number"
                   value={editRound.year}
-                  onChange={(e) => setEditRound({ ...editRound, year: parseInt(e.target.value) })}
+                  onChange={(e) =>
+                    setEditRound({
+                      ...editRound,
+                      year: parseInt(e.target.value),
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Status
+                </label>
                 <select
                   value={editRound.status}
-                  onChange={(e) => setEditRound({ ...editRound, status: e.target.value as KtuRoundStatus })}
+                  onChange={(e) =>
+                    setEditRound({
+                      ...editRound,
+                      status: e.target.value as KtuRoundStatus,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
                   <option value="DRAFT">Utkast</option>
@@ -311,20 +356,34 @@ export default function RoundsTab() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Åpningsdato</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Åpningsdato
+                </label>
                 <input
                   type="date"
                   value={editRound.openDate || ''}
-                  onChange={(e) => setEditRound({ ...editRound, openDate: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setEditRound({
+                      ...editRound,
+                      openDate: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Lukkedato</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Lukkedato
+                </label>
                 <input
                   type="date"
                   value={editRound.closeDate || ''}
-                  onChange={(e) => setEditRound({ ...editRound, closeDate: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setEditRound({
+                      ...editRound,
+                      closeDate: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>

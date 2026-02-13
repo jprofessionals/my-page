@@ -14,10 +14,12 @@ describe('DrawTab', () => {
           isDrawing={false}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
-      expect(screen.getByText('Trekningen må være låst før den kan kjøres')).toBeInTheDocument()
+      expect(
+        screen.getByText('Trekningen må være låst før den kan kjøres'),
+      ).toBeInTheDocument()
     })
 
     it('should show draw form when status is LOCKED', () => {
@@ -28,11 +30,13 @@ describe('DrawTab', () => {
           isDrawing={false}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
       expect(screen.getByText('Kjør trekning')).toBeInTheDocument()
-      expect(screen.getByPlaceholderText('La stå tom for tilfeldig trekning')).toBeInTheDocument()
+      expect(
+        screen.getByPlaceholderText('La stå tom for tilfeldig trekning'),
+      ).toBeInTheDocument()
     })
 
     it('should not show form when status is OPEN', () => {
@@ -43,7 +47,7 @@ describe('DrawTab', () => {
           isDrawing={false}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
       expect(screen.queryByText('Kjør trekning nå')).not.toBeInTheDocument()
@@ -59,10 +63,12 @@ describe('DrawTab', () => {
           isDrawing={false}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
-      const input = screen.getByPlaceholderText('La stå tom for tilfeldig trekning')
+      const input = screen.getByPlaceholderText(
+        'La stå tom for tilfeldig trekning',
+      )
       // Number inputs return null when empty
       expect(input).toHaveValue(null)
     })
@@ -75,10 +81,12 @@ describe('DrawTab', () => {
           isDrawing={false}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
-      const input = screen.getByPlaceholderText('La stå tom for tilfeldig trekning')
+      const input = screen.getByPlaceholderText(
+        'La stå tom for tilfeldig trekning',
+      )
       // Number inputs convert string values to numbers
       expect(input).toHaveValue(42)
     })
@@ -94,10 +102,12 @@ describe('DrawTab', () => {
           isDrawing={false}
           onSetDrawSeed={mockSetSeed}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
-      const input = screen.getByPlaceholderText('La stå tom for tilfeldig trekning')
+      const input = screen.getByPlaceholderText(
+        'La stå tom for tilfeldig trekning',
+      )
       await user.type(input, '123')
 
       expect(mockSetSeed).toHaveBeenCalled()
@@ -111,11 +121,13 @@ describe('DrawTab', () => {
           isDrawing={false}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
       expect(screen.getByText(/Ikke nødvendig å fylle ut/i)).toBeInTheDocument()
-      expect(screen.getByText(/Seed brukes kun for å reprodusere/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/Seed brukes kun for å reprodusere/i),
+      ).toBeInTheDocument()
     })
   })
 
@@ -128,7 +140,7 @@ describe('DrawTab', () => {
           isDrawing={false}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
       expect(screen.getByText('Kjør trekning nå')).toBeInTheDocument()
@@ -142,7 +154,7 @@ describe('DrawTab', () => {
           isDrawing={true}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
       expect(screen.getByText('Kjører trekning...')).toBeInTheDocument()
@@ -156,7 +168,7 @@ describe('DrawTab', () => {
           isDrawing={true}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
       const button = screen.getByRole('button', { name: /Kjører trekning/i })
@@ -171,7 +183,7 @@ describe('DrawTab', () => {
           isDrawing={false}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
       const button = screen.getByRole('button', { name: /Kjør trekning nå/i })
@@ -189,7 +201,7 @@ describe('DrawTab', () => {
           isDrawing={false}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={mockPerformDraw}
-        />
+        />,
       )
 
       const button = screen.getByRole('button', { name: /Kjør trekning nå/i })
@@ -209,7 +221,7 @@ describe('DrawTab', () => {
           isDrawing={true}
           onSetDrawSeed={vi.fn()}
           onPerformDraw={mockPerformDraw}
-        />
+        />,
       )
 
       const button = screen.getByRole('button', { name: /Kjører trekning/i })
@@ -221,9 +233,15 @@ describe('DrawTab', () => {
 
   describe('Edge Cases', () => {
     it('should handle all drawing statuses correctly', () => {
-      const statuses: DrawingStatus[] = ['DRAFT', 'OPEN', 'LOCKED', 'DRAWN', 'PUBLISHED']
+      const statuses: DrawingStatus[] = [
+        'DRAFT',
+        'OPEN',
+        'LOCKED',
+        'DRAWN',
+        'PUBLISHED',
+      ]
 
-      statuses.forEach(status => {
+      statuses.forEach((status) => {
         const { unmount } = render(
           <DrawTab
             drawingStatus={status}
@@ -231,15 +249,21 @@ describe('DrawTab', () => {
             isDrawing={false}
             onSetDrawSeed={vi.fn()}
             onPerformDraw={vi.fn()}
-          />
+          />,
         )
 
         if (status === 'LOCKED' || status === 'DRAWN') {
           expect(screen.getByText('Kjør trekning nå')).toBeInTheDocument()
         } else if (status === 'PUBLISHED') {
-          expect(screen.getByText('Kan ikke kjøre ny trekning når den allerede er publisert')).toBeInTheDocument()
+          expect(
+            screen.getByText(
+              'Kan ikke kjøre ny trekning når den allerede er publisert',
+            ),
+          ).toBeInTheDocument()
         } else {
-          expect(screen.getByText('Trekningen må være låst før den kan kjøres')).toBeInTheDocument()
+          expect(
+            screen.getByText('Trekningen må være låst før den kan kjøres'),
+          ).toBeInTheDocument()
         }
 
         unmount()
@@ -257,10 +281,12 @@ describe('DrawTab', () => {
           isDrawing={false}
           onSetDrawSeed={mockSetSeed}
           onPerformDraw={vi.fn()}
-        />
+        />,
       )
 
-      const input = screen.getByPlaceholderText('La stå tom for tilfeldig trekning') as HTMLInputElement
+      const input = screen.getByPlaceholderText(
+        'La stå tom for tilfeldig trekning',
+      ) as HTMLInputElement
       await user.type(input, '999')
 
       expect(mockSetSeed).toHaveBeenCalled()

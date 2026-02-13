@@ -117,7 +117,11 @@ export default function SalesPipelineCard({
         {/* Submitted date */}
         {activity.submittedAt && (
           <div className="text-xs text-teal-600">
-            Levert {activity.submittedTo === 'SUPPLIER' ? 'til leverandør' : 'til kunde'}:{' '}
+            Levert{' '}
+            {activity.submittedTo === 'SUPPLIER'
+              ? 'til leverandør'
+              : 'til kunde'}
+            :{' '}
             {new Date(activity.submittedAt).toLocaleDateString('nb-NO', {
               day: 'numeric',
               month: 'short',

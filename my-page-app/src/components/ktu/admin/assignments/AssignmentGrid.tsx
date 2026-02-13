@@ -42,15 +42,18 @@ export default function AssignmentGrid({
 }: AssignmentGridProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
-  const handleToggleOrg = useCallback((orgId: number) => {
-    const next = new Set(openOrgIds)
-    if (next.has(orgId)) {
-      next.delete(orgId)
-    } else {
-      next.add(orgId)
-    }
-    onOpenOrgIdsChange(next)
-  }, [openOrgIds, onOpenOrgIdsChange])
+  const handleToggleOrg = useCallback(
+    (orgId: number) => {
+      const next = new Set(openOrgIds)
+      if (next.has(orgId)) {
+        next.delete(orgId)
+      } else {
+        next.add(orgId)
+      }
+      onOpenOrgIdsChange(next)
+    },
+    [openOrgIds, onOpenOrgIdsChange],
+  )
 
   // Filter organizations that have at least one active contact
   const orgsWithContacts = useMemo(() => {
@@ -73,7 +76,7 @@ export default function AssignmentGrid({
       return orgContacts.some(
         (c) =>
           c.name.toLowerCase().includes(query) ||
-          c.email?.toLowerCase().includes(query)
+          c.email?.toLowerCase().includes(query),
       )
     })
   }, [orgsWithContacts, contacts, searchQuery])
@@ -82,7 +85,7 @@ export default function AssignmentGrid({
   const stats = useMemo(() => {
     const totalAssignments = assignments.length
     const sent = invitations.filter((i) =>
-      ['SENT', 'OPENED', 'RESPONDED'].includes(i.status)
+      ['SENT', 'OPENED', 'RESPONDED'].includes(i.status),
     ).length
     const responded = invitations.filter((i) => i.status === 'RESPONDED').length
     const pending = totalAssignments - sent
@@ -99,7 +102,7 @@ export default function AssignmentGrid({
       toast.success('Kontaktperson koblet')
       onDataChange()
     },
-    [roundId, onDataChange]
+    [roundId, onDataChange],
   )
 
   const handleAssignmentDelete = useCallback(
@@ -108,7 +111,7 @@ export default function AssignmentGrid({
       toast.success('Kontaktperson frakoblet')
       onDataChange()
     },
-    [roundId, onDataChange]
+    [roundId, onDataChange],
   )
 
   const handleContactCreate = useCallback(
@@ -121,11 +124,14 @@ export default function AssignmentGrid({
       toast.success('Kontakt opprettet')
       onDataChange()
     },
-    [onDataChange]
+    [onDataChange],
   )
 
   const handleContactUpdate = useCallback(
-    async (contactId: number, data: { name?: string; email?: string; active?: boolean }) => {
+    async (
+      contactId: number,
+      data: { name?: string; email?: string; active?: boolean },
+    ) => {
       await ktuService.updateContact(contactId, data)
       if (data.active === false) {
         toast.success('Kontakt deaktivert')
@@ -134,7 +140,7 @@ export default function AssignmentGrid({
       }
       onDataChange()
     },
-    [onDataChange]
+    [onDataChange],
   )
 
   return (
@@ -221,7 +227,9 @@ export default function AssignmentGrid({
               disabled={disabled}
               isOpen={openOrgIds.has(org.id)}
               onToggle={() => handleToggleOrg(org.id)}
-              manuallyAddedIds={manuallyAddedConsultants.get(org.id) || new Set()}
+              manuallyAddedIds={
+                manuallyAddedConsultants.get(org.id) || new Set()
+              }
               onManuallyAddedIdsChange={(ids) => {
                 const next = new Map(manuallyAddedConsultants)
                 next.set(org.id, ids)
@@ -235,8 +243,16 @@ export default function AssignmentGrid({
       {/* Help text */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
         <div className="flex items-start gap-2">
-          <svg className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+          <svg
+            className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clipRule="evenodd"
+            />
           </svg>
           <div>
             <p className="font-medium">Slik tildeler du kontaktpersoner:</p>

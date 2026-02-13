@@ -27,19 +27,28 @@ interface Props {
   onUpdate?: () => void
 }
 
-type DetailTab = 'oversikt' | 'spørsmål' | 'tildelinger' | 'svar' | 'forhåndsvisning'
+type DetailTab =
+  | 'oversikt'
+  | 'spørsmål'
+  | 'tildelinger'
+  | 'svar'
+  | 'forhåndsvisning'
 
 export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
   const [activeTab, setActiveTab] = useState<DetailTab>('oversikt')
   const [loading, setLoading] = useState(true)
   const [invitations, setInvitations] = useState<KtuInvitation[]>([])
   const [responses, setResponses] = useState<KtuResponseSummary[]>([])
-  const [selectedResponse, setSelectedResponse] = useState<KtuResponseSummary | null>(null)
+  const [selectedResponse, setSelectedResponse] =
+    useState<KtuResponseSummary | null>(null)
   const [showEditModal, setShowEditModal] = useState(false)
   const [editName, setEditName] = useState(survey.name)
-  const [editManualSentCount, setEditManualSentCount] = useState<number | null>(survey.manualSentCount ?? null)
+  const [editManualSentCount, setEditManualSentCount] = useState<number | null>(
+    survey.manualSentCount ?? null,
+  )
   const [updating, setUpdating] = useState(false)
-  const [editingResponse, setEditingResponse] = useState<KtuQuestionResponse | null>(null)
+  const [editingResponse, setEditingResponse] =
+    useState<KtuQuestionResponse | null>(null)
   const [editRatingValue, setEditRatingValue] = useState<number | null>(null)
   const [editTextValue, setEditTextValue] = useState<string>('')
   const [sendingInvitations, setSendingInvitations] = useState(false)
@@ -63,7 +72,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
     required: true,
   })
   const [showEmailPreviewModal, setShowEmailPreviewModal] = useState(false)
-  const [emailPreviewType, setEmailPreviewType] = useState<'invitation' | 'reminder'>('invitation')
+  const [emailPreviewType, setEmailPreviewType] = useState<
+    'invitation' | 'reminder'
+  >('invitation')
   const [emailPreviewHtml, setEmailPreviewHtml] = useState<string>('')
   const [emailPreviewSubject, setEmailPreviewSubject] = useState<string>('')
   const [loadingEmailPreview, setLoadingEmailPreview] = useState(false)
@@ -72,23 +83,35 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
   const [showTestSurveyModal, setShowTestSurveyModal] = useState(false)
   const [creatingTestSurvey, setCreatingTestSurvey] = useState(false)
   const [testSurveyEmail, setTestSurveyEmail] = useState('')
-  const [testSurveyResult, setTestSurveyResult] = useState<KtuTestSurveyResult | null>(null)
+  const [testSurveyResult, setTestSurveyResult] =
+    useState<KtuTestSurveyResult | null>(null)
 
   // Assignments state
   const [assignments, setAssignments] = useState<KtuAssignment[]>([])
   const [consultants, setConsultants] = useState<KtuConsultant[]>([])
   const [contacts, setContacts] = useState<KtuCustomerContact[]>([])
-  const [organizations, setOrganizations] = useState<KtuCustomerOrganization[]>([])
+  const [organizations, setOrganizations] = useState<KtuCustomerOrganization[]>(
+    [],
+  )
   const [openOrgIds, setOpenOrgIds] = useState<Set<number>>(new Set())
-  const [manuallyAddedConsultants, setManuallyAddedConsultants] = useState<Map<number, Set<number>>>(new Map())
+  const [manuallyAddedConsultants, setManuallyAddedConsultants] = useState<
+    Map<number, Set<number>>
+  >(new Map())
 
   // Calculate counts from invitations
-  const respondedCount = invitations.filter(i => i.status === 'RESPONDED').length
-  const actualSentCount = invitations.filter(i => ['SENT', 'OPENED', 'RESPONDED'].includes(i.status)).length
-  const waitingCount = invitations.filter(i => ['SENT', 'OPENED'].includes(i.status)).length
+  const respondedCount = invitations.filter(
+    (i) => i.status === 'RESPONDED',
+  ).length
+  const actualSentCount = invitations.filter((i) =>
+    ['SENT', 'OPENED', 'RESPONDED'].includes(i.status),
+  ).length
+  const waitingCount = invitations.filter((i) =>
+    ['SENT', 'OPENED'].includes(i.status),
+  ).length
   // Use manualSentCount if set (for imported data), otherwise use actual sent count
   const effectiveSentCount = survey.manualSentCount ?? actualSentCount
-  const responseRate = effectiveSentCount > 0 ? (respondedCount / effectiveSentCount) * 100 : 0
+  const responseRate =
+    effectiveSentCount > 0 ? (respondedCount / effectiveSentCount) * 100 : 0
 
   useEffect(() => {
     loadData()
@@ -97,7 +120,16 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [invitationsRes, responsesRes, assignmentsRes, consultantsRes, contactsRes, orgsRes, roundQuestionsRes, globalQuestionsRes] = await Promise.all([
+      const [
+        invitationsRes,
+        responsesRes,
+        assignmentsRes,
+        consultantsRes,
+        contactsRes,
+        orgsRes,
+        roundQuestionsRes,
+        globalQuestionsRes,
+      ] = await Promise.all([
         ktuService.getInvitations(survey.id),
         ktuService.getRoundResponses(survey.id),
         ktuService.getAssignments(survey.id),
@@ -125,7 +157,12 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
   }
 
   const handleSendInvitations = async () => {
-    if (!confirm('Er du sikker på at du vil sende ut invitasjoner til alle kontaktpersoner i denne undersøkelsen?')) return
+    if (
+      !confirm(
+        'Er du sikker på at du vil sende ut invitasjoner til alle kontaktpersoner i denne undersøkelsen?',
+      )
+    )
+      return
 
     setSendingInvitations(true)
     try {
@@ -143,7 +180,12 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
   }
 
   const handleSendReminders = async () => {
-    if (!confirm('Er du sikker på at du vil sende purring til alle som ikke har svart?')) return
+    if (
+      !confirm(
+        'Er du sikker på at du vil sende purring til alle som ikke har svart?',
+      )
+    )
+      return
 
     setSendingReminders(true)
     try {
@@ -173,7 +215,8 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
   }
 
   const handleCloseSurvey = async () => {
-    if (!confirm('Er du sikker på at du vil avslutte denne undersøkelsen?')) return
+    if (!confirm('Er du sikker på at du vil avslutte denne undersøkelsen?'))
+      return
     try {
       await ktuService.updateRound(survey.id, { status: 'CLOSED' })
       toast.success('Undersøkelsen er nå avsluttet')
@@ -206,7 +249,7 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
     setCreatingTestSurvey(true)
     try {
       // Wait for any pending auto-saves to complete (auto-save delay is 1500ms)
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
       const result = await ktuService.createTestSurvey(survey.id, {
         email: testSurveyEmail || undefined,
@@ -214,10 +257,14 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
       if (result.data) {
         setTestSurveyResult(result.data)
         if (result.data.emailSent) {
-          toast.success(`Test-undersøkelse opprettet og e-post sendt til ${result.data.emailSentTo}`)
+          toast.success(
+            `Test-undersøkelse opprettet og e-post sendt til ${result.data.emailSentTo}`,
+          )
         } else if (testSurveyEmail) {
           // Email was requested but failed to send
-          toast.warning('Test-undersøkelse opprettet, men e-post kunne ikke sendes. Sjekk server-loggen.')
+          toast.warning(
+            'Test-undersøkelse opprettet, men e-post kunne ikke sendes. Sjekk server-loggen.',
+          )
         } else {
           toast.success('Test-undersøkelse opprettet')
         }
@@ -288,9 +335,13 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
     }
   }
 
-
   const handleInitQuestionsFromTemplate = async () => {
-    if (!confirm('Vil du initialisere spørsmål fra standard mal? Dette vil legge til alle aktive globale spørsmål til denne undersøkelsen.')) return
+    if (
+      !confirm(
+        'Vil du initialisere spørsmål fra standard mal? Dette vil legge til alle aktive globale spørsmål til denne undersøkelsen.',
+      )
+    )
+      return
 
     setInitializingQuestions(true)
     try {
@@ -299,7 +350,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
       loadData()
     } catch (error) {
       console.error('Failed to init questions:', error)
-      toast.error('Feil ved initialisering av spørsmål. Undersøkelsen har kanskje allerede spørsmål.')
+      toast.error(
+        'Feil ved initialisering av spørsmål. Undersøkelsen har kanskje allerede spørsmål.',
+      )
     } finally {
       setInitializingQuestions(false)
     }
@@ -307,7 +360,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
 
   const handleToggleQuestionActive = async (rq: KtuRoundQuestion) => {
     try {
-      await ktuService.updateRoundQuestion(survey.id, rq.question.id, { active: !rq.active })
+      await ktuService.updateRoundQuestion(survey.id, rq.question.id, {
+        active: !rq.active,
+      })
       toast.success(rq.active ? 'Spørsmål deaktivert' : 'Spørsmål aktivert')
       loadData()
     } catch (error) {
@@ -317,7 +372,12 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
   }
 
   const handleRemoveQuestion = async (questionId: number) => {
-    if (!confirm('Er du sikker på at du vil fjerne dette spørsmålet fra undersøkelsen?')) return
+    if (
+      !confirm(
+        'Er du sikker på at du vil fjerne dette spørsmålet fra undersøkelsen?',
+      )
+    )
+      return
 
     try {
       await ktuService.removeRoundQuestion(survey.id, questionId)
@@ -332,9 +392,10 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
   const handleAddQuestion = async (questionId: number) => {
     setAddingQuestion(true)
     try {
-      const maxDisplayOrder = roundQuestions.length > 0
-        ? Math.max(...roundQuestions.map(rq => rq.displayOrder))
-        : 0
+      const maxDisplayOrder =
+        roundQuestions.length > 0
+          ? Math.max(...roundQuestions.map((rq) => rq.displayOrder))
+          : 0
       await ktuService.addRoundQuestion(survey.id, {
         questionId,
         displayOrder: maxDisplayOrder + 1,
@@ -352,7 +413,7 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
 
   // Get questions that are not yet added to the round
   const availableQuestions = globalQuestions.filter(
-    gq => !roundQuestions.some(rq => rq.question.id === gq.id)
+    (gq) => !roundQuestions.some((rq) => rq.question.id === gq.id),
   )
 
   const handleCreateQuestion = async () => {
@@ -390,19 +451,27 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
 
   const getStatusStyle = (status: KtuRoundStatus) => {
     switch (status) {
-      case 'DRAFT': return 'bg-gray-100 text-gray-700'
-      case 'OPEN': return 'bg-green-100 text-green-700'
-      case 'CLOSED': return 'bg-blue-100 text-blue-700'
-      default: return 'bg-gray-100 text-gray-700'
+      case 'DRAFT':
+        return 'bg-gray-100 text-gray-700'
+      case 'OPEN':
+        return 'bg-green-100 text-green-700'
+      case 'CLOSED':
+        return 'bg-blue-100 text-blue-700'
+      default:
+        return 'bg-gray-100 text-gray-700'
     }
   }
 
   const getStatusText = (status: KtuRoundStatus) => {
     switch (status) {
-      case 'DRAFT': return 'Utkast'
-      case 'OPEN': return 'Aktiv'
-      case 'CLOSED': return 'Avsluttet'
-      default: return status
+      case 'DRAFT':
+        return 'Utkast'
+      case 'OPEN':
+        return 'Aktiv'
+      case 'CLOSED':
+        return 'Avsluttet'
+      default:
+        return status
     }
   }
 
@@ -428,8 +497,18 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
           onClick={onBack}
           className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
         >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
           Tilbake til undersøkelser
         </button>
@@ -437,7 +516,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold text-gray-900">{survey.name}</h2>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {survey.name}
+              </h2>
               <button
                 onClick={() => {
                   setEditName(survey.name)
@@ -446,15 +527,27 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                 className="text-gray-400 hover:text-gray-600"
                 title="Rediger navn"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  />
                 </svg>
               </button>
             </div>
             <p className="text-gray-600">{survey.year}</p>
           </div>
           <div className="flex items-center gap-4">
-            <span className={`px-3 py-1 text-sm rounded-full ${getStatusStyle(survey.status)}`}>
+            <span
+              className={`px-3 py-1 text-sm rounded-full ${getStatusStyle(survey.status)}`}
+            >
               {getStatusText(survey.status)}
             </span>
             <div className="relative group">
@@ -462,12 +555,32 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center gap-2"
                 disabled={loadingEmailPreview}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
                 {loadingEmailPreview ? 'Laster...' : 'E-post'}
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
               <div className="absolute right-0 top-full mt-1 bg-white border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 min-w-[180px]">
@@ -495,8 +608,18 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                 className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 flex items-center gap-2"
                 title="Opprett en test-undersøkelse for å verifisere at flyten fungerer"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
                 Test
               </button>
@@ -553,20 +676,32 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
               {/* KPI cards */}
               <div className="grid grid-cols-4 gap-4">
                 <div className="bg-green-50 rounded-lg shadow p-4">
-                  <div className="text-2xl font-bold text-green-700">{respondedCount}</div>
+                  <div className="text-2xl font-bold text-green-700">
+                    {respondedCount}
+                  </div>
                   <div className="text-sm text-green-600">Svar mottatt</div>
                 </div>
                 <div className="bg-blue-50 rounded-lg shadow p-4">
-                  <div className="text-2xl font-bold text-blue-700">{effectiveSentCount}</div>
+                  <div className="text-2xl font-bold text-blue-700">
+                    {effectiveSentCount}
+                  </div>
                   <div className="text-sm text-blue-600">
                     Invitasjoner sendt
-                    {survey.manualSentCount !== undefined && survey.manualSentCount !== null && (
-                      <span className="ml-1 text-xs text-blue-400" title="Manuelt angitt antall">(manuelt)</span>
-                    )}
+                    {survey.manualSentCount !== undefined &&
+                      survey.manualSentCount !== null && (
+                        <span
+                          className="ml-1 text-xs text-blue-400"
+                          title="Manuelt angitt antall"
+                        >
+                          (manuelt)
+                        </span>
+                      )}
                   </div>
                 </div>
                 <div className="bg-yellow-50 rounded-lg shadow p-4">
-                  <div className="text-2xl font-bold text-yellow-700">{waitingCount}</div>
+                  <div className="text-2xl font-bold text-yellow-700">
+                    {waitingCount}
+                  </div>
                   <div className="text-sm text-yellow-600">Venter på svar</div>
                 </div>
                 <div className="bg-purple-50 rounded-lg shadow p-4">
@@ -594,7 +729,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                       disabled={sendingReminders || waitingCount === 0}
                       className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {sendingReminders ? 'Sender...' : `Send purring (${waitingCount})`}
+                      {sendingReminders
+                        ? 'Sender...'
+                        : `Send purring (${waitingCount})`}
                     </button>
                   </div>
                 </div>
@@ -603,7 +740,8 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
               {survey.status === 'DRAFT' && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <p className="text-yellow-800">
-                    Denne undersøkelsen er fortsatt et utkast. Åpne undersøkelsen for a sende invitasjoner.
+                    Denne undersøkelsen er fortsatt et utkast. Åpne
+                    undersøkelsen for a sende invitasjoner.
                   </p>
                 </div>
               )}
@@ -623,21 +761,29 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
             <div className="space-y-6">
               <div className="flex justify-between items-center">
                 <p className="text-sm text-gray-600">
-                  Disse spørsmålene vil bli stilt til kundekontaktene i denne undersøkelsen.
+                  Disse spørsmålene vil bli stilt til kundekontaktene i denne
+                  undersøkelsen.
                 </p>
                 {survey.status === 'DRAFT' && (
                   <div className="flex gap-2">
-                    {roundQuestions.length === 0 && globalQuestions.length > 0 && (
-                      <button
-                        onClick={handleInitQuestionsFromTemplate}
-                        disabled={initializingQuestions}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                      >
-                        {initializingQuestions ? 'Initialiserer...' : 'Initialiser fra mal'}
-                      </button>
-                    )}
+                    {roundQuestions.length === 0 &&
+                      globalQuestions.length > 0 && (
+                        <button
+                          onClick={handleInitQuestionsFromTemplate}
+                          disabled={initializingQuestions}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                        >
+                          {initializingQuestions
+                            ? 'Initialiserer...'
+                            : 'Initialiser fra mal'}
+                        </button>
+                      )}
                     <button
-                      onClick={() => availableQuestions.length > 0 ? setShowAddQuestionModal(true) : setShowCreateQuestionModal(true)}
+                      onClick={() =>
+                        availableQuestions.length > 0
+                          ? setShowAddQuestionModal(true)
+                          : setShowCreateQuestionModal(true)
+                      }
                       className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                     >
                       + Legg til spørsmål
@@ -654,7 +800,8 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                   </p>
                   {survey.status === 'DRAFT' && (
                     <p className="text-sm text-gray-400">
-                      Klikk &quot;Initialiser fra mal&quot; for a legge til standard spørsmål.
+                      Klikk &quot;Initialiser fra mal&quot; for a legge til
+                      standard spørsmål.
                     </p>
                   )}
                 </div>
@@ -673,12 +820,16 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                               <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
                                 {rq.question.code}
                               </span>
-                              <span className={`text-xs px-2 py-1 rounded ${
-                                rq.question.questionType === 'RATING_1_6'
-                                  ? 'bg-blue-100 text-blue-700'
-                                  : 'bg-purple-100 text-purple-700'
-                              }`}>
-                                {rq.question.questionType === 'RATING_1_6' ? 'Score 1-6' : 'Fritekst'}
+                              <span
+                                className={`text-xs px-2 py-1 rounded ${
+                                  rq.question.questionType === 'RATING_1_6'
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : 'bg-purple-100 text-purple-700'
+                                }`}
+                              >
+                                {rq.question.questionType === 'RATING_1_6'
+                                  ? 'Score 1-6'
+                                  : 'Fritekst'}
                               </span>
                               {rq.question.required && (
                                 <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-700">
@@ -691,9 +842,13 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                                 </span>
                               )}
                             </div>
-                            <p className="text-gray-900 font-medium">{rq.question.textNo}</p>
+                            <p className="text-gray-900 font-medium">
+                              {rq.question.textNo}
+                            </p>
                             {rq.question.textEn && (
-                              <p className="text-gray-500 text-sm mt-1 italic">{rq.question.textEn}</p>
+                              <p className="text-gray-500 text-sm mt-1 italic">
+                                {rq.question.textEn}
+                              </p>
                             )}
                             <div className="text-xs text-gray-400 mt-2">
                               Kategori: {rq.question.category}
@@ -709,12 +864,18 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                                       ? 'text-orange-600 hover:bg-orange-50'
                                       : 'text-green-600 hover:bg-green-50'
                                   }`}
-                                  title={rq.active ? 'Deaktiver for denne undersøkelsen' : 'Aktiver for denne undersøkelsen'}
+                                  title={
+                                    rq.active
+                                      ? 'Deaktiver for denne undersøkelsen'
+                                      : 'Aktiver for denne undersøkelsen'
+                                  }
                                 >
                                   {rq.active ? 'Deaktiver' : 'Aktiver'}
                                 </button>
                                 <button
-                                  onClick={() => handleRemoveQuestion(rq.question.id)}
+                                  onClick={() =>
+                                    handleRemoveQuestion(rq.question.id)
+                                  }
                                   className="text-sm px-2 py-1 rounded text-red-600 hover:bg-red-50"
                                   title="Fjern fra undersøkelsen"
                                 >
@@ -736,8 +897,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
               {survey.status !== 'DRAFT' && roundQuestions.length > 0 && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-blue-800 text-sm">
-                    <strong>Merk:</strong> Spørsmål kan kun endres når undersøkelsen er i utkast-status.
-                    Dette sikrer at alle respondenter får de samme spørsmålene.
+                    <strong>Merk:</strong> Spørsmål kan kun endres når
+                    undersøkelsen er i utkast-status. Dette sikrer at alle
+                    respondenter får de samme spørsmålene.
                   </p>
                 </div>
               )}
@@ -750,7 +912,8 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
               {/* Actions row */}
               <div className="flex justify-between items-center">
                 <p className="text-sm text-gray-600">
-                  Søk etter konsulenter og koble dem til kontaktpersoner i hver organisasjon.
+                  Søk etter konsulenter og koble dem til kontaktpersoner i hver
+                  organisasjon.
                 </p>
                 <div className="flex gap-3">
                   {survey.status === 'OPEN' && (
@@ -767,7 +930,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                         disabled={sendingReminders || waitingCount === 0}
                         className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
                       >
-                        {sendingReminders ? 'Sender...' : `Send purring (${waitingCount})`}
+                        {sendingReminders
+                          ? 'Sender...'
+                          : `Send purring (${waitingCount})`}
                       </button>
                     </>
                   )}
@@ -777,7 +942,8 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
               {survey.status === 'DRAFT' && assignments.length > 0 && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <p className="text-yellow-800">
-                    Undersøkelsen er et utkast. Åpne den for å sende invitasjoner.
+                    Undersøkelsen er et utkast. Åpne den for å sende
+                    invitasjoner.
                   </p>
                 </div>
               )}
@@ -808,11 +974,15 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-6">
                     <div>
-                      <div className="text-2xl font-bold text-green-700">{respondedCount}</div>
+                      <div className="text-2xl font-bold text-green-700">
+                        {respondedCount}
+                      </div>
                       <div className="text-sm text-gray-500">Svar mottatt</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-blue-700">{effectiveSentCount}</div>
+                      <div className="text-2xl font-bold text-blue-700">
+                        {effectiveSentCount}
+                      </div>
                       <div className="text-sm text-gray-500">Utsendte</div>
                     </div>
                     <div>
@@ -824,16 +994,30 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-2 justify-end">
-                      <label className="text-sm text-gray-600">Antall utsendte:</label>
+                      <label className="text-sm text-gray-600">
+                        Antall utsendte:
+                      </label>
                       <input
                         type="number"
                         min={0}
                         value={editManualSentCount ?? ''}
-                        onChange={(e) => setEditManualSentCount(e.target.value ? parseInt(e.target.value, 10) : null)}
+                        onChange={(e) =>
+                          setEditManualSentCount(
+                            e.target.value
+                              ? parseInt(e.target.value, 10)
+                              : null,
+                          )
+                        }
                         onBlur={async () => {
-                          if (editManualSentCount !== (survey.manualSentCount ?? null)) {
+                          if (
+                            editManualSentCount !==
+                            (survey.manualSentCount ?? null)
+                          ) {
                             try {
-                              await ktuService.updateRound(survey.id, { manualSentCount: editManualSentCount ?? undefined })
+                              await ktuService.updateRound(survey.id, {
+                                manualSentCount:
+                                  editManualSentCount ?? undefined,
+                              })
                               toast.success('Antall utsendte oppdatert')
                               onUpdate?.()
                             } catch {
@@ -845,75 +1029,105 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                         placeholder="Auto"
                       />
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">For importerte data. La stå tom for automatisk telling.</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      For importerte data. La stå tom for automatisk telling.
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Responses table */}
               <div className="bg-white rounded-lg shadow overflow-hidden">
-              {responses.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">
-                  Ingen svar registrert ennå
-                </div>
-              ) : (
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Konsulent</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kunde</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kontaktperson</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Scores</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Besvart</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Detaljer</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {responses.map((response) => {
-                      const allScores = (response.questionResponses || [])
-                        .map(qr => qr.ratingValue)
-                        .filter((v): v is number => v !== null && v !== undefined)
+                {responses.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    Ingen svar registrert ennå
+                  </div>
+                ) : (
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Konsulent
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Kunde
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Kontaktperson
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Scores
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Besvart
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Detaljer
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {responses.map((response) => {
+                        const allScores = (response.questionResponses || [])
+                          .map((qr) => qr.ratingValue)
+                          .filter(
+                            (v): v is number => v !== null && v !== undefined,
+                          )
 
-                      return (
-                        <tr key={response.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{response.consultantName}</td>
-                          <td className="px-6 py-4 text-sm">{response.organizationName || '-'}</td>
-                          <td className="px-6 py-4 text-sm">{response.contactName || '-'}</td>
-                          <td className="px-6 py-4 text-sm">
-                            {allScores.length > 0 ? (
-                              <div className="flex flex-wrap gap-1">
-                                {allScores.map((score, idx) => (
-                                  <span
-                                    key={idx}
-                                    className={`px-1.5 py-0.5 text-xs rounded ${
-                                      score >= 5 ? 'bg-green-100 text-green-700' :
-                                      score >= 3 ? 'bg-yellow-100 text-yellow-700' :
-                                      'bg-red-100 text-red-700'
-                                    }`}
-                                  >
-                                    {score}
-                                  </span>
-                                ))}
-                              </div>
-                            ) : '-'}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {response.respondedAt ? new Date(response.respondedAt).toLocaleDateString('nb-NO') : '-'}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <button
-                              onClick={() => setSelectedResponse(response)}
-                              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                            >
-                              Se svar
-                            </button>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              )}
+                        return (
+                          <tr key={response.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                              {response.consultantName}
+                            </td>
+                            <td className="px-6 py-4 text-sm">
+                              {response.organizationName || '-'}
+                            </td>
+                            <td className="px-6 py-4 text-sm">
+                              {response.contactName || '-'}
+                            </td>
+                            <td className="px-6 py-4 text-sm">
+                              {allScores.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {allScores.map((score, idx) => (
+                                    <span
+                                      key={idx}
+                                      className={`px-1.5 py-0.5 text-xs rounded ${
+                                        score >= 5
+                                          ? 'bg-green-100 text-green-700'
+                                          : score >= 3
+                                            ? 'bg-yellow-100 text-yellow-700'
+                                            : 'bg-red-100 text-red-700'
+                                      }`}
+                                    >
+                                      {score}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                '-'
+                              )}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {response.respondedAt
+                                ? new Date(
+                                    response.respondedAt,
+                                  ).toLocaleDateString('nb-NO')
+                                : '-'}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <button
+                                onClick={() => setSelectedResponse(response)}
+                                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                              >
+                                Se svar
+                              </button>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </div>
           )}
@@ -922,7 +1136,10 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
             <SurveyPreviewEditor
               survey={survey}
               questions={roundQuestions}
-              onUpdate={() => { loadData(); onUpdate?.(); }}
+              onUpdate={() => {
+                loadData()
+                onUpdate?.()
+              }}
             />
           )}
         </>
@@ -935,17 +1152,30 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
             <div className="p-6 border-b">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">Svardetaljer</h3>
+                  <h3 className="text-xl font-bold text-gray-900">
+                    Svardetaljer
+                  </h3>
                   <p className="text-gray-600 mt-1">
-                    {selectedResponse.consultantName} - {selectedResponse.organizationName}
+                    {selectedResponse.consultantName} -{' '}
+                    {selectedResponse.organizationName}
                   </p>
                 </div>
                 <button
                   onClick={() => setSelectedResponse(null)}
                   className="text-gray-400 hover:text-gray-600"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -956,20 +1186,28 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
               <div className="grid grid-cols-3 gap-4 mb-6 bg-gray-50 rounded-lg p-4">
                 <div>
                   <div className="text-sm text-gray-500">Kontaktperson</div>
-                  <div className="font-medium">{selectedResponse.contactName}</div>
+                  <div className="font-medium">
+                    {selectedResponse.contactName}
+                  </div>
                   {selectedResponse.contactEmail && (
-                    <div className="text-sm text-gray-500">{selectedResponse.contactEmail}</div>
+                    <div className="text-sm text-gray-500">
+                      {selectedResponse.contactEmail}
+                    </div>
                   )}
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">Organisasjon</div>
-                  <div className="font-medium">{selectedResponse.organizationName || '-'}</div>
+                  <div className="font-medium">
+                    {selectedResponse.organizationName || '-'}
+                  </div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">Besvart</div>
                   <div className="font-medium">
                     {selectedResponse.respondedAt
-                      ? new Date(selectedResponse.respondedAt).toLocaleDateString('nb-NO', {
+                      ? new Date(
+                          selectedResponse.respondedAt,
+                        ).toLocaleDateString('nb-NO', {
                           day: 'numeric',
                           month: 'long',
                           year: 'numeric',
@@ -980,29 +1218,53 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
               </div>
 
               {/* Question responses */}
-              <h4 className="font-semibold text-gray-900 mb-4">Svar på spørsmål</h4>
-              {selectedResponse.questionResponses && selectedResponse.questionResponses.length > 0 ? (
+              <h4 className="font-semibold text-gray-900 mb-4">
+                Svar på spørsmål
+              </h4>
+              {selectedResponse.questionResponses &&
+              selectedResponse.questionResponses.length > 0 ? (
                 <div className="space-y-4">
                   {selectedResponse.questionResponses.map((qr, index) => (
-                    <div key={qr.questionId || index} className="border rounded-lg p-4">
+                    <div
+                      key={qr.questionId || index}
+                      className="border rounded-lg p-4"
+                    >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                          <div className="text-sm text-gray-500 mb-1">{qr.questionCode}</div>
-                          <div className="font-medium text-gray-900">{qr.questionText}</div>
+                          <div className="text-sm text-gray-500 mb-1">
+                            {qr.questionCode}
+                          </div>
+                          <div className="font-medium text-gray-900">
+                            {qr.questionText}
+                          </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {qr.questionType === 'RATING_1_6' && qr.ratingValue !== undefined && qr.ratingValue !== null && (
-                            <span className={`px-3 py-1 text-lg font-bold rounded ${getScoreStyle(qr.ratingValue)}`}>
-                              {qr.ratingValue}
-                            </span>
-                          )}
+                          {qr.questionType === 'RATING_1_6' &&
+                            qr.ratingValue !== undefined &&
+                            qr.ratingValue !== null && (
+                              <span
+                                className={`px-3 py-1 text-lg font-bold rounded ${getScoreStyle(qr.ratingValue)}`}
+                              >
+                                {qr.ratingValue}
+                              </span>
+                            )}
                           <button
                             onClick={() => openEditResponse(qr)}
                             className="text-blue-600 hover:text-blue-800 text-sm"
                             title="Rediger svar"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -1014,7 +1276,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                       )}
                       {qr.questionType === 'RATING_1_6' && qr.textValue && (
                         <div className="mt-3 bg-blue-50 rounded p-3 text-gray-700 whitespace-pre-wrap">
-                          <div className="text-xs text-blue-600 font-medium mb-1">Kommentar:</div>
+                          <div className="text-xs text-blue-600 font-medium mb-1">
+                            Kommentar:
+                          </div>
                           {qr.textValue}
                         </div>
                       )}
@@ -1022,7 +1286,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                   ))}
                 </div>
               ) : (
-                <div className="text-gray-500 text-center py-4">Ingen detaljerte svar tilgjengelig</div>
+                <div className="text-gray-500 text-center py-4">
+                  Ingen detaljerte svar tilgjengelig
+                </div>
               )}
             </div>
 
@@ -1038,7 +1304,6 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
         </div>
       )}
 
-
       {/* Edit Name Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -1046,7 +1311,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
             <h2 className="text-xl font-bold mb-4">Rediger undersøkelse</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Navn *
+                </label>
                 <input
                   type="text"
                   value={editName}
@@ -1082,13 +1349,19 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
             <h2 className="text-xl font-bold mb-4">Rediger svar</h2>
             <div className="space-y-4">
               <div>
-                <div className="text-sm text-gray-500 mb-1">{editingResponse.questionCode}</div>
-                <div className="font-medium text-gray-900 mb-3">{editingResponse.questionText}</div>
+                <div className="text-sm text-gray-500 mb-1">
+                  {editingResponse.questionCode}
+                </div>
+                <div className="font-medium text-gray-900 mb-3">
+                  {editingResponse.questionText}
+                </div>
               </div>
 
               {editingResponse.questionType === 'RATING_1_6' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Score (1-6)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Score (1-6)
+                  </label>
                   <div className="flex gap-2">
                     {[1, 2, 3, 4, 5, 6].map((score) => (
                       <button
@@ -1099,8 +1372,8 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                             ? score >= 5
                               ? 'bg-green-600 text-white'
                               : score >= 3
-                              ? 'bg-yellow-500 text-white'
-                              : 'bg-red-600 text-white'
+                                ? 'bg-yellow-500 text-white'
+                                : 'bg-red-600 text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
@@ -1113,21 +1386,29 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {editingResponse.questionType === 'FREE_TEXT' ? 'Svar' : 'Kommentar'}
+                  {editingResponse.questionType === 'FREE_TEXT'
+                    ? 'Svar'
+                    : 'Kommentar'}
                 </label>
                 <textarea
                   value={editTextValue}
                   onChange={(e) => setEditTextValue(e.target.value)}
                   rows={4}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                  placeholder={editingResponse.questionType === 'FREE_TEXT' ? 'Skriv svar...' : 'Valgfri kommentar...'}
+                  placeholder={
+                    editingResponse.questionType === 'FREE_TEXT'
+                      ? 'Skriv svar...'
+                      : 'Valgfri kommentar...'
+                  }
                 />
               </div>
             </div>
 
             <div className="mt-6 flex justify-between">
               <button
-                onClick={() => editingResponse.id && handleDeleteResponse(editingResponse.id)}
+                onClick={() =>
+                  editingResponse.id && handleDeleteResponse(editingResponse.id)
+                }
                 className="px-4 py-2 text-red-600 hover:text-red-800"
               >
                 Slett svar
@@ -1152,7 +1433,6 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
         </div>
       )}
 
-
       {/* Add Question Modal */}
       {showAddQuestionModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -1163,17 +1443,30 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                 onClick={() => setShowAddQuestionModal(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
             <p className="text-sm text-gray-600 mb-4">
-              Velg et spørsmål fra listen nedenfor for a legge det til undersøkelsen.
+              Velg et spørsmål fra listen nedenfor for a legge det til
+              undersøkelsen.
             </p>
             <div className="overflow-y-auto flex-1 space-y-3">
               {availableQuestions.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">Alle tilgjengelige spørsmål er allerede lagt til.</p>
+                <p className="text-gray-500 text-center py-4">
+                  Alle tilgjengelige spørsmål er allerede lagt til.
+                </p>
               ) : (
                 availableQuestions
                   .sort((a, b) => a.displayOrder - b.displayOrder)
@@ -1192,12 +1485,16 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                             <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
                               {question.code}
                             </span>
-                            <span className={`text-xs px-2 py-1 rounded ${
-                              question.questionType === 'RATING_1_6'
-                                ? 'bg-blue-100 text-blue-700'
-                                : 'bg-purple-100 text-purple-700'
-                            }`}>
-                              {question.questionType === 'RATING_1_6' ? 'Score 1-6' : 'Fritekst'}
+                            <span
+                              className={`text-xs px-2 py-1 rounded ${
+                                question.questionType === 'RATING_1_6'
+                                  ? 'bg-blue-100 text-blue-700'
+                                  : 'bg-purple-100 text-purple-700'
+                              }`}
+                            >
+                              {question.questionType === 'RATING_1_6'
+                                ? 'Score 1-6'
+                                : 'Fritekst'}
                             </span>
                             {!question.active && (
                               <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-600">
@@ -1205,7 +1502,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                               </span>
                             )}
                           </div>
-                          <p className="text-gray-900 font-medium">{question.textNo}</p>
+                          <p className="text-gray-900 font-medium">
+                            {question.textNo}
+                          </p>
                           <div className="text-xs text-gray-400 mt-1">
                             Kategori: {question.category}
                           </div>
@@ -1254,31 +1553,48 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
             <h2 className="text-xl font-bold mb-4">Opprett nytt spørsmål</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Kode *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Kode *
+                </label>
                 <input
                   type="text"
                   value={newQuestion.code}
-                  onChange={(e) => setNewQuestion({ ...newQuestion, code: e.target.value })}
+                  onChange={(e) =>
+                    setNewQuestion({ ...newQuestion, code: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   placeholder="f.eks. Q14, CUSTOM1"
                 />
-                <p className="text-xs text-gray-500 mt-1">Unik identifikator for spørsmålet</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Unik identifikator for spørsmålet
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Spørsmålstekst (norsk) *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Spørsmålstekst (norsk) *
+                </label>
                 <textarea
                   value={newQuestion.textNo}
-                  onChange={(e) => setNewQuestion({ ...newQuestion, textNo: e.target.value })}
+                  onChange={(e) =>
+                    setNewQuestion({ ...newQuestion, textNo: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   rows={3}
                   placeholder="Skriv spørsmålet her..."
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Spørsmålstekst (engelsk)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Spørsmålstekst (engelsk)
+                </label>
                 <textarea
                   value={newQuestion.textEn || ''}
-                  onChange={(e) => setNewQuestion({ ...newQuestion, textEn: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setNewQuestion({
+                      ...newQuestion,
+                      textEn: e.target.value || undefined,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   rows={2}
                   placeholder="Optional English translation..."
@@ -1286,10 +1602,17 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Type *
+                  </label>
                   <select
                     value={newQuestion.questionType}
-                    onChange={(e) => setNewQuestion({ ...newQuestion, questionType: e.target.value as KtuQuestionType })}
+                    onChange={(e) =>
+                      setNewQuestion({
+                        ...newQuestion,
+                        questionType: e.target.value as KtuQuestionType,
+                      })
+                    }
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   >
                     <option value="RATING_1_6">Score 1-6</option>
@@ -1297,11 +1620,18 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Kategori *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Kategori *
+                  </label>
                   <input
                     type="text"
                     value={newQuestion.category}
-                    onChange={(e) => setNewQuestion({ ...newQuestion, category: e.target.value })}
+                    onChange={(e) =>
+                      setNewQuestion({
+                        ...newQuestion,
+                        category: e.target.value,
+                      })
+                    }
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
                     placeholder="f.eks. Leveranse, Kommunikasjon"
                   />
@@ -1312,10 +1642,17 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                   type="checkbox"
                   id="required"
                   checked={newQuestion.required ?? true}
-                  onChange={(e) => setNewQuestion({ ...newQuestion, required: e.target.checked })}
+                  onChange={(e) =>
+                    setNewQuestion({
+                      ...newQuestion,
+                      required: e.target.checked,
+                    })
+                  }
                   className="rounded"
                 />
-                <label htmlFor="required" className="text-sm text-gray-700">Påkrevd spørsmål</label>
+                <label htmlFor="required" className="text-sm text-gray-700">
+                  Påkrevd spørsmål
+                </label>
               </div>
             </div>
             <div className="mt-6 flex justify-end space-x-3">
@@ -1348,7 +1685,8 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
             <div className="bg-gray-50 border-b px-6 py-4 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">
-                  E-post forhåndsvisning: {emailPreviewType === 'invitation' ? 'Invitasjon' : 'Purring'}
+                  E-post forhåndsvisning:{' '}
+                  {emailPreviewType === 'invitation' ? 'Invitasjon' : 'Purring'}
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
                   Emne: {emailPreviewSubject}
@@ -1356,17 +1694,34 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => handleEmailPreview(emailPreviewType === 'invitation' ? 'reminder' : 'invitation')}
+                  onClick={() =>
+                    handleEmailPreview(
+                      emailPreviewType === 'invitation'
+                        ? 'reminder'
+                        : 'invitation',
+                    )
+                  }
                   className="px-3 py-1.5 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                 >
-                  Vis {emailPreviewType === 'invitation' ? 'purring' : 'invitasjon'}
+                  Vis{' '}
+                  {emailPreviewType === 'invitation' ? 'purring' : 'invitasjon'}
                 </button>
                 <button
                   onClick={() => setShowEmailPreviewModal(false)}
                   className="text-gray-400 hover:text-gray-600"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -1407,17 +1762,30 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
             {/* Modal Header */}
             <div className="border-b px-6 py-4 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Test undersøkelse</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Test undersøkelse
+                </h3>
                 <p className="text-sm text-gray-500 mt-1">
-                  Opprett en test-link for å verifisere at undersøkelsesflyten fungerer
+                  Opprett en test-link for å verifisere at undersøkelsesflyten
+                  fungerer
                 </p>
               </div>
               <button
                 onClick={() => setShowTestSurveyModal(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -1438,48 +1806,59 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                       placeholder="din@epost.no"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Oppgi en e-postadresse for å teste e-postutsendelse. La stå tom for kun å få lenken.
+                      Oppgi en e-postadresse for å teste e-postutsendelse. La
+                      stå tom for kun å få lenken.
                     </p>
                   </div>
 
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
                     <p className="font-medium mb-1">Merk:</p>
                     <ul className="list-disc list-inside space-y-1">
-                      <li>Dette oppretter en reell test-invitasjon i systemet</li>
-                      <li>Test-data merkes med [KTU-TEST] og kan fjernes senere</li>
+                      <li>
+                        Dette oppretter en reell test-invitasjon i systemet
+                      </li>
+                      <li>
+                        Test-data merkes med [KTU-TEST] og kan fjernes senere
+                      </li>
                       <li>Undersøkelsen må ha status DRAFT eller OPEN</li>
                     </ul>
                   </div>
                 </>
               ) : (
                 <div className="space-y-4">
-                  <div className={`rounded-lg p-4 ${
-                    testSurveyResult.emailSent
-                      ? 'bg-green-50 border border-green-200'
-                      : testSurveyEmail
-                        ? 'bg-yellow-50 border border-yellow-200'
-                        : 'bg-green-50 border border-green-200'
-                  }`}>
-                    <p className={`font-medium mb-2 ${
+                  <div
+                    className={`rounded-lg p-4 ${
                       testSurveyResult.emailSent
-                        ? 'text-green-800'
+                        ? 'bg-green-50 border border-green-200'
                         : testSurveyEmail
-                          ? 'text-yellow-800'
-                          : 'text-green-800'
-                    }`}>
+                          ? 'bg-yellow-50 border border-yellow-200'
+                          : 'bg-green-50 border border-green-200'
+                    }`}
+                  >
+                    <p
+                      className={`font-medium mb-2 ${
+                        testSurveyResult.emailSent
+                          ? 'text-green-800'
+                          : testSurveyEmail
+                            ? 'text-yellow-800'
+                            : 'text-green-800'
+                      }`}
+                    >
                       {testSurveyResult.emailSent
                         ? 'Test-undersøkelse opprettet!'
                         : testSurveyEmail
                           ? 'Test-undersøkelse opprettet, men e-post feilet'
                           : 'Test-undersøkelse opprettet!'}
                     </p>
-                    <p className={`text-sm ${
-                      testSurveyResult.emailSent
-                        ? 'text-green-700'
-                        : testSurveyEmail
-                          ? 'text-yellow-700'
-                          : 'text-green-700'
-                    }`}>
+                    <p
+                      className={`text-sm ${
+                        testSurveyResult.emailSent
+                          ? 'text-green-700'
+                          : testSurveyEmail
+                            ? 'text-yellow-700'
+                            : 'text-green-700'
+                      }`}
+                    >
                       {testSurveyResult.emailSent
                         ? `E-post sendt til ${testSurveyResult.emailSentTo}`
                         : testSurveyEmail
@@ -1501,14 +1880,26 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                       />
                       <button
                         onClick={() => {
-                          navigator.clipboard.writeText(testSurveyResult.surveyUrl)
+                          navigator.clipboard.writeText(
+                            testSurveyResult.surveyUrl,
+                          )
                           toast.success('Lenke kopiert!')
                         }}
                         className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                         title="Kopier lenke"
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -1535,11 +1926,17 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                   </div>
 
                   <p className="text-xs text-gray-500 text-center">
-                    Utløper: {testSurveyResult.expiresAt ? new Date(testSurveyResult.expiresAt).toLocaleDateString('nb-NO', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    }) : 'Ukjent'}
+                    Utløper:{' '}
+                    {testSurveyResult.expiresAt
+                      ? new Date(testSurveyResult.expiresAt).toLocaleDateString(
+                          'nb-NO',
+                          {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                          },
+                        )
+                      : 'Ukjent'}
                   </p>
                 </div>
               )}
@@ -1559,7 +1956,9 @@ export default function SurveyDetailView({ survey, onBack, onUpdate }: Props) {
                   disabled={creatingTestSurvey}
                   className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50"
                 >
-                  {creatingTestSurvey ? 'Oppretter...' : 'Opprett test-undersøkelse'}
+                  {creatingTestSurvey
+                    ? 'Oppretter...'
+                    : 'Opprett test-undersøkelse'}
                 </button>
               </div>
             )}

@@ -56,7 +56,9 @@ export default function PeriodForm({
           />
         </div>
         <div className="col-span-2">
-          <label className="block text-sm font-medium mb-2">Kommentar (valgfritt)</label>
+          <label className="block text-sm font-medium mb-2">
+            Kommentar (valgfritt)
+          </label>
           <input
             type="text"
             value={period.comment}

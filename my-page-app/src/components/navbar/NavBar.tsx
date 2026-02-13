@@ -16,7 +16,11 @@ import type { UserReadable } from '@/data/types'
 
 const navigation = [
   { href: '/admin', name: 'Admin 🛠️', requiresAdmin: true },
-  { href: '/admin/hyttetrekning', name: 'Hyttetrekning Admin', requiresAdmin: true },
+  {
+    href: '/admin/hyttetrekning',
+    name: 'Hyttetrekning Admin',
+    requiresAdmin: true,
+  },
   { href: '/admin/ktu', name: 'KTU Admin', requiresAdmin: true },
   { href: '/', name: 'Hjem' },
   { href: '/utlysninger', name: 'Utlysninger' },
@@ -94,7 +98,10 @@ const NavBar = () => {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowUserDropdown(false)
       }
     }
@@ -107,11 +114,13 @@ const NavBar = () => {
     const validUsers = allUsers.filter((u) => u.email)
     if (!searchQuery.trim()) return validUsers.slice(0, 10) // Show first 10 when no search
     const query = searchQuery.toLowerCase()
-    return validUsers.filter(
-      (u) =>
-        u.name?.toLowerCase().includes(query) ||
-        u.email?.toLowerCase().includes(query)
-    ).slice(0, 20)
+    return validUsers
+      .filter(
+        (u) =>
+          u.name?.toLowerCase().includes(query) ||
+          u.email?.toLowerCase().includes(query),
+      )
+      .slice(0, 20)
   }, [allUsers, searchQuery])
 
   // Get current test user by email (stored in testUserId which now holds email)
@@ -208,10 +217,23 @@ const NavBar = () => {
                       >
                         <span>🧪</span>
                         <span className="max-w-40 truncate">
-                          {currentTestUser?.name || (allUsers.length === 0 ? 'Laster...' : `ID: ${testUserId}`)}
+                          {currentTestUser?.name ||
+                            (allUsers.length === 0
+                              ? 'Laster...'
+                              : `ID: ${testUserId}`)}
                         </span>
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
                         </svg>
                       </button>
                       {showUserDropdown && (
@@ -228,19 +250,31 @@ const NavBar = () => {
                           </div>
                           <div className="max-h-64 overflow-y-auto">
                             {filteredUsers.length === 0 ? (
-                              <div className="px-3 py-2 text-sm text-gray-400">Ingen brukere funnet</div>
+                              <div className="px-3 py-2 text-sm text-gray-400">
+                                Ingen brukere funnet
+                              </div>
                             ) : (
                               filteredUsers.map((u) => (
                                 <button
                                   key={u.email}
-                                  onClick={() => handleTestUserChange(u.email || '')}
+                                  onClick={() =>
+                                    handleTestUserChange(u.email || '')
+                                  }
                                   className={cn(
                                     'w-full text-left px-3 py-2 text-sm hover:bg-gray-700 flex items-center gap-2',
-                                    u.email === testUserId ? 'bg-yellow-500/20 text-yellow-300' : 'text-white'
+                                    u.email === testUserId
+                                      ? 'bg-yellow-500/20 text-yellow-300'
+                                      : 'text-white',
                                   )}
                                 >
-                                  <span className="truncate flex-1">{u.name}</span>
-                                  {u.admin && <span className="text-xs text-yellow-500">Admin</span>}
+                                  <span className="truncate flex-1">
+                                    {u.name}
+                                  </span>
+                                  {u.admin && (
+                                    <span className="text-xs text-yellow-500">
+                                      Admin
+                                    </span>
+                                  )}
                                 </button>
                               ))
                             )}
@@ -261,7 +295,10 @@ const NavBar = () => {
                         width="40"
                         height="40"
                         className="rounded-full"
-                        unoptimized={userIcon.includes('cvpartner') || userIcon.includes('X-Amz')}
+                        unoptimized={
+                          userIcon.includes('cvpartner') ||
+                          userIcon.includes('X-Amz')
+                        }
                         onError={() => setImageError(true)}
                       />
                     </Menu.Button>
@@ -324,7 +361,11 @@ const NavBar = () => {
                     🧪 Test som bruker:
                   </label>
                   <div className="text-sm text-yellow-300 mb-2">
-                    Nå: {currentTestUser?.name || (allUsers.length === 0 ? 'Laster...' : `ID: ${testUserId}`)}
+                    Nå:{' '}
+                    {currentTestUser?.name ||
+                      (allUsers.length === 0
+                        ? 'Laster...'
+                        : `ID: ${testUserId}`)}
                   </div>
                   <input
                     type="text"
@@ -341,11 +382,15 @@ const NavBar = () => {
                         onClick={() => handleTestUserChange(u.email || '')}
                         className={cn(
                           'w-full text-left px-3 py-2 text-sm hover:bg-gray-700 flex items-center gap-2',
-                          u.email === testUserId ? 'bg-yellow-500/20 text-yellow-300' : 'text-white'
+                          u.email === testUserId
+                            ? 'bg-yellow-500/20 text-yellow-300'
+                            : 'text-white',
                         )}
                       >
                         <span className="truncate flex-1">{u.name}</span>
-                        {u.admin && <span className="text-xs text-yellow-500">Admin</span>}
+                        {u.admin && (
+                          <span className="text-xs text-yellow-500">Admin</span>
+                        )}
                       </Disclosure.Button>
                     ))}
                   </div>
@@ -365,7 +410,10 @@ const NavBar = () => {
                         width="60"
                         height="60"
                         className="rounded-lg"
-                        unoptimized={userIcon.includes('cvpartner') || userIcon.includes('X-Amz')}
+                        unoptimized={
+                          userIcon.includes('cvpartner') ||
+                          userIcon.includes('X-Amz')
+                        }
                         onError={() => setImageError(true)}
                       />
                       <span className="flex flex-col flex-wrap">

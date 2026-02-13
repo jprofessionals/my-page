@@ -8,10 +8,7 @@ type Props = {
   type: 'tiles' | 'list'
 }
 
-const BudgetList = ({
-  budgets,
-  type,
-}: Props) => {
+const BudgetList = ({ budgets, type }: Props) => {
   if (budgets.length === 0) {
     return (
       <div>
@@ -45,11 +42,7 @@ const BudgetList = ({
           )}
         >
           {budgets.map((budget) => (
-            <BudgetItem
-              key={budget.id}
-              budget={budget}
-              type={type}
-            />
+            <BudgetItem key={budget.id} budget={budget} type={type} />
           ))}
         </Accordion>
       </div>

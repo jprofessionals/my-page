@@ -88,7 +88,7 @@ const DrawingPeriodModal = ({
                   />
                 ))}
               </table>
-              <hr/>
+              <hr />
               <div className="italic font-bold text-center">{helpText}</div>
             </div>
           )}

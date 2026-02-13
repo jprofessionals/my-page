@@ -57,9 +57,8 @@ export default function EditActivityModal({
   const [actualStartDate, setActualStartDate] = useState<string>(
     activity.expectedStartDate || '',
   )
-  const [closeReason, setCloseReason] = useState<ClosedReason>(
-    'LOST_AT_CUSTOMER',
-  )
+  const [closeReason, setCloseReason] =
+    useState<ClosedReason>('LOST_AT_CUSTOMER')
   const [closeReasonNote, setCloseReasonNote] = useState('')
   // Evaluation fields for won/close dialogs
   const [matchRating, setMatchRating] = useState<number | undefined>(undefined)

@@ -43,8 +43,9 @@ export default function DrawTab({
               className="w-full border border-gray-300 rounded-md px-3 py-2"
             />
             <p className="text-xs text-gray-500 mt-1">
-              <strong>Ikke nødvendig å fylle ut.</strong> Når feltet er tomt genereres en helt tilfeldig trekning.
-              Seed brukes kun for å reprodusere eksakt samme trekning i testing.
+              <strong>Ikke nødvendig å fylle ut.</strong> Når feltet er tomt
+              genereres en helt tilfeldig trekning. Seed brukes kun for å
+              reprodusere eksakt samme trekning i testing.
             </p>
           </div>
 

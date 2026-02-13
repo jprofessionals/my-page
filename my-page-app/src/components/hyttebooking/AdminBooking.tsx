@@ -7,12 +7,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   adminCreateBooking,
   createPendingBooking as createPendingBookingSDK,
-  createPendingBookingForUser
+  createPendingBookingForUser,
 } from '@/data/types/sdk.gen'
-import {
-  type Apartment,
-  type CreateBooking
-} from '@/data/types/types.gen'
+import { type Apartment, type CreateBooking } from '@/data/types/types.gen'
 import '@/services/openapi-client'
 import Loading from '@/components/Loading'
 import * as Modal from '@/components/ui/modal'

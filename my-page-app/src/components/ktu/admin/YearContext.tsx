@@ -1,6 +1,12 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react'
 import ktuService, { KtuRound } from '@/services/ktu.service'
 
 interface YearContextType {
@@ -41,9 +47,11 @@ export function YearProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const availableYears = [...new Set(rounds.map(r => r.year))].sort((a, b) => b - a)
+  const availableYears = [...new Set(rounds.map((r) => r.year))].sort(
+    (a, b) => b - a,
+  )
   const currentRound = selectedYear
-    ? rounds.find(r => r.year === selectedYear) || null
+    ? rounds.find((r) => r.year === selectedYear) || null
     : null
 
   return (

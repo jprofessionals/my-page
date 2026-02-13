@@ -8,9 +8,14 @@ import ConsultantDetailModal from './ConsultantDetailModal'
 
 export default function ConsultantsTab() {
   const { selectedYear, currentRound } = useYear()
-  const [consultantStats, setConsultantStats] = useState<KtuConsultantStatistics[]>([])
+  const [consultantStats, setConsultantStats] = useState<
+    KtuConsultantStatistics[]
+  >([])
   const [loading, setLoading] = useState(true)
-  const [selectedConsultant, setSelectedConsultant] = useState<{ id: number; name: string } | null>(null)
+  const [selectedConsultant, setSelectedConsultant] = useState<{
+    id: number
+    name: string
+  } | null>(null)
 
   useEffect(() => {
     if (currentRound) {
@@ -26,7 +31,9 @@ export default function ConsultantsTab() {
 
     setLoading(true)
     try {
-      const response = await ktuService.getStatisticsByConsultant(currentRound.id)
+      const response = await ktuService.getStatisticsByConsultant(
+        currentRound.id,
+      )
       setConsultantStats(response.data || [])
     } catch (error) {
       console.error('Failed to load consultant stats:', error)
@@ -64,7 +71,9 @@ export default function ConsultantsTab() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-500">Laster konsulenter for {selectedYear}...</p>
+        <p className="text-gray-500">
+          Laster konsulenter for {selectedYear}...
+        </p>
       </div>
     )
   }
@@ -72,7 +81,9 @@ export default function ConsultantsTab() {
   if (!currentRound) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Ingen undersøkelse funnet for {selectedYear}</p>
+        <p className="text-gray-500">
+          Ingen undersøkelse funnet for {selectedYear}
+        </p>
       </div>
     )
   }
@@ -141,10 +152,12 @@ export default function ConsultantsTab() {
                   <tr
                     key={consultant.consultantId}
                     className="hover:bg-blue-50 cursor-pointer transition-colors"
-                    onClick={() => setSelectedConsultant({
-                      id: consultant.consultantId,
-                      name: consultant.consultantName,
-                    })}
+                    onClick={() =>
+                      setSelectedConsultant({
+                        id: consultant.consultantId,
+                        name: consultant.consultantName,
+                      })
+                    }
                     title="Klikk for a se detaljer"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -163,15 +176,21 @@ export default function ConsultantsTab() {
                           <div className="text-sm font-medium text-gray-900">
                             {consultant.consultantName}
                           </div>
-                          <div className="text-xs text-blue-600">Klikk for detaljer</div>
+                          <div className="text-xs text-blue-600">
+                            Klikk for detaljer
+                          </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">{consultant.responseCount}</span>
+                      <span className="text-sm text-gray-900">
+                        {consultant.responseCount}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">{consultant.organizationCount}</span>
+                      <span className="text-sm text-gray-900">
+                        {consultant.organizationCount}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -184,8 +203,11 @@ export default function ConsultantsTab() {
                       <div className="flex items-center gap-1">
                         {[1, 2, 3, 4, 5, 6].map((score) => {
                           // Handle both string and number keys from API
-                          const dist = consultant.scoreDistribution as Record<string | number, number> | undefined
-                          const count = dist?.[score] ?? dist?.[score.toString()] ?? 0
+                          const dist = consultant.scoreDistribution as
+                            | Record<string | number, number>
+                            | undefined
+                          const count =
+                            dist?.[score] ?? dist?.[score.toString()] ?? 0
                           return (
                             <div
                               key={score}
