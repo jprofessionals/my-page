@@ -33,6 +33,7 @@ import {
   getConsultantAnalytics,
   getCompetencyBaseAnalytics,
   getCustomerAnalytics,
+  getBenchAnalytics,
 } from '@/data/types/sdk.gen'
 import {
   type CreateSalesActivity,
@@ -356,6 +357,17 @@ export const salesPipelineService = {
     })
     return data
   },
+
+  /**
+   * Get bench analytics (current bench duration and involuntary bench trend)
+   * @param months - Number of months for trend data (default 12)
+   */
+  async getBenchAnalytics(months = 12) {
+    const { data } = await getBenchAnalytics({
+      query: { months },
+    })
+    return data
+  },
 }
 
 // Re-export types for convenience
@@ -406,4 +418,7 @@ export type {
   SourceStats,
   CustomerSector,
   KeyFactor,
+  BenchAnalyticsReadable as BenchAnalytics,
+  CurrentBenchConsultantReadable as CurrentBenchConsultant,
+  MonthlyInvoluntaryBench,
 } from '@/data/types/types.gen'

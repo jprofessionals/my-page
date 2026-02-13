@@ -14,6 +14,7 @@ import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.AvailabilityHistoryRepository
 import no.jpro.mypageapi.repository.ConsultantAvailabilityRepository
 import no.jpro.mypageapi.repository.CustomerRepository
+import no.jpro.mypageapi.repository.InvoluntaryBenchDataRepository
 import no.jpro.mypageapi.repository.InterviewRoundRepository
 import no.jpro.mypageapi.repository.JobPostingRepository
 import no.jpro.mypageapi.repository.SalesActivityRepository
@@ -39,7 +40,8 @@ class SalesPipelineService(
     private val jobPostingRepository: JobPostingRepository,
     private val settingsRepository: SettingsRepository,
     private val userRepository: UserRepository,
-    private val customerRepository: CustomerRepository
+    private val customerRepository: CustomerRepository,
+    private val involuntaryBenchDataRepository: InvoluntaryBenchDataRepository
 ) {
 
     // ==================== Consultant Availability ====================
@@ -1570,5 +1572,159 @@ class SalesPipelineService(
             supplierStats = supplierStats,
             sourceStats = sourceStats
         )
+    }
+
+    // ==================== Bench Analytics ====================
+
+    data class BenchAnalyticsData(
+        val currentBenchDuration: List<CurrentBenchConsultantData>,
+        val involuntaryBenchTrend: List<MonthlyInvoluntaryBenchData>
+    )
+
+    data class CurrentBenchConsultantData(
+        val consultant: User,
+        val daysOnBench: Int,
+        val becameAvailableAt: LocalDateTime
+    )
+
+    data class MonthlyInvoluntaryBenchData(
+        val month: String,
+        val totalBenchWeeks: Double,
+        val isCalculated: Boolean
+    )
+
+    @Transactional(readOnly = true)
+    fun getBenchAnalytics(months: Int = 12): BenchAnalyticsData {
+        val now = LocalDateTime.now()
+
+        // === Part 1: Current bench duration ===
+        val availabilities = consultantAvailabilityRepository.findAll()
+        val availableConsultants = availabilities.filter { it.status == AvailabilityStatus.AVAILABLE }
+
+        val currentBenchDuration = availableConsultants.mapNotNull { availability ->
+            val consultantId = availability.consultant.id!!
+
+            // Find most recent history entry where toStatus=AVAILABLE
+            val history = availabilityHistoryRepository.findByConsultantIdOrderByChangedAtDesc(consultantId)
+            val becameAvailable = history.firstOrNull { it.toStatus == AvailabilityStatus.AVAILABLE }
+                ?: return@mapNotNull null
+
+            val daysOnBench = ChronoUnit.DAYS.between(becameAvailable.changedAt.toLocalDate(), now.toLocalDate()).toInt()
+
+            CurrentBenchConsultantData(
+                consultant = availability.consultant,
+                daysOnBench = daysOnBench,
+                becameAvailableAt = becameAvailable.changedAt
+            )
+        }.sortedByDescending { it.daysOnBench }
+
+        // === Part 2: Involuntary bench trend ===
+        val startDate = now.minusMonths(months.toLong()).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
+        val startMonthStr = "${startDate.year}-${startDate.monthValue.toString().padStart(2, '0')}"
+        val endMonthStr = "${now.year}-${now.monthValue.toString().padStart(2, '0')}"
+
+        // Get all imported data for the period
+        val importedData = involuntaryBenchDataRepository.findByMonthBetweenOrderByMonth(startMonthStr, endMonthStr)
+        val importedByMonth = importedData.groupBy { it.month }
+            .mapValues { (_, entries) -> entries.sumOf { it.benchWeeks } }
+
+        // Fetch all availability history for calculation
+        val allHistoryEntries = availabilityHistoryRepository.findByChangedAtBetweenOrderByChangedAtAsc(startDate, now)
+        val consultantsOnBoard = availabilities.map { it.consultant.id!! }.toSet()
+        val availableFromByConsultant = availabilities.associate { avail ->
+            val consultantId = avail.consultant.id!!
+            val availableFromDate = avail.availableFrom?.atStartOfDay()
+                ?: availabilityHistoryRepository.findFirstByConsultantIdOrderByChangedAtAsc(consultantId)?.changedAt
+            consultantId to availableFromDate
+        }.filterValues { it != null }.mapValues { it.value!! }
+
+        val involuntaryBenchTrend = mutableListOf<MonthlyInvoluntaryBenchData>()
+
+        for (i in 0 until months) {
+            val monthStart = now.minusMonths((months - 1 - i).toLong()).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
+            val monthEnd = monthStart.plusMonths(1)
+            val monthStr = "${monthStart.year}-${monthStart.monthValue.toString().padStart(2, '0')}"
+
+            val importedValue = importedByMonth[monthStr]
+            if (importedValue != null) {
+                involuntaryBenchTrend.add(MonthlyInvoluntaryBenchData(
+                    month = monthStr,
+                    totalBenchWeeks = importedValue,
+                    isCalculated = false
+                ))
+            } else {
+                val benchWeeks = calculateInvoluntaryBenchWeeksForMonth(
+                    consultantsOnBoard = consultantsOnBoard,
+                    historyEntries = allHistoryEntries,
+                    monthStart = monthStart,
+                    monthEnd = monthEnd,
+                    availableFromByConsultant = availableFromByConsultant
+                )
+                involuntaryBenchTrend.add(MonthlyInvoluntaryBenchData(
+                    month = monthStr,
+                    totalBenchWeeks = benchWeeks,
+                    isCalculated = true
+                ))
+            }
+        }
+
+        return BenchAnalyticsData(
+            currentBenchDuration = currentBenchDuration,
+            involuntaryBenchTrend = involuntaryBenchTrend
+        )
+    }
+
+    /**
+     * Calculate involuntary bench weeks for a given month.
+     * Only counts time in AVAILABLE status (excludes ASSIGNED which means won assignment).
+     */
+    private fun calculateInvoluntaryBenchWeeksForMonth(
+        consultantsOnBoard: Set<Long>,
+        historyEntries: List<AvailabilityHistory>,
+        monthStart: LocalDateTime,
+        monthEnd: LocalDateTime,
+        availableFromByConsultant: Map<Long, LocalDateTime>
+    ): Double {
+        var totalBenchDays = 0
+
+        for (consultantId in consultantsOnBoard) {
+            val consultantHistory = historyEntries.filter { it.consultant.id == consultantId }
+                .sortedBy { it.changedAt }
+
+            val availableFromDate = availableFromByConsultant[consultantId]
+
+            if (availableFromDate == null || availableFromDate >= monthEnd) {
+                continue
+            }
+
+            val effectiveStart = if (availableFromDate > monthStart) availableFromDate else monthStart
+
+            val statusAtStart = availabilityHistoryRepository.findLatestStatusAsOf(consultantId, effectiveStart)?.toStatus
+                ?: AvailabilityStatus.AVAILABLE
+
+            var currentStatus = statusAtStart
+            var periodStart = effectiveStart
+
+            for (entry in consultantHistory) {
+                if (entry.changedAt >= effectiveStart && entry.changedAt < monthEnd) {
+                    if (currentStatus == AvailabilityStatus.AVAILABLE) {
+                        val days = calculateWorkDays(periodStart, entry.changedAt)
+                        totalBenchDays += days
+                    }
+                    currentStatus = entry.toStatus
+                    periodStart = entry.changedAt
+                }
+            }
+
+            if (currentStatus == AvailabilityStatus.AVAILABLE) {
+                val endDate = if (monthEnd > LocalDateTime.now()) LocalDateTime.now() else monthEnd
+                if (endDate > periodStart) {
+                    val days = calculateWorkDays(periodStart, endDate)
+                    totalBenchDays += days
+                }
+            }
+        }
+
+        return totalBenchDays / 5.0
     }
 }

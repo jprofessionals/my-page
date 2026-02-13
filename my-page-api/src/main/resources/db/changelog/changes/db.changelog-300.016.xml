@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="300.016-1" author="JProfessionals">
+        <comment>Create involuntary_bench_data table for tracking involuntary bench time (AVAILABLE-only)</comment>
+        <createTable tableName="involuntary_bench_data">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="consultant_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_involuntary_bench_consultant"
+                             references="user(id)"/>
+            </column>
+            <column name="month" type="VARCHAR(7)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bench_weeks" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_imported" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="involuntary_bench_data"
+                             columnNames="consultant_id, month"
+                             constraintName="uk_involuntary_bench_consultant_month"/>
+
+        <createIndex tableName="involuntary_bench_data" indexName="idx_involuntary_bench_month">
+            <column name="month"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="300.016-2" author="JProfessionals">
+        <comment>Import historical involuntary bench data from CSV</comment>
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'involuntary_bench_data'
+                ) THEN 1 ELSE 0 END
+            </sqlCheck>
+        </preConditions>
+        <loadData tableName="involuntary_bench_data"
+                  file="db/changelog/data/historical_bench_data.csv"
+                  separator=","
+                  encoding="UTF-8">
+            <column name="consultant_id" type="NUMERIC"/>
+            <column name="month" type="STRING"/>
+            <column name="bench_weeks" type="NUMERIC"/>
+            <column name="is_imported" type="BOOLEAN"/>
+        </loadData>
+    </changeSet>
+
+</databaseChangeLog>

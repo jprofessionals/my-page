@@ -5,6 +5,7 @@ import OverviewTab from './analytics/OverviewTab'
 import EvaluationTab from './analytics/EvaluationTab'
 import ConsultantTab from './analytics/ConsultantTab'
 import CompetencyBaseTab from './analytics/CompetencyBaseTab'
+import BenchTab from './analytics/BenchTab'
 import CustomerTab from './analytics/CustomerTab'
 import Link from 'next/link'
 
@@ -13,6 +14,7 @@ const TABS = [
   { id: 'evaluation', label: 'Evaluering' },
   { id: 'consultants', label: 'Konsulenter' },
   { id: 'competency', label: 'Konsulentbasen' },
+  { id: 'bench', label: 'Lediggang' },
   { id: 'customers', label: 'Kunder' },
 ] as const
 
@@ -46,6 +48,7 @@ export default function SalesPipelineAnalyticsComponent() {
       {activeTab === 'evaluation' && <EvaluationTab />}
       {activeTab === 'consultants' && <ConsultantTab />}
       {activeTab === 'competency' && <CompetencyBaseTab />}
+      {activeTab === 'bench' && <BenchTab />}
       {activeTab === 'customers' && <CustomerTab />}
     </div>
   )

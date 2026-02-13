@@ -2810,6 +2810,32 @@ paths:
         '403':
           description: Forbidden
 
+  /sales-pipeline/analytics/bench:
+    get:
+      operationId: getBenchAnalytics
+      summary: Get bench (lediggang) analytics
+      tags:
+        - sales-pipeline
+      parameters:
+        - name: months
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 12
+          description: Number of months for trend data (default 12)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BenchAnalytics'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
   # KTU (Customer Satisfaction Survey) Endpoints
 
   /ktu/color-themes:
@@ -7000,6 +7026,55 @@ components:
         - sectorComparison
         - supplierStats
         - sourceStats
+
+    # Bench Analytics Schemas
+
+    BenchAnalytics:
+      type: object
+      properties:
+        currentBenchDuration:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrentBenchConsultant'
+        involuntaryBenchTrend:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonthlyInvoluntaryBench'
+      required:
+        - currentBenchDuration
+        - involuntaryBenchTrend
+
+    CurrentBenchConsultant:
+      type: object
+      properties:
+        consultant:
+          $ref: '#/components/schemas/User'
+        daysOnBench:
+          type: integer
+        becameAvailableAt:
+          type: string
+          format: date-time
+      required:
+        - consultant
+        - daysOnBench
+        - becameAvailableAt
+
+    MonthlyInvoluntaryBench:
+      type: object
+      properties:
+        month:
+          type: string
+          description: Format "2024-01"
+        totalBenchWeeks:
+          type: number
+          format: double
+        isCalculated:
+          type: boolean
+          description: true if calculated from history, false if imported from CSV
+      required:
+        - month
+        - totalBenchWeeks
+        - isCalculated
 
     # KTU (Customer Satisfaction Survey) Schemas
 

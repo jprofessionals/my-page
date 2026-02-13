@@ -12,6 +12,7 @@ import no.jpro.mypageapi.entity.User
 import no.jpro.mypageapi.repository.AvailabilityHistoryRepository
 import no.jpro.mypageapi.repository.ConsultantAvailabilityRepository
 import no.jpro.mypageapi.repository.CustomerRepository
+import no.jpro.mypageapi.repository.InvoluntaryBenchDataRepository
 import no.jpro.mypageapi.repository.InterviewRoundRepository
 import no.jpro.mypageapi.repository.JobPostingRepository
 import no.jpro.mypageapi.repository.SalesActivityRepository
@@ -59,6 +60,9 @@ class SalesPipelineServiceTest {
     @Mock
     private lateinit var customerRepository: CustomerRepository
 
+    @Mock
+    private lateinit var involuntaryBenchDataRepository: InvoluntaryBenchDataRepository
+
     private lateinit var salesPipelineService: SalesPipelineService
 
     @BeforeEach
@@ -72,7 +76,8 @@ class SalesPipelineServiceTest {
             jobPostingRepository,
             settingsRepository,
             userRepository,
-            customerRepository
+            customerRepository,
+            involuntaryBenchDataRepository
         )
     }
 

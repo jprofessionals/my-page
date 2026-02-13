@@ -26,6 +26,9 @@ import no.jpro.mypageapi.model.UpdateInterviewRound
 import no.jpro.mypageapi.model.UpcomingAvailableConsultant
 import no.jpro.mypageapi.model.InterviewRound as InterviewRoundModel
 import no.jpro.mypageapi.model.AvailabilityStats
+import no.jpro.mypageapi.model.BenchAnalytics
+import no.jpro.mypageapi.model.CurrentBenchConsultant
+import no.jpro.mypageapi.model.MonthlyInvoluntaryBench
 import no.jpro.mypageapi.model.MonthlyTrendData
 import no.jpro.mypageapi.model.ClosedReasonCount
 import no.jpro.mypageapi.model.ConsultantActivityStats
@@ -820,6 +823,31 @@ class SalesPipelineApiDelegateImpl(
                     wonActivities = source.wonActivities,
                     lostActivities = source.lostActivities,
                     winRate = source.winRate
+                )
+            }
+        )
+
+        return ResponseEntity.ok(response)
+    }
+
+    // ==================== Bench Analytics ====================
+
+    override fun getBenchAnalytics(months: Int): ResponseEntity<BenchAnalytics> {
+        val data = salesPipelineService.getBenchAnalytics(months)
+
+        val response = BenchAnalytics(
+            currentBenchDuration = data.currentBenchDuration.map { entry ->
+                CurrentBenchConsultant(
+                    consultant = salesPipelineMapper.userMapper.toUserModel(entry.consultant),
+                    daysOnBench = entry.daysOnBench,
+                    becameAvailableAt = entry.becameAvailableAt.atOffset(java.time.ZoneOffset.UTC)
+                )
+            },
+            involuntaryBenchTrend = data.involuntaryBenchTrend.map { entry ->
+                MonthlyInvoluntaryBench(
+                    month = entry.month,
+                    totalBenchWeeks = entry.totalBenchWeeks,
+                    isCalculated = entry.isCalculated
                 )
             }
         )
