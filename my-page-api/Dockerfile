@@ -13,7 +13,7 @@ RUN chmod +x mvnw
 # Download dependencies (cached layer)
 RUN ./mvnw dependency:go-offline -B
 
-# Copy source code
+# Copy source code (cache-bust: 2026-02-13)
 COPY src src
 
 # Build the application (skip tests for faster builds)
