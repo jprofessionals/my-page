@@ -133,9 +133,9 @@ export default function AdminDrawingDetail({
         drawingRes.data &&
         ['DRAWN', 'PUBLISHED'].includes(drawingRes.data.status)
       ) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const allocsRes = await cabinLotteryService.adminGetAllocations(
           drawingId,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           executionIdToUse as any,
         )
         setAllocations(allocsRes.data ?? [])
@@ -373,9 +373,9 @@ export default function AdminDrawingDetail({
     setIsDrawing(true)
     try {
       const seed = drawSeed ? parseInt(drawSeed) : null
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await cabinLotteryService.adminPerformDraw(
         drawingId,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         seed as any,
       )
 

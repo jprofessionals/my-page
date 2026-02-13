@@ -107,8 +107,8 @@ export default function StatistikkPage() {
   }
 
   // Create clickable active dot component for each category
-  // eslint-disable-next-line react/display-name, @typescript-eslint/no-explicit-any
   const createClickableDot =
+    // eslint-disable-next-line react/display-name, @typescript-eslint/no-explicit-any
     (categoryKey: string, color: string) => (props: any) => {
       const { cx, cy, payload } = props
       return (
