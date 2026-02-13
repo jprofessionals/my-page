@@ -34,24 +34,4 @@
         </createIndex>
     </changeSet>
 
-    <changeSet id="300.016-2" author="JProfessionals">
-        <comment>Import historical involuntary bench data from CSV</comment>
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">
-                SELECT CASE WHEN EXISTS (
-                    SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'involuntary_bench_data'
-                ) THEN 1 ELSE 0 END
-            </sqlCheck>
-        </preConditions>
-        <loadData tableName="involuntary_bench_data"
-                  file="db/changelog/data/historical_bench_data.csv"
-                  separator=","
-                  encoding="UTF-8">
-            <column name="consultant_id" type="NUMERIC"/>
-            <column name="month" type="STRING"/>
-            <column name="bench_weeks" type="NUMERIC"/>
-            <column name="is_imported" type="BOOLEAN"/>
-        </loadData>
-    </changeSet>
-
 </databaseChangeLog>
