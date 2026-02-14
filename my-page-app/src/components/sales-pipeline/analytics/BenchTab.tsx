@@ -238,7 +238,19 @@ export default function BenchTab() {
                 <tbody>
                   {analytics.yearlyBenchSummary.map((entry) => (
                     <tr key={entry.year}>
-                      <td className="font-medium">{entry.year}</td>
+                      <td className="font-medium">
+                        {entry.year}
+                        {entry.year === new Date().getFullYear() && (
+                          <span className="text-xs opacity-50 ml-1">
+                            (t.o.m.{' '}
+                            {new Date().toLocaleDateString('nb-NO', {
+                              day: 'numeric',
+                              month: 'short',
+                            })}
+                            )
+                          </span>
+                        )}
+                      </td>
                       <td className="text-right">{entry.totalBenchWeeks}</td>
                       <td className="text-right">
                         {Math.round(entry.totalAvailableWeeks)}
