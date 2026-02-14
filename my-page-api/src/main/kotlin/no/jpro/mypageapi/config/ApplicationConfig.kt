@@ -55,7 +55,9 @@ class ApplicationConfig(
                 "/job/generate-notifications",
 // KTU public survey endpoints (accessed via token, not authentication)
                 "/ktu/survey/**",
-                "/ktu/public/**"
+                "/ktu/public/**",
+                // Temporary: one-time bench data import (remove after import)
+                "/admin/bench-import"
             )
 
             // Add development-only endpoints if in local/h2 profile
@@ -70,7 +72,8 @@ class ApplicationConfig(
                     "/sales-activities", "/sales-activities/**",
                     "/sales-pipeline", "/sales-pipeline/**",
                     "/flowcase", "/flowcase/**",
-                    "/consultant-availability", "/consultant-availability/**"
+                    "/consultant-availability", "/consultant-availability/**",
+                    "/admin/bench-import"
                 ))
             }
 

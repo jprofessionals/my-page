@@ -2,6 +2,7 @@ package no.jpro.mypageapi.service
 
 import no.jpro.mypageapi.entity.ActivityStatus
 import no.jpro.mypageapi.entity.AvailabilityHistory
+import no.jpro.mypageapi.entity.InvoluntaryBenchData
 import no.jpro.mypageapi.entity.AvailabilityStatus
 import no.jpro.mypageapi.entity.ClosedReason
 import no.jpro.mypageapi.entity.ConsultantAvailability
@@ -1726,5 +1727,104 @@ class SalesPipelineService(
         }
 
         return totalBenchDays / 5.0
+    }
+
+    // ==================== Historical Bench Data Import ====================
+
+    data class HistoricalBenchImportEntry(
+        val consultantName: String,
+        val year: Int,
+        val benchMonths: Double,
+        val firstActiveMonth: Int = 1,
+        val lastActiveMonth: Int = 12
+    )
+
+    data class BenchImportResult(
+        val imported: Int,
+        val skipped: List<String>,
+        val errors: List<String>,
+        val details: List<String>
+    )
+
+    @Transactional
+    fun importHistoricalBenchData(entries: List<HistoricalBenchImportEntry>, dryRun: Boolean = true): BenchImportResult {
+        val skipped = mutableListOf<String>()
+        val errors = mutableListOf<String>()
+        val details = mutableListOf<String>()
+        var imported = 0
+
+        val allUsers = userRepository.findAll()
+        val weeksPerFullMonth = 4.33
+
+        for (entry in entries) {
+            if (entry.benchMonths <= 0.0) continue
+
+            // Resolve user: exact name match, then fuzzy by last name
+            var user = allUsers.find { it.name.equals(entry.consultantName, ignoreCase = true) }
+            if (user == null) {
+                val lastName = entry.consultantName.trim().split(" ").last()
+                val candidates = allUsers.filter {
+                    it.familyName.equals(lastName, ignoreCase = true) ||
+                    it.name?.contains(lastName, ignoreCase = true) == true
+                }
+                if (candidates.size == 1) {
+                    user = candidates.first()
+                    details.add("Fuzzy matched '${entry.consultantName}' → '${user.name}' (id=${user.id})")
+                } else if (candidates.size > 1) {
+                    errors.add("Multiple matches for '${entry.consultantName}': ${candidates.map { "${it.name} (id=${it.id})" }}")
+                    continue
+                } else {
+                    errors.add("User not found: '${entry.consultantName}'")
+                    continue
+                }
+            }
+
+            // Place bench in consecutive months starting from firstActiveMonth
+            val startMonth = entry.firstActiveMonth.coerceIn(1, 12)
+            val endMonth = entry.lastActiveMonth.coerceIn(startMonth, 12)
+            val fullMonths = entry.benchMonths.toInt()
+            val remainder = entry.benchMonths - fullMonths
+
+            val monthEntries = mutableListOf<Pair<Int, Double>>()
+            for (m in 0 until fullMonths) {
+                val month = startMonth + m
+                if (month > endMonth) break
+                monthEntries.add(month to weeksPerFullMonth)
+            }
+            if (remainder > 0.0) {
+                val month = startMonth + fullMonths
+                if (month <= endMonth) {
+                    monthEntries.add(month to (remainder * weeksPerFullMonth))
+                }
+            }
+
+            for ((month, benchWeeks) in monthEntries) {
+                val monthStr = String.format("%d-%02d", entry.year, month)
+
+                val existing = involuntaryBenchDataRepository.findByConsultantIdAndMonth(user.id!!, monthStr)
+                if (existing != null) {
+                    skipped.add("${user.name} ${monthStr} already exists")
+                    continue
+                }
+
+                if (!dryRun) {
+                    val benchData = InvoluntaryBenchData(
+                        consultant = user,
+                        month = monthStr,
+                        benchWeeks = benchWeeks,
+                        isImported = true
+                    )
+                    involuntaryBenchDataRepository.save(benchData)
+                }
+                imported++
+            }
+
+            val totalWeeks = monthEntries.sumOf { it.second }
+            val monthRange = if (monthEntries.isNotEmpty())
+                "mnd ${monthEntries.first().first}-${monthEntries.last().first}" else "ingen"
+            details.add("${user.name} (${entry.year}): ${entry.benchMonths} mnd bench → $monthRange, ${String.format("%.2f", totalWeeks)} ukeverk")
+        }
+
+        return BenchImportResult(imported, skipped, errors, details)
     }
 }
