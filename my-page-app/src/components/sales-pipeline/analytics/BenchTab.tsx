@@ -122,27 +122,27 @@ export default function BenchTab() {
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="#374151"
+                    stroke="#d1d5db"
                     horizontal={false}
                   />
                   <XAxis
                     type="number"
-                    stroke="#9ca3af"
+                    stroke="#6b7280"
                     fontSize={12}
                     label={{
                       value: 'Dager',
                       position: 'insideBottom',
                       offset: -5,
-                      fill: '#9ca3af',
+                      fill: '#6b7280',
                     }}
                   />
                   <YAxis
                     type="category"
                     dataKey="name"
-                    stroke="#9ca3af"
+                    stroke="#6b7280"
                     fontSize={12}
                     width={120}
-                    tick={{ fill: '#d1d5db' }}
+                    tick={{ fill: '#374151' }}
                   />
                   <Tooltip
                     contentStyle={{
@@ -300,21 +300,21 @@ export default function BenchTab() {
             <>
               <ResponsiveContainer width="100%" height={350}>
                 <LineChart data={trendChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
                   <XAxis
                     dataKey="month"
-                    stroke="#9ca3af"
+                    stroke="#6b7280"
                     fontSize={12}
-                    tick={{ fill: '#d1d5db' }}
+                    tick={{ fill: '#374151' }}
                   />
                   <YAxis
-                    stroke="#9ca3af"
+                    stroke="#6b7280"
                     fontSize={12}
                     label={{
                       value: 'Ukeverk',
                       angle: -90,
                       position: 'insideLeft',
-                      fill: '#9ca3af',
+                      fill: '#6b7280',
                     }}
                   />
                   <Tooltip
