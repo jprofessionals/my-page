@@ -218,7 +218,54 @@ export default function BenchTab() {
         )}
       </div>
 
-      {/* Section 2: Ufrivillig lediggang over tid */}
+      {/* Section 2: Ufrivillig lediggang per år */}
+      {analytics.yearlyBenchSummary.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">
+            Ufrivillig lediggang per år
+          </h2>
+          <div className="bg-base-200 rounded-lg p-4">
+            <div className="overflow-x-auto">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>År</th>
+                    <th className="text-right">Lediggang (ukeverk)</th>
+                    <th className="text-right">Tilgjengelig (ukeverk)</th>
+                    <th className="text-right">Andel</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {analytics.yearlyBenchSummary.map((entry) => (
+                    <tr key={entry.year}>
+                      <td className="font-medium">{entry.year}</td>
+                      <td className="text-right">{entry.totalBenchWeeks}</td>
+                      <td className="text-right">
+                        {Math.round(entry.totalAvailableWeeks)}
+                      </td>
+                      <td className="text-right">
+                        <span
+                          className={
+                            entry.benchPercentage > 5
+                              ? 'text-error font-semibold'
+                              : entry.benchPercentage > 2
+                                ? 'text-warning'
+                                : 'text-success'
+                          }
+                        >
+                          {entry.benchPercentage}%
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Section 3: Ufrivillig lediggang over tid */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">

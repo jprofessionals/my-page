@@ -7040,9 +7040,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MonthlyInvoluntaryBench'
+        yearlyBenchSummary:
+          type: array
+          items:
+            $ref: '#/components/schemas/YearlyBenchSummary'
       required:
         - currentBenchDuration
         - involuntaryBenchTrend
+        - yearlyBenchSummary
 
     CurrentBenchConsultant:
       type: object
@@ -7075,6 +7080,29 @@ components:
         - month
         - totalBenchWeeks
         - isCalculated
+
+    YearlyBenchSummary:
+      type: object
+      properties:
+        year:
+          type: integer
+        totalBenchWeeks:
+          type: number
+          format: double
+          description: Total involuntary bench weeks for the year
+        totalAvailableWeeks:
+          type: number
+          format: double
+          description: Total available consultant-weeks for the year
+        benchPercentage:
+          type: number
+          format: double
+          description: Involuntary bench as percentage of available time
+      required:
+        - year
+        - totalBenchWeeks
+        - totalAvailableWeeks
+        - benchPercentage
 
     # KTU (Customer Satisfaction Survey) Schemas
 

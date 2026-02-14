@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="300.018-1" author="JProfessionals">
+        <comment>Create yearly_consultant_capacity table for tracking total available consultant-weeks per year</comment>
+        <createTable tableName="yearly_consultant_capacity">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="year" type="INT">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="total_available_weeks" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="300.018-2" author="JProfessionals">
+        <comment>Populate yearly consultant capacity from employee data (2019-2025)</comment>
+        <insert tableName="yearly_consultant_capacity">
+            <column name="year" valueNumeric="2019"/>
+            <column name="total_available_weeks" valueNumeric="1740.7"/>
+        </insert>
+        <insert tableName="yearly_consultant_capacity">
+            <column name="year" valueNumeric="2020"/>
+            <column name="total_available_weeks" valueNumeric="2231.1"/>
+        </insert>
+        <insert tableName="yearly_consultant_capacity">
+            <column name="year" valueNumeric="2021"/>
+            <column name="total_available_weeks" valueNumeric="2611.0"/>
+        </insert>
+        <insert tableName="yearly_consultant_capacity">
+            <column name="year" valueNumeric="2022"/>
+            <column name="total_available_weeks" valueNumeric="3133.3"/>
+        </insert>
+        <insert tableName="yearly_consultant_capacity">
+            <column name="year" valueNumeric="2023"/>
+            <column name="total_available_weeks" valueNumeric="3485.7"/>
+        </insert>
+        <insert tableName="yearly_consultant_capacity">
+            <column name="year" valueNumeric="2024"/>
+            <column name="total_available_weeks" valueNumeric="3243.2"/>
+        </insert>
+        <insert tableName="yearly_consultant_capacity">
+            <column name="year" valueNumeric="2025"/>
+            <column name="total_available_weeks" valueNumeric="3478.1"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

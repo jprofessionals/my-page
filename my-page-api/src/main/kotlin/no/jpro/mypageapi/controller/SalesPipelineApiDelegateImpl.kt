@@ -30,6 +30,7 @@ import no.jpro.mypageapi.model.BenchAnalytics
 import no.jpro.mypageapi.model.CurrentBenchConsultant
 import no.jpro.mypageapi.model.MonthlyInvoluntaryBench
 import no.jpro.mypageapi.model.MonthlyTrendData
+import no.jpro.mypageapi.model.YearlyBenchSummary
 import no.jpro.mypageapi.model.ClosedReasonCount
 import no.jpro.mypageapi.model.ConsultantActivityStats
 import no.jpro.mypageapi.model.ConsultantWithActivities
@@ -848,6 +849,14 @@ class SalesPipelineApiDelegateImpl(
                     month = entry.month,
                     totalBenchWeeks = entry.totalBenchWeeks,
                     isCalculated = entry.isCalculated
+                )
+            },
+            yearlyBenchSummary = data.yearlyBenchSummary.map { entry ->
+                YearlyBenchSummary(
+                    year = entry.year,
+                    totalBenchWeeks = entry.totalBenchWeeks,
+                    totalAvailableWeeks = entry.totalAvailableWeeks,
+                    benchPercentage = entry.benchPercentage
                 )
             }
         )

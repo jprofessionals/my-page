@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="300.017-1" author="JProfessionals">
+        <comment>Set Lasse Krabye as AVAILABLE since 2025-09-21</comment>
+
+        <!-- Update consultant_availability if exists -->
+        <sql>
+            UPDATE consultant_availability
+            SET status = 'AVAILABLE', available_from = '2025-09-21', updated_at = '2025-09-21 00:00:00', current_customer_id = NULL
+            WHERE consultant_id = (SELECT id FROM user WHERE name = 'Lasse Krabye');
+        </sql>
+
+        <!-- Insert consultant_availability if not exists -->
+        <sql>
+            INSERT INTO consultant_availability (consultant_id, status, available_from, updated_at, display_order)
+            SELECT id, 'AVAILABLE', '2025-09-21', '2025-09-21 00:00:00', 0
+            FROM user WHERE name = 'Lasse Krabye'
+            AND NOT EXISTS (
+                SELECT 1 FROM consultant_availability WHERE consultant_id = (SELECT id FROM user WHERE name = 'Lasse Krabye')
+            );
+        </sql>
+
+        <!-- Insert availability_history entry -->
+        <sql>
+            INSERT INTO availability_history (consultant_id, from_status, to_status, changed_at)
+            SELECT id, 'OCCUPIED', 'AVAILABLE', '2025-09-21 00:00:00'
+            FROM user WHERE name = 'Lasse Krabye'
+            AND NOT EXISTS (
+                SELECT 1 FROM availability_history
+                WHERE consultant_id = (SELECT id FROM user WHERE name = 'Lasse Krabye')
+                AND to_status = 'AVAILABLE'
+                AND changed_at = '2025-09-21 00:00:00'
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="300.017-2" author="JProfessionals">
+        <comment>Set Runar Bell as AVAILABLE since 2025-12-01</comment>
+
+        <!-- Update consultant_availability if exists -->
+        <sql>
+            UPDATE consultant_availability
+            SET status = 'AVAILABLE', available_from = '2025-12-01', updated_at = '2025-12-01 00:00:00', current_customer_id = NULL
+            WHERE consultant_id = (SELECT id FROM user WHERE name = 'Runar Bell');
+        </sql>
+
+        <!-- Insert consultant_availability if not exists -->
+        <sql>
+            INSERT INTO consultant_availability (consultant_id, status, available_from, updated_at, display_order)
+            SELECT id, 'AVAILABLE', '2025-12-01', '2025-12-01 00:00:00', 0
+            FROM user WHERE name = 'Runar Bell'
+            AND NOT EXISTS (
+                SELECT 1 FROM consultant_availability WHERE consultant_id = (SELECT id FROM user WHERE name = 'Runar Bell')
+            );
+        </sql>
+
+        <!-- Insert availability_history entry -->
+        <sql>
+            INSERT INTO availability_history (consultant_id, from_status, to_status, changed_at)
+            SELECT id, 'OCCUPIED', 'AVAILABLE', '2025-12-01 00:00:00'
+            FROM user WHERE name = 'Runar Bell'
+            AND NOT EXISTS (
+                SELECT 1 FROM availability_history
+                WHERE consultant_id = (SELECT id FROM user WHERE name = 'Runar Bell')
+                AND to_status = 'AVAILABLE'
+                AND changed_at = '2025-12-01 00:00:00'
+            );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

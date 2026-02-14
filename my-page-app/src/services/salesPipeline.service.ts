@@ -421,4 +421,5 @@ export type {
   BenchAnalyticsReadable as BenchAnalytics,
   CurrentBenchConsultantReadable as CurrentBenchConsultant,
   MonthlyInvoluntaryBench,
+  YearlyBenchSummary,
 } from '@/data/types/types.gen'

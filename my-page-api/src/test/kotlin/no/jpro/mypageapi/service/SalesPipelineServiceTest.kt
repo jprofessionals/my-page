@@ -19,6 +19,7 @@ import no.jpro.mypageapi.repository.SalesActivityRepository
 import no.jpro.mypageapi.repository.SalesStageHistoryRepository
 import no.jpro.mypageapi.repository.SettingsRepository
 import no.jpro.mypageapi.repository.UserRepository
+import no.jpro.mypageapi.repository.YearlyConsultantCapacityRepository
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -63,6 +64,9 @@ class SalesPipelineServiceTest {
     @Mock
     private lateinit var involuntaryBenchDataRepository: InvoluntaryBenchDataRepository
 
+    @Mock
+    private lateinit var yearlyConsultantCapacityRepository: YearlyConsultantCapacityRepository
+
     private lateinit var salesPipelineService: SalesPipelineService
 
     @BeforeEach
@@ -77,7 +81,8 @@ class SalesPipelineServiceTest {
             settingsRepository,
             userRepository,
             customerRepository,
-            involuntaryBenchDataRepository
+            involuntaryBenchDataRepository,
+            yearlyConsultantCapacityRepository
         )
     }
 

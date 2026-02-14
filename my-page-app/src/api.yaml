@@ -4827,7 +4827,7 @@ components:
         name:
           type: string
           description: The name of a customer
-          example: 'Skatteetaten'
+          example: "Skatteetaten"
         exclusive:
           type: boolean
           description: Whether the customer demands exclusive applications
@@ -4872,7 +4872,7 @@ components:
         title:
           type: string
           description: The title of a job posting
-          example: 'Software Engineer'
+          example: "Software Engineer"
         customer:
           $ref: '#/components/schemas/Customer'
         urgent:
@@ -4889,11 +4889,11 @@ components:
           type: string
           format: date-time
           description: The deadline for submitting applications
-          example: '2024-10-09T12:00:00+02:00'
+          example: "2024-10-09T12:00:00+02:00"
         description:
           type: string
           description: The description of the job posting
-          example: 'Skatteetaten leter etter en dyktig Kotlin-utvikler'
+          example: "Skatteetaten leter etter en dyktig Kotlin-utvikler"
         tags:
           $ref: '#/components/schemas/Tags'
         links:
@@ -4903,19 +4903,19 @@ components:
             type: string
             format: uri
           example:
-            - 'https://example.com/link1'
-            - 'https://example.com/link2'
+            - "https://example.com/link1"
+            - "https://example.com/link2"
         created_date:
           type: string
           format: date-time
           description: The date the job posting was created
-          example: '2024-10-09T12:00:00+02:00'
+          example: "2024-10-09T12:00:00+02:00"
         updated_at:
           type: string
           format: date-time
           nullable: true
           description: The date the job posting was last updated
-          example: '2024-10-10T14:30:00+02:00'
+          example: "2024-10-10T14:30:00+02:00"
         source:
           $ref: '#/components/schemas/JobPostingSource'
         estimated_hourly_rate:
@@ -4928,7 +4928,7 @@ components:
           type: string
           nullable: true
           description: Location of the position (e.g. Oslo, Remote, Hybrid)
-          example: 'Oslo'
+          example: "Oslo"
         intermediary:
           type: string
           nullable: true
@@ -4937,7 +4937,7 @@ components:
             - For BROKER: The broker company name
             - For SUPPLIER: The supplier company name
             - For FRAMEWORK_SUBCONTRACTOR: The company holding the framework agreement
-          example: 'Experis'
+          example: "Experis"
       required:
         - id
         - title
@@ -4970,16 +4970,16 @@ components:
         blobId:
           type: string
           description: The unique ID of the blob
-          example: 'abc123'
+          example: "abc123"
         name:
           type: string
           description: File name
-          example: 'utlysning.pdf'
+          example: "utlysning.pdf"
         url:
           type: string
           format: uri
           description: URL of the file
-          example: 'https://www.myfile.no/utlysning.pdf'
+          example: "https://www.myfile.no/utlysning.pdf"
       required:
         - blobId
         - name
@@ -5006,7 +5006,7 @@ components:
               month:
                 type: string
                 description: Month in YYYY-MM format
-                example: '2024-06'
+                example: "2024-06"
               javaKotlin:
                 type: integer
                 description: Number of Java/Kotlin job postings
@@ -5078,7 +5078,7 @@ components:
         name:
           type: string
           description: The name of the tag
-          example: 'Kotlin'
+          example: "Kotlin"
       required:
         - id
         - name
@@ -5893,18 +5893,7 @@ components:
 
     ClosedReason:
       type: string
-      enum:
-        [
-          REJECTED_BY_SUPPLIER,
-          REJECTED_BY_CUSTOMER,
-          MISSING_REQUIREMENTS,
-          LOST_AT_SUPPLIER,
-          LOST_AT_CUSTOMER,
-          ASSIGNMENT_CANCELLED,
-          CONSULTANT_UNAVAILABLE,
-          CONSULTANT_WON_OTHER,
-          OTHER,
-        ]
+      enum: [REJECTED_BY_SUPPLIER, REJECTED_BY_CUSTOMER, MISSING_REQUIREMENTS, LOST_AT_SUPPLIER, LOST_AT_CUSTOMER, ASSIGNMENT_CANCELLED, CONSULTANT_UNAVAILABLE, CONSULTANT_WON_OTHER, OTHER]
       description: Reason why a sales activity was closed
 
     CustomerSector:
@@ -6684,7 +6673,7 @@ components:
         month:
           type: string
           description: Month in format YYYY-MM
-          example: '2024-11'
+          example: "2024-11"
         created:
           type: integer
           description: Number of sales activities created this month (job postings we responded to)
@@ -7051,9 +7040,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MonthlyInvoluntaryBench'
+        yearlyBenchSummary:
+          type: array
+          items:
+            $ref: '#/components/schemas/YearlyBenchSummary'
       required:
         - currentBenchDuration
         - involuntaryBenchTrend
+        - yearlyBenchSummary
 
     CurrentBenchConsultant:
       type: object
@@ -7086,6 +7080,29 @@ components:
         - month
         - totalBenchWeeks
         - isCalculated
+
+    YearlyBenchSummary:
+      type: object
+      properties:
+        year:
+          type: integer
+        totalBenchWeeks:
+          type: number
+          format: double
+          description: Total involuntary bench weeks for the year
+        totalAvailableWeeks:
+          type: number
+          format: double
+          description: Total available consultant-weeks for the year
+        benchPercentage:
+          type: number
+          format: double
+          description: Involuntary bench as percentage of available time
+      required:
+        - year
+        - totalBenchWeeks
+        - totalAvailableWeeks
+        - benchPercentage
 
     # KTU (Customer Satisfaction Survey) Schemas
 
