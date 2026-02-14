@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="300.019-1" author="JProfessionals">
+        <comment>Fix Lasse Krabye: remove incorrect AVAILABLE history entries after 2025-09-21</comment>
+        <sql>
+            DELETE FROM availability_history
+            WHERE consultant_id = (SELECT id FROM user WHERE name = 'Lasse Krabye')
+            AND to_status = 'AVAILABLE'
+            AND changed_at > '2025-09-21 00:00:00';
+        </sql>
+    </changeSet>
+
+    <changeSet id="300.019-2" author="JProfessionals">
+        <comment>Fix Runar Bell: remove incorrect AVAILABLE history entries after 2025-12-01</comment>
+        <sql>
+            DELETE FROM availability_history
+            WHERE consultant_id = (SELECT id FROM user WHERE name = 'Runar Bell')
+            AND to_status = 'AVAILABLE'
+            AND changed_at > '2025-12-01 00:00:00';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
