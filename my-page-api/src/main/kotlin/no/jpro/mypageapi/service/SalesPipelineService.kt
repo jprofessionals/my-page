@@ -1815,7 +1815,7 @@ class SalesPipelineService(
 
         var totalWeeks = 0.0
         for (user in allRelevantUsers) {
-            val startDate = user.startDate ?: continue
+            val startDate = user.startDate ?: yearStart // Assume active since start of year if unknown
             if (startDate.isAfter(cutoff)) continue
 
             val effectiveStart = if (startDate.isBefore(yearStart)) yearStart else startDate
