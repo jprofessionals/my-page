@@ -29,5 +29,6 @@ data class User(
     val admin: Boolean = false,
     @OneToMany(mappedBy = "user")
     val budgets: List<Budget>,
-    val enabled: Boolean = true
+    val enabled: Boolean = true,
+    val disabledAt: LocalDate? = null
 )

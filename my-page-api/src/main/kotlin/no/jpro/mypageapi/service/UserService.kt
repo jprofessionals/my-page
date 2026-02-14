@@ -102,7 +102,10 @@ class UserService(
     @Transactional
     fun updateActive(email: String, isActive: Boolean): User {
         val user = getValidUserByEmail(email)
-        return userRepository.save(user.copy(enabled = isActive))
+        return userRepository.save(user.copy(
+            enabled = isActive,
+            disabledAt = if (!isActive) LocalDate.now() else null
+        ))
     }
 
     fun findUserByEmailAndConnect(jwt: Jwt): User? {

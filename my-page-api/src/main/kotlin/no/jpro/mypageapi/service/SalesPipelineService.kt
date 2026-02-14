@@ -1687,12 +1687,23 @@ class SalesPipelineService(
         val importedByYearMonth = allImportedData.groupBy { it.month }
             .mapValues { (_, entries) -> entries.sumOf { it.benchWeeks } }
 
-        val yearlyBenchSummary = capacities.keys.sorted().map { year ->
-            val capacity = capacities[year]!!
-            var totalBenchWeeks = 0.0
+        // Include current year even if no pre-calculated capacity exists
+        val currentYear = now.year
+        val yearsToProcess = (capacities.keys + currentYear).distinct().sorted()
 
-            // Sum bench weeks for each month in this year
-            for (m in 1..12) {
+        val yearlyBenchSummary = yearsToProcess.map { year ->
+            val totalAvailableWeeks = if (capacities.containsKey(year)) {
+                capacities[year]!!.totalAvailableWeeks
+            } else {
+                // Calculate capacity dynamically for current/future years
+                calculateAvailableWeeksForYear(year, now)
+            }
+
+            var totalBenchWeeks = 0.0
+            val lastMonth = if (year == currentYear) now.monthValue else 12
+
+            // Sum bench weeks for each month in this year (up to current month for current year)
+            for (m in 1..lastMonth) {
                 val monthStr = "$year-${m.toString().padStart(2, '0')}"
                 val imported = importedByYearMonth[monthStr]
                 if (imported != null) {
@@ -1714,14 +1725,14 @@ class SalesPipelineService(
             }
 
             totalBenchWeeks = Math.round(totalBenchWeeks * 10.0) / 10.0
-            val percentage = if (capacity.totalAvailableWeeks > 0) {
-                Math.round(totalBenchWeeks / capacity.totalAvailableWeeks * 1000.0) / 10.0
+            val percentage = if (totalAvailableWeeks > 0) {
+                Math.round(totalBenchWeeks / totalAvailableWeeks * 1000.0) / 10.0
             } else 0.0
 
             YearlyBenchSummaryData(
                 year = year,
                 totalBenchWeeks = totalBenchWeeks,
-                totalAvailableWeeks = capacity.totalAvailableWeeks,
+                totalAvailableWeeks = Math.round(totalAvailableWeeks * 10.0) / 10.0,
                 benchPercentage = percentage
             )
         }
@@ -1785,6 +1796,37 @@ class SalesPipelineService(
         }
 
         return totalBenchDays / 5.0
+    }
+
+    /**
+     * Calculate total available consultant-weeks for a year up to a given date.
+     * Uses all users (enabled + disabled with disabledAt) and their start/end dates.
+     */
+    private fun calculateAvailableWeeksForYear(year: Int, upTo: LocalDateTime): Double {
+        val yearStart = LocalDate.of(year, 1, 1)
+        val yearEnd = LocalDate.of(year, 12, 31)
+        val cutoff = if (upTo.toLocalDate().isBefore(yearEnd)) upTo.toLocalDate() else yearEnd
+
+        // Include both enabled users and disabled users who were active during this year
+        val enabledUsers = userRepository.findByEnabled(true)
+        val disabledUsers = userRepository.findByEnabled(false)
+            .filter { it.disabledAt != null && !it.disabledAt.isBefore(yearStart) }
+        val allRelevantUsers = enabledUsers + disabledUsers
+
+        var totalWeeks = 0.0
+        for (user in allRelevantUsers) {
+            val startDate = user.startDate ?: continue
+            if (startDate.isAfter(cutoff)) continue
+
+            val effectiveStart = if (startDate.isBefore(yearStart)) yearStart else startDate
+            val effectiveEnd = if (user.disabledAt != null && user.disabledAt.isBefore(cutoff)) user.disabledAt else cutoff
+            val weeks = ChronoUnit.WEEKS.between(effectiveStart, effectiveEnd).toDouble()
+            if (weeks > 0) {
+                totalWeeks += weeks
+            }
+        }
+
+        return totalWeeks
     }
 
 }

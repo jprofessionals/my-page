@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="300.020-1" author="JProfessionals">
+        <comment>Add disabled_at column to user table for tracking when employees left</comment>
+        <addColumn tableName="user">
+            <column name="disabled_at" type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="300.020-2" author="JProfessionals">
+        <comment>Backfill disabled_at for known former employees</comment>
+        <sql>UPDATE user SET disabled_at = '2009-02-01' WHERE name = 'Jon Anders Teigen' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2018-01-01' WHERE name = 'Gunnar Reinseth' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2016-01-01' WHERE name = 'Christine Teig' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2024-01-31' WHERE name = 'Christian Wiik' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2016-04-01' WHERE name = 'Naimdjon Takhirov' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2017-04-01' WHERE name = 'Morten Kristiansen' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2020-08-01' WHERE name = 'Håvard Bjåstad' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2016-08-01' WHERE name = 'Tia Firing' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2025-07-01' WHERE name = 'Geir Inge Høsteng' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2022-12-01' WHERE name = 'Steve Murphy' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2023-12-31' WHERE name = 'Pål Jødahl' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2023-08-01' WHERE name = 'Skjalg Bjørndal' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2023-12-31' WHERE name = 'Dejan Maric' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2024-12-31' WHERE name = 'Shahariar Bhuiyan' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2023-12-08' WHERE name = 'Marius Kluften' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2023-12-31' WHERE name = 'Anndrea Jørgensen Drivdahl' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2025-05-01' WHERE name = 'Roger Slaaen' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2025-09-01' WHERE name = 'Veronika Log' AND enabled = false;</sql>
+        <sql>UPDATE user SET disabled_at = '2025-05-11' WHERE name = 'Viktor Kjartansson' AND enabled = false;</sql>
+    </changeSet>
+
+</databaseChangeLog>
