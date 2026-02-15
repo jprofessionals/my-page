@@ -130,6 +130,11 @@ export default function BenchTab() {
   const { yoyChartData, yoyYears } = useMemo(() => {
     if (!yoyAnalytics) return { yoyChartData: [], yoyYears: [] }
 
+    // Only include years that appear in yearlyBenchSummary (years with real data)
+    const validYears = new Set(
+      yoyAnalytics.yearlyBenchSummary.map((s) => s.year),
+    )
+
     // Group by month number, with each year as a separate key
     const byMonth: Record<number, Record<string, number>> = {}
     const years = new Set<number>()
@@ -137,6 +142,7 @@ export default function BenchTab() {
     for (const entry of yoyAnalytics.involuntaryBenchTrend) {
       const [yearStr, monthStr] = entry.month.split('-')
       const year = parseInt(yearStr)
+      if (!validYears.has(year)) continue
       const monthIdx = parseInt(monthStr) - 1
       years.add(year)
       if (!byMonth[monthIdx]) byMonth[monthIdx] = {}
