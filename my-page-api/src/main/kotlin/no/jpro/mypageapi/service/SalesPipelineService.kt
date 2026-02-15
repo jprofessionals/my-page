@@ -1824,10 +1824,14 @@ class SalesPipelineService(
      * Calculate total available consultant-weeks for a period.
      * Uses all users (enabled + disabled with disabledAt) and their start/end dates.
      */
+    /**
+     * Calculate total available consultant-weeks for a period.
+     * Only counts users marked as consultants (consultant=true).
+     */
     private fun calculateAvailableWeeksForPeriod(periodStart: LocalDate, periodEnd: LocalDate): Double {
-        val enabledUsers = userRepository.findByEnabled(true)
+        val enabledUsers = userRepository.findByEnabled(true).filter { it.consultant }
         val disabledUsers = userRepository.findByEnabled(false)
-            .filter { it.disabledAt != null && !it.disabledAt.isBefore(periodStart) }
+            .filter { it.consultant && it.disabledAt != null && !it.disabledAt.isBefore(periodStart) }
         val allRelevantUsers = enabledUsers + disabledUsers
 
         var totalDays = 0L

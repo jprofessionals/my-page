@@ -30,5 +30,6 @@ data class User(
     @OneToMany(mappedBy = "user")
     val budgets: List<Budget>,
     val enabled: Boolean = true,
-    val disabledAt: LocalDate? = null
+    val disabledAt: LocalDate? = null,
+    val consultant: Boolean = true
 )

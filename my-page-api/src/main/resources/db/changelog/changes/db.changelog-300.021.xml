@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="300.021-1" author="JProfessionals">
+        <comment>Add consultant column to user table (default true, most users are consultants)</comment>
+        <addColumn tableName="user">
+            <column name="consultant" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="300.021-2" author="JProfessionals">
+        <comment>Mark admin/non-consultant users</comment>
+        <sql>UPDATE user SET consultant = false WHERE email = 'steinar@jpro.no';</sql>
+        <sql>UPDATE user SET consultant = false WHERE email = 'hege@jpro.no';</sql>
+        <sql>UPDATE user SET consultant = false WHERE email = 'roger@jpro.no';</sql>
+        <sql>UPDATE user SET consultant = false WHERE email = 'christel@jpro.no';</sql>
+        <sql>UPDATE user SET consultant = false WHERE email = 'morten@jpro.no';</sql>
+        <sql>UPDATE user SET consultant = false WHERE email = 'amalie@jpro.no';</sql>
+        <sql>UPDATE user SET consultant = false WHERE email = 'elisabeth@jpro.no';</sql>
+    </changeSet>
+
+    <changeSet id="300.021-3" author="JProfessionals">
+        <comment>Backfill start_date for all users from employee records</comment>
+        <sql>UPDATE user SET start_date = '2001-09-01' WHERE email = 'runar@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2001-09-01' WHERE email = 'ingebrigt@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2006-01-01' WHERE email = 'rune@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2006-01-01' WHERE email = 'steinar@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2007-02-01' WHERE email = 'oj@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2008-03-01' WHERE email = 'aase@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2009-02-01' WHERE email = 'rorchr@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2011-02-01' WHERE email = 'magnus@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2011-02-01' WHERE email = 'hp@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2011-02-01' WHERE email = 'frode@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2011-09-01' WHERE email = 'tore@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2013-03-01' WHERE email = 'robert@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2013-07-01' WHERE email = 'ckw@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2013-09-01' WHERE email = 'frodery@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2015-01-01' WHERE email = 'kenove@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2015-09-01' WHERE email = 'oystein@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2016-01-01' WHERE email = 'georg@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2016-01-01' WHERE email = 'joar@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2016-04-01' WHERE email = 'lo@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2017-02-01' WHERE email = 'janerik@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2017-02-01' WHERE email = 'audun@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2017-04-01' WHERE email = 'annemarte@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2017-08-01' WHERE email = 'geir.inge@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2017-08-01' WHERE email = 'steve@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2017-11-01' WHERE email = 'jonathan@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2018-04-01' WHERE email = 'david@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-01-01' WHERE email = 'kristian@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-03-01' WHERE email = 'petter@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-04-01' WHERE email = 'michael@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-04-01' WHERE email = 'line@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-05-01' WHERE email = 'geoffrey@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-06-01' WHERE email = 'pal@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-06-01' WHERE email = 'rune.offerdal@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-09-01' WHERE email = 'lasse@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-09-01' WHERE email = 'frederik@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-09-01' WHERE email = 'skjalg@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-10-01' WHERE email = 'havard.andersen@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2019-12-01' WHERE email = 'erling@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2020-01-01' WHERE email = 'anton@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2020-02-01' WHERE email = 'thomas@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2020-05-01' WHERE email = 'artur@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2020-05-01' WHERE email = 'espen@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2020-05-01' WHERE email = 'trygve@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2020-11-01' WHERE email = 'thomasarp@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2020-11-23' WHERE email = 'hege@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2020-12-01' WHERE email = 'sverre@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2021-02-01' WHERE email = 'dejan@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2021-03-01' WHERE email = 'bent@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2021-06-01' WHERE email = 'gbergem@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2021-06-01' WHERE email = 'iver@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2021-07-01' WHERE email = 'bjornaron@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2021-09-01' WHERE email = 'petterruud@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2021-09-01' WHERE email = 'erlend@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2021-11-01' WHERE email = 'arild@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2022-01-01' WHERE email = 'olekristian@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2022-02-01' WHERE email = 'ivar@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2022-03-01' WHERE email = 'thore@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2022-04-01' WHERE email = 'ingleiv@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2022-04-01' WHERE email = 'roger@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2022-06-01' WHERE email = 'shahariar@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2022-09-01' WHERE email = 'anders@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2022-09-01' WHERE email = 'matthew@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2022-09-12' WHERE email = 'christel@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2022-10-01' WHERE email = 'greger@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2022-10-01' WHERE email = 'terje@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2023-03-01' WHERE email = 'fredrik@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2023-03-01' WHERE email = 'marius.kluften@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2023-05-01' WHERE email = 'bram@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2023-05-01' WHERE email = 'frodegill@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2023-05-01' WHERE email = 'susanne@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2023-09-01' WHERE email = 'anndrea@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2024-12-01' WHERE email = 'tobias@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2025-01-01' WHERE email = 'truls@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2025-01-01' WHERE email = 'magnus.a@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2025-03-01' WHERE email = 'morten@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2025-03-01' WHERE email = 'veronika@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2025-04-01' WHERE email = 'viktor@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2025-04-23' WHERE email = 'amalie@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2025-05-01' WHERE email = 'marius@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2025-09-01' WHERE email = 'karina@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2025-09-01' WHERE email = 'elisa@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2025-09-01' WHERE email = 'bjornaron@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2026-01-01' WHERE email = 'olve@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2026-01-01' WHERE email = 'vlad@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2026-02-01' WHERE email = 'lars@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2026-01-01' WHERE email = 'joachim@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2026-02-01' WHERE email = 'lennart@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2026-03-01' WHERE email = 'elisabeth@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2026-03-01' WHERE email = 'mariusfjeldet@jpro.no' AND start_date IS NULL;</sql>
+        <sql>UPDATE user SET start_date = '2026-04-01' WHERE email = 'stian@jpro.no' AND start_date IS NULL;</sql>
+    </changeSet>
+
+</databaseChangeLog>
