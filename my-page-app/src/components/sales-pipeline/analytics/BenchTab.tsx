@@ -11,6 +11,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
   Cell,
 } from 'recharts'
@@ -24,6 +25,31 @@ const PERIOD_OPTIONS = [
   { value: 12, label: 'Siste 12 mnd' },
   { value: 24, label: 'Siste 2 år' },
 ] as const
+
+const MONTH_LABELS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'Mai',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Okt',
+  'Nov',
+  'Des',
+]
+
+const YEAR_COLORS = [
+  '#6366f1', // indigo
+  '#f59e0b', // amber
+  '#10b981', // emerald
+  '#ef4444', // red
+  '#8b5cf6', // violet
+  '#ec4899', // pink
+  '#14b8a6', // teal
+]
 
 function formatDuration(days: number): string {
   const weeks = Math.floor(days / 7)
@@ -85,6 +111,36 @@ export default function BenchTab() {
       totalBenchWeeks: Math.round(entry.totalBenchWeeks * 10) / 10,
       isCalculated: entry.isCalculated,
     }))
+  }, [analytics])
+
+  const { yoyChartData, yoyYears } = useMemo(() => {
+    if (!analytics) return { yoyChartData: [], yoyYears: [] }
+
+    // Group by month number, with each year as a separate key
+    const byMonth: Record<number, Record<string, number>> = {}
+    const years = new Set<number>()
+
+    for (const entry of analytics.involuntaryBenchTrend) {
+      const [yearStr, monthStr] = entry.month.split('-')
+      const year = parseInt(yearStr)
+      const monthIdx = parseInt(monthStr) - 1
+      years.add(year)
+      if (!byMonth[monthIdx]) byMonth[monthIdx] = {}
+      byMonth[monthIdx][String(year)] = entry.benchPercentage
+    }
+
+    const sortedYears = Array.from(years).sort()
+    const data = Array.from({ length: 12 }, (_, i) => {
+      const row: Record<string, string | number> = { month: MONTH_LABELS[i] }
+      for (const year of sortedYears) {
+        if (byMonth[i]?.[String(year)] !== undefined) {
+          row[String(year)] = byMonth[i][String(year)]
+        }
+      }
+      return row
+    }).filter((row) => Object.keys(row).length > 1)
+
+    return { yoyChartData: data, yoyYears: sortedYears }
   }, [analytics])
 
   if (loading) {
@@ -374,6 +430,60 @@ export default function BenchTab() {
           )}
         </div>
       </div>
+
+      {/* Section 4: År-mot-år sammenligning */}
+      {yoyChartData.length > 0 && yoyYears.length > 1 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">
+            Lediggang per måned – år mot år
+          </h2>
+          <div className="bg-base-200 rounded-lg p-4">
+            <ResponsiveContainer width="100%" height={350}>
+              <LineChart data={yoyChartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
+                <XAxis
+                  dataKey="month"
+                  stroke="#6b7280"
+                  fontSize={12}
+                  tick={{ fill: '#374151' }}
+                />
+                <YAxis
+                  stroke="#6b7280"
+                  fontSize={12}
+                  label={{
+                    value: '%',
+                    angle: -90,
+                    position: 'insideLeft',
+                    fill: '#6b7280',
+                  }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1f2937',
+                    border: 'none',
+                    color: '#f3f4f6',
+                  }}
+                  labelStyle={{ color: '#f3f4f6' }}
+                  itemStyle={{ color: '#f3f4f6' }}
+                  formatter={(value) => [`${value}%`]}
+                />
+                <Legend />
+                {yoyYears.map((year, idx) => (
+                  <Line
+                    key={year}
+                    type="monotone"
+                    dataKey={String(year)}
+                    stroke={YEAR_COLORS[idx % YEAR_COLORS.length]}
+                    strokeWidth={year === new Date().getFullYear() ? 3 : 1.5}
+                    dot={{ r: 3 }}
+                    connectNulls={false}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

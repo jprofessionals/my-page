@@ -7076,10 +7076,15 @@ components:
         isCalculated:
           type: boolean
           description: true if calculated from history, false if imported from CSV
+        benchPercentage:
+          type: number
+          format: double
+          description: Bench weeks as percentage of available capacity for the month
       required:
         - month
         - totalBenchWeeks
         - isCalculated
+        - benchPercentage
 
     YearlyBenchSummary:
       type: object

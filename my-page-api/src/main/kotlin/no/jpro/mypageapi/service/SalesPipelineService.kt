@@ -1594,7 +1594,8 @@ class SalesPipelineService(
     data class MonthlyInvoluntaryBenchData(
         val month: String,
         val totalBenchWeeks: Double,
-        val isCalculated: Boolean
+        val isCalculated: Boolean,
+        val benchPercentage: Double
     )
 
     data class YearlyBenchSummaryData(
@@ -1651,36 +1652,57 @@ class SalesPipelineService(
 
         val involuntaryBenchTrend = mutableListOf<MonthlyInvoluntaryBenchData>()
 
+        // Pre-load yearly capacities for calculating monthly percentages
+        val yearlyCapacities = yearlyConsultantCapacityRepository.findAll().associateBy { it.year }
+
         for (i in 0 until months) {
             val monthStart = now.minusMonths((months - 1 - i).toLong()).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
             val monthEnd = monthStart.plusMonths(1)
             val monthStr = "${monthStart.year}-${monthStart.monthValue.toString().padStart(2, '0')}"
 
+            val benchWeeks: Double
+            val isCalculated: Boolean
+
             val importedValue = importedByMonth[monthStr]
             if (importedValue != null) {
-                involuntaryBenchTrend.add(MonthlyInvoluntaryBenchData(
-                    month = monthStr,
-                    totalBenchWeeks = importedValue,
-                    isCalculated = false
-                ))
+                benchWeeks = importedValue
+                isCalculated = false
             } else {
-                val benchWeeks = calculateInvoluntaryBenchWeeksForMonth(
+                benchWeeks = calculateInvoluntaryBenchWeeksForMonth(
                     consultantsOnBoard = consultantsOnBoard,
                     historyEntries = allHistoryEntries,
                     monthStart = monthStart,
                     monthEnd = monthEnd,
                     availableFromByConsultant = availableFromByConsultant
                 )
-                involuntaryBenchTrend.add(MonthlyInvoluntaryBenchData(
-                    month = monthStr,
-                    totalBenchWeeks = benchWeeks,
-                    isCalculated = true
-                ))
+                isCalculated = true
             }
+
+            // Calculate available weeks for this specific month
+            val monthAvailableWeeks = if (yearlyCapacities.containsKey(monthStart.year)) {
+                // For historical years with pre-calculated yearly capacity, divide by 12
+                yearlyCapacities[monthStart.year]!!.totalAvailableWeeks / 12.0
+            } else {
+                // For current/future years, calculate dynamically for this month
+                val mStart = monthStart.toLocalDate()
+                val mEnd = if (monthEnd.toLocalDate().isAfter(now.toLocalDate())) now.toLocalDate() else monthEnd.toLocalDate()
+                calculateAvailableWeeksForPeriod(mStart, mEnd)
+            }
+
+            val benchPercentage = if (monthAvailableWeeks > 0) {
+                Math.round(benchWeeks / monthAvailableWeeks * 1000.0) / 10.0
+            } else 0.0
+
+            involuntaryBenchTrend.add(MonthlyInvoluntaryBenchData(
+                month = monthStr,
+                totalBenchWeeks = benchWeeks,
+                isCalculated = isCalculated,
+                benchPercentage = benchPercentage
+            ))
         }
 
         // === Part 3: Yearly bench summary with percentage ===
-        val capacities = yearlyConsultantCapacityRepository.findAll().associateBy { it.year }
+        val capacities = yearlyCapacities
 
         // Get ALL imported bench data (not limited by months parameter)
         val allImportedData = involuntaryBenchDataRepository.findAll()
@@ -1799,27 +1821,22 @@ class SalesPipelineService(
     }
 
     /**
-     * Calculate total available consultant-weeks for a year up to a given date.
+     * Calculate total available consultant-weeks for a period.
      * Uses all users (enabled + disabled with disabledAt) and their start/end dates.
      */
-    private fun calculateAvailableWeeksForYear(year: Int, upTo: LocalDateTime): Double {
-        val yearStart = LocalDate.of(year, 1, 1)
-        val yearEnd = LocalDate.of(year, 12, 31)
-        val cutoff = if (upTo.toLocalDate().isBefore(yearEnd)) upTo.toLocalDate() else yearEnd
-
-        // Include both enabled users and disabled users who were active during this year
+    private fun calculateAvailableWeeksForPeriod(periodStart: LocalDate, periodEnd: LocalDate): Double {
         val enabledUsers = userRepository.findByEnabled(true)
         val disabledUsers = userRepository.findByEnabled(false)
-            .filter { it.disabledAt != null && !it.disabledAt.isBefore(yearStart) }
+            .filter { it.disabledAt != null && !it.disabledAt.isBefore(periodStart) }
         val allRelevantUsers = enabledUsers + disabledUsers
 
         var totalWeeks = 0.0
         for (user in allRelevantUsers) {
-            val startDate = user.startDate ?: yearStart // Assume active since start of year if unknown
-            if (startDate.isAfter(cutoff)) continue
+            val startDate = user.startDate ?: periodStart
+            if (startDate.isAfter(periodEnd)) continue
 
-            val effectiveStart = if (startDate.isBefore(yearStart)) yearStart else startDate
-            val effectiveEnd = if (user.disabledAt != null && user.disabledAt.isBefore(cutoff)) user.disabledAt else cutoff
+            val effectiveStart = if (startDate.isBefore(periodStart)) periodStart else startDate
+            val effectiveEnd = if (user.disabledAt != null && user.disabledAt.isBefore(periodEnd)) user.disabledAt else periodEnd
             val weeks = ChronoUnit.WEEKS.between(effectiveStart, effectiveEnd).toDouble()
             if (weeks > 0) {
                 totalWeeks += weeks
@@ -1827,6 +1844,13 @@ class SalesPipelineService(
         }
 
         return totalWeeks
+    }
+
+    private fun calculateAvailableWeeksForYear(year: Int, upTo: LocalDateTime): Double {
+        val yearStart = LocalDate.of(year, 1, 1)
+        val yearEnd = LocalDate.of(year, 12, 31)
+        val cutoff = if (upTo.toLocalDate().isBefore(yearEnd)) upTo.toLocalDate() else yearEnd
+        return calculateAvailableWeeksForPeriod(yearStart, cutoff)
     }
 
 }

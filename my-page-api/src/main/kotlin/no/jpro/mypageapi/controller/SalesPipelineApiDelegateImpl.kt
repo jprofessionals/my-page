@@ -848,7 +848,8 @@ class SalesPipelineApiDelegateImpl(
                 MonthlyInvoluntaryBench(
                     month = entry.month,
                     totalBenchWeeks = entry.totalBenchWeeks,
-                    isCalculated = entry.isCalculated
+                    isCalculated = entry.isCalculated,
+                    benchPercentage = entry.benchPercentage
                 )
             },
             yearlyBenchSummary = data.yearlyBenchSummary.map { entry ->
