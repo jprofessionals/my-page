@@ -485,7 +485,7 @@ export default function BenchTab() {
                   }}
                   labelStyle={{ color: '#f3f4f6' }}
                   itemStyle={{ color: '#f3f4f6' }}
-                  formatter={(value) => [`${value}%`]}
+                  formatter={(value, name) => [`${value}%`, name]}
                 />
                 <Legend />
                 {yoyYears.map((year, idx) => (
