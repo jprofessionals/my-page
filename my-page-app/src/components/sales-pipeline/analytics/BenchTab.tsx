@@ -76,12 +76,17 @@ function getBenchColor(days: number): string {
 
 export default function BenchTab() {
   const [analytics, setAnalytics] = useState<BenchAnalytics | null>(null)
+  const [yoyAnalytics, setYoyAnalytics] = useState<BenchAnalytics | null>(null)
   const [loading, setLoading] = useState(true)
   const [months, setMonths] = useState<number>(12)
 
   useEffect(() => {
     loadData()
   }, [months])
+
+  useEffect(() => {
+    loadYoyData()
+  }, [])
 
   const loadData = async () => {
     setLoading(true)
@@ -93,6 +98,15 @@ export default function BenchTab() {
       toast.error('Kunne ikke laste lediggangsdata')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadYoyData = async () => {
+    try {
+      const data = await salesPipelineService.getBenchAnalytics(120)
+      setYoyAnalytics(data ?? null)
+    } catch (error) {
+      console.error('Failed to load YoY bench data:', error)
     }
   }
 
@@ -114,13 +128,13 @@ export default function BenchTab() {
   }, [analytics])
 
   const { yoyChartData, yoyYears } = useMemo(() => {
-    if (!analytics) return { yoyChartData: [], yoyYears: [] }
+    if (!yoyAnalytics) return { yoyChartData: [], yoyYears: [] }
 
     // Group by month number, with each year as a separate key
     const byMonth: Record<number, Record<string, number>> = {}
     const years = new Set<number>()
 
-    for (const entry of analytics.involuntaryBenchTrend) {
+    for (const entry of yoyAnalytics.involuntaryBenchTrend) {
       const [yearStr, monthStr] = entry.month.split('-')
       const year = parseInt(yearStr)
       const monthIdx = parseInt(monthStr) - 1
@@ -141,7 +155,7 @@ export default function BenchTab() {
     }).filter((row) => Object.keys(row).length > 1)
 
     return { yoyChartData: data, yoyYears: sortedYears }
-  }, [analytics])
+  }, [yoyAnalytics])
 
   if (loading) {
     return (
