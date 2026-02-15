@@ -1830,20 +1830,21 @@ class SalesPipelineService(
             .filter { it.disabledAt != null && !it.disabledAt.isBefore(periodStart) }
         val allRelevantUsers = enabledUsers + disabledUsers
 
-        var totalWeeks = 0.0
+        var totalDays = 0L
         for (user in allRelevantUsers) {
             val startDate = user.startDate ?: periodStart
             if (startDate.isAfter(periodEnd)) continue
 
             val effectiveStart = if (startDate.isBefore(periodStart)) periodStart else startDate
             val effectiveEnd = if (user.disabledAt != null && user.disabledAt.isBefore(periodEnd)) user.disabledAt else periodEnd
-            val weeks = ChronoUnit.WEEKS.between(effectiveStart, effectiveEnd).toDouble()
-            if (weeks > 0) {
-                totalWeeks += weeks
+            val days = ChronoUnit.DAYS.between(effectiveStart, effectiveEnd)
+            if (days > 0) {
+                totalDays += days
             }
         }
 
-        return totalWeeks
+        // Convert to weeks using days/5, consistent with bench weeks calculation
+        return totalDays / 5.0
     }
 
     private fun calculateAvailableWeeksForYear(year: Int, upTo: LocalDateTime): Double {
