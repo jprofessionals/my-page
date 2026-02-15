@@ -98,7 +98,7 @@ export default function BenchTab() {
     }))
   }, [analytics])
 
-  const { yoyChartData, yoyYears } = useMemo(() => {
+  const { yoyChartData, yoyYears, lastCurrentYearMonthLabel } = useMemo(() => {
     if (!analytics) return { yoyChartData: [], yoyYears: [] }
 
     // Only include years that appear in yearlyBenchSummary (years with real data)
@@ -131,7 +131,17 @@ export default function BenchTab() {
       return row
     }).filter((row) => Object.keys(row).length > 1)
 
-    return { yoyChartData: data, yoyYears: sortedYears }
+    // Find last month index with data for the current year
+    const currentYear = new Date().getFullYear()
+    let lastCurrentYearMonthLabel: string | null = null
+    for (let i = 11; i >= 0; i--) {
+      if (data[i]?.[String(currentYear)] !== undefined) {
+        lastCurrentYearMonthLabel = data[i].month as string
+        break
+      }
+    }
+
+    return { yoyChartData: data, yoyYears: sortedYears, lastCurrentYearMonthLabel }
   }, [analytics])
 
   if (loading) {
@@ -362,17 +372,58 @@ export default function BenchTab() {
                   itemSorter={(item) => -(item.value as number)}
                 />
                 <Legend />
-                {yoyYears.map((year, idx) => (
-                  <Line
-                    key={year}
-                    type="monotone"
-                    dataKey={String(year)}
-                    stroke={YEAR_COLORS[idx % YEAR_COLORS.length]}
-                    strokeWidth={year === new Date().getFullYear() ? 3 : 1.5}
-                    dot={{ r: 3 }}
-                    connectNulls={false}
-                  />
-                ))}
+                {yoyYears.map((year, idx) => {
+                  const isCurrentYear = year === new Date().getFullYear()
+                  const color = YEAR_COLORS[idx % YEAR_COLORS.length]
+                  return (
+                    <Line
+                      key={year}
+                      type="monotone"
+                      dataKey={String(year)}
+                      stroke={color}
+                      strokeWidth={isCurrentYear ? 3 : 1.5}
+                      dot={
+                        isCurrentYear
+                          ? (props: Record<string, unknown>) => {
+                              const { cx, cy, payload } = props as {
+                                cx: number
+                                cy: number
+                                payload: Record<string, string | number>
+                              }
+                              const isLastPoint =
+                                payload.month === lastCurrentYearMonthLabel
+                              const dateLabel = new Date().toLocaleDateString(
+                                'nb-NO',
+                                { day: 'numeric', month: 'short' },
+                              )
+                              return (
+                                <g key={`dot-${cx}-${cy}`}>
+                                  <circle
+                                    cx={cx}
+                                    cy={cy}
+                                    r={3}
+                                    fill={color}
+                                  />
+                                  {isLastPoint && (
+                                    <text
+                                      x={cx}
+                                      y={cy - 10}
+                                      textAnchor="middle"
+                                      fill="#9ca3af"
+                                      fontSize={11}
+                                    >
+                                      t.o.m. {dateLabel}
+                                    </text>
+                                  )}
+                                </g>
+                              )
+                            }
+                          : { r: 3 }
+                      }
+                      connectNulls={false}
+                    />
+                  )
+                })}
               </LineChart>
             </ResponsiveContainer>
           </div>
