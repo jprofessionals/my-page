@@ -118,7 +118,7 @@ export default function BenchTab() {
                 <BarChart
                   data={barChartData}
                   layout="vertical"
-                  margin={{ left: 20, right: 20 }}
+                  margin={{ left: 20, right: 20, bottom: 20 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
