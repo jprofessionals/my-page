@@ -15,16 +15,11 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts'
+
 import {
   salesPipelineService,
   type BenchAnalytics,
 } from '@/services/salesPipeline.service'
-
-const PERIOD_OPTIONS = [
-  { value: 6, label: 'Siste 6 mnd' },
-  { value: 12, label: 'Siste 12 mnd' },
-  { value: 24, label: 'Siste 2 år' },
-] as const
 
 const MONTH_LABELS = [
   'Jan',
@@ -76,37 +71,22 @@ function getBenchColor(days: number): string {
 
 export default function BenchTab() {
   const [analytics, setAnalytics] = useState<BenchAnalytics | null>(null)
-  const [yoyAnalytics, setYoyAnalytics] = useState<BenchAnalytics | null>(null)
   const [loading, setLoading] = useState(true)
-  const [months, setMonths] = useState<number>(12)
 
   useEffect(() => {
     loadData()
-  }, [months])
-
-  useEffect(() => {
-    loadYoyData()
   }, [])
 
   const loadData = async () => {
     setLoading(true)
     try {
-      const data = await salesPipelineService.getBenchAnalytics(months)
+      const data = await salesPipelineService.getBenchAnalytics(120)
       setAnalytics(data ?? null)
     } catch (error) {
       console.error('Failed to load bench analytics:', error)
       toast.error('Kunne ikke laste lediggangsdata')
     } finally {
       setLoading(false)
-    }
-  }
-
-  const loadYoyData = async () => {
-    try {
-      const data = await salesPipelineService.getBenchAnalytics(120)
-      setYoyAnalytics(data ?? null)
-    } catch (error) {
-      console.error('Failed to load YoY bench data:', error)
     }
   }
 
@@ -118,28 +98,19 @@ export default function BenchTab() {
     }))
   }, [analytics])
 
-  const trendChartData = useMemo(() => {
-    if (!analytics) return []
-    return analytics.involuntaryBenchTrend.map((entry) => ({
-      month: entry.month,
-      totalBenchWeeks: Math.round(entry.totalBenchWeeks * 10) / 10,
-      isCalculated: entry.isCalculated,
-    }))
-  }, [analytics])
-
   const { yoyChartData, yoyYears } = useMemo(() => {
-    if (!yoyAnalytics) return { yoyChartData: [], yoyYears: [] }
+    if (!analytics) return { yoyChartData: [], yoyYears: [] }
 
     // Only include years that appear in yearlyBenchSummary (years with real data)
     const validYears = new Set(
-      yoyAnalytics.yearlyBenchSummary.map((s) => s.year),
+      analytics.yearlyBenchSummary.map((s) => s.year),
     )
 
     // Group by month number, with each year as a separate key
     const byMonth: Record<number, Record<string, number>> = {}
     const years = new Set<number>()
 
-    for (const entry of yoyAnalytics.involuntaryBenchTrend) {
+    for (const entry of analytics.involuntaryBenchTrend) {
       const [yearStr, monthStr] = entry.month.split('-')
       const year = parseInt(yearStr)
       if (!validYears.has(year)) continue
@@ -161,7 +132,7 @@ export default function BenchTab() {
     }).filter((row) => Object.keys(row).length > 1)
 
     return { yoyChartData: data, yoyYears: sortedYears }
-  }, [yoyAnalytics])
+  }, [analytics])
 
   if (loading) {
     return (
@@ -353,105 +324,7 @@ export default function BenchTab() {
         </div>
       )}
 
-      {/* Section 3: Ufrivillig lediggang over tid */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">
-            Ufrivillig lediggang over tid
-          </h2>
-          <select
-            className="select select-bordered select-sm"
-            value={months}
-            onChange={(e) => setMonths(Number(e.target.value))}
-          >
-            {PERIOD_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="bg-base-200 rounded-lg p-4">
-          {trendChartData.length > 0 ? (
-            <>
-              <ResponsiveContainer width="100%" height={350}>
-                <LineChart data={trendChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
-                  <XAxis
-                    dataKey="month"
-                    stroke="#6b7280"
-                    fontSize={12}
-                    tick={{ fill: '#374151' }}
-                  />
-                  <YAxis
-                    stroke="#6b7280"
-                    fontSize={12}
-                    label={{
-                      value: 'Ukeverk',
-                      angle: -90,
-                      position: 'insideLeft',
-                      fill: '#6b7280',
-                    }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#1f2937',
-                      border: 'none',
-                      color: '#f3f4f6',
-                    }}
-                    labelStyle={{ color: '#f3f4f6' }}
-                    itemStyle={{ color: '#f3f4f6' }}
-                    formatter={(value, _name, props) => [
-                      `${value} ukeverk ${(props.payload as { isCalculated: boolean }).isCalculated ? '(beregnet)' : '(importert)'}`,
-                      'Lediggang',
-                    ]}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="totalBenchWeeks"
-                    stroke="#f59e0b"
-                    strokeWidth={2}
-                    dot={(props) => {
-                      const { cx, cy, payload } = props as {
-                        cx: number
-                        cy: number
-                        payload: { isCalculated: boolean }
-                      }
-                      return (
-                        <circle
-                          key={`dot-${cx}-${cy}`}
-                          cx={cx}
-                          cy={cy}
-                          r={4}
-                          fill={payload.isCalculated ? '#22c55e' : '#3b82f6'}
-                          stroke="none"
-                        />
-                      )
-                    }}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-              <div className="flex gap-4 mt-2 text-xs text-gray-500">
-                <span className="flex items-center gap-1">
-                  <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
-                  Beregnet fra historikk
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-                  Importert data
-                </span>
-              </div>
-            </>
-          ) : (
-            <div className="h-[350px] flex items-center justify-center text-gray-500">
-              Ingen trenddata tilgjengelig
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Section 4: År-mot-år sammenligning */}
+      {/* Section 3: År-mot-år sammenligning */}
       {yoyChartData.length > 0 && yoyYears.length > 1 && (
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">
